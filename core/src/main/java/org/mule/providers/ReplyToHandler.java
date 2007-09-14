@@ -13,7 +13,8 @@ package org.mule.providers;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.transformer.UMOTransformer;
+
+import java.util.List;
 
 /**
  * <code>ReplyToHandler</code> is used to handle routing where a replyTo endpointUri is
@@ -22,9 +23,11 @@ import org.mule.umo.transformer.UMOTransformer;
 
 public interface ReplyToHandler
 {
+
     void processReplyTo(UMOEvent event, UMOMessage returnMessage, Object replyTo) throws UMOException;
 
-    void setTransformer(UMOTransformer transformer);
+    void setTransformers(List transformers);
 
-    UMOTransformer getTransformer();
+    List getTransformers();
+    
 }

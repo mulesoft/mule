@@ -25,6 +25,7 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.CollectionUtils;
 
 import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
@@ -100,11 +101,10 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         UMOEvent event = getTestEvent("UncaughtEvent");
         strategy.setEndpoint((UMOEndpoint)endpoint.proxy());
 
-        endpoint.expectAndReturn("getTransformer", new TestEventTransformer());
-        endpoint.expectAndReturn("getTransformer", new TestEventTransformer());
+        endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
+        endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
-
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expect("send", new Constraint()

@@ -11,6 +11,7 @@
 package org.mule.providers.http;
 
 import org.mule.RegistryContext;
+import org.mule.transformers.TransformerUtils;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -198,8 +199,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_OK);
-            response = (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
-            return response;
+            return transformResponse(response);
         }
 
         protected HttpResponse doGetOrPost(HttpRequest request, RequestLine requestLine) throws IOException, UMOException
@@ -251,7 +251,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 }
                 else
                 {
-                    response = (HttpResponse)connector.getDefaultResponseTransformer().transform(tempResponse);
+                    response = transformResponse(tempResponse);
                 }
                 response.disableKeepAlive(!((HttpConnector)connector).isKeepAlive());
             }
@@ -270,8 +270,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_METHOD_NOT_ALLOWED);
             response.setBodyString(HttpMessages.methodNotAllowed(method).toString() + HttpConstants.CRLF);
-            response = (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
-            return response;
+            return transformResponse(response);
         }
 
         protected HttpResponse doBad(RequestLine requestLine) throws UMOException
@@ -282,8 +281,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
             response.setBodyString(HttpMessages.malformedSyntax().toString() + HttpConstants.CRLF);
-            response = (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
-            return response;
+            return transformResponse(response);
         }
 
         protected UMOMessageAdapter buildStreamingAdapter(HttpRequest request, Map headers) throws MessagingException
@@ -317,9 +315,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     final MuleEvent event = new MuleEvent(new MuleMessage(expected), endpoint,
                             new MuleSession(component), true);
                     RequestContext.setEvent(event);
-                    expected = (HttpResponse)connector.getDefaultResponseTransformer().transform(
-                            expected);
-                    conn.writeResponse(expected);
+                    conn.writeResponse(transformResponse(expected));
                 }
             }
 
@@ -348,7 +344,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             RequestContext.setEvent(new MuleEvent(new MuleMessage(response), endpoint,
                     new MuleSession(component), true));
             // The DefaultResponseTransformer will set the necessary headers
-            return (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
+            return transformResponse(response);
         }
 
         protected Map parseHeaders(HttpRequest request) throws MalformedCookieException
@@ -488,6 +484,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
 
         return receiver;
+    }
+
+    protected HttpResponse transformResponse(Object response) throws TransformerException
+    {
+        return (HttpResponse) TransformerUtils.applyAllTransformersToObject(
+                connector.getDefaultResponseTransformers(), response);
     }
 
 }

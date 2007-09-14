@@ -23,7 +23,7 @@ import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.transformers.TransformerUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -32,6 +32,7 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -44,7 +45,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     protected InetAddress inetAddress;
     protected int bufferSize;
     private URI uri;
-    protected UMOTransformer responseTransformer = null;
+    protected List responseTransformers = null;
 
     public UdpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
             throws CreateException
@@ -68,7 +69,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
             throw new CreateException(UdpMessages.failedToLocateHost(uri), e, this);
         }
 
-        responseTransformer = getResponseTransformer();
+        responseTransformers = getResponseTransformers();
     }
 
     protected void doConnect() throws Exception
@@ -113,14 +114,14 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         // nothing to do
     }
 
-    protected UMOTransformer getResponseTransformer()
+    protected List getResponseTransformers()
     {
-        UMOTransformer transformer = endpoint.getResponseTransformer();
-        if (transformer == null)
+        List transformers = endpoint.getResponseTransformers();
+        if (transformers == null)
         {
-            return connector.getDefaultResponseTransformer();
+            return connector.getDefaultResponseTransformers();
         }
-        return transformer;
+        return transformers;
     }
 
     protected DatagramSocket createSocket(URI uri, InetAddress inetAddress) throws IOException
@@ -260,9 +261,9 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                 if (returnMessage != null)
                 {
                     byte[] data;
-                    if (responseTransformer != null)
+                    if (responseTransformers != null)
                     {
-                        Object response = responseTransformer.transform(returnMessage.getPayload());
+                        Object response = TransformerUtils.applyAllTransformers(responseTransformers, returnMessage);
                         if (response instanceof byte[])
                         {
                             data = (byte[]) response;

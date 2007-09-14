@@ -35,7 +35,7 @@
         <service name="mycomponent">
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
-                <inbound-endpoint address="axis:servlet://mycomponent" responseTransformers="ByteArrayToString">
+                <inbound-endpoint address="axis:servlet://mycomponent" responseTransformer-ref="ByteArrayToString">
                     <acegi:http-security-filter realm="mule-realm"/>
                 </inbound-endpoint>
             </inbound-router>

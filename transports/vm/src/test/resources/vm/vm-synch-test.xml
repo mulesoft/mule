@@ -11,7 +11,7 @@
     <model name="synchTestModel">
 
         <service name="bridge">
-            <component class="org.mule.components.simple.BridgeComponent"/>
+            <bridge-component/>
             <inbound-router>
                 <inbound-endpoint address="vm://bridge" synchronous="true"/>
             </inbound-router>

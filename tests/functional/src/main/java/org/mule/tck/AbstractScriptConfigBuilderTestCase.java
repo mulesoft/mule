@@ -22,6 +22,7 @@ import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestEntryPointResolver;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -35,6 +36,7 @@ import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -91,8 +93,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         UMODescriptor descriptor = managementContext.getRegistry().lookupService("orangeComponent");
         UMOImmutableEndpoint ep = descriptor.getInboundRouter().getEndpoint("Orange");
         assertNotNull(ep);
-        assertNotNull(ep.getResponseTransformer());
-        assertTrue(ep.getResponseTransformer() instanceof TestCompressionTransformer);
+        assertNotNull(ep.getResponseTransformers());
+        assertTrue(ep.getResponseTransformers() instanceof TestCompressionTransformer);
     }
 
     public void testExceptionStrategy()
@@ -211,14 +213,13 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint)router.getEndpoints().get(0);
         assertNotNull(endpoint);
         assertEquals("appleInEndpoint", endpoint.getName());
-        assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof TransformerChain);
-        assertTrue(((TransformerChain) endpoint.getTransformer()).getDelegateClass().equals(TestCompressionTransformer.class));
+        assertNotNull(endpoint.getTransformers());
+        assertTrue(TransformerUtils.firstOrNull(endpoint.getTransformers()) instanceof TestCompressionTransformer);
 
         // check the global endpoint
         endpoint = managementContext.getRegistry().lookupEndpoint("appleInEndpoint");
         assertNotNull(endpoint);
-        assertNull(endpoint.getTransformer());
+        assertTrue(TransformerUtils.isUndefined(endpoint.getTransformers()));
 
         assertEquals(2, descriptor.getInboundRouter().getEndpoints().size());
         assertNotNull(descriptor.getInboundRouter().getCatchAllStrategy());
@@ -233,14 +234,13 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(endpoint);
         assertEquals("orangeEndpoint", endpoint.getName());
         assertEquals("orangeQ", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof TransformerChain);
-        assertTrue(((TransformerChain) endpoint.getTransformer()).getDelegateClass().equals(TestCompressionTransformer.class));
+        assertNotNull(endpoint.getTransformers());
+        assertTrue(TransformerUtils.firstOrNull(endpoint.getTransformers()) instanceof TestCompressionTransformer);
 
         // check the global endpoint
         endpoint = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
         assertNotNull(endpoint);
-        assertNull(endpoint.getTransformer());
+        assertTrue(TransformerUtils.isUndefined(endpoint.getTransformers()));
     }
 
     public void testInboundRouterConfig()

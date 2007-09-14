@@ -12,6 +12,9 @@ package org.mule.umo.transformer;
 
 import org.mule.config.i18n.Message;
 import org.mule.umo.endpoint.EndpointException;
+import org.mule.transformers.TransformerUtils;
+
+import java.util.List;
 
 /**
  * <code>TransformerException</code> is a simple exception that is thrown by
@@ -37,6 +40,13 @@ public class TransformerException extends EndpointException
         addInfo("Transformer", transformer.toString());
     }
 
+    public TransformerException(Message message, List transformers)
+    {
+        super(message);
+        this.transformer = TransformerUtils.firstOrNull(transformers);
+        addInfo("Transformer", TransformerUtils.toString(transformers));
+    }
+
     /**
      * @param message the exception message
      * @param cause the exception that cause this exception to be thrown
@@ -48,6 +58,13 @@ public class TransformerException extends EndpointException
         addInfo("Transformer", transformer.toString());
     }
 
+    public TransformerException(Message message, List transformers, Throwable cause)
+    {
+        super(message, cause);
+        this.transformer = TransformerUtils.firstOrNull(transformers);
+        addInfo("Transformer", TransformerUtils.toString(transformers));
+    }
+
     public TransformerException(UMOTransformer transformer, Throwable cause)
     {
         super(cause);
@@ -55,7 +72,14 @@ public class TransformerException extends EndpointException
         addInfo("Transformer", (transformer == null ? "null" : transformer.toString()));
     }
 
-    /**
+     public TransformerException(List transformers, Throwable cause)
+    {
+        super(cause);
+        this.transformer = TransformerUtils.firstOrNull(transformers);
+        addInfo("Transformer", TransformerUtils.toString(transformers));
+    }
+
+   /**
      * @param message the exception message
      * @param cause the exception that cause this exception to be thrown
      */

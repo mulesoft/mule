@@ -37,12 +37,14 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
+import org.mule.util.CollectionUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -451,10 +453,10 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         // Remove the Axis Receiver Security filter now
         receiverEndpoint.setSecurityFilter(null);
 
-        if (receiverEndpoint.getTransformer() != null)
+        if (!CollectionUtils.isEmpty(receiverEndpoint.getTransformers()))
         {
-            serviceEndpoint.setTransformer(receiverEndpoint.getTransformer());
-            receiverEndpoint.setTransformer(null);
+            serviceEndpoint.setTransformers(receiverEndpoint.getTransformers());
+            receiverEndpoint.setTransformers(new LinkedList());
         }
 
         //set transaction properties

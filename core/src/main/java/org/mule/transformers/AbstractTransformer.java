@@ -20,10 +20,13 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringMessageUtils;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.RequestContext;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import java.util.List;
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,9 +40,6 @@ public abstract class AbstractTransformer implements UMOTransformer
 {
     protected static final int DEFAULT_TRUNCATE_LENGTH = 200;
 
-    /**
-     * logger used by this class
-     */
     protected final Log logger = LogFactory.getLog(getClass());
 
     /**
@@ -388,4 +388,5 @@ public abstract class AbstractTransformer implements UMOTransformer
         }
         return result;
     }
+
 }

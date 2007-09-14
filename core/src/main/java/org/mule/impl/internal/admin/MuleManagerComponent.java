@@ -26,6 +26,7 @@ import org.mule.impl.model.ModelHelper;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
 import org.mule.transformers.wire.WireFormat;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
@@ -37,12 +38,13 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MapUtils;
 import org.mule.util.object.SimpleObjectFactory;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -129,10 +131,10 @@ public class MuleManagerComponent implements Callable, Initialisable
             UMOSession session = new MuleSession(ModelHelper.getComponent(destComponent));
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
-            // the
-            // message will not be of expected type
+            // the message will not be of expected type
             UMOEndpoint ep = new MuleEndpoint(RequestContext.getEvent().getEndpoint());
-            ep.setTransformer(null);
+            // TODO - is this correct?  it stops any other transformer from being set
+            ep.setTransformers(new LinkedList());
             UMOEvent event = new MuleEvent(action.getMessage(), ep, context.getSession(),
                 context.isSynchronous());
             event = RequestContext.setEvent(event);
@@ -210,11 +212,10 @@ public class MuleManagerComponent implements Callable, Initialisable
             if (result != null)
             {
                 // See if there is a default transformer on the connector
-                UMOTransformer trans = ((AbstractConnector) endpoint.getConnector()).getDefaultInboundTransformer();
-                if (trans != null)
+                List transformers = ((AbstractConnector) endpoint.getConnector()).getDefaultInboundTransformers();
+                if (transformers != null)
                 {
-                    Object payload = trans.transform(result.getPayload());
-                    result = new MuleMessage(payload, result);
+                    result = TransformerUtils.applyAllTransformers(transformers, result);
                 }
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 wireFormat.write(out, result, getEncoding());

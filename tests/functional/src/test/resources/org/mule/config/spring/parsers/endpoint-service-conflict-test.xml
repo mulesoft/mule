@@ -69,7 +69,7 @@
             <outbound-router>
                 <!-- again, could be pass-through? -->
                 <filtering-router>
-                    <outbound-endpoint ref="BankGateway" transformers="SetLendersAsRecipients"/>
+                    <outbound-endpoint ref="BankGateway" transformer-ref="SetLendersAsRecipients"/>
                 </filtering-router>
             </outbound-router>
         </service>

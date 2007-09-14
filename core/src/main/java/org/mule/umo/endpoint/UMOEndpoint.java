@@ -17,6 +17,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -85,27 +86,23 @@ public interface UMOEndpoint extends UMOImmutableEndpoint
     void setName(String name);
 
     /**
-     * The transformer is responsible for transforming data when it is received or
+     * The transformers are responsible for transforming data when it is received or
      * sent by the UMO (depending on whether this endpoint is a receiver or not). A
      * tranformation for an inbound event can be forced by the user by calling the
      * inbound event.getTransformedMessage(). A tranformation for an outbound event
      * is called or when the UMO dispatchEvent() or sendEvent() methods are called.
-     * <p/> This attribute represents the name of the transformer to use as declared
-     * in the transformers section of the configuration file. IF a name for the
-     * transformer is not set on the configuration element, it will default to the
-     * name of the className attribute minus the package name.
-     * 
-     * @param trans the transformer to use when receiving or sending data
+     *
+     * @param transformers the transformers to use when receiving or sending data
      */
-    void setTransformer(UMOTransformer trans);
+    void setTransformers(List transformers);
 
     /**
-     * Sets tyhe transformer used when a response is sent back from the endpoint
+     * Sets the transformers used when a response is sent back from the endpoint
      * invocation
      * 
-     * @param trans the transformer to use
+     * @param transformers the transformers to use
      */
-    void setResponseTransformer(UMOTransformer trans);
+    void setResponseTransformers(List transformers);
 
     /**
      * @param props properties for this endpoint

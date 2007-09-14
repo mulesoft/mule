@@ -162,8 +162,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("custom-connector", new MuleChildDefinitionParser(true));
 
         //Transformer elements
-        registerBeanDefinitionParser("transformers", new ChildDefinitionParser("transformer", TransformerChain.class));
-        registerMuleDefinitionParser("transformers-ref", new ParentDefinitionParser()).addAlias("transformers", "transformer");
+        registerMuleDefinitionParser("transformer", new ParentDefinitionParser()).addAlias("ref", "transformer");
 
         registerBeanDefinitionParser("custom-transformer", new MuleChildDefinitionParser(false));
         registerBeanDefinitionParser("transformer-no-action", new TransformerDefinitionParser(NoActionTransformer.class));

@@ -19,6 +19,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
+import java.util.LinkedList;
+
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
@@ -99,7 +101,8 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
                         {
                             throw new MessagingException(e.getI18nMessage(), returnMessage, e);
                         }
-                        endpoint.setTransformer(null);
+                        // TODO - is this correct?  it stops other transformers from being used
+                        endpoint.setTransformers(new LinkedList());
                         endpoint.setName(this.getClass().getName());
                         UMOEvent returnEvent = new MuleEvent(returnMessage, endpoint, event.getComponent(),
                             event);

@@ -18,6 +18,7 @@ import org.mule.umo.transformer.UMOTransformer;
 import java.util.Collection;
 import java.util.Iterator;
 
+// TODO - delete!
 public class TransformerChain implements UMOTransformer
 {
 

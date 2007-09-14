@@ -13,6 +13,7 @@ package org.mule.extras.spring.events;
 import org.mule.MuleException;
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
+import org.mule.transformers.TransformerUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.extras.spring.i18n.SpringMessages;
@@ -509,10 +510,13 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                         ((AbstractConnector)endpoint.getConnector()).getSessionHandler(), component);
                     RequestContext.setEvent(new MuleEvent(message, endpoint, session, false));
                     // transform if necessary
-                    if (endpoint.getTransformer() != null)
+                    if (endpoint.getTransformers() != null)
                     {
-                        message = new MuleMessage(endpoint.getTransformer().transform(
-                            applicationEvent.getSource()), applicationEvent.getProperties());
+                        message = new MuleMessage(
+                                TransformerUtils.applyAllTransformersToObject(
+                                        endpoint.getTransformers(),
+                                        applicationEvent.getSource()),
+                                applicationEvent.getProperties());
                     }
                     endpoint.dispatch(new MuleEvent(message, endpoint, session, false));
                 }

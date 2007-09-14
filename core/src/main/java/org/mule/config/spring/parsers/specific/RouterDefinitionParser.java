@@ -21,7 +21,6 @@ public class RouterDefinitionParser extends ChildDefinitionParser
     {
         super(setterMethod, clazz);
         addMapping("enableCorrelation", "IF_NOT_SET=0,ALWAYS=1,NEVER=2");
-        addAlias("transformers", "transformer");
     }
 
 }

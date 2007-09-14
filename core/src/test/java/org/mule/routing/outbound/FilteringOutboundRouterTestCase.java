@@ -22,6 +22,7 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.CollectionUtils;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -72,13 +73,17 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(!router.isMatch(message));
 
-        router.setTransformer(new AbstractTransformer()
-        {
-            public Object doTransform(Object src, String encoding) throws TransformerException
-            {
-                return ((Exception)src).getMessage();
-            }
-        });
+        router.setTransformers(
+                CollectionUtils.singletonList(
+                        new AbstractTransformer()
+                        {
+                            public Object doTransform(Object src, String encoding) throws TransformerException
+                            {
+                                return ((Exception)src).getMessage();
+                            }
+                        }
+                )
+        );
 
         assertTrue(router.isMatch(message));
     }

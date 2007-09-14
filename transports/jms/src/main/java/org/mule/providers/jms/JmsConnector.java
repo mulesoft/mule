@@ -481,7 +481,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     public ReplyToHandler getReplyToHandler()
     {
-        return new JmsReplyToHandler(this, getDefaultResponseTransformer());
+        return new JmsReplyToHandler(this, getDefaultResponseTransformers());
     }
 
     public void onNotification(UMOServerNotification notification)

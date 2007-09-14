@@ -58,17 +58,17 @@
             
             <inbound-router>
                 <!-- Incoming HTTP requests -->
-                <inbound-endpoint address="http://localhost:8888" transformers="HttpRequestToNameString" synchronous="true">
+                <inbound-endpoint address="http://localhost:8888" transformer-ref="HttpRequestToNameString" synchronous="true">
                     <not-filter>
                         <wildcard-filter pattern="/favicon.ico"/>   
                     </not-filter>
                 </inbound-endpoint>                    
                 
                 <!-- Incoming Servlet requests -->
-                <inbound-endpoint address="servlet://rest" transformers="StringToNameString" responseTransformers="PlainTextResponseTransformer" synchronous="true"/>
+                <inbound-endpoint address="servlet://rest" transformer-ref="StringToNameString" responseTransformer-ref="PlainTextResponseTransformer" synchronous="true"/>
 
                 <!-- Incoming VM requests -->
-                <inbound-endpoint address="vm://greeter" transformers="StringToNameString" synchronous="true"/>
+                <inbound-endpoint address="vm://greeter" transformer-ref="StringToNameString" synchronous="true"/>
             </inbound-router>
 
             <outbound-router>
@@ -95,7 +95,7 @@
             <component class="org.mule.samples.hello.ChitChatter"/>
             
             <inbound-router>
-                <inbound-endpoint address="vm://chitchatter" transformers="NameStringToChatString" responseTransformers="ChatStringToString" synchronous="true"/>
+                <inbound-endpoint address="vm://chitchatter" transformer-ref="NameStringToChatString" responseTransformer-ref="ChatStringToString" synchronous="true"/>
             </inbound-router>
         </service>
 
@@ -105,7 +105,7 @@
             <bridge-component/>
             
             <inbound-router>
-                <inbound-endpoint address="vm://userErrorHandler" responseTransformers="ExceptionToString" synchronous="true"/>
+                <inbound-endpoint address="vm://userErrorHandler" responseTransformer-ref="ExceptionToString" synchronous="true"/>
             </inbound-router>
         </service>
                 

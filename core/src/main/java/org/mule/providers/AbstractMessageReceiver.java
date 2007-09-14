@@ -14,7 +14,6 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.NullSessionHandler;
 import org.mule.impl.OptimizedRequestContext;
@@ -38,16 +37,14 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.security.SecurityException;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.WaitableBoolean;
+import org.mule.transformers.TransformerUtils;
 
 import java.io.OutputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -586,78 +583,13 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
                 }
                 OptimizedRequestContext.unsafeRewriteEvent(resultMessage);
             }
-            return applyResponseTransformer(resultMessage);
+            return TransformerUtils.applyAllTransformers(endpoint.getResponseTransformers(), resultMessage);
         }
     }
 
     protected String getConnectEventId()
     {
         return connector.getName() + ".receiver (" + endpoint.getEndpointURI() + ")";
-    }
-
-    protected UMOMessage applyResponseTransformer(UMOMessage returnMessage) throws TransformerException
-    {
-        UMOTransformer transformer = endpoint.getResponseTransformer();
-
-        // no transformer, so do nothing.
-        if (transformer == null)
-        {
-            return returnMessage;
-        }
-
-        if (returnMessage == null)
-        {
-            if (transformer.isAcceptNull())
-            {
-                returnMessage = new MuleMessage(NullPayload.getInstance(), RequestContext.getEventContext()
-                        .getMessage());
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        Object returnPayload = returnMessage.getPayload();
-        if (transformer.isSourceTypeSupported(returnPayload.getClass()))
-        {
-            Object result = transformer.transform(returnPayload);
-            if (result instanceof UMOMessage)
-            {
-                returnMessage = (UMOMessage) result;
-            }
-            else
-            {
-                // Try and wrap the response in the correct messageAdapter, if this
-                // doesn't work for some reason
-                // just use a standard adater
-                // try {
-                // UMOMessageAdapter adapter =
-                // endpoint.getConnector().getMessageAdapter(result);
-                // returnMessage = new MuleMessage(adapter, returnMessage);
-                // } catch (MessagingException e) {
-                // if(logger.isWarnEnabled()) {
-                // logger.warn("Failed to wrap response in " +
-                // endpoint.getConnector().getProtocol() + ". Error is: " +
-                // e.getMessage());
-                // }
-
-                // need to add properties that may have been set in various transformers
-//                returnMessage = new MuleMessage(result, returnMessage);
-                returnMessage = new MuleMessage(result, RequestContext.getEvent().getMessage());
-                // }
-                //
-            }
-        }
-        else
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Response transformer: " + transformer + " doesn't support the result payload: "
-                        + returnPayload.getClass());
-            }
-        }
-        return returnMessage;
     }
 
     public void setReceiverKey(String receiverKey)

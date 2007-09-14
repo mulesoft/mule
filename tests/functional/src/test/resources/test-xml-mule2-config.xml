@@ -225,12 +225,12 @@
                     <endpoint address="test://catch.all"/>
                 </catch-all-strategy -->
                     <mule:inbound-endpoint name="Orange"
-                                           address="test://orange/" transformers="TestCompressionTransformer"
-                                           responseTransformers="TestCompressionTransformer"/>
+                                           address="test://orange/" transformer-ref="TestCompressionTransformer"
+                                           responseTransformer-ref="TestCompressionTransformer"/>
                     <!-- endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer"
                     responseTransformers="TestCompressionTransformer"/ -->
                     <mule:inbound-endpoint ref="orangeEndpoint"
-                                           transformers="TestCompressionTransformer">
+                                           transformer-ref="TestCompressionTransformer">
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                         <mule:properties>
                             <entry key="testLocal" value="value1"/>
@@ -264,7 +264,7 @@
                         <!-- TODO -->
                         <!-- shouldn't it be transformers-ref? -->
                         <mule:outbound-endpoint ref="appleInEndpoint"
-                                                transformers="TestCompressionTransformer"/>
+                                                transformer-ref="TestCompressionTransformer"/>
                     </mule:outbound-pass-through-router>
                 </mule:outbound-router>
                 <!-- outbound-router>
@@ -340,7 +340,7 @@
                     <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                     <mule:filtering-router>
                         <mule:outbound-endpoint name="TestApple-Out"
-                                           address="test://appleQ2" transformers="TestCompressionTransformer"/>
+                                           address="test://appleQ2" transformer-ref="TestCompressionTransformer"/>
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                     </mule:filtering-router>
                     <mule:filtering-router>

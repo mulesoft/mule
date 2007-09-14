@@ -12,6 +12,7 @@ package org.mule.util;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
+import org.mule.transformers.TransformerUtils;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.routing.filters.EqualsFilter;
@@ -24,6 +25,8 @@ import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -42,43 +45,37 @@ public final class MuleObjectHelper
     }
 
     /**
-     * Builds a linked list of UMOTransformers.
+     * Builds a list of UMOTransformers.
      * 
-     * @param list - a list of transformers separated by "delim"
+     * @param names - a list of transformers separated by "delim"
      * @param delim - the character used to delimit the transformers in the list
-     * @return an UMOTransformer whose method getNextTransformer() will return the
-     *         next transformer in the list.
+     * @return a list (possibly empty) of transformers or
+     * {@link org.mule.transformers.TransformerUtils#UNDEFINED} if the names list is null
      * @throws MuleException
      */
-    public static UMOTransformer getTransformer(String list, String delim) throws MuleException
+    public static List getTransformers(String names, String delim) throws MuleException
     {
-        StringTokenizer st = new StringTokenizer(list, delim);
-        UMOTransformer currentTrans = null;
-        UMOTransformer returnTrans = null;
-
-        while (st.hasMoreTokens())
+        if (null != names)
         {
-            String key = st.nextToken().trim();
-            UMOTransformer tempTrans = RegistryContext.getRegistry().lookupTransformer(key);
+            List transformers = new LinkedList();
+            StringTokenizer st = new StringTokenizer(names, delim);
+            while (st.hasMoreTokens())
+            {
+                String key = st.nextToken().trim();
+                UMOTransformer transformer = RegistryContext.getRegistry().lookupTransformer(key);
 
-            if (tempTrans == null)
-            {
-                throw new MuleException(CoreMessages.objectNotRegistered("Transformer", key));
+                if (transformer == null)
+                {
+                    throw new MuleException(CoreMessages.objectNotRegistered("Transformer", key));
+                }
+                transformers.add(transformer);
             }
-
-            if (currentTrans == null)
-            {
-                currentTrans = tempTrans;
-                returnTrans = tempTrans;
-            }
-            else
-            {
-                currentTrans.setNextTransformer(tempTrans);
-                currentTrans = tempTrans;
-            }
+            return transformers;
         }
-
-        return returnTrans;
+        else
+        {
+            return TransformerUtils.UNDEFINED;
+        }
     }
 
     public static UMOEndpoint getEndpointByProtocol(String protocol) throws UMOException

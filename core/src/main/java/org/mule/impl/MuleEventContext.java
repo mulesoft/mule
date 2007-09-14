@@ -118,8 +118,8 @@ public class MuleEventContext implements UMOEventContext
         else
         {
             throw new TransformerException(
-                CoreMessages.transformOnObjectNotOfSpecifiedType(this.getComponentDescriptor().getName(), 
-                    expectedType), this.event.getEndpoint().getTransformer());
+                CoreMessages.transformOnObjectNotOfSpecifiedType(this.getComponentDescriptor().getName(), expectedType),
+                    this.event.getEndpoint().getTransformers());
         }
     }
 

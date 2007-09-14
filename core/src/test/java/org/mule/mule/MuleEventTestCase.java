@@ -24,6 +24,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.CollectionUtils;
 
 import java.util.Properties;
 
@@ -62,7 +63,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     {
         String data = "Test Data";
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        endpoint.setTransformer(new TestEventTransformer());
+        endpoint.setTransformers(CollectionUtils.singletonList(new TestEventTransformer()));
         UMOEvent event = getTestEvent(data, endpoint);
 
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
@@ -77,7 +78,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     {
         String data = "Test Data";
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        endpoint.setTransformer(new TestEventTransformer());
+        endpoint.setTransformers(CollectionUtils.singletonList(new TestEventTransformer()));
         MuleEvent event = new MuleEvent(new MuleMessage(data), endpoint,
             getTestSession(getTestComponent(getTestDescriptor("apple", Apple.class.getName()))), true,
             new ResponseOutputStream(System.out));

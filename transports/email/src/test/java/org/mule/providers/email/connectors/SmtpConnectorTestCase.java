@@ -27,8 +27,10 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.transformers.TransformerUtils;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import javax.mail.internet.MimeMessage;
 
@@ -85,7 +87,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         UMOComponent component = model.getComponent(d.getName());
         UMOEndpoint endpoint = 
             new MuleEndpoint("test", new MuleEndpointURI(getTestEndpointURI()), connector,
-                null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, new HashMap());
+                    TransformerUtils.UNDEFINED, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, new HashMap());
         try
         {
             connector.registerListener(component, endpoint);

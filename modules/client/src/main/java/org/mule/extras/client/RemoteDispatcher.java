@@ -168,7 +168,7 @@ public class RemoteDispatcher implements Disposable
 
         if (transformers != null)
         {
-            result.setTransformer(MuleObjectHelper.getTransformer(transformers, ","));
+            result.setTransformers(MuleObjectHelper.getTransformers(transformers, ","));
         }
 
         result.execute();

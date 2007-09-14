@@ -28,6 +28,7 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
 {
 
     private Map parsers = new HashMap();
+    private MuleDefinitionParser otherwise = null;
 
     public ParentContextDefinitionParser(String context, MuleDefinitionParser parser)
     {
@@ -45,6 +46,12 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         return this;
     }
 
+    public ParentContextDefinitionParser otherwise(MuleDefinitionParser otherwise)
+    {
+        this.otherwise = otherwise;
+        return this;
+    }
+
     protected MuleDefinitionParser getDelegate(Element element, ParserContext parserContext)
     {
         // i'm not sure why this is suddenly necessary here and not elsewhere.
@@ -54,6 +61,10 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         if (parsers.containsKey(context))
         {
             return (MuleDefinitionParser) parsers.get(context);
+        }
+        else if (null != otherwise)
+        {
+            return otherwise;
         }
         else
         {

@@ -23,6 +23,7 @@ import org.mule.providers.service.TransportFactoryException;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransactionConfig;
@@ -33,12 +34,12 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -51,8 +52,8 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected UMOConnector connector;
     protected UMOEndpointURI endpointURI;
-    protected UMOTransformer transformer;
-    protected UMOTransformer responseTransformer;
+    protected List transformers = TransformerUtils.UNDEFINED;
+    protected List responseTransformers = TransformerUtils.UNDEFINED;
     protected String name;
     protected Map properties;
     protected UMOTransactionConfig transactionConfig;
@@ -274,66 +275,32 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         return 0;
     }
 
-    protected UMOTransformer getInboundTransformer(UMOConnector connector, UMOEndpointURI endpointURI)
+    protected List getInboundTransformers(UMOConnector connector, UMOEndpointURI endpointURI)
         throws TransportFactoryException
     {
-        // #1 Transformer set on builder
-        if (transformer != null)
+        //  #1 Transformers set on builder
+        if (TransformerUtils.isDefined(transformers))
         {
-            return transformer;
+            return transformers;
         }
+
         // #2 Transformer specified on uri
-        else if (endpointURI.getTransformers() != null)
+        List transformers = getTransformersFromString(endpointURI.getTransformers());
+        if (TransformerUtils.isDefined(transformers))
         {
-            try
-            {
-                return MuleObjectHelper.getTransformer(endpointURI.getTransformers(), ",");
-            }
-            catch (MuleException e)
-            {
-                throw new TransportFactoryException(e);
-            }
+            return transformers;
         }
+
         // #3 Default Transformer
-        else
-        {
-            return getDefaultInboundTransformer(connector);
-        }
+        return getDefaultInboundTransformers(connector);
     }
 
-    protected UMOTransformer getDefaultInboundTransformer(UMOConnector connector) throws TransportFactoryException
+    protected List getDefaultInboundTransformers(UMOConnector connector) throws TransportFactoryException
     {
         try
         {
-            UMOTransformer trans = null;
-            // Get connector specific overrides to set on the descriptor
-            Properties overrides = new Properties();
-            if (connector instanceof AbstractConnector)
-            {
-                Map so = ((AbstractConnector) connector).getServiceOverrides();
-                if (so != null)
-                {
-                    overrides.putAll(so);
-                }
-            }
-
-            String scheme = endpointURI.getSchemeMetaInfo();
-
-            TransportServiceDescriptor sd = (TransportServiceDescriptor) RegistryContext.getRegistry()
-                .lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
-            if (sd != null)
-            {
-                trans = sd.createInboundTransformer();
-                if (trans != null)
-                {
-                    trans.initialise();
-                }
-            }
-            else
-            {
-                throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
-            }
-            return trans;
+            return TransformerUtils.getDefaultInboundTransformers(
+                    getNonNullServiceDescriptor(endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -341,65 +308,31 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         }
     }
 
-    protected UMOTransformer getOutboundTransformer(UMOConnector connector, UMOEndpointURI endpointURI) throws TransportFactoryException
+    protected List getOutboundTransformers(UMOConnector connector, UMOEndpointURI endpointURI) throws TransportFactoryException
     {
-        // #1 Transformer set on builder
-        if (transformer != null)
+        //  #1 Transformers set on builder
+        if (TransformerUtils.isDefined(transformers))
         {
-            return transformer;
+            return transformers;
         }
+
         // #2 Transformer specified on uri
-        else if (endpointURI.getTransformers() != null)
+        List transformers = getTransformersFromString(endpointURI.getTransformers());
+        if (TransformerUtils.isDefined(transformers))
         {
-            try
-            {
-                return MuleObjectHelper.getTransformer(endpointURI.getTransformers(), ",");
-            }
-            catch (MuleException e)
-            {
-                throw new TransportFactoryException(e);
-            }
+            return transformers;
         }
+
         // #3 Default Transformer
-        else
-        {
-            return getDefaultOutboundTransformer(connector);
-        }
+        return getDefaultOutboundTransformers(connector);
     }
 
-    protected UMOTransformer getDefaultOutboundTransformer(UMOConnector connector) throws TransportFactoryException
+    protected List getDefaultOutboundTransformers(UMOConnector connector) throws TransportFactoryException
     {
         try
         {
-            UMOTransformer trans = null;
-            // Get connector specific overrides to set on the descriptor
-            Properties overrides = new Properties();
-            if (connector instanceof AbstractConnector)
-            {
-                Map so = ((AbstractConnector) connector).getServiceOverrides();
-                if (so != null)
-                {
-                    overrides.putAll(so);
-                }
-            }
-
-            String scheme = endpointURI.getSchemeMetaInfo();
-
-            TransportServiceDescriptor sd = (TransportServiceDescriptor) RegistryContext.getRegistry()
-                .lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
-            if (sd != null)
-            {
-                trans = sd.createOutboundTransformer();
-                if (trans != null)
-                {
-                    trans.initialise();
-                }
-            }
-            else
-            {
-                throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
-            }
-            return trans;
+            return TransformerUtils.getDefaultOutboundTransformers(
+                    getNonNullServiceDescriptor(endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -407,69 +340,77 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         }
     }
 
-    protected UMOTransformer getResponseTransformer(UMOConnector connector, UMOEndpointURI endpointURI) throws TransportFactoryException
+    protected List getResponseTransformers(UMOConnector connector, UMOEndpointURI endpointURI) throws TransportFactoryException
     {
-        // #1 Transformer set on builder
-        if (responseTransformer != null)
+        //  #1 Transformers set on builder
+        if (TransformerUtils.isDefined(responseTransformers))
         {
-            return responseTransformer;
+            return responseTransformers;
         }
+
         // #2 Transformer specified on uri
-        else if (endpointURI.getResponseTransformers() != null)
+        List transformers = getTransformersFromString(endpointURI.getResponseTransformers());
+        if (TransformerUtils.isDefined(transformers))
         {
-            try
-            {
-                return MuleObjectHelper.getTransformer(endpointURI.getResponseTransformers(), ",");
-            }
-            catch (MuleException e)
-            {
-                throw new TransportFactoryException(e);
-            }
+            return transformers;
         }
+
         // #3 Default Transformer
-        else
-        {
-            return getDefaultResponeTransformer(connector);
-        }
+        return getDefaultResponseTransformers(connector);
     }
 
-    protected UMOTransformer getDefaultResponeTransformer(UMOConnector connector) throws TransportFactoryException
+    protected List getDefaultResponseTransformers(UMOConnector connector) throws TransportFactoryException
     {
         try
         {
-            UMOTransformer trans = null;
-            // Get connector specific overrides to set on the descriptor
-            Properties overrides = new Properties();
-            if (connector instanceof AbstractConnector)
-            {
-                Map so = ((AbstractConnector) connector).getServiceOverrides();
-                if (so != null)
-                {
-                    overrides.putAll(so);
-                }
-            }
-
-            String scheme = endpointURI.getSchemeMetaInfo();
-
-            TransportServiceDescriptor sd = (TransportServiceDescriptor) RegistryContext.getRegistry()
-                .lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
-            if (sd != null)
-            {
-                trans = sd.createResponseTransformer();
-                if (trans != null)
-                {
-                    trans.initialise();
-                }
-            }
-            else
-            {
-                throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
-            }
-            return trans;
+            return TransformerUtils.getDefaultResponseTransformers(
+                    getNonNullServiceDescriptor(endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
             throw new TransportFactoryException(e);
+        }
+    }
+
+    private List getTransformersFromString(String transformers) throws TransportFactoryException
+    {
+        try
+        {
+            return MuleObjectHelper.getTransformers(transformers, ",");
+        }
+        catch (MuleException e)
+        {
+            throw new TransportFactoryException(e);
+        }
+    }
+
+    private Properties getOverrides(UMOConnector connector)
+    {
+        // Get connector specific overrides to set on the descriptor
+        Properties overrides = new Properties();
+        if (connector instanceof AbstractConnector)
+        {
+            Map so = ((AbstractConnector) connector).getServiceOverrides();
+            if (so != null)
+            {
+                overrides.putAll(so);
+            }
+        }
+        return overrides;
+    }
+
+    private TransportServiceDescriptor getNonNullServiceDescriptor(String scheme, Properties overrides)
+            throws ServiceException
+    {
+        TransportServiceDescriptor sd = (TransportServiceDescriptor) RegistryContext.getRegistry()
+            .lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
+        if (null != sd)
+        {
+            return sd;
+        }
+        else
+        {
+            throw new ServiceException(CoreMessages.noServiceTransportDescriptor(scheme));
         }
     }
 
@@ -530,15 +471,15 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     }
 
 
-    public UMOEndpointBuilder setTransformer(UMOTransformer transformer)
+    public UMOEndpointBuilder setTransformers(List transformers)
     {
-        this.transformer = transformer;
+        this.transformers = transformers;
         return this;
     }
 
-    public UMOEndpointBuilder setResponseTransformer(UMOTransformer responseTransformer)
+    public UMOEndpointBuilder setResponseTransformers(List responseTransformers)
     {
-        this.responseTransformer = responseTransformer;
+        this.responseTransformers = responseTransformers;
         return this;
     }
 

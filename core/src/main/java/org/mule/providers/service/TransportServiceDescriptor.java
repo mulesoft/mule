@@ -26,6 +26,7 @@ import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -59,11 +60,11 @@ public interface TransportServiceDescriptor extends ServiceDescriptor
 
     public UMOConnector createConnector() throws TransportServiceException;
 
-    public UMOTransformer createInboundTransformer() throws TransportFactoryException;
+    public List createInboundTransformers() throws TransportFactoryException;
 
-    public UMOTransformer createOutboundTransformer() throws TransportFactoryException;
+    public List createOutboundTransformers() throws TransportFactoryException;
 
-    public UMOTransformer createResponseTransformer() throws TransportFactoryException;
+    public List createResponseTransformers() throws TransportFactoryException;
 
     public EndpointURIBuilder createEndpointBuilder() throws TransportFactoryException;
 

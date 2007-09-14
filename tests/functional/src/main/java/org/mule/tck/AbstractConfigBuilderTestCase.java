@@ -12,6 +12,7 @@ package org.mule.tck;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
+import org.mule.transformers.TransformerUtils;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -128,9 +129,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         // check first Router
         UMOOutboundRouter route1 = (UMOOutboundRouter) router.getRouters().get(0);
         assertTrue(route1 instanceof FilteringOutboundRouter);
-        assertNotNull(((FilteringOutboundRouter) route1).getTransformer());
-        assertTrue((((FilteringOutboundRouter) route1).getTransformer()) instanceof TransformerChain);
-        assertTrue(((TransformerChain) ((FilteringOutboundRouter) route1).getTransformer()).getDelegateClass().equals(TestCompressionTransformer.class));
+        assertNotNull(((FilteringOutboundRouter) route1).getTransformers());
+        assertTrue(TransformerUtils.firstOrNull(((FilteringOutboundRouter) route1).getTransformers())
+                instanceof TestCompressionTransformer);
 
         UMOFilter filter = ((FilteringOutboundRouter) route1).getFilter();
         assertNotNull(filter);

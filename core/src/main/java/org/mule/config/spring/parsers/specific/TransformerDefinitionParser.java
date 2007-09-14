@@ -25,12 +25,11 @@ public class TransformerDefinitionParser extends ParentContextDefinitionParser
             AbstractMuleBeanDefinitionParser.ROOT_ELEMENT + " "
                     + AbstractMuleBeanDefinitionParser.ROOT_UNSAFE_ELEMENT;
     public static final String TRANSFORMER = "transformer";
-    public static final String TRANSFORMERS = "transformers";
 
     public TransformerDefinitionParser(Class transformer)
     {
         super(ROOT_ELEMENTS, new MuleChildDefinitionParser(transformer, false));
-        and(TRANSFORMERS, new ChildDefinitionParser(TRANSFORMER, transformer));
+        otherwise( new ChildDefinitionParser(TRANSFORMER, transformer));
     }
 
 }

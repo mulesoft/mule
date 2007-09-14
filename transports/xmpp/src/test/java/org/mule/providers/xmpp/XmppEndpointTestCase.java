@@ -80,7 +80,7 @@ public class XmppEndpointTestCase extends AbstractMuleTestCase
         catch (InitialisationException e)
         {
             // expected
-        }
+        }                                             
 
         MuleEndpointURI uri = 
             new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=false");

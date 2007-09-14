@@ -70,7 +70,7 @@
             <component class="org.mule.samples.hello.Greeter"/>
             
             <inbound-router>
-                <inbound-endpoint address="stdio://System.in" transformers="StdinToNameString"/>
+                <inbound-endpoint address="stdio://System.in" transformer-ref="StdinToNameString"/>
             </inbound-router>
             
             <outbound-router>
@@ -102,12 +102,12 @@
             <component class="org.mule.samples.hello.ChitChatter"/>
 
             <inbound-router>
-                <inbound-endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
+                <inbound-endpoint address="vm://chitchatter" transformer-ref="NameStringToChatString"/>
             </inbound-router>
                 
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="stdio://System.out" transformers="ChatStringToString" />
+                    <outbound-endpoint address="stdio://System.out" transformer-ref="ChatStringToString" />
                 </outbound-pass-through-router>
             </outbound-router>
 
@@ -122,7 +122,7 @@
             <bridge-component/>
                 
             <inbound-router>
-                <inbound-endpoint address="vm://userErrorHandler" transformers="ExceptionToString"/>
+                <inbound-endpoint address="vm://userErrorHandler" transformer-ref="ExceptionToString"/>
             </inbound-router>
             
             <outbound-router>

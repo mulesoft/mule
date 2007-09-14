@@ -260,7 +260,7 @@
             <xsd:element ref="abstract-response-endpoint" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-response-router" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="transformers" type="xsd:string"/>
+        <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
         <xsd:attribute name="timeout" type="xsd:string"/>
     </xsd:complexType>
 
@@ -502,11 +502,8 @@
     <!-- these include option/repeats - should be embedded once -->
     <xsd:group name="defaultEndpointElements">
         <xsd:sequence>
-            <xsd:choice minOccurs="0">
-                <xsd:element ref="transformers"/>
-                <xsd:element ref="transformers-ref"/>
-            </xsd:choice>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:element ref="abstract-transformer" minOccurs="0"/>
                 <xsd:element ref="abstract-transaction" minOccurs="0"/>
                 <xsd:element ref="abstract-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-security-filter" minOccurs="0"/>
@@ -524,8 +521,8 @@
         <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
         <!-- explicit or global endpoints -->
         <xsd:attribute name="address" type="xsd:string"/>
-        <xsd:attribute name="transformers" type="xsd:string"/>
-        <xsd:attribute name="responseTransformers" type="xsd:string"/>
+        <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
+        <xsd:attribute name="responseTransformer-ref" type="xsd:NMTOKENS"/>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="restrictedEndpointAttributes">
@@ -655,20 +652,13 @@
     <!--   Transformer elements                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="transformers" type="transformersType"/>
-    <xsd:complexType name="transformersType">
-        <!-- min occurs must be 1 since setting this erases existing transformer.
-             if you don't eant transformers, omit the entire transformers element -->
-        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-            <xsd:element ref="abstract-transformer"/>
-        </xsd:sequence>
-    </xsd:complexType>
-
-     <xsd:element name="transformers-ref" type="transformersRefType"/>
-    <xsd:complexType name="transformersRefType">
-        <!-- min occurs must be 1 since setting this erases existing transformer.
-             if you don't eant transformers, omit the entire transformers element -->
-        <xsd:attribute name="transformers" type="xsd:NMTOKENS" use="required"/>
+    <xsd:element name="transformer" type="transformerRefType" substitutionGroup="abstract-transformer"/>
+    <xsd:complexType name="transformerRefType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="custom-transformer" type="customTransformerType" substitutionGroup="abstract-transformer"/>
@@ -1153,7 +1143,7 @@
     <xsd:complexType name="selectiveConsumerRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
-                <xsd:attribute name="transformers" type="xsd:string"/>
+                <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
                 <xsd:attribute name="transformerFirst" type="substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -1247,7 +1237,7 @@
                 <xsd:sequence>
                     <xsd:element ref="abstract-filter" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attribute name="transformers" type="xsd:string"/>
+                <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

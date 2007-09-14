@@ -15,7 +15,7 @@
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <vm:inbound-endpoint address="simple">
-                    <transformers-ref transformers="appendString"/>
+                    <transformer ref="appendString"/>
                 </vm:inbound-endpoint>
             </inbound-router>
         </service>
@@ -37,7 +37,7 @@
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <vm:inbound-endpoint address="out">
-                    <transformers-ref transformers="appendString"/>
+                    <transformer ref="appendString"/>
                 </vm:inbound-endpoint>
             </inbound-router>
         </service>

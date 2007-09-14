@@ -12,6 +12,7 @@ package org.mule.impl;
 
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
+import org.mule.transformers.TransformerUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractConnector;
@@ -213,10 +214,9 @@ public final class MuleSession implements UMOSession
 
         // Handles the situation where a response has been received via a remote
         // ReplyTo channel.
-        if (endpoint.isRemoteSync() && endpoint.getResponseTransformer() != null && result != null)
+        if (endpoint.isRemoteSync() && TransformerUtils.isDefined(endpoint.getResponseTransformers()) && result != null)
         {
-            Object response = endpoint.getResponseTransformer().transform(result.getPayload());
-            result = new MuleMessage(response, result);
+            result = TransformerUtils.applyAllTransformers(endpoint.getResponseTransformers(), result);
         }
 
         if (result != null)
@@ -442,12 +442,12 @@ public final class MuleSession implements UMOSession
         }
 
         // Use default transformer if none is set
-        if (endpoint.getTransformer() == null && endpoint instanceof UMOEndpoint)
+        if (TransformerUtils.isUndefined(endpoint.getTransformers()) && endpoint instanceof UMOEndpoint)
         {
             if (endpoint.getConnector() instanceof AbstractConnector)
             {
-                ((UMOEndpoint)endpoint).setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
-                logger.debug("Using default connector outbound transformer: " + endpoint.getTransformer());
+                ((UMOEndpoint)endpoint).setTransformers(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformers());
+                logger.debug("Using default connector outbound transformer: " + endpoint.getTransformers());
             }
         }
         try

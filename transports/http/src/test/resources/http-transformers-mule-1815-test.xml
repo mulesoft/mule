@@ -82,7 +82,7 @@
         <service name="ignoredService1">
             <component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
             <inbound-router>
-                <inbound-endpoint ref="ignored" transformers="appendString"/>
+                <inbound-endpoint ref="ignored" transformer-ref="appendString"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -94,7 +94,7 @@
         <service name="ignoredService2">
             <component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="vm://echo3" synchronous="true" transformers="appendString2"/>
+                <inbound-endpoint address="vm://echo3" synchronous="true" transformer-ref="appendString2"/>
             </inbound-router>
         </service>
 
@@ -107,7 +107,7 @@
         <service name="inboundService1">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <inbound-endpoint ref="inbound" transformers="appendString"/>
+                <inbound-endpoint ref="inbound" transformer-ref="appendString"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -119,7 +119,7 @@
         <service name="inboundService2">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="vm://echo4" synchronous="true" transformers="appendString2"/>
+                <inbound-endpoint address="vm://echo4" synchronous="true" transformer-ref="appendString2"/>
             </inbound-router>
         </service>
 

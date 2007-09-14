@@ -11,8 +11,8 @@
 package org.mule.routing.outbound;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
@@ -25,11 +25,12 @@ import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutePathNotFoundException;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.TemplateParser;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,7 +40,7 @@ import java.util.Map;
 
 public class FilteringOutboundRouter extends AbstractOutboundRouter
 {
-    private UMOTransformer transformer;
+    private List transformers = new LinkedList();
 
     private UMOFilter filter;
 
@@ -94,31 +95,27 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         {
             return true;
         }
-        if (transformer != null)
+        try
         {
-            try
-            {
-                Object payload = transformer.transform(message.getPayload());
-                message = new MuleMessage(payload, message);
-            }
-            catch (TransformerException e)
-            {
-                throw new RoutingException(
+            message = TransformerUtils.applyAllTransformers(transformers, message);
+        }
+        catch (TransformerException e)
+        {
+            throw new RoutingException(
                     CoreMessages.transformFailedBeforeFilter(),
                     message, (UMOEndpoint) endpoints.get(0), e);
-            }
         }
         return getFilter().accept(message);
     }
 
-    public UMOTransformer getTransformer()
+    public List getTransformers()
     {
-        return transformer;
+        return transformers;
     }
 
-    public void setTransformer(UMOTransformer transformer)
+    public void setTransformers(List transformers)
     {
-        this.transformer = transformer;
+        this.transformers = transformers;
     }
 
     public void addEndpoint(UMOImmutableEndpoint endpoint)

@@ -10,6 +10,8 @@
 
 package org.mule.config.spring.parsers.assembly;
 
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +29,6 @@ import org.springframework.util.StringUtils;
 public class SimplePropertyConfiguration implements PropertyConfiguration
 {
 
-    public static final String ATTRIBUTE_REF_SUFFIX = "-ref";
     private List references = new ArrayList();
     private Properties nameMappings = new Properties();
     private Map valueMappings = new HashMap();
@@ -109,7 +110,9 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
      */
     public boolean isBeanReference(String attributeName)
     {
-        return (references.contains(attributeName) || attributeName.endsWith(ATTRIBUTE_REF_SUFFIX));
+        return (references.contains(attributeName)
+                || attributeName.endsWith(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX)
+                || attributeName.equals(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
     }
 
      /**
@@ -127,7 +130,7 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
     public String translateName(String oldName)
     {
         // Remove the bean reference suffix if any.
-        String name = org.mule.util.StringUtils.chomp(oldName, ATTRIBUTE_REF_SUFFIX);
+        String name = org.mule.util.StringUtils.chomp(oldName, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX);
         // Map to the real property name if necessary.
         name = getAttributeMapping(name);
         // JavaBeans property convention.

@@ -20,7 +20,8 @@
     </transformers>
 
     <global-endpoints>
-        <endpoint name="foo" address="test://foo" connector="testConnector" transformers="testTransformer">
+        <endpoint name="foo" address="test://foo" connector="testConnector"
+                  transformers="testTransformer">
             <!--<connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">-->
                 <!--<properties>-->
                     <!--<property name="retryCount" value="4"/>-->

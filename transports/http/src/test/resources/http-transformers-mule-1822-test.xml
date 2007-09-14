@@ -63,7 +63,7 @@
         <service name="responseService1">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <inbound-endpoint ref="response" responseTransformers="appendResponse"/>
+                <inbound-endpoint ref="response" responseTransformer-ref="appendResponse"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -75,7 +75,7 @@
         <service name="responseService2">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="vm://echo2" synchronous="true" responseTransformers="appendResponse2"/>
+                <inbound-endpoint address="vm://echo2" synchronous="true" responseTransformer-ref="appendResponse2"/>
             </inbound-router>
         </service>
 
@@ -89,7 +89,7 @@
         <service name="bothService1">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-                <inbound-endpoint ref="both" transformers="appendString" responseTransformers="appendResponse"/>
+                <inbound-endpoint ref="both" transformer-ref="appendString" responseTransformer-ref="appendResponse"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -101,8 +101,8 @@
         <service name="bothService2">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="vm://echo3" synchronous="true" transformers="appendString2"
-                                  responseTransformers="appendResponse2"/>
+                <inbound-endpoint address="vm://echo3" synchronous="true" transformer-ref="appendString2"
+                                  responseTransformer-ref="appendResponse2"/>
             </inbound-router>
         </service>
 

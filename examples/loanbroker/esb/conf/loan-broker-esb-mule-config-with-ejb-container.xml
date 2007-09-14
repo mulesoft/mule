@@ -99,7 +99,7 @@
                 <mule:component class="org.mule.examples.loanbroker.AsynchronousLoanBroker" />
 
                 <mule:inbound-router>
-                    <mule:endpoint ref="CustomerRequestsREST" transformers="RestRequestToCustomerRequest" />
+                    <mule:endpoint ref="CustomerRequestsREST" transformer-ref="RestRequestToCustomerRequest" />
                     <mule:endpoint ref="CustomerRequests" />
                 </mule:inbound-router>
 
@@ -128,8 +128,8 @@
                         <!-- We invoke the credit Agency service using remoteSync which means that a response
                         will be returned from the service. there is also a responseTransformer that will
                         conver the Xml returned from the CreditAgency Ejb into a CreditProfile object -->
-                        <mule:endpoint remoteSync="true" transformers="LoanQuoteRequestToCreditProfileArgs"
-                                       responseTransformers="CreditProfileXmlToCreditProfile" ref="CreditAgency" />
+                        <mule:endpoint remoteSync="true" transformer-ref="LoanQuoteRequestToCreditProfileArgs"
+                                       responseTransformer-ref="CreditProfileXmlToCreditProfile" ref="CreditAgency" />
                         <mule:endpoint ref="LenderGateway" />
                     </mule:filtering-router>
                 </mule:outbound-router>
@@ -155,7 +155,7 @@
                     <mule:chaining-router>
                         <mule:endpoint remoteSync="true" ref="LenderService" />
                         <mule:endpoint ref="BankingGateway"
-                                       transformers="SetLendersAsRecipients ObjectToJMSMessage" />
+                                       transformer-ref="SetLendersAsRecipients ObjectToJMSMessage" />
                     </mule:chaining-router>
                 </mule:outbound-router>
             </mule:service>

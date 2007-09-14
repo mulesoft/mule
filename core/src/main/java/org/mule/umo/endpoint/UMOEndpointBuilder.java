@@ -17,8 +17,8 @@ import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
-import org.mule.umo.transformer.UMOTransformer;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,7 +32,6 @@ public interface UMOEndpointBuilder
     /**
      * Constructs inbound endpoints
      * 
-     * @param uri
      * @return
      * @throws EndpointException
      * @throws InitialisationException
@@ -43,7 +42,6 @@ public interface UMOEndpointBuilder
     /**
      * Constructs outbound endpoints
      * 
-     * @param uri
      * @return
      * @throws EndpointException
      * @throws InitialisationException
@@ -54,7 +52,6 @@ public interface UMOEndpointBuilder
     /**
      * Constructs response endpoints See MULE-2293
      * 
-     * @param uri
      * @return
      * @throws EndpointException
      * @throws InitialisationException
@@ -64,9 +61,9 @@ public interface UMOEndpointBuilder
     
     public abstract UMOEndpointBuilder setConnector(UMOConnector connector);
 
-    public abstract UMOEndpointBuilder setTransformer(UMOTransformer transformer);
+    public abstract UMOEndpointBuilder setTransformers(List transformers);
 
-    public abstract UMOEndpointBuilder setResponseTransformer(UMOTransformer responseTransformer);
+    public abstract UMOEndpointBuilder setResponseTransformers(List responseTransformer);
 
     public abstract UMOEndpointBuilder setName(String name);
 

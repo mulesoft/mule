@@ -16,83 +16,83 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
 /**
- * A unique transformer instance than indicates the unintialised state and allows
- * atomic assignment in the presence of external updates (ie we can't use null).
+ * A unique transformer instance than indicates an error (typically that the transformer
+ * in question has not been initialised).
  */
-public class UninitialisedTransformer implements UMOTransformer
+public class VoidTransformer implements UMOTransformer
 {
 
     private static class SingletonHolder
     {
-        private static final UninitialisedTransformer instance = new UninitialisedTransformer();
+        private static final VoidTransformer instance = new VoidTransformer();
     }
 
-    public static UninitialisedTransformer getInstance()
+    public static VoidTransformer getInstance()
     {
         return SingletonHolder.instance;
     }
 
-    private UninitialisedTransformer() {
+    private VoidTransformer() {
         // no-op
     }
 
     public boolean isSourceTypeSupported(Class aClass)
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public boolean isAcceptNull()
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public Object transform(Object src) throws TransformerException
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public void setReturnClass(Class theClass)
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public Class getReturnClass()
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public UMOTransformer getNextTransformer()
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public void setNextTransformer(UMOTransformer nextTransformer)
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public UMOImmutableEndpoint getEndpoint()
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public void setEndpoint(UMOImmutableEndpoint endpoint)
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public void setName(String newName)
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public String getName()
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 
     public void initialise() throws InitialisationException
     {
-        throw new NullPointerException("Null transformer");
+        throw new IllegalStateException("Void transformer");
     }
 }

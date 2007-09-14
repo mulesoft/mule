@@ -93,9 +93,9 @@
                 <forwarding-catch-all-strategy>
                     <outbound-endpoint address="test2://catch.all"/>
                 </forwarding-catch-all-strategy>
-                <inbound-endpoint name="Orange" address="test://orange/" transformers="TestCompressionTransformer"
-                                  responseTransformers="TestCompressionTransformer"/>
-                <inbound-endpoint ref="orangeEndpoint" transformers="TestCompressionTransformer">
+                <inbound-endpoint name="Orange" address="test://orange/" transformer-ref="TestCompressionTransformer"
+                                  responseTransformer-ref="TestCompressionTransformer"/>
+                <inbound-endpoint ref="orangeEndpoint" transformer-ref="TestCompressionTransformer">
                     <payload-type-filter expectedType="java.lang.String"/>
                     <properties>
                         <spring:entry key="testLocal" value="value1"/>
@@ -114,7 +114,7 @@
 
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="appleInEndpoint" transformers="TestCompressionTransformer"/>
+                    <outbound-endpoint ref="appleInEndpoint" transformer-ref="TestCompressionTransformer"/>
                 </outbound-pass-through-router>
             </outbound-router>
 
@@ -169,7 +169,7 @@
 
             <outbound-router>
                 <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
-                <filtering-router transformers="TestCompressionTransformer">
+                <filtering-router transformer-ref="TestCompressionTransformer">
                     <outbound-endpoint address="test://appleQ2" name="TestApple-Out"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>

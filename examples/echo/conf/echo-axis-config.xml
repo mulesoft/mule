@@ -25,7 +25,7 @@
             <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:65081/services"
-                    transformers="HttpRequestToSoapRequest"/>
+                    transformer-ref="HttpRequestToSoapRequest"/>
                 <inbound-endpoint address="axis:http://localhost:65082/services"/>
                 <inbound-endpoint address="vm://echo" />
             </inbound-router>

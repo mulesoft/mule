@@ -22,9 +22,11 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.providers.service.TransportServiceException;
+import org.mule.providers.service.TransportFactoryException;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -48,7 +50,6 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -64,6 +65,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -79,7 +81,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -969,53 +970,19 @@ public abstract class AbstractConnector
      */
     protected abstract void doStop() throws UMOException;
 
-    public UMOTransformer getDefaultInboundTransformer()
+    public List getDefaultInboundTransformers()
     {
-        try
-        {
-            UMOTransformer transformer = serviceDescriptor.createInboundTransformer();
-            if(transformer==null) return null;
-            transformer.initialise();
-            return transformer;
-        }
-        catch (UMOException e)
-        {
-            logger.debug(e.getMessage(), e);
-            return null;
-        }
+        return TransformerUtils.getDefaultInboundTransformers(serviceDescriptor);
     }
 
-    public UMOTransformer getDefaultResponseTransformer()
+    public List getDefaultResponseTransformers()
     {
-        try
-        {
-            UMOTransformer transformer = serviceDescriptor.createResponseTransformer();
-            if(transformer==null) return null;
-            transformer.initialise();
-            return transformer;
-        }
-        catch (UMOException e)
-        {
-            logger.debug(e.getMessage(), e);
-            return null;
-        }
+        return TransformerUtils.getDefaultResponseTransformers(serviceDescriptor);
     }
 
-    public UMOTransformer getDefaultOutboundTransformer()
+    public List getDefaultOutboundTransformers()
     {
-        try
-        {
-            UMOTransformer transformer = serviceDescriptor.createOutboundTransformer();
-            if(transformer==null) return null;
-            transformer.initialise();
-            return transformer;
-        }
-        catch (UMOException e)
-        {
-            logger.debug(e.getMessage(), e);
-            return null;
-        }
-
+        return TransformerUtils.getDefaultOutboundTransformers(serviceDescriptor);
     }
 
     /**
@@ -1025,7 +992,7 @@ public abstract class AbstractConnector
      */
     public ReplyToHandler getReplyToHandler()
     {
-        return new DefaultReplyToHandler(getDefaultResponseTransformer());
+        return new DefaultReplyToHandler(getDefaultResponseTransformers());
     }
 
     /**

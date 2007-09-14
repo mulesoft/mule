@@ -14,6 +14,9 @@ import org.mule.impl.MuleMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.concurrent.DaemonThreadFactory;
+import org.mule.transformers.TransformerUtils;
+
+import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutionException;
@@ -59,7 +62,7 @@ public class FutureMessageResult extends FutureTask
     private Executor executor;
 
     // @GuardedBy(this)
-    private UMOTransformer transformer;
+    private List transformers;
 
     public FutureMessageResult(Callable callable)
     {
@@ -89,14 +92,14 @@ public class FutureMessageResult extends FutureTask
     /**
      * Set a post-invocation transformer.
      * 
-     * @param t UMOTransformer to be applied to the result of this invocation. May be
+     * @param t UMOTransformers to be applied to the result of this invocation. May be
      *            null.
      */
-    public void setTransformer(UMOTransformer t)
+    public void setTransformers(List t)
     {
         synchronized (this)
         {
-            this.transformer = t;
+            this.transformers = t;
         }
     }
 
@@ -122,9 +125,9 @@ public class FutureMessageResult extends FutureTask
 
             synchronized (this)
             {
-                if (transformer != null)
+                if (transformers != null)
                 {
-                    obj = transformer.transform(obj);
+                    obj = TransformerUtils.applyAllTransformersToObject(transformers, obj);
                 }
             }
 

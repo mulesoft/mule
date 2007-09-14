@@ -31,6 +31,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.model.UMOEntryPoint;
 import org.mule.umo.model.UMOEntryPointResolver;
+import org.mule.util.CollectionUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -79,12 +80,12 @@ public class DynamicEntryPointDiscoveryTestCase extends AbstractEntryPointDiscov
 
         if (className.equals(FruitBowl.class.getName()))
         {
-            endpoint.setTransformer(new ObjectToFruitLover());
+            endpoint.setTransformers(CollectionUtils.singletonList(new ObjectToFruitLover()));
             descriptor.getInboundRouter().addEndpoint(endpoint);
         }
         else if (className.equals(InvocationHandler.class.getName()))
         {
-            endpoint.setTransformer(new ObjectToFruitLover());
+            endpoint.setTransformers(CollectionUtils.singletonList(new ObjectToFruitLover()));
             descriptor.getInboundRouter().addEndpoint(endpoint);
         }
         return descriptor;

@@ -13,6 +13,8 @@ package org.mule.util;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 
 // @ThreadSafe
@@ -168,6 +170,29 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
 
         buf.append(']');
         return buf.toString();
+    }
+
+    /**
+     * Some code uses null to indicate "unset", which makes appending items complex.
+     */
+    public static List addCreate(List list, Object value)
+    {
+        if (null == list)
+        {
+            return singletonList(value);
+        }
+        else
+        {
+            list.add(value);
+            return list;
+        }
+    }
+
+    public static List singletonList(Object value)
+    {
+        List list = new LinkedList();
+        list.add(value);
+        return list;
     }
 
 }

@@ -21,9 +21,9 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -41,12 +41,12 @@ public class DefaultReplyToHandler implements ReplyToHandler
      */
     protected static final Log logger = LogFactory.getLog(DefaultReplyToHandler.class);
 
-    private volatile UMOTransformer transformer;
+    private volatile List transformers;
     private final Map endpointCache = new HashMap();
 
-    public DefaultReplyToHandler(UMOTransformer transformer)
+    public DefaultReplyToHandler(List transformers)
     {
-        this.transformer = transformer;
+        this.transformers = transformers;
     }
 
     public void processReplyTo(UMOEvent event, UMOMessage returnMessage, Object replyTo) throws UMOException
@@ -61,15 +61,15 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // get the endpoint for this url
         UMOImmutableEndpoint endpoint = getEndpoint(event, replyToEndpoint);
 
-        if (transformer == null)
+        if (transformers == null)
         {
-            transformer = event.getEndpoint().getResponseTransformer();
+            transformers = event.getEndpoint().getResponseTransformers();
         }
 
-        if (transformer != null)
+        if (transformers != null)
         {
             //TODO DF: Endpoint mutabily issue pending
-            ((UMOEndpoint) endpoint).setTransformer(transformer);
+            ((UMOEndpoint) endpoint).setTransformers(transformers);
         }
 
         // make sure remove the replyTo property as not cause a a forever
@@ -109,14 +109,14 @@ public class DefaultReplyToHandler implements ReplyToHandler
         return endpoint;
     }
 
-    public UMOTransformer getTransformer()
+    public List getTransformers()
     {
-        return transformer;
+        return transformers;
     }
 
-    public void setTransformer(UMOTransformer transformer)
+    public void setTransformers(List transformers)
     {
-        this.transformer = transformer;
+        this.transformers = transformers;
     }
 
 }

@@ -17,8 +17,10 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.StringMessageUtils;
+import org.mule.transformers.TransformerUtils;
+
+import java.util.List;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -36,9 +38,9 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
 {
     private final JmsConnector connector;
 
-    public JmsReplyToHandler(JmsConnector connector, UMOTransformer transformer)
+    public JmsReplyToHandler(JmsConnector connector, List transformers)
     {
-        super(transformer);
+        super(transformers);
         this.connector = connector;
     }
 
@@ -59,21 +61,11 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 super.processReplyTo(event, returnMessage, replyTo);
                 return;
             }
-            Object payload = returnMessage.getPayload();
-            if (getTransformer() != null)
-            {
-                getTransformer().setEndpoint(getEndpoint(event, "jms://temporary"));
-                if (getTransformer().isSourceTypeSupported(payload.getClass()))
-                {
-                    payload = getTransformer().transform(payload);
-                }
-                else if (logger.isDebugEnabled())
-                {
-                    logger.debug("transformer for replyTo Handler: " + getTransformer().toString()
-                                 + " does not support source type: " + payload.getClass()
-                                 + ". Not doing a transform");
-                }
-            }
+
+            Object payload =
+                    TransformerUtils.applyAllTransformers(
+                            getTransformers(), returnMessage,
+                            getEndpoint(event, "jms://temporary")).getPayload();
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue
                     && connector.getJmsSupport() instanceof Jms102bSupport)

@@ -19,6 +19,7 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.ComponentRoutingException;
 import org.mule.umo.routing.RoutingException;
+import org.mule.transformers.TransformerUtils;
 
 /**
  * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router for
@@ -43,11 +44,9 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
         {
             UMOEndpoint endpoint = getEndpoint();
             
-            if (sendTransformed && endpoint.getTransformer() != null)
+            if (sendTransformed && endpoint.getTransformers() != null)
             {
-                Object payload = message.getPayload();
-                payload = endpoint.getTransformer().transform(payload);
-                message = new MuleMessage(payload, message);
+                message = TransformerUtils.applyAllTransformers(endpoint.getTransformers(), message);
             }
 
             UMOEvent newEvent = new MuleEvent(message, endpoint, session, synchronous);

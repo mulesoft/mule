@@ -35,6 +35,7 @@ import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 import org.mule.util.object.SingletonObjectFactory;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.codehaus.xfire.DefaultXFire;
@@ -359,13 +360,13 @@ public class XFireConnector extends AbstractConnector
         serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
 
         // Set the transformers on the endpoint too
-        serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
+        serviceEndpoint.setTransformers(receiver.getEndpoint().getTransformers());
         // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((MuleEndpoint) receiver.getEndpoint()).setTransformer(null);
+        ((MuleEndpoint) receiver.getEndpoint()).setTransformers(new LinkedList());
 
-        serviceEndpoint.setResponseTransformer(receiver.getEndpoint().getResponseTransformer());
+        serviceEndpoint.setResponseTransformers(receiver.getEndpoint().getResponseTransformers());
         // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((MuleEndpoint) receiver.getEndpoint()).setResponseTransformer(null);
+        ((MuleEndpoint) receiver.getEndpoint()).setResponseTransformers(new LinkedList());
 
         // set the filter on the axis endpoint on the real receiver endpoint
         serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());

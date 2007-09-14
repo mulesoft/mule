@@ -26,9 +26,12 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.transformers.TransformerUtils;
 
+import java.util.List;
 import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 /**
  * <code>MuleEndpoint</code> describes a Provider in the Mule Server. A endpoint is
@@ -50,19 +53,19 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
      */
     public MuleEndpoint()
     {
-        super(null, null, null, null, ENDPOINT_TYPE_SENDER_AND_RECEIVER, 0, null, null);
+        super(null, null, null, TransformerUtils.UNDEFINED, ENDPOINT_TYPE_SENDER_AND_RECEIVER, 0, null, null);
     }
 
     public MuleEndpoint(String name,
                         UMOEndpointURI endpointUri,
                         UMOConnector connector,
-                        UMOTransformer transformer,
+                        List transformers,
                         String type,
                         int createConnector,
                         String endpointEncoding,
                         Map props)
     {
-        super(name, endpointUri, connector, transformer, type, createConnector, endpointEncoding, props);
+        super(name, endpointUri, connector, transformers, type, createConnector, endpointEncoding, props);
     }
 
     public MuleEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
@@ -135,10 +138,16 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
         this.name = name;
     }
 
-    public void setTransformer(UMOTransformer trans)
+    public void setTransformers(List transformers)
     {
-        transformer.set(trans);
-        updateTransformerEndpoint();
+        setTransformers(this.transformers, transformers);
+    }
+
+    protected void setTransformers(AtomicReference reference, List transformers)
+    {
+        TransformerUtils.discourageNullTransformers(transformers);
+        reference.set(transformers);
+        updateTransformerEndpoints(reference);
     }
 
     public void setProperties(Map props)
@@ -263,9 +272,10 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
         this.initialState = state;
     }
 
-    public void setResponseTransformer(UMOTransformer trans)
+    public void setResponseTransformers(List transformers)
     {
-        responseTransformer = trans;
+        setTransformers(responseTransformers, transformers);
+        updateTransformerEndpoints(responseTransformers);
     }
 
     /**

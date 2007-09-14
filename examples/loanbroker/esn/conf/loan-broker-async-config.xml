@@ -51,7 +51,7 @@
             <outbound-router>
                 <!-- Credit profile requests -->
                 <filtering-router>
-                    <outbound-endpoint ref="CreditAgency" transformers="ExtractCustomer"/>
+                    <outbound-endpoint ref="CreditAgency" transformer-ref="ExtractCustomer"/>
                     <payload-type-filter expectedType="org.mule.examples.loanbroker.messages.Customer"/>
                 </filtering-router>
                 <!-- Quote requests to the banks -->
@@ -87,7 +87,7 @@
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <outbound-endpoint ref="BankGateway" transformers="SetLendersAsRecipients"/>
+                    <outbound-endpoint ref="BankGateway" transformer-ref="SetLendersAsRecipients"/>
                 </filtering-router>
             </outbound-router>
         </service>

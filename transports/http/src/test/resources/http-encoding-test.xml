@@ -22,7 +22,7 @@
         <service name="testComponent">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint ref="clientEndpoint" responseTransformers="setResponseType"/>
+                <inbound-endpoint ref="clientEndpoint" responseTransformer-ref="setResponseType"/>
             </inbound-router>
         </service>
     </model>

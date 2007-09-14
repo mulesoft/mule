@@ -16,8 +16,8 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.transformer.UMOTransformer;
 
+import java.util.List;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +33,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
     public EndpointURIEndpointBuilder(String name,
                                   final UMOEndpointURI endpointURI,
                                   final UMOConnector connector,
-                                  final UMOTransformer transformer,
+                                  final List transformers,
                                   final int createConnector,
                                   final String endpointEncoding,
                                   final Map props,
@@ -52,8 +52,8 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
     {
         InboundEndpoint ep = new InboundEndpoint();
         configureEndpoint(ep);
-        ep.setTransformer(getInboundTransformer(ep.getConnector(),ep.getEndpointURI()));
-        ep.setResponseTransformer(getResponseTransformer(ep.getConnector(),ep.getEndpointURI()));
+        ep.setTransformers(getInboundTransformers(ep.getConnector(), ep.getEndpointURI()));
+        ep.setResponseTransformers(getResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
         return ep;
     }
 
@@ -61,8 +61,8 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
     {
         OutboundEndpoint ep = new OutboundEndpoint();
         configureEndpoint(ep);
-        ep.setTransformer(getOutboundTransformer(ep.getConnector(),ep.getEndpointURI()));
-        ep.setResponseTransformer(getResponseTransformer(ep.getConnector(),ep.getEndpointURI()));
+        ep.setTransformers(getOutboundTransformers(ep.getConnector(), ep.getEndpointURI()));
+        ep.setResponseTransformers(getResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
         return ep;
     }
 
@@ -70,8 +70,8 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
     {
         ResponseEndpoint ep = new ResponseEndpoint();
         configureEndpoint(ep);
-        ep.setTransformer(getInboundTransformer(ep.getConnector(),ep.getEndpointURI()));
-        ep.setResponseTransformer(getResponseTransformer(ep.getConnector(),ep.getEndpointURI()));
+        ep.setTransformers(getInboundTransformers(ep.getConnector(), ep.getEndpointURI()));
+        ep.setResponseTransformers(getResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
         return ep;
     }
 

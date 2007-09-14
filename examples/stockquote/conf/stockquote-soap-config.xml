@@ -81,7 +81,7 @@
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote"
-                        responseTransformers="XmlDecoder Xslt XmlToObject">
+                                       responseTransformer-ref="XmlDecoder Xslt XmlToObject">
                         <properties>
                             <spring:entry key="soapAction" value="[methodNamespace][method]"/>
                             <spring:entry key="soapMethods">

@@ -28,10 +28,14 @@ import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
+import org.mule.util.CollectionUtils;
 import org.mule.util.object.ObjectFactory;
+import org.mule.transformers.TransformerUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import org.springframework.beans.BeansException;
@@ -347,66 +351,45 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.service.TransportServiceDescriptor#createInboundTransformer()
+     * @see org.mule.providers.service.TransportServiceDescriptor#createInboundTransformers()
      */
-    public UMOTransformer createInboundTransformer() throws TransportFactoryException
+    public List createInboundTransformers() throws TransportFactoryException
     {
-        if (context.containsBean(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER))
+        return getTransformerFromContex(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, "inbound");
+    }
+
+    protected List getTransformerFromContex(String name, String type) throws TransportFactoryException
+    {
+        if (context.containsBean(name))
         {
             try
             {
-                UMOTransformer t = (UMOTransformer)context.getBean(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
-                logger.info("Loaded default inbound transformer: " + t);
-                return t;
+                UMOTransformer t = (UMOTransformer)context.getBean(name);
+                logger.info("Loaded default " + type + " transformer: " + t);
+                return CollectionUtils.singletonList(t);
             }
             catch (Exception e)
             {
-                throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("inbound", MuleProperties.CONNECTOR_INBOUND_TRANSFORMER), e);
+                throw new TransportFactoryException(CoreMessages.failedToLoadTransformer(type, name), e);
             }
         }
-        return null;
+        return TransformerUtils.UNDEFINED;
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.service.TransportServiceDescriptor#createOutboundTransformer()
+     * @see org.mule.providers.service.TransportServiceDescriptor#createOutboundTransformers()
      */
-    public UMOTransformer createOutboundTransformer() throws TransportFactoryException
+    public List createOutboundTransformers() throws TransportFactoryException
     {
-        if (context.containsBean(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER))
-        {
-            try
-            {
-                UMOTransformer t = (UMOTransformer)context.getBean(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
-                logger.info("Loaded default outbound transformer: " + t);
-                return t;
-            }
-            catch (Exception e)
-            {
-                throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("outbound", MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER), e);
-            }
-        }
-        return null;
+        return getTransformerFromContex(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, "outbound");
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.service.TransportServiceDescriptor#createResponseTransformer()
+     * @see org.mule.providers.service.TransportServiceDescriptor#createResponseTransformers()
      */
-    public UMOTransformer createResponseTransformer() throws TransportFactoryException
+    public List createResponseTransformers() throws TransportFactoryException
     {
-        if (context.containsBean(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER))
-        {
-            try
-            {
-                UMOTransformer t = (UMOTransformer)context.getBean(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
-                logger.info("Loaded default response transformer: " + t);
-                return t;
-            }
-            catch (Exception e)
-            {
-                throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("response", MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER), e);
-            }
-        }
-        return null;
+        return getTransformerFromContex(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, "response");
     }
 
     /* (non-Javadoc)

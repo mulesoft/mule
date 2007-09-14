@@ -26,7 +26,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="tcp://localhost:9994" transformers="NoAction"/>
+                    <outbound-endpoint address="tcp://localhost:9994" transformer-ref="NoAction"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -34,7 +34,7 @@
         <service name="BridgeOut">
             <bridge-component/>
             <inbound-router>
-                <inbound-endpoint address="tcp://localhost:9994" transformers="NoAction"/>
+                <inbound-endpoint address="tcp://localhost:9994" transformer-ref="NoAction"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

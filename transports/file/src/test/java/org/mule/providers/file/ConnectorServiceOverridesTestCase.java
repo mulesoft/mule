@@ -13,6 +13,7 @@ package org.mule.providers.file;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transformers.TransformerUtils;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOException;
@@ -33,10 +34,10 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         assertNotNull(c.getServiceOverrides());
         assertEquals("org.mule.transformers.simple.ByteArrayToSerializable",
                 c.getServiceOverrides().get("inbound.transformer"));
-        assertNotNull(c.getDefaultInboundTransformer());
-        assertNotNull(c.getDefaultOutboundTransformer());
-        assertTrue(c.getDefaultInboundTransformer() instanceof ByteArrayToSerializable);
-        assertTrue(c.getDefaultOutboundTransformer() instanceof SerializableToByteArray);
+        assertNotNull(TransformerUtils.firstOrNull(c.getDefaultInboundTransformers()));
+        assertNotNull(TransformerUtils.firstOrNull(c.getDefaultOutboundTransformers()));
+        assertTrue(TransformerUtils.firstOrNull(c.getDefaultInboundTransformers()) instanceof ByteArrayToSerializable);
+        assertTrue(TransformerUtils.firstOrNull(c.getDefaultOutboundTransformers()) instanceof SerializableToByteArray);
     }
 
     public void testServiceOverrides2() throws InterruptedException

@@ -1074,14 +1074,14 @@
     </xsl:template>
 
 
-    <xsl:template match="@transformers|@responseTransformers|@inboundTransformer|@outboundTransformer"
+    <xsl:template match="@transformers|@responseTransformers|@inboundTransformer|@outboundTransformer|@name"
                   mode="addTransformers">
         <xsl:variable name="propertyName">
             <xsl:choose>
-                <xsl:when test="local-name() = 'transformers'">transformer</xsl:when>
+                <xsl:when test="local-name() = 'transformer'">transformers</xsl:when>
                 <xsl:otherwise>
                     <xsl:choose>
-                        <xsl:when test="local-name() = 'responseTransformers'">responseTransformer</xsl:when>
+                        <xsl:when test="local-name() = 'responseTransformer'">responseTransformers</xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of select="local-name()"/>
                         </xsl:otherwise>
@@ -1089,26 +1089,27 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <!--<property name="{$propertyName}">-->
-        <!--<bean class="org.mule.util.MuleObjectHelper"-->
-        <!--factory-method="getTransformer">-->
-        <!--<constructor-arg index="0" type="java.lang.String">-->
-        <!--<value>-->
-        <!--<xsl:value-of select="."/>-->
-        <!--</value>-->
-        <!--</constructor-arg>-->
-        <!--<constructor-arg index="1">-->
-        <!--<value>-->
-        <!--<xsl:value-of select="' '"/>-->
-        <!--</value>-->
-        <!--</constructor-arg>-->
-        <!--</bean>-->
-        <!--</property>-->
         <property name="{$propertyName}">
-            <value>
-                <xsl:value-of select="."/>
-            </value>
+            <list>
+                <ref>
+                    <xsl:attribute name="bean">
+                        <xsl:value-of select="."/>
+                    </xsl:attribute>
+                </ref>
+            </list>
 
+        </property>
+    </xsl:template>
+
+    <xsl:template match="property" mode="addTransformers">
+        <property name="transformers">
+            <list>
+                <ref>
+                    <xsl:attribute name="bean">
+                        <xsl:value-of select="@value"/>
+                    </xsl:attribute>
+                </ref>
+            </list>
         </property>
     </xsl:template>
 
@@ -1139,19 +1140,23 @@
                 <xsl:apply-templates select="list" mode="mapListProperty"/>
                 <xsl:apply-templates select="bean" mode="asMap"/>
                 <xsl:apply-templates select="spring-property" mode="asMap"/>
-
             </map>
         </property>
     </xsl:template>
 
     <xsl:template match="property">
-        <xsl:if test="@name!='org.mule.useManagerProperties'">
-            <property name="{@name}">
-                <value>
-                    <xsl:value-of select="@value"/>
-                </value>
-            </property>
-        </xsl:if>
+        <xsl:choose>
+            <xsl:when test="@name='transformer'">
+                <xsl:apply-templates select="." mode="addTransformers"/>
+            </xsl:when>
+            <xsl:when test="@name!='org.mule.useManagerProperties'">
+                <property name="{@name}">
+                    <value>
+                        <xsl:value-of select="@value"/>
+                    </value>
+                </property>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
 
     <!-- container properties -->

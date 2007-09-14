@@ -25,6 +25,8 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOEntryPoint;
 import org.mule.umo.model.UMOModel;
+import org.mule.util.CollectionUtils;
+import org.mule.transformers.TransformerUtils;
 
 import java.util.Iterator;
 
@@ -67,7 +69,7 @@ public class StreamingComponent extends AbstractComponent
                 throw new InitialisationException(CoreMessages.streamingEndpointsMustBeUsedWithStreamingModel(), this);
             }
             // TODO RM*: This restriction could be lifted in future
-            if (ep.getTransformer() != null)
+            if (TransformerUtils.isDefined(ep.getTransformers()))
             {
                 throw new InitialisationException(
                     CoreMessages.streamingEndpointsDoNotSupportTransformers(), this);

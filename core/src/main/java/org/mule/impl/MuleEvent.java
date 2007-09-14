@@ -15,6 +15,7 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.security.MuleCredentials;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -38,6 +39,8 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.SerializationUtils;
@@ -277,14 +280,8 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
                 return false;
             }
         }
-        Object value = message.getProperty(key);
 
-        if (value != null)
-        {
-            return true;
-        }
-
-        return false;
+        return null != message.getProperty(key);
     }
 
     protected void setCredentials()
@@ -336,10 +333,10 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         }
         if (transformedMessage == null)
         {
-            UMOTransformer tran = endpoint.getTransformer();
-            if (tran != null)
+            List transformers = endpoint.getTransformers();
+            if (null != transformers)
             {
-                transformedMessage = tran.transform(message.getPayload());
+                transformedMessage = TransformerUtils.applyAllTransformers(transformers, message).getPayload();
             }
             else
             {
@@ -440,7 +437,7 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         }
         catch (UnsupportedEncodingException e)
         {
-            throw new TransformerException(endpoint.getTransformer(), e);
+            throw new TransformerException(endpoint.getTransformers(), e);
         }
     }
 
@@ -655,36 +652,43 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         return outputStream;
     }
 
-    private void marshallTransformers(UMOTransformer trans, ObjectOutputStream out) throws IOException
+    private void marshallTransformers(List transformers, ObjectOutputStream out) throws IOException
     {
-        if (trans != null)
+        if (transformers != null)
         {
-            out.writeObject(trans.getName());
-            marshallTransformers(trans.getNextTransformer(), out);
+            Iterator transformer = transformers.iterator();
+            while (transformer.hasNext())
+            {
+                out.writeObject(((UMOTransformer) transformer.next()).getName());
+            }
         }
     }
 
-    private UMOTransformer unmarshallTransformers(ObjectInputStream in) throws IOException, ClassNotFoundException
+    private List unmarshallTransformers(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
-        UMOTransformer trans = null;
+        List transformers = new LinkedList();
         try {
-            String transformerName = (String) in.readObject();
-            trans = RegistryContext.getRegistry().lookupTransformer(transformerName);
-            trans.setNextTransformer(unmarshallTransformers(in));
+            while (true)
+            {
+                String transformerName = (String) in.readObject();
+                transformers.add(RegistryContext.getRegistry().lookupTransformer(transformerName));
+            }
         } catch (OptionalDataException e) {
+            // as far as i can tell, this must always report an error
+            // (and was like this before converting to transformer lists)
             if (logger.isDebugEnabled())
             {
                 logger.debug("Failed to load transformers from stream", e);
             }
         }
-        return trans;
+        return transformers;
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException
     {
         out.defaultWriteObject();
         out.writeObject(endpoint.getEndpointURI().toString());
-        marshallTransformers(endpoint.getTransformer(), out);
+        marshallTransformers(endpoint.getTransformers(), out);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -692,14 +696,14 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         logger = LogFactory.getLog(getClass());
         in.defaultReadObject();
         String uri = (String) in.readObject();
-        UMOTransformer trans = unmarshallTransformers(in);
+        List transformers = unmarshallTransformers(in);
         try
         {
             endpoint = getManagementContext().getRegistry().lookupOutboundEndpoint(uri,getManagementContext());
 
-            if (endpoint.getTransformer() == null)
+            if (TransformerUtils.isUndefined(endpoint.getTransformers()))
             {
-                ((UMOEndpoint) endpoint).setTransformer(trans);
+                ((UMOEndpoint) endpoint).setTransformers(transformers);
             }
         }
         catch (UMOException e)

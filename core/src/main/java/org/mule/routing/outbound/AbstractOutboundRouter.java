@@ -70,13 +70,13 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
             {
                 logger.debug("Message being sent to: " + endpoint.getEndpointURI() + " Message payload: \n"
                              + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false)
-                             + "\n outbound transformer is: " + endpoint.getTransformer());
+                             + "\n outbound transformer is: " + endpoint.getTransformers());
             }
             catch (Exception e)
             {
                 logger.debug("Message being sent to: " + endpoint.getEndpointURI()
                              + " Message payload: \n(unable to retrieve payload: " + e.getMessage()
-                             + "\n outbound transformer is: " + endpoint.getTransformer());
+                             + "\n outbound transformer is: " + endpoint.getTransformers());
             }
         }
 

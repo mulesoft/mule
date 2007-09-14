@@ -17,6 +17,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.CollectionUtils;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -36,7 +37,7 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public UMOEndpoint getEndpoint() throws Exception
     {
         endpoint = new MuleEndpoint("http://localhost:6789", true);
-        endpoint.setResponseTransformer(new UMOMessageToHttpResponse());
+        endpoint.setResponseTransformers(CollectionUtils.singletonList(new UMOMessageToHttpResponse()));
         return endpoint;
     }
 }

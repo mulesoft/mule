@@ -13,6 +13,7 @@ package org.mule.impl;
 import org.mule.MuleException;
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
+import org.mule.transformers.TransformerUtils;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -42,6 +43,8 @@ import org.mule.util.ObjectNameHelper;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,7 +52,6 @@ import java.util.regex.Pattern;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -80,14 +82,14 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     protected UMOEndpointURI endpointUri = null;
 
     /**
-     * The transformer used to transform the incoming or outgoing data
+     * The transformers used to transform the incoming or outgoing data
      */
-    protected AtomicReference transformer = new AtomicReference(UninitialisedTransformer.getInstance());
+    protected AtomicReference transformers = new AtomicReference(TransformerUtils.UNDEFINED);
 
     /**
-     * The transformer used to transform the incoming or outgoing data
+     * The transformers used to transform the incoming or outgoing data
      */
-    protected UMOTransformer responseTransformer = null;
+    protected AtomicReference responseTransformers = new AtomicReference(TransformerUtils.UNDEFINED);
 
     /**
      * The name for the endpoint
@@ -190,7 +192,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public ImmutableMuleEndpoint(String name,
                                  UMOEndpointURI endpointUri,
                                  UMOConnector connector,
-                                 UMOTransformer transformer,
+                                 List transformers,
                                  String type,
                                  int createConnector,
                                  String endpointEncoding,
@@ -207,7 +209,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             this.endpointUri = new MuleEndpointURI(endpointUri);
         }
 
-        initTransformerIfNotNull(transformer);
+        setTransformersIfUndefined(this.transformers, transformers);
 
         this.properties = new ConcurrentHashMap();
 
@@ -268,17 +270,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             connector = source.getConnector();
         }
 
-        initTransformerIfNotNull(source.getTransformer());
-
-        if (responseTransformer == null)
-        {
-            responseTransformer = source.getResponseTransformer();
-        }
-
-        if (responseTransformer != null)
-        {
-            responseTransformer.setEndpoint(this);
-        }
+        setTransformersIfUndefined(transformers, source.getTransformers());
+        setTransformersIfUndefined(responseTransformers, source.getResponseTransformers());
 
         properties = new ConcurrentHashMap();
 
@@ -339,23 +332,10 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return name;
     }
 
-    public UMOTransformer getTransformer()
+    public List getTransformers()
     {
-        lazyInitTransformer();
-        return getTransformerValue();
-    }
-
-    protected UMOTransformer getTransformerValue()
-    {
-        UMOTransformer value = (UMOTransformer) transformer.get();
-        if (UninitialisedTransformer.getInstance() == value)
-        {
-            return null;
-        }
-        else
-        {
-            return value;
-        }
+        lazyInitTransformers();
+        return (List) transformers.get();
     }
 
     public Map getProperties()
@@ -379,7 +359,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             sanitizedEndPointUri = endpointUri.toString();
             uri = endpointUri.getUri();
         }
-        //
         // The following will further sanitize the endpointuri by removing
         // the embedded password. This will only remove the password if the
         // uri contains all the necessary information to successfully rebuild the url
@@ -404,7 +383,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
 
         return ClassUtils.getClassName(getClass()) + "{endpointUri=" + sanitizedEndPointUri
-               + ", connector=" + connector + ", transformer=" + getTransformerValue() + ", name='" + name + "'"
+               + ", connector=" + connector + ", transformer=" + transformers.get() + ", name='" + name + "'"
                + ", type='" + type + "'" + ", properties=" + properties + ", transactionConfig="
                + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
                + deleteUnacceptedMessages + ", initialised=" + initialised + ", securityFilter="
@@ -461,13 +440,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         {
             return false;
         }
-        // MULE-1551
-//        if (transformer != null
-//                        ? !transformer.equals(immutableMuleProviderDescriptor.transformer)
-//                        : immutableMuleProviderDescriptor.transformer != null)
-//        {
-//            return false;
-//        }
+        // MULE-1551 - transformer excluded from comparison here
         return getType().equals(immutableMuleProviderDescriptor.getType());
     }
 
@@ -475,14 +448,9 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         int result = appendHash(0, connector);
         result = appendHash(result, endpointUri);
-        // MULE-1551
-//        result = appendHash(result, transformer);
+        // MULE-1551 - transformer excluded from hash here
         result = appendHash(result, name);
         result = appendHash(result, getType());
-//        if (logger.isDebugEnabled())
-//        {
-//            logger.debug("hashCode: " + result);
-//        }
         return result;
     }
 
@@ -576,40 +544,22 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             properties = Collections.unmodifiableMap(properties);
         }
 
-        if (endpointUri.getTransformers() != null)
+        try
         {
-            try
-            {
-                UMOTransformer newTransformer = MuleObjectHelper.getTransformer(endpointUri.getTransformers(), ",");
-                initTransformerIfNotNull(newTransformer);
-            }
-            catch (MuleException e)
-            {
-                throw new InitialisationException(e, this);
-            }
+            setTransformersIfUndefined(transformers,
+                    MuleObjectHelper.getTransformers(endpointUri.getTransformers(), ","));
+            setTransformersIfUndefined(responseTransformers,
+                    MuleObjectHelper.getTransformers(endpointUri.getResponseTransformers(), ","));
         }
-
-        if (endpointUri.getResponseTransformers() != null)
+        catch (MuleException e)
         {
-            try
-            {
-                responseTransformer = MuleObjectHelper.getTransformer(endpointUri.getResponseTransformers(), ",");
-            }
-            catch (MuleException e)
-            {
-                throw new InitialisationException(e, this);
-            }
+            throw new InitialisationException(e, this);
         }
-        if (responseTransformer == null)
+        
+        if (connector instanceof AbstractConnector)
         {
-            if (connector instanceof AbstractConnector)
-            {
-                responseTransformer = ((AbstractConnector) connector).getDefaultResponseTransformer();
-            }
-        }
-        if (responseTransformer != null)
-        {
-            responseTransformer.setEndpoint(this);
+            setTransformersIfUndefined(responseTransformers,
+                    ((AbstractConnector) connector).getDefaultResponseTransformers());
         }
 
         if (securityFilter != null)
@@ -638,72 +588,58 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
         initialised.set(true);
 
-        // For now at least, we don't want a registration error to affect
-        // the initialisation process.
-// MULE-1989
-//        try
-//        {
-//            register();
-//            UMOTransformer transformerValue = getTransformerValue();
-//            if (transformerValue != null && transformerValue.getRegistryId() == null) transformerValue.register();
-//            if (responseTransformer != null && responseTransformer.getRegistryId() == null) responseTransformer.register();
-//        }
-//        catch (RegistrationException re)
-//        {
-//            logger.warn(re);
-//        }
+        // MULE-1989 - registration related bumph removed
     }
 
-    protected void lazyInitTransformer()
+    protected void lazyInitTransformers()
     {
         // for efficiency
-        if (UninitialisedTransformer.getInstance() == transformer.get())
+        if (TransformerUtils.isUndefined((List) transformers.get()))
         {
-            UMOTransformer newTransformer = null;
+            List newTransformers;
             if (connector instanceof AbstractConnector)
             {
                 if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
                 {
-                    newTransformer = ((AbstractConnector) connector).getDefaultOutboundTransformer();
+                    newTransformers = ((AbstractConnector) connector).getDefaultOutboundTransformers();
                 }
                 else
                 {
-                    newTransformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
+                    newTransformers = ((AbstractConnector) connector).getDefaultInboundTransformers();
                 }
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Creating new transformer " + newTransformer + " for endpoint " + this + " of type " + type);
+                    logger.debug("Creating new transformer " + newTransformers + " for endpoint " + this + " of type " + type);
                 }
             }
             else
             {
+                newTransformers = null;
                 // Why would a connector not inherit AbstractConnector?
                 logger.warn("Connector " + connector.getName() + " does not inherit AbstractConnector");
             }
-            // this respects the original semantics; not sure it makes sense
-            // ie there is no further initialisation after this point - value
-            // may be forced to null here
-            transformer.compareAndSet(UninitialisedTransformer.getInstance(), newTransformer);
-            updateTransformerEndpoint();
+            setTransformersIfUndefined(transformers, newTransformers);
         }
     }
 
-    protected void initTransformerIfNotNull(UMOTransformer newTransformer)
+    protected void setTransformersIfUndefined(AtomicReference reference, List transformers)
     {
-        if (null != newTransformer)
-        {
-            transformer.compareAndSet(UninitialisedTransformer.getInstance(), newTransformer);
-            updateTransformerEndpoint();
-        }
+        TransformerUtils.discourageNullTransformers(transformers);
+        reference.compareAndSet(TransformerUtils.UNDEFINED, transformers);
+        updateTransformerEndpoints(reference);
     }
 
-    protected void updateTransformerEndpoint()
+    // TODO - remove (or fix)
+    protected void updateTransformerEndpoints(AtomicReference reference)
     {
-        UMOTransformer target = getTransformerValue();
-        if (null != target)
+        List transformers = (List) reference.get();
+        if (TransformerUtils.isDefined(transformers))
         {
-            // setEndpoint should be idempotent
-            target.setEndpoint(this);
+            Iterator transformer = transformers.iterator();
+            while (transformer.hasNext())
+            {
+                ((UMOTransformer) transformer.next()).setEndpoint(this);
+            }
         }
     }
 
@@ -797,9 +733,9 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return initialState;
     }
 
-    public UMOTransformer getResponseTransformer()
+    public List getResponseTransformers()
     {
-        return responseTransformer;
+        return (List) responseTransformers.get();
     }
 
     /**

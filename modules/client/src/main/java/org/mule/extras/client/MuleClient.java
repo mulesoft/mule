@@ -31,6 +31,7 @@ import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.TransportFactory;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
@@ -47,19 +48,18 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -403,10 +403,10 @@ public class MuleClient implements Disposable
                 CoreMessages.objectNotRegistered("Component", component),
                 message, null);
         }
-        UMOTransformer trans = null;
+        List trans = null;
         if (transformers != null)
         {
-            trans = MuleObjectHelper.getTransformer(transformers, ",");
+            trans = MuleObjectHelper.getTransformers(transformers, ",");
         }
 
         if (!RegistryContext.getConfiguration().isDefaultSynchronousEndpoints())
@@ -433,7 +433,7 @@ public class MuleClient implements Disposable
 
         if (result != null && trans != null)
         {
-            return new MuleMessage(trans.transform(result.getPayload()));
+            return TransformerUtils.applyAllTransformers(trans, result);
         }
         else
         {
@@ -636,7 +636,7 @@ public class MuleClient implements Disposable
 
         if (StringUtils.isNotBlank(transformers))
         {
-            result.setTransformer(MuleObjectHelper.getTransformer(transformers, ","));
+            result.setTransformers(MuleObjectHelper.getTransformers(transformers, ","));
         }
 
         result.execute();
@@ -759,13 +759,9 @@ public class MuleClient implements Disposable
         try
         {
             UMOMessage message = endpoint.receive(timeout);
-            if (message != null && endpoint.getTransformer() != null)
+            if (message != null && endpoint.getTransformers() != null)
             {
-                if (endpoint.getTransformer().isSourceTypeSupported(message.getPayload().getClass()))
-                {
-                    message = new MuleMessage(endpoint.getTransformer().transform(message.getPayload()),
-                        message);
-                }
+                message = TransformerUtils.applyAllTransformers(endpoint.getTransformers(), message);
             }
             return message;
         }
@@ -790,7 +786,7 @@ public class MuleClient implements Disposable
      */
     public UMOMessage receive(String url, String transformers, long timeout) throws UMOException
     {
-        return receive(url, MuleObjectHelper.getTransformer(transformers, ","), timeout);
+        return receive(url, MuleObjectHelper.getTransformers(transformers, ","), timeout);
     }
 
     /**
@@ -798,19 +794,19 @@ public class MuleClient implements Disposable
      * 
      * @param url the Mule url used to determine the destination and transport of the
      *            message
-     * @param transformer A transformer used to apply to the result message
+     * @param transformers Transformers used to modify the result message
      * @param timeout how long to block waiting to receive the event, if set to 0 the
      *            receive will not wait at all and if set to -1 the receive will wait
      *            forever
      * @return the message received or null if no message was received
      * @throws org.mule.umo.UMOException
      */
-    public UMOMessage receive(String url, UMOTransformer transformer, long timeout) throws UMOException
+    public UMOMessage receive(String url, List transformers, long timeout) throws UMOException
     {
         UMOMessage message = receive(url, timeout);
-        if (message != null && transformer != null)
+        if (message != null && transformers != null)
         {
-            return new MuleMessage(transformer.transform(message.getPayload()));
+            return TransformerUtils.applyAllTransformers(transformers, message);
         }
         else
         {
@@ -874,16 +870,18 @@ public class MuleClient implements Disposable
         UMOEndpoint endpoint = (UMOEndpoint)descriptor.getInboundRouter().getEndpoints().get(0);
         if (endpoint != null)
         {
-            if (endpoint.getTransformer() != null)
+            if (endpoint.getTransformers() != null)
             {
-                if (endpoint.getTransformer().isSourceTypeSupported(payload.getClass()))
+                // the original code here really did just check the first exception
+                // as far as i can tell
+                if (TransformerUtils.isSourceTypeSupportedByFirst(endpoint.getTransformers(), payload.getClass()))
                 {
                     return endpoint;
                 }
                 else
                 {
                     endpoint = new MuleEndpoint(endpoint);
-                    endpoint.setTransformer(null);
+                    endpoint.setTransformers(new LinkedList());
                     return endpoint;
                 }
             }
@@ -899,8 +897,8 @@ public class MuleClient implements Disposable
             connector = TransportFactory.createConnector(defaultEndpointUri, managementContext);
             managementContext.getRegistry().registerConnector(connector);
             connector.start();
-            endpoint = new MuleEndpoint("muleClientProvider", defaultEndpointUri, connector, null,
-                UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);
+            endpoint = new MuleEndpoint("muleClientProvider", defaultEndpointUri, connector,
+                    TransformerUtils.UNDEFINED, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);
         }
 
        managementContext.getRegistry().registerEndpoint(endpoint);

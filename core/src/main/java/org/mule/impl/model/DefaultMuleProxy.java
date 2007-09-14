@@ -393,9 +393,9 @@ public class DefaultMuleProxy implements MuleProxy
         {
             replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler();
             // Use the response transformer for the event if one is set
-            if (endpoint.getResponseTransformer() != null)
+            if (endpoint.getResponseTransformers() != null)
             {
-                replyToHandler.setTransformer(endpoint.getResponseTransformer());
+                replyToHandler.setTransformers(endpoint.getResponseTransformers());
             }
         }
         return replyToHandler;

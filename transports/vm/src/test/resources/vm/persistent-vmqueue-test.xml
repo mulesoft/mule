@@ -26,7 +26,7 @@
             <outbound-router>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint address="echo">
-                        <transformers-ref transformers="testTransformer"/>
+                        <transformer ref="testTransformer"/>
                     </vm:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>

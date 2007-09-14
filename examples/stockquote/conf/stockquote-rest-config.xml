@@ -57,7 +57,7 @@
 
             <inbound-router>
                 <inbound-endpoint address="vm://stockquote"
-                               responseTransformers="XmlDecoder Xslt XmlToObject"/>
+                                  responseTransformer-ref="XmlDecoder Xslt XmlToObject"/>
             </inbound-router>
         </service>
     </model>

@@ -24,6 +24,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.util.CollectionUtils;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -93,7 +94,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage("test event");
 
         UMOEndpoint endpoint = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        endpoint.setTransformer(new StringToByteArray());
+        endpoint.setTransformers(CollectionUtils.singletonList(new StringToByteArray()));
         UMOEvent event = new MuleEvent(message, endpoint, (UMOSession)session.proxy(), false);
         assertTrue(router.isMatch(event));
 
