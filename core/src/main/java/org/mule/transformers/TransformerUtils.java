@@ -84,7 +84,7 @@ public class TransformerUtils
                 }
                 else
                 {
-                    return null;
+                    break;
                 }
             }
 
@@ -122,7 +122,6 @@ public class TransformerUtils
                     logger.debug("Transformer: " + iterator + " doesn't support the result payload: "
                             + payload.getClass());
                 }
-                // abort series at this point
                 break;
             }
         }
