@@ -379,6 +379,36 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="no-args-call-component" type="noArgsCallWrapperType" substitutionGroup="abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                Built-in NoArgsCallWrapper
+                There's a need to call a method having no arguments.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="noArgsCallWrapperType">
+        <xsd:complexContent>
+            <xsd:extension base="componentShortcutType">
+                <xsd:choice minOccurs="1" maxOccurs="1">
+                        <xsd:element name="delegateClass" type="noArgsCallDelegateClassType"/>
+                        <xsd:element name="delegateInstance" type="noArgsCallDelegateInstanceType"/>
+                    </xsd:choice>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="noArgsCallDelegateClassType">
+        <xsd:attribute name="delegateClass" type="xsd:string" use="required"/>
+        <xsd:attribute name="delegateMethod" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="noArgsCallDelegateInstanceType">
+        <xsd:attribute name="delegateInstance-ref" type="xsd:NMTOKEN" use="required"/>
+        <xsd:attribute name="delegateMethod" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
 
     <!-- Transaction Managers -->
 
@@ -1664,8 +1694,6 @@
             </xsd:simpleType>
         </xsd:union>
     </xsd:simpleType>
-    
-    
     <!--==============================================================-->
     <!--  ObjectFactory Types                                         -->
     <!--==============================================================-->
@@ -1735,7 +1763,7 @@
             <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0"/>
         </xsd:sequence>
     </xsd:group>
-    
+
     <xsd:complexType name="serviceOverridesType">
         <xsd:attribute name="messageReceiver" type="xsd:NMTOKEN"/>
         <xsd:attribute name="transactedMessageReceiver" type="xsd:NMTOKEN"/>
@@ -1749,7 +1777,6 @@
         <xsd:attribute name="serviceFinder" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
-    
     <!--==============================================================-->
     <!--   JNDI support                                               -->
     <!--==============================================================-->

@@ -12,11 +12,13 @@ package org.mule.config.spring.handlers;
 import org.mule.components.simple.BridgeComponent;
 import org.mule.components.simple.EchoComponent;
 import org.mule.components.simple.LogComponent;
+import org.mule.components.simple.NoArgsCallWrapper;
 import org.mule.components.simple.NullComponent;
 import org.mule.components.simple.PassThroughComponent;
 import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.editors.TransformerChain;
+import org.mule.config.spring.parsers.collection.AttributeMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
@@ -231,10 +233,16 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("log-component", new SimpleComponentDefinitionParser("serviceFactory", LogComponent.class));
         registerBeanDefinitionParser("echo-component", new SimpleComponentDefinitionParser("serviceFactory", EchoComponent.class));
         registerBeanDefinitionParser("null-component", new SimpleComponentDefinitionParser("serviceFactory", NullComponent.class));
+        registerBeanDefinitionParser("no-args-call-component", new SimpleComponentDefinitionParser("serviceFactory", NoArgsCallWrapper.class));
+
         registerBeanDefinitionParser("inbound-router", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
         registerBeanDefinitionParser("nested-router", new ChildDefinitionParser("nestedRouter", NestedRouterCollection.class));
         registerBeanDefinitionParser("response-router", new ChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
+
+        //NoArgsCallWrapper
+        registerBeanDefinitionParser("delegateClass", new AttributeMapDefinitionParser("properties"));
+        registerBeanDefinitionParser("delegateInstance", new AttributeMapDefinitionParser("properties"));
 
         //Inbound Routers
         registerBeanDefinitionParser("inbound-pass-through-router", new RouterDefinitionParser("router", InboundPassThroughRouter.class));
