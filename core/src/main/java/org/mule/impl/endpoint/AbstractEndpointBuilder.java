@@ -217,7 +217,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected boolean getDefaultRemoteSync(UMOConnector connector)
     {
-        return !connector.isRemoteSyncEnabled();
+        return false;
     }
 
     protected boolean getDeleteUnacceptedMessages(UMOConnector connector)
