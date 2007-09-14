@@ -14,7 +14,6 @@ import org.mule.MuleException;
 import org.mule.RegistryContext;
 import org.mule.transformers.TransformerUtils;
 import org.mule.config.ThreadingProfile;
-import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;

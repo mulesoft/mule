@@ -31,9 +31,6 @@
                       class="org.springframework.beans.factory.config.CustomEditorConfigurer">
                     <property name="customEditors">
                         <map>
-                            <entry key="org.mule.umo.transformer.UMOTransformer">
-                                <bean class="org.mule.config.spring.editors.TransformerPropertyEditor"/>
-                            </entry>
                             <entry key="org.mule.umo.provider.UMOConnector">
                                 <bean class="org.mule.config.spring.editors.ConnectorPropertyEditor"/>
                             </entry>

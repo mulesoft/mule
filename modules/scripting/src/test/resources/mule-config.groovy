@@ -2,7 +2,6 @@ package org.mule.config.builders;
 
 import org.mule.MuleServer
 import org.mule.config.MuleProperties;
-import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.ResponseEndpoint;

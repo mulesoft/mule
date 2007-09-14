@@ -10,7 +10,6 @@
 
 package org.mule.tck;
 
-import org.mule.config.spring.editors.TransformerChain;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
@@ -36,7 +35,6 @@ import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
