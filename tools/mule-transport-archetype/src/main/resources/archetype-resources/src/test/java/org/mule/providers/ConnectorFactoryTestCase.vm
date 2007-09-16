@@ -12,9 +12,8 @@
 package org.mule.providers.${TransportName.toLowerCase()};
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.service.TransportFactory;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 
 public class ${TransportName}ConnectorFactoryTestCase extends AbstractMuleTestCase
@@ -26,10 +25,11 @@ public class ${TransportName}ConnectorFactoryTestCase extends AbstractMuleTestCa
     public void testCreateFromFactory() throws Exception
     {
         MuleEndpointURI url = new MuleEndpointURI(getEndpointURI());
-        UMOEndpoint endpoint = TransportFactory.createEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().createEndpoint(
+                url, UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
-        assertTrue(endpoint.getConnector() instanceof ${TransportName}Connector);
+        assertTrue(endpoint.getConnector() instanceof Test2Connector);
         assertEquals(getEndpointURI(), endpoint.getEndpointURI().getAddress());
     }
     

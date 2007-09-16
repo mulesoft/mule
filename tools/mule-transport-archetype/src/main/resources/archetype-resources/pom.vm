@@ -85,7 +85,7 @@
        </repository>
    </repositories>
 
-   <!-- End of MuleForge Configuration
+   <!-- End of MuleForge Configuration -->
 #end
 
    <build>

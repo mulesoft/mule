@@ -1,16 +1,6 @@
 <archetype>
     <id>maven-archetype-mule-transport</id>
     <variables>
-        <!--<variable>-->
-        <!--<name>MuleVersion</name>-->
-        <!--<description>Which version of Mule are you working with?</description>-->
-        <!--<defvalue></defvalue>-->
-        <!--</variable>-->
-        <!--<variable>-->
-        <!--<name>TransportName</name>-->
-        <!--<description>The protocol name to use for the transport (lower case) i.e. jms or http</description>-->
-        <!--<defvalue>myTransport</defvalue>-->
-        <!--</variable>-->
         <variable>
             <name>TransportDescription</name>
             <description>Provide a description of what the transport does:</description>
@@ -100,6 +90,7 @@
 
     </variables>
     <templates>
+        <!-- the template pom should be run fisrt since it sets up some other variables -->
         <template>
             <file>pom.vm</file>
             <output>pom.xml</output>

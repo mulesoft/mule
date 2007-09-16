@@ -21,14 +21,13 @@ public class ${TransportName}ConnectorTestCase extends AbstractConnectorTestCase
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
-    public UMOConnector getConnector() throws Exception
+    public UMOConnector createConnector() throws Exception
     {
- 
         /* IMPLEMENTATION NOTE: Create and initialise an instance of your
            connector here. Do not actually call the connect method. */
 
-        ${TransportName}Connector c = new ${TransportName}Connector();
-        c.setName("Test-${TransportName}");
+        Test2Connector c = new Test2Connector();
+        c.setName("Test-Test2");
         // TODO Set any additional properties on the connector here
         return c;
     }
