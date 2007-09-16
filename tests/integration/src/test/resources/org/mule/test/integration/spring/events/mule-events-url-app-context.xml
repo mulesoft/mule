@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-    <bean id="muleManager"
-        class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean"/>
+    <!--<bean id="muleManager"-->
+    <!--class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean"/>-->
 
-    <bean id="muleNameProcessor"
-        class="org.mule.extras.spring.config.MuleObjectNameProcessor"/>
+    <!--<bean id="muleNameProcessor"-->
+    <!--class="org.mule.extras.spring.config.MuleObjectNameProcessor"/>-->
 
     <bean id="applicationEventMulticaster"
-        class="org.mule.extras.spring.events.MuleEventMulticaster">
+          class="org.mule.extras.spring.events.MuleEventMulticaster">
         <property name="subscriptions">
             <list>
                 <value>vm://*</value>
@@ -18,36 +18,19 @@
     </bean>
 
     <bean id="emailEndpoint" class="org.mule.impl.endpoint.MuleEndpoint">
-        <property name="name">
-            <value>email</value>
-        </property>
+        <property name="name" value="email"/>
         <property name="connector">
             <ref local="mailConnector"/>
         </property>
-        <property name="type">
-            <value>receiver</value>
-        </property>
-        <property name="address">
-            <value>pop3://user@lotsofmail.org</value>
-        </property>
+        <property name="type" value="receiver"/>
+        <property name="endpointURI" value="pop3://user@lotsofmail.org"/>
     </bean>
 
-    <bean id="mailConnector"
-        class="org.mule.providers.email.Pop3Connector">
-        <property name="name">
-            <value>mailConnector</value>
-        </property>
-        <property name="username">
-            <value>mule</value>
-        </property>
-        <property name="hostname">
-            <value>mail.muleumo.org</value>
-        </property>
-        <property name="password">
-            <value>secret</value>
-        </property>
-        <property name="checkFrequency">
-            <value>60000</value>
-        </property>
+    <bean id="mailConnector" class="org.mule.providers.email.Pop3Connector">
+        <property name="name" value="mailConnector"/>
+        <property name="username" value="mule"/>
+        <property name="hostname" value="mail.muleumo.org"/>
+        <property name="password" value="secret"/>
+        <property name="checkFrequency" value="60000"/>
     </bean>
 </beans>

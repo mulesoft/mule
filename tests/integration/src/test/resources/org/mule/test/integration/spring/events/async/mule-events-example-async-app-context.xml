@@ -2,43 +2,30 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
     <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost</value></property>
-        <property name="useEmbeddedBroker"><value>true</value></property>
-        <property name="brokerContainerFactory">
-            <bean id="bcf" class="org.activemq.broker.impl.BrokerContainerFactoryImpl">
-                <constructor-arg index="0">
-                    <bean id="vmp" class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/>
-                </constructor-arg>
-            </bean>
-        </property>
+        <property name="brokerURL" value="vm://localhost"/>
     </bean>
 
     <!-- the jms server connector config -->
     <bean id="jmsConnector" class="org.mule.providers.jms.JmsConnector">
-        <property name="connectionFactory"><ref local="jmsConnectionFactory"/></property>
-        <property name="specification"><value>1.1</value></property>
-        <property name="jndiProviderProperties">
-            <map>
-                <entry key="brokerURL"><value>vm://localhost</value></entry>
-            </map>
-        </property>
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+        <property name="specification" value="1.1"/>
     </bean>
 
-   <!-- The Mule implementation of the Spring ApplicationEventMulticaster.  On startup the
-   application context will look in the container for a bean called applicationEventMulticaster and
-   register it as the spring context event multicaster  -->
-   <bean id="applicationEventMulticaster" class="org.mule.extras.spring.events.MuleEventMulticaster">
+    <!-- The Mule implementation of the Spring ApplicationEventMulticaster.  On startup the
+application context will look in the container for a bean called applicationEventMulticaster and
+register it as the spring context event multicaster  -->
+    <bean id="applicationEventMulticaster" class="org.mule.extras.spring.events.MuleEventMulticaster">
         <property name="asynchronous" value="true"/>
-     </bean>
+    </bean>
 
-   <!-- Our ourderManager bean -->
+    <!-- Our ourderManager bean -->
     <bean id="orderManager" class="org.mule.test.integration.spring.events.async.AsyncOrderManagerBean">
         <property name="subscriptions">
-        <list>
-            <value>jms://orders.queue</value>
-            <!-- <value>pop3://user:password@mail.myrestaurant.com?transformers=EmailMessageToString,StringToOrder</value>-->
-            <value>axis:http://localhost:44444/mule/orderManager</value>
-        </list>
+            <list>
+                <value>jms://orders.queue</value>
+                <!-- <value>pop3://user:password@mail.myrestaurant.com?transformers=EmailMessageToString,StringToOrder</value>-->
+                <value>axis:http://localhost:44444/mule/orderManager</value>
+            </list>
         </property>
     </bean>
 
@@ -46,7 +33,8 @@
     <!-- <bean id="EmailMessageToString" class="org.mule.providers.email.transformers.EmailMessageToString"/>-->
 
     <bean id="StringToOrder" class="org.mule.test.integration.spring.events.StringToOrder">
-        <property name="returnClass"><value>org.mule.test.integration.spring.events.Order</value></property>
+        <property name="returnClass">
+            <value>org.mule.test.integration.spring.events.Order</value>
+        </property>
     </bean>
-
 </beans>
