@@ -18,7 +18,7 @@ import org.mule.providers.AbstractMessageReceiver;
 #end
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
 /**
@@ -33,31 +33,33 @@ public class ${TransportName}MessageReceiver extends #if( $PollingMessageReceive
 #if( $PollingMessageReceiver == "y")
     public ${TransportName}MessageReceiver(UMOConnector connector, UMOComponent component,
                               UMOEndpoint endpoint, long pollingFrequency)
-            throws InitialisationException
+            throws CreateException
     {
-        super(connector, component, endpoint, pollingFrequency);
+        super(connector, component, endpoint);
+        setFrequency(pollingFrequency);
     }
 #else
     public ${TransportName}MessageReceiver(UMOConnector connector, UMOComponent component,
                               UMOEndpoint endpoint)
-            throws InitialisationException
+            throws CreateException
     {
         super(connector, component, endpoint);
     }
 #end
     public void doConnect() throws ConnectException
     {
-        /* IMPLEMENTATION NOTE: Should make a connection to the underlying
+        /* IMPLEMENTATION NOTE: This method should make a connection to the underlying
            transport i.e. connect to a socket or register a soap service. When
            there is no connection to be made this method should be used to
-           chack that resources are available. For example the
+           check that resources are available. For example the
            FileMessageReceiver checks that the directories it will be using
            are available and readable. The MessageReceiver should remain in a
            'stopped' state even after the doConnect() method is called. This
            means that a connection has been made but no events will be
-           received until the start() method is called. Calling start() on the
-           MessageReceiver will call doConnect() if the receiver hasn't
-           connected. */
+           received until the start() method is called.
+
+           Calling start() on the MessageReceiver will call doConnect() if the receiver
+           hasn't connected already. */
 
         /* IMPLEMENTATION NOTE: If you need to spawn any threads such as
            worker threads for this receiver you can schedule a worker thread
@@ -83,7 +85,7 @@ public class ${TransportName}MessageReceiver extends #if( $PollingMessageReceive
            MessageReceiver into a disconnected state so that it can be
            connected again using the doConnect() method. */
 
-        // TODO release any resources
+        // TODO release any resources here
     }
 
     public void doStart()

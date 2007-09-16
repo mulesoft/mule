@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:${TransportNameLower}="http://www.mulesource.org/schema/mule/${TransportNameLower}/${MuleMajorMinorVersion}"
+    xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion} http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}/mule.xsd
+       http://www.mulesource.org/schema/mule/${TransportNameLower}/${MuleMajorMinorVersion} http://www.mulesource.org/schema/mule/${TransportNameLower}/${MuleMajorMinorVersion}/mule-${TransportNameLower}.xsd">
+
+    <${TransportNameLower}:connector name="${TransportNameLower}Connector">
+        <!-- TODO Add connector specific properties here and then assert that 
+             they have been set in org.mule.providers.${TransportNameLower}.${TransportName}NamespaceHandlerTestCase -->
+    </${TransportNameLower}:connector>
+
+</mule>

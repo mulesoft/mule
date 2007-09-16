@@ -1,20 +1,30 @@
 <archetype>
     <id>maven-archetype-mule-transport</id>
     <variables>
-        <variable>
-            <name>MuleVersion</name>
-            <description>Which version of Mule are you working with?</description>
-            <defvalue>1.4</defvalue>
-        </variable>
-        <variable>
-            <name>TransportName</name>
-            <description>The protocol name to use for the transport (lower case) i.e. jms or http</description>
-            <defvalue>myTransport</defvalue>
-        </variable>
+        <!--<variable>-->
+        <!--<name>MuleVersion</name>-->
+        <!--<description>Which version of Mule are you working with?</description>-->
+        <!--<defvalue></defvalue>-->
+        <!--</variable>-->
+        <!--<variable>-->
+        <!--<name>TransportName</name>-->
+        <!--<description>The protocol name to use for the transport (lower case) i.e. jms or http</description>-->
+        <!--<defvalue>myTransport</defvalue>-->
+        <!--</variable>-->
         <variable>
             <name>TransportDescription</name>
             <description>Provide a description of what the transport does:</description>
             <defvalue></defvalue>
+        </variable>
+        <variable>
+            <name>ForgeProject</name>
+            <description>Will This project be hosted on MuleForge? [y] or [n]</description>
+            <defvalue>y</defvalue>
+        </variable>
+        <variable>
+            <name>CustomSchema</name>
+            <description>Will This transport have a custom schema for configuring the transport in Xml?</description>
+            <defvalue>y</defvalue>
         </variable>
         <variable>
             <name>Receiver</name>
@@ -24,7 +34,8 @@
             <variables>
                 <variable>
                     <name>PollingMessageReceiver</name>
-                    <description>Does the Message Receiver need to poll the underlying resource? [y] or [n]</description>
+                    <description>Does the Message Receiver need to poll the underlying resource? [y] or [n]
+                    </description>
                     <defvalue>n</defvalue>
                 </variable>
 
@@ -69,7 +80,7 @@
                 <variable>
                     <name>CustomTransactions</name>
                     <description>Does this transport use a non-JTA Transaction manager? [y] or [n]
-                    (i.e. needs to wrap proprietary transaction management)
+                        (i.e. needs to wrap proprietary transaction management)
                     </description>
                     <defvalue>n</defvalue>
                 </variable>
@@ -79,10 +90,10 @@
         <variable>
             <name>EndpointBuilder</name>
             <description>What type of Endpoints does this transport use?
-            - [r]esource endpoints (i.e. jms://my.queue)
-            - [u]rl endpoints (i.e. http://localhost:1234/context/foo?param=1)
-            - [s]ocket endpoints (i.e. tcp://localhost:1234)
-            - [c]ustom - parse your own
+                - [r]esource endpoints (i.e. jms://my.queue)
+                - [u]rl endpoints (i.e. http://localhost:1234/context/foo?param=1)
+                - [s]ocket endpoints (i.e. tcp://localhost:1234)
+                - [c]ustom - parse your own
             </description>
             <defvalue>r</defvalue>
         </variable>
@@ -90,22 +101,49 @@
     </variables>
     <templates>
         <template>
+            <file>pom.vm</file>
+            <output>pom.xml</output>
+        </template>
+        <template>
+            <file>assembly.xml.vm</file>
+            <output>assembly.xml</output>
+        </template>
+        <template>
             <file>src/main/resources/META-INF/services/org/mule/providers/csd.vm</file>
-            <output>src/main/resources/META-INF/services/org/mule/providers/${TransportName}</output>
+            <output>src/main/resources/META-INF/services/org/mule/providers/${TransportNameLower}.properties</output>
         </template>
         <template>
             <file>src/main/resources/META-INF/services/org/mule/i18n/messages.vm</file>
-            <output>src/main/resources/META-INF/services/org/mule/i18n/${TransportNameLower}-messages.properties</output>
+            <output>src/main/resources/META-INF/services/org/mule/i18n/${TransportNameLower}-messages.properties
+            </output>
         </template>
         <template>
-            <file>pom.vm</file>
-            <output>pom.xml</output>
+            <file>src/main/resources/META-INF/spring.handlers.vm</file>
+            <output>src/main/resources/META-INF/spring.handlers</output>
+            <dependsOnVar>CustomSchema=y</dependsOnVar>
+        </template>
+        <template>
+            <file>src/main/resources/META-INF/spring.schemas.vm</file>
+            <output>src/main/resources/META-INF/spring.schemas</output>
+            <dependsOnVar>CustomSchema=y</dependsOnVar>
+        </template>
+        <template>
+            <file>src/main/resources/META-INF/schema.vm</file>
+            <output>src/main/resources/META-INF/mule-${TransportNameLower}.xsd</output>
+            <dependsOnVar>CustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/providers/Connector.vm</file>
             <output>
                 src/main/java/org/mule/providers/${TransportNameLower}/${TransportName}Connector.java
             </output>
+        </template>
+        <template>
+            <file>src/main/java/org/mule/providers/config/NamespaceHandler.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/config/${TransportName}NamespaceHandler.java
+            </output>
+            <dependsOnVar>CustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/providers/MessageAdapter.vm</file>
@@ -168,13 +206,15 @@
 
         <template>
             <file>src/main/java/org/mule/providers/InboundTransformer.vm</file>
-            <output>src/main/java/org/mule/providers/${TransportNameLower}/transformers/${InboundTransformer}.java</output>
+            <output>src/main/java/org/mule/providers/${TransportNameLower}/transformers/${InboundTransformer}.java
+            </output>
             <dependsOnVar>InboundTransformer!=n</dependsOnVar>
         </template>
 
         <template>
             <file>src/main/java/org/mule/providers/OutboundTransformer.vm</file>
-            <output>src/main/java/org/mule/providers/${TransportNameLower}/transformers/${OutboundTransformer}.java</output>
+            <output>src/main/java/org/mule/providers/${TransportNameLower}/transformers/${OutboundTransformer}.java
+            </output>
             <dependsOnVar>OutboundTransformer!=n</dependsOnVar>
         </template>
 
@@ -208,6 +248,20 @@
             <output>
                 src/test/java/org/mule/providers/${TransportNameLower}/${TransportName}MessageAdapterTestCase.java
             </output>
+        </template>
+        <template>
+            <file>src/test/java/org/mule/providers/NamespaceHandlerTestCase.vm</file>
+            <output>
+                src/test/java/org/mule/providers/${TransportNameLower}/${TransportName}NamespaceHandlerTestCase.java
+            </output>
+            <dependsOnVar>CustomSchema=y</dependsOnVar>
+        </template>
+        <template>
+            <file>src/test/resources/namespace-config.xml.vm</file>
+            <output>
+                src/test/resources/${TransportNameLower}-namespace-config.xml
+            </output>
+            <dependsOnVar>CustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/java/org/mule/providers/MessageReceiverTestCase.vm</file>

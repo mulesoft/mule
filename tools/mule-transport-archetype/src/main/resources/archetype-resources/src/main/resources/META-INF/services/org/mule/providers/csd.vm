@@ -1,12 +1,3 @@
-#set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1).toLowerCase()}")
-#set($TransportNameLower = "${TransportName.toLowerCase()}")
-#set($id = "")
-#if(!$groupId)
-  #set($groupId = "org.mule.transports")
-#end
-#if(!$artifactId)
-  #set($artifactId = "mule-transport-${TransportNameLower}")
-#end
 #This file is the service descriptor for your transport
 #It ties all the implementation classes together so that Mule can
 #construct endpoints for your transport protocol at runtime
