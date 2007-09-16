@@ -18,7 +18,6 @@ import org.mule.impl.registry.AbstractRegistry;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -39,12 +38,11 @@ import java.util.Properties;
 import javax.transaction.TransactionManager;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-/**
- * TODO
- */
+/** TODO */
 public class SpringRegistry extends AbstractRegistry implements ApplicationContextAware
 {
     public static final String REGISTRY_ID = "org.mule.Registry.Spring";
@@ -53,17 +51,13 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
 
     protected MultiContainerContext containerContext;
 
-    /**
-     * Default Constructor
-     */
+    /** Default Constructor */
     public SpringRegistry()
     {
         super(REGISTRY_ID);
     }
 
-    /**
-     * Default Constructor
-     */
+    /** Default Constructor */
     public SpringRegistry(String id)
     {
         super(id);
@@ -89,37 +83,32 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         return lcm;
     }
 
-    protected Object doLookupObject(String key) 
+    protected Object doLookupObject(String key)
     {
         try
         {
             return applicationContext.getBean(key.toString());
         }
-        catch (Exception e)
+        catch (NoSuchBeanDefinitionException e)
         {
             logger.debug(e);
             return null;
-//          TODO MULE-1908
-//            //If we're looking up a Mule object don't looking in the container contexts
-//            if(returntype.getPackage().getName().startsWith("org.mule"))
-//            {
-//                throw new ObjectNotFoundException(key.toString(), e);
-//            }
-//            else
-//            {
-//                return doLookupInContainerContext(key, returntype);
-//            }
+        }
+        catch (Exception e)
+        {
+            logger.error(e);
+            return null;
         }
     }
 
     protected Object doLookupInContainerContext(String key, Class returntype) throws ObjectNotFoundException
     {
-        if(containerContext==null)
+        if (containerContext == null)
         {
             containerContext = new MultiContainerContext();
 
             Collection containers = doLookupObjects(UMOContainerContext.class);
-            if(containers.size()>0)
+            if (containers.size() > 0)
             {
                 for (Iterator iterator = containers.iterator(); iterator.hasNext();)
                 {
@@ -163,9 +152,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public TransactionManager getTransactionManager()
     {
         Map m = applicationContext.getBeansOfType(TransactionManager.class);
@@ -181,9 +168,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         return applicationContext.getBeansOfType(UMOModel.class).values();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Collection getConnectors()
     {
         return applicationContext.getBeansOfType(UMOConnector.class).values();
@@ -194,17 +179,13 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         return applicationContext.getBeansOfType(UMOAgent.class).values();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Collection getEndpoints()
     {
         return applicationContext.getBeansOfType(UMOImmutableEndpoint.class).values();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Collection getTransformers()
     {
         return applicationContext.getBeansOfType(UMOTransformer.class).values();
