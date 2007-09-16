@@ -56,7 +56,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testConnectorConfig() throws Exception
     {
-        TestConnector c = (TestConnector)managementContext.getRegistry().lookupConnector("dummyConnector");
+        TestConnector c = (TestConnector) managementContext.getRegistry().lookupConnector("dummyConnector");
         assertNotNull(c);
         assertNotNull(c.getExceptionListener());
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
@@ -68,7 +68,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
         assertNotNull(endpoint.getFilter());
-        JXPathFilter filter = (JXPathFilter)endpoint.getFilter();
+        JXPathFilter filter = (JXPathFilter) endpoint.getFilter();
         assertEquals("name", filter.getPattern());
         assertEquals("bar", filter.getExpectedValue());
         assertEquals("http://foo.com", filter.getNamespaces().get("foo"));
@@ -77,8 +77,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(ep);
         assertNotNull(ep.getConnectionStrategy());
         assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-        assertEquals(4, ((SimpleRetryConnectionStrategy)ep.getConnectionStrategy()).getRetryCount());
-        assertEquals(3000, ((SimpleRetryConnectionStrategy)ep.getConnectionStrategy()).getRetryFrequency());
+        assertEquals(4, ((SimpleRetryConnectionStrategy) ep.getConnectionStrategy()).getRetryCount());
+        assertEquals(3000, ((SimpleRetryConnectionStrategy) ep.getConnectionStrategy()).getRetryFrequency());
     }
 
     public void testEndpointConfig()
@@ -101,9 +101,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(managementContext.getRegistry().lookupModel("main").getExceptionListener());
         assertNotNull(descriptor.getExceptionListener());
 
-        assertTrue(((AbstractExceptionListener)descriptor.getExceptionListener()).getEndpoints().size() > 0);
-        UMOEndpoint ep = (UMOEndpoint)((AbstractExceptionListener)descriptor.getExceptionListener()).getEndpoints()
-            .get(0);
+        assertTrue(((AbstractExceptionListener) descriptor.getExceptionListener()).getEndpoints().size() > 0);
+        UMOEndpoint ep = (UMOEndpoint) ((AbstractExceptionListener) descriptor.getExceptionListener()).getEndpoints()
+                .get(0);
 
         assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
     }
@@ -114,7 +114,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
         assertEquals(t.getReturnClass(), String.class);
-        assertNotNull(((TestCompressionTransformer)t).getContainerProperty());
+        assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
     }
 
     public void testModelConfig() throws Exception
@@ -125,13 +125,13 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(model.getEntryPointResolver() instanceof TestEntryPointResolver);
         assertTrue(model.getExceptionListener() instanceof TestExceptionStrategy);
 
-        assertTrue(((AbstractExceptionListener)model.getExceptionListener()).getEndpoints().size() > 0);
-        UMOEndpoint ep = (UMOEndpoint)((AbstractExceptionListener)model.getExceptionListener()).getEndpoints()
-            .get(0);
+        assertTrue(((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().size() > 0);
+        UMOEndpoint ep = (UMOEndpoint) ((AbstractExceptionListener) model.getExceptionListener()).getEndpoints()
+                .get(0);
 
         assertEquals("test://component.exceptions", ep.getEndpointURI().toString());
 
-       // assertTrue(model.isComponentRegistered("orangeComponent"));
+        // assertTrue(model.isComponentRegistered("orangeComponent"));
     }
 
     public void testPropertiesConfig() throws Exception
@@ -145,21 +145,21 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("Juicy Baby!", props.get("brand"));
 
         assertNotNull(props.get("listProperties"));
-        List list = (List)props.get("listProperties");
+        List list = (List) props.get("listProperties");
         assertEquals(3, list.size());
         assertEquals("prop1", list.get(0));
         assertEquals("prop2", list.get(1));
         assertEquals("prop3", list.get(2));
 
         assertNotNull(props.get("arrayProperties"));
-        list = (List)props.get("arrayProperties");
+        list = (List) props.get("arrayProperties");
         assertEquals(3, list.size());
         assertEquals("prop4", list.get(0));
         assertEquals("prop5", list.get(1));
         assertEquals("prop6", list.get(2));
 
         assertNotNull(props.get("mapProperties"));
-        props = (Map)props.get("mapProperties");
+        props = (Map) props.get("mapProperties");
         assertEquals("prop1", props.get("prop1"));
         assertEquals("prop2", props.get("prop2"));
 
@@ -175,7 +175,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNull(router.getCatchAllStrategy());
         assertEquals(1, router.getRouters().size());
         // check first Router
-        UMOOutboundRouter route1 = (UMOOutboundRouter)router.getRouters().get(0);
+        UMOOutboundRouter route1 = (UMOOutboundRouter) router.getRouters().get(0);
         assertTrue(route1 instanceof OutboundPassThroughRouter);
         assertEquals(1, route1.getEndpoints().size());
     }
@@ -188,27 +188,27 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         UMONestedRouterCollection router = descriptor.getNestedRouter();
         assertEquals(2, router.getRouters().size());
         // check first Router
-        UMONestedRouter route1 = (UMONestedRouter)router.getRouters().get(0);
+        UMONestedRouter route1 = (UMONestedRouter) router.getRouters().get(0);
         assertEquals(FruitCleaner.class, route1.getInterface());
         assertEquals("wash", route1.getMethod());
         assertNotNull(route1.getOutboundRouter());
         assertEquals(1, route1.getOutboundRouter().getEndpoints().size());
         // check second Router
-        UMONestedRouter route2 = (UMONestedRouter)router.getRouters().get(1);
+        UMONestedRouter route2 = (UMONestedRouter) router.getRouters().get(1);
         assertEquals(FruitCleaner.class, route2.getInterface());
         assertEquals("polish", route2.getMethod());
-        assertNotNull(route2.getOutboundRouter());        
+        assertNotNull(route2.getOutboundRouter());
         assertEquals(1, route2.getOutboundRouter().getEndpoints().size());
 
     }
-    
+
     public void testDescriptorEndpoints()
     {
         UMODescriptor descriptor = managementContext.getRegistry().lookupService("orangeComponent");
         assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
-        UMOOutboundRouter router = (UMOOutboundRouter)descriptor.getOutboundRouter().getRouters().get(0);
+        UMOOutboundRouter router = (UMOOutboundRouter) descriptor.getOutboundRouter().getRouters().get(0);
         assertEquals(1, router.getEndpoints().size());
-        UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint)router.getEndpoints().get(0);
+        UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) router.getEndpoints().get(0);
         assertNotNull(endpoint);
         assertEquals("appleInEndpoint", endpoint.getName());
         assertNotNull(endpoint.getTransformers());
@@ -223,11 +223,11 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(descriptor.getInboundRouter().getCatchAllStrategy());
         assertTrue(descriptor.getInboundRouter().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
         assertNotNull(descriptor.getInboundRouter().getCatchAllStrategy().getEndpoint());
-        assertEquals("test2://catch.all", descriptor.getInboundRouter()
-            .getCatchAllStrategy()
-            .getEndpoint()
-            .getEndpointURI()
-            .toString());
+        assertEquals("test://catch.all", descriptor.getInboundRouter()
+                .getCatchAllStrategy()
+                .getEndpoint()
+                .getEndpointURI()
+                .toString());
         endpoint = descriptor.getInboundRouter().getEndpoint("orangeEndpoint");
         assertNotNull(endpoint);
         assertEquals("orangeEndpoint", endpoint.getName());
@@ -260,14 +260,14 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNull(messageRouter.getCatchAllStrategy());
         assertEquals(10001, messageRouter.getTimeout());
         assertEquals(1, messageRouter.getRouters().size());
-        UMOResponseRouter router = (UMOResponseRouter)messageRouter.getRouters().get(0);
+        UMOResponseRouter router = (UMOResponseRouter) messageRouter.getRouters().get(0);
         assertTrue(router instanceof TestResponseAggregator);
         assertNotNull(messageRouter.getEndpoints());
         assertEquals(2, messageRouter.getEndpoints().size());
-        UMOEndpoint ep = (UMOEndpoint)messageRouter.getEndpoints().get(0);
+        UMOEndpoint ep = (UMOEndpoint) messageRouter.getEndpoints().get(0);
         assertEquals("response1", ep.getEndpointURI().getAddress());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
-        ep = (UMOEndpoint)messageRouter.getEndpoints().get(1);
+        ep = (UMOEndpoint) messageRouter.getEndpoints().get(1);
         assertEquals("AppleResponseQueue", ep.getEndpointURI().getAddress());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
     }
