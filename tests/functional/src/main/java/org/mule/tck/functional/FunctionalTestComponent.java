@@ -50,10 +50,10 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     private EventCallback eventCallback;
     private Object returnMessage = null;
     private boolean appendComponentName = false;
-    private boolean throwException = false;    
+    private boolean throwException = false;
     private boolean enableMessageHistory = true;
-    
-    /** 
+
+    /**
      * Keeps a list of any messages received on this component. Note that only references
      * to the messages (objects) are stored, so any subsequent changes to the objects
      * will change the history.
@@ -73,16 +73,14 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         // nothing to do
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public Object onCall(UMOEventContext context) throws Exception
     {
         if (enableMessageHistory)
         {
             messageHistory.add(context.getTransformedMessage());
-        }                
-        
+        }
+
         String contents = context.getTransformedMessageAsString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
                 + context.getComponentDescriptor().getName() + ". Content is: "
@@ -128,16 +126,18 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /**
+     * This method duplicates much of the functionality for the {@link #onCall} method above. This method is currently
+     * used by some WebServices tests where you don' want to be introducing the {@link org.mule.umo.UMOEventContext} as
+     * a complex type.
+     * TODO: It would be nice to remove this method or at least refactor the methods so there is little or no duplication
+     *
      * @param data the event data received
      * @return the processed message
      * @throws Exception
-     *
-     * @deprecated Not sure why we have this duplicate method here. Need to investigate...
      */
     public Object onReceive(Object data) throws Exception
     {
         UMOEventContext context = RequestContext.getEventContext();
-
         String contents = data.toString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
                 + context.getComponentDescriptor().getName() + ". Content is: "
@@ -165,13 +165,13 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
         if (throwException)
         {
-            if(returnMessage!=null && returnMessage instanceof Exception)
+            if (returnMessage != null && returnMessage instanceof Exception)
             {
-                throw (Exception)returnMessage;
+                throw (Exception) returnMessage;
             }
             else
             {
-                throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));                
+                throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));
             }
         }
 
@@ -317,9 +317,9 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         }
     }
 
-    /** 
+    /**
      * If enableMessageHistory = true, returns a message received by the component in chronological order.
-     * For example, getReceivedMessage(1) returns the first message received by the component, 
+     * For example, getReceivedMessage(1) returns the first message received by the component,
      * getReceivedMessage(2) returns the second message received by the component, etc.
      */
     public Object getReceivedMessage(int number)
@@ -335,9 +335,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         return message;
     }
 
-    /** 
-     * If enableMessageHistory = true, returns the last message received by the component in chronological order.
-     */
+    /** If enableMessageHistory = true, returns the last message received by the component in chronological order. */
     public Object getLastReceivedMessage()
     {
         if (messageHistory != null)
