@@ -12,7 +12,6 @@ package org.mule.tck;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
-import org.mule.transformers.TransformerUtils;
 import org.mule.config.ThreadingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
@@ -26,11 +25,11 @@ import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCatchAllStrategy;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -38,6 +37,7 @@ import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.umo.routing.UMONestedRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
@@ -68,7 +68,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     // @Override
     public void testGlobalEndpointConfig()
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("fruitBowlEndpoint");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("fruitBowlEndpoint", managementContext);
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
         assertNotNull(endpoint.getFilter());
@@ -83,7 +83,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testEndpointConfig()
     {
         // test that endpoints have been resolved on endpoints
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("waterMelonEndpoint");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("waterMelonEndpoint", managementContext);
         assertNotNull(endpoint);
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
@@ -299,18 +299,15 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(managementContext.getRegistry().lookupObject("OS_Version"));
     }
 
-//    public void testObjectReferences() throws UMOException
-//    {
-//        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
-//            "orangeComponent");
-//        assertTrue("orangeComponent is not an Orange", descriptor.getService() instanceof Orange);
-//    }
 
     public void testNestedRouterProxyCreation() throws ObjectNotFoundException
     {
         //Test that the proxy object was created and set on the service object
-        Orange orange = (Orange) managementContext.getRegistry().lookupObject("orange");
+        UMODescriptor orange = managementContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(orange);
-        assertNotNull(orange.getCleaner());
+        UMONestedRouter r = (UMONestedRouter) orange.getNestedRouter().getRouters().get(0);
+        assertNotNull(r);
+
+        //TODO Grab an instance of the service object itself and test that the proxy has been injected
     }
 }
