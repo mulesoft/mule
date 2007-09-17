@@ -91,7 +91,7 @@
 
             <inbound-router>
                 <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
-                    <endpoint connector="dummyConnector2" address="test2://catch.all"/>
+                    <endpoint connector="dummyConnector2" address="test://catch.all"/>
                 </catch-all-strategy>
                 <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer" responseTransformers="TestCompressionTransformer"/>
                 <global-endpoint name="orangeEndpoint" transformers="TestCompressionTransformer">
