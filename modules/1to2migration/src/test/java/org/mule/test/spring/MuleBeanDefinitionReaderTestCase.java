@@ -69,7 +69,7 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
         assertTrue(strategy instanceof ForwardingCatchAllStrategy);
         UMOConnector conn = strategy.getEndpoint().getConnector();
         assertTrue(conn instanceof TestConnector);
-        assertEquals("dummyConnector2", conn.getName());
+        assertEquals("dummyConnector", conn.getName());
         
     }
 
