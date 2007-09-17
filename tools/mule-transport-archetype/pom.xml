@@ -80,6 +80,8 @@
                             <!--</includes>-->
                             <excludes>
                                 <exclude>**/*MavenTest.class</exclude>
+                                <!--MULETOOLS-36  -->
+                                <exclude>**/*TransportArchetypeMavenTest.class</exclude>
                             </excludes>
                         </configuration>
                     </execution>
