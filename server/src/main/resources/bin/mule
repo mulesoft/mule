@@ -199,6 +199,9 @@ case "$DIST_OS" in
     'unix_sv')
         DIST_OS="unixware"
         ;;
+    'aix')
+        DIST_OS="aix"
+        ;;
 esac
 
 ######################################################################
@@ -206,7 +209,13 @@ esac
 ######################################################################
 
 # Resolve the architecture
-PROC_ARCH=`uname -m | tr [:upper:] [:lower:] | tr -d [:blank:]`
+UNAME_PROC_OPTION="-m"
+if [ "$DIST_OS" == "aix" ]; then
+    UNAME_PROC_OPTION="-p"
+fi
+
+PROC_ARCH=`uname $UNAME_PROC_OPTION | tr [:upper:] [:lower:] | tr -d [:blank:]`
+
 while :
 do
     case "$PROC_ARCH" in
@@ -232,7 +241,7 @@ do
             DIST_ARCH="parisc"
             break;;
         *)
-            echo "Your machine's hardware type (uname -m) was not recognized by the Service Wrapper as a supported platform."
+            echo "Your machine's hardware type (uname $UNAME_PROC_OPTION) was not recognized by the Service Wrapper as a supported platform."
             echo "Please report this message along with your machine's processor/architecture."
             exit 1
             ;;
