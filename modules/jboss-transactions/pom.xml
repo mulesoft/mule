@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>2.0-M2-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-module-jbossts</artifactId>
+    <packaging>jar</packaging>
+    <name>JBoss Transactions Integration</name>
+    <description>Provides access to the JBoss Transaction Service for User and Xa transactions.</description>
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jbossts-common</artifactId>
+            <version>4.2.3-SP5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jbossts-jta</artifactId>
+            <version>4.2.3-SP5-patched</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jbossts-jta-integration</artifactId>
+            <version>4.2.3-SP5</version>
+        </dependency>
+
+    </dependencies>
+</project>

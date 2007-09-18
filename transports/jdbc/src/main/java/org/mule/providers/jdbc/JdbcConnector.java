@@ -278,9 +278,9 @@ public class JdbcConnector extends AbstractConnector
         {
             throw new IllegalArgumentException("Read statement should not be null");
         }
-        if (!"select".equalsIgnoreCase(readStmt.substring(0, 6)))
+        if (!"select".equalsIgnoreCase(readStmt.substring(0, 6)) && !"call".equalsIgnoreCase(readStmt.substring(0, 4)))
         {
-            throw new IllegalArgumentException("Read statement should be a select sql statement");
+            throw new IllegalArgumentException("Read statement should be a select sql statement or a stored procedure");
         }
         if (ackStmt != null)
         {

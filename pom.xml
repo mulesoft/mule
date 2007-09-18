@@ -871,11 +871,12 @@
                         <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
                         <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/docs/api/</link>
                         <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
+                        <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
                         <link>http://jakarta.apache.org/commons/io/api-1.2/</link>
                         <link>http://jakarta.apache.org/commons/lang/api-2.1/</link>
-                        <link>http://jakarta.apache.org/commons/logging/commons-logging-1.0.4/docs/apidocs/</link>
                         <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
                         <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
+                        <link>http://www.slf4j.org/api/</link>
                         <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
                         <link>http://www.junit.org/junit/javadoc/3.8.1/</link>
                     </links>

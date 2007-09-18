@@ -32,6 +32,8 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
 {
 
     private JdbcConnector connector;
+    private static final String STORED_PROCEDURE_PREFIX = "{ ";
+    private static final String STORED_PROCEDURE_SUFFIX = " }";
 
     public JdbcMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
@@ -75,10 +77,11 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         }
         if (!"insert".equalsIgnoreCase(writeStmt.substring(0, 6))
             && !"update".equalsIgnoreCase(writeStmt.substring(0, 6))
-            && !"delete".equalsIgnoreCase(writeStmt.substring(0, 6)))
+            && !"delete".equalsIgnoreCase(writeStmt.substring(0, 6))
+            && !"call".equalsIgnoreCase(writeStmt.substring(0, 4)))
         {
             throw new IllegalArgumentException(
-                "Write statement should be an insert / update / delete sql statement");
+                "Write statement should be an insert / update / delete sql statement, or a stored-procedure call");
         }
         List paramNames = new ArrayList();
         writeStmt = connector.parseStatement(writeStmt, paramNames);
@@ -91,7 +94,12 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         try
         {
             con = this.connector.getConnection();
-
+            
+            if ("call".equalsIgnoreCase(writeStmt.substring(0, 4)))
+            {
+                writeStmt = STORED_PROCEDURE_PREFIX + writeStmt + STORED_PROCEDURE_SUFFIX;
+            }
+            
             int nbRows = connector.createQueryRunner().update(con, writeStmt, paramValues);
             if (nbRows != 1)
             {
@@ -133,8 +141,8 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      *            no data becomes available before the timeout elapses, null will be
      *            returned
      * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
+     *         returned if no data was available
+     * @throws Exception if the call to the underlying protocol causes an exception
      */
     protected UMOMessage doReceive(long timeout) throws Exception
     {

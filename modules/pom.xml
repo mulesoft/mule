@@ -22,6 +22,7 @@
         <module>boot</module>
         <module>client</module>
         <module>jaas</module>
+        <module>jboss-transactions</module>
         <module>jca</module>
         <module>jotm</module>
         <module>management</module>

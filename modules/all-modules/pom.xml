@@ -44,6 +44,21 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jbossts</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules.jca</groupId>
+            <artifactId>mule-module-jca-generic</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules.jca</groupId>
+            <artifactId>mule-module-jca-jboss</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jotm</artifactId>
             <version>${version}</version>
         </dependency>
@@ -87,15 +102,15 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-persistence</artifactId>
             <version>${version}</version>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-registry</artifactId>
             <version>${version}</version>
-        </dependency> 
+        </dependency>
         -->
     </dependencies>
-    
+
     <profiles>
         <profile>
             <id>osgi</id>

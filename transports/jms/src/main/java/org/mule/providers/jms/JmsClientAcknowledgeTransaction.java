@@ -29,7 +29,7 @@ import javax.jms.Session;
  */
 public class JmsClientAcknowledgeTransaction extends AbstractSingleResourceTransaction
 {
-    private Message message;
+    private volatile Message message;
 
     public void setMessage(Message message)
     {

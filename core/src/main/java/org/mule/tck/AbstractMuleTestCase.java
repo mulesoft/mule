@@ -59,6 +59,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractMuleTestCase extends TestCase implements TestCaseWatchdogTimeoutHandler
 {
+
+    /**
+     * Top-level directories under <code>.mule</code> which are not deleted on each
+     * test case recycle. This is required, e.g. to play nice with transaction manager
+     * recovery service object store.
+     */
+    public static final String[] IGNORED_DOT_MULE_DIRS = new String[] {"transaction-log"};
+
     protected static UMOManagementContext managementContext;
 
     /**
@@ -397,7 +405,9 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             {
                 if (RegistryContext.getRegistry() != null)
                 {
-                    FileUtils.deleteTree(FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory()));
+                    final String workingDir = RegistryContext.getConfiguration().getWorkingDirectory();
+                    // do not delete TM recovery object store, everything else is good to go
+                    FileUtils.deleteTree(FileUtils.newFile(workingDir), IGNORED_DOT_MULE_DIRS);
                 }
                 managementContext.dispose();
             }
