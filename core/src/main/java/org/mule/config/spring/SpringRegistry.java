@@ -11,6 +11,7 @@ package org.mule.config.spring;
 
 import org.mule.config.MuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
@@ -29,6 +30,7 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.SpiUtils;
+import org.mule.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -85,6 +87,12 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
 
     protected Object doLookupObject(String key)
     {
+        if (StringUtils.isBlank(key))
+        {
+            logger.warn(MessageFactory.createStaticMessage("Detected a lookup attempt with an empty or null key"),
+                        new Throwable().fillInStackTrace());
+            return null;
+        }
         try
         {
             return applicationContext.getBean(key.toString());
