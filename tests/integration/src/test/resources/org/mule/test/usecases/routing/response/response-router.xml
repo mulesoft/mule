@@ -56,7 +56,7 @@
     <model name="fo">
         <mule-descriptor implementation="org.mule.components.simple.EchoComponent" name="getLaszloW10">
             <inbound-router>
-                <endpoint address="http://localhost:8081"></endpoint>
+                <endpoint address="http://localhost:28081"></endpoint>
             </inbound-router>
 
             <outbound-router matchAll="false">

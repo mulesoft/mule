@@ -141,24 +141,24 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
             throw new MessageTypeNotSupportedException(message, MailMessageAdapter.class);
         }
     }
-
-    private void setMessageDetails(Message message) throws javax.mail.MessagingException 
+    
+    private void setMessageDetails(Message message)  throws javax.mail.MessagingException 
     {
-        setProperty(MailProperties.TO_ADDRESSES_PROPERTY,
+        setProperty(MailProperties.INBOUND_TO_ADDRESSES_PROPERTY,
             MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.TO)));
-        setProperty(MailProperties.CC_ADDRESSES_PROPERTY,
+        setProperty(MailProperties.INBOUND_CC_ADDRESSES_PROPERTY,
             MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.CC)));
-        setProperty(MailProperties.BCC_ADDRESSES_PROPERTY,
+        setProperty(MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY,
             MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.BCC)));
-        setProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY,
+        setProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
             MailUtils.mailAddressesToString(message.getReplyTo()));
-        setProperty(MailProperties.FROM_ADDRESS_PROPERTY, 
+        setProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
             MailUtils.mailAddressesToString(message.getFrom()));
-        setProperty(MailProperties.SUBJECT_PROPERTY, 
-            StringUtils.defaultIfEmpty(message.getSubject(), "(no subject)"));
-        setProperty(MailProperties.CONTENT_TYPE_PROPERTY, 
-            StringUtils.defaultIfEmpty(message.getContentType(), "text/plain"));
-
+        setProperty(MailProperties.INBOUND_SUBJECT_PROPERTY, StringUtils.defaultIfEmpty(
+            message.getSubject(),"(no subject)"));
+        setProperty(MailProperties.INBOUND_CONTENT_TYPE_PROPERTY, StringUtils.defaultIfEmpty(
+            message.getContentType(), "text/plain"));
+        
         Date sentDate = message.getSentDate();
         if (sentDate == null)
         {
@@ -186,7 +186,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
             {
                 ((List) getProperty(listName)).add(header.getValue());
             }
-       }
+        }
     }
 
     /**

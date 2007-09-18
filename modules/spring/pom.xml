@@ -11,7 +11,7 @@
     <artifactId>mule-module-spring</artifactId>
     <!--<packaging>bundle</packaging>-->
     <name>Spring Extras</name>
-    <description>Non-core functionality provided by Spring such as transactions, remoting, data sources, etc.</description>   
+    <description>Non-core functionality provided by Spring such as transactions, remoting, data sources, etc.</description>
 
     <build>
          <plugins>
@@ -128,7 +128,7 @@
             </dependencies>
         </profile>
     </profiles>
-    
+
     <dependencies>
         <!-- do not include the org.springframework:spring depencency kitchen sink
              but rather include each spring module individually. This allows for
@@ -189,7 +189,7 @@
         </dependency>
 
         <!-- For test cases only -->
-        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
+        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency:
              mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
         <dependency>
             <groupId>org.mule.tests</groupId>

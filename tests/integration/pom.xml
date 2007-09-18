@@ -56,6 +56,12 @@
                         </exclude>
                         <!-- This test works when I run it from the IDE (Intellij -->
                         <exclude>org/mule/test/usecases/dlq/DLQExceptionHandlerTestCase.java</exclude>
+
+                        <exclude>org/mule/test/integration/routing/nested/NestedRouterTestCase.java</exclude>
+                        <exclude>org/mule/test/integration/providers/jms/NestedRouterTestCase.java</exclude>
+                        <!-- fails on the build server MULE-2258 -->
+                        <exclude>org/mule/test/usecases/sync/TcpToFileTestCase.java</exclude>
+
                     </excludes>
                 </configuration>
             </plugin>

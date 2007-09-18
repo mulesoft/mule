@@ -26,7 +26,6 @@ import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.ObjectFactoryUtils;
 import org.mule.util.object.SimpleObjectFactory;
 import org.mule.util.properties.BeanPropertyExtractor;
 import org.mule.util.properties.MapPropertyExtractor;
@@ -49,6 +48,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 
@@ -84,6 +85,8 @@ public class JdbcConnector extends AbstractConnector
     //protected String queryRunner = DEFAULT_QUERY_RUNNER;
     protected Set propertyExtractors = new HashSet();
     protected ObjectFactory dataSourceFactory;
+
+    protected ConcurrentMap propertyExtractorCache = new ConcurrentHashMap();
 
     protected void doInitialise() throws InitialisationException
     {
@@ -166,7 +169,7 @@ public class JdbcConnector extends AbstractConnector
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#getProtocol()
      */
     public String getProtocol()
@@ -579,7 +582,7 @@ public class JdbcConnector extends AbstractConnector
     /**
      * Parse the given statement filling the parameter list and return the ready to
      * use statement.
-     * 
+     *
      * @param stmt
      * @param params
      * @return
@@ -602,9 +605,10 @@ public class JdbcConnector extends AbstractConnector
         return sb.toString();
     }
 
-    public Object[] getParams(UMOImmutableEndpoint endpoint, List paramNames, Object message)
+    public Object[] getParams(UMOImmutableEndpoint endpoint, List paramNames, Object message, String query)
         throws Exception
     {
+
         Object[] params = new Object[paramNames.size()];
         for (int i = 0; i < paramNames.size(); i++)
         {
@@ -615,21 +619,29 @@ public class JdbcConnector extends AbstractConnector
             boolean foundValue = false;
             if (message != null)
             {
-                for (Iterator iterator = propertyExtractors.iterator(); iterator.hasNext();)
+                PropertyExtractor pe = (PropertyExtractor) propertyExtractorCache.get(query + param);
+                if (pe == null)
                 {
-                    PropertyExtractor pe =
-                            (PropertyExtractor) ObjectFactoryUtils.createIfNecessary(iterator.next(),
-                                    PropertyExtractor.class);
-                    value = pe.getProperty(name, message);
-                    if (value != null)
+                    for (Iterator iterator = propertyExtractors.iterator(); iterator.hasNext();)
                     {
-                        if (value.equals(StringUtils.EMPTY) && pe instanceof BeanPropertyExtractor)
+                        pe = (PropertyExtractor) iterator.next();
+                        value = pe.getProperty(name, message);
+                        if (value != null)
                         {
-                            value = null;
+                            foundValue = true;
+                            propertyExtractorCache.putIfAbsent(query + param, pe);
+                            break;
                         }
-                        foundValue = true;
-                        break;
                     }
+                }
+                else
+                {
+                    value = pe.getProperty(name, message);
+                    foundValue = true;
+                }
+                if (StringUtils.EMPTY.equals(value) && pe instanceof BeanPropertyExtractor)
+                {
+                    value = null;
                 }
             }
             if (!foundValue)
