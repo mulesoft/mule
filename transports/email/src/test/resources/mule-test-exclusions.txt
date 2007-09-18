@@ -1,0 +1,11 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# MULE-2403
+Pop3FunctionalTestCase
+Pop3MimeWithConnectorMule2042TestCase
+
+# Use FQN below once AMTC changes are merged from trunk
+#org.mule.providers.email.functional.Pop3FunctionalTestCase
+#org.mule.providers.email.issues.Pop3MimeWithConnectorMule2042TestCase
