@@ -1,27 +1,18 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="test" version="1.0">
 
-     <!-- embed Spring configuration to create a Jms Connection factory -->
+    <!-- embed Spring configuration to create a Jms Connection factory -->
     <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
             <text-property name="configuration">
                 <![CDATA[
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-    <bean id="jmsConnectionFactory"
-        class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost</value></property>
-        <property name="useEmbeddedBroker"><value>true</value></property>
-        <property name="brokerContainerFactory">
-            <bean id="bcf" class="org.activemq.broker.impl.BrokerContainerFactoryImpl">
-                <constructor-arg index="0">
-                    <bean id="vmp" class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/>
-                </constructor-arg>
-            </bean>
-        </property>
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value></property>
     </bean>
 </beans>
                 ]]>
@@ -39,18 +30,18 @@
 
     <transformers>
         <transformer name="jmsmessagetoobject" className="org.mule.providers.jms.transformers.JMSMessageToObject"/>
-        <transformer name="inboundtransformer" className="org.mule.transformers.simple.ByteArrayToString"></transformer>
+        <transformer name="inboundtransformer" className="org.mule.transformers.simple.ByteArrayToString"/>
     </transformers>
 
     <model name="model">
         <mule-descriptor name="TcpReceiver"
-            implementation="org.mule.components.simple.EchoComponent">
+                         implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="tcp://localhost:4444" synchronous="true"/>
+                <endpoint address="tcp://localhost:4444" remoteSync="true"/>
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://queue_in" />
+                    <endpoint address="jms://queue_in"/>
                     <reply-to address="jms://queue_out"/>
                 </router>
             </outbound-router>
@@ -61,7 +52,7 @@
         </mule-descriptor>
 
         <mule-descriptor name="JMSReplyProvider"
-            implementation="org.mule.test.integration.service.TestReceiver">
+                         implementation="org.mule.test.integration.service.TestReceiver">
             <inbound-router>
                 <endpoint address="jms://queue_in" transformers="jmsmessagetoobject inboundtransformer"/>
             </inbound-router>

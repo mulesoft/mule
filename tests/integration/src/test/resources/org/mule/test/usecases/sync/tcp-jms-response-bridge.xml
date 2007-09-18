@@ -14,17 +14,8 @@
                 <![CDATA[
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-    <bean id="jmsConnectionFactory"
-        class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost</value></property>
-        <property name="useEmbeddedBroker"><value>true</value></property>
-        <property name="brokerContainerFactory">
-            <bean id="bcf" class="org.activemq.broker.impl.BrokerContainerFactoryImpl">
-                <constructor-arg index="0">
-                    <bean id="vmp" class="org.apache.activemq.store.memory.MemoryPersistenceAdapter"/>
-                </constructor-arg>
-            </bean>
-        </property>
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value></property>
     </bean>
 </beans>
                 ]]>
@@ -50,11 +41,11 @@
         <mule-descriptor name="TcpReceiver"
             implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="tcp://localhost:4444" synchronous="true"/>
+                <endpoint address="tcp://localhost:4444" remoteSync="true"/>
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://queue_in" remoteSync="true" responseTransformers="responsetransformer" />
+                    <endpoint address="jms://queue_in" responseTransformers="responsetransformer" />
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -65,6 +56,7 @@
                 <endpoint address="jms://queue_in" transformers="jmsmessagetoobject inboundtransformer"/>
             </inbound-router>
         </mule-descriptor>
+
     </model>
 
 </mule-configuration>

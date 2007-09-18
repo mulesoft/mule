@@ -12,23 +12,42 @@ package org.mule.test.integration.routing.nested;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
 public class NestedRouterTestCase extends FunctionalTestCase
 {
+    private static final int RECEIVE_TIMEOUT = 5000;
+
+    private static final int number = 0xC0DE;
+
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/nested/nestedrouter-test.xml";
     }
 
-    public void testNestedRouter() throws UMOException
+    private void internalTest(String prefix) throws Exception
     {
         MuleClient client = new MuleClient();
         String message = "Mule";
-        client.dispatch("vm://invoker.in", message, null);
-        UMOMessage reply = client.receive("vm://invoker.out", 10000);
+        client.dispatch(prefix + "invoker.in", message, null);
+        UMOMessage reply = client.receive(prefix + "invoker.out", RECEIVE_TIMEOUT);
         assertNotNull(reply);
-        assertEquals("Received: Hello " + message + " " + 0xC0DE, reply.getPayload());
+        assertNull(reply.getExceptionPayload());
+        assertEquals("Received: Hello " + message + " " + number, reply.getPayload());
+    }
+
+    public void testNestedRouter() throws Exception
+    {
+        internalTest("vm://");
+    }
+
+    public void testJmsQueueNestedRouter() throws Exception
+    {
+        internalTest("jms://");
+    }
+
+    public void testJmsTopicNestedRouter() throws Exception
+    {
+        internalTest("jms://topic:t");
     }
 }

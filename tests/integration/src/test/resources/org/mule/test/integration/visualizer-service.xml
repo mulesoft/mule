@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="visualizer_test" version="1.0">
+
+    <mule-environment-properties serverUrl="" workingDirectory="/mule"/>
+
+    <global-endpoints>
+        <endpoint address="pop3://mule%40inmail24.com:testbox@pop3.inmail24.com?checkFrequency=5000" name="email-in"/>
+        <endpoint address="smtp://mule%40inmail24.com:testbox@smtp.inmail24.com?address=mule@inmail24.com" name="email-out"/>
+    </global-endpoints>
+
+    <model name="main">
+        <mule-descriptor name="visualizer" implementation="org.mule.tools.visualizer.service.VisualizerService">
+            <inbound-router>
+                <global-endpoint name="email-in"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>    
+</mule-configuration>

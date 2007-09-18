@@ -10,20 +10,19 @@
 
 package org.mule.test.integration.models;
 
+import org.mule.MuleManager;
 import org.mule.impl.model.seda.SedaModel;
-import org.mule.umo.model.UMOModel;
 
-public class SedaPipelineComponentPerRequestTestCase extends AbstractPipelineTestCase
+public class SedaPipelineComponentPerRequestTestCase extends SedaPipelineTestCase
 {
-    protected String getModelType()
+
+    //@java.lang.Override
+    protected void doPostFunctionalSetUp() throws Exception
     {
-        return "seda";
+        //TODO: this should be configurable from the XML in Mule 2.0
+        SedaModel model = (SedaModel)MuleManager.getInstance().lookupModel("main");
+        model.setComponentPerRequest(true);
+        model.setEnablePooling(false);
     }
 
-    protected void configureModel(UMOModel model)
-    {
-        SedaModel m = (SedaModel)model;
-        m.setComponentPerRequest(true);
-        m.setEnablePooling(false);
-    }
 }

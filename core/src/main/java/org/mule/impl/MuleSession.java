@@ -230,7 +230,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#dispatchEvent(org.mule.umo.UMOEvent)
      */
     public void dispatchEvent(UMOEvent event) throws UMOException
@@ -290,7 +290,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#sendEvent(org.mule.umo.UMOEvent)
      */
     // TODO This method is practically the same as dispatchEvent(UMOEvent event),
@@ -361,7 +361,7 @@ public final class MuleSession implements UMOSession
     /**
      * Once an event has been processed we need to romove certain properties so that
      * they not propagated to the next request
-     * 
+     *
      * @param response The response from the previous request
      */
     protected void processResponse(UMOMessage response)
@@ -376,7 +376,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#isValid()
      */
     public boolean isValid()
@@ -386,7 +386,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#setValid(boolean)
      */
     public void setValid(boolean value)
@@ -396,7 +396,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint,
      *      long, org.mule.umo.UMOEvent)
      */
@@ -409,7 +409,7 @@ public final class MuleSession implements UMOSession
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint,
      *      long, org.mule.umo.UMOEvent)
      */

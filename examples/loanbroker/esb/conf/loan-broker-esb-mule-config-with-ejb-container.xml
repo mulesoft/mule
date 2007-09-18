@@ -109,7 +109,7 @@
                     </mule:outbound-pass-through-router>
                 </mule:outbound-router>
 
-                <mule:response-router timeout="1000000">
+                <mule:response-router timeout="10000">
                     <mule:endpoint ref="LoanQuotes" />
                     <mule:custom-response-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator" />
                 </mule:response-router>

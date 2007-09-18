@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="PipelineModelConfiguration" version="1.0">
+
+    <connector name="vmNoQueuing" className="org.mule.providers.vm.VMConnector"/>
+
+    <connector name="vmWithQueuing" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+    <global-endpoints>
+        <endpoint address="vm://component1" name="component1.endpoint" connector="vmNoQueuing"/>
+        <endpoint address="vm://component2" name="component2.endpoint" connector="vmNoQueuing"/>
+        <endpoint address="vm://component3" name="component3.endpoint" connector="vmNoQueuing"/>
+        <endpoint address="vm://results" name="results.endpoint" connector="vmWithQueuing"/>
+    </global-endpoints>
+
+    <model name="main" type="inherited">
+        <mule-descriptor name="component1" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <global-endpoint name="component1.endpoint"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <global-endpoint name="component2.endpoint"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="component2" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <global-endpoint name="component2.endpoint"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <global-endpoint name="component3.endpoint"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="component3" implementation="org.mule.components.simple.StaticComponent">
+            <inbound-router>
+                <global-endpoint name="component3.endpoint"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <global-endpoint name="results.endpoint"/>
+                </router>
+            </outbound-router>
+            <properties>
+                <property name="data" value="request received by component 3"/>
+            </properties>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

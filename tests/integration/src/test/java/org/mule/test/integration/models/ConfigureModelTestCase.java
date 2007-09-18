@@ -19,7 +19,7 @@ public class ConfigureModelTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/models/direct-model-config.xml";
+        return "org/mule/test/integration/models/direct-pipeline-test-config.xml";
     }
 
     public void testConfigure()

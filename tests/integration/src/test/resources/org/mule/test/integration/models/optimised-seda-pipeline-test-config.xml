@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="OptimisedSedaPipelineModelConfiguration" version="1.0">
+
+    <!-- the components for this test are standard and are cnfigured in the pipeline-test-config.xml -->    
+    <model name="main" type="custom" className="org.mule.impl.model.seda.optimised.OptimisedSedaModel"/>
+</mule-configuration>

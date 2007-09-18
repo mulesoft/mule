@@ -10,25 +10,16 @@
 
 package org.mule.test.integration.models;
 
-import org.mule.components.simple.EchoComponent;
-import org.mule.components.simple.StaticComponent;
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.providers.vm.VMConnector;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.model.UMOModel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
+public abstract class AbstractPipelineTestCase extends FunctionalTestCase
 {
-
-    protected abstract String getModelType();
 
     protected int getNumberOfMessages()
     {
@@ -37,24 +28,11 @@ public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
 
     public void testPipelineSynchronous() throws Exception
     {
-
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-        builder.registerModel("seda", "main");
-        configureModel(builder.getManagementContext().getRegistry().lookupModel("main"));
-        builder.registerComponent(EchoComponent.class.getName(), "component1", "vm://component1",
-            "vm://component2", null);
-        builder.registerComponent(EchoComponent.class.getName(), "component2", "vm://component2",
-            "vm://component3", null);
-        Map props = new HashMap();
-        props.put("data", "request received by component 3");
-        builder.registerComponent(StaticComponent.class.getName(), "component3", "vm://component3", null,
-            props);
-
         MuleClient client = new MuleClient();
         List results = new ArrayList();
         for (int i = 0; i < getNumberOfMessages(); i++)
         {
-            UMOMessage result = client.send("vm://component1", "test", null);
+            UMOMessage result = client.send("component1.endpoint", "test", null);
             assertNotNull(result);
             results.add(result);
         }
@@ -69,38 +47,17 @@ public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
 
     public void testPipelineAsynchronous() throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-
-        VMConnector c = new VMConnector();
-        c.setName("queuingConnector");
-        c.setQueueEvents(true);
-        builder.getManagementContext().getRegistry().registerConnector(c);
-
-        VMConnector c2 = new VMConnector();
-        c2.setName("vmNoQueue");
-        builder.getManagementContext().getRegistry().registerConnector(c2);
-
-        builder.registerComponent(EchoComponent.class.getName(), "component1",
-            "vm://component1?connector=vmNoQueue", "vm://component2?connector=vmNoQueue", null);
-        builder.registerComponent(EchoComponent.class.getName(), "component2",
-            "vm://component2?connector=vmNoQueue", "vm://component3?connector=vmNoQueue", null);
-
-        Map props = new HashMap();
-        props.put("data", "request received by component 3");
-        builder.registerComponent(StaticComponent.class.getName(), "component3",
-            "vm://component3?connector=vmNoQueue", "vm://results?connector=queuingConnector", props);
-
         MuleClient client = new MuleClient();
 
         List results = new ArrayList();
         for (int i = 0; i < getNumberOfMessages(); i++)
         {
-            client.dispatch("vm://component1", "test", null);
+            client.dispatch("component1.endpoint", "test", null);
         }
 
         for (int i = 0; i < getNumberOfMessages(); i++)
         {
-            UMOMessage result = client.receive("vm://results?connector=queuingConnector", 100000);
+            UMOMessage result = client.receive("results.endpoint", 1000);
             assertNotNull(result);
             results.add(result);
         }
@@ -112,9 +69,6 @@ public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
         }
     }
 
-    protected void configureModel(UMOModel model)
-    {
-        // nothing to do here
-    }
+
 
 }

@@ -10,9 +10,15 @@
     </transformers>
 
     <model name="model">
-        <mule-descriptor name="HttpWithoutRemoteSynch" implementation="org.mule.components.simple.EchoComponent">
+        <mule-descriptor name="HttpAsync" implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="http://localhost:8999" transformers="ByteArrayToString"/>
+                <endpoint address="http://localhost:8990" transformers="ByteArrayToString"/>
+            </inbound-router>
+        </mule-descriptor>
+
+         <mule-descriptor name="HttpWithoutRemoteSynch" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="http://localhost:8999" transformers="ByteArrayToString" synchronous="true"/>
             </inbound-router>
         </mule-descriptor>
 
