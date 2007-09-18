@@ -1,0 +1,5 @@
+#
+# Test cases listed in this file are not run.
+#
+EndpointTransformerMule2131TestCase
+ResponseTransformerMule2165TestCase

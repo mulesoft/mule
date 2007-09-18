@@ -12,7 +12,7 @@
     <!--<packaging>bundle</packaging>-->
     <name>Web Service Security</name>
     <description>Mule WS-Security uses Apache's WSS4J and XFire's WSS4JHandlers to secure WebServices using SOAP</description>
-    
+
     <build>
          <plugins>
              <plugin>
@@ -111,7 +111,6 @@
     </profiles>
 
     <dependencies>
-        
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-axis</artifactId>
@@ -122,18 +121,18 @@
             <artifactId>mule-transport-xfire</artifactId>
             <version>${version}</version>
         </dependency>
-        
+
         <!-- other profile-independent dependencies -->
-        
+
         <!-- common -->
         <dependency>
             <groupId>wss4j</groupId>
             <artifactId>wss4j</artifactId>
             <version>1.5.0</version>
         </dependency>
-        
+
         <!-- Axis: none -->
-        
+
         <!-- XFire -->
         <!-- need to bump the Xalan version -->
         <dependency>
@@ -152,7 +151,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <!-- For unit tests only -->
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -187,16 +186,7 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.0.1</version>
             <scope>test</scope>
-            <exclusions>
-                <!-- we like slf4j -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>                
-            </exclusions>
         </dependency>
     </dependencies>
-
 </project>

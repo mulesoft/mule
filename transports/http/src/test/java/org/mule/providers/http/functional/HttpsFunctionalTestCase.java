@@ -37,7 +37,6 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
     {
         UMOModel model = managementContext.getRegistry().lookupModel("main");
 
-        // 
         final TestSedaComponent testSedaComponent = (TestSedaComponent) model.getComponent("testComponent");
         TestMuleProxy proxy = (TestMuleProxy) testSedaComponent.getProxy();
         FunctionalTestComponent testComponent = (FunctionalTestComponent) proxy.getComponent();

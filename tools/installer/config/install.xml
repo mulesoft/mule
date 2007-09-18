@@ -59,7 +59,7 @@
         <res id="Heading.image.8" src="../images/Installer_bar.7of7.rs.jpg"/>
         <res id="userInputSpec.xml" src="userInput.xml"/>
       <res id="InfoPanel.info" src="../resources/INSTALL.txt"/>
-        <res id="conditions.xml" src="conditions.xml" /> 
+        <res id="conditions.xml" src="conditions.xml" />
     </resources>
 
     <!-- The panels section. We indicate here which panels we want to use. The order will be respected. -->
@@ -112,7 +112,7 @@
         </pack>
         <pack name="standard library" id="standard library" required="yes" conditionid="show.lib.standard">
             <description>Contains the standard Mule Library</description>
-            <file src="../distribution/lib" targetdir="$INSTALL_PATH"/> 
+            <file src="../distribution/lib" targetdir="$INSTALL_PATH"/>
         <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
             <args>
             <arg value="$INSTALL_PATH"/>

@@ -58,7 +58,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
         HttpClient client = new HttpClient();
         method = new OptionsMethod("http://localhost:60200");
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_METHOD_NOT_ALLOWED), Integer.toString(statusCode));
+        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
 
     public void testPut() throws Exception
@@ -66,7 +66,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
         HttpClient client = new HttpClient();
         method = new PutMethod("http://localhost:60200");
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_METHOD_NOT_ALLOWED), Integer.toString(statusCode));
+        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
 
     public void testDelete() throws Exception
@@ -74,7 +74,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
         HttpClient client = new HttpClient();
         method = new DeleteMethod("http://localhost:60200");
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_METHOD_NOT_ALLOWED), Integer.toString(statusCode));
+        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
 
     public void testTrace() throws Exception
@@ -82,7 +82,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
         HttpClient client = new HttpClient();
         method = new TraceMethod("http://localhost:60200");
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_METHOD_NOT_ALLOWED), Integer.toString(statusCode));
+        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
 
     public void testConnect() throws Exception
@@ -96,7 +96,7 @@ public class HttpMethodTestCase extends FunctionalTestCase
             }
         };
         int statusCode = client.executeMethod(method);
-        assertEquals(Integer.toString(HttpStatus.SC_METHOD_NOT_ALLOWED), Integer.toString(statusCode));
+        assertEquals(Integer.toString(HttpStatus.SC_OK), Integer.toString(statusCode));
     }
 
     public void testFoo() throws Exception

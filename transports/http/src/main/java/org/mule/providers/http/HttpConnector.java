@@ -256,7 +256,7 @@ public class HttpConnector extends TcpConnector
 
     public void setCookieSpec(String cookieSpec)
     {
-        if (!(cookieSpec.equalsIgnoreCase(COOKIE_SPEC_NETSCAPE) || cookieSpec.equalsIgnoreCase(COOKIE_SPEC_RFC2109)))
+        if (!(COOKIE_SPEC_NETSCAPE.equalsIgnoreCase(cookieSpec) || COOKIE_SPEC_RFC2109.equalsIgnoreCase(cookieSpec)))
         {
             throw new IllegalArgumentException(
                 CoreMessages.propertyHasInvalidValue("cookieSpec", cookieSpec).toString());

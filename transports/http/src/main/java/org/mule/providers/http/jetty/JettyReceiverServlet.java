@@ -10,10 +10,10 @@
 
 package org.mule.providers.http.jetty;
 
-import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.http.servlet.MuleReceiverServlet;
 import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.provider.UMOMessageReceiver;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -26,18 +26,18 @@ public class JettyReceiverServlet extends MuleReceiverServlet
      */
     private static final long serialVersionUID = 238326861089137293L;
 
-    private AbstractMessageReceiver receiver;
+    private UMOMessageReceiver receiver;
 
     protected void doInit(ServletConfig servletConfig) throws ServletException
     {
-        receiver = (AbstractMessageReceiver)servletConfig.getServletContext().getAttribute("messageReceiver");
+        receiver = (UMOMessageReceiver)servletConfig.getServletContext().getAttribute("messageReceiver");
         if (receiver == null)
         {
             throw new ServletException(HttpMessages.receiverPropertyNotSet().toString());
         }
     }
 
-    protected AbstractMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
+    protected UMOMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
         throws EndpointException
     {
         return receiver;

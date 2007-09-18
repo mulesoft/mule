@@ -1,0 +1,7 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# MULE-2164
+MuleCopiedEndpointURITestCase
+

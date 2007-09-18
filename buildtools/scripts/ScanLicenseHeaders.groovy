@@ -24,7 +24,7 @@ scanner.each { file ->
 
         if (line.indexOf(licenseLine) == -1)
         {
-            println("check file " + file)
+            println("License suspect: $file")
         }
     }
 }

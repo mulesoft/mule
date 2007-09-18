@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="http_method_test" version="1.0">
+    <model name="main">
+        <mule-descriptor name="httpIn" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="http://localhost:60200/foo" synchronous="true"/>
+            </inbound-router>
+        </mule-descriptor>
+        
+        <mule-descriptor name="jettyIn" implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="jetty:http://localhost:60201/foo" synchronous="true"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

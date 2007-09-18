@@ -1,7 +1,7 @@
 Building the Mule GUI Installer Using IzPack Version 3.10
 
 1.) Unpack the full distribution from distributions/server/full in the
-    mule/tools/installer/distribution folder. This is where the install.xml 
+    mule/tools/installer/distribution folder. This is where the install.xml
     is set to look for the Mule Distribution folders.
     The distribution folder must contain the contents of the distribution directly,
     i.e. the bin, sbin, examples folders etc.

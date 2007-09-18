@@ -47,9 +47,15 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.HeadMethod;
+import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.io.IOUtils;
@@ -90,19 +96,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             client = new HttpClient();
             client.setState(state);
             client.setHttpConnectionManager(connector.getClientConnectionManager());
-            //RM* This isn't a good idea since if the connection is not re-used a HEAD request is sent for
-            //every invocation.
-            // test the connection via HEAD
-//            HeadMethod method = new HeadMethod(endpoint.getEndpointURI().getAddress());
-//            try
-//            {
-//                client.executeMethod(getHostConfig(endpoint.getEndpointURI().getUri()), method);
-//            }
-//            catch (Exception e)
-//            {
-//                throw new ConnectException(
-//                    HttpMessages.failedToConnect(endpoint.getEndpointURI().getUri()), e, this);
-//            }
         }
 
     }
@@ -241,36 +234,39 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             httpMethod = new GetMethod(uri.toString());
         }
-        else
+        else if (HttpConstants.METHOD_PUT.equalsIgnoreCase(method))
+        {
+            PutMethod postMethod = new PutMethod(uri.toString());
+
+            httpMethod = createEntityMethod(event, body, postMethod);
+        }
+        else if (HttpConstants.METHOD_POST.equalsIgnoreCase(method))
         {
             PostMethod postMethod = new PostMethod(uri.toString());
 
-            if (body instanceof String)
-            {
-                ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
-                httpMethod = (HttpMethod)trans.transform(body.toString());
-            }
-            else if (body instanceof UMOStreamMessageAdapter)
-            {
-                UMOStreamMessageAdapter sma = (UMOStreamMessageAdapter)body;
-                Map headers = sma.getOutputHandler().getHeaders(event);
-                for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
-                {
-                    Map.Entry entry = (Map.Entry)iterator.next();
-                    postMethod.addRequestHeader((String)entry.getKey(), (String)entry.getValue());
-                }
-                postMethod.setRequestEntity(new StreamPayloadRequestEntity((StreamMessageAdapter)body, event));
-                postMethod.setContentChunked(true);
-                httpMethod = postMethod;
-            }
-            else
-            {
-                byte[] buffer = event.getTransformedMessageAsBytes();
-                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getEncoding()));
-                httpMethod = postMethod;
-            }
-
+            httpMethod = createEntityMethod(event, body, postMethod);
         }
+        else if (HttpConstants.METHOD_DELETE.equalsIgnoreCase(method))
+        {
+            httpMethod = new DeleteMethod(uri.toString());
+        }
+        else if (HttpConstants.METHOD_HEAD.equalsIgnoreCase(method))
+        {
+            httpMethod = new HeadMethod(uri.toString());
+        }
+        else if (HttpConstants.METHOD_OPTIONS.equalsIgnoreCase(method))
+        {
+            httpMethod = new OptionsMethod(uri.toString());
+        }
+        else if (HttpConstants.METHOD_TRACE.equalsIgnoreCase(method))
+        {
+            httpMethod = new TraceMethod(uri.toString());
+        }
+        else
+        {
+            throw new TransformerException(HttpMessages.unsupportedMethod(method));
+        }
+        
         httpMethod.setDoAuthentication(true);
         if (event.getCredentials() != null)
         {
@@ -288,6 +284,37 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             // don't use preemptive if there are no credentials to send
             client.getParams().setAuthenticationPreemptive(false);
+        }
+        return httpMethod;
+    }
+
+    private HttpMethod createEntityMethod(UMOEvent event, Object body, EntityEnclosingMethod postMethod)
+        throws TransformerException
+    {
+        HttpMethod httpMethod;
+        if (body instanceof String)
+        {
+            ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
+            httpMethod = (HttpMethod)trans.transform(body.toString());
+        }
+        else if (body instanceof UMOStreamMessageAdapter)
+        {
+            UMOStreamMessageAdapter sma = (UMOStreamMessageAdapter)body;
+            Map headers = sma.getOutputHandler().getHeaders(event);
+            for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
+            {
+                Map.Entry entry = (Map.Entry)iterator.next();
+                postMethod.addRequestHeader((String)entry.getKey(), (String)entry.getValue());
+            }
+            postMethod.setRequestEntity(new StreamPayloadRequestEntity((StreamMessageAdapter)body, event));
+            postMethod.setContentChunked(true);
+            httpMethod = postMethod;
+        }
+        else
+        {
+            byte[] buffer = event.getTransformedMessageAsBytes();
+            postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getEncoding()));
+            httpMethod = postMethod;
         }
         return httpMethod;
     }

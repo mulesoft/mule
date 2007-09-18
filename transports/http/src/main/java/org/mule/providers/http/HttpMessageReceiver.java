@@ -174,17 +174,14 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 return doHead(requestLine);
             }
             else if (method.equals(HttpConstants.METHOD_GET)
-                    || method.equals(HttpConstants.METHOD_POST))
-            {
-                return doGetOrPost(request, requestLine);
-            }
-            else if (method.equals(HttpConstants.METHOD_OPTIONS)
+                    || method.equals(HttpConstants.METHOD_POST)
+                    || method.equals(HttpConstants.METHOD_OPTIONS)
                     || method.equals(HttpConstants.METHOD_PUT)
                     || method.equals(HttpConstants.METHOD_DELETE)
                     || method.equals(HttpConstants.METHOD_TRACE)
                     || method.equals(HttpConstants.METHOD_CONNECT))
             {
-                return doOtherValid(requestLine, method);
+                return doRequest(request, requestLine);
             }
             else
             {
@@ -202,7 +199,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             return transformResponse(response);
         }
 
-        protected HttpResponse doGetOrPost(HttpRequest request, RequestLine requestLine) throws IOException, UMOException
+        protected HttpResponse doRequest(HttpRequest request, RequestLine requestLine) throws IOException, UMOException
         {
             Map headers = parseHeaders(request);
 
@@ -217,7 +214,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 adapter = buildStandardAdapter(request, headers);
             }
             UMOMessage message = new MuleMessage(adapter);
-
+            
             if (logger.isDebugEnabled())
             {
                 logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
@@ -466,14 +463,21 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 requestUri.append(path);
             }
 
-            if (logger.isTraceEnabled())
+            if (logger.isDebugEnabled())
             {
-                logger.trace("Secondary lookup of receiver on connector: " + connector.getName()
+                logger.debug("Secondary lookup of receiver on connector: " + connector.getName()
                         + " with URI key: " + requestUri.toString());
             }
 
             // try again
-            receiver = connector.lookupReceiver(requestUri.toString());
+            String uriStr = requestUri.toString();
+            receiver = connector.lookupReceiver(uriStr);
+            
+            if (receiver == null) 
+            {
+				receiver = findReceiverByStem(connector.getReceivers(), uriStr);
+			}
+           
             if (receiver == null && logger.isWarnEnabled())
             {
                 logger.warn("No receiver found with secondary lookup on connector: " + connector.getName()
@@ -490,6 +494,24 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     {
         return (HttpResponse) TransformerUtils.applyAllTransformersToObject(
                 connector.getDefaultResponseTransformers(), response);
+    }
+
+	public static UMOMessageReceiver findReceiverByStem(Map receivers, String uriStr)
+    {
+        int match = 0;
+        UMOMessageReceiver receiver = null;
+        for (Iterator itr = receivers.entrySet().iterator(); itr.hasNext();)
+        {
+            Map.Entry e = (Map.Entry)itr.next();
+            String key = (String)e.getKey();
+            UMOMessageReceiver candidate = (UMOMessageReceiver)e.getValue();
+            if (uriStr.startsWith(key) && match < key.length())
+            {
+                match = key.length();
+                receiver = candidate;
+            }
+        }
+        return receiver;
     }
 
 }

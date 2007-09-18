@@ -71,7 +71,7 @@ public abstract class AbstractLoanBrokerApp
     {
         return new MuleXmlConfigurationBuilder();
     }
-    
+
     protected void dispose() throws Exception
     {
         client.dispose();
@@ -130,7 +130,7 @@ public abstract class AbstractLoanBrokerApp
             }
         }
     }
-    
+
     public CustomerQuoteRequest createRequest()
     {
         int index = new Double(Math.random() * 10).intValue();
@@ -216,7 +216,7 @@ public abstract class AbstractLoanBrokerApp
     {
         return requestSend(number, endpoint, null);
     }
-    
+
     public List requestSend(int number, String endpoint, Map properties) throws Exception
     {
         List results = new ArrayList(number);

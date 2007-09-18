@@ -449,7 +449,10 @@ public class MuleServer implements Runnable
     {
         public void run()
         {
-            managementContext.dispose();
+            if (!managementContext.isDisposed() && !managementContext.isDisposing())
+            {
+                managementContext.dispose();
+            }
         }
     }
 }

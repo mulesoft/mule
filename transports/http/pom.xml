@@ -21,7 +21,7 @@
                      <excludes>
                          <!-- MULE-2208 -->
                          <exclude>**/HttpsFunctionalTestCase.java</exclude>
-                         
+
                          <exclude>**/*Mule1389TestCase.java</exclude>
                      </excludes>
                  </configuration>
@@ -112,18 +112,6 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.0.1</version>
-            <exclusions>
-                <!-- we like slf4j -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

@@ -12,7 +12,6 @@ package org.mule.providers.http.servlet;
 
 import org.mule.RegistryContext;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
@@ -26,6 +25,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 
 /**
  * <code>MuleRESTReceiverServlet</code> is used for sending a receiving events from
@@ -77,7 +77,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             }
             else
             {
-                AbstractMessageReceiver receiver = getReceiverForURI(httpServletRequest);
+            	UMOMessageReceiver receiver = getReceiverForURI(httpServletRequest);
                 httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
                 UMOMessage message = new MuleMessage(receiver.getConnector().getMessageAdapter(
                     httpServletRequest));
@@ -96,7 +96,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
     {
         try
         {
-            AbstractMessageReceiver receiver = getReceiverForURI(httpServletRequest);
+        	UMOMessageReceiver receiver = getReceiverForURI(httpServletRequest);
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
             UMOMessage message = new MuleMessage(receiver.getConnector()
                 .getMessageAdapter(httpServletRequest));
@@ -115,7 +115,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
     {
         try
         {
-            AbstractMessageReceiver receiver = getReceiverForURI(httpServletRequest);
+        	UMOMessageReceiver receiver = getReceiverForURI(httpServletRequest);
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
             UMOMessage message = new MuleMessage(receiver.getConnector()
                 .getMessageAdapter(httpServletRequest));
@@ -185,10 +185,12 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             // if we dont find an endpoint for the given name, lets check the
             // servlet receivers
             UMOMessageReceiver receiver = (UMOMessageReceiver)getReceivers().get(endpointName);
+            
             if (receiver == null)
             {
                 throw new EndpointNotFoundException(endpointName);
             }
+            
             endpoint = receiver.getEndpoint();
 
         }

@@ -16,12 +16,14 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.HttpMessageReceiver;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.service.TransportFactory;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.NoReceiverForEndpointException;
+import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.PropertiesUtils;
 
 import java.io.IOException;
@@ -79,7 +81,27 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected void doHead(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-        response.setStatus(HttpServletResponse.SC_OK);
+        try
+        {
+            UMOMessageReceiver receiver = getReceiverForURI(request);
+            UMOMessage responseMessage = null;
+            UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
+            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "HEAD");
+            setupRequestMessage(request, requestMessage);
+            receiver.routeMessage(requestMessage, true);
+            if (responseMessage != null)
+            {
+                writeResponse(response, responseMessage);
+            }
+            else 
+            {
+                response.setStatus(HttpConstants.SC_OK);
+            }
+        }
+        catch (Exception e)
+        {
+            handleException(e, e.getMessage(), response);
+        }
     }
     
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -87,10 +109,11 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            AbstractMessageReceiver receiver = getReceiverForURI(request);
+        	UMOMessageReceiver receiver = getReceiverForURI(request);
             UMOMessage responseMessage;
             UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+            setupRequestMessage(request, requestMessage);
             responseMessage = receiver.routeMessage(requestMessage, true);
             writeResponse(response, responseMessage);
         }
@@ -100,15 +123,21 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
     }
 
+    private void setupRequestMessage(HttpServletRequest request, UMOMessage requestMessage)
+    {
+        requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request.getRequestURI());
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
         try
         {
-            AbstractMessageReceiver receiver = getReceiverForURI(request);
+        	UMOMessageReceiver receiver = getReceiverForURI(request);
             UMOMessage responseMessage;
             UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
+            setupRequestMessage(request, requestMessage);
             responseMessage = receiver.routeMessage(requestMessage, true);
             if (responseMessage != null)
             {
@@ -124,11 +153,18 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected void doOptions(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         try
         {
-            response.getWriter().write(
-                HttpMessages.methodNotAllowed(HttpConstants.METHOD_OPTIONS).toString() + HttpConstants.CRLF);
+            UMOMessageReceiver receiver = getReceiverForURI(request);
+            UMOMessage responseMessage;
+            UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
+            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "OPTIONS");
+            setupRequestMessage(request, requestMessage);
+            responseMessage = receiver.routeMessage(requestMessage, true);
+            if (responseMessage != null)
+            {
+                writeResponse(response, responseMessage);
+            }
         }
         catch (Exception e)
         {
@@ -139,11 +175,18 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         try
         {
-            response.getWriter().write(
-                HttpMessages.methodNotAllowed(HttpConstants.METHOD_PUT).toString() + HttpConstants.CRLF);
+            UMOMessageReceiver receiver = getReceiverForURI(request);
+            UMOMessage responseMessage;
+            UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
+            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "PUT");
+            setupRequestMessage(request, requestMessage);
+            responseMessage = receiver.routeMessage(requestMessage, true);
+            if (responseMessage != null)
+            {
+                writeResponse(response, responseMessage);
+            }
         }
         catch (Exception e)
         {
@@ -154,11 +197,18 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         try
         {
-            response.getWriter().write(
-                HttpMessages.methodNotAllowed(HttpConstants.METHOD_DELETE).toString() + HttpConstants.CRLF);
+            UMOMessageReceiver receiver = getReceiverForURI(request);
+            UMOMessage responseMessage;
+            UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
+            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "DELETE");
+            setupRequestMessage(request, requestMessage);
+            responseMessage = receiver.routeMessage(requestMessage, true);
+            if (responseMessage != null)
+            {
+                writeResponse(response, responseMessage);
+            }
         }
         catch (Exception e)
         {
@@ -169,11 +219,18 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected void doTrace(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         try
         {
-            response.getWriter().write(
-                HttpMessages.methodNotAllowed(HttpConstants.METHOD_TRACE).toString() + HttpConstants.CRLF);
+            UMOMessageReceiver receiver = getReceiverForURI(request);
+            UMOMessage responseMessage;
+            UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
+            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "TRACE");
+            setupRequestMessage(request, requestMessage);
+            responseMessage = receiver.routeMessage(requestMessage, true);
+            if (responseMessage != null)
+            {
+                writeResponse(response, responseMessage);
+            }
         }
         catch (Exception e)
         {
@@ -184,11 +241,18 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     protected void doConnect(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         try
         {
-            response.getWriter().write(
-                HttpMessages.methodNotAllowed(HttpConstants.METHOD_CONNECT).toString() + HttpConstants.CRLF);
+            UMOMessageReceiver receiver = getReceiverForURI(request);
+            UMOMessage responseMessage;
+            UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
+            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "CONNECT");
+            setupRequestMessage(request, requestMessage);
+            responseMessage = receiver.routeMessage(requestMessage, true);
+            if (responseMessage != null)
+            {
+                writeResponse(response, responseMessage);
+            }
         }
         catch (Exception e)
         {
@@ -196,7 +260,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
     }
 
-    protected AbstractMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
+    protected UMOMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
         throws EndpointException
     {
         String uri = getReceiverName(httpServletRequest);
@@ -206,7 +270,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 HttpMessages.unableToGetEndpointUri(httpServletRequest.getRequestURI()));
         }
 
-        AbstractMessageReceiver receiver = (AbstractMessageReceiver)getReceivers().get(uri);
+        UMOMessageReceiver receiver = (UMOMessageReceiver)getReceivers().get(uri);
 
         if (receiver == null)
         {
@@ -219,10 +283,16 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 receiver = (AbstractMessageReceiver)getReceivers().get(tempUri);
             }
 
-            // Conversely, lets see if the uri matches up with the last part of
-            // any of the receiver keys. This will be necesary to find xfire
-            // receivers
-
+            // Lets see if the uri matches up with the last part of
+            // any of the receiver keys.
+            if (receiver == null) 
+            {
+				receiver = HttpMessageReceiver.findReceiverByStem(connector.getReceivers(), uri);
+            }
+            
+            // This is some bizarre piece of code so the XFire Servlet code works.
+            // We should remove this at some point (see XFireWsdlCallTestCase for a failure
+            // if this code is removed).
             if (receiver == null)
             {
                 Map receivers = getReceivers();
@@ -233,14 +303,15 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                     i = key.lastIndexOf("/");
                     if (i > -1)
                     {
-                        if (key.substring(i+1).equals(uri))
+                        String key2 = key.substring(i+1);
+                        if (key2.equals(uri))
                         {
                             receiver = (AbstractMessageReceiver)receivers.get(key);
                             break;
                         }
                     }
                 }
-            }
+			}
             
             if (receiver == null)
             {

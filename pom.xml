@@ -306,7 +306,7 @@
                     <exclusion>
                         <groupId>commons-logging</groupId>
                         <artifactId>commons-logging</artifactId>
-                    </exclusion>                
+                    </exclusion>
                     <exclusion>
                         <!-- we want the newer version below -->
                         <groupId>woodstox</groupId>
@@ -378,11 +378,23 @@
                     <exclusion>
                         <groupId>commons-logging</groupId>
                         <artifactId>commons-logging</artifactId>
-                    </exclusion>                
+                    </exclusion>
                     <!-- this should really be in test scope -->
                     <exclusion>
                         <groupId>jmock</groupId>
                         <artifactId>jmock</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>commons-httpclient</groupId>
+                <artifactId>commons-httpclient</artifactId>
+                <version>3.1</version>
+                <exclusions>
+                    <!-- we like slf4j -->
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -863,7 +875,7 @@
                         <link>http://jakarta.apache.org/commons/lang/api-2.1/</link>
                         <link>http://jakarta.apache.org/commons/logging/commons-logging-1.0.4/docs/apidocs/</link>
                         <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
-                        <link>http://logging.apache.org/log4j/docs/api/</link>
+                        <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                         <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
                         <link>http://www.junit.org/junit/javadoc/3.8.1/</link>
                     </links>

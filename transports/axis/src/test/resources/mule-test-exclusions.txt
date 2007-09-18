@@ -1,0 +1,8 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# MULE-2164
+AxisServletBindingTestCase
+# Use FQN below once AMTC changes are merged from trunk
+#org.mule.providers.soap.axis.AxisServletBindingTestCase
