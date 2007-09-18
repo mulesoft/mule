@@ -51,6 +51,7 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-i18n</include>
         <include>org.mule.modules:mule-module-jaas</include>
+        <include>org.mule.modules:mule-module-jbossts</include>
         <include>org.mule.modules:mule-module-jotm</include>
         <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-ognl</include>

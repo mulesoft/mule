@@ -408,6 +408,7 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-jaas</include>
+        <include>org.mule.modules:mule-module-jbossts</include>
         <include>org.mule.modules:mule-module-jotm</include>
         <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-ognl</include>
@@ -460,6 +461,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-module-acegi</exclude>
         <exclude>org.mule.modules:mule-module-client</exclude>
         <exclude>org.mule.modules:mule-module-jaas</exclude>
+        <exclude>org.mule.modules:mule-module-jbossts</exclude>
         <exclude>org.mule.modules:mule-module-jca</exclude>
         <exclude>org.mule.modules:mule-module-jotm</exclude>
         <exclude>org.mule.modules:mule-module-management</exclude>
