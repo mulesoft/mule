@@ -129,12 +129,13 @@ spring-aop-2.0.6
 spring-beans-2.0.6
 spring-context-2.0.6
 spring-core-2.0.6
-spring-remoting-2.0.6
+spring-dao-2.0.6
+spring-hibernate3-2.0.6
 spring-jdbc-2.0.6
 spring-jms-2.0.6
-spring-dao-2.0.6
 spring-modules-jbpm31-nodeps-0.8a
-spring-hibernate3-2.0.6
+spring-remoting-2.0.6
+spring-support-2.0.6
 stax-api-1.0.1
 stax-utils-20040917
 velocity-1.4
