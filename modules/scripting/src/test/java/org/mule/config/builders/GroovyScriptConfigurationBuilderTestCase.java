@@ -23,6 +23,7 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
         return "mule-config.groovy";
     }
 
+    // @Override
     public ConfigurationBuilder getBuilder()
     {
         try
@@ -36,7 +37,6 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
             fail(e.getMessage());
             return null;
         }
-
     }
 
 }

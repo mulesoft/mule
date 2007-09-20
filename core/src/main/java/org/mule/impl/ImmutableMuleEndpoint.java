@@ -62,11 +62,6 @@ import org.apache.commons.logging.LogFactory;
 public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 {
     /**
-     * Serial version
-     */
-    private static final long serialVersionUID = -2431378111247771909L;
-
-    /**
      * logger used by this class
      */
     protected static final Log logger = LogFactory.getLog(ImmutableMuleEndpoint.class);

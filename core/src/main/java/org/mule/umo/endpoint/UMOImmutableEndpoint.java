@@ -18,7 +18,6 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatching;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.Serializable;
 import java.util.List;
@@ -61,14 +60,14 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
      * block. When the message-provider is created the endpointUri is first lookup in
      * the endpointUri registry and if nothing is returned the endpointUri value
      * itself is used.
-     * 
+     *
      * @return the endpointUri on which the endpoint sends or receives data
      */
     UMOEndpointURI getEndpointURI();
 
     /**
      * Decides the encoding to be used for events received by this endpoint
-     * 
+     *
      * @return the encoding set on the endpoint or null if no codin has been
      *         specified
      */
@@ -83,7 +82,7 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
      * <li>senderAndReceiver - PROVIDER_TYPE_SENDER_AND_RECEIVER</li>
      * </ul>
      * The default is 'senderAndReceiver'.
-     * 
+     *
      * @return the endpoint type
      */
     String getType();
@@ -92,14 +91,14 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
      * The endpoint that will be used to send the message on. It is important that
      * the endpointUri and the connection correlate i.e. if your endpointUri is a jms
      * queue your connection must be a JMS endpoint.
-     * 
+     *
      * @return the endpoint associated with the endpoint
      */
     UMOConnector getConnector();
 
     /**
      * The name is the identifier for the endpoint
-     * 
+     *
      * @return the endpoint name
      */
     String getName();
@@ -117,21 +116,21 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
 
     /**
      * The transformers used when a response is returned from invoking this endpoint
-     * 
+     *
      * @return the transformer to use when receiving the response data
      */
     List getResponseTransformers();
 
     /**
      * Returns any properties set on this endpoint
-     * 
+     *
      * @return a map of properties for this endpoint
      */
     Map getProperties();
 
     /**
      * Retrieves a property set on the endpoint
-     * 
+     *
      * @param key the name of the property
      * @return the property value or null if it does not exist
      */
@@ -140,7 +139,7 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
     /**
      * The transport protocol name that the message endpoint communicates over. i.e.
      * jms, sms, smtp etc. The protocol must match that of the associated endpoint
-     * 
+     *
      * @return the protocol name
      */
     String getProtocol();
@@ -154,21 +153,21 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
 
     /**
      * Determines whether this endpoint can be used to send events
-     * 
+     *
      * @return true if it has been configured to send events, false otherwise
      */
     boolean canSend();
 
     /**
      * Determines whether this endpoint can be used to receive events
-     * 
+     *
      * @return true if it has been configured to receive events, false otherwise
      */
     boolean canReceive();
 
     /**
      * Returns the transaction configuration for this endpoint
-     * 
+     *
      * @return the transaction configuration for this endpoint or null if the
      *         endpoint is not transactional
      */
@@ -177,7 +176,7 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
     /**
      * The filter to apply to incoming messages. Only applies when the endpoint
      * endpointUri is a receiver
-     * 
+     *
      * @return the UMOFilter to use or null if one is not set
      */
     UMOFilter getFilter();
@@ -185,7 +184,7 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
     /**
      * If a filter is configured on this endpoint, this property will determine if
      * message that are not excepted by the filter are deleted
-     * 
+     *
      * @return true if message should be deleted, false otherwise
      */
     boolean isDeleteUnacceptedMessages();
@@ -193,7 +192,7 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
     /**
      * Returns an UMOEndpointSecurityFilter for this endpoint. If one is not set,
      * there will be no authentication on events sent via this endpoint
-     * 
+     *
      * @return UMOEndpointSecurityFilter responsible for authenticating message flow
      *         via this endpoint.
      * @see UMOEndpointSecurityFilter
@@ -204,7 +203,7 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
      * Determines if requests originating from this endpoint should be synchronous
      * i.e. execute in a single thread and possibly return an result. This property
      * is only used when the endpoint is of type 'receiver'
-     * 
+     *
      * @return whether requests on this endpoint should execute in a single thread.
      *         This property is only used when the endpoint is of type 'receiver'
      */
@@ -212,8 +211,7 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
 
     /**
      * Determines if the synchronous porperty has been set on the endpoint
-     * 
-     * @return
+     *
      */
     boolean isSynchronousSet();
 
@@ -222,14 +220,13 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
      * (outputStream) or Jms (ReplyTo) Mule can automatically wait for a response
      * from a backchannel when dispatching over these protocols. This is different
      * for synchronous as synchronous behavior only applies to in
-     * 
-     * @return
+     *
      */
     boolean isRemoteSync();
 
     /**
      * The timeout value for remoteSync invocations
-     * 
+     *
      * @return the timeout in milliseconds
      */
     int getRemoteSyncTimeout();
@@ -237,22 +234,21 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
     /**
      * Determines if a new connector is created for this endpoint or an exising one
      * must already be present
-     * 
-     * @return
+     *
      */
     int getCreateConnector();
 
     /**
      * Sets the state the endpoint will be loaded in. The States are 'stopped' and
      * 'started' (default)
-     * 
+     *
      * @return the endpoint starting state
      */
     String getInitialState();
 
     /**
      * Determines whether the endpoint should deal with requests as streams
-     * 
+     *
      * @return true if the request should be streamed
      */
     boolean isStreaming();
