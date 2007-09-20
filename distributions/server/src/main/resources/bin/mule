@@ -88,7 +88,7 @@ PIDDIR="."
 
 #-----------------------------------------------------------------------------
 
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MULE_HOME/sbin/profiler
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MULE_HOME/lib/native/profiler
 
 # Get the fully qualified path to the script
 case $0 in
