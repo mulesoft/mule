@@ -7,6 +7,8 @@
     <!-- The info section -->
     <info>
         <appname>Mule</appname>
+        <!-- IMPORTANT - When changing the version also change the version further down
+                         within this file where the classpath is set to point to mule core. -->
         <appversion>2.0-M2-SNAPSHOT</appversion>
         <authors>
             <author name="MuleSource" email="support@mulesource.com"/>
@@ -105,6 +107,7 @@
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/mule" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/setup_local_instance.sh" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/visualizer" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/visualizer.groovy" stage="never"/>
         </pack>
         <pack name="conf" required="yes">
             <description>The configuration files for Mule</description>
@@ -122,12 +125,12 @@
         <pack name="full library" id="full library" required="yes" conditionid="show.lib.full">
             <description> Contains the standard Mule Library plus the third party libraries not distributed with mule</description>
             <file src="../distribution/lib" targetdir="$INSTALL_PATH"/>
-            <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
+            <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot-2.0-M2-SNAPSHOT.jar:$INSTALL_PATH/lib/opt/commons-io-1.3.1.jar:$INSTALL_PATH/lib/opt/log4j-1.2.14.jar:$INSTALL_PATH/lib/opt/slf4j-log4j12-1.4.3.jar:$INSTALL_PATH/lib/opt/jcl104-over-slf4j-1.4.3.jar:$INSTALL_PATH/lib/opt/commons-lang-2.3.jar:$INSTALL_PATH/lib/opt/slf4j-api-1.4.3.jar:$INSTALL_PATH/lib/mule/mule-core-2.0-M2-SNAPSHOT.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
             <args>
                   <arg value="$INSTALL_PATH"/>
             </args>
             </executable>
-                <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot.jar" class="org.mule.modules.boot.GuiInstallerLibraryDownloader" failure="abort" type="jar" stage="postinstall" keep="true">
+                <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot-2.0-M2-SNAPSHOT.jar" class="org.mule.modules.boot.GuiInstallerLibraryDownloader" failure="abort" type="jar" stage="postinstall" keep="true">
             <args>
                  <arg value="$INSTALL_PATH"/>
                 <arg value="$PROXYHOST"/>
@@ -141,10 +144,13 @@
             <description>The License files</description>
             <file src="../distribution/licenses" targetdir="$INSTALL_PATH"/>
         </pack>
+<!-- TODO: Not supported in 2.x yet
         <pack name="sbin" required="yes">
             <description>The wrapper</description>
             <file src="../distribution/sbin" targetdir="$INSTALL_PATH"/>
+-->
             <!-- unix derivates need the wrapper files to be exectuable -->
+<!-- TODO: see above TODO
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/sbin/wrapper-linux-ia-64" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/sbin/wrapper-linux-ppc-64" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/sbin/wrapper-linux-x86-32" stage="never"/>
@@ -155,6 +161,7 @@
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/sbin/wrapper-solaris-sparc-64" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/sbin/wrapper-solaris-x86-32" stage="never"/>
         </pack>
+-->
         <pack name="src" required="yes">
             <description>The sources</description>
             <file src="../distribution/src" targetdir="$INSTALL_PATH"/>
