@@ -45,7 +45,7 @@ if "%MULE_APP%" == "" (
     )
 )
 
-set PATH=%PATH%;%MULE_HOME%\sbin\profiler
+set PATH=%PATH%;%MULE_HOME%\lib\native\profiler
 set _WRAPPER_BASE=%MULE_HOME%\lib\boot\exec\wrapper
 
 rem ###############################################################
