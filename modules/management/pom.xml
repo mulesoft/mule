@@ -74,7 +74,11 @@
             <artifactId>mx4j-remote</artifactId>
             <version>2.1.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.yourkit</groupId>
+            <artifactId>yjp-controller-api-redist</artifactId>
+            <version>7.0</version>
+        </dependency>
         <!-- Provided by the OSGi environment -->
         <dependency>
             <groupId>log4j</groupId>

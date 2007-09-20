@@ -45,7 +45,9 @@ if "%MULE_APP%" == "" (
     )
 )
 
+set PATH=%PATH%;%MULE_HOME%\sbin\profiler
 set _WRAPPER_BASE=%MULE_HOME%\lib\boot\exec\wrapper
+
 rem ###############################################################
 set _WRAPPER_EXE=%_WRAPPER_BASE%-windows-x86-32.exe
 if exist "%_WRAPPER_EXE%" goto validate

@@ -45,6 +45,7 @@
         <module>embedded</module>
         <!-- <module>extras</module> -->
         <module>jca</module>
+        <module>profiler</module>
         <module>server</module>
     </modules>
 

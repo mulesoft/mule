@@ -33,6 +33,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
 
     private boolean loadJdmkAgent = false;
     private boolean loadMx4jAgent = false;
+    private boolean loadProfilerAgent = false;
     private String port;
     private String host;
 
@@ -148,6 +149,15 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 }
             }
 
+            if (loadProfilerAgent)
+            {
+                agent = createProfilerAgent();
+                if (!isAgentRegistered(agent))
+                {
+                    RegistryContext.getRegistry().registerAgent(agent, managementContext);
+                }
+            }
+
             // remove this agent once it has registered the other agents
             //TODO RM* this currently does nothing!!!
             managementContext.getRegistry().unregisterAgent(name);
@@ -224,6 +234,11 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         return new JdmkAgent();
     }
 
+    protected YourKitProfilerAgent createProfilerAgent()
+    {
+        return new YourKitProfilerAgent();
+    }
+
     protected boolean isAgentRegistered(UMOAgent agent)
     {
         return managementContext.getRegistry().lookupAgent(agent.getName()) != null;
@@ -269,6 +284,23 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         this.loadMx4jAgent = loadMx4jAgent;
     }
 
+    /**
+     * Getter for property 'loadProfilerAgent'.
+     * @return Value for property 'loadProfilerAgent'.
+     */
+    public boolean isLoadProfilerAgent()
+    {
+        return loadProfilerAgent;
+    }
+
+    /**
+     * Setter for property 'loadProfilerAgent'.
+     * @param loadProfilerAgent Value to set for property 'loadProfilerAgent'.
+     */
+    public void setLoadProfilerAgent(boolean loadProfilerAgent)
+    {
+        this.loadProfilerAgent = loadProfilerAgent;
+    }
 
     /**
      * Getter for property 'port'.

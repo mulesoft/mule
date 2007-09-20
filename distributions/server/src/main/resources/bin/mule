@@ -88,6 +88,8 @@ PIDDIR="."
 
 #-----------------------------------------------------------------------------
 
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MULE_HOME/sbin/profiler
+
 # Get the fully qualified path to the script
 case $0 in
     /*)
@@ -587,24 +589,8 @@ dump() {
     fi
 }
 
-checkDebug() {
-    # Checking if "-debug" option is specified
-    debugEnabled=false
-    for arg in $@
-    do
-        if [ "$arg" = "-debug" ]; then
-            debugEnabled=true;
-            break
-        fi
-    done
-
-    if [ $debugEnabled = true ]; then
-        echo Debug enabled
-        # Generating additional wrapper-jpda.conf (should be included in wrapper.conf at the end)
-        $MULE_HOME/bin/launcher $MULE_HOME/bin/jpda_settings.groovy $WRAPPER_CONF $JPDA_OPTS
-    else
-        rm -f `echo $WRAPPER_CONF | sed 's/[^\/]*$/wrapper-jpda\.conf/'`
-    fi
+checkAdditionalJvmParams() {
+    $MULE_HOME/bin/launcher $MULE_HOME/bin/additional.groovy $WRAPPER_CONF "$JPDA_OPTS" $@
 }
 
 ######################################################################
@@ -625,13 +611,13 @@ case "$1" in
 
     'console')
         checkUser touchlock $1
-        checkDebug $*
+        checkAdditionalJvmParams $*
         console
         ;;
 
     'start')
         checkUser touchlock $1
-        checkDebug $*
+        checkAdditionalJvmParams $*
         start
         ;;
 
