@@ -28,7 +28,7 @@
             </outbound-router>
 
             <threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6"/>
-            <!--<pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>-->
+            <!--<pooling-profile maxIdle="6" maxActive="9" exhaustedAction="GROW" maxWait="4002" initialisationPolicy="INITIALISE_ALL"/>-->
             <!--<queue-profile maxOutstandingMessages="102"/>-->
         </mule-descriptor>
     </model>

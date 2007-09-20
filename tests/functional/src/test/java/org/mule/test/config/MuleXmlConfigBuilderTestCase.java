@@ -24,7 +24,9 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
@@ -42,6 +44,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         return "test-xml-mule2-config.xml,test-xml-mule2-config-split.xml,test-xml-mule2-config-split-properties.xml";
     }
 
+    // @Override
     public ConfigurationBuilder getBuilder()
     {
         return new MuleXmlConfigurationBuilder();
@@ -132,8 +135,31 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertTrue(props.get(5) instanceof Apple);
     }
 
+    public void testEndpointURIParamsConfig()
+    {
+        UMODescriptor d = managementContext.getRegistry().lookupService("testPropertiesComponent");
+        assertNotNull(d);
+        final UMOInboundRouterCollection router = d.getInboundRouter();
+        assertNotNull(router);
+        final List endpoints = router.getEndpoints();
+        assertNotNull(endpoints);
+        assertFalse(endpoints.isEmpty());
+        final UMOEndpoint inboundEndpoint = (UMOEndpoint) endpoints.get(0);
+        assertNotNull(inboundEndpoint);
+        final List transformers = inboundEndpoint.getTransformers();
+        assertFalse(transformers.isEmpty());
+        assertNotNull(transformers.get(0));
+        final List responseTransformers = inboundEndpoint.getResponseTransformers();
+        assertFalse(responseTransformers.isEmpty());
+        assertNotNull(responseTransformers.get(0));
+    }
+
+    // @Override
     public void testTransformerConfig()
     {
+        // first of all test generic transformer configuration
+        super.testTransformerConfig();
+
         UMOTransformer t = managementContext.getRegistry().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
@@ -161,9 +187,10 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
      * config elements for threadingProfiles, queueProfiles and poolingProfiles, so
      * that defaults can be declared in the main configuration but overiding elements
      * can just replace certain values
-     * 
+     *
      * @throws MuleException
      */
+    // @Override
     public void testThreadingConfig() throws MuleException
     {
         // test config
@@ -199,30 +226,6 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertEquals(6, tp.getMaxThreadsIdle());
         assertEquals(0, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
-    }
-
-    public void testPoolingConfig()
-    {
-        // test config
-        //TODO RM*
-//        PoolingProfile pp = RegistryContext.getConfiguration().getPoolingProfile();
-//        assertEquals(8, pp.getMaxActive());
-//        assertEquals(4, pp.getMaxIdle());
-//        assertEquals(4000, pp.getMaxWait());
-//        assertEquals(ObjectPool.DEFAULT_EXHAUSTED_ACTION, pp.getExhaustedAction());
-//        assertEquals(1, pp.getInitialisationPolicy());
-//        assertTrue(pp.getPoolFactory() instanceof CommonsPoolFactory);
-
-        // test override
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
-            "appleComponent2");
-//        PoolingProfile pp = descriptor.getPoolingProfile();
-//
-//        assertEquals(8, pp.getMaxActive());
-//        assertEquals(4, pp.getMaxIdle());
-//        assertEquals(4000, pp.getMaxWait());
-//        assertEquals(ObjectPool.DEFAULT_EXHAUSTED_ACTION, pp.getExhaustedAction());
-//        assertEquals(2, pp.getInitialisationPolicy());
     }
 
     public void testGlobalEndpointOverrides()

@@ -31,6 +31,7 @@ import java.util.Set;
 public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestCase
 {
 
+    // @Override
     public String getConfigResources()
     {
         // A Mule Xml config file and a Spring context file
@@ -41,6 +42,7 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
                 "test-mule-to-spring-with-xslt.xml";
     }
 
+    // @Override
     public ConfigurationBuilder getBuilder()
     {
         return new MuleXmlConfigurationBuilder();

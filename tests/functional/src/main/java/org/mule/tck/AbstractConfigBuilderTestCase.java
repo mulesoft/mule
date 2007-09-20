@@ -48,12 +48,16 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     // @Override
     public void testManagerConfig() throws Exception
     {
+        super.testManagerConfig();
+
         assertNotNull(managementContext.getTransactionManager());
     }
 
     // @Override
     public void testConnectorConfig() throws Exception
     {
+        super.testConnectorConfig();
+
         TestConnector c = (TestConnector) managementContext.getRegistry().lookupConnector("dummyConnector");
         assertNotNull(c);
         assertNotNull(c.getExceptionListener());
@@ -68,6 +72,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     // @Override
     public void testGlobalEndpointConfig()
     {
+        super.testGlobalEndpointConfig();
+
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("fruitBowlEndpoint", managementContext);
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
@@ -82,6 +88,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     // @Override
     public void testEndpointConfig()
     {
+        super.testEndpointConfig();
+
         // test that endpoints have been resolved on endpoints
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("waterMelonEndpoint", managementContext);
         assertNotNull(endpoint);
@@ -101,6 +109,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     // @Override
     public void testTransformerConfig()
     {
+        super.testTransformerConfig();
+
         UMOTransformer t = managementContext.getRegistry().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
@@ -111,6 +121,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     // @Override
     public void testModelConfig() throws Exception
     {
+        super.testModelConfig();
+
         UMOModel model = managementContext.getRegistry().lookupModel("main");
         super.testModelConfig();
         assertTrue(model.isComponentRegistered("appleComponent"));
@@ -219,23 +231,23 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         //TODO RM* test config
 //        PoolingProfile pp = RegistryContext.getConfiguration().getPoolingProfile();
-//        assertEquals(8, pp.getMaxActive());
-//        assertEquals(4, pp.getMaxIdle());
-//        assertEquals(4000, pp.getMaxWait());
-//        assertEquals(ObjectPool.WHEN_EXHAUSTED_GROW, pp.getExhaustedAction());
-//        assertEquals(1, pp.getInitialisationPolicy());
+//        assertEquals(10, pp.getMaxActive());
+//        assertEquals(5, pp.getMaxIdle());
+//        assertEquals(10001, pp.getMaxWait());
+//        assertEquals(ObjectPool.WHEN_EXHAUSTED_WAIT, pp.getExhaustedAction());
+//        assertEquals(PoolingProfiler.INITIALISE_ONE, pp.getInitialisationPolicy());
 //        assertTrue(pp.getPoolFactory() instanceof CommonsPoolFactory);
 
-        // test override
+        // test per-descriptor overrides
         MuleDescriptor descriptor = (MuleDescriptor) managementContext.getRegistry().lookupService(
                 "appleComponent2");
 //        PoolingProfile pp = descriptor.getPoolingProfile();
 //
-//        assertEquals(5, pp.getMaxActive());
-//        assertEquals(5, pp.getMaxIdle());
-//        assertEquals(4000, pp.getMaxWait());
+//        assertEquals(9, pp.getMaxActive());
+//        assertEquals(6, pp.getMaxIdle());
+//        assertEquals(4002, pp.getMaxWait());
 //        assertEquals(ObjectPool.WHEN_EXHAUSTED_GROW, pp.getExhaustedAction());
-//        assertEquals(2, pp.getInitialisationPolicy());
+//        assertEquals(PoolingProfile.INITIALISE_ALL, pp.getInitialisationPolicy());
     }
 
     public void testQueueProfileConfig()

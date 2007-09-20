@@ -18,13 +18,26 @@ import org.mule.examples.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase
 import org.mule.providers.bpm.BPMS;
 import org.mule.providers.bpm.ProcessConnector;
 
+import java.io.File;
+
 
 public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCase
 {
     /** For unit tests, we assume a virgin database, therefore the process ID is assumed to be = 1 */
     public static final long PROCESS_ID = 1;
     
-    protected ConfigurationBuilder getBuilder() throws Exception {
+    protected void suitePreSetUp() throws Exception
+    {
+        // set the derby.system.home system property to make sure that all derby databases are
+        // created in maven's target directory
+        File derbySystemHome = new File(System.getProperty("user.dir"), "target");
+        System.setProperty("derby.system.home",  derbySystemHome.getAbsolutePath());
+
+        super.suitePreSetUp();
+    }
+
+    protected ConfigurationBuilder getBuilder() throws Exception 
+    {
         return new MuleXmlConfigurationBuilder();
     }
     
