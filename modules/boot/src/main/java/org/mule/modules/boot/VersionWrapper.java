@@ -9,6 +9,8 @@
  */
 package org.mule.modules.boot;
 
+import org.mule.config.i18n.CoreMessages;
+
 import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
 
@@ -22,7 +24,7 @@ public class VersionWrapper implements WrapperListener
     {
         try
         {
-            System.out.println(ReflectionHelper.getCoreMessages("productInformation"));
+            System.out.println(CoreMessages.productInformation());
         }
         catch (Exception e)
         {

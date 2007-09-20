@@ -10,8 +10,6 @@
 
 package org.mule.modules.boot;
 
-import java.io.File;
-
 public class GuiInstallerLicenseHandler
 {
     /**
@@ -24,12 +22,7 @@ public class GuiInstallerLicenseHandler
      */
     public static void main(String args[]) throws Exception
     {
-        File muleHome = new File(args[0].toString());
-        LicenseHandler handler = new LicenseHandler(muleHome);
-        // No need to trap the exception: the saveLicenseAck method
-        // Now checks to make sure there is no license.props already
-        // saved. However, the GuiInstaller should really do this check
-        // first.
-        handler.saveLicenseAck("MuleSource Public License", "1.1.3");
+        System.setProperty("mule.home", args[0].toString());
+        LicenseHandler.saveLicenseInfo(new LicenseHandler.LicenseInfo());
     }
 }
