@@ -500,6 +500,9 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.apache.activemq:activemq-core</exclude>
         <exclude>org.apache.activemq:activeio-core</exclude>
 
+        <!-- this lib is provided separately in 'profiler' distribution -->
+        <exclude>com.yourkit:yjp-controller-api-redist</exclude>
+
         <!-- Tools -->
         <exclude>org.mule.tools:mule-tools-visualizer</exclude>
       </excludes>

@@ -1,0 +1,46 @@
+<!--
+Assembly descriptor for the YourKit Profiler distribution.
+-->
+<assembly>
+  <id>yjp</id>
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <directory>src/main/resources</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+
+    <fileSet>
+      <directory>src/main/resources/sbin</directory>
+      <outputDirectory>lib/native/profiler</outputDirectory>
+      <fileMode>755</fileMode>
+    </fileSet>
+
+  </fileSets>
+    
+
+    <!--
+    ============================
+        Libraries
+    ============================
+    -->
+
+  <dependencySets>
+
+    <!-- Non-Mule libraries -->
+    <dependencySet>
+      <outputDirectory>lib/user</outputDirectory>
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+      <includes>
+        <include>com.yourkit:yjp-controller-api-redist</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+
+</assembly>
