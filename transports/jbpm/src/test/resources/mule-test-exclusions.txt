@@ -1,0 +1,4 @@
+# MULE-2418
+org.mule.providers.bpm.jbpm.SimpleJbpmTestCase
+org.mule.providers.bpm.jbpm.MessagingJbpmTestCase
+org.mule.providers.bpm.jbpm.SimpleJbpmLegacyTestCase
