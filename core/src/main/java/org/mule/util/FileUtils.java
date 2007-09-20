@@ -17,6 +17,7 @@ import org.mule.config.i18n.MessageFactory;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,11 +29,16 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>FileUtils</code> contains useful methods for dealing with files &
@@ -41,9 +47,9 @@ import java.util.zip.ZipFile;
 // @ThreadSafe
 public class FileUtils extends org.apache.commons.io.FileUtils
 {
-
+    private static final Log logger = LogFactory.getLog(FileUtils.class);
     public static final String DEFAULT_ENCODING = "UTF-8";
-
+    
     public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException
     {
         if (destination.exists() && !destination.canWrite())
@@ -579,5 +585,150 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         }
     }
 
+    public static boolean renameFileHard(String srcFilePath, String destFilePath)
+    {
+        if (StringUtils.isNotBlank(srcFilePath) && StringUtils.isNotBlank(destFilePath))
+        {
+            return renameFileHard(new File(srcFilePath), new File(destFilePath));
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    public static boolean renameFileHard(File srcFile, File destFile)
+    {
+        boolean isRenamed = false;
+        if (srcFile != null && destFile != null)
+        {
+            logger.debug("Moving file " + srcFile.getAbsolutePath() + " to " + destFile.getAbsolutePath());
+            if (!destFile.exists())
+            {
+                try
+                {
+                    if (srcFile.isFile())
+                    {
+                        logger.debug("Trying to rename file");
+                        FileInputStream in = null;
+                        FileOutputStream out = null;
+                        try
+                        {
+                            in = new FileInputStream(srcFile);
+                            out = new FileOutputStream(destFile);
+                            out.getChannel().transferFrom(in.getChannel(), 0, srcFile.length());
+                            isRenamed = true;
+                        }
+                        catch (Exception e)
+                        {
+                            logger.debug(e);
+                        }
+                        finally
+                        {
+                            if (in != null)
+                            {
+                                try
+                                {
+                                    in.close();
+                                }
+                                catch (Exception inNotClosed)
+                                {
+                                    logger.debug(inNotClosed);
+                                }
+                            }
+                            if (out != null)
+                            {
+                                try
+                                {
+                                    out.close();
+                                }
+                                catch (Exception outNotClosed)
+                                {
+                                    logger.debug(outNotClosed);
+                                }
+                            }
+                        }
+                        logger.debug("File renamed: " + isRenamed);
+                        if (isRenamed)
+                        {
+                            srcFile.delete();
+                        }
+                        else
+                        {
+                            destFile.delete();
+                        }
+                    }
+                    else
+                    {
+                        logger.debug(srcFile.getAbsolutePath() + " is not a valid file.");
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.debug("Error renaming file from " + srcFile.getAbsolutePath() + " to " + destFile.getAbsolutePath());
+                }
+            }
+            else
+            {
+                logger.debug("Error renaming file " + srcFile.getAbsolutePath() + ". Destination file " + destFile.getAbsolutePath() + " already exists.");
+            }
+        }
+        return isRenamed;
+    }
 
+    public static boolean renameFile(String srcFilePath, String destFilePath)
+    {
+        if (StringUtils.isNotBlank(srcFilePath) && StringUtils.isNotBlank(destFilePath))
+        {
+            return renameFile(new File(srcFilePath), new File(destFilePath));
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    public static boolean renameFile(File srcFile, File destFile)
+    {
+        boolean isRenamed = false;
+        if (srcFile != null && destFile != null)
+        {
+            logger.debug("Moving file " + srcFile.getAbsolutePath() + " to " + destFile.getAbsolutePath());
+            if (!destFile.exists())
+            {
+                try
+                {
+                    if (srcFile.isFile())
+                    {
+                        logger.debug("Trying to rename file");
+                        isRenamed = srcFile.renameTo(destFile);
+                        if (!isRenamed && srcFile.exists())
+                        {
+                            logger.debug("Trying hard copy, assuming partition crossing ...");
+                            isRenamed = renameFileHard(srcFile, destFile);
+                        }
+                        logger.debug("File renamed: " + isRenamed);
+                    }
+                    else
+                    {
+                        logger.debug(srcFile.getAbsolutePath() + " is not a valid file");
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.debug("Error moving file from " + srcFile.getAbsolutePath() + " to " + destFile.getAbsolutePath(), e);
+                }
+            }
+            else
+            {
+                logger.debug("Error renaming file " + srcFile.getAbsolutePath() + ". Destination file " + destFile.getAbsolutePath() + " already exists.");
+            }
+        }
+        else
+        {
+            logger.debug("Error renaming file. Source or destination file is null.");
+        }
+    
+        return isRenamed;
+    }
 }

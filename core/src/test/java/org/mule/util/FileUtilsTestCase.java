@@ -13,6 +13,7 @@ package org.mule.util;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.io.File;
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -301,5 +302,55 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         assertTrue("Shouldn't have been deleted.", keepMeIntact.exists());
 
         FileUtils.deleteTree(outputDir);
+    }
+    
+    public void testRenameFile()
+    {
+        try
+        {
+            File sourceFile = createTestFile("source");
+            File destFile = createTestFile("dest");
+    
+            assertTrue(destFile.delete());
+            assertTrue(FileUtils.renameFile(sourceFile, destFile));
+            assertTrue(destFile.exists());
+            assertTrue(destFile.delete());
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
+    }
+
+    public void testRenameFileAcrossFolders()
+    {
+        try
+        {
+            File dir = createTestDir("test");
+            File sourceFile = createTestFile("source");
+            File destFile = new File(dir, "dest");
+    
+            assertTrue(FileUtils.renameFile(sourceFile, destFile));
+            assertTrue(destFile.exists());
+            assertTrue(destFile.delete());
+            assertTrue(dir.delete());
+        }
+        catch (Exception e)
+        {
+            fail(e.getMessage());
+        }
+    }
+
+    private File createTestFile(String filePath) throws IOException
+    {
+        return File.createTempFile(filePath, ".junit");
+    }
+    
+    private File createTestDir(String dirPath) throws IOException
+    {
+        File file = createTestFile(dirPath);
+        file.delete();
+        file.mkdir();
+        return file;
     }
 }
