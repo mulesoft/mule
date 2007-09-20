@@ -53,8 +53,8 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
 
     protected Connection getConnection() throws Exception
     {
-        Class.forName("org.hsqldb.jdbcDriver");
-        return DriverManager.getConnection("jdbc:hsqldb:mem:.");
+        Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+        return DriverManager.getConnection("jdbc:derby:muleEmbeddedDB;create=true");
     }
 
     public List execSqlQuery(String sql) throws Exception

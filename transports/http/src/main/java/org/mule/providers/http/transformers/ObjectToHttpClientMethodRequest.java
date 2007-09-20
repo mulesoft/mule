@@ -225,53 +225,53 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         }
     }
 
-	private void setupEntityMethod(Object src, String encoding,
-			UMOEventContext context, UMOMessage msg, URI uri,
-			EntityEnclosingMethod postMethod) throws UnsupportedEncodingException,
-			TransformerException {
-		// Dont set a POST payload if the body is a Null Payload.
-		// This way client calls
-		// can control if a POST body is posted explicitly
-		if (!(context.getMessage().getPayload() instanceof NullPayload))
-		{
-		    // See if we have a MIME type set
-		    String mimeType = msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
+    private void setupEntityMethod(Object src, String encoding,
+            UMOEventContext context, UMOMessage msg, URI uri,
+            EntityEnclosingMethod postMethod) throws UnsupportedEncodingException,
+            TransformerException {
+        // Dont set a POST payload if the body is a Null Payload.
+        // This way client calls
+        // can control if a POST body is posted explicitly
+        if (!(context.getMessage().getPayload() instanceof NullPayload))
+        {
+            // See if we have a MIME type set
+            String mimeType = msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
 
-		    if (src instanceof String)
-		    {
-		        // Ensure that we strip the encoding information from the
-		        // encoding type
-		        if (mimeType != null)
-		        {
-		            int parameterIndex = mimeType.indexOf(";");
-		            if (parameterIndex > 0)
-		            {
-		                mimeType = mimeType.substring(0, parameterIndex);
-		            }
-		        }
-		        if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-		        if (encoding == null) encoding = RegistryContext.getRegistry().getConfiguration().getDefaultEncoding();
-		        postMethod.setRequestEntity(new StringRequestEntity(src.toString(), mimeType,
-		            encoding));
-		    }
-		    else if (src instanceof InputStream)
-		    {
-		        // TODO Danger here! We don't know if the content is
-		        // really text or not
-		        if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-		        postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream)src,
-		            mimeType));
-		    }
-		    else
-		    {
-		        // TODO Danger here! We don't know if the content is
-		        // really text or not
-		        if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-		        byte[] buffer = (byte[])serializableToByteArray.doTransform(src, encoding);
-		        postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, mimeType));
-		    }
-		}
-	}
+            if (src instanceof String)
+            {
+                // Ensure that we strip the encoding information from the
+                // encoding type
+                if (mimeType != null)
+                {
+                    int parameterIndex = mimeType.indexOf(";");
+                    if (parameterIndex > 0)
+                    {
+                        mimeType = mimeType.substring(0, parameterIndex);
+                    }
+                }
+                if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                if (encoding == null) encoding = RegistryContext.getRegistry().getConfiguration().getDefaultEncoding();
+                postMethod.setRequestEntity(new StringRequestEntity(src.toString(), mimeType,
+                    encoding));
+            }
+            else if (src instanceof InputStream)
+            {
+                // TODO Danger here! We don't know if the content is
+                // really text or not
+                if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream)src,
+                    mimeType));
+            }
+            else
+            {
+                // TODO Danger here! We don't know if the content is
+                // really text or not
+                if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                byte[] buffer = (byte[])serializableToByteArray.doTransform(src, encoding);
+                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, mimeType));
+            }
+        }
+    }
 
     protected void setHeaders(HttpMethod httpMethod, UMOEventContext context)
     {

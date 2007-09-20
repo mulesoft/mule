@@ -10,13 +10,14 @@
 
 package org.mule.providers.tcp.issues;
 
+import org.mule.tck.AbstractMuleTestCase;
+
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
  * All this is by AC on linux, dual CPU, Java 1.4 - I suspect results will vary like crazy
  * in different contexts.
  */
-public class ReuseExperimentMule2067TestCase extends TestCase
+public class ReuseExperimentMule2067TestCase extends AbstractMuleTestCase
 {
 
     private static final int NO_WAIT = -1;

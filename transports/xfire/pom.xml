@@ -19,7 +19,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!-- This class matches surefire's include pattern by accident. 
+                        <!-- This class matches surefire's include pattern by accident.
                              Don't execute it as it's not a unit test.
                         -->
                         <exclude>**/TestXFireComponent.java</exclude>
@@ -52,22 +52,6 @@
     <profiles>
         <profile>
             <id>tests-external</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <!-- MULE-1134 -->
-                                <exclude>**/XFireConnectorVMFunctionalTestCase.java</exclude>
-                                <!-- Makes for cyclic dependency with axis ... hold for now -->
-                                <exclude>**/XFireServiceUsingAxisEndpointTestCase.java</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
             <dependencies>
                 <dependency>
                     <groupId>org.mule.tests</groupId>

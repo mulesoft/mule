@@ -21,10 +21,10 @@
             <ref local="jotm"/>
         </property>
         <property name="driverName">
-            <value>org.hsqldb.jdbcDriver</value>
+            <value>org.apache.derby.jdbc.EmbeddedDriver</value>
         </property>
         <property name="url">
-            <value>jdbc:hsqldb:mem:.</value>
+            <value>jdbc:derby:muleEmbeddedDB;create=true</value>
         </property>
     </bean>
     <!--

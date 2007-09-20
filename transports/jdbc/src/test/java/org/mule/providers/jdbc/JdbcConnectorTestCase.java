@@ -16,7 +16,7 @@ import org.mule.umo.provider.UMOConnector;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hsqldb.jdbc.jdbcDataSource;
+import org.apache.derby.jdbc.EmbeddedDataSource;
 
 public class JdbcConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -30,11 +30,10 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
     public UMOConnector createConnector() throws Exception
     {
         JdbcConnector c = new JdbcConnector();
+        EmbeddedDataSource embeddedDS = new EmbeddedDataSource();
+        embeddedDS.setDatabaseName("embeddedDB");
         c.setName("JdbcConnector");
-        jdbcDataSource ds = new jdbcDataSource();
-        ds.setDatabase("hsqldb:.");
-        ds.setUser("sa");
-        c.setDataSource(ds);
+        c.setDataSource(embeddedDS);
         c.setPollingFrequency(1000);
         return c;
     }

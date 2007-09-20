@@ -50,9 +50,9 @@
         
         <!-- For unit tests only -->
         <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>1.7.3.0</version>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.3.1.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

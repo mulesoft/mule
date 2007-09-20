@@ -1,0 +1,8 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# these fail unless a security patch is applied to JAVA_HOME/lib
+KeyBasedEncryptionStrategyTestCase
+PGPSecurityFilterTestCase
+

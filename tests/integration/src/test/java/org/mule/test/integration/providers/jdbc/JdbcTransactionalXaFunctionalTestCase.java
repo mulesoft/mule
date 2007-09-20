@@ -48,10 +48,8 @@ public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransacti
     protected DataSource createDataSource() throws Exception
     {
         StandardXADataSource ds = new StandardXADataSource();
-        ds.setDriverName("org.hsqldb.jdbcDriver");
-        ds.setUrl("jdbc:hsqldb:mem:.");
-        ds.setUser("sa");
-        ds.setPassword("");
+        ds.setDriverName(EMBEDDED_DRIVER_NAME);
+        ds.setUrl(EMBEDDED_CONNECTION_STRING);
         ds.setTransactionManager(txManager);
         return new DataSourceWrapper(ds, txManager);
     }

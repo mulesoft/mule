@@ -7,13 +7,11 @@
 <hibernate-configuration>
   <session-factory>
     <!-- JDBC connection properties -->
-    <property name="hibernate.connection.driver_class">org.hsqldb.jdbcDriver</property>
-    <property name="hibernate.connection.url">jdbc:hsqldb:mem:.;sql.enforce_strict_size=true</property>
-    <property name="hibernate.connection.username">sa</property>
-    <property name="hibernate.connection.password"></property>
+    <property name="hibernate.connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
+    <property name="hibernate.connection.url">jdbc:derby:muleEmbeddedDB;create=true;sql.enforce_strict_size=true</property>
 
     <!-- These properties may depend on your database -->
-    <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.DerbyDialect</property>
     <property name="hibernate.query.substitutions">true 1, false 0</property>
     <property name="hibernate.jdbc.batch_size">0</property>
 

@@ -1,0 +1,10 @@
+#
+# Test cases listed in this file are not run.
+#
+
+ActiveMQJmsTransactionMule2071TestCase
+
+# MULE-2065
+ActiveMQJmsTransactionFunctionalTestCase
+ActiveMQJmsXaTransactionFunctionalTestCase
+

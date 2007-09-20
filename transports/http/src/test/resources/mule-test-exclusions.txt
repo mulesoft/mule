@@ -1,0 +1,7 @@
+#
+# Test cases listed in this file are not run.
+#
+
+StreamingDownloadMule1389TestCase
+StreamingSpeedMule1389TestCase
+

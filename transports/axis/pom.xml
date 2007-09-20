@@ -27,23 +27,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- Only run tests with external dependencies in the tests-external profile -->
-                        <exclude>**/AxisExternalServerTest.java</exclude>
-                        <exclude>**/VmToAxisProxyTestCase.java</exclude>
-
-                        <!-- MULE-1553, remaining tests waiting for JMS  -->
-                        <exclude>**/AxisConnectorJmsFunctionalTestCase.java</exclude>
-                        <exclude>**/AxisConnectorJmsTopicsFunctionalTestCase.java</exclude>
-                        <exclude>**/AxisConnectorJmsEndpointFormatTestCase.java</exclude>
-                        <!-- MULE-2164 -->
-                        <exclude>**/AxisEndpointMule2164TestCase.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 

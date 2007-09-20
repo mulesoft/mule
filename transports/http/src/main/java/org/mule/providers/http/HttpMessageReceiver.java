@@ -214,7 +214,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 adapter = buildStandardAdapter(request, headers);
             }
             UMOMessage message = new MuleMessage(adapter);
-            
+
             if (logger.isDebugEnabled())
             {
                 logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
@@ -472,12 +472,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // try again
             String uriStr = requestUri.toString();
             receiver = connector.lookupReceiver(uriStr);
-            
-            if (receiver == null) 
+
+            if (receiver == null)
             {
-				receiver = findReceiverByStem(connector.getReceivers(), uriStr);
-			}
-           
+                receiver = findReceiverByStem(connector.getReceivers(), uriStr);
+            }
+
             if (receiver == null && logger.isWarnEnabled())
             {
                 logger.warn("No receiver found with secondary lookup on connector: " + connector.getName()
@@ -496,7 +496,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 connector.getDefaultResponseTransformers(), response);
     }
 
-	public static UMOMessageReceiver findReceiverByStem(Map receivers, String uriStr)
+    public static UMOMessageReceiver findReceiverByStem(Map receivers, String uriStr)
     {
         int match = 0;
         UMOMessageReceiver receiver = null;

@@ -2,7 +2,17 @@
 # Test cases listed in this file are not run.
 #
 
+# Skip these until the tests-external profile works
+org.mule.providers.soap.axis.AxisExternalServerTest
+org.mule.providers.soap.axis.VmToAxisProxyTestCase
+
+# MULE-1553
+org.mule.providers.soap.axis.AxisConnectorHttpsTestCase
+org.mule.providers.soap.axis.AxisConnectorJmsFunctionalTestCase
+org.mule.providers.soap.axis.AxisConnectorJmsTopicsFunctionalTestCase
+org.mule.providers.soap.axis.AxisConnectorVMFunctionalTestCase
+org.mule.providers.soap.axis.AxisServletBindingTestCase
+org.mule.providers.soap.axis.functional.SoapAttachmentsFunctionalTestCase
+
 # MULE-2164
-AxisServletBindingTestCase
-# Use FQN below once AMTC changes are merged from trunk
-#org.mule.providers.soap.axis.AxisServletBindingTestCase
+org.mule.providers.soap.axis.AxisEndpointMule2164TestCase

@@ -16,7 +16,7 @@
     <properties>
         <webappName>mule-examples</webappName>
     </properties>
-    
+
     <build>
         <!-- Default goal is to build the war and start it up in Jetty
              (surf to http://localhost:8090/mule-examples to test) -->
@@ -54,20 +54,9 @@
                             <maxIdleTime>60000</maxIdleTime>
                         </connector>
                     </connectors>
-                 </configuration>       
+                 </configuration>
             </plugin>
 
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- These tests are a work-in-progress -->
-                        <exclude>**/JettyTestCase.java</exclude>
-                        <exclude>**/TomcatTestCase.java</exclude>
-                        <exclude>**/MockTestCase.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 

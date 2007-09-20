@@ -27,21 +27,11 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- these fail unless a security patch is applied to JAVA_HOME/lib -->
-                        <exclude>**/KeyBasedEncryptionStrategyTestCase.*</exclude>
-                        <exclude>**/PGPSecurityFilterTestCase.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
     <dependencies>
-        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
+        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency:
              mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
         <dependency>
             <groupId>org.mule.tests</groupId>

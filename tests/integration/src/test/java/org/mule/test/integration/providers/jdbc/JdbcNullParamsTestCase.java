@@ -21,26 +21,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.enhydra.jdbc.standard.StandardDataSource;
-
 public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
 {
     public static final int idValue = 1;
     public static final String SQL_READ_NULL = "SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE ID = " + idValue + " AND ACK IS NULL";
     public static final String SQL_ACK_NULL = "UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id}";
     public static final String SQL_WRITE_NULL = "INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES(1, NULL, NULL, NULL, NULL)";
-
-    protected DataSource createDataSource() throws Exception
-    {
-        StandardDataSource ds = new StandardDataSource();
-        ds.setDriverName("org.hsqldb.jdbcDriver");
-        ds.setUrl("jdbc:hsqldb:mem:.");
-        ds.setUser("sa");
-        ds.setPassword("");
-        return ds;
-    }
     
     public UMOConnector createConnector() throws Exception
     {

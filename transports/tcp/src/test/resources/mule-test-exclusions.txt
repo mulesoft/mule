@@ -1,0 +1,15 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# MULE-1389
+AbstractStreamingDownloadMule1389TestCase
+StreamingDownloadMule1389TestCase
+
+# MULE-16878
+SynchStreamingMule1687TestCase
+
+# MULE-2067
+LingerExperimentMule2067TestCase
+ReuseExperimentMule2067TestCase
+

@@ -509,7 +509,9 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             // load test exclusions
             try
             {
-                URL fileUrl = IOUtils.getResourceAsUrl("mule-test-exclusions.txt", this.getClass());
+                URL fileUrl = IOUtils.getResourceAsUrl("mule-test-exclusions.txt", test.getClass());
+
+                
 
                 if (fileUrl != null)
                 {

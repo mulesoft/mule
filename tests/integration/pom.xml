@@ -269,6 +269,12 @@
             <version>1.7.3.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbyclient</artifactId>
+            <version>10.3.1.4</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- mule-module-spring does not pull in Hibernate, therefore we
             have to include it for the tests. The list of exclusions is
@@ -431,6 +437,12 @@
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.3.1.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

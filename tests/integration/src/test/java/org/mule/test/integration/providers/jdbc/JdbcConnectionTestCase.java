@@ -25,8 +25,6 @@ import java.util.HashMap;
 
 import javax.sql.DataSource;
 
-import org.hsqldb.jdbc.jdbcDataSource;
-
 /**
  * This test must be run manually. See the comments inline in testReconnection
  */
@@ -52,14 +50,6 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
         return connector;
     }
 
-    protected DataSource createDataSource() throws Exception
-    {
-        jdbcDataSource ds = new jdbcDataSource();
-        ds.setDatabase("jdbc:hsqldb:hsql://localhost");
-        ds.setUser("sa");
-        return ds;
-    }
-
     public void testReconnection() throws Exception
     {
 
@@ -73,15 +63,20 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
         managementContext.start();
         connector.registerListener(component, endpoint);
 
-        // The hsqldb instance should be put offline before starting test
+        // The derbydb instance should be put offline before starting test
         // The receiver should try to connect to the database
         //
-        // Then put hsqldb online.
+        // Then put derbydb online.
         // Check that the receiver reconnect and polls the database
         //
-        // Put hsqldb offline.
+        // Put derbydb offline.
         // The receiver should try to connect to the database.
         Thread.sleep(1000);
+    }
+    
+    protected DataSource createDataSource() throws Exception
+    {
+        return createClientDataSource();
     }
 
 }

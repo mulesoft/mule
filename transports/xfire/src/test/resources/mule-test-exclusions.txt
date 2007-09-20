@@ -1,0 +1,14 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# MULE-1134
+XFireConnectorVMFunctionalTestCase
+
+# tests with external dependencies
+XFireWsdlTestCase
+
+# Cyclic dependency with axis ... hold for now
+XFireServiceUsingAxisEndpointTestCase
+ComplexTypeMethodTestCase
+

@@ -10,12 +10,13 @@
 
 package org.mule.providers.tcp.issues;
 
+import org.mule.tck.AbstractMuleTestCase;
+
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.InetSocketAddress;
 
-import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * - data needs to be sent
  * - explicitly setting or disabling the SO_LINGER value has little effect
  */
-public class LingerExperimentMule2067TestCase extends TestCase
+public class LingerExperimentMule2067TestCase extends AbstractMuleTestCase
 {
 
     private static final int NO_LINGER = -1;

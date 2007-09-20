@@ -33,6 +33,7 @@ import javax.sql.XADataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
+import org.enhydra.jdbc.standard.StandardDataSource;
 
 public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCase
 {
@@ -44,7 +45,13 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
 
     public static final String SQL_READ = "SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL";
     public static final String SQL_ACK = "UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}";
-    public static final String SQL_WRITE = "INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES(NULL, ${type}, ${payload}, NULL, NULL)";
+    public static final String SQL_WRITE = "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)";
+    
+    public static final String EMBEDDED_CONNECTION_STRING = "jdbc:derby:muleEmbeddedDB;create=true";
+    public static final String EMBEDDED_DRIVER_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
+    
+    public static final String CLIENT_CONNECTION_STRING = "jdbc:derby://localhost:1527/muleEmbeddedDB;create=true";
+    public static final String CLIENT_DRIVER_NAME = "org.apache.derby.jdbc.ClientDriver";
 
     protected UMOConnector connector;
     protected UMOModel model;
@@ -141,8 +148,6 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
         return dataSource;
     }
 
-    protected abstract DataSource createDataSource() throws Exception;
-
     public UMOConnector createConnector() throws Exception
     {
         JdbcConnector connector = new JdbcConnector();
@@ -184,6 +189,28 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
             fail(e.getMessage());
             return null;
         }
+    }
+    
+    //by default use the embedded datasource
+    protected DataSource createDataSource() throws Exception
+    {
+        return createEmbeddedDataSource();
+    }
+    
+    protected DataSource createEmbeddedDataSource() throws Exception
+    {
+        StandardDataSource ds = new StandardDataSource();
+        ds.setDriverName(EMBEDDED_DRIVER_NAME);
+        ds.setUrl(EMBEDDED_CONNECTION_STRING);
+        return ds;
+    }
+    
+    protected DataSource createClientDataSource() throws Exception
+    {
+        StandardDataSource ds = new StandardDataSource();
+        ds.setDriverName(CLIENT_DRIVER_NAME);
+        ds.setUrl(CLIENT_CONNECTION_STRING);
+        return ds;
     }
 
 }

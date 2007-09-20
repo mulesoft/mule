@@ -36,10 +36,10 @@
             <scope>provided</scope> 
         </dependency>        
         <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>1.8.0.7</version>
-            <scope>provided</scope> 
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.3.1.4</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -68,11 +68,12 @@
                                     <version>${version}</version>
                                     <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>hsqldb</groupId>
-                                    <artifactId>hsqldb</artifactId>
-                                    <version>1.8.0.7</version>
-                                </artifactItem>
+                                <dependency>
+                                    <groupId>org.apache.derby</groupId>
+                                    <artifactId>derby</artifactId>
+                                    <version>10.3.1.4</version>
+                                    <scope>test</scope>
+                                </dependency>
                                 <artifactItem>
                                     <groupId>bsh</groupId>
                                     <artifactId>bsh</artifactId>
