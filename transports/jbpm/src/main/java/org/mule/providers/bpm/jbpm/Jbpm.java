@@ -15,7 +15,6 @@ import org.mule.providers.bpm.MessageService;
 import org.mule.util.IOUtils;
 import org.mule.util.NumberUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -85,7 +84,7 @@ public class Jbpm implements BPMS
 
     public void destroy()
     {
-        if (containerManaged == false && jbpmConfiguration != null)
+        if (!containerManaged && jbpmConfiguration != null)
         {
             jbpmConfiguration.close();
             jbpmConfiguration = null;
@@ -97,7 +96,7 @@ public class Jbpm implements BPMS
         JbpmContext jbpmContext = jbpmConfiguration.createJbpmContext();
         try
         {
-            ((MuleMessageService)jbpmContext.getServices().getMessageService()).setMessageService(msgService);
+            MuleMessageService.setMessageService(msgService);
         }
         finally
         {
@@ -126,15 +125,17 @@ public class Jbpm implements BPMS
      */
     public synchronized Object startProcess(Object processType, Object transition, Map processVariables) throws Exception
     {
-        ProcessInstance processInstance = null;
+        ProcessInstance processInstance;
 
         JbpmContext jbpmContext = jbpmConfiguration.createJbpmContext();
         try
         {
             ProcessDefinition processDefinition = jbpmContext.getGraphSession().findLatestProcessDefinition(
-                (String)processType);
+                (String) processType);
             if (processDefinition == null)
+            {
                 throw new IllegalArgumentException("No process definition found for process " + processType);
+            }
 
             processInstance = new ProcessInstance(processDefinition);
 
@@ -181,7 +182,7 @@ public class Jbpm implements BPMS
     public synchronized Object advanceProcess(Object processId, Object transition, Map processVariables)
         throws Exception
     {
-        ProcessInstance processInstance = null;
+        ProcessInstance processInstance;
 
         JbpmContext jbpmContext = jbpmConfiguration.createJbpmContext();
         try
@@ -207,7 +208,7 @@ public class Jbpm implements BPMS
             // Advance the workflow.
             if (transition != null)
             {
-                processInstance.signal((String)transition);
+                processInstance.signal((String) transition);
             }
             else
             {
@@ -237,7 +238,7 @@ public class Jbpm implements BPMS
      */
     public synchronized Object updateProcess(Object processId, Map processVariables) throws Exception
     {
-        ProcessInstance processInstance = null;
+        ProcessInstance processInstance;
 
         JbpmContext jbpmContext = jbpmConfiguration.createJbpmContext();
         try
@@ -302,7 +303,7 @@ public class Jbpm implements BPMS
 
     public Object getId(Object process) throws Exception
     {
-        return new Long(((ProcessInstance)process).getId());
+        return new Long(((ProcessInstance) process).getId());
     }
 
     // By default the process is lazily-initialized so we need to open a new session to the
@@ -327,7 +328,7 @@ public class Jbpm implements BPMS
 
     public boolean hasEnded(Object process) throws Exception
     {
-        return ((ProcessInstance)process).hasEnded();
+        return ((ProcessInstance) process).hasEnded();
     }
 
     /**
@@ -337,7 +338,7 @@ public class Jbpm implements BPMS
      */
     public Object lookupProcess(Object processId) throws Exception
     {
-        ProcessInstance processInstance = null;
+        ProcessInstance processInstance;
 
         JbpmContext jbpmContext = jbpmConfiguration.createJbpmContext();
         try
@@ -360,13 +361,13 @@ public class Jbpm implements BPMS
     /**
      * Deploy a new process definition.
      */
-    public void deployProcess(String processDefinitionFile) throws FileNotFoundException, IOException
+    public void deployProcess(String processDefinitionFile) throws IOException
     {
         deployProcessFromStream(IOUtils.getResourceAsStream(processDefinitionFile, getClass()));
     }
 
     public void deployProcessFromStream(InputStream processDefinition)
-        throws FileNotFoundException, IOException
+        throws IOException
     {
         deployProcess(ProcessDefinition.parseXmlInputStream(processDefinition));
     }
@@ -386,7 +387,7 @@ public class Jbpm implements BPMS
 
     public List/* <TaskInstance> */loadTasks(ProcessInstance process)
     {
-        List/* <TaskInstance> */taskInstances = null;
+        List/* <TaskInstance> */taskInstances;
 
         JbpmContext jbpmContext = jbpmConfiguration.createJbpmContext();
         try

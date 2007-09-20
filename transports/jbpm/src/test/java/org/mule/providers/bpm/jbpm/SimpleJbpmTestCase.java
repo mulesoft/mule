@@ -20,9 +20,11 @@ import org.mule.util.NumberUtils;
 /**
  * Tests the connector against jBPM with a simple process.
  */
-public class SimpleJbpmTestCase extends AbstractBpmTestCase {
+public class SimpleJbpmTestCase extends AbstractBpmTestCase
+{
 
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "jbpm-functional-test.xml";
     }
 
@@ -34,7 +36,8 @@ public class SimpleJbpmTestCase extends AbstractBpmTestCase {
         Object process;
         BPMS bpms = connector.getBpms();
         MuleClient client = new MuleClient();
-        try {
+        try
+        {
             // Create a new process.
             response = client.send("bpm://simple", "data", null);
             process = response.getPayload();
@@ -50,12 +53,15 @@ public class SimpleJbpmTestCase extends AbstractBpmTestCase {
 
             // The process should have ended.
             assertTrue(bpms.hasEnded(process));
-        } finally {
+        }
+        finally
+        {
             client.dispose();
         }
     }
 
-    public void testSimpleProcessWithParameters() throws Exception {
+    public void testSimpleProcessWithParameters() throws Exception
+    {
         // Deploy the process definition.
         ((Jbpm) bpms).deployProcess("simple-process.xml");
 
@@ -63,29 +69,32 @@ public class SimpleJbpmTestCase extends AbstractBpmTestCase {
         Object process;
         BPMS bpms = connector.getBpms();
         MuleClient client = new MuleClient();
-        try {
+        try
+        {
             // Create a new process.
             response = client.send("bpm://?" +
-                ProcessConnector.PROPERTY_ACTION + "=" + ProcessConnector.ACTION_START +
-                "&" + ProcessConnector.PROPERTY_PROCESS_TYPE + "=simple", "data", null);
+                                   ProcessConnector.PROPERTY_ACTION + "=" + ProcessConnector.ACTION_START +
+                                   "&" + ProcessConnector.PROPERTY_PROCESS_TYPE + "=simple", "data", null);
             process = response.getPayload();
 
             long processId =
-                response.getLongProperty(ProcessConnector.PROPERTY_PROCESS_ID, -1);
+                    response.getLongProperty(ProcessConnector.PROPERTY_PROCESS_ID, -1);
             // The process should be started and in a wait state.
             assertFalse(processId == -1);
             assertEquals("dummyState", bpms.getState(process));
 
             // Advance the process one step.
             response = client.send("bpm://?" +
-                    ProcessConnector.PROPERTY_ACTION + "=" + ProcessConnector.ACTION_ADVANCE +
-                    "&" + ProcessConnector.PROPERTY_PROCESS_TYPE + "=simple&" +
-                    ProcessConnector.PROPERTY_PROCESS_ID + "=" + processId, "data", null);
+                                   ProcessConnector.PROPERTY_ACTION + "=" + ProcessConnector.ACTION_ADVANCE +
+                                   "&" + ProcessConnector.PROPERTY_PROCESS_TYPE + "=simple&" +
+                                   ProcessConnector.PROPERTY_PROCESS_ID + "=" + processId, "data", null);
             process = response.getPayload();
 
             // The process should have ended.
             assertTrue(bpms.hasEnded(process));
-        } finally {
+        }
+        finally
+        {
             client.dispose();
         }
     }

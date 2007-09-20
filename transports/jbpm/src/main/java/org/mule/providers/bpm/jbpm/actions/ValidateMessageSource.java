@@ -41,7 +41,7 @@ public class ValidateMessageSource extends LoggingActionHandler
         String messageSource = (String)executionContext
             .getVariable(ProcessConnector.PROCESS_VARIABLE_INCOMING_SOURCE);
         logger.debug("Validating message source = " + messageSource + ", expected = " + expectedSource);
-        if (expectedSource.equalsIgnoreCase(messageSource) == false)
+        if (!expectedSource.equalsIgnoreCase(messageSource))
         {
             throw new JbpmException("Incoming message source is " + messageSource + ", expected source is "
                             + expectedSource);

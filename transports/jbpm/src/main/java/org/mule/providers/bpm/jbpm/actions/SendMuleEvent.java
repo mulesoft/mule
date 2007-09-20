@@ -56,7 +56,7 @@ public class SendMuleEvent extends LoggingActionHandler
     {
         super.execute(executionContext);
 
-        MuleMessageService mule = (MuleMessageService)executionContext.getJbpmContext().getServices()
+        MuleMessageService mule = (MuleMessageService) executionContext.getJbpmContext().getServices()
             .getMessageService();
 
         if (transformers != null)

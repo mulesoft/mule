@@ -53,7 +53,7 @@ public class ValidateMessageType extends IntegrationActionHandler
         {
             match = expectedClass.isAssignableFrom(message.getClass());
         }
-        if (match == false)
+        if (!match)
         {
             throw new JbpmException("Incoming message type is " + message.getClass() + ", expected type is "
                             + expectedType);

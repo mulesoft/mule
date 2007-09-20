@@ -42,6 +42,12 @@
    BPMS Configuration
    *************************************************** -->
 
+    <spring:bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <spring:property name="location">
+            <spring:value>classpath:derby.properties</spring:value>
+        </spring:property>
+    </spring:bean>
+    
     <!-- BPMS object for Mule's BPM Connector -->
     <spring:bean id="jbpm" class="org.mule.providers.bpm.jbpm.Jbpm" destroy-method="destroy">
         <spring:property name="jbpmConfiguration">
@@ -76,7 +82,7 @@
         <spring:property name="hibernateProperties">
             <spring:props>
                 <!-- These properties may depend on your database -->
-                <spring:prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</spring:prop>
+                <spring:prop key="hibernate.dialect">org.hibernate.dialect.DerbyDialect</spring:prop>
                 <spring:prop key="hibernate.query.substitutions">true 1, false 0</spring:prop>
                 <spring:prop key="hibernate.jdbc.batch_size">0</spring:prop>
                 <!-- Create/update the database tables automatically when the JVM starts up -->
@@ -98,17 +104,9 @@
     <!-- JBPM Datasource -->
     <spring:bean id="jbpmDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <spring:property name="driverClassName">
-            <spring:value>org.hsqldb.jdbcDriver</spring:value>
-        </spring:property>
+            <spring:value>org.apache.derby.jdbc.EmbeddedDriver</spring:value></spring:property>
         <spring:property name="url">
-            <spring:value>jdbc:hsqldb:mem:.;sql.enforce_strict_size=true</spring:value>
-        </spring:property>
-        <spring:property name="username">
-            <spring:value>sa</spring:value>
-        </spring:property>
-        <spring:property name="password">
-            <spring:value/>
-        </spring:property>
+            <spring:value>${database.connection}</spring:value></spring:property>
     </spring:bean>
 
     <!-- JBPM data types -->
