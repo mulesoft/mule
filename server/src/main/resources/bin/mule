@@ -219,7 +219,7 @@ PROC_ARCH=`uname $UNAME_PROC_OPTION | tr [:upper:] [:lower:] | tr -d [:blank:]`
 while :
 do
     case "$PROC_ARCH" in
-        'amd64' | 'athlon' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64')
+        'amd64' | 'athlon' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64' | 'i86pc')
             DIST_ARCH="x86"
             break;;
 	    'ia32' | 'ia64')
