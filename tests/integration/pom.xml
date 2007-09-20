@@ -14,60 +14,6 @@
     <description>Tests which ensure that Mule sub projects work well together.</description>
     <packaging>jar</packaging>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- These tests hang if you're behind a firewall.
-                            TODO Figure out how to use proxy settings for the tests. -->
-                        <exclude>org/mule/test/integration/client/MuleClientAxisExternalTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/client/MuleClientWsdlSoapExternalTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/providers/xmpp/XmppFunctionalTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/routing/replyto/ReplytoChainIntegration2TestCase.java
-                        </exclude>
-                        <exclude>org/mule/test/integration/routing/replyto/ReplytoChainIntegration4TestCase.java
-                        </exclude>
-                        <!-- MULE-2244 -->
-                        <exclude>org/mule/test/integration/transaction/XABridgeJmsJdbcTestCase.java</exclude>
-                        <!-- MULE-2257 -->
-                        <exclude>org/mule/test/usecases/sync/TcpJmsResponseTestCase.java</exclude>
-
-
-                        <!-- More testing on these: not recorded in Jira yet -->
-                        <exclude>org/mule/test/usecases/axis/AxisClientWithComplexTypesTestCase.java</exclude>
-                        <exclude>org/mule/test/usecases/axis/AxisClientWithComplexTypesTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/EventMetaDataPropagationTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/VisualizerServiceTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/spring/events/async/SpringEventsJmsAsyncExampleTestCase.java
-                        </exclude>
-                        <exclude>org/mule/test/integration/spring/events/async/SpringEventsJmsAsyncExampleTestCase.java
-                        </exclude>
-                        <exclude>org/mule/test/integration/client/RemoteExceptionTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/client/MuleClientRemotingJmsTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/client/MuleClientRemotingJmsTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/transaction/OutboundTransactionsTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/transaction/OutboundTransactionsTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/client/MuleClientRemotingHttpTestCase.java</exclude>
-                        <!-- This test works when I run it from the IDE (Intellij -->
-                        <exclude>org/mule/test/integration/routing/replyto/ReplytoChainIntegration3TestCase.java
-                        </exclude>
-                        <!-- This test works when I run it from the IDE (Intellij -->
-                        <exclude>org/mule/test/usecases/dlq/DLQExceptionHandlerTestCase.java</exclude>
-
-                        <exclude>org/mule/test/integration/routing/nested/NestedRouterTestCase.java</exclude>
-                        <exclude>org/mule/test/integration/providers/jms/NestedRouterTestCase.java</exclude>
-                        <!-- fails on the build server MULE-2258 -->
-                        <exclude>org/mule/test/usecases/sync/TcpToFileTestCase.java</exclude>
-
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <profiles>
         <profile>
             <id>java14</id>
@@ -269,12 +215,12 @@
             <version>1.7.3.0</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derbyclient</artifactId>
             <version>10.3.1.4</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
 
         <!-- mule-module-spring does not pull in Hibernate, therefore we
             have to include it for the tests. The list of exclusions is
@@ -442,7 +388,6 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <version>10.3.1.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -23,6 +23,7 @@
         <properties>
             <container-property name="connectionFactory" reference="jmsConnectionFactoryXa"/>
             <property name="specification" value="1.1"/>
+            <property name="eagerConsumer" value="false"/>
         </properties>
     </connector>
 
@@ -33,7 +34,7 @@
             <map name="queries">
                 <property name="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
                 <property name="getTest.ack" value="UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}" />
-                <property name="writeTest" value="INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES(NULL, ${type}, ${payload}, NULL, NULL)" />
+                <property name="writeTest" value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)" />
             </map>
         </properties>
        <threading-profile id="default" maxThreadsActive="2" maxThreadsIdle="2" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>

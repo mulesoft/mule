@@ -50,39 +50,9 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
     {
         // template method
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.AbstractMessageDispatcher#doDispatch(org.mule.umo.UMOEvent)
-     */
-    protected void doDispatch(UMOEvent event) throws Exception
+    
+    protected void executeWriteStatement(UMOEvent event, String writeStmt) throws Exception
     {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Dispatch event: " + event);
-        }
-
-        UMOImmutableEndpoint endpoint = event.getEndpoint();
-        String writeStmt = endpoint.getEndpointURI().getAddress();
-        String str;
-        if ((str = this.connector.getQuery(endpoint, writeStmt)) != null)
-        { 
-            writeStmt = str;
-        }
-        writeStmt = StringUtils.trimToEmpty(writeStmt);
-        if (StringUtils.isBlank(writeStmt))
-        {
-            throw new IllegalArgumentException("Missing a write statement");
-        }
-        if (!"insert".equalsIgnoreCase(writeStmt.substring(0, 6))
-            && !"update".equalsIgnoreCase(writeStmt.substring(0, 6))
-            && !"delete".equalsIgnoreCase(writeStmt.substring(0, 6))
-            && !"call".equalsIgnoreCase(writeStmt.substring(0, 4)))
-        {
-            throw new IllegalArgumentException(
-                "Write statement should be an insert / update / delete sql statement, or a stored-procedure call");
-        }
         List paramNames = new ArrayList();
         writeStmt = connector.parseStatement(writeStmt, paramNames);
 
@@ -121,6 +91,61 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             throw e;
         }
     }
+    
+    protected String getStatement(UMOImmutableEndpoint endpoint)
+    {
+        String writeStmt = endpoint.getEndpointURI().getAddress();
+        String str;
+        if ((str = this.connector.getQuery(endpoint, writeStmt)) != null)
+        { 
+            writeStmt = str;
+        }
+        writeStmt = StringUtils.trimToEmpty(writeStmt);
+        if (StringUtils.isBlank(writeStmt))
+        {
+            throw new IllegalArgumentException("Missing statement");
+        }
+        
+        return writeStmt;
+    }
+    
+    protected boolean isWriteStatement(String writeStmt)
+    {
+        if (!"insert".equalsIgnoreCase(writeStmt.substring(0, 6))
+                        && !"update".equalsIgnoreCase(writeStmt.substring(0, 6))
+                        && !"delete".equalsIgnoreCase(writeStmt.substring(0, 6))
+                        && !"merge".equalsIgnoreCase(writeStmt.substring(0, 5))
+                        && !"call".equalsIgnoreCase(writeStmt.substring(0, 4)))
+        {
+            return false;
+        }
+        
+        return true;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.providers.AbstractMessageDispatcher#doDispatch(org.mule.umo.UMOEvent)
+     */
+    protected void doDispatch(UMOEvent event) throws Exception
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Dispatch event: " + event);
+        }
+        
+        String writeStmt = getStatement(event.getEndpoint());
+        
+        if (!isWriteStatement(writeStmt))
+        {
+            throw new IllegalArgumentException(
+                "Write statement should be an insert / update / delete / merge sql statement, or a stored-procedure call");
+        }
+        
+        this.executeWriteStatement(event, writeStmt);
+        
+    }
 
     /*
      * (non-Javadoc)
@@ -129,8 +154,16 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      */
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {
-        doDispatch(event);
-        return event.getMessage();
+        String statement = getStatement(event.getEndpoint());
+        
+        if (isWriteStatement(statement))
+        {
+            executeWriteStatement(event, statement);
+            return event.getMessage();
+        }
+        
+        return doReceive(event.getTimeout());
+        
     }
 
     /**

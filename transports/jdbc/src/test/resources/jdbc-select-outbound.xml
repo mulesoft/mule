@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+    
+    <mule-environment-properties serverUrl=""/>
+    
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+                <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                    <bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
+                        <property name="driverName"><value>org.apache.derby.jdbc.EmbeddedDriver</value></property>
+                        <property name="url"><value>jdbc:derby:muleEmbeddedDB;create=true</value></property>
+                    </bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+    
+    <connector name="jdbcConnector" className="org.mule.providers.jdbc.JdbcConnector">
+        <properties>
+            <property name="pollingFrequency" value="1000"/>
+            <container-property name="dataSource" reference="jdbcDataSource"/>
+            <map name="queries">
+                <property name="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
+            </map>
+        </properties>
+    </connector>
+    
+    <model name="JdbcSelectOnOutbound">
+        <mule-descriptor name="bridge" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://jdbc.test"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jdbc://getTest?type=1"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+    
+</mule-configuration>

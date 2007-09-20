@@ -2,6 +2,7 @@
 # Test cases listed in this file are not run.
 #
 
-StreamingDownloadMule1389TestCase
-StreamingSpeedMule1389TestCase
+# MULE-1389
+org.mule.providers.http.issues.StreamingDownloadMule1389TestCase
+org.mule.providers.http.issues.StreamingSpeedMule1389TestCase
 

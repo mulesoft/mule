@@ -1,0 +1,38 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# These tests hang if you're behind a firewall.
+# Figure out how to use proxy settings here.
+org.mule.test.integration.client.MuleClientAxisExternalTestCase
+org.mule.test.integration.client.MuleClientWsdlSoapExternalTestCase
+org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
+
+org.mule.test.integration.routing.replyto.ReplytoChainIntegration2TestCase
+org.mule.test.integration.routing.replyto.ReplytoChainIntegration4TestCase
+
+# MULE-2257
+org.mule.test.usecases.sync.TcpJmsResponseTestCase
+
+# More testing on these: not recorded in Jira yet
+org.mule.test.usecases.axis.AxisClientWithComplexTypesTestCase
+org.mule.test.integration.EventMetaDataPropagationTestCase
+org.mule.test.integration.VisualizerServiceTestCase
+
+org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
+
+org.mule.test.integration.client.RemoteExceptionTestCase
+org.mule.test.integration.client.MuleClientRemotingHttpTestCase
+org.mule.test.integration.client.MuleClientRemotingJmsTestCase
+org.mule.test.integration.transaction.OutboundTransactionsTestCase
+
+# These tests work when run from the IDE (IntelliJ)
+org.mule.test.integration.routing.replyto.ReplytoChainIntegration3TestCase
+org.mule.test.usecases.dlq.DLQExceptionHandlerTestCase
+
+org.mule.test.integration.routing.nested.NestedRouterTestCase
+org.mule.test.integration.providers.jms.NestedRouterTestCase
+
+# MULE-2258: fails on the build server
+org.mule.test.usecases.sync.TcpToFileTestCase
+

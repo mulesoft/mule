@@ -496,11 +496,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
          * Whether to dispose the manager after every method or once all tests for
          * the class have run
          */
+        private final String name;
         private boolean disposeManagerPerSuite = false;
         private boolean excluded = false;
         private int testCount = 0;
         private int runCount = 0;
-        private String name;
 
         public TestInfo(TestCase test)
         {
@@ -515,19 +515,17 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
                 if (fileUrl != null)
                 {
+                    // this iterates over all lines in the exclusion file
                     Iterator lines = FileUtils.lineIterator(FileUtils.newFile(fileUrl.getFile()));
-                    Iterator filtered = IteratorUtils.filteredIterator(lines, new Predicate()
+
+                    // ..and this finds non-comments that match the test case name
+                    excluded = IteratorUtils.filteredIterator(lines, new Predicate()
                     {
                         public boolean evaluate(Object object)
                         {
-                            String line = StringUtils.trimToEmpty((String) object);
-                            return (StringUtils.isNotEmpty(line) && line.charAt(0) != '#');
+                            return StringUtils.equals(name, StringUtils.trimToEmpty((String) object));
                         }
-                    });
-
-                    Set valid = new HashSet();
-                    CollectionUtils.addAll(valid, filtered);
-                    excluded = valid.contains(ClassUtils.getShortClassName(test.getClass()));
+                    }).hasNext();
                 }
             }
             catch (IOException ioex)

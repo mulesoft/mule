@@ -10,6 +10,7 @@ org.mule.providers.soap.axis.VmToAxisProxyTestCase
 org.mule.providers.soap.axis.AxisConnectorHttpsTestCase
 org.mule.providers.soap.axis.AxisConnectorJmsFunctionalTestCase
 org.mule.providers.soap.axis.AxisConnectorJmsTopicsFunctionalTestCase
+org.mule.providers.soap.axis.AxisConnectorJmsEndpointFormatTestCase
 org.mule.providers.soap.axis.AxisConnectorVMFunctionalTestCase
 org.mule.providers.soap.axis.AxisServletBindingTestCase
 org.mule.providers.soap.axis.functional.SoapAttachmentsFunctionalTestCase

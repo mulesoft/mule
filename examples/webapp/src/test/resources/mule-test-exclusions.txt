@@ -3,5 +3,4 @@
 #
 
 # These tests are a work-in-progress
-JettyTestCase
-TomcatTestCase
+org.mule.examples.webapp.JettyTestCase

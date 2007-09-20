@@ -53,6 +53,10 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.mule.modules</groupId>
+                    <artifactId>mule-module-boot</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.modules</groupId>
                     <artifactId>mule-module-jbossts</artifactId>
                 </exclusion>
                 <exclusion>

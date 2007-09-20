@@ -3,6 +3,6 @@
 #
 
 # these fail unless a security patch is applied to JAVA_HOME/lib
-KeyBasedEncryptionStrategyTestCase
-PGPSecurityFilterTestCase
+org.mule.extras.pgp.KeyBasedEncryptionStrategyTestCase
+org.mule.extras.pgp.PGPSecurityFilterTestCase
 

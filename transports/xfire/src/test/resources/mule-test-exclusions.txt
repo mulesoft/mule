@@ -3,12 +3,12 @@
 #
 
 # MULE-1134
-XFireConnectorVMFunctionalTestCase
+org.mule.providers.soap.xfire.XFireConnectorVMFunctionalTestCase
 
 # tests with external dependencies
-XFireWsdlTestCase
+org.mule.providers.soap.xfire.XFireWsdlTestCase
 
 # Cyclic dependency with axis ... hold for now
-XFireServiceUsingAxisEndpointTestCase
-ComplexTypeMethodTestCase
+org.mule.providers.soap.xfire.XFireServiceUsingAxisEndpointTestCase
+org.mule.providers.soap.xfire.ComplexTypeMethodTestCase
 

@@ -13,7 +13,7 @@ SET ACTIVEMQ=activemq-core-4.1.0-incubator.jar
 SET OPENEJB=openejb-core-1.0.jar
 REM 3rd party libraries for LoanBroker BPM
 SET BSH=bsh-1.3.0.jar
-SET HSQLDB=hsqldb-1.8.0.7.jar
+SET DERBYDB=derby-10.3.1.4.jar
 
 :testactivemq
 if exist "%MULE_BASE%\lib\user\%ACTIVEMQ%" goto :testopenejb
@@ -26,13 +26,13 @@ if exist "%MULE_HOME%\lib\user\%OPENEJB%" goto :testbsh
 goto :missinglibs
 
 :testbsh
-if exist "%MULE_BASE%\lib\user\%BSH%" goto :testhsqldb
-if exist "%MULE_HOME%\lib\user\%BSH%" goto :testhsqldb
+if exist "%MULE_BASE%\lib\user\%BSH%" goto :testderbydb
+if exist "%MULE_HOME%\lib\user\%BSH%" goto :testderbydb
 goto :missinglibs
 
-:testhsqldb
-if exist "%MULE_BASE%\lib\user\%HSQLDB%" goto :mule
-if exist "%MULE_HOME%\lib\user\%HSQLDB%" goto :mule
+:testderbydb
+if exist "%MULE_BASE%\lib\user\%DERBYDB%" goto :mule
+if exist "%MULE_HOME%\lib\user\%DERBYDB%" goto :mule
 
 :missinglibs
 echo This example requires additional libraries which need to be downloaded by the build script.  Please follow the instructions in the README.txt file.

@@ -29,7 +29,7 @@
         </property>
     </bean>
   
-    <bean id="libraryDao" class="org.mule.test.integration.transaction.extras.LibraryDao" singleton="false">
+    <bean id="libraryDao" class="org.mule.test.integration.transaction.extras.JdbcLibraryDao" singleton="false">
         <property name="jdbcTemplate">
             <ref bean="jdbcTemplate" />
         </property>

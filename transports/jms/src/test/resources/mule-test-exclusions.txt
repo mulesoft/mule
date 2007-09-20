@@ -2,9 +2,10 @@
 # Test cases listed in this file are not run.
 #
 
-ActiveMQJmsTransactionMule2071TestCase
+# MULE-2071
+org.mule.providers.jms.issues.ActiveMQJmsTransactionMule2071TestCase
 
 # MULE-2065
-ActiveMQJmsTransactionFunctionalTestCase
-ActiveMQJmsXaTransactionFunctionalTestCase
+org.mule.test.integration.providers.jms.activemq.ActiveMQJmsTransactionFunctionalTestCase
+org.mule.test.integration.providers.jms.activemq.ActiveMQJmsXaTransactionFunctionalTestCase
 

@@ -3,13 +3,13 @@
 #
 
 # MULE-1389
-AbstractStreamingDownloadMule1389TestCase
-StreamingDownloadMule1389TestCase
+org.mule.providers.tcp.issues.AbstractStreamingDownloadMule1389TestCase
+org.mule.providers.tcp.issues.StreamingDownloadMule1389TestCase
 
 # MULE-16878
-SynchStreamingMule1687TestCase
+org.mule.providers.tcp.issues.SynchStreamingMule1687TestCase
 
 # MULE-2067
-LingerExperimentMule2067TestCase
-ReuseExperimentMule2067TestCase
+org.mule.providers.tcp.issues.LingerExperimentMule2067TestCase
+org.mule.providers.tcp.issues.ReuseExperimentMule2067TestCase
 
