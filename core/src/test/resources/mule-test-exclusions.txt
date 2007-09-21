@@ -4,4 +4,3 @@
 
 # MULE-2164
 org.mule.impl.endpoint.MuleCopiedEndpointURITestCase
-org.mule.util.TimedSocketTestCase
