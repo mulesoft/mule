@@ -102,7 +102,7 @@
             <description>The compiled distribution code</description>
             <file src="../distribution/bin" targetdir="$INSTALL_PATH"/>
             <!-- make the scripts etc. executable -->
-            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/jpda_settings.groovy" stage="never"/>
+            <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/additional.groovy" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/launcher" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/mule" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/setup_local_instance.sh" stage="never"/>
