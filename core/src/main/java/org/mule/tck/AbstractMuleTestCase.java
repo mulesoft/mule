@@ -26,10 +26,7 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassUtils;
-import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
@@ -38,16 +35,18 @@ import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.CodeSource;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -489,7 +488,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         return MuleTestUtils.getTestDescriptor(name, implementation, managementContext);
     }
-
+   
     public static class TestInfo
     {
         /**
@@ -502,6 +501,16 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         private int testCount = 0;
         private int runCount = 0;
 
+        // TODO HH: MULE-2414
+        // this is a shorter version of the snippet from:
+        // http://www.davidflanagan.com/blog/2005_06.html#000060
+        // (see comments; DF's "manual" version works fine too)
+        public static URL getClassPathRoot(Class clazz)
+        {
+            CodeSource cs = clazz.getProtectionDomain().getCodeSource();
+            return (cs != null ? cs.getLocation() : null);
+        }
+
         public TestInfo(TestCase test)
         {
             this.name = test.getClass().getName();
@@ -509,9 +518,18 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             // load test exclusions
             try
             {
-                URL fileUrl = IOUtils.getResourceAsUrl("mule-test-exclusions.txt", test.getClass());
+                // TODO HH: MULE-2414
+                // This may fail with jar files (such as in maven) since
+                // IOUtils/ClassUtils uses delegation-first to locate resources in
+                // jar files, which may then not be accessible to the actual test class.
+                // URL fileUrl = IOUtils.getResourceAsUrl("mule-test-exclusions.txt", test.getClass());
 
-                
+                // TODO HH: MULE-2414
+                // We find the physical classpath root URL of the test class and
+                // use that to find the correct resource. Works fine everywhere,
+                // regardless of classloaders.
+                URL[] urls = new URL[]{getClassPathRoot(test.getClass())};
+                URL fileUrl = new URLClassLoader(urls).getResource("mule-test-exclusions.txt");
 
                 if (fileUrl != null)
                 {

@@ -20,7 +20,7 @@
                  <configuration>
                      <excludes>
                          <!-- MULE-2414 -->
-                         <exclude>**/*.java</exclude>
+                         <!-- <exclude>**/*.java</exclude> -->
                          <!-- MULE-2208 -->
                          <exclude>**/HttpsFunctionalTestCase.java</exclude>
 
