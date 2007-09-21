@@ -20,13 +20,10 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringMessageUtils;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import java.util.List;
-import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -228,7 +225,7 @@ public abstract class AbstractTransformer implements UMOTransformer
             if (ignoreBadInput)
             {
                 logger.debug("Source type is incompatible with this transformer and property 'ignoreBadInput' is set to true, so the transformer chain will continue.");
-                return nextTransform(src);
+                return src;
             }
             else
             {
@@ -259,8 +256,6 @@ public abstract class AbstractTransformer implements UMOTransformer
 
         result = checkReturnClass(result);
 
-        result = nextTransform(result);
-
         return result;
     }
 
@@ -277,52 +272,9 @@ public abstract class AbstractTransformer implements UMOTransformer
     public void setEndpoint(UMOImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
-        UMOTransformer trans = nextTransformer;
-        while (trans != null && endpoint != null)
-        {
-            trans.setEndpoint(endpoint);
-            trans = trans.getNextTransformer();
-        }
     }
 
     protected abstract Object doTransform(Object src, String encoding) throws TransformerException;
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.transformer.UMOTransformer#getNextTransformer()
-     */
-    public UMOTransformer getNextTransformer()
-    {
-        return nextTransformer;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.transformer.UMOTransformer#setNextTransformer(org.mule.umo.transformer.UMOTransformer)
-     */
-    public void setNextTransformer(UMOTransformer nextTransformer)
-    {
-        this.nextTransformer = nextTransformer;
-    }
-
-    /**
-     * Will return the return type for the last transformer in the chain
-     * 
-     * @return the last transformers return type
-     */
-    public Class getFinalReturnClass()
-    {
-        UMOTransformer tempTrans = this;
-        UMOTransformer returnTrans = this;
-        while (tempTrans != null)
-        {
-            returnTrans = tempTrans;
-            tempTrans = tempTrans.getNextTransformer();
-        }
-        return returnTrans.getReturnClass();
-    }
 
     /**
      * Template method were deriving classes can do any initialisation after the
@@ -372,21 +324,6 @@ public abstract class AbstractTransformer implements UMOTransformer
     public boolean isAcceptNull()
     {
         return false;
-    }
-
-    /**
-     * Safely call the next transformer in chain, if any.
-     */
-    protected Object nextTransform(Object result)
-            throws TransformerException
-    {
-        if (nextTransformer != null)
-        {
-            logger.debug("Following transformer in the chain is " + nextTransformer.getName() + " ("
-                            + nextTransformer.getClass().getName() + ")");
-            result = nextTransformer.transform(result);
-        }
-        return result;
     }
 
 }

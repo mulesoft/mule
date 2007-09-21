@@ -115,7 +115,7 @@ public class TransformerUtils
                 }
                 RequestContext.writeResponse(iteratedMessage);
             }
-            else
+            else if (!transformer.isIgnoreBadInput())
             {
                 if (logger.isDebugEnabled())
                 {

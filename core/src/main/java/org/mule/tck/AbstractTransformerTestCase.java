@@ -14,6 +14,7 @@ import org.mule.impl.RequestContext;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.transformers.TransformerUtils;
 
 import java.util.Arrays;
 
@@ -82,8 +83,11 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         if (this.getRoundTripTransformer() != null)
         {
             UMOTransformer trans = this.getTransformer();
-            trans.setNextTransformer(this.getRoundTripTransformer());
-            Object result = trans.transform(this.getTestData());
+            UMOTransformer trans2 = this.getRoundTripTransformer();
+            Object result =
+                    TransformerUtils.applyAllTransformersToObject(Arrays.asList(
+                            new UMOTransformer[]{trans, trans2}),
+                            getTestData());
             this.compareRoundtripResults(this.getTestData(), result);
         }
     }
@@ -101,7 +105,6 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
             // expected
         }
     }
-
 
     protected void doTestClone(UMOTransformer original, UMOTransformer clone) throws Exception
     {

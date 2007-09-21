@@ -14,6 +14,8 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.util.Arrays;
+
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public class TransformerChainingTestCase extends AbstractMuleTestCase
@@ -41,21 +43,21 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         // Grrrr....
         AbstractTransformer transformer = (AbstractTransformer) this.getTransformer();
         assertNotNull(transformer);
-
         transformer.setIgnoreBadInput(true);
         final AtomicBoolean nextCalled = new AtomicBoolean(false);
         final Object marker = new Object();
-        transformer.setNextTransformer(new AbstractTransformer()
+        UMOTransformer transformer2 = new AbstractTransformer()
         {
-
             protected Object doTransform(Object src, String encoding) throws TransformerException
             {
                 nextCalled.set(true);
                 return marker;
             }
-        });
-
-        Object result = transformer.transform(this);
+        };
+        Object result =
+                TransformerUtils.applyAllTransformersToObject(
+                        Arrays.asList(new UMOTransformer[]{transformer, transformer2}),
+                        this);
         assertNotNull(result);
         assertSame(marker, result);
         assertTrue("Next transformer not called.", nextCalled.get());

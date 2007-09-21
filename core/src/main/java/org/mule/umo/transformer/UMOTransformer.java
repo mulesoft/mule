@@ -33,6 +33,8 @@ public interface UMOTransformer extends UMOBaseTransformer
      */
     boolean isAcceptNull();
 
+    public boolean isIgnoreBadInput();    
+
     /**
      * Thransforms the supplied data and returns the result
      * 
@@ -56,19 +58,5 @@ public interface UMOTransformer extends UMOBaseTransformer
      * @return the exceptedreturn type
      */
     Class getReturnClass();
-
-    /**
-     * Transformers can be chained together and invoked in a series
-     * 
-     * @return the next transformer to invoke after this one
-     */
-    UMOTransformer getNextTransformer();
-
-    /**
-     * Transformers can be chained together and invoked in a series
-     * 
-     * @param nextTransformer the next transforer to invoke
-     */
-    void setNextTransformer(UMOTransformer nextTransformer);
 
 }

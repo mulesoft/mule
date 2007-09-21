@@ -46,6 +46,11 @@ public class VoidTransformer implements UMOTransformer
         throw new IllegalStateException("Void transformer");
     }
 
+    public boolean isIgnoreBadInput()
+    {
+        throw new IllegalStateException("Void transformer");
+    }
+
     public Object transform(Object src) throws TransformerException
     {
         throw new IllegalStateException("Void transformer");
@@ -57,16 +62,6 @@ public class VoidTransformer implements UMOTransformer
     }
 
     public Class getReturnClass()
-    {
-        throw new IllegalStateException("Void transformer");
-    }
-
-    public UMOTransformer getNextTransformer()
-    {
-        throw new IllegalStateException("Void transformer");
-    }
-
-    public void setNextTransformer(UMOTransformer nextTransformer)
     {
         throw new IllegalStateException("Void transformer");
     }
