@@ -15,7 +15,6 @@
     <description>Modules which extend the Mule Core but do not qualify as Transports</description>
 
     <modules>
-        <module>1to2migration</module>
         <module>acegi</module>
         <module>all-modules</module>
         <module>builders</module>
