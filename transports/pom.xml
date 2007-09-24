@@ -155,6 +155,14 @@
                 </dependency>
             </dependencies>
         </profile>
-        <!-- no need for a jdk5 profile since we don't have to exclude anything -->
+        <profile>
+            <id>java15</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <modules>
+                <!-- TODO Dan: insert the cxf transport here -->
+            </modules>
+        </profile>
     </profiles>
 </project>
