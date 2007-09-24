@@ -13,7 +13,6 @@ package org.mule.providers.jdbc;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.NullPayload;
-import org.mule.providers.jdbc.JdbcConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
@@ -36,7 +35,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
         super.doSetUp();
 
         JdbcConnector jdbcConnector = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector");
-        QueryRunner qr = new QueryRunner(jdbcConnector.getDataSource());
+        QueryRunner qr = jdbcConnector.createQueryRunner();
         int updated;
         
         try
@@ -57,7 +56,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
     protected void doFunctionalTearDown() throws Exception
     {
         JdbcConnector jdbcConnector = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector");
-        QueryRunner qr = new QueryRunner(jdbcConnector.getDataSource());
+        QueryRunner qr = jdbcConnector.createQueryRunner();
         int updated = qr.update(jdbcConnector.getConnection(), "DELETE FROM TEST");
         logger.debug(updated + " rows deleted");
 
