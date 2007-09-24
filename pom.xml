@@ -1006,7 +1006,7 @@
                     of compiling with jdk 1.5
                 <jdk>1.5</jdk> 
                 -->
-                <!-- </activation> -->
+            </activation>
             <build>
                 <plugins>
                     <plugin>
