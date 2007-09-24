@@ -91,7 +91,8 @@ rem Customized for Mule
 rem ###############################################################
 rem Export the location of this script.  This will be used in wrapper.conf
 rem ATTENTION: %_REALPATH% contains a trailing path delimiter that will cause the wrapper to fail. Do not use that
-set MULE_EXE=%MULE_HOME%\bin
+rem (making MULE_EXE as absolute path to enable wrapper include additional configs correctly)
+for /f "tokens=* delims= " %%a in ('attrib %MULE_HOME%\bin') do set MULE_EXE=%%a
 
 rem Mule options: Set the working directory to the current one and pass all command-line
 rem options (-config, -builder, etc.) straight through to the main() method.
