@@ -119,6 +119,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jdbc</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
