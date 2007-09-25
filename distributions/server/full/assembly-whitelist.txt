@@ -87,7 +87,6 @@ mule-module-spring
 mule-module-wssecurity
 mule-module-xml
 mule-tests-functional
-mule-tools-visualizer
 mule-transport-axis
 mule-transport-bpm
 mule-transport-ejb
