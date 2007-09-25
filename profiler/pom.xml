@@ -48,7 +48,7 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>mule-assembly-verifier</artifactId>
-                <version>1.0</version>
+                <!-- version is managed in the pluginManagement of the toplevel pom -->
                 <executions>
                     <execution>
                         <phase>verify</phase>
