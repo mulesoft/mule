@@ -22,6 +22,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
+import org.mule.util.ClassUtils;
 
 import java.util.List;
 
@@ -156,7 +157,7 @@ public class YourKitProfilerAgent implements UMOAgent
     private boolean isApiAvailable()
     {
         try{
-            Class.forName("com.yourkit.api.Controller");
+            ClassUtils.getClass("com.yourkit.api.Controller");
             return true;
         }
         catch(ClassNotFoundException e)

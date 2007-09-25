@@ -111,7 +111,7 @@ public abstract class AbstractReceiverWorker implements Work
 
                         MuleMessage muleMessage = new MuleMessage(adapter);
                         preRouteMuleMessage(muleMessage);
-                        UMOMessage result = receiver.routeMessage(muleMessage, tx,  endpoint.isSynchronous(), out);
+                        UMOMessage result = receiver.routeMessage(muleMessage, tx,  tx != null || endpoint.isSynchronous(), out);
                         if (result != null)
                         {
                             o = postProcessMessage(result);

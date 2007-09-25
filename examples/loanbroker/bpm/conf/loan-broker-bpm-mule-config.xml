@@ -133,8 +133,13 @@
     </model>
 
     <!-- ***************************************************
-        BPMS Configuration
-        *************************************************** -->
+         BPMS Configuration
+         *************************************************** -->
+    <spring:bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <spring:property name="location">
+            <value>classpath:derby.properties</value>
+        </spring:property>
+    </spring:bean>
     <!-- BPMS object for Mule's BPM Connector -->
     <spring:bean id="jbpm" class="org.mule.providers.bpm.jbpm.Jbpm" destroy-method="destroy">
         <spring:property name="jbpmConfiguration">
@@ -201,18 +206,10 @@
 
     <!-- JBPM Datasource -->
     <spring:bean id="jbpmDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <spring:property name="driverClassName">
-            <spring:value>org.apache.derby.jdbc.EmbeddedDriver</spring:value>
-        </spring:property>
-        <spring:property name="url">
-            <spring:value>jdbc:derby:muleEmbeddedDB;create=true;sql.enforce_strict_size=true</spring:value>
-        </spring:property>
-        <!--<spring:property name="username">-->
-            <!--<spring:value>sa</spring:value>-->
-        <!--</spring:property>-->
-        <spring:property name="password">
-            <spring:value></spring:value>
-        </spring:property>
+        <spring:property name="driverClassName"><value>org.apache.derby.jdbc.EmbeddedDriver</value></spring:property>
+        <spring:property name="url"><value>${database.connection}</value></spring:property>
+        <!--spring:property name="username"><value>sa</value></spring:property>
+        <spring:property name="password"><value></value></spring:property-->
     </spring:bean>
 
     <!-- JBPM data types -->

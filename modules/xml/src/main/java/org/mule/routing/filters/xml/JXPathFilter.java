@@ -60,6 +60,18 @@ public class JXPathFilter implements UMOFilter
 
     public boolean accept(UMOMessage obj)
     {
+        if (obj.getPayload() instanceof byte[])
+        {
+            try
+            {
+                return accept(obj.getPayloadAsString());
+            }
+            catch (Exception e)
+            {
+                logger.debug("JxPath filter rejected message because it could not convert from byte[] to String" + e.getMessage(), e);
+                return false;
+            }
+        }
         return accept(obj.getPayload());
     }
 

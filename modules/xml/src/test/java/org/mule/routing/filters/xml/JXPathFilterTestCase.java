@@ -133,6 +133,11 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
     {
         doTestExpectedValueFilter(xmlStringInput);
     }
+    
+    public void testExpectedValueFilterXmlByteArray() throws Exception
+    {
+        doTestExpectedValueFilter(xmlStringInput.getBytes());
+    }
 
     public void testBooleanFilter1XmlString() throws Exception
     {

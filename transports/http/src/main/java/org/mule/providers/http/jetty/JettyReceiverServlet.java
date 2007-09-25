@@ -16,6 +16,7 @@ import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -28,15 +29,21 @@ public class JettyReceiverServlet extends MuleReceiverServlet
 
     private UMOMessageReceiver receiver;
 
+    //@Override
     protected void doInit(ServletConfig servletConfig) throws ServletException
     {
-        receiver = (UMOMessageReceiver)servletConfig.getServletContext().getAttribute("messageReceiver");
+        final ServletContext servletContext = servletConfig.getServletContext();
+        synchronized (servletContext)
+        {
+            receiver = (UMOMessageReceiver) servletContext.getAttribute("messageReceiver");
+        }
         if (receiver == null)
         {
             throw new ServletException(HttpMessages.receiverPropertyNotSet().toString());
         }
     }
 
+    //@Override
     protected UMOMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest)
         throws EndpointException
     {
