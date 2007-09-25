@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <spring:bean name="JmxAgent" class="org.mule.management.agents.JmxAgent"/>
+    <spring:bean name="mx4jAgent" class="org.mule.management.agents.Mx4jAgent"/>
 
-<mule-configuration id="Mule_Samples" version="1.0">
-    <agents>
-        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
-        <agent name="mx4jAgent" className="org.mule.management.agents.Mx4jAgent"/>
-    </agents>
-</mule-configuration>
+</mule>
+        
