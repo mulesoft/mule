@@ -57,6 +57,8 @@ class Package {
         addSpringConfig(file, doc)
       } else if (name.equals("{http://www.mulesource.org/schema/mule/core/2.0}mule")) {
         addNewMuleConfig(file, doc)
+      } else if (name.equals("{http://www.mulesource.org/schema/mule/core/2.0}mule-unsafe")) {
+        addNewMuleConfig(file, doc)
       } else if (name.equals("mule-configuration")) {
         addOldMuleConfig(file, doc)
       } else if (name.equals("project")) {
@@ -117,6 +119,7 @@ class Package {
   }
 
   void addOldMuleConfig(File file, Node doc) {
+    println "# *** old config: " + file.name
     xmlTypeCountOldMule++
   }
 
@@ -193,8 +196,8 @@ checkCurrentDirectory()
 def packages = findPackages()
 println "group,package,error-type,other-type,spring-type,old-mule-type,new-mule-type,context-endpoint,transport-endpoint"
 for (pkg in packages) {
-  pkg.scan()
   println "# ------------------"
+  pkg.scan()
   println pkg
   println pkg.types()
   println pkg.csv()
