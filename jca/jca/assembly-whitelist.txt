@@ -1,5 +1,6 @@
 acegi-security-1.0.1
 antlr-2.7.6
+aopalliance-1.0
 axis-1.4
 axis-jaxrpc-1.4
 axis-saaj-1.4
@@ -27,6 +28,7 @@ cryptix-jce-provider-20050328
 cryptix-message-api-20050405
 cryptix-openpgp-provider-20050405
 cryptix-pki-api-20050405
+derby-10.3.1.4
 dom4j-1.4
 groovy-all-1.0
 groovy-engine-1.0-jdk14
@@ -43,7 +45,6 @@ jython-engine-1.0-jdk14
 log4j-1.2.14
 mockobjects-core-0.09
 mule-core
-mule-module-1to2migration
 mule-module-acegi
 mule-module-builders
 mule-module-client
@@ -125,3 +126,4 @@ XmlSchema-1.1
 xmlsec-1.3.0
 xpp3_min-1.1.3.4.O
 xstream-1.2.1
+yjp-controller-api-redist-7.0

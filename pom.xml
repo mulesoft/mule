@@ -49,12 +49,6 @@
         <module>server</module>
     </modules>
 
-    <!-- Do not include ANY dependencies here. Individual distro types need
-         different dependency sets, configure depdencies in the lower level POMs.
-    -->
-    <dependencies>
-    </dependencies>
-
     <profiles>
         <profile>
             <id>osgi</id>

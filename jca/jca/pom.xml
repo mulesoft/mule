@@ -50,8 +50,9 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.modules.jca</groupId>
-            <artifactId>mule-module-jca-generic</artifactId>
+            <artifactId>mule-module-jca-jboss</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
