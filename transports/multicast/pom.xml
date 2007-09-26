@@ -19,6 +19,8 @@
                  <artifactId>maven-surefire-plugin</artifactId>
                  <configuration>
                      <excludes>
+                         <!-- andrew cooke local only!! -->
+                         <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
                      </excludes>
                  </configuration>
              </plugin>

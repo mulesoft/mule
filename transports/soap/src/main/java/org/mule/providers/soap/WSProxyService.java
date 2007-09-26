@@ -23,7 +23,7 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
@@ -173,8 +173,8 @@ public class WSProxyService implements Callable, UMODescriptorAware, Initialisab
         {
             try
             {
-                this.wsdlFileContents = FileUtils.readFileToString(new File(this.wsdlFile));
-                
+                this.wsdlFileContents = IOUtils.getResourceAsString(this.wsdlFile, getClass());
+
                 if (StringUtils.isNotBlank(this.wsdlFileContents))
                 {
                     this.useFile = true;

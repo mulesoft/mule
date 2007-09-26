@@ -1,46 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
 
-<mule-configuration id="Proxy_Test" version="1.0">
-    <description>
-		Testing a proxy WebService Component
-    </description>
-
-    <mule-environment-properties synchronous="true"/>
+    <configuration serverId="server id" defaultSynchronousEndpoints="true"/>
 
     <model name="Proxy_Test">
-        
-		<mule-descriptor name="WebService" implementation="org.mule.components.simple.EchoComponent">
-			<inbound-router>
-				<endpoint address="xfire:http://localhost:6065"/>
-			</inbound-router>
-		</mule-descriptor>
-		
-        <mule-descriptor name="webServiceProxy" implementation="org.mule.providers.soap.WSProxyService">
+
+        <service name="WebService">
+            <echo-component/>
             <inbound-router>
-                <endpoint address="http://localhost:6070/webServiceProxy"/>
+                <inbound-endpoint address="xfire:http://localhost:6065"/>
             </inbound-router>
-			<outbound-router>
-				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-					<endpoint address="http://localhost:6065/WebService"/>
-				</router>
-			</outbound-router>
-        </mule-descriptor>
-        
-        <mule-descriptor name="webServiceProxyWitWsdlFromFile" implementation="org.mule.providers.soap.WSProxyService">
+        </service>
+
+        <service name="webServiceProxy">
+            <component class="org.mule.providers.soap.WSProxyService"/>
             <inbound-router>
-                <endpoint address="http://localhost:6075/webServiceProxy"/>
+                <inbound-endpoint address="http://localhost:6070/webServiceProxy"/>
             </inbound-router>
-			<outbound-router>
-				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-					<endpoint address="http://localhost:6065/WebService"/>
-				</router>
-			</outbound-router>
-			<properties>
-				<property name="wsdlFile" value="src/test/resources/localWsdl.wsdl"/>
-			</properties>
-        </mule-descriptor>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="http://localhost:6065/WebService"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+        <service name="webServiceProxyWitWsdlFromFile">
+            <component class="org.mule.providers.soap.WSProxyService">
+                <properties>
+                    <spring:entry key="wsdlFile" value="localWsdl.wsdl"/>
+                </properties>
+            </component>
+            <inbound-router>
+                <inbound-endpoint address="http://localhost:6075/webServiceProxy"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="http://localhost:6065/WebService"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
     </model>
-</mule-configuration>
+
+</mule>
+
