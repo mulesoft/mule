@@ -20,7 +20,7 @@ public class SpringRemotingTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "../../../../../../../../../../tests/functional/src/test/resources/org/mule/test/spring/spring-remoting-mule-config.xml";
+        return "spring-remoting-mule-config.xml";
     }
 
     public void testHttpInvokeSpringService() throws Exception
