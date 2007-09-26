@@ -34,6 +34,11 @@
             <artifactId>mule-transport-xfire</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
