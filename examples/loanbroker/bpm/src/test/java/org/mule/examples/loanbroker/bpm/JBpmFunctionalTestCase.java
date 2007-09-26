@@ -17,42 +17,20 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.examples.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
 import org.mule.providers.bpm.BPMS;
 import org.mule.providers.bpm.ProcessConnector;
-import org.mule.util.FileUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Properties;
-
-import org.apache.derby.jdbc.EmbeddedDriver;
+import org.mule.util.MuleDerbyTestUtils;
 
 
 public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCase
 {
     /** For unit tests, we assume a virgin database, therefore the process ID is assumed to be = 1 */
     public static final long PROCESS_ID = 1;
-    
-    protected void cleanupDerbyDb(String derbySystemHome) throws IOException, SQLException
-    {
-        Properties derbyProperties = new Properties();
-        derbyProperties.load(new FileInputStream("conf/derby.properties"));
-        String derbyDbConnection = derbyProperties.getProperty("database.connection");
-        String derbyDbName = derbyProperties.getProperty("database.name");
-        derbyDbConnection = derbyDbConnection.replaceAll("\\$\\{database.name\\}", derbyDbName + ";create=true");
-        FileUtils.deleteTree(new File(derbySystemHome + "/" + derbyDbName));
-        EmbeddedDriver embeddedDriver = new EmbeddedDriver();
-        embeddedDriver.connect(derbyDbConnection, null);
-    }
-    
+
     protected void suitePreSetUp() throws Exception
     {
         // set the derby.system.home system property to make sure that all derby databases are
         // created in maven's target directory
-        File derbySystemHome = new File(System.getProperty("user.dir"), "target");
-        System.setProperty("derby.system.home",  derbySystemHome.getAbsolutePath());
         
-        cleanupDerbyDb(derbySystemHome.getAbsolutePath());
+        MuleDerbyTestUtils.defaultDerbyCleanAndInit("conf/derby.properties", "database.name");
 
         super.suitePreSetUp();
     }
