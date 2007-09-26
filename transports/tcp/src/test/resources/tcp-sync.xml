@@ -1,39 +1,28 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+       xmlns:stream="http://www.mulesource.org/schema/mule/streaming/2.0"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd
+       http://www.mulesource.org/schema/mule/streaming/2.0 http://www.mulesource.org/schema/mule/streaming/2.0/mule-streaming.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <environment-property name="test.endpoint" value="tcp://localhost:45441"/>
+    <configuration serverId="server id" defaultRemoteSync="false"/>
+    <tcp:connector name="tcpConnector" clientSoTimeout="60000" serverSoTimeout="60000" tcpProtocolClassName="org.mule.providers.tcp.protocols.LengthProtocol"/>
 
-<mule-configuration id="test" version="1.0">
-
-    <environment-properties>
-        <property name="test.endpoint" value="tcp://localhost:45441"/>
-    </environment-properties>
-
-
-    <!-- Mule properties -->
-    <mule-environment-properties remoteSync="false" />
-
-    <connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
-        <properties>
-            <property name="timeout" value="60000"/>
-        <!--
-            <property name="bufferSize" value="1048576"/>
-         -->
-             <property name="tcpProtocolClassName" value="org.mule.providers.tcp.protocols.LengthProtocol"/>
-        </properties>
-    </connector>
-
-    <global-endpoints>
-        <endpoint name="clientEndpoint" address="${test.endpoint}" type="sender"/>
-    </global-endpoints>
+    <endpoint name="clientEndpoint" address="${test.endpoint}"/>
 
     <model name="model">
-        <mule-descriptor name="TcpReceiver" implementation="org.mule.components.simple.EchoComponent">
+        <service name="service">
+            <echo-component/>
             <inbound-router>
-                <endpoint address="${test.endpoint}" synchronous="true"/>
+                <inbound-endpoint address="${test.endpoint}" synchronous="true"/>
             </inbound-router>
-        </mule-descriptor>
-
+        </service>
     </model>
 
-</mule-configuration>
+</mule>
