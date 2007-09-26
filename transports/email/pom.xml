@@ -19,6 +19,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
+                        <!-- MULE-2441 -->
+                        <exclude>**/ExceptionhandlingMule2167TestCase.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

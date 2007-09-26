@@ -1,31 +1,34 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-<mule-configuration version="1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xmlns:pop3="http://www.mulesource.org/schema/mule/pop3/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/smtp/2.0 http://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/pop3/2.0 http://www.mulesource.org/schema/mule/pop3/2.0/mule-pop3.xsd">
 
-    <connector name="defaultVm" className="org.mule.providers.vm.VMConnector"/>
-    <connector name="queue" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <property name="queueEvents" value="true"/>
-        </properties>
-    </connector>
-    <connector name="smtp" className="org.mule.providers.email.SmtpConnector"/>
+    <vm:connector name="defaultVm"/>
+    <vm:connector name="queue" queueEvents="true"/>
+    <smtp:connector name="smtp"/>
 
     <model name="main">
-        
-        <mule-descriptor name="default config" implementation="org.mule.components.simple.BridgeComponent">
+        <service name="default config">
+            <bridge-component/>
             <inbound-router>
-                <endpoint address="vm://in-default" connector="defaultVm"/>
+                <vm:inbound-endpoint address="in-default" connector-ref="defaultVm"/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.ExceptionBasedRouter">
-                    <endpoint address="smtp://error@localhost:65540" connector="smtp"/>
-                    <endpoint address="vm://out-default" connector="queue"/>
-                </router>
+                <exception-based-router>
+                    <outbound-endpoint address="smtp://error@localhost:65540" connector-ref="smtp"/>
+                    <vm:outbound-endpoint address="out-default" connector-ref="queue"/>
+                </exception-based-router>
             </outbound-router>
-        </mule-descriptor>
-
+        </service>
     </model>
 
-</mule-configuration>
-        
+</mule>
