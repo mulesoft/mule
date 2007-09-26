@@ -5,3 +5,6 @@
 # MULE-2403
 org.mule.providers.email.functional.Pop3FunctionalTestCase
 org.mule.providers.email.issues.Pop3MimeWithConnectorMule2042TestCase
+
+# MULE-2441
+org.mule.providers.email.issues.ExceptionHandlingMule2167TestCase
