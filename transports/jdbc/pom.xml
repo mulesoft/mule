@@ -47,14 +47,13 @@
             <artifactId>xapool</artifactId>
             <version>1.4</version>
         </dependency>
-
-        <!-- For unit tests only -->
+        
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <scope>test</scope>
         </dependency>
-        
+
+        <!-- For unit tests only -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>

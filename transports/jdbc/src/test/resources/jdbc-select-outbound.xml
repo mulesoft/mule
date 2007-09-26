@@ -8,11 +8,18 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd">
 
+
     <spring:beans>
         <spring:bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
             <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
             <spring:property name="url" value="jdbc:derby:muleEmbeddedDB;create=true"/>
         </spring:bean>
+
+        <!--<spring:bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+            <!--<spring:property name="location">-->
+                <!--<spring:value>classpath:derby.properties</spring:value>-->
+            <!--</spring:property>-->
+        <!--</spring:bean>-->
     </spring:beans>
 
     <jdbc:connector name="jdbcConnector" pollingFrequency="1000">
@@ -21,6 +28,7 @@
             <spring:entry key="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
         </jdbc:queries>
     </jdbc:connector>
+
 
     <model name="JdbcSelectOnOutbound">
         <service name="bridge">
