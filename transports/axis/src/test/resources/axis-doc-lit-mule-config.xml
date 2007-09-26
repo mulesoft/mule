@@ -1,22 +1,30 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="axis_doclit_test" version="1.0">
-
-    <mule-environment-properties/>
     <model name="test">
-        <mule-descriptor name="mycomponent"
-            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
-            inboundEndpoint="axis:http://localhost:62108/mule">
-            <properties>
-                <property name="style" value="Document"/>
-                <property name="use" value="Literal"/>
-                <list name="beanTypes">
-                    <entry value="java.lang.Exception"/>
-                </list>
-            </properties>
-        </mule-descriptor>
+        <service name="mycomponent">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent">
+                <properties>
+                    <spring:entry key="style" value="wrapped"/>
+                    <spring:entry key="use" value="literal"/>
+                    <spring:entry key="beanTypes">
+                        <spring:list>
+                            <spring:value>java.lang.Exception</spring:value>
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+            </component>
+            <inbound-router>
+                <inbound-endpoint address="axis:http://localhost:62108/mule"/>
+            </inbound-router>
+        </service>
     </model>
-</mule-configuration>
+
+</mule>

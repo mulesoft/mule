@@ -1,26 +1,44 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="axis_test" version="1.0">
     <model name="test">
-        <mule-descriptor name="proxy" implementation="org.mule.components.simple.BridgeComponent">
+        <service name="proxy">
+            <bridge-component/>
             <inbound-router>
-                <endpoint address="vm://proxy" synchronous="true"/>
+                <inbound-endpoint address="vm://proxy" synchronous="true"/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="axis:http://localhost:62080/mule-tests-external-xfire/services/TestService?method=getTest">
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="axis:http://localhost:62080/mule-tests-external-xfire/services/TestService?method=getTest">
                         <properties>
-                            <property name="soapAction" value="[methodNamespace][method]"/>
-                            <map name="soapMethods">
-                                <property name="qname{getTest:http://mule.mulesource.org/Tests/TestService/}" value="in0;string;in,out;ns1:Test;out,returnClass;org.mule.tck.external.applications.Test"/>
-                            </map>
+                            <spring:entry key="soapAction" value="[methodNamespace][method]"/>
+                            <spring:entry key="soapMethods">
+                                <spring:list>
+                                    <spring:bean class="org.mule.providers.soap.SoapMethod">
+                                        <spring:constructor-arg value="qname{getTest:http://mule.mulesource.org/Tests/TestService/}"/>
+                                        <spring:constructor-arg>
+                                            <spring:list>
+                                                <spring:value>in0;string;in</spring:value>
+                                                <spring:value>out;ns1:Test;out</spring:value>
+                                                <spring:value>returnClass;org.mule.tck.external.applications.Test</spring:value>
+                                            </spring:list>
+                                        </spring:constructor-arg>
+                                    </spring:bean>
+                                </spring:list>
+                            </spring:entry>
                         </properties>
-                    </endpoint>
-                </router>
+                    </outbound-endpoint>
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-</mule-configuration>
+
+</mule>
+

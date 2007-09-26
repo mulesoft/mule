@@ -1,41 +1,50 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <endpoint name="calculatorAddEndpoint" address="axis:http://localhost:62088/axis/Calculator?method=add">
+        <properties>
+            <spring:entry key="style" value="wrapped"/>
+            <spring:entry key="use" value="literal"/>
+            <spring:entry key="soapMethods" value="Number1;int;in,Number2;int;in,return;int"/>
+        </properties>
+    </endpoint>
 
-<mule-configuration id="axis_calculator_test" version="1.0">
-
-    <global-endpoints>
-        <endpoint name="calculatorAddEndpoint" address="axis:http://localhost:62088/axis/Calculator?method=add">
-            <properties>
-                <property name="style" value="wrapped"/>
-                <property name="use" value="literal"/>
-                <map name="soapMethods">
-                    <list name="qname{add:http://muleumo.org/Calc}">
-                        <entry value="Number1;int;in"/>
-                        <entry value="Number2;int;in"/>
-                        <entry value="return;int"/>
-                    </list>
-                </map>
-            </properties>
-        </endpoint>
-    </global-endpoints>
     <model name="test">
-        <mule-descriptor name="Calculator"
-            implementation="org.mule.providers.soap.axis.Calculator"
-            inboundEndpoint="axis:http://localhost:62088/axis">
-
-            <properties>
-                <property name="style" value="document"/>
-                <property name="use" value="literal"/>
-                <map name="soapMethods">
-                    <list name="qname{add:http://muleumo.org/Calc}">
-                        <entry value="Number1;any;in"/>
-                        <entry value="Number2;any;in"/>
-                        <entry value="return;any"/>
-                    </list>
-                </map>
-            </properties>
-        </mule-descriptor>
+        <service name="Calculator">
+            <component class="org.mule.providers.soap.axis.Calculator">
+                <!-- it's not clear to me (ac) that this is correct.  and if it is, shouldn't we have something simpler? -->
+                <!-- also, email to dirk pending about simpler syntax seen in axis-named-param-mule-config.xml -->
+                <properties>
+                    <spring:entry key="style" value="document"/>
+                    <spring:entry key="use" value="literal"/>
+                    <spring:entry key="soapMethods">
+                        <spring:list>
+                            <spring:bean class="org.mule.providers.soap.SoapMethod">
+                                <!-- the strange qname syntax here will generate a QName instance via a property editor -->
+                                <spring:constructor-arg value="qname{add:http://muleumo.org/Calc}"/>
+                                <spring:constructor-arg>
+                                    <spring:list>
+                                        <spring:value>Number1;int;in</spring:value>
+                                        <spring:value>Number2;int;in</spring:value>
+                                        <spring:value>return;int"</spring:value>
+                                    </spring:list>
+                                </spring:constructor-arg>
+                            </spring:bean>
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+            </component>
+            <inbound-router>
+                <inbound-endpoint address="axis:http://localhost:62088/axis"/>
+            </inbound-router>
+        </service>
     </model>
-</mule-configuration>
+
+</mule>
