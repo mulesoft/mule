@@ -13,7 +13,7 @@ package org.mule.providers.bpm.jbpm;
 import org.mule.providers.bpm.tests.AbstractBpmTestCase;
 import org.mule.util.MuleDerbyTestUtils;
 
-public abstract class AbstractJbmpTestCase extends AbstractBpmTestCase
+public abstract class AbstractJbpmTestCase extends AbstractBpmTestCase
 {
     private static boolean derbySetupDone = false;
 

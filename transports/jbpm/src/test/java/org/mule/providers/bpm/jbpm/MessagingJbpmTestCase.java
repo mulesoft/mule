@@ -12,7 +12,6 @@ package org.mule.providers.bpm.jbpm;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.bpm.BPMS;
-import org.mule.providers.bpm.tests.AbstractBpmTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.NumberUtils;
 
@@ -21,7 +20,7 @@ import org.mule.util.NumberUtils;
  * processes its response.
  * jBPM is instantiated by Spring using the Spring jBPM module.
  */
-public class MessagingJbpmTestCase extends AbstractBpmTestCase {
+public class MessagingJbpmTestCase extends AbstractJbpmTestCase {
 
     protected String getConfigResources() {
         return "jbpm-functional-test.xml";

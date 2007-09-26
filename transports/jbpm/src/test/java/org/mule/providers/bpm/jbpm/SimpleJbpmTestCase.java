@@ -13,14 +13,13 @@ package org.mule.providers.bpm.jbpm;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.bpm.BPMS;
 import org.mule.providers.bpm.ProcessConnector;
-import org.mule.providers.bpm.tests.AbstractBpmTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.NumberUtils;
 
 /**
  * Tests the connector against jBPM with a simple process.
  */
-public class SimpleJbpmTestCase extends AbstractBpmTestCase
+public class SimpleJbpmTestCase extends AbstractJbpmTestCase
 {
 
     protected String getConfigResources()
