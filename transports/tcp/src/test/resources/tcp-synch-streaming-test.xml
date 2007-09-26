@@ -20,7 +20,7 @@
         <stream:service name="echo">
             <component class="org.mule.components.simple.StreamingBridgeComponent"/>
             <stream:inbound-router>
-                <stream:inbound-endpoint address="tcp://localhost:65432?endpointName=myEndpoint"/>
+                <stream:inbound-endpoint address="tcp://localhost:65432"/>
             </stream:inbound-router>
         </stream:service>
 
