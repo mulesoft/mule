@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="attachments_test" version="1.0">
-
-    <mule-environment-properties/>
-
-    <global-endpoints>
-        <endpoint address="vm://in" name="vm-in"/>
-    </global-endpoints>
+    <vm:endpoint address="vm://in" name="vm-in"/>
 
     <model name="main">
-        <mule-descriptor name="test" implementation="org.mule.providers.vm.functional.AttachmentsComponent">
+        <service name="test">
+            <component class="org.mule.providers.vm.functional.AttachmentsComponent"/>
             <inbound-router>
-                <global-endpoint name="vm-in"/>
+                <inbound-endpoint ref="vm-in"/>
             </inbound-router>
-        </mule-descriptor>
+        </service>
     </model>
 
-</mule-configuration>
+</mule>
