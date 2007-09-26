@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <configuration serverId="server id" defaultSynchronousEndpoints="true"/>
 
-<mule-configuration id="Mule_Http_Properties_Propagation" version="1.0">
+    <mxml:xslt-transformer name="Xslt" xsl-file="stylesheet.xsl"/>
 
-
-<mule-environment-properties synchronous="true"/>
-
-    <transformers>
-        <transformer name="Xslt" className="org.mule.transformers.xml.XsltTransformer">
-            <properties>
-                <property name="xslFile" value="stylesheet.xsl"/>
-            </properties>
-        </transformer>
-    </transformers >
-    
     <model name="PSMaxIntegration">
-
-        <mule-descriptor name="PSMaxMsg1" implementation="org.mule.components.simple.BridgeComponent" >
+        
+        <service name="PSMaxMsg1">
+            <bridge-component/>
             <inbound-router>
-                <endpoint name="httpEndpoint" address="http://localhost:8085" transformers="Xslt">
+                <inbound-endpoint name="httpEndpoint" address="http://localhost:8085" transformer-ref="Xslt">
                     <properties>
-                        <property name="Content-Type" value="text/xml"/>
+                        <spring:entry key="Content-Type" value="text/xml"/>
                     </properties>
-                </endpoint>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="http://localhost:8087"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="http://localhost:8087"/>
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
-        
-        <mule-descriptor name="PSMaxMsg2" implementation="org.mule.components.simple.BridgeComponent" >
-            <inbound-router>
-                <endpoint address="http://localhost:8087"/>
-            </inbound-router>
-        </mule-descriptor>
-        
-    </model>
-</mule-configuration>
+        </service>
 
+        <service name="PSMaxMsg2">
+            <bridge-component/>
+            <inbound-router>
+                <inbound-endpoint address="http://localhost:8087"/>
+            </inbound-router>
+        </service>
+
+    </model>
+
+</mule>
