@@ -19,6 +19,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
+                        <!-- cannot have a legacy test case with old config without 1to2migration -->
+                        <exclude>**/TcpFunctionalLegacyTestCase.*</exclude>
+
                         <exclude>**/SafeProtocolMule2227TestCase.*</exclude>
                         <exclude>**/MuleMessageProtocolChunkingTestCase.*</exclude>
                         <!--<exclude>**/SynchStreamingMule1687TestCase.*</exclude>-->
