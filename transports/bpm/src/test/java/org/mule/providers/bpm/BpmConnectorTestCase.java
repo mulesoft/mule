@@ -14,6 +14,8 @@ import org.mule.providers.bpm.test.TestBpms;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
+import com.mockobjects.dynamic.Mock;
+
 /**
  * Generic connector tests.
  */
@@ -31,15 +33,18 @@ public class BpmConnectorTestCase extends AbstractConnectorTestCase
         c.setName("ProcessConnector");
         c.setBpms(new TestBpms());
 
-        // TODO Disabled because c.initialise() causes an NPE with the new lifecycle.
-//        // The BPMS must be set prior to initializing the connector.
-//        Mock bpms = new Mock(BPMS.class);
-//        bpms.expect("setMessageService", c);
-//        c.setBpms((BPMS) bpms.proxy());
-//        c.initialise();
-//        bpms.verify();
-
         return c;
+    }
+
+    public void testMessageServiceSet() throws Exception
+    {
+        ProcessConnector c = (ProcessConnector) this.createConnector();
+        // The BPMS must be set prior to initializing the connector.
+        Mock bpms = new Mock(BPMS.class);
+        bpms.expect("setMessageService", c);
+        c.setBpms((BPMS) bpms.proxy());
+        c.initialise();
+        bpms.verify();
     }
 
     /*
