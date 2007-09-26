@@ -14,62 +14,20 @@
     <description>Mule server and core classes</description>
 
     <build>
-         <plugins>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <instructions>
-                        <!-- TODO Limit exports to the minimum necessary,
-                            in particular "impl" packages should not be exported. -->
-                        <Export-Package>
-                            org.mule,
-                            org.mule.components.*,
-                            org.mule.config.*,
-                            org.mule.impl,
-                            org.mule.impl.endpoint,
-                            org.mule.impl.container,
-                            org.mule.impl.work,
-                            org.mule.impl.jndi,
-                            org.mule.impl.message,
-                            org.mule.impl.model.*,
-                            org.mule.impl.security.*,
-                            org.mule.impl.internal.*,
-                            org.mule.interceptors,
-                            org.mule.management.stats.*,
-                            org.mule.model,
-                            org.mule.persistence.*,
-                            org.mule.providers.*,
-                            org.mule.registry.*,
-                            org.mule.registry.metadata,
-                            org.mule.routing.*,
-                            org.mule.transaction.*,
-                            org.mule.transformers.*,
-                            org.mule.umo.*,
-                            org.mule.util.*
-                        </Export-Package>
-                        <Private-Package>
-                            org.mule.*,
-                            org.apache.commons.cli.*,
-                            org.safehaus.uuid.*
-                        </Private-Package>
-                    </instructions>
+                    <excludes>
+                        <!-- Do we intend to support other containers for 2.0? -->
+                        <exclude>**/MuleContainerContextTestCase.*</exclude>
+                        <exclude>**/JndiContainerContextTestCase.*</exclude>
+                        <!-- MULE-2164 -->
+                        <exclude>**/MuleCopiedEndpointURITestCase.*</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
-
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <!-- Do we intend to support other containers for 2.0? -->
-                         <exclude>**/MuleContainerContextTestCase.*</exclude>
-                         <exclude>**/JndiContainerContextTestCase.*</exclude>
-                         <!-- MULE-2164 -->
-                        <exclude>**/MuleCopiedEndpointURITestCase.*</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-         </plugins>
+        </plugins>
     </build>
 
     <dependencies>
@@ -91,7 +49,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-remoting</artifactId>
         </dependency>
-
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
@@ -105,7 +62,6 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
         </dependency>
-
         <!-- UUID generator, only called directly by mule-core -->
         <dependency>
             <groupId>org.safehaus.jug</groupId>
@@ -117,13 +73,7 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
         </dependency>
-
-
-        <!-- Note: Ideally, the following list of libraries should be in the Mule project's top-level
-            POM, but Maven has visibility problems when dependencies are more than 2 levels away, so
-            this list is repeated in core/pom.xml, modules/pom.xml, transports/pom.xml, examples/pom.xml -->
 
         <!-- The following libraries are provided by the mule-module-util bundle -->
         <dependency>
@@ -183,7 +133,6 @@
             <artifactId>commons-lang</artifactId>
             <version>2.3</version>
         </dependency>
-
         <!--
             Bind log4j statically, but preserve
             the clogging API compatibility.
@@ -203,39 +152,13 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.4.3</version>
         </dependency>
-
-        <!-- UUID generator -->
-        <dependency>
-            <groupId>org.safehaus.jug</groupId>
-            <artifactId>jug</artifactId>
-            <version>2.0.0</version>
-            <classifier>asl</classifier>
-        </dependency>
-
         <!-- Used by mules default component pooling mechanism -->
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.3</version>
         </dependency>
-        <!-- UMOMesage attachment support; not needed for JDK 6 -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
-
         <!-- These are used by the TCK, which will hopefully be in its own project some day -->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <!-- Used for XA Transactions -->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
-            <version>1.0.1</version>
-        </dependency>
         <!-- Unit tests -->
         <dependency>
             <groupId>junit</groupId>
@@ -274,6 +197,55 @@
             </dependencies>
         </profile>
         <!-- no need for a jdk5 profile since we don't have to exclude anything -->
+
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <!-- TODO Limit exports to the minimum necessary,
+                                     in particular "impl" packages should not be exported. -->
+                                <Export-Package>
+                                    org.mule,
+                                    org.mule.components.*,
+                                    org.mule.config.*,
+                                    org.mule.impl,
+                                    org.mule.impl.endpoint,
+                                    org.mule.impl.container,
+                                    org.mule.impl.work,
+                                    org.mule.impl.jndi,
+                                    org.mule.impl.message,
+                                    org.mule.impl.model.*,
+                                    org.mule.impl.security.*,
+                                    org.mule.impl.internal.*,
+                                    org.mule.interceptors,
+                                    org.mule.management.stats.*,
+                                    org.mule.model,
+                                    org.mule.persistence.*,
+                                    org.mule.providers.*,
+                                    org.mule.registry.*,
+                                    org.mule.registry.metadata,
+                                    org.mule.routing.*,
+                                    org.mule.transaction.*,
+                                    org.mule.transformers.*,
+                                    org.mule.umo.*,
+                                    org.mule.util.*
+                                </Export-Package>
+                                <Private-Package>
+                                    org.mule.*,
+                                    org.apache.commons.cli.*,
+                                    org.safehaus.uuid.*
+                                </Private-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
 

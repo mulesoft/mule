@@ -19,12 +19,12 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-1to2migration</artifactId>
+            <artifactId>mule-module-acegi</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-acegi</artifactId>
+            <artifactId>mule-module-boot</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

@@ -12,7 +12,7 @@
     <!--<packaging>bundle</packaging>-->
     <name>JDBC Transport</name>
     <description>A Mule transport for JDBC connectivity.</description>
-    
+
     <build>
          <plugins>
             <plugin>
@@ -22,21 +22,15 @@
                     </excludes>
                 </configuration>
              </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            org.mule.providers.jdbc.*
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
          </plugins>
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
         <dependency>
             <groupId>commons-dbutils</groupId>
             <artifactId>commons-dbutils</artifactId>
@@ -47,7 +41,7 @@
             <artifactId>xapool</artifactId>
             <version>1.4</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
@@ -55,22 +49,45 @@
 
         <!-- For unit tests only -->
         <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <!-- TODO ensure proper merge from trunk where MuleDerbyTestUtils
+                 does not have a compile time dependency on Derby
+            -->
+            <!-- <scope>test</scope> -->
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <Export-Package>
+                                    org.mule.providers.jdbc.*
+                                </Export-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

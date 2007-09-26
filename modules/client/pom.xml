@@ -13,22 +13,6 @@
     <name>Mule Client</name>
     <description>MuleClient is a simple interface for Mule clients to send and receive events from local or remote Mule Servers.</description>   
 
-    <build>
-         <plugins>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            org.mule.extras.client.*
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-         </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -43,4 +27,24 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <Export-Package>
+                                    org.mule.extras.client.*
+                                </Export-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

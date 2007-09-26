@@ -28,54 +28,6 @@
                      </excludes>
                  </configuration>
              </plugin>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Mule-Transports>
-                            http,
-                            https,
-                            servlet,
-                            jetty
-                        </Mule-Transports>
-                        <!-- Needed for tcp-messages -->
-                        <Import-Package>
-                            META-INF.services.org.mule.i18n,
-                            !com.ccg.net.ethernet,
-                            !com.sun.activation.registries,
-                            !com.sun.net.ssl,
-                            !com.sun.net.ssl.internal.ssl,
-                            !javax.crypto,
-                            !javax.crypto.spec,
-                            !javax.naming,
-                            !javax.naming.spi,
-                            !javax.net,
-                            !javax.net.ssl,
-                            !javax.security.auth,
-                            !javax.security.cert,
-                            !javax.xml.namespace,
-                            !javax.xml.transform,
-                            !org.xml.sax,
-                            !sun.misc,
-                            *
-                        </Import-Package>
-                        <Export-Package>
-                            org.mule.providers.http.*
-                        </Export-Package>
-                        <Private-Package>
-                            org.mule.modules.osgi,
-                            org.apache.commons.codec.*,
-                            org.apache.commons.httpclient.*,
-                            org.mortbay.http.*,
-                            org.mortbay.jetty.*,
-                            org.mortbay.log,
-                            org.mortbay.xml,
-                            org.mortbay.util
-                        </Private-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
          </plugins>
     </build>
 
@@ -96,6 +48,61 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <Mule-Transports>
+                                    http,
+                                    https,
+                                    servlet,
+                                    jetty
+                                </Mule-Transports>
+                                <!-- Needed for tcp-messages -->
+                                <Import-Package>
+                                    META-INF.services.org.mule.i18n,
+                                    !com.ccg.net.ethernet,
+                                    !com.sun.activation.registries,
+                                    !com.sun.net.ssl,
+                                    !com.sun.net.ssl.internal.ssl,
+                                    !javax.crypto,
+                                    !javax.crypto.spec,
+                                    !javax.naming,
+                                    !javax.naming.spi,
+                                    !javax.net,
+                                    !javax.net.ssl,
+                                    !javax.security.auth,
+                                    !javax.security.cert,
+                                    !javax.xml.namespace,
+                                    !javax.xml.transform,
+                                    !org.xml.sax,
+                                    !sun.misc,
+                                    *
+                                </Import-Package>
+                                <Export-Package>
+                                    org.mule.providers.http.*
+                                </Export-Package>
+                                <Private-Package>
+                                    org.mule.modules.osgi,
+                                    org.apache.commons.codec.*,
+                                    org.apache.commons.httpclient.*,
+                                    org.mortbay.http.*,
+                                    org.mortbay.jetty.*,
+                                    org.mortbay.log,
+                                    org.mortbay.xml,
+                                    org.mortbay.util
+                                </Private-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>
@@ -105,41 +112,36 @@
             <artifactId>mule-transport-ssl</artifactId>
             <version>${version}</version>
         </dependency>
-
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
-
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
         </dependency>
-
         <dependency>
             <groupId>jetty</groupId>
             <artifactId>org.mortbay.jetty</artifactId>
             <version>5.1.12</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.4_spec</artifactId>
-            <!-- TODO MULE-1021
-                This library causes conflicts when Mule is deployed to a Web/J2EE server but is
-                needed otherwise.
-            <scope>provided</scope>
-            -->
         </dependency>
-
         <!-- for functional tests only -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-tcp</artifactId>
@@ -147,14 +149,12 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-stdio</artifactId>
@@ -162,5 +162,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

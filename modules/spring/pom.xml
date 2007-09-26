@@ -23,20 +23,6 @@
                      </excludes>
                  </configuration>
              </plugin>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            org.mule.extras.spring.config,
-                            org.mule.extras.spring.events,
-                            org.mule.extras.spring.remoting,
-                            org.mule.extras.spring.transaction
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
          </plugins>
     </build>
 
@@ -127,6 +113,27 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <Export-Package>
+                                    org.mule.extras.spring.config,
+                                    org.mule.extras.spring.events,
+                                    org.mule.extras.spring.remoting,
+                                    org.mule.extras.spring.transaction
+                                </Export-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>
@@ -216,5 +223,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

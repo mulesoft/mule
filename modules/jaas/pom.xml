@@ -23,31 +23,23 @@
                      </excludes>
                  </configuration>
              </plugin>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            org.mule.extras.jaas.*
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
          </plugins>
     </build>
 
     <dependencies>
-        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
-                mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- For unit tests only -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- For unit tests only -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
@@ -61,4 +53,25 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <Export-Package>
+                                    org.mule.extras.jaas.*
+                                </Export-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

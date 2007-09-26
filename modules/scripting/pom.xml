@@ -24,53 +24,50 @@
                     </excludes>
                 </configuration>
              </plugin>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <!-- TODO This module needs reorganization in order to properly export its packages. -->
-                        <Export-Package>
-                            org.mule.components.script.*,
-                            org.mule.transformers.script.*
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
          </plugins>
     </build>
 
     <dependencies>
-        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
-                mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
         <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
             <version>${version}</version>
-            <scope>test</scope>
         </dependency>
-        
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-support</artifactId>
+            <version>2.0.6</version>
+            <exclusions>
+                <exclusion>
+                    <!-- No, thank you. -->
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>2.0.6</version>
+        </dependency>
         <!-- need to explicitly mark javax.activation as provided -->
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <!-- Used by ScriptConfigurationBuilder -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${version}</version>
         </dependency>
-
         <!-- required for the script-api and retrotranslated JSR-223 engines -->
         <dependency>
             <groupId>net.sf.retrotranslator</groupId>
             <artifactId>retrotranslator-runtime</artifactId>
             <version>1.2.1</version>
         </dependency>
-
         <dependency>
             <groupId>javax.script</groupId>
             <artifactId>script-api</artifactId>
@@ -78,7 +75,6 @@
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
         </dependency>
-
         <!-- These are engines for JSR-223 compliance, not actual implementations -->
         <dependency>
             <groupId>javax.script</groupId>
@@ -87,7 +83,6 @@
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
         </dependency>
-
         <dependency>
             <groupId>javax.script</groupId>
             <artifactId>js-engine</artifactId>
@@ -95,7 +90,6 @@
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
         </dependency>
-
         <dependency>
             <groupId>javax.script</groupId>
             <artifactId>jython-engine</artifactId>
@@ -103,7 +97,6 @@
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
         </dependency>
-
         <dependency>
             <groupId>javax.script</groupId>
             <artifactId>jruby-engine</artifactId>
@@ -111,7 +104,6 @@
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
         </dependency>
-
         <!-- This is the actual language implementation -->
         <dependency>
             <groupId>groovy</groupId>
@@ -119,6 +111,12 @@
             <version>1.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
@@ -143,29 +141,29 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        
         <!-- spring dynamic scripting -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-support</artifactId>
-            <version>2.0.6</version>
-            <exclusions>
-                <exclusion>
-                    <!-- No, thank you. -->
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>2.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>aopalliance</groupId>
-            <artifactId>aopalliance</artifactId>
-            <version>1.0</version>
-        </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <!-- TODO This module needs reorganization in order to properly export its packages. -->
+                                <Export-Package>
+                                    org.mule.components.script.*,
+                                    org.mule.transformers.script.*
+                                </Export-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

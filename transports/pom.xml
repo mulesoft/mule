@@ -39,48 +39,12 @@
         <module>xmpp</module>
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <!-- Now that m2 dependency resolution works, activation
-             should ONLY come via core or (in the future) core-api, but there is
-             OF COURSE a bug with m2's handling of provided dependencies:
-             http://jira.codehaus.org/browse/MNG-2205
-        -->
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- This is required if the Tests use Mule 1.x configuration format
-             over tie we may revome this dependency, but I think its a good idea
-             to maintain backward compatability until Mule 3.0
-         -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-1to2migration</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <profiles>
         <profile>
             <id>osgi</id>
             <build>
-                 <plugins>
-                      <plugin>
+                <plugins>
+                    <plugin>
                         <groupId>org.apache.felix</groupId>
                         <artifactId>maven-bundle-plugin</artifactId>
                         <configuration>
@@ -122,14 +86,6 @@
                     </plugin>
                  </plugins>
             </build>
-            <dependencies>
-                <!-- Needed for the TransportActivator -->
-                <dependency>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-osgi</artifactId>
-                    <version>${version}</version>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>java14</id>

@@ -12,7 +12,13 @@
     <packaging>jar</packaging>
     <name>JBoss Transactions Integration</name>
     <description>Provides access to the JBoss Transaction Service for User and Xa transactions.</description>
+
     <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jbossts-common</artifactId>
@@ -28,6 +34,5 @@
             <artifactId>jbossts-jta-integration</artifactId>
             <version>4.2.3-SP5</version>
         </dependency>
-
     </dependencies>
 </project>

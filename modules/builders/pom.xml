@@ -92,16 +92,15 @@
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
         <!-- Used by MuleXmlBuilderContextServlet -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.4_spec</artifactId>
-            <!-- TODO MULE-10221
-            This library causes conflicts when Mule is deployed to a Web/J2EE server but is
-            needed otherwise.
-            <scope>provided</scope>
-            -->
         </dependency>
     </dependencies>
-
 </project>

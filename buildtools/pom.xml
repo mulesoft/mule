@@ -13,14 +13,6 @@
     <name>Mule Build Tools</name>
     <description>These are the tools used by the Mule's build procedure</description>
 
-    <dependencies>
-        <dependency>
-            <artifactId>junit</artifactId>
-            <groupId>junit</groupId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>

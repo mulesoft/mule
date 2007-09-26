@@ -488,7 +488,6 @@
             <name>OPS4J Repository</name>
             <url>http://repository.ops4j.org/maven2/</url>
         </repository>
-
         <repository>
             <id>apache.incubating.releases</id>
             <name>Apache Incubating Release Distribution Repository</name>
@@ -538,7 +537,6 @@
             <name>Mule Dependencies</name>
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
         </pluginRepository>
-
     </pluginRepositories>
 
     <build>
@@ -728,21 +726,6 @@
                 </executions>
             </plugin>
 
-            <!-- Bind Clover Coverage instrumentation to the site generation -->
-            <!-- Blocked by http://jira.codehaus.org/browse/MCLOVER-50 -->
-            <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-clover-plugin</artifactId>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<phase>pre-site</phase>-->
-            <!--<goals>-->
-            <!--<goal>instrument</goal>-->
-            <!--</goals>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--</plugin>-->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
@@ -830,25 +813,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>surefire-report-maven-plugin</artifactId>
                 <version>2.0-beta-1</version>
-            </plugin>
-            -->
-
-            <!-- Developer activity (last 6 months)
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>changelog-maven-plugin</artifactId>
-                <reportSets>
-                    <reportSet>
-                        <id>dev-only</id>
-                        <configuration>
-                            <type>range</type>
-                            <range>180</range>
-                        </configuration>
-                        <reports>
-                            <report>dev-activity</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
             </plugin>
             -->
 
@@ -948,16 +912,6 @@
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>${coberturaVersion}</version>
             </plugin>
-
-            <!-- Code Coverage by Clover -->
-            <!-- Blocked by http://jira.codehaus.org/browse/MCLOVER-50 -->
-            <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-clover-plugin</artifactId>-->
-            <!--<configuration>-->
-            <!--<jdk>1.4</jdk>-->
-            <!--</configuration>-->
-            <!--</plugin>-->
         </plugins>
     </reporting>
 

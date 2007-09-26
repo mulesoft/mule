@@ -11,4 +11,17 @@
     <artifactId>mule-example-loanbroker-common</artifactId>
     <packaging>jar</packaging>
     <name>Loan Broker Example: Shared classes</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+        </dependency>
+    </dependencies>
 </project>

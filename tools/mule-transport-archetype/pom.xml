@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.tools</groupId>
             <artifactId>bobberplus</artifactId>
             <version>${version}</version>
@@ -59,6 +64,18 @@
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <!-- 
+                         all repositories for org.apache.maven.shared.file-management seem to
+                         be broken. Hard-code a dependency here so the build will not fail
+                         -->
+                    <dependency>
+                        <groupId>org.apache.maven.shared</groupId>
+                        <artifactId>file-management</artifactId>
+                        <version>1.1</version>
+                        <scope>test</scope>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <!-- Testing the result of the it pom.xml -->
@@ -89,5 +106,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

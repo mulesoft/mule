@@ -16,17 +16,15 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
+                <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <instructions>
-                        <Export-Package>
-                            org.mule.extras.pgp.*
-                        </Export-Package>
-                    </instructions>
+                    <excludes>
+                        <!-- these fail unless a security patch is applied to JAVA_HOME/lib -->
+                        <exclude>**/KeyBasedEncryptionStrategyTestCase.*</exclude>
+                        <exclude>**/PGPSecurityFilterTestCase.*</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
@@ -95,4 +93,25 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <Export-Package>
+                                    org.mule.extras.pgp.*
+                                </Export-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

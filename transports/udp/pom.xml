@@ -13,24 +13,41 @@
     <name>UDP Transport</name>
     <description>A Mule transport for Udp Connectivity. This transport supplies a Udp Data Packet dispatcher and client implementation.</description>
 
-    <build>
-         <plugins>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            org.mule.providers.udp.*
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-         </plugins>
-    </build>
+    <profiles>
+        <profile>
+            <id>osgi</id>
+            <build>
+                    <plugins>
+                        <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <Export-Package>
+                                    org.mule.providers.udp.*
+                                </Export-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                    </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+
         <!-- Functional testing -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>

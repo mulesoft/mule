@@ -37,14 +37,6 @@
         -->
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${version}</version>
-        </dependency>
-    </dependencies>
-
     <profiles>
         <profile>
             <id>osgi</id>

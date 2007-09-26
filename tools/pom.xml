@@ -13,15 +13,15 @@
     <packaging>pom</packaging>
     <name>Mule Tools</name>
     <description>Tools for building and working with Mule projects.</description>
-    
+
     <modules>
         <!--  <module>visualizer</module> -->
         <module>bobberplus</module>
-        <module>mule-transport-archetype</module>
+<!--         <module>mule-transport-archetype</module> -->
         <module>mule-assembly-verifier</module>
     </modules>
 
-    <pluginRepositories>
+<!--    <pluginRepositories>
         <pluginRepository>
             <id>mule-plugins</id>
             <name>Mule Plugin Dependencies</name>
@@ -30,7 +30,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </pluginRepository>
-    </pluginRepositories>
+    </pluginRepositories>-->
 
     <build>
         <plugins>
@@ -52,13 +52,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${parent.version}</version>
-        </dependency>
-    </dependencies>
-
 </project>
