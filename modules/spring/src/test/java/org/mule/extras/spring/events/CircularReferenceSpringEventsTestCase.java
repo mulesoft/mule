@@ -19,7 +19,7 @@ public class CircularReferenceSpringEventsTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "../../../../../../../../../../tests/functional/src/test/resources/org/mule/test/spring/mule-events-with-manager.xml";
+        return "mule-events-with-manager.xml";
     }
 
     public void testManagerIsInstanciated() throws Exception
