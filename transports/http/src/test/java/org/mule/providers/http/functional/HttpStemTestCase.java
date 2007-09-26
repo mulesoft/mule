@@ -14,6 +14,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.providers.http.HttpConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 
 public class HttpStemTestCase extends FunctionalTestCase
 {
@@ -23,32 +24,27 @@ public class HttpStemTestCase extends FunctionalTestCase
         return "http-stem-test.xml";
     }
 
-
     public void testStemMatchingHttp() throws Exception
     {
         MuleClient client = new MuleClient();
-
-        UMOMessage result = client.send("http://localhost:60200/foo", "Hello World", null);
-        assertEquals("Hello World", result.getPayloadAsString());
-        assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
-        
-        result = client.send("http://localhost:60200/foo/bar", "Hello World", null);
-        assertEquals("Hello World", result.getPayloadAsString());
-        assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+        doTest(client, "http://localhost:60200/foo");
+        doTest(client, "http://localhost:60200/foo/bar");
     }
     
     public void testStemMatchingJetty() throws Exception
     {
         MuleClient client = new MuleClient();
+        doTest(client, "http://localhost:60201/foo");
+        doTest(client, "http://localhost:60201/foo/bar");
+    }
 
-        UMOMessage result = client.send("http://localhost:60201/foo", "Hello World", null);
-        assertEquals("Hello World", result.getPayloadAsString());
-        assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
-        
-        result = client.send("http://localhost:60201/foo/bar", "Hello World", null);
+    protected void doTest(MuleClient client, String url) throws Exception
+    {
+        UMOMessage result = client.send(url, "Hello World", null);
         assertEquals("Hello World", result.getPayloadAsString());
         assertEquals(200, result.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
+
 }
 
 
