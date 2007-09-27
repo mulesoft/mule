@@ -1,0 +1,2 @@
+org.mule.examples.loanbroker.esb.LoanBrokerEsbContainerTestCase
+org.mule.examples.loanbroker.esb.LoanBrokerEsbTestCase
