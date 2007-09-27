@@ -122,6 +122,7 @@
             <artifactId>mule-transport-jdbc</artifactId>
             <version>${version}</version>
             <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>

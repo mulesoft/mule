@@ -17,16 +17,10 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.MuleDerbyTestUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Properties;
 
 import org.apache.commons.dbutils.QueryRunner;
-import org.apache.derby.jdbc.EmbeddedDriver;
 
 public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
 {
@@ -72,7 +66,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
 
     protected void suitePreSetUp() throws Exception
     {
-        MuleDerbyTestUtils.defaultDerbyCleanAndInit("src/test/resources/derby.properties", "database.name");
+        MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
         super.suitePreSetUp();
     }
 

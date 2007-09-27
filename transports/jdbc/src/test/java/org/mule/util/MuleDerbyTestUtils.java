@@ -10,12 +10,9 @@
 
 package org.mule.util;
 
-import org.mule.util.FileUtils;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -53,10 +50,11 @@ public class MuleDerbyTestUtils
         embeddedDriver.connect("jdbc:derby:" + databaseName + ";create=true", null);
     }
     
-    public static String loadDatabaseName(String propertiesLocation, String propertyName) throws FileNotFoundException, IOException
+    public static String loadDatabaseName(String propertiesLocation, String propertyName) throws IOException
     {
         Properties derbyProperties = new Properties();
-        derbyProperties.load(new FileInputStream(propertiesLocation));
+        URL resource = ClassUtils.getResource(propertiesLocation, MuleDerbyTestUtils.class);
+        derbyProperties.load(resource.openStream());
         return derbyProperties.getProperty(propertyName);
     }
     
