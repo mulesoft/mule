@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -11,19 +10,25 @@
     <artifactId>mule-module-spring</artifactId>
     <!--<packaging>bundle</packaging>-->
     <name>Spring Extras</name>
-    <description>Non-core functionality provided by Spring such as transactions, remoting, data sources, etc.</description>
+    <description>
+        Non-core functionality provided by Spring such as transactions, remoting, data sources, etc.
+    </description>
 
     <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <exclude>**/*</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-         </plugins>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- 
+                        TODO do not use mule-test-exclusions.txt for now as this module still
+                        needs to be sorted out
+                     -->
+                    <excludes>
+                        <exclude>**/*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
@@ -123,10 +128,8 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.extras.spring.config,
-                                    org.mule.extras.spring.events,
-                                    org.mule.extras.spring.remoting,
-                                    org.mule.extras.spring.transaction
+                                    org.mule.extras.spring.config, org.mule.extras.spring.events,
+                                    org.mule.extras.spring.remoting, org.mule.extras.spring.transaction
                                 </Export-Package>
                             </instructions>
                         </configuration>
@@ -138,8 +141,8 @@
 
     <dependencies>
         <!-- do not include the org.springframework:spring depencency kitchen sink
-             but rather include each spring module individually. This allows for
-             finer grained management of dependencies.
+            but rather include each spring module individually. This allows for
+            finer grained management of dependencies.
         -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -155,7 +158,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-jms</artifactId>
             <exclusions>
-                 <exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-support</artifactId>
                 </exclusion>
@@ -186,7 +189,7 @@
             TODO this is a hack. Duplicate declaration (original is in the top pom.xml)
             makes Spring happy to compile when run from the project root folder,
             otherwise it cannot find classes from commons-logging.
-
+            
             It seems m2 dependency visibility hierarchy is limited to 1 level deep.
         -->
         <dependency>
@@ -197,7 +200,7 @@
 
         <!-- For test cases only -->
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency:
-             mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
+            mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
