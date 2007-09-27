@@ -22,15 +22,6 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 
     <dependencies>
