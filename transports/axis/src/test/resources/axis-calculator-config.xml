@@ -8,6 +8,9 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
+    <!-- is this file used?  i had the impression it was used somehow by AxisExternalServerTest
+         as part of external tests, but now cannot see how -->
+
     <endpoint name="calculatorAddEndpoint" address="axis:http://localhost:62088/axis/Calculator?method=add">
         <properties>
             <spring:entry key="style" value="wrapped"/>
@@ -20,7 +23,7 @@
         <service name="Calculator">
             <component class="org.mule.providers.soap.axis.Calculator">
                 <!-- it's not clear to me (ac) that this is correct.  and if it is, shouldn't we have something simpler? -->
-                <!-- also, email to dirk pending about simpler syntax seen in axis-named-param-mule-config.xml -->
+                <!-- also, email to daniel pending about simpler syntax seen in axis-named-param-mule-config.xml -->
                 <properties>
                     <spring:entry key="style" value="document"/>
                     <spring:entry key="use" value="literal"/>
