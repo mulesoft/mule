@@ -46,23 +46,6 @@
         </dependency>
     </dependencies>
 
-    <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <!-- MULE-2136 -->
-                         <exclude>**/MulticastRouterMule2136TestCase.*</exclude>
-                         <!-- MULE-2131 -->
-                         <exclude>**/EndpointTransformerMule2131TestCase.*</exclude>
-                         <exclude>**/TransformerChainMule2131TestCase.*</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-         </plugins>
-    </build>
-
     <profiles>
         <profile>
             <id>osgi</id>

@@ -16,25 +16,6 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- cannot have a legacy test case with old config without 1to2migration -->
-                        <exclude>**/TcpFunctionalLegacyTestCase.*</exclude>
-
-                        <exclude>**/SafeProtocolMule2227TestCase.*</exclude>
-                        <exclude>**/MuleMessageProtocolChunkingTestCase.*</exclude>
-                        <!--<exclude>**/SynchStreamingMule1687TestCase.*</exclude>-->
-                        <exclude>**/AsynchMule1869TestCase.*</exclude>
-                        <!-- be careful when re-enabling this, it may hang the CI server -->
-                        <exclude>**/KeepSendSocketOpenMule1491TestCase.*</exclude>
-                        <exclude>**/*Mule1389TestCase.java</exclude>
-                        <exclude>**/*Mule1687TestCase.java</exclude>
-                        <exclude>**/*Mule2067TestCase.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>

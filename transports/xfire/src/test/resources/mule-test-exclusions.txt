@@ -2,6 +2,10 @@
 # Test cases listed in this file are not run.
 #
 
+# This class matches surefire's include pattern by accident.
+# Don't execute it as it's not a unit test.
+org.mule.providers.soap.xfire.testmodels.TestXFireComponent
+
 # MULE-1134
 org.mule.providers.soap.xfire.XFireConnectorVMFunctionalTestCase
 
@@ -11,4 +15,3 @@ org.mule.providers.soap.xfire.XFireWsdlTestCase
 # Cyclic dependency with axis ... hold for now
 org.mule.providers.soap.xfire.XFireServiceUsingAxisEndpointTestCase
 org.mule.providers.soap.xfire.ComplexTypeMethodTestCase
-
