@@ -13,19 +13,6 @@
     <name>SSL Transport</name>
     <description>A Mule transport for Socket connectivity using SSL authentication. This transport supplies a tcp Server and client implementation over SSL.</description>
 
-    <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <exclude>**/AsynchronousSslMule1854TestCase.*</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-         </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>

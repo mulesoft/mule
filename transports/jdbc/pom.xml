@@ -13,18 +13,6 @@
     <name>JDBC Transport</name>
     <description>A Mule transport for JDBC connectivity.</description>
 
-    <build>
-         <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                    </excludes>
-                </configuration>
-             </plugin>
-         </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

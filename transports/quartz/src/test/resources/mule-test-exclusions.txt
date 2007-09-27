@@ -1,0 +1,2 @@
+org.mule.providers.quartz.QuartzFunctionalLegacyTestCase
+org.mule.providers.quartz.QuartzFunctionalTestCase

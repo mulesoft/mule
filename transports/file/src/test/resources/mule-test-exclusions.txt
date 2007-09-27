@@ -1,0 +1,1 @@
+org.mule.providers.file.issues.IndirectReceiveMule1842TestCase

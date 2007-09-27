@@ -13,21 +13,6 @@
     <name>Quartz Transport</name>
     <description>A Mule transport for Quartz. This transport supplies a receiver for jobs scheduled with Quartz.</description>
 
-    <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <!-- MULE-1925 -->
-                         <exclude>**/QuartzFunctionalLegacyTestCase.*</exclude>
-                         <exclude>**/QuartzFunctionalTestCase.*</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-         </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>quartz</groupId>

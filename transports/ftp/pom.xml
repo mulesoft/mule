@@ -13,18 +13,6 @@
     <name>FTP Transport</name>
     <description>A Mule transport for Ftp Connectivity.</description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <artifactId>commons-net</artifactId>

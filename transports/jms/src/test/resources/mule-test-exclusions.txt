@@ -9,3 +9,13 @@ org.mule.providers.jms.issues.ActiveMQJmsTransactionMule2071TestCase
 org.mule.test.integration.providers.jms.activemq.ActiveMQJmsTransactionFunctionalTestCase
 org.mule.test.integration.providers.jms.activemq.ActiveMQJmsXaTransactionFunctionalTestCase
 
+org.mule.providers.jms.functional.MultipleJmsConnectorsTestCase
+
+# Transactions not working yet
+org.mule.providers.jms.transactions.ActiveMQJmsTransactionFunctionalTestCase
+org.mule.providers.jms.transactions.ActiveMQJmsXaTransactionFunctionalTestCase
+org.mule.providers.jms.transactions.ActiveMQJmsSingleResourceTransactionFunctionalTestCase
+org.mule.providers.jms.transactions.JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase
+org.mule.providers.jms.transactions.JmsClientAcknowledgeTransactionFunctionalTestCase
+
+org.mule.providers.jms.vendors.ActiveMqXaJmsConnectorTestCase

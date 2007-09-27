@@ -6,7 +6,7 @@
 org.mule.providers.soap.axis.AxisExternalServerTest
 org.mule.providers.soap.axis.VmToAxisProxyTestCase
 
-# MULE-1553
+# MULE-1839
 org.mule.providers.soap.axis.AxisConnectorHttpsTestCase
 org.mule.providers.soap.axis.AxisConnectorJmsFunctionalTestCase
 org.mule.providers.soap.axis.AxisConnectorJmsTopicsFunctionalTestCase
@@ -17,3 +17,5 @@ org.mule.providers.soap.axis.functional.SoapAttachmentsFunctionalTestCase
 
 # MULE-2164
 org.mule.providers.soap.axis.AxisEndpointMule2164TestCase
+
+org.mule.providers.soap.axis.issues.EndpointRetrievalMule2021TestCase

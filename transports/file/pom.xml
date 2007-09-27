@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -11,21 +10,14 @@
     <artifactId>mule-transport-file</artifactId>
     <!--<packaging>bundle</packaging>-->
     <name>File Transport</name>
-    <description>A Mule transport for File Connectivity. This transport allows files to be read and written to
-        directories on the local file system. The transport can be configured to filter the file it reads and the way
-        files are written, such as whether binary output is used or the file is appended to.</description>
+    <description>
+        A Mule transport for File Connectivity. This transport allows files to be read and written to
+        directories on the local file system. The transport can be configured to filter the file it reads and
+        the way files are written, such as whether binary output is used or the file is appended to.
+    </description>
 
     <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <!-- waiting on MULE-1842 -->
-                         <exclude>**/IndirectReceiveMule1842TestCase.*</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -37,8 +29,8 @@
                     </execution>
                 </executions>
             </plugin>
-         </plugins>
-     </build>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -59,7 +51,7 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
@@ -77,12 +69,8 @@
                         <artifactId>maven-bundle-plugin</artifactId>
                         <configuration>
                             <instructions>
-                                <Mule-Transports>
-                                    file
-                                </Mule-Transports>
-                                <Export-Package>
-                                    org.mule.providers.file.*
-                                </Export-Package>
+                                <Mule-Transports>file</Mule-Transports>
+                                <Export-Package>org.mule.providers.file.*</Export-Package>
                             </instructions>
                         </configuration>
                     </plugin>

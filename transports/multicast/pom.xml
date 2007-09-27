@@ -13,20 +13,6 @@
     <name>Multicast Transport</name>
     <description>A Mule transport for Udp Multicasting. This transport supplies a Multicast Data Packet dispatcher and client implementation.</description>
 
-    <build>
-        <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <!-- andrew cooke local only!! -->
-                         <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>

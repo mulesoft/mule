@@ -13,24 +13,6 @@
     <name>Web Service Security</name>
     <description>Mule WS-Security uses Apache's WSS4J and XFire's WSS4JHandlers to secure WebServices using SOAP</description>
 
-    <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <!-- MULE-1176 -->
-                         <exclude>**/XfireMultipleConnectorsWSSecurityTestCase.*</exclude>
-                         <exclude>**/XfireWsSecurityOnOutboundTestCase.*</exclude>
-                         <exclude>**/XfireWsSecurityOnOutboundUsingPropertiesTestCase.*</exclude>
-                         <!-- MULE-2118 -->
-                         <exclude>**/AxisWsSecurityOnOutbound.*</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-         </plugins>
-    </build>
-
     <profiles>
         <profile>
             <id>java14</id>

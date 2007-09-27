@@ -9,3 +9,8 @@ org.mule.components.rest.RESTTestCase
 org.mule.providers.http.issues.StreamingDownloadMule1389TestCase
 org.mule.providers.http.issues.StreamingSpeedMule1389TestCase
 
+org.mule.providers.http.functional.HttpsFunctionalTestCase
+org.mule.providers.tcp.issues.AbstractStreamingDownloadMule1389TestCase
+org.mule.providers.http.issues.StreamingDownloadMule1389TestCase
+org.mule.providers.http.issues.StreamingSpeedMule1389TestCase
+org.mule.providers.tcp.issues.StreamingDownloadMule1389TestCase

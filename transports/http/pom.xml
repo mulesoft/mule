@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.transports</groupId>
@@ -11,43 +10,11 @@
     <artifactId>mule-transport-http</artifactId>
     <!--<packaging>bundle</packaging>-->
     <name>HTTP Transport</name>
-    <description>A Mule transport for Http Connectivity. This transport supplies a simple Http Server implementation.</description>
-
-    <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <!-- MULE-2414 -->
-                         <!-- <exclude>**/*.java</exclude> -->
-                         <!-- MULE-2208 -->
-                         <exclude>**/HttpsFunctionalTestCase.java</exclude>
-
-                         <exclude>**/*Mule1389TestCase.java</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-         </plugins>
-    </build>
+    <description>
+        A Mule transport for Http Connectivity. This transport supplies a simple Http Server implementation.
+    </description>
 
     <profiles>
-        <profile>
-            <id>tests-external</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <exclude>**/*Mule1389TestCase.java</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>osgi</id>
             <build>
@@ -57,45 +24,21 @@
                         <artifactId>maven-bundle-plugin</artifactId>
                         <configuration>
                             <instructions>
-                                <Mule-Transports>
-                                    http,
-                                    https,
-                                    servlet,
-                                    jetty
-                                </Mule-Transports>
+                                <Mule-Transports>http, https, servlet, jetty</Mule-Transports>
                                 <!-- Needed for tcp-messages -->
                                 <Import-Package>
-                                    META-INF.services.org.mule.i18n,
-                                    !com.ccg.net.ethernet,
-                                    !com.sun.activation.registries,
-                                    !com.sun.net.ssl,
-                                    !com.sun.net.ssl.internal.ssl,
-                                    !javax.crypto,
-                                    !javax.crypto.spec,
-                                    !javax.naming,
-                                    !javax.naming.spi,
-                                    !javax.net,
-                                    !javax.net.ssl,
-                                    !javax.security.auth,
-                                    !javax.security.cert,
-                                    !javax.xml.namespace,
-                                    !javax.xml.transform,
-                                    !org.xml.sax,
-                                    !sun.misc,
-                                    *
+                                    META-INF.services.org.mule.i18n, !com.ccg.net.ethernet,
+                                    !com.sun.activation.registries, !com.sun.net.ssl,
+                                    !com.sun.net.ssl.internal.ssl, !javax.crypto, !javax.crypto.spec,
+                                    !javax.naming, !javax.naming.spi, !javax.net, !javax.net.ssl,
+                                    !javax.security.auth, !javax.security.cert, !javax.xml.namespace,
+                                    !javax.xml.transform, !org.xml.sax, !sun.misc, *
                                 </Import-Package>
-                                <Export-Package>
-                                    org.mule.providers.http.*
-                                </Export-Package>
+                                <Export-Package>org.mule.providers.http.*</Export-Package>
                                 <Private-Package>
-                                    org.mule.modules.osgi,
-                                    org.apache.commons.codec.*,
-                                    org.apache.commons.httpclient.*,
-                                    org.mortbay.http.*,
-                                    org.mortbay.jetty.*,
-                                    org.mortbay.log,
-                                    org.mortbay.xml,
-                                    org.mortbay.util
+                                    org.mule.modules.osgi, org.apache.commons.codec.*,
+                                    org.apache.commons.httpclient.*, org.mortbay.http.*, org.mortbay.jetty.*,
+                                    org.mortbay.log, org.mortbay.xml, org.mortbay.util
                                 </Private-Package>
                             </instructions>
                         </configuration>
