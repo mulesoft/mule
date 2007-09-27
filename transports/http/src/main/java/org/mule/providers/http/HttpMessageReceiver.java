@@ -435,10 +435,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
 
         StringBuffer requestUri = new StringBuffer(80);
-        requestUri.append(endpoint.getProtocol()).append("://");
-        requestUri.append(endpoint.getEndpointURI().getHost());
-        requestUri.append(':').append(endpoint.getEndpointURI().getPort());
-
+        if (path.indexOf("://")==-1)
+        {
+            requestUri.append(endpoint.getProtocol()).append("://");
+            requestUri.append(endpoint.getEndpointURI().getHost());
+            requestUri.append(':').append(endpoint.getEndpointURI().getPort());
+        }
         // first check that there is a receiver on the root address
         if (logger.isTraceEnabled())
         {

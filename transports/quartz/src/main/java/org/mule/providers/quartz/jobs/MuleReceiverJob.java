@@ -18,6 +18,7 @@ import org.mule.providers.NullPayload;
 import org.mule.providers.quartz.QuartzConnector;
 import org.mule.providers.quartz.QuartzMessageReceiver;
 import org.mule.providers.quartz.i18n.QuartzMessages;
+import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,8 +72,8 @@ public class MuleReceiverJob implements Job
                 // too
                 if (ref == null)
                 {
-                    ref = jobExecutionContext.getJobDetail().getJobDataMap().getString(
-                        QuartzConnector.PROPERTY_PAYLOAD_CLASS_NAME);
+                    ref = StringUtils.defaultIfEmpty(jobExecutionContext.getJobDetail().getJobDataMap().getString(
+                        QuartzConnector.PROPERTY_PAYLOAD_CLASS_NAME), null); // treat empty string as null
                 }
                 if (ref == null)
                 {

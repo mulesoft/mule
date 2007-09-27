@@ -281,7 +281,7 @@ public class DefaultMuleProxy implements MuleProxy
                     returnMessage = descriptor.getResponseRouter().getResponse(returnMessage);
                 }
 
-                // process repltyTo if there is one
+                // process replyTo if there is one
                 if (returnMessage != null && replyToHandler != null)
                 {
                     String requestor = (String) returnMessage.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
@@ -460,7 +460,7 @@ public class DefaultMuleProxy implements MuleProxy
                     descriptor.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
                 }
 
-                // process repltyTo if there is one
+                // process replyTo if there is one
                 if (result != null && replyToHandler != null)
                 {
                     String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);

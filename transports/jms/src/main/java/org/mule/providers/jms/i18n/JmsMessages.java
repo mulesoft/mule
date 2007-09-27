@@ -65,7 +65,7 @@ public class JmsMessages extends MessageFactory
 
     public static Message checkTransformer(String string, Class class1, String name)
     {
-        return createMessage(BUNDLE_PATH, 14, string, ClassUtils.getSimpleName(class1.getClass()),
+        return createMessage(BUNDLE_PATH, 13, string, ClassUtils.getSimpleName(class1.getClass()),
             name);
     }
     

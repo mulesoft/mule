@@ -11,6 +11,7 @@
 package org.mule.providers.jms;
 
 import org.mule.util.ArrayUtils;
+import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -146,7 +147,8 @@ public class JmsMessageUtils
         else
         {
             throw new JMSException(
-                "Source was not a supported type, data must be Serializable, String, byte[], Map or InputStream");
+                "Source was not of a supported type, data must be Serializable, String, byte[], Map or InputStream, " +
+                "but was " + ClassUtils.getShortClassName(object, "<null>"));
         }
     }
 

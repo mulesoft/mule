@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+
+    <mule-environment-properties synchronous="true" synchronousEventTimeout="5000">
+        <threading-profile id="default" maxThreadsActive="1" maxThreadsIdle="1" maxBufferSize="1" doThreading="false"
+                           poolExhaustedAction="WAIT"/>
+    </mule-environment-properties>
+
+    <!-- Container context -->
+    <container-context name="spring" className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile"
+                      value="org/mule/test/integration/transaction/jdbc-xatransaction-1479-spring.xml"/>
+        </properties>
+    </container-context>
+
+    <!-- Transaction manager -->
+    <transaction-manager ref="transactionManagerFactory"/>
+
+    <connector name="jdbcConnectorXA" className="org.mule.providers.jdbc.JdbcConnector">
+        <properties>
+            <container-property name="dataSource" reference="jdbcDataSourceXA" required="true"/>
+            <map name="queries">
+                <property name="insertRecord" value="INSERT into Test (data) VALUES (${payload})"/>
+                <property name="causeException" value="INSERT into Test (bad_column_name) VALUES (${payload})"/>
+            </map>
+        </properties>
+    </connector>
+
+    <connector name="jmsConnectorXA" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
+        <properties>
+            <container-property name="connectionFactory" reference="jmsConnectionFactoryXa"/>
+            <property name="specification" value="1.1"/>
+        </properties>
+    </connector>
+
+    <model name="model">
+        <mule-descriptor name="TestJdbc"
+                         implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://in">
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.MulticastingRouter">
+                    <endpoint address="jdbc://insertRecord" connector="jdbcConnectorXA">
+                        <transaction action="ALWAYS_JOIN" factory="org.mule.transaction.XaTransactionFactory"/>
+                    </endpoint>
+                    <endpoint address="jdbc://causeException" connector="jdbcConnectorXA">
+                        <transaction action="ALWAYS_JOIN" factory="org.mule.transaction.XaTransactionFactory"/>
+                    </endpoint>
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>
+                </router>
+            </outbound-router>
+            <exception-strategy className="org.mule.test.integration.transaction.RollbackRoutingExceptionStrategy"/>
+        </mule-descriptor>
+
+        <mule-descriptor name="TestJms"
+                         implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="vm://in1"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.MulticastingRouter">
+                    <endpoint address="jdbc://insertRecord" connector="jdbcConnectorXA">
+                        <transaction action="ALWAYS_JOIN" factory="org.mule.transaction.XaTransactionFactory"/>
+                    </endpoint>
+                    <endpoint address="jms://queue.out" connector="jmsConnectorXA" synchronous="true">
+                        <transaction action="ALWAYS_JOIN" factory="org.mule.transaction.XaTransactionFactory"/>
+                    </endpoint>
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>
+                </router>
+            </outbound-router>
+            <exception-strategy className="org.mule.test.integration.transaction.RollbackRoutingExceptionStrategy"/>
+        </mule-descriptor>
+
+<!--
+        <mule-descriptor name="TestJmsConsole"
+                         implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="jms://queue.out"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.MulticastingRouter">
+                    <endpoint address="stream://System.out" synchronous="true"/>
+                </router>
+            </outbound-router>
+            <exception-strategy className="org.mule.test.integration.transaction.RollbackRoutingExceptionStrategy"/>
+        </mule-descriptor>
+-->
+    </model>
+</mule-configuration>

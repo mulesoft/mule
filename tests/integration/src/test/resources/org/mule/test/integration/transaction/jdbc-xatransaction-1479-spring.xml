@@ -1,0 +1,26 @@
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <!-- Transaction management for XA transactions involving multiple JDBC and/or JMS -->
+    <bean id="transactionManagerFactory" class="org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
+    <bean id="transactionManager" factory-bean="transactionManagerFactory" factory-method="create"/>
+
+
+
+    <bean id="jdbcDataSourceXA" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">
+       <property name="dataSource" ref="dataSourceBean"/>
+    </bean>
+
+    <bean id="dataSourceBean" class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
+       <property name="transactionManager" ref="transactionManager" />
+       <property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver" />
+       <property name="url" value="jdbc:derby:muleEmbeddedDB;create=true" />
+    </bean>
+
+    <!-- ActiveMQ -->
+    <bean id="jmsConnectionFactoryXa"
+        class="org.apache.activemq.ActiveMQXAConnectionFactory">
+        <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=true</value></property>
+    </bean>   
+
+</beans>

@@ -11,14 +11,15 @@ For more information, refer to http://www.muledocs.org/Mule+Examples+Webapp
 +---------------------+
 | Running the example |
 +---------------------+
-First, make sure you have set the MULE_HOME environment variable as recommended in INSTALL.txt
+First, make sure you have set the MULE_HOME environment variable as recommended 
+in INSTALL.txt
 
-Depending on the build tool you are using (Ant or Maven), you can build the example by simply 
-running "ant" or "mvn".  This will generate a WAR file in the "target" directory which can be 
-deployed to any standard JEE web server.
+Depending on the build tool you are using (Ant or Maven), you can build the example 
+by simply running "ant" or "mvn".  This will generate a WAR file in the "target" 
+directory which can be deployed to any standard JEE web server.
 
-By default, the "mvn" build will automatically start up the WAR in Jetty!  Just surf to the 
-following URL in your browser:
+By default, the "mvn" build will automatically start up the WAR in Jetty! (Note that
+this only works with JDK5 and above)  Just surf to the following URL in your browser:
 
 http://localhost:8090/mule-examples
 
