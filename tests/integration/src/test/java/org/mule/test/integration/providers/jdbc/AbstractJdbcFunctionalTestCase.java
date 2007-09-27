@@ -64,8 +64,8 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     {
         if (!derbySetupDone)
         {
-            String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", "database.name");
-            MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
+            String dbName = MuleDerbyTestUtils.loadDatabaseName("src/test/resources/derby.properties", "database.name");
+            MuleDerbyTestUtils.defaultDerbyCleanAndInit("src/test/resources/derby.properties", "database.name");
             EMBEDDED_CONNECTION_STRING = "jdbc:derby:" + dbName;
             CLIENT_CONNECTION_STRING = "jdbc:derby://localhost:1527/"+ dbName +";create=true";
             derbySetupDone = true;
