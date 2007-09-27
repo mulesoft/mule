@@ -322,7 +322,7 @@
         <!--        </property>-->
     </bean>
 
-    <bean id="entryPointResolver" class="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
+    <bean id="entryPointResolver" class="org.mule.tck.testmodels.mule.TestEntryPointResolverSet"/>
 
     <bean id="lifecycleAdapterFactory" class="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/>
 
@@ -645,7 +645,7 @@
     </bean>
 
     <bean id="main" class="org.mule.impl.model.seda.SedaModel" init-method="initialise" destroy-method="dispose">
-        <property name="entryPointResolver">
+        <property name="entryPointResolverSet">
             <ref local="entryPointResolver"/>
         </property>
         <property name="lifecycleAdapterFactory">

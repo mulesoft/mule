@@ -12,8 +12,7 @@ package org.mule.impl;
 
 import org.mule.MuleException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.model.resolvers.DynamicEntryPoint;
-import org.mule.impl.model.resolvers.DynamicEntryPointResolver;
+import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.nested.NestedInvocationHandler;
 import org.mule.umo.ComponentException;
 import org.mule.umo.Invocation;
@@ -27,7 +26,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
-import org.mule.umo.model.UMOEntryPointResolver;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.routing.UMONestedRouter;
 import org.mule.util.ClassUtils;
 
@@ -48,9 +47,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
 {
-    /**
-     * logger used by this class
-     */
+    /** logger used by this class */
     protected static final Log logger = LogFactory.getLog(DefaultLifecycleAdapter.class);
 
     private Object component;
@@ -62,21 +59,21 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
     private boolean started = false;
     private boolean disposed = false;
 
-    private DynamicEntryPoint entryPoint;
+    private UMOEntryPointResolverSet entryPointResolver;
 
     public DefaultLifecycleAdapter(Object component, UMODescriptor descriptor) throws UMOException
     {
-        this(component, descriptor, new DynamicEntryPointResolver());
+        this(component, descriptor, new LegacyEntryPointResolverSet());
     }
 
     public DefaultLifecycleAdapter(Object component,
                                    UMODescriptor descriptor,
-                                   UMOEntryPointResolver epResolver) throws UMOException
+                                   UMOEntryPointResolverSet epResolver) throws UMOException
     {
         initialise(component, descriptor, epResolver);
     }
 
-    protected void initialise(Object component, UMODescriptor descriptor, UMOEntryPointResolver epDiscovery)
+    protected void initialise(Object component, UMODescriptor descriptor, UMOEntryPointResolverSet entryPointResolver)
             throws UMOException
     {
         if (component == null)
@@ -87,12 +84,12 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         {
             throw new IllegalArgumentException("Descriptor cannot be null");
         }
-        if (epDiscovery == null)
+        if (entryPointResolver == null)
         {
-            epDiscovery = new DynamicEntryPointResolver();
+            entryPointResolver = new LegacyEntryPointResolverSet();
         }
         this.component = component;
-        this.entryPoint = (DynamicEntryPoint) epDiscovery.resolveEntryPoint(descriptor);
+        this.entryPointResolver = entryPointResolver;
         this.descriptor = descriptor;
 
         isStartable = Startable.class.isInstance(component);
@@ -117,7 +114,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             catch (Exception e)
             {
                 throw new MuleException(
-                    CoreMessages.failedToStart("UMO Component: " + descriptor.getName()), e);
+                        CoreMessages.failedToStart("UMO Component: " + descriptor.getName()), e);
             }
         }
         started = true;
@@ -134,7 +131,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             catch (Exception e)
             {
                 throw new MuleException(
-                    CoreMessages.failedToStop("UMO Component: " + descriptor.getName()), e);
+                        CoreMessages.failedToStop("UMO Component: " + descriptor.getName()), e);
             }
         }
         started = false;
@@ -157,17 +154,13 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         disposed = true;
     }
 
-    /**
-     * @return true if the component has been started
-     */
+    /** @return true if the component has been started */
     public boolean isStarted()
     {
         return started;
     }
 
-    /**
-     * @return whether the component managed by this lifecycle has been disposed
-     */
+    /** @return whether the component managed by this lifecycle has been disposed */
     public boolean isDisposed()
     {
         return disposed;
@@ -191,22 +184,31 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
 
         try
         {
-            result = entryPoint.invoke(component, RequestContext.getEventContext());
+            //Use the overriding entrypoint resolver if one is set
+            if (descriptor.getEntryPointResolverSet() != null)
+            {
+                result = descriptor.getEntryPointResolverSet().invoke(component, RequestContext.getEventContext());
+
+            }
+            else
+            {
+                result = entryPointResolver.invoke(component, RequestContext.getEventContext());
+            }
         }
         catch (Exception e)
         {
             // should all Exceptions caught here be a ComponentException?!?
             // TODO MULE-863: See above
             throw new ComponentException(
-                CoreMessages.failedToInvoke(component.getClass().getName()),
-                invocation.getMessage(), event.getComponent(), e);
+                    CoreMessages.failedToInvoke(component.getClass().getName()),
+                    invocation.getMessage(), event.getComponent(), e);
         }
 
         UMOMessage resultMessage = null;
         if (result instanceof VoidResult)
         {
-            resultMessage = new MuleMessage(event.getTransformedMessage(), 
-                RequestContext.getEventContext().getMessage());
+            resultMessage = new MuleMessage(event.getTransformedMessage(),
+                    RequestContext.getEventContext().getMessage());
         }
         else if (result != null)
         {
@@ -254,9 +256,9 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     Method setterMethod;
 
 
-                    List methods = 
-                        ClassUtils.getSatisfiableMethods(component.getClass(), 
-                            new Class[]{nestedRouter.getInterface()}, true, false, null);
+                    List methods =
+                            ClassUtils.getSatisfiableMethods(component.getClass(),
+                                    new Class[]{nestedRouter.getInterface()}, true, false, null);
                     if (methods.size() == 1)
                     {
                         setterMethod = (Method) methods.get(0);
@@ -269,7 +271,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     else
                     {
                         throw new NoSatisfiableMethodsException(
-                                component.getClass(), nestedRouter.getInterface());
+                                component.getClass(), new Class[]{nestedRouter.getInterface()});
                     }
 
                     try
@@ -279,8 +281,8 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     catch (Exception e)
                     {
                         throw new InitialisationException(
-                            CoreMessages.failedToSetProxyOnService(nestedRouter, 
-                                component.getClass()), e, this);
+                                CoreMessages.failedToSetProxyOnService(nestedRouter,
+                                        component.getClass()), e, this);
                     }
                 }
                 else

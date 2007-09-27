@@ -7,26 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
-package org.mule.mule.model;
-
-import org.mule.umo.UMOEventContext;
+package org.mule.impl.model.resolvers;
 
 /**
- * A test object with multiple matching methods accepting UMOEventContext for the
- * discovery to fail.
+ * This resolver can be removed once we move to the API refactoring
+ *
+ * @deprecated
  */
-public class MultipleEventContextsTestObject
+public class StreamingEntryPointResolverSet extends DefaultEntryPointResolverSet
 {
-
-    public void onCall(UMOEventContext context)
+    public StreamingEntryPointResolverSet()
     {
-        // nothing to do
+        addEntryPointResolver(new StreamingEntryPointResolver());
     }
-
-    public void doCall(UMOEventContext context)
-    {
-        // nothing to do
-    }
-
 }

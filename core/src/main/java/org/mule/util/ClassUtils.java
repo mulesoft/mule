@@ -10,6 +10,8 @@
 
 package org.mule.util;
 
+import org.mule.routing.filters.WildcardFilter;
+
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
@@ -31,7 +33,7 @@ import java.util.Set;
 
 /**
  * Extend the Apache Commons ClassUtils to provide additional functionality.
- *
+ * <p/>
  * <p>This class is useful for loading resources and classes in a fault tolerant manner
  * that works across different applications servers. The resource and classloading
  * methods are SecurityManager friendly.</p>
@@ -40,8 +42,10 @@ import java.util.Set;
 public class ClassUtils extends org.apache.commons.lang.ClassUtils
 {
     public static final Object[] NO_ARGS = new Object[]{};
+    public static final Class[] NO_ARGS_TYPE = new Class[]{};
 
     private static final Map wrapperToPrimitiveMap = new HashMap();
+
     static
     {
         wrapperToPrimitiveMap.put(Boolean.class, Boolean.TYPE);
@@ -74,7 +78,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * {@link Class#getClassLoader() ClassUtils.class.getClassLoader()}
      * <li>From the {@link Class#getClassLoader() callingClass.getClassLoader() }
      * </ul>
-     * 
+     *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      */
@@ -180,13 +184,13 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * {@link Class#getClassLoader() ClassLoaderUtil.class.getClassLoader()}
      * <li>From the {@link Class#getClassLoader() callingClass.getClassLoader() }
      * </ul>
-     * 
-     * @param className The name of the class to load
+     *
+     * @param className    The name of the class to load
      * @param callingClass The Class object of the calling object
      * @throws ClassNotFoundException If the class cannot be found anywhere.
      */
     public static Class loadClass(final String className, final Class callingClass)
-        throws ClassNotFoundException
+            throws ClassNotFoundException
     {
         Class clazz = (Class) AccessController.doPrivileged(new PrivilegedAction()
         {
@@ -265,9 +269,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return clazz;
     }
 
-    /**
-     * Prints the current classloader hierarchy - useful for debugging.
-     */
+    /** Prints the current classloader hierarchy - useful for debugging. */
     public static void printClassLoader()
     {
         System.out.println("ClassLoaderUtils.printClassLoader");
@@ -289,8 +291,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     public static Object instanciateClass(Class clazz, Object[] constructorArgs)
-        throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
-        IllegalAccessException, InvocationTargetException
+            throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
+            IllegalAccessException, InvocationTargetException
     {
         Class[] args;
         if (constructorArgs != null)
@@ -330,15 +332,15 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 argsString.append(args[i].getName()).append(", ");
             }
             throw new NoSuchMethodException("could not find constructor with matching arg params: "
-                            + argsString);
+                    + argsString);
         }
 
         return ctor.newInstance(constructorArgs);
     }
 
     public static Object instanciateClass(String name, Object[] constructorArgs)
-        throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
-        InstantiationException, IllegalAccessException, InvocationTargetException
+            throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
+            InstantiationException, IllegalAccessException, InvocationTargetException
     {
         Class clazz = loadClass(name, ClassUtils.class);
         return instanciateClass(clazz, constructorArgs);
@@ -346,8 +348,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     public static Object instanciateClass(String name, Object[] constructorArgs, Class callingClass)
-        throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
-        InstantiationException, IllegalAccessException, InvocationTargetException
+            throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
+            InstantiationException, IllegalAccessException, InvocationTargetException
     {
         Class clazz = loadClass(name, callingClass);
         return instanciateClass(clazz, constructorArgs);
@@ -377,9 +379,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      * Returns a matching method for the given name and parameters on the given class
      * If the parameterTypes arguments is null it will return the first matching
      * method on the class.
-     * 
-     * @param clazz the class to find the method on
-     * @param name the method name to find
+     *
+     * @param clazz          the class to find the method on
+     * @param name           the method name to find
      * @param parameterTypes an array of argument types or null
      * @return the Method object or null if none was found
      */
@@ -402,7 +404,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
         return null;
     }
-    
+
     public static Constructor getConstructor(Class clazz, Class[] paramTypes)
     {
         Constructor[] ctors = clazz.getConstructors();
@@ -435,14 +437,14 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     /**
      * A helper method that will find all matching methods on a class with the given
      * parameter type
-     * 
-     * @param implementation the class to build methods on
-     * @param parameterTypes the argument param types to look for
-     * @param voidOk whether void methods shouldbe included in the found list
-     * @param matchOnObject determines whether parameters of Object type are matched
-     *            when they are of Object.class type
+     *
+     * @param implementation     the class to build methods on
+     * @param parameterTypes     the argument param types to look for
+     * @param voidOk             whether void methods shouldbe included in the found list
+     * @param matchOnObject      determines whether parameters of Object type are matched
+     *                           when they are of Object.class type
      * @param ignoredMethodNames a Set of method names to ignore. Often 'equals' is
-     *            not a desired match. This argument can be null.
+     *                           not a desired match. This argument can be null.
      * @return a List of methods on the class that match the criteria. If there are
      *         none, an empty list is returned
      */
@@ -452,6 +454,32 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                                              boolean matchOnObject,
                                              Set ignoredMethodNames)
     {
+        return getSatisfiableMethods(implementation, parameterTypes, voidOk, matchOnObject, ignoredMethodNames, null);
+    }
+
+    /**
+     * A helper method that will find all matching methods on a class with the given
+     * parameter type
+     *
+     * @param implementation     the class to build methods on
+     * @param parameterTypes     the argument param types to look for
+     * @param voidOk             whether void methods shouldbe included in the found list
+     * @param matchOnObject      determines whether parameters of Object type are matched
+     *                           when they are of Object.class type
+     * @param ignoredMethodNames a Set of method names to ignore. Often 'equals' is
+     *                           not a desired match. This argument can be null.
+     * @return a List of methods on the class that match the criteria. If there are
+     *         none, an empty list is returned
+     */
+    public static List getSatisfiableMethods(Class implementation,
+                                             Class[] parameterTypes,
+                                             boolean voidOk,
+                                             boolean matchOnObject,
+                                             Set ignoredMethodNames,
+                                             WildcardFilter filter)
+    {
+
+
         List result = new ArrayList();
 
         if (ignoredMethodNames == null)
@@ -463,6 +491,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         for (int i = 0; i < methods.length; i++)
         {
             Method method = methods[i];
+            //supporting wildcards
+            if (filter != null && filter.accept(method.getName()))
+            {
+                continue;
+            }
             Class[] methodParams = method.getParameterTypes();
 
             if (compare(methodParams, parameterTypes, matchOnObject))
@@ -482,9 +515,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     }
 
     public static List getSatisfiableMethodsWithReturnType(Class implementation,
-                                             Class returnType,
-                                             boolean matchOnObject,
-                                             Set ignoredMethodNames)
+                                                           Class returnType,
+                                                           boolean matchOnObject,
+                                                           Set ignoredMethodNames)
     {
         List result = new ArrayList();
 
@@ -514,8 +547,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     /**
      * Can be used by serice endpoints to select which service to use based on what's
      * loaded on the classpath
-     * 
-     * @param className The class name to look for
+     *
+     * @param className    The class name to look for
      * @param currentClass the calling class
      * @return true if the class is on the path
      */
@@ -533,7 +566,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     /**
      * Used for creating an array of class types for an array or single object
-     * 
+     *
      * @param object single object or array
      * @return an array of class types for the object
      */
@@ -625,6 +658,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     /**
      * Provide a simple-to-understand class name (with access to only Java 1.4 API).
+     *
      * @param clazz The class whose name we will generate
      * @return A readable name for the class
      */
@@ -649,19 +683,30 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         try
         {
             encodedName.mark(1);
-            switch(encodedName.read())
+            switch (encodedName.read())
             {
-                case -1: return "null";
-                case 'Z': return "boolean";
-                case 'B': return "byte";
-                case 'C': return "char";
-                case 'D': return "double";
-                case 'F': return "float";
-                case 'I': return "int";
-                case 'J': return "long";
-                case 'S': return "short";
-                case '[': return classNameHelper(encodedName) + "[]";
-                case 'L': return shorten(new BufferedReader(encodedName).readLine());
+                case -1:
+                    return "null";
+                case 'Z':
+                    return "boolean";
+                case 'B':
+                    return "byte";
+                case 'C':
+                    return "char";
+                case 'D':
+                    return "double";
+                case 'F':
+                    return "float";
+                case 'I':
+                    return "int";
+                case 'J':
+                    return "long";
+                case 'S':
+                    return "short";
+                case '[':
+                    return classNameHelper(encodedName) + "[]";
+                case 'L':
+                    return shorten(new BufferedReader(encodedName).readLine());
                 default:
                     encodedName.reset();
                     return shorten(new BufferedReader(encodedName).readLine());

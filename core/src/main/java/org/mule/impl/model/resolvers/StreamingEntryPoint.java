@@ -54,25 +54,23 @@ public class StreamingEntryPoint implements UMOEntryPoint
         {
             inAndOut = true;
             List methods = ClassUtils.getSatisfiableMethods(component.getClass(), new Class[]{
-                InputStream.class, OutputStream.class}, true, false, null);
+                    InputStream.class, OutputStream.class}, true, false, null);
 
             if (methods.size() == 0)
             {
                 inAndOut = false;
                 methods = ClassUtils.getSatisfiableMethods(component.getClass(),
-                    new Class[]{InputStream.class}, true, false, null);
+                        new Class[]{InputStream.class}, true, false, null);
             }
 
             if (methods.size() == 0)
             {
-                throw new NoSatisfiableMethodsException(component, new Class[]{InputStream.class},
-                    new NoSatisfiableMethodsException(component, new Class[]{InputStream.class,
-                        OutputStream.class}));
+                throw new NoSatisfiableMethodsException(component, new Class[]{InputStream.class});
             }
             else if (methods.size() > 1)
             {
                 throw new TooManySatisfiableMethodsException(component, new Class[]{InputStream.class,
-                    OutputStream.class});
+                        OutputStream.class});
             }
             else
             {
@@ -98,7 +96,7 @@ public class StreamingEntryPoint implements UMOEntryPoint
             if (component instanceof StreamingService)
             {
                 result = streamingMethod.invoke(component, new Object[]{adapter.getInputStream(), out,
-                    context});
+                        context});
             }
             else if (inAndOut)
             {

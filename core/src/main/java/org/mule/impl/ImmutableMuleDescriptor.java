@@ -24,6 +24,7 @@ import org.mule.routing.response.ResponseRouterCollection;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -46,43 +47,31 @@ import java.util.Map;
 
 public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 {
-    /**
-     * The initial states that the component can be started in
-     */
+    /** The initial states that the component can be started in */
     public static final String INITIAL_STATE_STOPPED = "stopped";
     public static final String INITIAL_STATE_STARTED = "started";
     public static final String INITIAL_STATE_PAUSED = "paused";
 
-    /**
-     * holds the exception stategy for this UMO
-     */
+    /** holds the exception stategy for this UMO */
     protected ExceptionListener exceptionListener;
 
-    /**
-     * Factory which creates an instance of the actual service object.
-     */
+    /** Factory which creates an instance of the actual service object. */
     protected ObjectFactory serviceFactory;
 
-    /**
-     * The descriptor name
-     */
+    /** The descriptor name */
     protected String name;
 
     /**
      * The properties for the Mule UMO.
-     * 
+     *
      * @deprecated MULE-1933 Properties for the underlying service should be set on the ServiceFactory instead.
      */
     protected Map properties = new HashMap();
 
-    /**
-     * The descriptors version
-     */
+    /** The descriptors version */
     protected String version = "1.0";
 
-    /**
-     * A list of UMOinteceptors that will be executed when the Mule UMO executed
-     */
+    /** A list of UMOinteceptors that will be executed when the Mule UMO executed */
     protected List intecerptorList = new CopyOnWriteArrayList();
 
     protected UMOInboundRouterCollection inboundRouter;
@@ -117,21 +106,19 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     protected String initialState = INITIAL_STATE_STARTED;
 
-    /**
-     * Determines if this component is a singleton
-     */
+    /** Determines if this component is a singleton */
     protected boolean singleton = false;
 
     protected List initialisationCallbacks = new ArrayList();
 
     protected String registryId = null;
 
-    /**
-     * The name of the model that this descriptor is associated with
-     */
+    /** The name of the model that this descriptor is associated with */
     protected String modelName;
 
     protected UMOManagementContext managementContext;
+
+    protected UMOEntryPointResolverSet entryPointResolverSet;
 
     /**
      * Default constructor. Initalises common properties for the MuleConfiguration
@@ -156,6 +143,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         initialState = descriptor.getInitialState();
         singleton = descriptor.isSingleton();
         modelName = descriptor.getModelName();
+        entryPointResolverSet = descriptor.getEntryPointResolverSet();
     }
 
     /**
@@ -260,9 +248,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return intecerptorList;
     }
 
-    /**
-     * Factory which creates an instance of the actual service object.
-     */
+    /** Factory which creates an instance of the actual service object. */
     public ObjectFactory getServiceFactory()
     {
         return serviceFactory;
@@ -337,6 +323,18 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return modelName;
     }
 
+    /**
+     * A descriptor can have a custom entrypoint resolver for its own object.
+     * By default this is null. When set this resolver will override the resolver on the model
+     *
+     * @return Null is a resolver set has not been set otherwise the resolver to use
+     *         on this component
+     */
+    public UMOEntryPointResolverSet getEntryPointResolverSet()
+    {
+        return entryPointResolverSet;
+    }
+
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();
@@ -350,6 +348,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         sb.append(", initialState='").append(initialState).append('\'');
         sb.append(", singleton=").append(singleton);
         sb.append(", modelName='").append(modelName).append('\'');
+        sb.append(", entryPointResolver='").append(entryPointResolverSet).append('\'');
         sb.append('}');
         return sb.toString();
     }

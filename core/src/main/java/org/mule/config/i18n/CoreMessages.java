@@ -15,6 +15,7 @@ import org.mule.impl.AbstractExceptionListener;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseRouterCollection;
@@ -213,14 +214,14 @@ public class CoreMessages extends MessageFactory
     public static Message transformUnexpectedType(Class class1, Class returnClass)
     {
         return createMessage(BUNDLE_PATH, 53, ClassUtils.getSimpleName(class1),
-                             ClassUtils.getSimpleName(returnClass));
+                ClassUtils.getSimpleName(returnClass));
     }
 
     public static Message transformOnObjectUnsupportedTypeOfEndpoint(String name, Class class1,
                                                                      UMOImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 54, name, StringMessageUtils.toString(class1),
-                             (endpoint != null ? endpoint.getEndpointURI() : null));
+                (endpoint != null ? endpoint.getEndpointURI() : null));
     }
 
     public static Message transformFailedFrom(Class clazz)
@@ -251,14 +252,14 @@ public class CoreMessages extends MessageFactory
     public static Message tooManyAcceptableMethodsOnObjectForTypes(Object object, Object types)
     {
         return createMessage(BUNDLE_PATH, 60, StringMessageUtils.toString(object),
-                             StringMessageUtils.toString(types));
+                StringMessageUtils.toString(types));
     }
 
     public static Message cannotSetPropertyOnObjectWithParamType(String property,
                                                                  Class class1, Class class2)
     {
         return createMessage(BUNDLE_PATH, 61, property, StringMessageUtils.toString(class1),
-                             StringMessageUtils.toString(class2));
+                StringMessageUtils.toString(class2));
     }
 
     public static Message noComponentForEndpoint()
@@ -464,7 +465,7 @@ public class CoreMessages extends MessageFactory
     public static Message methodWithParamsNotFoundOnObject(String method, Object class1, Class class2)
     {
         return createMessage(BUNDLE_PATH, 109, method, StringMessageUtils.toString(class1),
-                             StringMessageUtils.toString(class2));
+                StringMessageUtils.toString(class2));
     }
 
     public static Message transformFailed(String from, String to)
@@ -485,7 +486,7 @@ public class CoreMessages extends MessageFactory
     public static Message noEntryPointFoundWithArgs(Object object, Object args)
     {
         return createMessage(BUNDLE_PATH, 116, StringMessageUtils.toString(object),
-                             StringMessageUtils.toString(args));
+                StringMessageUtils.toString(args));
     }
 
     public static Message authNoSecurityProvider(String providerName)
@@ -607,7 +608,7 @@ public class CoreMessages extends MessageFactory
                                                      Class actual)
     {
         return createMessage(BUNDLE_PATH, 157, property, StringMessageUtils.toString(expected),
-                             StringMessageUtils.toString(actual));
+                StringMessageUtils.toString(actual));
     }
 
     public static Message containerAlreadyRegistered(String name)
@@ -698,7 +699,7 @@ public class CoreMessages extends MessageFactory
     public static Message objectNotOfCorrectType(Class actualClass, Class expectedClass)
     {
         return createMessage(BUNDLE_PATH, 185, StringMessageUtils.toString(actualClass),
-                             StringMessageUtils.toString(expectedClass));
+                StringMessageUtils.toString(expectedClass));
     }
 
     public static Message failedToConvertStringUsingEncoding(String encoding)
@@ -799,7 +800,7 @@ public class CoreMessages extends MessageFactory
     public static Message tooManyMatchingMethodsOnObjectWhichReturn(Object object, Object returnType)
     {
         return createMessage(BUNDLE_PATH, 216, StringMessageUtils.toString(object),
-                             StringMessageUtils.toString(returnType));
+                StringMessageUtils.toString(returnType));
     }
 
     public static Message failedToSetProxyOnService(Object proxy, Class routerClass)
@@ -820,7 +821,7 @@ public class CoreMessages extends MessageFactory
     public static Message noMatchingMethodsOnObjectReturning(Object object, Class returnType)
     {
         return createMessage(BUNDLE_PATH, 220, StringMessageUtils.toString(object),
-                             StringMessageUtils.toString(returnType));
+                StringMessageUtils.toString(returnType));
     }
 
     public static Message moreThanOneConnectorWithProtocol(String protocol)
@@ -895,6 +896,52 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 235, endpoint, exceptionListener);
     }
 
+
+    public static Message noEntryPointFoundForNoArgsMethodUsingResolver(final Object component, final String methodName, UMOEntryPointResolver resolver)
+    {
+        return createMessage(BUNDLE_PATH, 239, methodName, component, resolver);
+    }
+
+    public static Message noEntryPointFoundWithArgsUsingResolver(Object object, Object args, UMOEntryPointResolver resolver)
+    {
+        return createMessage(BUNDLE_PATH, 240, StringMessageUtils.toString(object),
+                StringMessageUtils.toString(args), resolver);
+    }
+
+    public static Message noMatchingMethodsOnObjectReturningUsingResolver(Object object, Class returnType, UMOEntryPointResolver resolver)
+    {
+        return createMessage(BUNDLE_PATH, 241, StringMessageUtils.toString(object),
+                returnType.getClass().getName(), resolver);
+    }
+
+    public static Message tooManyAcceptableMethodsOnObjectUsingResolverForTypes(Object object, Object types, UMOEntryPointResolver resolver)
+    {
+        return createMessage(BUNDLE_PATH, 242, StringMessageUtils.toString(object),
+                StringMessageUtils.toString(types), resolver);
+    }
+
+    public static Message tooManyMatchingMethodsOnObjectUsingResolverWhichReturn(Object object, Object returnType, UMOEntryPointResolver resolver)
+    {
+        return createMessage(BUNDLE_PATH, 243, StringMessageUtils.toString(returnType),
+                StringMessageUtils.toString(object), resolver);
+    }
+
+    public static Message objectDoesNotImplementInterface(Object object, Class interfaceClass)
+    {
+        return createMessage(BUNDLE_PATH, 244, StringMessageUtils.toString(object), interfaceClass);
+    }
+
+    public static Message invocationSuccessfulCantSetError()
+    {
+        return createMessage(BUNDLE_PATH, 245);
+    }
+
+    public static Message noMatchingMethodsOnObjectCalledUsingResolver(Object object, String methodName, UMOEntryPointResolver resolver)
+    {
+        return createMessage(BUNDLE_PATH, 246, StringMessageUtils.toString(object),
+                methodName, resolver);
+    }
+
     /**
      * Returns a message that is a product informatin.
      *
@@ -905,8 +952,8 @@ public class CoreMessages extends MessageFactory
         MuleManifest config = new MuleManifest();
         String notset = CoreMessages.notSet().getMessage();
         return createMessage(BUNDLE_PATH, 236, StringUtils.defaultString(config.getProductDescription(), notset),
-                             StringUtils.defaultString(config.getProductVersion(), notset),
-                             StringUtils.defaultString(config.getVendorName(), notset) + " " + StringUtils.defaultString(config.getVendorUrl(), notset));
+                StringUtils.defaultString(config.getProductVersion(), notset),
+                StringUtils.defaultString(config.getVendorName(), notset) + " " + StringUtils.defaultString(config.getVendorUrl(), notset));
     }
 
 

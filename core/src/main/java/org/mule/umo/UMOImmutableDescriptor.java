@@ -10,13 +10,14 @@
 
 package org.mule.umo;
 
+import org.mule.config.PoolingProfile;
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.object.ObjectFactory;
-import org.mule.config.PoolingProfile;
 
 import java.beans.ExceptionListener;
 import java.util.List;
@@ -47,7 +48,6 @@ public interface UMOImmutableDescriptor extends Initialisable
      * Returns any properties configured on this descriptor.
      *
      * @return properties defined for the descriptor.
-     * 
      * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
      */
     Map getProperties();
@@ -69,9 +69,7 @@ public interface UMOImmutableDescriptor extends Initialisable
      */
     String getVersion();
 
-    /**
-     * @return Factory which creates an instance of the actual service object.
-     */
+    /** @return Factory which creates an instance of the actual service object. */
     ObjectFactory getServiceFactory();
 
     /**
@@ -128,10 +126,21 @@ public interface UMOImmutableDescriptor extends Initialisable
 
     /**
      * Returns the name of the model that this descriptor is registered with.
+     *
      * @return the name of the model that this descriptor is registered with or null
-     * if this descriptor has not been registered with a model yet
+     *         if this descriptor has not been registered with a model yet
      */
     String getModelName();
+
     PoolingProfile getPoolingProfile();
+
+    /**
+     * A descriptor can have a custom entrypoint resolver for its own object.
+     * By default this is null. When set this resolver will override the resolver on the model
+     *
+     * @return Null is a resolver set has not been set otherwise the resolver to use
+     *         on this component
+     */
+    UMOEntryPointResolverSet getEntryPointResolverSet();
 
 }

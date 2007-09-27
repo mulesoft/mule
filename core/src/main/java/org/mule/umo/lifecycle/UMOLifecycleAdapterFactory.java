@@ -12,13 +12,11 @@ package org.mule.umo.lifecycle;
 
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOEntryPointResolver;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 
-/**
- * <code>UMOLifecycleAdapterFactory</code> TODO (document class)
- */
+/** <code>UMOLifecycleAdapterFactory</code> TODO (document class) */
 public interface UMOLifecycleAdapterFactory
 {
-    UMOLifecycleAdapter create(Object component, UMODescriptor descriptor, UMOEntryPointResolver resolver)
-        throws UMOException;
+    UMOLifecycleAdapter create(Object component, UMODescriptor descriptor, UMOEntryPointResolverSet resolver)
+            throws UMOException;
 }

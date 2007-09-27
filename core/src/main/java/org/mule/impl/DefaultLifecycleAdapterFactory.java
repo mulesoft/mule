@@ -14,7 +14,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
-import org.mule.umo.model.UMOEntryPointResolver;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 
 /**
  * <code>DefaultLifecycleAdapterFactory</code> creates a DefaultLifeCycleAdapter.  Users can
@@ -41,7 +41,7 @@ public class DefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFactor
      */
     public UMOLifecycleAdapter create(Object component,
                                       UMODescriptor descriptor,
-                                      UMOEntryPointResolver resolver) throws UMOException
+                                      UMOEntryPointResolverSet resolver) throws UMOException
     {
         return new DefaultLifecycleAdapter(component, descriptor, resolver);
     }

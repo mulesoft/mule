@@ -11,14 +11,13 @@
 package org.mule.tck;
 
 import org.mule.impl.AbstractExceptionListener;
-import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.tck.testmodels.mule.TestEntryPointResolver;
+import org.mule.tck.testmodels.mule.TestEntryPointResolverSet;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformers.TransformerUtils;
@@ -125,7 +124,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         UMOModel model = managementContext.getRegistry().lookupModel("main");
         assertNotNull(model);
         assertEquals("main", model.getName());
-        assertTrue(model.getEntryPointResolver() instanceof TestEntryPointResolver);
+        assertTrue(model.getEntryPointResolverSet() instanceof TestEntryPointResolverSet);
         assertTrue(model.getExceptionListener() instanceof TestExceptionStrategy);
 
         assertTrue(((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().size() > 0);

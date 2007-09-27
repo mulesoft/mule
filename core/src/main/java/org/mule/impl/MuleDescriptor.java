@@ -16,6 +16,7 @@ import org.mule.config.ThreadingProfile;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOManagementContext;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -35,9 +36,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescriptor
 {
-    /**
-     * logger used by this class
-     */
+    /** logger used by this class */
     private static Log logger = LogFactory.getLog(MuleDescriptor.class);
 
     public MuleDescriptor(String name)
@@ -142,9 +141,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         this.intecerptorList = inteceptorList;
     }
 
-    /**
-     * Factory which creates an instance of the actual service object.
-     */
+    /** Factory which creates an instance of the actual service object. */
     public void setServiceFactory(ObjectFactory serviceFactory)
     {
         if (serviceFactory == null)
@@ -223,25 +220,15 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         this.managementContext = context;
     }
 
-
-    //@java.lang.Override
-//    public void initialise() throws InitialisationException
-//    {
-//        super.initialise();
-//        if(StringUtils.isNotEmpty(modelName))
-//        {
-//            UMOModel model = managementContext.getRegistry().lookupModel(modelName);
-//            if(model!=null)
-//            {
-//                try
-//                {
-//                    model.registerComponent(this);
-//                }
-//                catch (UMOException e)
-//                {
-//                    throw new InitialisationException(e, this);
-//                }
-//            }
-//        }
-//    }
+    /**
+     * A descriptor can have a custom entrypoint resolver for its own object.
+     * By default this is null. When set this resolver will override the resolver on the model
+     *
+     * @param resolverSet theresolver set to use when resolving entry points
+     *                    on this component
+     */
+    public void setEntryPointResolverSet(UMOEntryPointResolverSet resolverSet)
+    {
+        this.entryPointResolverSet = entryPointResolverSet;
+    }
 }

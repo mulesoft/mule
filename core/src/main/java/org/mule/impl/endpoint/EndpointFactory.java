@@ -26,9 +26,7 @@ import org.apache.commons.logging.LogFactory;
 public class EndpointFactory implements UMOEndpointFactory
 {
 
-    /**
-     * logger used by this class
-     */
+    /** logger used by this class */
     protected static final Log logger = LogFactory.getLog(EndpointFactory.class);
 
     public static final int GET_OR_CREATE_CONNECTOR = 0;
@@ -37,7 +35,7 @@ public class EndpointFactory implements UMOEndpointFactory
     public static final int USE_CONNECTOR = 3;
 
     public UMOImmutableEndpoint createInboundEndpoint(String uri, UMOManagementContext managementContext)
-        throws UMOException
+            throws UMOException
     {
         UMOImmutableEndpoint globalEndpoint = lookupEndpoint(uri);
         UMOImmutableEndpoint endpoint = null;
@@ -55,7 +53,7 @@ public class EndpointFactory implements UMOEndpointFactory
     }
 
     public UMOImmutableEndpoint createOutboundEndpoint(String uri, UMOManagementContext managementContext)
-        throws UMOException
+            throws UMOException
     {
         UMOImmutableEndpoint globalEndpoint = lookupEndpoint(uri);
         UMOImmutableEndpoint endpoint = null;
@@ -73,7 +71,7 @@ public class EndpointFactory implements UMOEndpointFactory
     }
 
     public UMOImmutableEndpoint createResponseEndpoint(String uri, UMOManagementContext managementContext)
-        throws UMOException
+            throws UMOException
     {
         UMOImmutableEndpoint globalEndpoint = lookupEndpoint(uri);
         UMOImmutableEndpoint endpoint = null;
@@ -90,14 +88,16 @@ public class EndpointFactory implements UMOEndpointFactory
         return endpoint;
     }
 
-    /**
-     * @deprecated
-     */
+    /** @deprecated  */
     public UMOImmutableEndpoint createEndpoint(UMOEndpointURI uri,
                                                String type,
                                                UMOManagementContext managementContext) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = lookupEndpoint(uri.getEndpointName());
+        UMOImmutableEndpoint endpoint = null;
+        if (uri.getEndpointName() != null)
+        {
+            endpoint = lookupEndpoint(uri.getEndpointName());
+        }
         if (endpoint == null)
         {
             endpoint = buidNewEndpoint(uri, type, managementContext);
@@ -113,7 +113,7 @@ public class EndpointFactory implements UMOEndpointFactory
     protected UMOImmutableEndpoint buidNewEndpoint(UMOEndpointURI uri,
                                                    String type,
                                                    UMOManagementContext managementContext)
-        throws InitialisationException, EndpointException
+            throws InitialisationException, EndpointException
     {
         UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
@@ -138,7 +138,7 @@ public class EndpointFactory implements UMOEndpointFactory
     protected UMOImmutableEndpoint buidNewInboundEndpoint(UMOEndpointURI uri,
                                                           String type,
                                                           UMOManagementContext managementContext)
-        throws InitialisationException, EndpointException
+            throws InitialisationException, EndpointException
     {
         UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         return endpointBuilder.buildInboundEndpoint();
@@ -147,7 +147,7 @@ public class EndpointFactory implements UMOEndpointFactory
     protected UMOImmutableEndpoint buidNewOutboundEndpoint(UMOEndpointURI uri,
                                                            String type,
                                                            UMOManagementContext managementContext)
-        throws InitialisationException, EndpointException
+            throws InitialisationException, EndpointException
     {
         UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         return endpointBuilder.buildOutboundEndpoint();
@@ -156,7 +156,7 @@ public class EndpointFactory implements UMOEndpointFactory
     protected UMOImmutableEndpoint buidNewResponeEndpoint(UMOEndpointURI uri,
                                                           String type,
                                                           UMOManagementContext managementContext)
-        throws InitialisationException, EndpointException
+            throws InitialisationException, EndpointException
     {
         UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         return endpointBuilder.buildResponseEndpoint();

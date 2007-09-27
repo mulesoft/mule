@@ -12,13 +12,12 @@ package org.mule.impl.model.streaming;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
 import org.mule.impl.model.resolvers.StreamingEntryPointResolver;
+import org.mule.impl.model.resolvers.StreamingEntryPointResolverSet;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.model.UMOEntryPointResolver;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 
-/**
- * TODO
- */
+/** TODO */
 public class StreamingModel extends AbstractModel
 {
 
@@ -27,7 +26,7 @@ public class StreamingModel extends AbstractModel
     {
         super();
         //Set this entrypoint respolver by default
-        setEntryPointResolver(new StreamingEntryPointResolver());
+        getEntryPointResolverSet().addEntryPointResolver(new StreamingEntryPointResolver());
     }
 
     protected UMOComponent createComponent(UMODescriptor descriptor)
@@ -46,13 +45,13 @@ public class StreamingModel extends AbstractModel
     *
     * @see org.mule.umo.model.UMOModel#setEntryPointResolver(org.mule.umo.model.UMOEntryPointResolver)
     */
-    public void setEntryPointResolver(UMOEntryPointResolver entryPointResolver)
+    public void setEntryPointResolverSet(UMOEntryPointResolverSet entryPointResolver)
     {
-        if (!(entryPointResolver instanceof StreamingEntryPointResolver))
+        if (!(entryPointResolver instanceof StreamingEntryPointResolverSet))
         {
             throw new IllegalArgumentException("EntrypointResolver needs to be an instance of " + StreamingEntryPointResolver.class.getName());
         }
-        super.setEntryPointResolver(entryPointResolver);
+        super.setEntryPointResolverSet(entryPointResolver);
     }
-    
+
 }

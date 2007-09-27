@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-spring-configuration.dtd">
+        "http://mule.mulesource.org/dtds/mule-spring-configuration.dtd">
 
 
 <mule-configuration id="Test_Mule_Properties" version="1.0">
@@ -15,11 +15,12 @@
     </environment-properties>
 
     <mule-environment-properties
-        synchronous="false"
-        model="main">
+            synchronous="false"
+            model="main">
         <threading-profile id="default" maxBufferSize="0" maxThreadsActive="8"
-            maxThreadsIdle="4" poolExhaustedAction="WAIT" threadTTL="60001"/>
-        <pooling-profile exhaustedAction="WAIT" maxActive="8" maxIdle="4" maxWait="4000" initialisationPolicy="INITIALISE_FIRST"/>
+                           maxThreadsIdle="4" poolExhaustedAction="WAIT" threadTTL="60001"/>
+        <pooling-profile exhaustedAction="WAIT" maxActive="8" maxIdle="4" maxWait="4000"
+                         initialisationPolicy="INITIALISE_FIRST"/>
         <queue-profile maxOutstandingMessages="100" persistent="true"/>
         <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/>
     </mule-environment-properties>
@@ -48,15 +49,16 @@
     </endpoint-identifiers>
 
     <transformers>
-        <transformer name="TestCompressionTransformer" className="org.mule.tck.testmodels.mule.TestCompressionTransformer"
-            returnClass="java.lang.String">
+        <transformer name="TestCompressionTransformer"
+                     className="org.mule.tck.testmodels.mule.TestCompressionTransformer"
+                     returnClass="java.lang.String">
             <properties>
                 <property name="org.mule.useManagerProperties" value="true"/>
                 <property name="beanProperty2" value="12"/>
                 <container-property name="containerProperty" reference="string"/>
             </properties>
         </transformer>
-        <transformer name="Default" className="org.mule.transformers.NoActionTransformer" />
+        <transformer name="Default" className="org.mule.transformers.NoActionTransformer"/>
     </transformers>
 
     <global-endpoints>
@@ -86,24 +88,26 @@
     </interceptor-stack>
 
     <model name="main">
-        <entry-point-resolver className="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
+        <entry-point-resolver className="org.mule.tck.testmodels.mule.TestEntryPointResolverSet"/>
 
-        <component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/>
+        <component-lifecycle-adapter-factory
+                className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/>
 
         <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy">
             <endpoint address=" test://component.exceptions "/>
         </exception-strategy>
 
         <mule-descriptor name="orangeComponent"
-            inboundEndpoint="Test Queue"
-            implementation="orange"
-            container="descriptor">
+                         inboundEndpoint="Test Queue"
+                         implementation="orange"
+                         container="descriptor">
 
             <inbound-router>
                 <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
                     <endpoint connector="dummyConnector" address="test://catch.all"/>
                 </catch-all-strategy>
-                <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer" responseTransformers="TestCompressionTransformer"/>
+                <endpoint name="Orange" type="receiver" address="test://orange/"
+                          transformers="TestCompressionTransformer" responseTransformers="TestCompressionTransformer"/>
                 <global-endpoint name="orangeEndpoint" transformers="TestCompressionTransformer">
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="java.lang.String"/>
                     <properties>
@@ -120,14 +124,14 @@
                     <endpoint address="test://do.polish"/>
                 </binding>
             </nested-router>
-            
+
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
                     <global-endpoint name="appleInEndpoint" transformers="TestCompressionTransformer"/>
                 </router>
             </outbound-router>
 
-            <response-router timeout="10001" >
+            <response-router timeout="10001">
                 <endpoint address="test://response1"/>
                 <global-endpoint name="appleResponseEndpoint"/>
                 <router className="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
@@ -163,7 +167,7 @@
         </mule-descriptor>
 
         <mule-descriptor name="appleComponent"
-            implementation="org.mule.tck.testmodels.fruit.Apple">
+                         implementation="org.mule.tck.testmodels.fruit.Apple">
             <inbound-router>
                 <catch-all-strategy className="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <global-endpoint name="appleInEndpoint"/>
@@ -196,8 +200,8 @@
             <exception-strategy className="org.mule.impl.DefaultExceptionStrategy"/>
         </mule-descriptor>
     </model>
-    
-    <import resource="classpath:test-application-context.xml"/> 
-    <import resource="classpath:test-application-context-2.xml"/> 
-    
+
+    <import resource="classpath:test-application-context.xml"/>
+    <import resource="classpath:test-application-context-2.xml"/>
+
 </mule-configuration>

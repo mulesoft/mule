@@ -14,14 +14,14 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
-import org.mule.umo.model.UMOEntryPointResolver;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 
 
 public class TestDefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFactory
 {
 
     /**
-     * 
+     *
      */
     public TestDefaultLifecycleAdapterFactory()
     {
@@ -36,7 +36,7 @@ public class TestDefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFa
      */
     public UMOLifecycleAdapter create(Object component,
                                       UMODescriptor descriptor,
-                                      UMOEntryPointResolver resolver) throws UMOException
+                                      UMOEntryPointResolverSet resolver) throws UMOException
     {
         return new TestDefaultLifecycleAdapter(component, descriptor, resolver);
     }

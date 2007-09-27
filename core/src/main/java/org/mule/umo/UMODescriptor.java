@@ -12,6 +12,7 @@ package org.mule.umo;
 
 import org.mule.config.PoolingProfile;
 import org.mule.impl.ManagementContextAware;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -52,7 +53,7 @@ public interface UMODescriptor extends UMOImmutableDescriptor, ManagementContext
      * The exception strategy to use to handle exceptions in the Mule UMO.
      *
      * @param listener the exception strategy to use. If none has been set or
-     *            argument is null a default
+     *                 argument is null a default
      */
     void setExceptionListener(ExceptionListener listener);
 
@@ -65,9 +66,8 @@ public interface UMODescriptor extends UMOImmutableDescriptor, ManagementContext
 
     /**
      * @param props the properties for the descriptor. These will be passed to the
-     *            UMO when it's initialise method is called or set as bean properties
-     *            whe the UMO is created
-     *            
+     *              UMO when it's initialise method is called or set as bean properties
+     *              whe the UMO is created
      * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
      */
     void setProperties(Map props);
@@ -80,9 +80,7 @@ public interface UMODescriptor extends UMOImmutableDescriptor, ManagementContext
      */
     void setVersion(String ver);
 
-    /**
-     * @param Factory which creates an instance of the actual service object.
-     */
+    /** @param Factory which creates an instance of the actual service object. */
     void setServiceFactory(ObjectFactory serviceFactory);
 
     /**
@@ -141,10 +139,20 @@ public interface UMODescriptor extends UMOImmutableDescriptor, ManagementContext
 
     /**
      * Sets the Model name that this descriptor is registered within.
+     *
      * @param modelName name of the model
      */
     void setModelName(String modelName);
 
     void setPoolingProfile(PoolingProfile profile);
-    
+
+    /**
+     * A descriptor can have a custom entrypoint resolver for its own object.
+     * By default this is null. When set this resolver will override the resolver on the model
+     *
+     * @param resolverSet theresolver set to use when resolving entry points
+     *                    on this component
+     */
+    void setEntryPointResolverSet(UMOEntryPointResolverSet resolverSet);
+
 }

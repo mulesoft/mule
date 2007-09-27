@@ -13,11 +13,9 @@ package org.mule.tck.testmodels.mule;
 import org.mule.impl.DefaultLifecycleAdapter;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOEntryPointResolver;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 
-/**
- * <code>TestDefaultLifecycleAdapter</code> TODO document
- */
+/** <code>TestDefaultLifecycleAdapter</code> TODO document */
 public class TestDefaultLifecycleAdapter extends DefaultLifecycleAdapter
 {
     /**
@@ -38,7 +36,7 @@ public class TestDefaultLifecycleAdapter extends DefaultLifecycleAdapter
      */
     public TestDefaultLifecycleAdapter(Object component,
                                        UMODescriptor descriptor,
-                                       UMOEntryPointResolver epResolver) throws UMOException
+                                       UMOEntryPointResolverSet epResolver) throws UMOException
     {
         super(component, descriptor, epResolver);
     }

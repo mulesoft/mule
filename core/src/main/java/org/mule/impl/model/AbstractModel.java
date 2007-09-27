@@ -16,7 +16,7 @@ import org.mule.impl.DefaultLifecycleAdapterFactory;
 import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.MuleSession;
 import org.mule.impl.internal.notifications.ModelNotification;
-import org.mule.impl.model.resolvers.DynamicEntryPointResolver;
+import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -27,7 +27,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.ModelException;
-import org.mule.umo.model.UMOEntryPointResolver;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.model.UMOModel;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
@@ -50,22 +50,18 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractModel implements UMOModel
 {
     public static final String DEFAULT_MODEL_NAME = "main";
-    /**
-     * logger used by this class
-     */
+    /** logger used by this class */
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private String name = DEFAULT_MODEL_NAME;
-    private UMOEntryPointResolver entryPointResolver = new DynamicEntryPointResolver();
+    private UMOEntryPointResolverSet entryPointResolverSet = new LegacyEntryPointResolverSet();
     private UMOLifecycleAdapterFactory lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
 
     private Map components = new ConcurrentSkipListMap();
 
     protected UMOManagementContext managementContext;
 
-    /**
-     * Collection for mule descriptors registered in this Manager
-     */
+    /** Collection for mule descriptors registered in this Manager */
     protected Map descriptors = new ConcurrentHashMap();
 
     private AtomicBoolean initialised = new AtomicBoolean(false);
@@ -74,14 +70,12 @@ public abstract class AbstractModel implements UMOModel
 
     private ExceptionListener exceptionListener = new DefaultComponentExceptionStrategy();
 
-    /**
-     * Default constructor
-     */
+    /** Default constructor */
     public AbstractModel()
     {
         // Always set default entrypoint resolver, lifecycle and compoenent
         // resolver and exceptionstrategy.
-        entryPointResolver = new DynamicEntryPointResolver();
+        entryPointResolverSet = new LegacyEntryPointResolverSet();
         lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
         components = new ConcurrentSkipListMap();
         descriptors = new ConcurrentHashMap();
@@ -113,9 +107,9 @@ public abstract class AbstractModel implements UMOModel
      * 
      * @see org.mule.umo.model.UMOModel#getEntryPointResolver()
      */
-    public UMOEntryPointResolver getEntryPointResolver()
+    public UMOEntryPointResolverSet getEntryPointResolverSet()
     {
-        return entryPointResolver;
+        return entryPointResolverSet;
     }
 
     /*
@@ -123,9 +117,9 @@ public abstract class AbstractModel implements UMOModel
      * 
      * @see org.mule.umo.model.UMOModel#setEntryPointResolver(org.mule.umo.model.UMOEntryPointResolver)
      */
-    public void setEntryPointResolver(UMOEntryPointResolver entryPointResolver)
+    public void setEntryPointResolverSet(UMOEntryPointResolverSet entryPointResolverSet)
     {
-        this.entryPointResolver = entryPointResolver;
+        this.entryPointResolverSet = entryPointResolverSet;
     }
 
     /*
@@ -150,11 +144,11 @@ public abstract class AbstractModel implements UMOModel
             throw new ModelException(CoreMessages.objectIsNull("UMO Descriptor"));
         }
 
-        if(descriptor.getModelName()==null)
+        if (descriptor.getModelName() == null)
         {
             descriptor.setModelName(getName());
         }
-        else if(!descriptor.getModelName().equals(getName()))
+        else if (!descriptor.getModelName().equals(getName()))
         {
             throw new ModelException(CoreMessages.modelNameDoesNotMatchModel(descriptor, getName()));
         }
@@ -170,7 +164,7 @@ public abstract class AbstractModel implements UMOModel
         {
             throw new ModelException(CoreMessages.descriptorAlreadyExists(descriptor.getName()));
         }
-        
+
         UMOComponent component = (UMOComponent) components.get(descriptor.getName());
 
         if (component == null)
@@ -237,9 +231,7 @@ public abstract class AbstractModel implements UMOModel
         this.lifecycleAdapterFactory = lifecycleAdapterFactory;
     }
 
-    /**
-     * Destroys any current components
-     */
+    /** Destroys any current components */
     public void dispose()
     {
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSING));

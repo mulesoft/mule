@@ -84,7 +84,7 @@
             <outbound-endpoint address=" test://component.exceptions "/>
         </custom-exception-strategy>
 
-        <custom-entrypoint-resolver class="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
+        <custom-entrypoint-resolver class="org.mule.tck.testmodels.mule.TestEntryPointResolverSet"/>
 
         <service name="orangeComponent">
             <component scope="singleton" instance-ref="orange"/>

@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.models;
 
-import org.mule.MuleManager;
 import org.mule.impl.model.seda.SedaModel;
 
 public class SedaPipelineComponentPerRequestTestCase extends SedaPipelineTestCase
@@ -20,7 +19,7 @@ public class SedaPipelineComponentPerRequestTestCase extends SedaPipelineTestCas
     protected void doPostFunctionalSetUp() throws Exception
     {
         //TODO: this should be configurable from the XML in Mule 2.0
-        SedaModel model = (SedaModel)MuleManager.getInstance().lookupModel("main");
+        SedaModel model = (SedaModel)managementContext.getRegistry().lookupModel("main");
         model.setComponentPerRequest(true);
         model.setEnablePooling(false);
     }

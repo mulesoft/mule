@@ -12,7 +12,6 @@ package org.mule.test.integration.providers.jdbc;
 
 
 import org.mule.RegistryContext;
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpoint;

@@ -33,6 +33,8 @@ import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 import org.mule.util.concurrent.Latch;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -42,15 +44,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import junit.framework.TestCase;
+import junit.framework.TestResult;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
@@ -64,13 +64,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      * test case recycle. This is required, e.g. to play nice with transaction manager
      * recovery service object store.
      */
-    public static final String[] IGNORED_DOT_MULE_DIRS = new String[] {"transaction-log"};
+    public static final String[] IGNORED_DOT_MULE_DIRS = new String[]{"transaction-log"};
 
     protected static UMOManagementContext managementContext;
 
-    /**
-     * This flag controls whether the text boxes will be logged when starting each test case.
-     */
+    /** This flag controls whether the text boxes will be logged when starting each test case. */
     private static final boolean verbose;
 
     // A Map of test case extension objects. JUnit creates a new TestCase instance for
@@ -80,9 +78,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     // A logger that should be suitable for most test cases.
     protected final transient Log logger = LogFactory.getLog(this.getClass());
 
-    /**
-     * Start the ManagementContext once it's configured (defaults to false for AbstractMuleTestCase, true for FunctionalTestCase).
-     */
+    /** Start the ManagementContext once it's configured (defaults to false for AbstractMuleTestCase, true for FunctionalTestCase). */
     private boolean startContext = false;
 
     // Should be set to a string message describing any prerequisites not met.
@@ -97,7 +93,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         if (StringUtils.isNotBlank(muleOpts))
         {
             Map parsedOpts = SystemUtils.parsePropertyDefinitions(muleOpts);
-            String optVerbose = (String)parsedOpts.get("mule.verbose");
+            String optVerbose = (String) parsedOpts.get("mule.verbose");
             verbose = Boolean.valueOf(optVerbose).booleanValue();
         }
         else
@@ -228,6 +224,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     /**
      * Should this test run?
+     *
      * @param testMethodName name of the test method
      * @return whether the test should execute in the current envionment
      */
@@ -241,7 +238,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         if (offline)
         {
             logger.warn(StringMessageUtils.getBoilerPlate(
-                "Working offline cannot run test: " + method, '=', 80));
+                    "Working offline cannot run test: " + method, '=', 80));
         }
         return offline;
     }
@@ -318,7 +315,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         // Should we set up the manager for every method?
         UMOManagementContext context;
-        if (getTestInfo().isDisposeManagerPerSuite() && managementContext!=null)
+        if (getTestInfo().isDisposeManagerPerSuite() && managementContext != null)
         {
             context = managementContext;
         }
@@ -343,17 +340,13 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return "";
     }
 
-    /**
-     * Run <strong>before</strong> any testcase setup.
-     */
+    /** Run <strong>before</strong> any testcase setup. */
     protected void suitePreSetUp() throws Exception
     {
         // nothing to do
     }
 
-    /**
-     * Run <strong>after</strong> all testcase teardowns.
-     */
+    /** Run <strong>after</strong> all testcase teardowns. */
     protected void suitePostTearDown() throws Exception
     {
         // nothing to do
@@ -459,7 +452,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     }
 
     public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOImmutableEndpoint endpoint)
-        throws UMOException
+            throws UMOException
     {
         return MuleTestUtils.getTestEvent(data, descriptor, endpoint);
     }
@@ -488,7 +481,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         return MuleTestUtils.getTestDescriptor(name, implementation, managementContext);
     }
-   
+
     public static class TestInfo
     {
         /**
@@ -596,7 +589,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         {
             StringBuffer buf = new StringBuffer();
             return buf.append(name).append(", (").append(runCount).append(" / ").append(testCount).append(
-                ") tests run, disposePerSuite=").append(disposeManagerPerSuite).toString();
+                    ") tests run, disposePerSuite=").append(disposeManagerPerSuite).toString();
         }
     }
 

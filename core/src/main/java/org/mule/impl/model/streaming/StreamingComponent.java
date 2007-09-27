@@ -15,6 +15,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.impl.model.ComponentFactory;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -23,16 +24,12 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.model.UMOEntryPoint;
+import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.model.UMOModel;
-import org.mule.util.CollectionUtils;
-import org.mule.transformers.TransformerUtils;
 
 import java.util.Iterator;
 
-/**
- * TODO
- */
+/** TODO */
 public class StreamingComponent extends AbstractComponent
 {
 
@@ -40,7 +37,7 @@ public class StreamingComponent extends AbstractComponent
 
     protected Object component;
 
-    protected UMOEntryPoint entryPoint;
+    protected UMOEntryPointResolverSet entryPointResolverSet;
 
     public StreamingComponent(MuleDescriptor descriptor, UMOModel model)
     {
@@ -72,7 +69,7 @@ public class StreamingComponent extends AbstractComponent
             if (TransformerUtils.isDefined(ep.getTransformers()))
             {
                 throw new InitialisationException(
-                    CoreMessages.streamingEndpointsDoNotSupportTransformers(), this);
+                        CoreMessages.streamingEndpointsDoNotSupportTransformers(), this);
             }
         }
         if (component instanceof Initialisable)
@@ -80,15 +77,10 @@ public class StreamingComponent extends AbstractComponent
             ((Initialisable) component).initialise();
         }
 
-        try
+        if (entryPointResolverSet == null)
         {
-            entryPoint = model.getEntryPointResolver().resolveEntryPoint(descriptor);
+            entryPointResolverSet = model.getEntryPointResolverSet();
         }
-        catch (Exception e)
-        {
-            throw new InitialisationException(e, this);
-        }
-
     }
 
     protected UMOMessage doSend(UMOEvent event) throws UMOException
@@ -102,7 +94,7 @@ public class StreamingComponent extends AbstractComponent
 
         try
         {
-            entryPoint.invoke(component, RequestContext.getEventContext());
+            entryPointResolverSet.invoke(component, RequestContext.getEventContext());
         }
         catch (UMOException e)
         {
