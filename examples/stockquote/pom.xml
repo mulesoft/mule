@@ -13,17 +13,6 @@
     <description>This example demonstrates how to invoke an ASPX web service from Mule and transform the result using XSLT and deserialise the result to a StockQuote javabean. The examples demonstrates invoking the service using REST and SOAP.</description>
 
     <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- server too busy 2007-08-22 -->
-                        <exclude>**/*StockQuoteFunctionalTestCase.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
         <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
         <resources>
             <resource>
