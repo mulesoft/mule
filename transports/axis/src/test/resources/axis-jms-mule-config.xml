@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
+
+    <spring:bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <spring:property name="brokerURL" value="vm://localhost?broker.persistence=true"/>
+    </spring:bean>
+
+    <!--
+    JmsConnector is used to send and receive information via the Jms channel
+    -->
+    
+    <!-- Testing with ActiveMq -->
+    <jms:connector name="jmsConnector" >
+        <jms:connection-factory instance-ref="jmsConnectionFactory"/>
+        <!-- property name="specification" value="1.1"/ -->
+    </jms:connector>
+
+    <model name="test">
+
+        <service name="mycomponent">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="axis:jms://mycomponent"/>
+            </inbound-router>
+        </service>
+
+        <service name="mycomponent2">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent">
+                <properties>
+                    <spring:entry key="serviceInterfaces">
+                        <spring:list>
+                            <spring:value>org.mule.components.simple.EchoService</spring:value>
+                            <spring:value>org.mule.tck.testmodels.services.DateService</spring:value>
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+            </component>
+            <inbound-router>
+                <inbound-endpoint address="axis:jms://mycomponent2"/>
+            </inbound-router>
+        </service>
+
+        <service name="mycomponent3">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="axis:jms://mycomponent3"/>
+            </inbound-router>
+        </service>
+
+        <service name="mycomponent4">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="axis:jms://mycomponent3" synchronous="false"/>
+            </inbound-router>
+        </service>
+
+    </model>
+
+</mule>
