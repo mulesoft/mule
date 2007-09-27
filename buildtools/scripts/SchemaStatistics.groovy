@@ -119,7 +119,9 @@ class Package {
   }
 
   void addOldMuleConfig(File file, Node doc) {
-    println "# *** old config: " + file.name
+    if (! file.name.contains("legacy")) {
+      println "# *** old config: " + file.name
+    }
     xmlTypeCountOldMule++
   }
 

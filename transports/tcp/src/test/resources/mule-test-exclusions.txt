@@ -3,10 +3,9 @@
 #
 
 # MULE-1389
-org.mule.providers.tcp.issues.AbstractStreamingDownloadMule1389TestCase
 org.mule.providers.tcp.issues.StreamingDownloadMule1389TestCase
 
-# MULE-16878
+# MULE-1687
 org.mule.providers.tcp.issues.SynchStreamingMule1687TestCase
 
 # MULE-2067
@@ -21,4 +20,6 @@ org.mule.providers.tcp.issues.AsynchMule1869TestCase
 
 # be careful when re-enabling this, it may hang the CI server
 org.mule.providers.tcp.issues.KeepSendSocketOpenMule1491TestCase
+
+# this isn't really a bug - see note in test and MULE-2449
 org.mule.providers.tcp.issues.SafeProtocolMule2227TestCase

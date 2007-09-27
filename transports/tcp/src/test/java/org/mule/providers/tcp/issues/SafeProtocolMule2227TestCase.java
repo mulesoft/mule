@@ -17,10 +17,18 @@ import org.mule.umo.UMOException;
 public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
 {
 
-    // this actually "works" in that a response is received that looks reasonable.
+    // this actually "works" much of the time, in that a response is received that looks reasonable.
     // that's just because the test is so simple that the length encoded string is read by the
     // server as a literal chunk of text (including the cookies and lengths!).  on the return these
     // are still present so the data that were sent are read (missing the appended text).
+
+    // the rest of the time, it gives an out of memory error.  that's because it responds to the
+    // cookie alone, which means that "Received" is taken as a message, and "Re" gives a length of
+    // 542270819 leading to a memory overflow
+
+    // the only way round this i can see is to allow a parameter on the protocol to specify a
+    // maximum size.  see MULE-2449.
+
     public void testSafeToUnsafe() throws UMOException
     {
         MuleClient client = new MuleClient();
