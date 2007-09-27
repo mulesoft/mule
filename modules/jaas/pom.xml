@@ -13,19 +13,6 @@
     <name>Jaas Security</name>
     <description>Mule Jaas Support exposes Jaas Authentication providers and Method interceptors to authentication event traffic via endpoints.</description>   
 
-    <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                         <exclude>**/JaasAuthenticationWithNtLoginModule.java</exclude>
-                     </excludes>
-                 </configuration>
-             </plugin>
-         </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
