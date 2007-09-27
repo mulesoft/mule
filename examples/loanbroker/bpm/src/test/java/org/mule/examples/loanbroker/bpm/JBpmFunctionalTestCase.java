@@ -30,7 +30,7 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
         // set the derby.system.home system property to make sure that all derby databases are
         // created in maven's target directory
         
-        MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
+        MuleDerbyTestUtils.defaultDerbyCleanAndInit("conf/derby.properties", "database.name");
 
         super.suitePreSetUp();
     }
