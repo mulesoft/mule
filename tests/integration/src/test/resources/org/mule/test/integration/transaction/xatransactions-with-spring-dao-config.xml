@@ -39,6 +39,9 @@
                     <endpoint address="vm://output"/>
                 </router>
             </outbound-router>
+            <properties>
+                <container-property name="library" reference="libraryDao"/>
+            </properties>
         </mule-descriptor>
     </model>
 </mule-configuration>

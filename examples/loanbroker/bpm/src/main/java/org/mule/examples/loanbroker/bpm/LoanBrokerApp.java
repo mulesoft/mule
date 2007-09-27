@@ -12,6 +12,10 @@ package org.mule.examples.loanbroker.bpm;
 
 import org.mule.examples.loanbroker.AbstractLoanBrokerApp;
 import org.mule.util.MuleDerbyTestUtils;
+import org.mule.util.MuleDerbyTestUtils;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Executes the LoanBroker BPM example.

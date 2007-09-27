@@ -116,16 +116,11 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
      */
     protected UMOMessage doReceive(long timeout) throws Exception
     {
-        FTPClient client = connector.getFtp(endpoint.getEndpointURI());
+        FTPClient client = null;
         try
         {
-            connector.enterActiveOrPassiveMode(client, endpoint);
-            connector.setupFileType(client, endpoint);
-            if (!client.changeWorkingDirectory(endpoint.getEndpointURI().getPath()))
-            {
-                throw new IOException("Ftp error: " + client.getReplyCode());
-            }
-
+            client = connector.createFtpClient(endpoint);
+            
             FilenameFilter filenameFilter = null;
             if (endpoint.getFilter() instanceof FilenameFilter)
             {

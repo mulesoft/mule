@@ -41,6 +41,11 @@
         </constructor-arg>
     </bean>
 
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	    <property name="location">
+            <value>classpath:derby.properties</value>
+        </property>
+    </bean>
         <!-- Data Source -->
     <bean id="innerDataSource"
         class="org.enhydra.jdbc.standard.StandardXADataSource"
@@ -52,7 +57,7 @@
             <value>org.apache.derby.jdbc.EmbeddedDriver</value>
         </property>
         <property name="url">
-            <value>jdbc:derby:muleEmbeddedDB;create=true</value>
+            <value>${database.connection}</value>
         </property>
     </bean>
     

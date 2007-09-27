@@ -30,6 +30,7 @@ import org.mule.util.ClassUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -493,16 +494,10 @@ public class FtpConnector extends AbstractConnector
         {
             final UMOEndpointURI uri = endpoint.getEndpointURI();
             String filename = getFilename(endpoint, message);
-            final FTPClient client = getFtp(uri);
 
+            final FTPClient client = this.createFtpClient(endpoint);
             try
             {
-                enterActiveOrPassiveMode(client, endpoint);
-                setupFileType(client, endpoint);
-                if (!client.changeWorkingDirectory(uri.getPath()))
-                {
-                    throw new IOException("Ftp error: " + client.getReplyCode());
-                }
                 OutputStream out = client.storeFileStream(filename);
                 return new CallbackOutputStream(out,
                         new CallbackOutputStream.Callback()
@@ -566,4 +561,31 @@ public class FtpConnector extends AbstractConnector
         return getFilenameParser().getFilename(message, pattern);
     }
 
+    /**
+     * Creates a new FTPClient that logs in and changes the working directory using the data
+     * provided in <code>endpoint</code>.
+     */
+    protected FTPClient createFtpClient(UMOImmutableEndpoint endpoint) throws Exception
+    {
+        UMOEndpointURI uri = endpoint.getEndpointURI();
+        FTPClient client = this.getFtp(uri);
+
+        this.enterActiveOrPassiveMode(client, endpoint);
+        this.setupFileType(client, endpoint);
+
+        String path = uri.getPath();
+        // MULE-2400: if the path begins with '~' we must strip the first '/' to make things
+        // work with FTPClient
+        if ((path.length() >= 2) && (path.charAt(1) == '~'))
+        {
+            path = path.substring(1);
+        }
+        
+        if (!client.changeWorkingDirectory(path))
+        {
+            throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
+                                                       new Object[] {path, new Integer(client.getReplyCode())}));
+        }
+        return client;
+    }
 }

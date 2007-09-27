@@ -23,6 +23,7 @@ import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.MuleDerbyTestUtils;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -47,15 +48,30 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     public static final String SQL_ACK = "UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}";
     public static final String SQL_WRITE = "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)";
     
-    public static final String EMBEDDED_CONNECTION_STRING = "jdbc:derby:muleEmbeddedDB;create=true";
+    public static String EMBEDDED_CONNECTION_STRING;
     public static final String EMBEDDED_DRIVER_NAME = "org.apache.derby.jdbc.EmbeddedDriver";
     
-    public static final String CLIENT_CONNECTION_STRING = "jdbc:derby://localhost:1527/muleEmbeddedDB;create=true";
+    public static String CLIENT_CONNECTION_STRING ;
     public static final String CLIENT_DRIVER_NAME = "org.apache.derby.jdbc.ClientDriver";
 
     protected UMOConnector connector;
     protected UMOModel model;
     protected DataSource dataSource;
+    
+    private static boolean derbySetupDone = false;
+    
+    protected void suitePreSetUp() throws Exception
+    {
+        if (!derbySetupDone)
+        {
+            String dbName = MuleDerbyTestUtils.loadDatabaseName("src/test/resources/derby.properties", "database.name");
+            MuleDerbyTestUtils.defaultDerbyCleanAndInit("src/test/resources/derby.properties", "database.name");
+            EMBEDDED_CONNECTION_STRING = "jdbc:derby:" + dbName;
+            CLIENT_CONNECTION_STRING = "jdbc:derby://localhost:1527/"+ dbName +";create=true";
+            derbySetupDone = true;
+        }
+        super.suitePreSetUp();
+    }
 
     protected void doSetUp() throws Exception
     {
@@ -77,7 +93,8 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     {
         try
         {
-            execSqlUpdate("DELETE FROM TEST");
+            int updated = execSqlUpdate("DELETE FROM TEST");
+            int x = updated;
         }
         catch (Exception e)
         {
