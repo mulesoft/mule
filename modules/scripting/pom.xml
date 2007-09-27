@@ -13,20 +13,6 @@
     <name>JSR-223 Scripting</name>
     <description>Support for Scripting Mule Services and embedding Mule inside scripts</description>
 
-    <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                    <excludes>
-                        <!--  MULE-2297 -->
-                        <exclude>**/GroovyScriptConfigurationBuilderTestCase.*</exclude>
-                    </excludes>
-                </configuration>
-             </plugin>
-         </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
