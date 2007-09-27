@@ -15,18 +15,6 @@
         event traffic via endpoints and method level authorisation on components.
     </description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
                 mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
