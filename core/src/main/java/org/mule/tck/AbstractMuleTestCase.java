@@ -516,9 +516,10 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         private final String name;
         private boolean disposeManagerPerSuite = false;
         private boolean excluded = false;
-        private int testCount = 0;
-        private int runCount = 0;
-        private Set registeredTestMethod = Collections.synchronizedSet(new HashSet());
+        private volatile int testCount = 0;
+        private volatile int runCount = 0;
+        // @GuardedBy(this)
+        private Set registeredTestMethod = new HashSet();
 
         // TODO HH: MULE-2414
         // this is a shorter version of the snippet from:
@@ -576,7 +577,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             return testCount;
         }
 
-        public void incTestCount(String name)
+        public synchronized void incTestCount(String name)
         {
             if (!registeredTestMethod.contains(name))
             {
@@ -615,7 +616,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             return excluded;
         }
 
-        public String toString()
+        public synchronized String toString()
         {
             StringBuffer buf = new StringBuffer();
             return buf.append(name).append(", (").append(runCount).append(" / ").append(testCount).append(
