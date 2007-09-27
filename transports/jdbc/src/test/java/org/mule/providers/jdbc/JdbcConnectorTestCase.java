@@ -20,12 +20,6 @@ import org.apache.derby.jdbc.EmbeddedDataSource;
 
 public class JdbcConnectorTestCase extends AbstractConnectorTestCase
 {
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#getConnector()
-     */
     // @Override
     public UMOConnector createConnector() throws Exception
     {
@@ -38,25 +32,14 @@ public class JdbcConnectorTestCase extends AbstractConnectorTestCase
         return c;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#getValidMessage()
-     */
     public Object getValidMessage() throws Exception
     {
         Map map = new HashMap();
         return map;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractConnectorTestCase#getTestEndpointURI()
-     */
     public String getTestEndpointURI()
     {
         return "jdbc://test?sql=SELECT * FROM TABLE";
     }
-
 }

@@ -183,20 +183,20 @@ public class ConnectionFactoryWrapper
             {
                 XASession xas = ((XAConnection)xac).createXASession();
                 return Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[]{Session.class},
-                    new SessionInvocationHandler(xas.getSession(), xas.getXAResource()));
+                    new SessionInvocationHandler(xas, xas.getSession(), xas.getXAResource()));
             }
             else if (method.getName().equals("createQueueSession"))
             {
                 XAQueueSession xaqs = ((XAQueueConnection)xac).createXAQueueSession();
                 return Proxy.newProxyInstance(Session.class.getClassLoader(),
-                    new Class[]{QueueSession.class}, new SessionInvocationHandler(xaqs.getQueueSession(),
+                    new Class[]{QueueSession.class}, new SessionInvocationHandler(xaqs, xaqs.getQueueSession(),
                         xaqs.getXAResource()));
             }
             else if (method.getName().equals("createTopicSession"))
             {
                 XATopicSession xats = ((XATopicConnection)xac).createXATopicSession();
                 return Proxy.newProxyInstance(Session.class.getClassLoader(),
-                    new Class[]{TopicSession.class}, new SessionInvocationHandler(xats.getTopicSession(),
+                    new Class[]{TopicSession.class}, new SessionInvocationHandler(xats, xats.getTopicSession(),
                         xats.getXAResource()));
             }
             else
@@ -209,11 +209,13 @@ public class ConnectionFactoryWrapper
         {
 
             private Object session;
+            private Object xasession;
             private Object xares;
             private Transaction tx;
 
-            public SessionInvocationHandler(Object session, Object xares)
+            public SessionInvocationHandler(Object xasession, Object session, Object xares)
             {
+                this.xasession = xasession;
                 this.session = session;
                 this.xares = xares;
             }

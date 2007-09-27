@@ -30,11 +30,6 @@
             <version>1.4</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-        </dependency>
-
         <!-- For unit tests only -->
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -57,10 +52,7 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
-            <!-- TODO ensure proper merge from trunk where MuleDerbyTestUtils
-                 does not have a compile time dependency on Derby
-            -->
-            <!-- <scope>test</scope> -->
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
