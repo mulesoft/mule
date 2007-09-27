@@ -1,2 +1,6 @@
+
+# Cannot run legacy tests without 1to2migration module
 org.mule.providers.quartz.QuartzFunctionalLegacyTestCase
+
+# MULE-1925
 org.mule.providers.quartz.QuartzFunctionalTestCase
