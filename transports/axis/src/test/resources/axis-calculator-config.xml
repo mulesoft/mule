@@ -36,7 +36,7 @@
                                     <spring:list>
                                         <spring:value>Number1;int;in</spring:value>
                                         <spring:value>Number2;int;in</spring:value>
-                                        <spring:value>return;int"</spring:value>
+                                        <spring:value>return;int</spring:value>
                                     </spring:list>
                                 </spring:constructor-arg>
                             </spring:bean>

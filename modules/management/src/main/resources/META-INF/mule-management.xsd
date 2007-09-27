@@ -101,15 +101,15 @@
     <xsd:complexType name="notificationLoggerAgentType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractAgentType">
-                <xsd:attribute name="ignoreManagerNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
-                <xsd:attribute name="ignoreModelNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
-                <xsd:attribute name="ignoreComponentNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
-                <xsd:attribute name="ignoreConnectionNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
-                <xsd:attribute name="ignoreSecurityNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
-                <xsd:attribute name="ignoreManagementNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
-                <xsd:attribute name="ignoreCustomNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
-                <xsd:attribute name="ignoreAdminNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
-                <xsd:attribute name="ignoreMessageNotifications" type="mule:substitutableBoolean" default="false"></xsd:attribute>
+                <xsd:attribute name="ignoreManagerNotifications" type="mule:substitutableBoolean" default="false"/>
+                <xsd:attribute name="ignoreModelNotifications" type="mule:substitutableBoolean" default="false"/>
+                <xsd:attribute name="ignoreComponentNotifications" type="mule:substitutableBoolean" default="false"/>
+                <xsd:attribute name="ignoreConnectionNotifications" type="mule:substitutableBoolean" default="false"/>
+                <xsd:attribute name="ignoreSecurityNotifications" type="mule:substitutableBoolean" default="false"/>
+                <xsd:attribute name="ignoreManagementNotifications" type="mule:substitutableBoolean" default="false"/>
+                <xsd:attribute name="ignoreCustomNotifications" type="mule:substitutableBoolean" default="false"/>
+                <xsd:attribute name="ignoreAdminNotifications" type="mule:substitutableBoolean" default="false"/>
+                <xsd:attribute name="ignoreMessageNotifications" type="mule:substitutableBoolean" default="false"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

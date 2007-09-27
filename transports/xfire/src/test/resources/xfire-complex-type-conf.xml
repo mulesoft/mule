@@ -1,42 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
 
-<mule-configuration id="Mule_Test" version="1.0">
+    <endpoint address="wsdl-xfire:http://localhost:63999/services/PeopleServiceWS?WSDL&amp;method=addPersonWithConfirmation" name="wsdlEndpoint">
+        <properties>
+            <spring:entry key="complexTypes">
+                <spring:map>
+                    <spring:entry key="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
+                    <spring:entry key="org.mule.tck.testmodels.services.PersonResponse" value="PersonResponse:http://services.testmodels.tck.mule.org"/>
+                    <spring:entry key="org.mule.tck.testmodels.services.Address" value="Address:http://services.testmodels.tck.mule.org"/>
+                    <spring:entry key="org.mule.tck.testmodels.services.PersonResponse" value="addPersonWithConfirmationout:http://services.testmodels.tck.mule.org"/>
+                </spring:map>
+            </spring:entry>
+        </properties>
+    </endpoint>
 
-    <global-endpoints>
-        <endpoint address="wsdl-xfire:http://localhost:63999/services/PeopleServiceWS?WSDL&amp;method=addPersonWithConfirmation" name="wsdlEndpoint">
-            <properties>
-                <map name="complexTypes">
-                    <property name="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
-                    <property name="org.mule.tck.testmodels.services.PersonResponse" value="PersonResponse:http://services.testmodels.tck.mule.org"/>
-                    <property name="org.mule.tck.testmodels.services.Address" value="Address:http://services.testmodels.tck.mule.org"/>
-                    <property name="org.mule.tck.testmodels.services.PersonResponse" value="addPersonWithConfirmationout:http://services.testmodels.tck.mule.org"/>
-                </map>
-            </properties>
-        </endpoint>
-        <endpoint address="xfire:http://localhost:63999/services/PeopleServiceWS?method=addPersonWithConfirmation" name="xfireEndpoint">
-            <properties>
-                <map name="complexTypes">
-                    <property name="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
-                    <property name="org.mule.tck.testmodels.services.PersonResponse" value="PersonResponse:http://services.testmodels.tck.mule.org"/>
-                    <property name="org.mule.tck.testmodels.services.Address" value="Address:http://services.testmodels.tck.mule.org"/>
-                    <property name="org.mule.tck.testmodels.services.PersonResponse" value="addPersonWithConfirmationout:http://services.testmodels.tck.mule.org"/>
-                </map>
-            </properties>
-        </endpoint>
-    </global-endpoints>
+    <endpoint address="xfire:http://localhost:63999/services/PeopleServiceWS?method=addPersonWithConfirmation" name="xfireEndpoint">
+        <properties>
+            <spring:entry key="complexTypes">
+                <spring:map>
+                    <spring:entry key="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
+                    <spring:entry key="org.mule.tck.testmodels.services.PersonResponse" value="PersonResponse:http://services.testmodels.tck.mule.org"/>
+                    <spring:entry key="org.mule.tck.testmodels.services.Address" value="Address:http://services.testmodels.tck.mule.org"/>
+                    <spring:entry key="org.mule.tck.testmodels.services.PersonResponse" value="addPersonWithConfirmationout:http://services.testmodels.tck.mule.org"/>
+                </spring:map>
+            </spring:entry>
+        </properties>
+    </endpoint>
 
     <model name="ComplexTypes">
-        <mule-descriptor name="PeopleServiceWS" implementation="org.mule.providers.soap.xfire.testmodels.XFireComplexTypeService">
+        <service name="PeopleServiceWS">
+            <component class="org.mule.providers.soap.xfire.testmodels.XFireComplexTypeService">
+                <properties>
+                    <spring:entry key="SOAP_NAMESPACE_PROPERTY" value="http://services.testmodels.tck.mule.org"/>
+                    <spring:entry key="style" value="document"/>
+                    <spring:entry key="use" value="literal"/>
+                </properties>
+            </component>
             <inbound-router>
-                <endpoint address="xfire:http://localhost:63999/services"/>
+                <inbound-endpoint address="xfire:http://localhost:63999/services"/>
             </inbound-router>
-            <properties>
-                <property name="SOAP_NAMESPACE_PROPERTY" value="http://services.testmodels.tck.mule.org"/>
-                <property name="style" value="document"/>
-                <property name="use" value="literal"/>
-            </properties>
-        </mule-descriptor>
+        </service>
     </model>
-</mule-configuration>
+
+</mule>
