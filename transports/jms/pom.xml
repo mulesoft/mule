@@ -18,6 +18,14 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <forkMode>pertest</forkMode>
+                    <includes>
+                        <!-- 
+                            This module has some classes which begin with 'Test' and that are
+                            no JUnit tests. Exclude those.
+                         -->
+                        <include>**/*TestCase.java</include>
+                        <include>**/*Test.java</include>
+                    </includes>
                 </configuration>
             </plugin>
             <plugin>

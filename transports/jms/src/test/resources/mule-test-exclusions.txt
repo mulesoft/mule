@@ -10,6 +10,8 @@ org.mule.test.integration.providers.jms.activemq.ActiveMQJmsTransactionFunctiona
 org.mule.test.integration.providers.jms.activemq.ActiveMQJmsXaTransactionFunctionalTestCase
 
 org.mule.providers.jms.functional.MultipleJmsConnectorsTestCase
+org.mule.providers.jms.functional.ActiveMQJmsTopicFunctionalTestCase
+org.mule.providers.jms.functional.ActiveMQJmsQueueFunctionalTestCase
 
 # Transactions not working yet
 org.mule.providers.jms.transactions.ActiveMQJmsTransactionFunctionalTestCase
