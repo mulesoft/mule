@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -8,22 +7,10 @@
         <artifactId>mule-modules</artifactId>
         <version>2.0-M2-SNAPSHOT</version>
     </parent>
-  <artifactId>mule-module-management</artifactId>
+    <artifactId>mule-module-management</artifactId>
     <!--<packaging>bundle</packaging>-->
-  <name>Management Extensions</name>
-  <description>Management Extensions for Mule</description>
-
-    <build>
-         <plugins>
-             <plugin>
-                 <artifactId>maven-surefire-plugin</artifactId>
-                 <configuration>
-                     <excludes>
-                     </excludes>
-                 </configuration>
-             </plugin>
-         </plugins>
-    </build>
+    <name>Management Extensions</name>
+    <description>Management Extensions for Mule</description>
 
     <dependencies>
         <dependency>
@@ -32,7 +19,7 @@
             <version>${version}</version>
         </dependency>
 
-      <dependency>
+        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
             <exclusions>
@@ -95,10 +82,9 @@
                         <configuration>
                             <instructions>
                                 <!-- TODO This module needs reorganization in order to properly export its packages. 
-                                     Note that org.mule.management.stats.* is still in mule-core -->
+                                    Note that org.mule.management.stats.* is still in mule-core -->
                                 <Export-Package>
-                                    org.mule.management.*,
-                                    org.mule.management.agents.*
+                                    org.mule.management.*, org.mule.management.agents.*
                                 </Export-Package>
                             </instructions>
                         </configuration>
