@@ -521,8 +521,6 @@
         <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
         <!-- explicit or global endpoints -->
         <xsd:attribute name="address" type="xsd:string"/>
-        <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
-        <xsd:attribute name="responseTransformer-ref" type="xsd:NMTOKENS"/>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="restrictedEndpointAttributes">
@@ -540,6 +538,8 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
+        <xsd:attribute name="responseTransformer-ref" type="xsd:NMTOKENS"/>
     </xsd:attributeGroup>
 
     <xsd:element name="transaction" type="transactionType" substitutionGroup="abstract-transaction"/>

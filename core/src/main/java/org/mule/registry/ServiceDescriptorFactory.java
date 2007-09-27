@@ -55,7 +55,7 @@ public class ServiceDescriptorFactory
             }
             catch (ClassNotFoundException e)
             {
-                //TODO RM* e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                throw (IllegalStateException) new IllegalStateException("Cannot create transport " + name).initCause(e);
             }
             props = SpiUtils.findServiceDescriptor(EXCEPTION_SERVICE_TYPE, name + "-exception-mappings");
             ((TransportServiceDescriptor) sd).setExceptionMappings(props);

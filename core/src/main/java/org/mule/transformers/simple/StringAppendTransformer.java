@@ -18,6 +18,16 @@ public class StringAppendTransformer extends AbstractTransformer
 
     String message = "";
 
+    public StringAppendTransformer()
+    {
+        this("");
+    }
+
+    public StringAppendTransformer(String message)
+    {
+        this.message = message;
+    }
+
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         String string;
