@@ -29,8 +29,19 @@ import java.util.Set;
  * <p/>
  * Users can set explicit method names on this resolver to control which methods are allowed to be called. Also a set of
  * 'ingorred' methods are available (and the use can add others) to tell the resolver to not resolve to these methods.
- * The default ones are: {@link #toString()} {@link #getClass()}, {@link #notify}, {@link #notifyAll}, {@link #hashCode},
- * {@link #wait}, {@link Cloneable#clone()}, 'is*' and 'get*'. Note that wildcard expressions can be used.
+ * The default ones are:
+ * <ul>
+ * <li>{@link #toString()}
+ * <li>{@link #getClass()}
+ * <li>{@link #notify}
+ * <li>{@link #notifyAll}
+ * <li>{@link #hashCode}
+ * <li>{@link #wait}
+ * <li>{@link Cloneable#clone()}
+ * <li>'is*'
+ * <li>'get*'.
+ * </ul>
+ * <p/> Note that wildcard expressions can be used.
  */
 public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntryPointResolver
 {
