@@ -437,6 +437,9 @@
     <xsd:complexType name="customTransactionManagerType">
         <xsd:complexContent>
             <xsd:extension base="jndiTransactionManagerType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -854,6 +857,9 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="securityProviderType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="provider-ref" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -867,6 +873,9 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="encryptionStrategyType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -983,6 +992,9 @@
     <xsd:complexType name="customConnectionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="connectionStrategyType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -1049,6 +1061,9 @@
     <xsd:complexType name="customEntrypointResolverType">
         <xsd:complexContent>
             <xsd:extension base="abstractEntrypointResolverType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -1110,7 +1125,7 @@
                     <xsd:element ref="abstract-filter" minOccurs="0"/>
                     <xsd:choice minOccurs="0">
                         <xsd:element ref="abstract-property-extractor"/>
-                        <xsd:element ref="custom-property-extractor"/> <!-- hardwired object factory -->
+                        <xsd:element ref="custom-property-extractor"/>
                     </xsd:choice>
                 </xsd:sequence>
             </xsd:extension>
@@ -1165,6 +1180,7 @@
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
                 <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
@@ -1174,6 +1190,7 @@
 
     <!-- ResponseRouters -->
 
+    <xsd:element name="single-response-router" type="responseRouterType" substitutionGroup="abstract-response-router"/>
     <xsd:complexType name="responseRouterType">
         <xsd:complexContent>
             <xsd:extension base="abstractResponseRouterType">
@@ -1181,7 +1198,7 @@
                     <xsd:element ref="abstract-response-endpoint" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:choice minOccurs="0">
                         <xsd:element ref="abstract-property-extractor"/>
-                        <xsd:element ref="custom-property-extractor"/> <!-- hardwired object factory -->
+                        <xsd:element ref="custom-property-extractor"/>
                     </xsd:choice>
                 </xsd:sequence>
             </xsd:extension>
@@ -1192,7 +1209,10 @@
     <xsd:complexType name="customResponseRouterType">
         <xsd:complexContent>
             <xsd:extension base="responseRouterType">
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1210,7 +1230,7 @@
                     <xsd:element ref="abstract-transaction" minOccurs="0"/>
                     <xsd:choice minOccurs="0">
                          <xsd:element ref="abstract-property-extractor"/>
-                         <xsd:element ref="custom-property-extractor"/> <!-- hardwired object factory -->
+                         <xsd:element ref="custom-property-extractor"/>
                     </xsd:choice>
                 </xsd:sequence>
                 <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
@@ -1287,6 +1307,9 @@
     <xsd:complexType name="customOutboundRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -1310,6 +1333,9 @@
     <xsd:complexType name="customCatchAllStrategyType">
         <xsd:complexContent>
             <xsd:extension base="abstractCatchAllStrategyType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -1684,15 +1710,13 @@
             </xsd:simpleType>
         </xsd:union>
     </xsd:simpleType>
-    <!--==============================================================-->
-    <!--  ObjectFactory Types                                         -->
-    <!--==============================================================-->
 
     <xsd:element name="custom-property-extractor"/>
     <xsd:complexType name="customPropertyExtractorType">
-        <xsd:complexContent>
-            <xsd:extension base="objectFactoryType" />
-        </xsd:complexContent>
+        <xsd:sequence>
+            <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
     </xsd:complexType>
 
     <!-- i found this a bit confusing, so here's some background...

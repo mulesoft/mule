@@ -34,16 +34,16 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements U
 
     private boolean failOnTimeout = true;
 
-    protected PropertyExtractor correlationExtractor = new CorrelationPropertiesExtractor();
+    protected PropertyExtractor propertyExtractor = new CorrelationPropertiesExtractor();
 
-    public PropertyExtractor getCorrelationExtractor()
+    public PropertyExtractor getPropertyExtractor()
     {
-        return correlationExtractor;
+        return propertyExtractor;
     }
 
-    public void setCorrelationExtractor(PropertyExtractor correlationExtractor)
+    public void setPropertyExtractor(PropertyExtractor propertyExtractor)
     {
-        this.correlationExtractor = correlationExtractor;
+        this.propertyExtractor = propertyExtractor;
     }
 
     /**
@@ -55,7 +55,7 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements U
     {
         try
         {
-            this.correlationExtractor = (PropertyExtractor) ClassUtils.instanciateClass(className, null,
+            this.propertyExtractor = (PropertyExtractor) ClassUtils.instanciateClass(className, null,
                 getClass());
         }
         catch (Exception ex)
@@ -86,7 +86,7 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements U
      */
     protected Object getReplyAggregateIdentifier(UMOMessage message)
     {
-        return correlationExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
+        return propertyExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
     }
 
     /**
@@ -101,7 +101,7 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements U
      */
     protected Object getCallResponseAggregateIdentifier(UMOMessage message)
     {
-        return correlationExtractor.getProperty(MuleProperties.MULE_MESSAGE_ID_PROPERTY, message);
+        return propertyExtractor.getProperty(MuleProperties.MULE_MESSAGE_ID_PROPERTY, message);
     }
 
 

@@ -91,6 +91,7 @@ import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.routing.outbound.TemplateEndpointRouter;
 import org.mule.routing.response.ResponseRouterCollection;
+import org.mule.routing.response.SingleResponseRouter;
 import org.mule.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.transaction.lookup.JBossTransactionManagerLookupFactory;
 import org.mule.transaction.lookup.JRunTransactionManagerLookupFactory;
@@ -272,11 +273,12 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         //Response Routers
         registerBeanDefinitionParser("custom-response-router", new RouterDefinitionParser("router", null));
+        registerBeanDefinitionParser("single-response-router", new RouterDefinitionParser("router", SingleResponseRouter.class));
 
         //Property Extractors
         registerBeanDefinitionParser("bean-property-extractor", new ChildDefinitionParser("propertyExtractor", BeanPropertyExtractor.class));
         registerBeanDefinitionParser("correlation-property-extractor", new ChildDefinitionParser("propertyExtractor", CorrelationPropertiesExtractor.class));
-        registerBeanDefinitionParser("custom-property-extractor", new ObjectFactoryDefinitionParser("propertyExtractor"));
+        registerBeanDefinitionParser("custom-property-extractor", new ChildDefinitionParser("propertyExtractor"));
         registerBeanDefinitionParser("map-property-extractor", new ChildDefinitionParser("propertyExtractor", MapPropertyExtractor.class));
         registerBeanDefinitionParser("message-property-extractor", new ChildDefinitionParser("propertyExtractor", MessagePropertyExtractor.class));
         registerBeanDefinitionParser("payload-property-extractor", new ChildDefinitionParser("propertyExtractor", PayloadPropertyExtractor.class));

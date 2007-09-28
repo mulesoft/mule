@@ -91,7 +91,7 @@ class Package {
 
   void addErrorConfig(File file, Exception e) {
     xmlTypeCountError++
-    println "# failed to parse " + file.name
+    println "# *** failed to parse " + file.name
     println "# " + e.message
   }
 
