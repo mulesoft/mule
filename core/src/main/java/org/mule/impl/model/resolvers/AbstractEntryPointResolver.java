@@ -151,7 +151,7 @@ public abstract class AbstractEntryPointResolver implements UMOEntryPointResolve
             logger.debug("Result of call " + methodCall + " is " + (result == null ? "null" : "not null"));
         }
 
-        return new InvocationResult(result);
+        return new InvocationResult(result, method);
     }
 
 

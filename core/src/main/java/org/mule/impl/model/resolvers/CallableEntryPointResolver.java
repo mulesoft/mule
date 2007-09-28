@@ -11,11 +11,15 @@
 package org.mule.impl.model.resolvers;
 
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.model.InvocationResult;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.util.ClassUtils;
+import org.mule.MuleRuntimeException;
+
+import java.lang.reflect.Method;
 
 /**
  * An entrypoint resolver that only allows Service objects that implmement the
@@ -25,12 +29,28 @@ import org.mule.util.ClassUtils;
  */
 public class CallableEntryPointResolver implements UMOEntryPointResolver
 {
+    protected static final Method callableMethod;
+
+    static
+    {
+        try
+        {
+            callableMethod = Callable.class.getMethod("onCall", new Class[] {UMOEventContext.class});
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new MuleRuntimeException(
+                    MessageFactory.createStaticMessage("Panic! No onCall(UMOEventContext) method found in the Callable interface."));
+        }
+    }
+
+
     public InvocationResult invoke(Object component, UMOEventContext context) throws Exception
     {
         if (component instanceof Callable)
         {
             Object result = ((Callable) component).onCall(context);
-            return new InvocationResult(result);
+            return new InvocationResult(result, callableMethod);
         }
         else
         {
