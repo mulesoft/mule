@@ -45,6 +45,12 @@ import org.mule.umo.transformer.UMOTransformer;
 public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
 
+    public AbstractConfigBuilderTestCase(boolean legacy)
+    {
+        super(legacy);
+    }
+
+
     // @Override
     public void testManagerConfig() throws Exception
     {
@@ -93,9 +99,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         // test that endpoints have been resolved on endpoints
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("waterMelonEndpoint", managementContext);
         assertNotNull(endpoint);
-        // aliases not possible in 2.0
-//        assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
-        assertEquals("cannot-have-aliases", endpoint.getEndpointURI().getAddress());
+        assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
         UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent2");
         assertNotNull(descriptor);

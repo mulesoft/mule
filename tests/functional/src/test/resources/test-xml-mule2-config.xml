@@ -111,7 +111,7 @@
         <!-- TODO -->
         <!-- cannot have aliases -->
         <!-- mule:endpoint name="waterMelonEndpoint" ref="TestQueue"/ -->
-        <mule:endpoint name="waterMelonEndpoint" address="test://cannot-have-aliases"/>
+        <mule:endpoint name="waterMelonEndpoint" address="test://test.queue"/>
         <!-- TODO -->
         <!-- cannot specify type of endpoint -->
         <mule:endpoint name="appleInEndpoint" address="test://AppleQueue"/>
