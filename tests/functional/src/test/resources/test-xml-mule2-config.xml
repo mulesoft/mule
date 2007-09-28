@@ -104,15 +104,14 @@
     </transformers -->
 
         <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
-            <mxml:jxpath-filter pattern="name">
+            <mxml:jxpath-filter pattern="name" expectedValue="bar">
                 <mxml:namespace prefix="foo" uri="http://foo.com"/>
-                <mxml:context-property key="value" value="bar"/>
             </mxml:jxpath-filter>
         </mule:endpoint>
         <!-- TODO -->
         <!-- cannot have aliases -->
         <!-- mule:endpoint name="waterMelonEndpoint" ref="TestQueue"/ -->
-        <mule:endpoint name="waterMelonEndpoint" address="test://tmporary-hack"/>
+        <mule:endpoint name="waterMelonEndpoint" address="test://cannot-have-aliases"/>
         <!-- TODO -->
         <!-- cannot specify type of endpoint -->
         <mule:endpoint name="appleInEndpoint" address="test://AppleQueue"/>

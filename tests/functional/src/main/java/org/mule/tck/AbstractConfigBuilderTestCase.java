@@ -93,7 +93,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         // test that endpoints have been resolved on endpoints
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("waterMelonEndpoint", managementContext);
         assertNotNull(endpoint);
-        assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
+        // aliases not possible in 2.0
+//        assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
+        assertEquals("cannot-have-aliases", endpoint.getEndpointURI().getAddress());
 
         UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent2");
         assertNotNull(descriptor);
@@ -103,7 +105,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent");
         assertNotNull(descriptor.getExceptionListener());
-        assertEquals(DefaultExceptionStrategy.class, descriptor.getExceptionListener().getClass());
+        assertTrue(DefaultExceptionStrategy.class.isAssignableFrom(descriptor.getExceptionListener().getClass()));
     }
 
     // @Override

@@ -11,13 +11,13 @@
 package org.mule.tck;
 
 import org.mule.impl.AbstractExceptionListener;
+import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.tck.testmodels.mule.TestEntryPointResolverSet;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformers.TransformerUtils;
@@ -85,7 +85,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         // test that endpoints have been resolved on endpoints
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("waterMelonEndpoint");
         assertNotNull(endpoint);
-        assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
+        // aliases no longer possible
+//        assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
+        assertEquals("cannot-have-aliases", endpoint.getEndpointURI().getAddress());
 
         UMODescriptor descriptor = managementContext.getRegistry().lookupService("orangeComponent");
         UMOImmutableEndpoint ep = descriptor.getInboundRouter().getEndpoint("Orange");
@@ -124,7 +126,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         UMOModel model = managementContext.getRegistry().lookupModel("main");
         assertNotNull(model);
         assertEquals("main", model.getName());
-        assertTrue(model.getEntryPointResolverSet() instanceof TestEntryPointResolverSet);
+        // changed in 2.0
+//        assertTrue(model.getEntryPointResolverSet() instanceof TestEntryPointResolverSet);
+        assertTrue(model.getEntryPointResolverSet() instanceof LegacyEntryPointResolverSet);
         assertTrue(model.getExceptionListener() instanceof TestExceptionStrategy);
 
         assertTrue(((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().size() > 0);

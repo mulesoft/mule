@@ -230,22 +230,23 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertEquals(60001, tp.getThreadTTL());
     }
 
-    public void testGlobalEndpointOverrides()
-    {
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
-        assertNotNull(ep);
-        assertEquals(1, ep.getProperties().size());
-        assertEquals("value1", ep.getProperties().get("testGlobal"));
-        assertNull(ep.getFilter());
-
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
-            "orangeComponent");
-        assertNotNull(descriptor);
-        ep = descriptor.getInboundRouter().getEndpoint("orangeEndpoint");
-        assertNotNull(ep);
-        assertEquals("value1", ep.getProperties().get("testLocal"));
-        assertEquals("value1", ep.getProperties().get("testGlobal"));
-        assertEquals(2, ep.getProperties().size());
-        assertNotNull(ep.getFilter());
-    }
+    // MULE-2458 (now has separate test)
+//    public void testGlobalEndpointOverrides()
+//    {
+//        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
+//        assertNotNull(ep);
+//        assertEquals(1, ep.getProperties().size());
+//        assertEquals("value1", ep.getProperties().get("testGlobal"));
+//        assertNull(ep.getFilter());
+//
+//        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
+//            "orangeComponent");
+//        assertNotNull(descriptor);
+//        ep = descriptor.getInboundRouter().getEndpoint("orangeEndpoint");
+//        assertNotNull(ep);
+//        assertEquals("value1", ep.getProperties().get("testLocal"));
+//        assertEquals("value1", ep.getProperties().get("testGlobal"));
+//        assertEquals(2, ep.getProperties().size());
+//        assertNotNull(ep.getFilter());
+//    }
 }
