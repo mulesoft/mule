@@ -11,6 +11,8 @@ package org.mule.umo.model;
 
 import org.mule.config.i18n.CoreMessages;
 
+import java.lang.reflect.Method;
+
 /** TODO */
 public class InvocationResult
 {
@@ -24,6 +26,9 @@ public class InvocationResult
     public static final int STATE_INVOKED_FAILED = 2;
 
     private String errorMessage;
+
+    /** the name of the method called for this invocation */
+    private String methodCalled;
 
     private Object result;
 
@@ -53,11 +58,23 @@ public class InvocationResult
      *
      * @param result the result of a successful invocation
      */
-    public InvocationResult(Object result)
+    public InvocationResult(Object result, Method method)
     {
 
         this.result = result;
         this.state = STATE_INVOKED_SUCESSFUL;
+        this.methodCalled = method.getName();
+    }
+
+    /**
+     * Returns the name of the method invoked, this property is only set if the state of the invocation is
+     * {@link #STATE_INVOKED_SUCESSFUL}
+     *
+     * @return the name of the method invoked
+     */
+    public String getMethodCalled()
+    {
+        return methodCalled;
     }
 
     /**

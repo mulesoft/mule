@@ -14,6 +14,7 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.FruitLover;
@@ -38,6 +39,24 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
     }
 
+    public void testMethodMatchWithArguments() throws Exception
+    {
+        ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
+        InvocationResult result = resolver.invoke(new FruitBowl(), getTestEventContext(new Object[]{new Apple(), new Banana()}));
+        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertTrue(result.getResult() instanceof Fruit[]);
+        //test that the correct methd was called
+        assertTrue(((Fruit[]) result.getResult())[0] instanceof Apple);
+        assertTrue(((Fruit[]) result.getResult())[1] instanceof Banana);
+        assertEquals("addAppleAndBanana", result.getMethodCalled());
+
+        result = resolver.invoke(new FruitBowl(), getTestEventContext(new Object[]{new Banana(), new Apple()}));
+        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertTrue(result.getResult() instanceof Fruit[]);
+        assertTrue(((Fruit[]) result.getResult())[0] instanceof Banana);
+        assertTrue(((Fruit[]) result.getResult())[1] instanceof Apple);
+        assertEquals("addBananaAndApple", result.getMethodCalled());
+    }
 
     public void testExplicitMethodMatchSetArrayFail() throws Exception
     {
