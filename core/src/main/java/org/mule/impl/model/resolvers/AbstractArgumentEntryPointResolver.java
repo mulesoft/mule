@@ -44,7 +44,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
         setAcceptVoidMethods(true);
         // we don't want to match these methods when looking for a service method
         //If you add to this list please change the javaDoc above too.
-        setIgnorredMethods(new HashSet(Arrays.asList(new String[]{"toString",
+        setIgnoredMethods(new HashSet(Arrays.asList(new String[]{"toString",
                 "getClass", "notify", "notifyAll", "wait", "hashCode", "clone", "is*", "get*"})));
     }
 
@@ -111,7 +111,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
             {
                 Class[] argTypes = getMethodArgumentTypes(payload);
                 List methods = ClassUtils.getSatisfiableMethods(component.getClass(), argTypes,
-                        isAcceptVoidMethods(), false, getIgnorredMethods(), filter);
+                        isAcceptVoidMethods(), false, getIgnoredMethods(), filter);
 
                 if (methods.size() > 1)
                 {

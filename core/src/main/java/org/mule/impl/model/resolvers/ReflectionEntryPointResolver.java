@@ -46,17 +46,17 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
     }
 
     /**
-     * Returns an unmodifable Set of ignorredMethods on this resolver
+     * Returns an unmodifable Set of ignoredMethods on this resolver
      * To add method to the resolver use {@link #addIgnorredMethod(String)}
      *
      * @return unmodifiable set of method names set on this resolver
      */
-    public Set getIgnorredMethods()
+    public Set getIgnoredMethods()
     {
         return Collections.unmodifiableSet(ignoredMethods);
     }
 
-    public void setIgnorredMethods(Set methods)
+    public void setIgnoredMethods(Set methods)
     {
         this.ignoredMethods = methods;
         updateFilter();
@@ -79,7 +79,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
     {
         Object[] payload = getPayloadFromMessage(context);
 
-        Method method = null;
+        Method method;
         InvocationResult result;
 
         method = this.getMethodByArguments(component, payload);
