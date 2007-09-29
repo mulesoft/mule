@@ -567,23 +567,26 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     /**
      * Used for creating an array of class types for an array or single object
      *
-     * @param object single object or array
+     * @param object single object or array. If this parameter is null or a zero length
+     *               array then {@link #NO_ARGS_TYPE} is returned
      * @return an array of class types for the object
      */
     public static Class[] getClassTypes(Object object)
     {
-        Class[] types;
+        if (object == null)
+        {
+            return NO_ARGS_TYPE;
+        }
 
-        // TODO MULE-1088: instead of returning the classes of an array's elements we should
-        // just return the array class - which makes the whole method pointless!?
-//        if (object.getClass().isArray())
-//        {
-//            types = new Class[]{object.getClass()};
-//        }
+        Class[] types;
 
         if (object instanceof Object[])
         {
             Object[] objects = (Object[]) object;
+            if (objects.length == 0)
+            {
+                return NO_ARGS_TYPE;
+            }
             types = new Class[objects.length];
             for (int i = 0; i < objects.length; i++)
             {

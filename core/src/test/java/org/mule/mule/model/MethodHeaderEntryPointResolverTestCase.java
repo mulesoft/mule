@@ -10,7 +10,9 @@
 package org.mule.mule.model;
 
 import org.mule.impl.model.resolvers.MethodHeaderPropertyEntryPointResolver;
+import org.mule.providers.NullPayload;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.model.InvocationResult;
 
@@ -23,6 +25,16 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
         ctx.getMessage().setProperty("method", "someBusinessMethod");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+    }
+
+    public void testMethodSetWithNoArgsPass() throws Exception
+    {
+        MethodHeaderPropertyEntryPointResolver resolver = new MethodHeaderPropertyEntryPointResolver();
+        UMOEventContext ctx = getTestEventContext(NullPayload.getInstance());
+        ctx.getMessage().setProperty("method", "wash");
+        InvocationResult result = resolver.invoke(new Apple(), ctx);
+        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals("wash", result.getMethodCalled());
     }
 
     public void testCustomMethodProperty() throws Exception

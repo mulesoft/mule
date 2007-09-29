@@ -12,12 +12,14 @@ package org.mule.mule.model;
 
 import org.mule.impl.RequestContext;
 import org.mule.impl.model.resolvers.ReflectionEntryPointResolver;
+import org.mule.providers.NullPayload;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.FruitLover;
+import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.umo.model.InvocationResult;
@@ -83,5 +85,19 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         RequestContext.setEvent(getTestEvent("Hello"));
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), RequestContext.getEventContext());
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_FAILED);
+    }
+
+    public void testMatchOnNoArgs() throws Exception
+    {
+        ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
+        //This should fail because the Kiwi.bite() method has a void return type, and by default
+        //void methods are ignorred
+        InvocationResult result = resolver.invoke(new Kiwi(), getTestEventContext(NullPayload.getInstance()));
+        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_FAILED);
+
+        resolver.setAcceptVoidMethods(true);
+        result = resolver.invoke(new Kiwi(), getTestEventContext(NullPayload.getInstance()));
+        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals("bite", result.getMethodCalled());
     }
 }

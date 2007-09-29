@@ -10,6 +10,7 @@
 package org.mule.impl.model.resolvers;
 
 import org.mule.impl.VoidResult;
+import org.mule.providers.NullPayload;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.model.InvocationResult;
 import org.mule.umo.model.UMOEntryPointResolver;
@@ -107,6 +108,7 @@ public abstract class AbstractEntryPointResolver implements UMOEntryPointResolve
         return key.toString();
     }
 
+
     protected Object[] getPayloadFromMessage(UMOEventContext context) throws TransformerException
     {
         Object temp;
@@ -121,6 +123,10 @@ public abstract class AbstractEntryPointResolver implements UMOEntryPointResolve
         if (temp instanceof Object[])
         {
             return (Object[]) temp;
+        }
+        else if (temp instanceof NullPayload)
+        {
+            return ClassUtils.NO_ARGS;
         }
         else
         {

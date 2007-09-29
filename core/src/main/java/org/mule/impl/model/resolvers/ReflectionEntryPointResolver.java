@@ -29,16 +29,42 @@ import java.util.Set;
  * the event payload type(s) as the argument using reflection. An entry point will try and match for
  * different argument types, so it's possible to have multiple entry points on a
  * single component.
+ * <p/>
+ * For multiple parameters the payload of context.getMessage().geTPayload() should be an Array of objects.
+ * If the message payload is of type {@link org.mule.providers.NullPayload} the resolver will look for a no-argument
+ * method to call that doesn't match the set of ignoredMethods on the resover.
+ * <p/>
+ * Also a set of 'ingorred' methods are available (and the use can add others) to tell the resolver to not
+ * resolve to these methods. The default ones are:
+ * <ul>
+ * <li>{@link #toString()}
+ * <li>{@link #getClass()}
+ * <li>{@link #notify}
+ * <li>{@link #notifyAll}
+ * <li>{@link #hashCode}
+ * <li>{@link #wait}
+ * <li>{@link java.lang.reflect.Proxy#getInvocationHandler}
+ * <li>{@link Cloneable#clone()}
+ * <li>'is*'
+ * <li>'get*'.
+ * <li>'set*'.
+ * </ul>
+ * <p/> Note that wildcard expressions can be used.
  */
 public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
 {
 
     // we don't want to match these methods when looking for a service method
     private Set ignoredMethods = new HashSet(Arrays.asList(new String[]{"equals",
-            "getInvocationHandler", "set*"}));
+            "getInvocationHandler", "set*", "toString",
+            "getClass", "notify", "notifyAll", "wait", "hashCode", "clone", "is*", "get*"}));
 
     protected WildcardFilter filter;
 
+    public ReflectionEntryPointResolver()
+    {
+        updateFilter();
+    }
 
     private void updateFilter()
     {
@@ -75,6 +101,17 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
         return result;
     }
 
+    /**
+     * Will discover the entrypoint on the component using the payload type to figure out the method to call.
+     * For multiple parameters the payload of context.getMessage().geTPayload() should be an Array of objects.
+     * If the message payload is of type {@link org.mule.providers.NullPayload} the resolver will look for a no-argument
+     * method to call that doesn't match the set of ignoredMethods on the resover.
+     *
+     * @param component
+     * @param context
+     * @return
+     * @throws Exception
+     */
     public InvocationResult invoke(Object component, UMOEventContext context) throws Exception
     {
         Object[] payload = getPayloadFromMessage(context);
