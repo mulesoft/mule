@@ -65,12 +65,8 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <endpoint address="jdbc://insertRecord" connector="jdbcConnectorXA">
-                        <transaction action="ALWAYS_JOIN" factory="org.mule.transaction.XaTransactionFactory"/>
-                    </endpoint>
-                    <endpoint address="jms://queue.out" connector="jmsConnectorXA" synchronous="true">
-                        <transaction action="ALWAYS_JOIN" factory="org.mule.transaction.XaTransactionFactory"/>
-                    </endpoint>
+                    <endpoint address="jdbc://insertRecord" connector="jdbcConnectorXA"/>
+                    <endpoint address="jms://queue.out" connector="jmsConnectorXA" synchronous="true"/>
                     <transaction action="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>
                 </router>
             </outbound-router>

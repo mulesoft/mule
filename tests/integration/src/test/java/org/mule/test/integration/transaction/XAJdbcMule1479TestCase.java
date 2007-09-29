@@ -81,6 +81,7 @@ public class XAJdbcMule1479TestCase extends FunctionalTestCase
         }
     }
 
+/*
     public void testJdbcXa() throws Exception
     {
 
@@ -91,6 +92,7 @@ public class XAJdbcMule1479TestCase extends FunctionalTestCase
         List results = execSqlQuery("SELECT * FROM TEST");
         assertEquals(0, results.size());
     }    
+*/
 
     public void testJmsXa() throws Exception
     {
@@ -99,10 +101,12 @@ public class XAJdbcMule1479TestCase extends FunctionalTestCase
 
         client.dispatch("vm://in1","test",null);
 
-//        Thread.sleep(5000000);
+        logger.debug("########### receiving message");
 
 //        UMOMessage res = client.receive("jms://queue.out", 1000);
 //        assertNotNull(res);
+
+        Thread.sleep(5000000);
 
         List results = execSqlQuery("SELECT * FROM TEST");
         assertEquals(1, results.size());

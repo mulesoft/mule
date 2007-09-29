@@ -17,7 +17,6 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.MuleDerbyTestUtils;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -67,8 +66,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
 
     protected void suitePreSetUp() throws Exception
     {
-        InputStream propertiesStream = this.getClass().getClassLoader().getResourceAsStream("derby.properties");
-        MuleDerbyTestUtils.defaultDerbyCleanAndInit(propertiesStream, "database.name");
+        MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
         super.suitePreSetUp();
     }
 

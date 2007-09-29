@@ -7,45 +7,49 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+package org.mule.examples.loanbroker.bpm;
 
-package org.mule.util;
+import org.mule.util.ClassUtils;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-
-public class MuleDerbyTestUtils
+/**
+ * This is a clone of {@link org.mule.util.MuleDerbyTestUtils}
+ */
+public class DbUtils
 {
     private static final String DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver";
-    
+
     //class cannot be instantiated
-    private MuleDerbyTestUtils()
+    private DbUtils()
     {
         super();
     }
-    
+
     //by default, set the derby home to the target directory
     public static String setDerbyHome()
     {
         return setDerbyHome("target");
     }
-    
+
     public static String setDerbyHome(String path)
     {
         File derbySystemHome = new File(System.getProperty("user.dir"), path);
         System.setProperty("derby.system.home",  derbySystemHome.getAbsolutePath());
         return derbySystemHome.getAbsolutePath();
     }
-    
+
     /**
      * Properly shutdown an embedded Derby database
-     * 
+     *
      * @throws SQLException
      * @see <h href="http://db.apache.org/derby/docs/10.3/devguide/tdevdvlp20349.html">Derby docs</a>
      */
@@ -62,7 +66,7 @@ public class MuleDerbyTestUtils
         catch (SQLException sqlex)
         {
             // this exception is documented to be thrown upon shutdown
-            if (sqlex.getSQLState().equals("XJ015") == false)
+            if (!"XJ015".equals(sqlex.getSQLState()))
             {
                 throw sqlex;
             }
@@ -74,13 +78,13 @@ public class MuleDerbyTestUtils
             throw new RuntimeException(ex);
         }
     }
-    
+
     public static void cleanupDerbyDb(String derbySystemHome, String databaseName) throws IOException, SQLException
     {
         stopDatabase();
         FileUtils.deleteTree(new File(derbySystemHome + File.separator + databaseName));
     }
-    
+
     public static void createDataBase(String databaseName) throws SQLException
     {
         // Do not use the EmbeddedDriver class here directly to avoid compile time references
@@ -88,10 +92,10 @@ public class MuleDerbyTestUtils
         try
         {
             Driver derbyDriver = (Driver) ClassUtils.instanciateClass(DERBY_DRIVER_CLASS, new Object[0]);
-            
-            Method connectMethod = derbyDriver.getClass().getMethod("connect", 
+
+            Method connectMethod = derbyDriver.getClass().getMethod("connect",
                 new Class[] { String.class, Properties.class });
-            
+
             String connectionName = "jdbc:derby:" + databaseName + ";create=true";
             connectMethod.invoke(derbyDriver, new Object[] { connectionName, null });
         }
@@ -100,21 +104,20 @@ public class MuleDerbyTestUtils
             throw new RuntimeException("Error creating the database " + databaseName, ex);
         }
     }
-    
-    public static String loadDatabaseName(InputStream propertiesStream, String propertyName) throws IOException
+
+    public static String loadDatabaseName(String propertiesLocation, String propertyName) throws IOException
     {
         Properties derbyProperties = new Properties();
-        derbyProperties.load(propertiesStream);
+        URL resource = ClassUtils.getResource(propertiesLocation, DbUtils.class);
+        derbyProperties.load(resource.openStream());
         return derbyProperties.getProperty(propertyName);
     }
-    
-    public static void defaultDerbyCleanAndInit(InputStream propertiesStream, String propertyName) throws IOException, SQLException
+
+    public static void defaultDerbyCleanAndInit(String propertiesLocation, String propertyName) throws IOException, SQLException
     {
         String derbyHome = setDerbyHome();
-        String dbName = loadDatabaseName(propertiesStream, propertyName);
+        String dbName = loadDatabaseName(propertiesLocation, propertyName);
         cleanupDerbyDb(derbyHome, dbName);
         createDataBase(dbName);
     }
 }
-
-
