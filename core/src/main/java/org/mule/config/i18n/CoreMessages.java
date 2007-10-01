@@ -903,11 +903,11 @@ public class CoreMessages extends MessageFactory
      */
     public static Message productInformation()
     {
-        MuleManifest config = new MuleManifest();
         String notset = CoreMessages.notSet().getMessage();
-        return createMessage(BUNDLE_PATH, 236, StringUtils.defaultString(config.getProductDescription(), notset),
-                             StringUtils.defaultString(config.getProductVersion(), notset),
-                             StringUtils.defaultString(config.getVendorName(), notset) + " " + StringUtils.defaultString(config.getVendorUrl(), notset));
+        return createMessage(BUNDLE_PATH, 236, StringUtils.defaultString(MuleManifest.getProductDescription(), notset),
+                             StringUtils.defaultString(MuleManifest.getProductVersion(), notset),
+                             StringUtils.defaultString(MuleManifest.getVendorName(), notset) + " " +
+                             StringUtils.defaultString(MuleManifest.getVendorUrl(), notset));
     }
 
 
