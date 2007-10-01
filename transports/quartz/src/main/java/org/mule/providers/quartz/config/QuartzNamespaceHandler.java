@@ -1,5 +1,5 @@
 /*
- * $Id: VmNamespaceHandler.java 6433 2007-05-09 14:26:35Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
