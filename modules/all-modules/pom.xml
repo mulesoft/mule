@@ -37,7 +37,7 @@
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- MULE-XXX -->
+        <!-- MULE-2648 -->
         <!--<dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jaas</artifactId>

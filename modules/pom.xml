@@ -20,7 +20,7 @@
         <module>builders</module>
         <module>boot</module>
         <module>client</module>
-        <!-- MULE-XXX -->
+        <!-- MULE-2648 -->
         <!--<module>jaas</module>-->
         <module>jboss-transactions</module>
         <module>jca</module>
