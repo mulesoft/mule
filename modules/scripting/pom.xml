@@ -96,7 +96,13 @@
             <artifactId>groovy-all</artifactId>
             <version>1.0</version>
         </dependency>
-
+        <!-- Annoying: we need to override retrotranslated dependencies -->
+        <dependency>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>3.1</version>
+        </dependency>        
+        <!-- Mule dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
