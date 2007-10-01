@@ -11,7 +11,6 @@
 package org.mule.extras.jaas;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.security.MuleAuthentication;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
@@ -25,6 +24,7 @@ import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.security.auth.Subject;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
@@ -189,9 +189,8 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
     public final UMOAuthentication authenticate(UMOAuthentication authentication)
             throws org.mule.umo.security.SecurityException
     {
-
         LoginContext loginContext;
-        MuleAuthentication auth = (MuleAuthentication) authentication;
+        JaasAuthentication auth = (JaasAuthentication)authentication;
 
         // Create the Mule Callback Handler
         MuleCallbackHandler cbh = new MuleCallbackHandler(auth);
@@ -199,7 +198,14 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
         // Create the LoginContext object, and pass it to the CallbackHandler
         try
         {
-            loginContext = new LoginContext(loginContextName, cbh);
+            if (auth.getSubject() != null)
+            {
+                loginContext = new LoginContext(loginContextName,auth.getSubject(), cbh);
+            }
+            else
+            {
+                loginContext = new LoginContext(loginContextName, cbh);
+            }
         }
         catch (LoginException e)
         {
@@ -214,12 +220,15 @@ public class JaasSimpleAuthenticationProvider implements UMOSecurityProvider
         }
         catch (LoginException le)
         {
+            le.fillInStackTrace();
             throw new UnauthorisedException(CoreMessages.authFailedForUser(auth.getPrincipal()));
         }
 
-        auth.setAuthenticated(true);
+        Subject subject = loginContext.getSubject();
+        JaasAuthentication finalAuth = new JaasAuthentication(auth.getPrincipal(), auth.getCredentials(),subject);
+        finalAuth.setAuthenticated(true);
 
-        return auth;
+        return finalAuth;
     }
 
     /**

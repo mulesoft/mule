@@ -10,9 +10,12 @@
 
 package org.mule.extras.jaas.loginmodule;
 
+import org.mule.extras.jaas.MuleJaasPrincipal;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.security.auth.Subject;
@@ -44,6 +47,7 @@ public class DefaultLoginModule implements LoginModule
     private String password;
     private String credentials;
     private List credentialList;
+    private Subject subject;
 
     /**
      * Abort if authentication fails
@@ -90,15 +94,26 @@ public class DefaultLoginModule implements LoginModule
         }
         else
         {
+            // set the principal just authenticated in the subject
+            if (subject == null) 
+            {
+                return false;
+            }
+            MuleJaasPrincipal principal = new MuleJaasPrincipal(username); 
+            Set entities = subject.getPrincipals();
+            if (!entities.contains(principal))
+            {
+              entities.add(principal);
+            }
+
             // in any case, clean out state
             username = null;
             password = null;
-
             commitSucceeded = true;
             return true;
         }
     }
-
+    
     /**
      * Initialises the callbackHandler, the credentials and the credentials list
      * 
@@ -112,9 +127,10 @@ public class DefaultLoginModule implements LoginModule
                                  Map sharedState,
                                  Map options)
     {
+        this.subject = subject;
         this.callbackHandler = callbackHandler;
 
-        this.credentials = (String)options.get("credentials");
+        this.credentials = (String) options.get("credentials");
         this.credentialList = getCredentialList(this.credentials);
     }
 
@@ -215,7 +231,7 @@ public class DefaultLoginModule implements LoginModule
             }
         }
     }
-
+    
     /**
      * Returns true when authentication succeeds or false when it fails
      * 
