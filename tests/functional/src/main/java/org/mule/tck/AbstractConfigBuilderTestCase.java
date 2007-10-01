@@ -241,7 +241,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertEquals(5, pp.getMaxIdle());
 //        assertEquals(10001, pp.getMaxWait());
 //        assertEquals(ObjectPool.WHEN_EXHAUSTED_WAIT, pp.getExhaustedAction());
-//        assertEquals(PoolingProfiler.INITIALISE_ONE, pp.getInitialisationPolicy());
+//        assertEquals(PoolingProfile.INITIALISE_ONE, pp.getInitialisationPolicy());
 //        assertTrue(pp.getPoolFactory() instanceof CommonsPoolFactory);
 
         // test per-descriptor overrides
@@ -252,7 +252,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertEquals(9, pp.getMaxActive());
 //        assertEquals(6, pp.getMaxIdle());
 //        assertEquals(4002, pp.getMaxWait());
-//        assertEquals(ObjectPool.WHEN_EXHAUSTED_GROW, pp.getExhaustedAction());
+//        assertEquals(ObjectPool.WHEN_EXHAUSTED_FAIL, pp.getExhaustedAction());
 //        assertEquals(PoolingProfile.INITIALISE_ALL, pp.getInitialisationPolicy());
     }
 
