@@ -140,4 +140,11 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
     {
         this.capturing = false;
     }
+
+    /** {@inheritDoc} */
+    public long getStatus() throws java.lang.Exception
+    {
+        return controller.getStatus();
+    }
+
 }

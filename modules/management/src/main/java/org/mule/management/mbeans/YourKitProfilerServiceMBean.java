@@ -18,6 +18,7 @@ public interface YourKitProfilerServiceMBean
     public static final long ALLOCATION_RECORDING_ADAPTIVE = ProfilingModes.ALLOCATION_RECORDING_ADAPTIVE;
     public static final long CPU_SAMPLING = ProfilingModes.CPU_SAMPLING;
     public static final long CPU_TRACING = ProfilingModes.CPU_TRACING;
+    public static final long MONITOR_PROFILING = ProfilingModes.MONITOR_PROFILING;
     public static final long CPU_J2EE = ProfilingModes.CPU_J2EE;
     public static final long SNAPSHOT_WITHOUT_HEAP = ProfilingModes.SNAPSHOT_WITHOUT_HEAP;
     public static final long SNAPSHOT_WITH_HEAP = ProfilingModes.SNAPSHOT_WITH_HEAP;
@@ -179,5 +180,41 @@ public interface YourKitProfilerServiceMBean
      * @see #startCapturingMemorySnapshotEverySeconds(int)
      */
     public void stopCapturingMemorySnapshot();
+
+    /**
+     * Get current profiling status. The following code snippet demonstrates how to use this method:
+     * <code><pre>
+     * long status = controller.getStatus();
+     *
+     * if ((status & YourKitProfilerServiceMBean.ALLOCATION_RECORDING_ADAPTIVE) != 0) {
+     *  System.out.println("Allocation recording is on (adaptive)");
+     * }
+     * else if ((status & YourKitProfilerServiceMBean.ALLOCATION_RECORDING_ALL) != 0) {
+     *  System.out.println("Allocation recording is on (all objects)");
+     * }
+     * else {
+     *  System.out.println("Allocation recording is off");
+     * }
+     *
+     * if ((status & YourKitProfilerServiceMBean.CPU_TRACING) != 0) {
+     *  System.out.println("CPU profiling is on (tracing)");
+     * }
+     * else if ((status & YourKitProfilerServiceMBean.CPU_SAMPLING) != 0) {
+     *  System.out.println("CPU profiling is on (sampling)");
+     * }
+     * else {
+     *  System.out.println("CPU profiling is off");
+     * }
+     *
+     * if ((status & YourKitProfilerServiceMBean.MONITOR_PROFILING) != 0) {
+     *  System.out.println("Monitor profiling is on");
+     * }
+     * else {
+     *  System.out.println("Monitor profiling is off");
+     * }</pre></code>
+     * @return a bit mask to check against Profiling Modes
+     * @throws java.lang.Exception
+     */
+    public long getStatus() throws java.lang.Exception;
 
 }
