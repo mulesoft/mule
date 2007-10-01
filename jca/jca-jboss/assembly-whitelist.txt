@@ -5,7 +5,7 @@ axis-1.4
 axis-jaxrpc-1.4
 axis-saaj-1.4
 axis-wsdl4j-1.5.1
-backport-util-concurrent-3.0
+backport-util-concurrent-3.1
 bcprov-jdk14-133
 c3p0-0.9.0.4
 cglib-nodep-2.1_3
@@ -110,7 +110,7 @@ stax-utils-20040917
 wrapper-3.2.3
 wsdl4j-1.6.1
 wss4j-1.5.0
-wstx-asl-3.2.1
+wstx-asl-3.2.2
 xapool-1.4
 xfire-aegis-1.2.6
 xfire-annotations-1.2.6
