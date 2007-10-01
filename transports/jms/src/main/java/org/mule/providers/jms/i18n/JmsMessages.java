@@ -71,6 +71,6 @@ public class JmsMessages extends MessageFactory
     
     public static Message noConnectionFactorySet()
     {
-        return createMessage(BUNDLE_PATH, 15);
+        return createMessage(BUNDLE_PATH, 14);
     }
 }
