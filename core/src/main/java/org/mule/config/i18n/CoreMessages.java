@@ -896,6 +896,20 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 235, endpoint, exceptionListener);
     }
 
+    /**
+     * Returns a message that is a product informatin.
+     *
+     * @return message
+     */
+    public static Message productInformation()
+    {
+        MuleManifest config = new MuleManifest();
+        String notset = CoreMessages.notSet().getMessage();
+        return createMessage(BUNDLE_PATH, 236, StringUtils.defaultString(config.getProductDescription(), notset),
+                             StringUtils.defaultString(config.getProductVersion(), notset),
+                             StringUtils.defaultString(config.getVendorName(), notset) + " " + StringUtils.defaultString(config.getVendorUrl(), notset));
+    }
+
 
     public static Message noEntryPointFoundForNoArgsMethodUsingResolver(final Object component, final String methodName, UMOEntryPointResolver resolver)
     {
@@ -942,19 +956,14 @@ public class CoreMessages extends MessageFactory
                 methodName, resolver);
     }
 
-    /**
-     * Returns a message that is a product informatin.
-     *
-     * @return message
-     */
-    public static Message productInformation()
+    public static Message noJtaTransactionAvailable(final Thread callingThread)
     {
-        MuleManifest config = new MuleManifest();
-        String notset = CoreMessages.notSet().getMessage();
-        return createMessage(BUNDLE_PATH, 236, StringUtils.defaultString(config.getProductDescription(), notset),
-                StringUtils.defaultString(config.getProductVersion(), notset),
-                StringUtils.defaultString(config.getVendorName(), notset) + " " + StringUtils.defaultString(config.getVendorUrl(), notset));
+        return createMessage(BUNDLE_PATH, 247, StringUtils.defaultString(callingThread.toString()));
     }
 
+    public static Message notMuleXaTransaction(Object tx)
+    {
+        return createMessage(BUNDLE_PATH, 248, tx.getClass());
+    }
 
 }

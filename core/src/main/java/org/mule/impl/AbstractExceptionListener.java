@@ -104,7 +104,8 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     public void exceptionThrown(Exception e)
     {
         fireNotification(new ExceptionNotification(e));
-        
+        logException(e);
+
         Throwable t = getExceptionType(e, RoutingException.class);
         if (t != null)
         {

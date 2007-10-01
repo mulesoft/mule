@@ -14,6 +14,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.jdbc.i18n.JdbcMessages;
+import org.mule.providers.jdbc.xa.DataSourceWrapper;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
@@ -47,6 +48,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import javax.sql.XADataSource;
+import javax.transaction.TransactionManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
@@ -112,6 +115,16 @@ public class JdbcConnector extends AbstractConnector
 
                 }
             }
+
+            if (dataSource != null && dataSource instanceof XADataSource)
+            {
+                final TransactionManager tm = managementContext.getTransactionManager();
+                if (tm != null)
+                {
+                    dataSource = new DataSourceWrapper((XADataSource)dataSource, tm);
+                }
+            }
+
             // setup property Extractors for queries
             if (propertyExtractors.isEmpty())
             {

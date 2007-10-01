@@ -17,7 +17,7 @@
 
     <!-- Transaction manager -->
     <transaction-manager
-        factory="org.mule.extras.jotm.JotmTransactionManagerFactory" />
+        factory="org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory" />
 
     <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>

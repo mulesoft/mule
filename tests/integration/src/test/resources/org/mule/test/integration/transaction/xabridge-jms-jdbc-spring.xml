@@ -2,27 +2,23 @@
 <beans>
 
     <!-- JOTM Transaction manager -->
-    <bean id="jotm"
-        class="org.springframework.transaction.jta.JotmFactoryBean"/>
-    <!--
-    <bean id="transactionManager"
-        class="org.mule.extras.spring.transaction.MuleJtaTransactionManager">
-        <property name="userTransaction">
-            <ref local="jotm"/>
-        </property>
-    </bean>
-    -->
+    <bean name="ArjunaFactory" class="org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
+
+    <bean id="arjunaTM"
+        factory-bean="ArjunaFactory" factory-method="create"/>
+
+
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 	    <property name="location">
             <value>classpath:derby.properties</value>
         </property>
     </bean>
     <!-- Data Source -->
-    <bean id="innerDataSource"
+    <bean id="jdbcDataSource"
         class="org.enhydra.jdbc.standard.StandardXADataSource"
         destroy-method="shutdown">
         <property name="transactionManager">
-            <ref local="jotm"/>
+            <ref local="arjunaTM"/>
         </property>
         <property name="driverName">
             <value>org.apache.derby.jdbc.EmbeddedDriver</value>
@@ -43,15 +39,6 @@
         </property>
     </bean>
     -->
-    <bean id="jdbcDataSource"
-           class="org.mule.providers.jdbc.xa.DataSourceWrapper">
-        <property name="xaDataSource">
-            <ref local="innerDataSource"/>
-        </property>
-        <property name="transactionManager">
-            <ref local="jotm"/>
-        </property>
-    </bean>
 
     <!-- ActiveMQ -->
     <bean id="jmsConnectionFactoryXa"

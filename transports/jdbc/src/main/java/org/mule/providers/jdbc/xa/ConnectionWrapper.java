@@ -10,9 +10,10 @@
 
 package org.mule.providers.jdbc.xa;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.XaTransaction;
+import org.mule.umo.UMOTransaction;
+
 import java.lang.reflect.Proxy;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -25,323 +26,322 @@ import java.sql.Statement;
 import java.util.Map;
 
 import javax.sql.XAConnection;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO
+ * Using for unification XAConnection and Connection
  */
 public class ConnectionWrapper implements Connection
 {
+    private final XAConnection xaConnection;
+    private Connection connection;
+    private volatile boolean enlisted = false;
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
-    private XAConnection xaCon;
-    private Connection con;
-    private TransactionManager tm;
-    private Transaction tx;
-
-    public ConnectionWrapper(XAConnection xaCon, TransactionManager tm) throws SQLException
+    public ConnectionWrapper(XAConnection xaCon) throws SQLException
     {
-        this.xaCon = xaCon;
-        this.con = xaCon.getConnection();
-        this.tm = tm;
-        this.tx = null;
+        this.xaConnection = xaCon;
+        this.connection = xaCon.getConnection();
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see java.sql.Connection#getHoldability()
-     */
+    * (non-Javadoc)
+    *
+    * @see java.sql.Connection#getHoldability()
+    */
+
     public int getHoldability() throws SQLException
     {
-        return con.getHoldability();
+        return connection.getHoldability();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#getTransactionIsolation()
      */
     public int getTransactionIsolation() throws SQLException
     {
-        return con.getTransactionIsolation();
+        return connection.getTransactionIsolation();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#clearWarnings()
      */
     public void clearWarnings() throws SQLException
     {
-        con.clearWarnings();
+        connection.clearWarnings();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#close()
      */
     public void close() throws SQLException
     {
-        con.close();
+        connection.close();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#commit()
      */
     public void commit() throws SQLException
     {
-        con.commit();
+        connection.commit();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#rollback()
      */
     public void rollback() throws SQLException
     {
-        con.rollback();
+        connection.rollback();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#getAutoCommit()
      */
     public boolean getAutoCommit() throws SQLException
     {
-        return con.getAutoCommit();
+        return connection.getAutoCommit();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#isClosed()
      */
     public boolean isClosed() throws SQLException
     {
-        return con.isClosed();
+        return connection.isClosed();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#isReadOnly()
      */
     public boolean isReadOnly() throws SQLException
     {
-        return con.isReadOnly();
+        return connection.isReadOnly();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#setHoldability(int)
      */
     public void setHoldability(int holdability) throws SQLException
     {
-        con.setHoldability(holdability);
+        connection.setHoldability(holdability);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#setTransactionIsolation(int)
      */
     public void setTransactionIsolation(int level) throws SQLException
     {
-        con.setTransactionIsolation(level);
+        connection.setTransactionIsolation(level);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#setAutoCommit(boolean)
      */
     public void setAutoCommit(boolean autoCommit) throws SQLException
     {
-        con.setAutoCommit(autoCommit);
+        connection.setAutoCommit(autoCommit);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#setReadOnly(boolean)
      */
     public void setReadOnly(boolean readOnly) throws SQLException
     {
-        con.setReadOnly(readOnly);
+        connection.setReadOnly(readOnly);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#getCatalog()
      */
     public String getCatalog() throws SQLException
     {
-        return con.getCatalog();
+        return connection.getCatalog();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#setCatalog(java.lang.String)
      */
     public void setCatalog(String catalog) throws SQLException
     {
-        con.setCatalog(catalog);
+        connection.setCatalog(catalog);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#getMetaData()
      */
     public DatabaseMetaData getMetaData() throws SQLException
     {
-        return con.getMetaData();
+        return connection.getMetaData();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#getWarnings()
      */
     public SQLWarning getWarnings() throws SQLException
     {
-        return con.getWarnings();
+        return connection.getWarnings();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#setSavepoint()
      */
     public Savepoint setSavepoint() throws SQLException
     {
-        return con.setSavepoint();
+        return connection.setSavepoint();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#releaseSavepoint(java.sql.Savepoint)
      */
     public void releaseSavepoint(Savepoint savepoint) throws SQLException
     {
-        con.releaseSavepoint(savepoint);
+        connection.releaseSavepoint(savepoint);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#rollback(java.sql.Savepoint)
      */
     public void rollback(Savepoint savepoint) throws SQLException
     {
-        con.rollback();
+        connection.rollback();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#createStatement()
      */
     public Statement createStatement() throws SQLException
     {
-        Statement st = con.createStatement();
+        Statement st = connection.createStatement();
         return (Statement) Proxy.newProxyInstance(Statement.class.getClassLoader(),
-            new Class[]{Statement.class}, new StatementInvocationHandler(st));
+                                                  new Class[]{Statement.class}, new StatementInvocationHandler(this, st));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#createStatement(int, int)
      */
     public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException
     {
-        Statement st = con.createStatement(resultSetType, resultSetConcurrency);
+        Statement st = connection.createStatement(resultSetType, resultSetConcurrency);
         return (Statement) Proxy.newProxyInstance(Statement.class.getClassLoader(),
-            new Class[]{Statement.class}, new StatementInvocationHandler(st));
+                                                  new Class[]{Statement.class}, new StatementInvocationHandler(this, st));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#createStatement(int, int, int)
      */
     public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
-        throws SQLException
+            throws SQLException
     {
-        Statement st = con.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
+        Statement st = connection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
         return (Statement) Proxy.newProxyInstance(Statement.class.getClassLoader(),
-            new Class[]{Statement.class}, new StatementInvocationHandler(st));
+                                                  new Class[]{Statement.class}, new StatementInvocationHandler(this, st));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#getTypeMap()
      */
     public Map getTypeMap() throws SQLException
     {
-        return con.getTypeMap();
+        return connection.getTypeMap();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#setTypeMap(java.util.Map)
      */
     public void setTypeMap(Map map) throws SQLException
     {
-        con.setTypeMap(map);
+        connection.setTypeMap(map);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#nativeSQL(java.lang.String)
      */
     public String nativeSQL(String sql) throws SQLException
     {
-        return con.nativeSQL(sql);
+        return connection.nativeSQL(sql);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#prepareCall(java.lang.String)
      */
     public CallableStatement prepareCall(String sql) throws SQLException
     {
-        CallableStatement cs = con.prepareCall(sql);
+        CallableStatement cs = connection.prepareCall(sql);
         return (CallableStatement) Proxy.newProxyInstance(CallableStatement.class.getClassLoader(),
-            new Class[]{CallableStatement.class}, new StatementInvocationHandler(cs));
+                                                          new Class[]{CallableStatement.class}, new StatementInvocationHandler(this, cs));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#prepareCall(java.lang.String, int, int)
      */
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency)
-        throws SQLException
+            throws SQLException
     {
-        CallableStatement cs = con.prepareCall(sql, resultSetType, resultSetConcurrency);
+        CallableStatement cs = connection.prepareCall(sql, resultSetType, resultSetConcurrency);
         return (CallableStatement) Proxy.newProxyInstance(CallableStatement.class.getClassLoader(),
-            new Class[]{CallableStatement.class}, new StatementInvocationHandler(cs));
+                                                          new Class[]{CallableStatement.class}, new StatementInvocationHandler(this, cs));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#prepareCall(java.lang.String, int, int, int)
      */
     public CallableStatement prepareCall(String sql,
@@ -349,51 +349,51 @@ public class ConnectionWrapper implements Connection
                                          int resultSetConcurrency,
                                          int resultSetHoldability) throws SQLException
     {
-        CallableStatement cs = con.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+        CallableStatement cs = connection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
         return (CallableStatement) Proxy.newProxyInstance(CallableStatement.class.getClassLoader(),
-            new Class[]{CallableStatement.class}, new StatementInvocationHandler(cs));
+                                                          new Class[]{CallableStatement.class}, new StatementInvocationHandler(this, cs));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#prepareStatement(java.lang.String)
      */
     public PreparedStatement prepareStatement(String sql) throws SQLException
     {
-        PreparedStatement ps = con.prepareStatement(sql);
+        PreparedStatement ps = connection.prepareStatement(sql);
         return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
+                                                          new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#prepareStatement(java.lang.String, int)
      */
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException
     {
-        PreparedStatement ps = con.prepareStatement(sql, autoGeneratedKeys);
+        PreparedStatement ps = connection.prepareStatement(sql, autoGeneratedKeys);
         return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
+                                                          new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#prepareStatement(java.lang.String, int, int)
      */
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency)
-        throws SQLException
+            throws SQLException
     {
-        PreparedStatement ps = con.prepareStatement(sql, resultSetType, resultSetConcurrency);
+        PreparedStatement ps = connection.prepareStatement(sql, resultSetType, resultSetConcurrency);
         return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
+                                                          new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#prepareStatement(java.lang.String, int, int, int)
      */
     public PreparedStatement prepareStatement(String sql,
@@ -401,91 +401,80 @@ public class ConnectionWrapper implements Connection
                                               int resultSetConcurrency,
                                               int resultSetHoldability) throws SQLException
     {
-        PreparedStatement ps = con.prepareStatement(sql, resultSetType, resultSetConcurrency,
-            resultSetHoldability);
+        PreparedStatement ps = connection.prepareStatement(sql, resultSetType, resultSetConcurrency,
+                                                           resultSetHoldability);
         return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
+                                                          new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#prepareStatement(java.lang.String, int[])
      */
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException
     {
-        PreparedStatement ps = con.prepareStatement(sql, columnIndexes);
+        PreparedStatement ps = connection.prepareStatement(sql, columnIndexes);
         return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
+                                                          new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#setSavepoint(java.lang.String)
      */
     public Savepoint setSavepoint(String name) throws SQLException
     {
-        return con.setSavepoint(name);
+        return connection.setSavepoint(name);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.sql.Connection#prepareStatement(java.lang.String,
      *      java.lang.String[])
      */
     public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException
     {
-        PreparedStatement ps = con.prepareStatement(sql, columnNames);
-        return (PreparedStatement)Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
-            new Class[]{PreparedStatement.class}, new StatementInvocationHandler(ps));
+        PreparedStatement ps = connection.prepareStatement(sql, columnNames);
+        return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
+                                                          new Class[]{PreparedStatement.class}, new StatementInvocationHandler(this, ps));
     }
 
     protected void enlist() throws Exception
     {
-        if (tm != null && tx == null)
+        if (isEnlisted())
         {
-            tx = tm.getTransaction();
-            if (tx != null)
-            {
-                tx.enlistResource(xaCon.getXAResource());
-            }
+            return;
+        }
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Enlistment request: " + this);
+        }
+
+        UMOTransaction transaction = TransactionCoordination.getInstance().getTransaction();
+        if (transaction == null && logger.isDebugEnabled())
+        {
+            logger.debug("Mule transaction is null, but enlist method is called");
+        }
+        if (transaction != null && !(transaction instanceof XaTransaction))
+        {
+            throw new IllegalStateException("Can't enlist resource, Mule transaction is not instance of XaTransaction " + transaction);
+        }
+        if (transaction != null && !isEnlisted())
+        {
+            enlisted = ((XaTransaction) transaction).enlistResource(xaConnection.getXAResource());
         }
     }
 
-    protected class StatementInvocationHandler implements InvocationHandler
+    public boolean isEnlisted()
     {
-
-        private Statement statement;
-
-        public StatementInvocationHandler(Statement statement)
-        {
-            this.statement = statement;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
-         *      java.lang.reflect.Method, java.lang.Object[])
-         */
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-        {
-            if (method.getName().startsWith("execute"))
-            {
-                enlist();
-            }
-            try
-            {
-                return method.invoke(statement, args);
-            }
-            catch (InvocationTargetException ex)
-            {
-                throw ex.getTargetException();
-            }
-        }
-
+        return enlisted;
     }
 
+    public void setEnlisted(boolean enlisted)
+    {
+        this.enlisted = enlisted;
+    }
 }

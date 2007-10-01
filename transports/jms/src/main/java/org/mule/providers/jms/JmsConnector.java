@@ -184,13 +184,13 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             if (jndiInitialFactory != null)
             {
                 connectionFactory = new JndiObjectFactory(connectionFactoryJndiName, jndiInitialFactory, jndiProviderUrl, jndiProviderProperties);
-                ((Initialisable) connectionFactory).initialise();
+                connectionFactory.initialise();
                 jndiContext = ((JndiObjectFactory) connectionFactory).getContext();
             }
             else if (getDefaultConnectionFactory() != null)
             {
                 connectionFactory = getDefaultConnectionFactory();
-                ((Initialisable) connectionFactory).initialise();
+                connectionFactory.initialise();
             }
             else
             {
@@ -205,7 +205,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         if (redeliveryHandler == null)
         {
             redeliveryHandler = new SimpleObjectFactory(DefaultRedeliveryHandler.class);
-            ((Initialisable) redeliveryHandler).initialise();
+            redeliveryHandler.initialise();
         }
 
         try
@@ -241,7 +241,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
         if (connectionFactory != null && connectionFactory instanceof Disposable)
         {
-            ((Disposable) connectionFactory).dispose();
+            connectionFactory.dispose();
         }
     }
 
@@ -253,6 +253,10 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         try
         {
             cf = (ConnectionFactory) connectionFactory.create();
+            if (cf instanceof XAConnectionFactory && managementContext.getTransactionManager() != null)
+            {
+                cf = new ConnectionFactoryWrapper(cf);
+            }
         }
         catch (Exception e)
         {
@@ -260,16 +264,9 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         if (cf == null)
         {
-            throw new InitialisationException(CoreMessages.failedToCreate("ConnectionFactory"), this);
+            throw new InitialisationException(JmsMessages.noConnectionFactorySet(), this);
         }
 
-        if (cf instanceof XAConnectionFactory)
-        {
-            if (managementContext.getTransactionManager() != null)
-            {
-                cf = new ConnectionFactoryWrapper(cf, managementContext.getTransactionManager());
-            }
-        }
 
         if (username != null)
         {
@@ -985,7 +982,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     /**
      * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
+     * @see <a href="http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee"/>
      * @see org.mule.util.object.JndiObjectFactory
      */
     public String getConnectionFactoryJndiName()

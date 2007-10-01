@@ -19,99 +19,85 @@ import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
 
 /**
- * TODO
+ * Using for unification XADataSource and DataSource
  */
 public class DataSourceWrapper implements DataSource
 {
 
-    private XADataSource xads;
-    private TransactionManager tm;
+    private XADataSource xaDataSource;
 
     public DataSourceWrapper()
     {
         super();
     }
 
-    public DataSourceWrapper(XADataSource xads, TransactionManager tm)
+    public DataSourceWrapper(XADataSource xaDataSource, TransactionManager tm)
     {
-        this.xads = xads;
-        this.tm = tm;
+        this.xaDataSource = xaDataSource;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.sql.DataSource#getLoginTimeout()
      */
     public int getLoginTimeout() throws SQLException
     {
-        return xads.getLoginTimeout();
+        return xaDataSource.getLoginTimeout();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.sql.DataSource#setLoginTimeout(int)
      */
     public void setLoginTimeout(int seconds) throws SQLException
     {
-        xads.setLoginTimeout(seconds);
+        xaDataSource.setLoginTimeout(seconds);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.sql.DataSource#getLogWriter()
      */
     public PrintWriter getLogWriter() throws SQLException
     {
-        return xads.getLogWriter();
+        return xaDataSource.getLogWriter();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.sql.DataSource#setLogWriter(java.io.PrintWriter)
      */
     public void setLogWriter(PrintWriter out) throws SQLException
     {
-        xads.setLogWriter(out);
+        xaDataSource.setLogWriter(out);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.sql.DataSource#getConnection()
      */
     public Connection getConnection() throws SQLException
     {
-        return new ConnectionWrapper(xads.getXAConnection(), tm);
+        final Connection connWrapper = new ConnectionWrapper(xaDataSource.getXAConnection());
+        connWrapper.setAutoCommit(false);
+        return connWrapper;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.sql.DataSource#getConnection(java.lang.String, java.lang.String)
      */
     public Connection getConnection(String username, String password) throws SQLException
     {
-        return new ConnectionWrapper(xads.getXAConnection(username, password), tm);
-    }
-
-    /**
-     * @return Returns the transaction manager.
-     */
-    public TransactionManager getTransactionManager()
-    {
-        return tm;
-    }
-
-    /**
-     * @param tm The transaction manager to set.
-     */
-    public void setTransactionManager(TransactionManager tm)
-    {
-        this.tm = tm;
+        final Connection connWrapper = new ConnectionWrapper(xaDataSource.getXAConnection(username, password));
+        connWrapper.setAutoCommit(false);
+        return connWrapper;
     }
 
     /**
@@ -119,7 +105,7 @@ public class DataSourceWrapper implements DataSource
      */
     public XADataSource getXaDataSource()
     {
-        return xads;
+        return xaDataSource;
     }
 
     /**
@@ -127,6 +113,6 @@ public class DataSourceWrapper implements DataSource
      */
     public void setXaDataSource(XADataSource xads)
     {
-        this.xads = xads;
+        this.xaDataSource = xads;
     }
 }

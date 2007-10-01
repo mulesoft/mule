@@ -12,6 +12,7 @@ package org.mule.transaction;
 
 import org.mule.MuleServer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.umo.TransactionException;
 
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAResource;
 
 /**
  * <code>XaTransaction</code> represents an XA transaction in Mule.
@@ -241,8 +243,8 @@ public class XaTransaction extends AbstractTransaction
         catch (SystemException e)
         {
             throw (IllegalStateException) new IllegalStateException(
-                "Failed to set transaction to rollback only: " + e.getMessage()
-                ).initCause(e);
+                    "Failed to set transaction to rollback only: " + e.getMessage()
+            ).initCause(e);
         }
     }
 
@@ -274,10 +276,35 @@ public class XaTransaction extends AbstractTransaction
             if (resources.containsKey(key))
             {
                 throw new IllegalTransactionStateException(
-                    CoreMessages.transactionResourceAlreadyListedForKey(key));
+                        CoreMessages.transactionResourceAlreadyListedForKey(key));
             }
 
             resources.put(key, resource);
         }
     }
+
+    // moved here from connection wrapper
+    public boolean enlistResource(XAResource resource) throws TransactionException
+    {
+        TransactionManager txManager = MuleServer.getManagementContext().getTransactionManager();
+        try
+        {
+            Transaction tx = txManager.getTransaction();
+            if (tx == null)
+            {
+                throw new TransactionException(MessageFactory.createStaticMessage("XATransaction is null"));
+            }
+            return tx.enlistResource(resource);
+        }
+        catch (RollbackException e)
+        {
+            throw new TransactionException(e);
+        }
+        catch (SystemException e)
+        {
+            throw new TransactionException(e);
+        }
+    }
+
+
 }
