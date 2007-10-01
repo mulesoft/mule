@@ -17,7 +17,6 @@
                                                                
                 <mule:inbound-router>
                     <mule:inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
-                    <!-- endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/ -->
                     <mule:inbound-endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE"
                                            address="test://endpoint.in2">
                         <!-- mule:transaction action="ALWAYS_BEGIN" -->
@@ -61,11 +60,8 @@
 
                 <mule:threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6"
                                         poolExhaustedAction="WAIT" threadTTL="60001"/>
-                <!-- threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6"/ -->
                 <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT" initialisationPolicy="INITIALISE_ALL"/>
-                <!-- pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/ -->
                 <mule:queue-profile maxOutstandingMessages="102"/>
-                <!-- queue-profile maxOutstandingMessages="102"/ -->
 
             </mule:service>
 

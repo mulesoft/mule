@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.config;
+package org.mule.test.spring;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
@@ -25,7 +25,6 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
@@ -34,19 +33,30 @@ import org.mule.util.properties.JXPathPropertyExtractor;
 import org.mule.util.properties.PropertyExtractor;
 
 import java.util.List;
-import java.util.Map;
 
-public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
+/**
+ * This is an extended version of the same test covered in
+ * {@link org.mule.test.spring.SpringNamespaceConfigBuilderTestCase}.  Both are translations of an
+ * earlier (1.X) test.
+ *
+ * I realise this seems rather messy, and I did consider merging the two, but they often test different
+ * things, and we would have lost quite a few tests on merging.  So I am afraid we are left with two
+ * rather rambling, parallel tests.  But these tests examing "corner cases" no other tests cover, so
+ * are quite valuable...
+ */
+public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilderTestCase
 {
 
-    public MuleXmlConfigBuilderTestCase()
+    public SpringNamespaceConfigBuilderV2TestCase()
     {
         super(true);
     }
 
     public String getConfigResources()
     {
-        return "test-xml-mule2-config.xml,test-xml-mule2-config-split.xml,test-xml-mule2-config-split-properties.xml";
+        return "org/mule/test/spring/config2/test-xml-mule2-config.xml," +
+                "org/mule/test/spring/config2/test-xml-mule2-config-split.xml," +
+                "org/mule/test/spring/config2/test-xml-mule2-config-split-properties.xml";
     }
 
     // @Override
@@ -105,6 +115,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertEquals("test2", d.getProperties().get("test2"));
     }
 
+    // no equivalent in 2.x for these
 //    public void testMapPropertyTypesConfig() throws Exception
 //    {
 //        UMODescriptor d = managementContext.getRegistry().lookupService("testPropertiesComponent");

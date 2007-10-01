@@ -21,8 +21,8 @@ public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderT
 
     public String getConfigResources()
     {
-        return "org/mule/test/spring/test-xml-mule2-config.xml," +
-                "org/mule/test/spring/test-xml-mule2-config-split.xml";
+        return "org/mule/test/spring/config1/test-xml-mule2-config.xml," +
+                "org/mule/test/spring/config1/test-xml-mule2-config-split.xml";
     }
 
 }
