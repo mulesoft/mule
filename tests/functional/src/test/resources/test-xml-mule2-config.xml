@@ -16,7 +16,7 @@
          conversion, with the same name, done by ross, in org.mule.test.spring directory.
          this file is converted by andrew cooke and may converge on ross's translation,
          but currently differs in that it (1) is more detailed/direct and (2) is
-         associated with tests (rather than just seeing if parsing fails). -->
+         associated with more tests. -->
 
         <mule:environment-property name="doCompression" value="true"/>
         <mule:environment-property name="beanProperty1" value="this was set from the manager properties!"/>
@@ -45,9 +45,8 @@
         <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/>
     </mule-environment-properties -->
 
-        <!-- TODO -->
-        <!-- seem to be missing any kind of custom transaction manager -->
         <!-- transaction-manager factory="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/ -->
+        <mule:custom-transaction-manager class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
 
         <!-- TODO -->
         <!-- daniel is working on management, i think -->
@@ -258,8 +257,6 @@
 
                 <mule:outbound-router>
                     <mule:outbound-pass-through-router>
-                        <!-- TODO -->
-                        <!-- shouldn't it be transformers-ref? -->
                         <mule:outbound-endpoint ref="appleInEndpoint"
                                                 transformer-ref="TestCompressionTransformer"/>
                     </mule:outbound-pass-through-router>
@@ -288,7 +285,32 @@
                    <endpoint address="test://orange.exceptions"/>
                 </exception-strategy -->
 
-                <!-- moved to bean -->
+                <mule:meta-info>
+                    <entry key="brand" value="Juicy Baby!"/>
+                    <entry key="segments" value="9"/>
+                    <entry key="radius" value="4.21"/>
+                    <entry key="mapProperties">
+                        <map>
+                            <entry key="prop1" value="prop1"/>
+                            <entry key="prop2" value="prop2"/>
+                        </map>
+                    </entry>
+                    <entry key="listProperties">
+                        <list>
+                            <value>prop1</value>
+                            <value>prop2</value>
+                            <value>prop3</value>
+                        </list>
+                    </entry>
+                    <entry key="arrayProperties">
+                        <list>
+                            <value>prop4</value>
+                            <value>prop5</value>
+                            <value>prop6</value>
+                        </list>
+                    </entry>
+                </mule:meta-info>
+
                 <!-- properties>
                 <factory-property name="orange" factory="org.mule.tck.testmodels.fruit.Orange"/>
                 <property name="brand" value="Juicy Baby!"/>
@@ -336,9 +358,9 @@
                 <mule:outbound-router>
                     <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                     <mule:filtering-router>
-                        <mule:outbound-endpoint name="TestApple-Out"
-                                           address="test://appleQ2" transformer-ref="TestCompressionTransformer"/>
+                        <mule:outbound-endpoint name="TestApple-Out" address="test://appleQ2"/>
                         <mule:payload-type-filter expectedType="java.lang.String"/>
+                        <mule:transformer ref="TestCompressionTransformer"/>
                     </mule:filtering-router>
                     <mule:filtering-router>
                         <mule:outbound-endpoint ref="waterMelonEndpoint"/>

@@ -11,7 +11,6 @@
 package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
-import org.mule.config.spring.parsers.preprocessors.CheckExclusiveAttributes;
 
 public class GenericEndpointDefinitionParser extends ChildEndpointDefinitionParser
 {

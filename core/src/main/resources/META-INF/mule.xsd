@@ -259,6 +259,7 @@
         <xsd:sequence>
             <xsd:element ref="abstract-response-endpoint" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-response-router" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
         <xsd:attribute name="timeout" type="xsd:string"/>
@@ -1158,6 +1159,9 @@
     <xsd:complexType name="selectiveConsumerRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
                 <xsd:attribute name="transformerFirst" type="substitutableBoolean"/>
             </xsd:extension>
@@ -1256,6 +1260,7 @@
             <xsd:extension base="outboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-filter" minOccurs="0"/>
+                    <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
             </xsd:extension>

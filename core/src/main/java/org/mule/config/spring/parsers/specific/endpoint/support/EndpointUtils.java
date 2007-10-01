@@ -14,10 +14,8 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.util.StringUtils;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import org.w3c.dom.Element;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
 /**
  * Routines and constants common to the two endpoint definition parsers.
@@ -71,8 +69,6 @@ public class EndpointUtils
     {
         parser.addAlias(ADDRESS_ATTRIBUTE, ENDPOINT_URI_ATTRIBUTE);
         parser.addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
-        parser.addAlias("transformers", "transformer");
-        parser.addAlias("responseTransformers", "responseTransformer");
     }
 
 }

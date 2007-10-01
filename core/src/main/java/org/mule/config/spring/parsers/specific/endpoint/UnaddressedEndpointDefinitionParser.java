@@ -45,8 +45,6 @@ public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinition
         this.endpointClass = endpointClass;
         addAlias(ADDRESS_ATTRIBUTE, ENDPOINT_URI_ATTRIBUTE);
         addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
-        addAlias("transformers", "transformer");
-        addAlias("responseTransformers", "responseTransformer");
         addIgnored(ATTRIBUTE_REF);
     }
 

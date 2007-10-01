@@ -1,4 +1,1 @@
-# MULE-1838
-org.mule.test.config.MuleXmlConfigBuilderTestCase
-
 org.mule.test.spring.GlobalPropertiesMule2458TestCase
