@@ -1,6 +1,6 @@
 <project name="IzPack" default="all" basedir="..">
     <!--
-  $Id: build.xml 1711 2007-01-16 08:24:34Z jponge $
+  $Id$
   
   build.xml first written by Pierre Dittgen (pierre.dittgen@criltelecom.com)
   This file is intended to be used with ant (http://jakarta.apache.org/ant),
