@@ -76,7 +76,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         assertEquals(1, utExStrat.getMessagingExceptions().size());
         
         assertNotNull(result);
-        // assertTrue(result.getPayload() instanceof byte[]);
+        assertTrue(result.getPayload() instanceof byte[]);
     }
    
     protected String getConfigResources()

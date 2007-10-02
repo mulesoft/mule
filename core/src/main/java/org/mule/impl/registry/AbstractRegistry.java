@@ -38,7 +38,6 @@ import org.mule.util.UUID;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -299,26 +298,6 @@ public abstract class AbstractRegistry implements Registry
         return (UMOTransformer) lookupObject(name);
     }
 
-    public UMOTransformer lookupTransformer(Class input, Class output)
-    {
-        // TODO: Optimize & Cache
-        Collection transformers = getTransformers();
-        for (Iterator itr = transformers.iterator(); itr.hasNext();) 
-        {
-            UMOTransformer t = (UMOTransformer) itr.next();
-            Class c = t.getReturnClass();
-            if (c == null) {
-                c = Object.class;
-            }
-            if (output.isAssignableFrom(c)
-                && t.isSourceTypeSupported(input))
-            {
-                return t;
-            }
-        }
-        return null;
-    }
-    
     public UMOModel lookupModel(String name)
     {
         return (UMOModel) lookupObject(name);

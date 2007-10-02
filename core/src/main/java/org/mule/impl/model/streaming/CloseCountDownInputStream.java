@@ -1,5 +1,5 @@
 /*
- * $Id: CloseCountDownInputStream.java 8077 2007-08-27 20:15:25Z aperepel $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -13,39 +13,21 @@ package org.mule.impl.model.streaming;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class DelegatingInputStream extends InputStream
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+
+/**
+ * Decrements the latch on close.
+ */
+public class CloseCountDownInputStream extends InputStream
 {
 
     private InputStream delegate;
-    
-    public DelegatingInputStream(InputStream delegate)
+    private CountDownLatch latch;
+
+    public CloseCountDownInputStream(InputStream delegate, CountDownLatch latch)
     {
         this.delegate = delegate;
-    }
-
-    public int available() throws IOException
-    {
-        return delegate.available();
-    }
-
-    public synchronized void mark(int readlimit)
-    {
-        delegate.mark(readlimit);
-    }
-
-    public boolean markSupported()
-    {
-        return delegate.markSupported();
-    }
-
-    public synchronized void reset() throws IOException
-    {
-        delegate.reset();
-    }
-
-    public long skip(long n) throws IOException
-    {
-        return delegate.skip(n);
+        this.latch = latch;
     }
 
     public int read() throws IOException
@@ -65,7 +47,17 @@ public class DelegatingInputStream extends InputStream
 
     public void close() throws IOException
     {
-        delegate.close();
+        try
+        {
+            delegate.close();
+        }
+        finally
+        {
+            if (null != latch)
+            {
+                latch.countDown();
+            }
+        }
     }
 
 }

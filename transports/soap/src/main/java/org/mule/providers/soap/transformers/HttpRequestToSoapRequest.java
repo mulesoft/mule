@@ -14,14 +14,11 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.IOUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringMessageUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,36 +38,12 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
     public HttpRequestToSoapRequest()
     {
         registerSourceType(String.class);
-        registerSourceType(InputStream.class);
         registerSourceType(byte[].class);
     }
 
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         String data = src.toString();
-        if (src instanceof InputStream)
-        {
-            InputStream is = (InputStream)src;
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            try
-            {
-                try
-                {
-                    IOUtils.copy(is, bos);
-                }
-                finally
-                {
-                    is.close();
-                }
-            }
-            catch (IOException e)
-            {
-                throw new TransformerException(this, e);
-            }
-            
-            src = bos.toByteArray();
-        }
-        
         if (src instanceof byte[])
         {
             try
@@ -87,7 +60,6 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
                 return data;
             }
         }
-        
         String httpMethod = context.getMessage().getStringProperty("http.method", "GET");
         String request = context.getMessage().getStringProperty("http.request", null);
 
@@ -104,7 +76,15 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
 
         if (httpMethod.equals("POST"))
         {
-            p.setProperty(method, data);
+
+            try
+            {
+                p.setProperty(method, context.getMessageAsString());
+            }
+            catch (UMOException e)
+            {
+                throw new TransformerException(this, e);
+            }
         }
 
         StringBuffer result = new StringBuffer(8192);

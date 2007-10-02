@@ -47,6 +47,16 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
         assertNotNull(stringMessage);
 
         assertNotNull(adapter.getPayload());
+
+        try
+        {
+            adapter = createAdapter(getInvalidMessage());
+            fail("Message adapter should throw MessageTypeNotSupportedException if an invalid message is set");
+        }
+        catch (MessageTypeNotSupportedException e)
+        {
+            // expected
+        }
     }
 
     public void testMessageProps() throws Exception

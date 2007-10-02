@@ -35,6 +35,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
 import java.util.Iterator;
@@ -42,6 +43,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -325,39 +327,25 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
 
     public Object getTransformedMessage() throws TransformerException
     {
-        return getTransformedMessage(null);
-    }
-
-    public Object getTransformedMessage(Class outputType) throws TransformerException
-    {
+        if (isStreaming())
+        {
+            return message.getAdapter();
+        }
         if (transformedMessage == null)
         {
             List transformers = endpoint.getTransformers();
             if (null != transformers)
             {
-                transformedMessage = TransformerUtils.applyAllTransformers(transformers, message).getPayload(outputType);
+                transformedMessage = TransformerUtils.applyAllTransformers(transformers, message).getPayload();
             }
             else
             {
-                transformedMessage = message.getPayload(outputType);
+                transformedMessage = message.getPayload();
             }
-        }
-        else if (outputType != null && !transformedMessage.getClass().isAssignableFrom(outputType))
-        {
-            Class inputCls = transformedMessage.getClass();
-            UMOTransformer transformer = RegistryContext.getRegistry()
-                .lookupTransformer(inputCls, outputType);
-            
-            if (transformer == null)
-            {
-                throw new TransformerException(
-                    CoreMessages.noTransformerFoundForMessage(inputCls, outputType));
-            }
-
-            transformedMessage = transformer.transform(transformedMessage);
         }
         return transformedMessage;
     }
+
     /**
      * This method will attempt to convert the transformed message into an array of
      * bytes It will first check if the result of the transformation is a byte array
@@ -371,7 +359,41 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
      */
     public byte[] getTransformedMessageAsBytes() throws TransformerException
     {
-        return (byte[]) getTransformedMessage(byte[].class);
+        Object msg = getTransformedMessage();
+        if (msg instanceof byte[])
+        {
+            return (byte[]) msg;
+        }
+        else if (msg instanceof String)
+        {
+            try
+            {
+                return msg.toString().getBytes(getEncoding());
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                throw new TransformerException(
+                    CoreMessages.transformFailedFrom(msg.getClass()), e);
+            }
+        }
+        else if (msg instanceof Serializable)
+        {
+            try
+            {
+                return SerializationUtils.serialize((Serializable) msg);
+            }
+            catch (Exception e)
+            {
+                throw new TransformerException(
+                    CoreMessages.transformFailed(msg.getClass().getName(), "byte[]"), e);
+            }
+        }
+        else
+        {
+            throw new TransformerException(
+                CoreMessages.transformOnObjectNotOfSpecifiedType(msg.getClass().getName(),
+                    "byte[] or " + Serializable.class.getName()));
+        }
     }
 
     /**

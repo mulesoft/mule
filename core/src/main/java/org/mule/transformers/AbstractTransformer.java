@@ -10,19 +10,11 @@
 
 package org.mule.transformers;
 
-import java.io.InputStream;
-import java.util.List;
-
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.NullPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
@@ -30,6 +22,11 @@ import org.mule.util.FileUtils;
 import org.mule.util.StringMessageUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractTransformer</code> is a base class for all transformers.
@@ -208,14 +205,10 @@ public abstract class AbstractTransformer implements UMOTransformer
     {
         String encoding = null;
 
-        UMOMessageAdapter adapter = null;
-        if (src instanceof UMOMessageAdapter 
-                        && !isSourceTypeSupported(UMOMessageAdapter.class, true)
-                        && !isSourceTypeSupported(UMOMessage.class, true))
+        if (src instanceof UMOMessage && !isSourceTypeSupported(UMOMessage.class))
         {
-            encoding = ((UMOMessageAdapter) src).getEncoding();
-            adapter = (UMOMessageAdapter) src;
-            src = ((UMOMessageAdapter) src).getPayload();
+            encoding = ((UMOMessage) src).getEncoding();
+            src = ((UMOMessage) src).getPayload();
         }
 
         if (encoding == null && endpoint != null)
@@ -227,8 +220,7 @@ public abstract class AbstractTransformer implements UMOTransformer
             encoding = FileUtils.DEFAULT_ENCODING;
         }
 
-        Class srcCls = src.getClass();
-        if (!isSourceTypeSupported(srcCls))
+        if (!isSourceTypeSupported(src.getClass()))
         {
             if (ignoreBadInput)
             {
@@ -264,17 +256,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
         result = checkReturnClass(result);
 
-        if (adapter != null && isConsumed(srcCls))
-        {
-            adapter.setPayload(result);
-        }
-        
         return result;
-    }
-
-    protected boolean isConsumed(Class srcCls)
-    {
-        return InputStream.class.isAssignableFrom(srcCls) || StreamSource.class.isAssignableFrom(srcCls);
     }
 
     public UMOImmutableEndpoint getEndpoint()

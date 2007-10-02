@@ -10,13 +10,8 @@
 
 package org.mule.transformers.simple;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.Serializable;
-
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.IOUtils;
 
 /**
  * <code>ObjectToByteArray</code> converts serilaizable object to a byte array but
@@ -28,43 +23,27 @@ public class ObjectToByteArray extends SerializableToByteArray
 
     public ObjectToByteArray()
     {
-        this.registerSourceType(String.class);
-        this.registerSourceType(Serializable.class);
-        this.registerSourceType(InputStream.class);
+        this.registerSourceType(Object.class);
     }
 
     // @Override
     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-        try
+        if (src instanceof String)
         {
-            if (src instanceof String)
+            try
             {
                 return src.toString().getBytes(encoding);
             }
-            else if (src instanceof InputStream)
+            catch (Exception e)
             {
-                InputStream is = (InputStream) src;
-                ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-                try 
-                {
-                    IOUtils.copy(is, byteOut);
-                }
-                finally 
-                {
-                    is.close();
-                }
-                return byteOut.toByteArray();
+                throw new TransformerException(this, e);
             }
         }
-        catch (Exception e)
+        else
         {
-            throw new TransformerException(this, e);
+            return super.transform(src, encoding, context);
         }
-
-        
-        return super.transform(src, encoding, context);
-        
     }
 
 }

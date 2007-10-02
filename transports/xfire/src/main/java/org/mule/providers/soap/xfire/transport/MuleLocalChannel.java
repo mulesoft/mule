@@ -34,7 +34,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -358,7 +357,7 @@ public class MuleLocalChannel extends AbstractChannel
             XMLStreamReader reader;
 
             // TODO isStreaming()?
-            Object payload = ctx.getTransformedMessage();
+            Object payload = ctx.getMessage().getPayload();
             if (payload instanceof InputStream)
             {
                 reader = STAXUtils.createXMLStreamReader((InputStream)payload, ctx.getEncoding(), context);

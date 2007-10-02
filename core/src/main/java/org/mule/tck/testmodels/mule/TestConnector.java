@@ -17,12 +17,19 @@ import org.mule.providers.AbstractMessageDispatcherFactory;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.OutputHandler;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * <code>TestConnector</code> use a mock connector
@@ -84,6 +91,13 @@ public class TestConnector extends AbstractConnector
         return new DummyMessageAdapter(message);
     }
 
+    public UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out)
+        throws MessagingException
+    {
+        return new DummyMessageAdapter(in);
+    }
+
+
     public String getSomeProperty()
     {
         return someProperty;
@@ -131,7 +145,7 @@ public class TestConnector extends AbstractConnector
         // nothing to do
     }
 
-    public class DummyMessageAdapter extends AbstractMessageAdapter
+    public class DummyMessageAdapter extends AbstractMessageAdapter implements UMOStreamMessageAdapter
     {
         /**
          * Serial version
@@ -161,9 +175,34 @@ public class TestConnector extends AbstractConnector
             return message.toString();
         }
 
-        public void setPayload(Object payload)
+        public InputStream getInputStream()
         {
-            this.message = payload;
+            return null;
+        }
+
+        public OutputStream getOutputStream()
+        {
+            return null;
+        }
+
+        public void write(UMOEvent event) throws IOException
+        {
+            // nothing to do
+        }
+
+        public OutputHandler getOutputHandler()
+        {
+            return null;
+        }
+
+        public void setOutputHandler(OutputHandler handler)
+        {
+            // nothing to do
+        }
+
+        public void release()
+        {
+            // nothing to do
         }
 
         public ThreadSafeAccess newThreadCopy()

@@ -12,25 +12,29 @@ package org.mule.providers.http;
 
 import org.mule.impl.MuleMessage;
 import org.mule.impl.message.ExceptionPayload;
-import org.mule.impl.model.streaming.DelegatingInputStream;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.providers.http.transformers.ObjectToHttpClientMethodRequest;
+import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.OutputHandler;
 import org.mule.umo.provider.ReceiveException;
+import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.Cookie;
@@ -50,9 +54,11 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.io.IOUtils;
 
 /**
  * <code>HttpClientMessageDispatcher</code> dispatches Mule events over HTTP.
@@ -282,10 +288,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return httpMethod;
     }
 
-
-    private HttpMethod createEntityMethod(UMOEvent event, 
-                                          Object body, 
-                                          EntityEnclosingMethod postMethod)
+    protected HttpMethod createEntityMethod(UMOEvent event, Object body, EntityEnclosingMethod postMethod)
         throws TransformerException
     {
         HttpMethod httpMethod;
@@ -294,25 +297,25 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
             httpMethod = (HttpMethod)trans.transform(body.toString());
         }
-        else if (body instanceof byte[])
+        else if (body instanceof UMOStreamMessageAdapter)
+        {
+            UMOStreamMessageAdapter sma = (UMOStreamMessageAdapter)body;
+            Map headers = sma.getOutputHandler().getHeaders(event);
+            for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
+            {
+                Map.Entry entry = (Map.Entry)iterator.next();
+                postMethod.addRequestHeader((String)entry.getKey(), (String)entry.getValue());
+            }
+            postMethod.setRequestEntity(new StreamPayloadRequestEntity((StreamMessageAdapter)body, event));
+            postMethod.setContentChunked(true);
+            httpMethod = postMethod;
+        }
+        else
         {
             byte[] buffer = event.getTransformedMessageAsBytes();
             postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getEncoding()));
             httpMethod = postMethod;
         }
-        else 
-        {
-            if (!(body instanceof OutputHandler)) 
-            {
-                body = event.getTransformedMessage(OutputHandler.class);
-            }
-            
-            OutputHandler outputHandler = (OutputHandler)body;
-            postMethod.setRequestEntity(new StreamPayloadRequestEntity(outputHandler, event));
-            postMethod.setContentChunked(true);
-            httpMethod = postMethod;
-        }
-        
         return httpMethod;
     }
 
@@ -330,6 +333,20 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         try
         {
+            Properties h = new Properties();
+            Header[] headers = httpMethod.getResponseHeaders();
+            for (int i = 0; i < headers.length; i++)
+            {
+                h.setProperty(headers[i].getName(), headers[i].getValue());
+            }
+
+            String status = String.valueOf(httpMethod.getStatusCode());
+
+            h.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Http response is: " + status);
+            }
             ExceptionPayload ep = null;
             if (httpMethod.getStatusCode() >= ERROR_STATUS_CODE_RANGE_START)
             {
@@ -337,39 +354,39 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                     new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " "
                                   + httpMethod.getStatusText())));
             }
-            
-            
-            InputStream is = httpMethod.getResponseBodyAsStream();
-            Object body = null;
-            if (is == null)
+            UMOMessage m;
+            // text or binary content?
+            Header header = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
+            if ((header != null) && event.isStreaming())
             {
-                body = StringUtils.EMPTY;
-            }            
+                HttpStreamMessageAdapter sp = (HttpStreamMessageAdapter)connector.getStreamMessageAdapter(
+                    httpMethod.getResponseBodyAsStream(), null);
+                sp.setHttpMethod(httpMethod);
+                m = new MuleMessage(sp, h);
+            }
             else
             {
-                is = new ReleasingInputStream(is, httpMethod);
-                body = is;
+                Object body = IOUtils.toByteArray(httpMethod.getResponseBodyAsStream());
+                if (body == null)
+                {
+                    body = StringUtils.EMPTY;
+                }
+                UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{body, h});
+                m = new MuleMessage(adapter);
             }
-            
-            Header[] headers = httpMethod.getResponseHeaders();
-            HttpMessageAdapter adapter = new HttpMessageAdapter(new Object[]{body, headers});
-
-            String status = String.valueOf(httpMethod.getStatusCode());
-
-            adapter.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Http response is: " + status);
-            }
-            
-            UMOMessage m = new MuleMessage(adapter);
-          
             m.setExceptionPayload(ep);
             return m;
         }
         catch (Exception e)
         {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
+        }
+        finally
+        {
+            if (httpMethod != null && !event.isStreaming())
+            {
+                httpMethod.releaseConnection();
+            }
         }
     }
 
@@ -394,24 +411,36 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         // template method
     }
 
-    private final class ReleasingInputStream extends DelegatingInputStream
+    protected class StreamPayloadRequestEntity implements RequestEntity
     {
-        private final HttpMethod method2;
+        private UMOStreamMessageAdapter messageAdapter;
+        private UMOEvent event;
 
-        private ReleasingInputStream(InputStream is, HttpMethod method2)
+        public StreamPayloadRequestEntity(UMOStreamMessageAdapter messageAdapter, UMOEvent event)
         {
-            super(is);
-            this.method2 = method2;
+            this.messageAdapter = messageAdapter;
+            this.event = event;
         }
 
-        public void close() throws IOException 
+        public boolean isRepeatable()
         {
-            super.close();
-            
-            if (method2 != null)
-            {
-                method2.releaseConnection();
-            }
+            return true;
+        }
+
+        public void writeRequest(OutputStream outputStream) throws IOException
+        {
+            messageAdapter.getOutputHandler().write(event, outputStream);
+        }
+
+        public long getContentLength()
+        {
+            return -1L;
+        }
+
+        public String getContentType()
+        {
+            return event.getMessage().getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
         }
     }
+
 }

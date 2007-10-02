@@ -63,7 +63,7 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
         List results = new ArrayList();
         for (int i = 0; i < noOfMessages; i++)
         {
-            results.add(client.send(endpoint, message, null).getPayload(byte[].class));
+            results.add(client.send(endpoint, message, null).getPayload());
         }
 
         assertEquals(noOfMessages, results.size());

@@ -12,6 +12,7 @@ package org.mule.providers.tcp.protocols;
 
 import org.mule.providers.tcp.TcpProtocol;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 
@@ -56,11 +57,13 @@ public abstract class ByteProtocol implements TcpProtocol
 
     public void write(OutputStream os, Object data) throws IOException
     {
-        if (data instanceof InputStream)
+        if (data instanceof UMOStreamMessageAdapter)
         {
             if (streamOk)
             {
-                copyStream((InputStream)data, os);
+                IOUtils.copy(((UMOStreamMessageAdapter) data).getInputStream(), os);
+                os.flush();
+                os.close();
             }
             else
             {
@@ -80,8 +83,7 @@ public abstract class ByteProtocol implements TcpProtocol
         {
             // TODO SF: encoding is lost/ignored; it is probably a good idea to have
             // a separate "stringEncoding" property on the protocol
-            String s = (String) data;
-            writeByteArray(os, s.getBytes(getStringEncoding(s)));
+            writeByteArray(os, ((String) data).getBytes());
         }
         else if (data instanceof Serializable)
         {
@@ -91,20 +93,6 @@ public abstract class ByteProtocol implements TcpProtocol
         {
             throw new IllegalArgumentException("Cannot serialize data: " + data);
         }
-    }
-
-    protected void copyStream(InputStream is, OutputStream os) throws IOException
-    {
-        IOUtils.copy((InputStream) is, os);
-    }
-
-    /**
-     * Override this if you'd like to change the String encoding for a message.
-     * @return
-     */
-    protected String getStringEncoding(String s)
-    {
-        return "UTF-8";
     }
 
     protected void writeByteArray(OutputStream os, byte[] data) throws IOException

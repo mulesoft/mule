@@ -13,7 +13,6 @@ package org.mule.transformers.xml;
 import org.mule.transformers.AbstractTransformer;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -50,7 +49,6 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         registerSourceType(Document.class);
         registerSourceType(org.w3c.dom.Document.class);
         registerSourceType(org.w3c.dom.Element.class);
-        registerSourceType(InputStream.class);
     }
 
     public Source getXmlSource(Object src)
@@ -58,10 +56,6 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         if (src instanceof byte[])
         {
             return new StreamSource(new ByteArrayInputStream((byte[])src));
-        }
-        else if (src instanceof InputStream)
-        {
-            return new StreamSource((InputStream) src);
         }
         else if (src instanceof String)
         {
@@ -109,7 +103,7 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
     protected static ResultHolder getResultHolder(Class desiredClass)
     {
         if (desiredClass == null) return null;
-        if (byte[].class.equals(desiredClass) || InputStream.class.isAssignableFrom(desiredClass))
+        if (byte[].class.equals(desiredClass))
         {
             return new ResultHolder()
             {

@@ -94,8 +94,6 @@ public class FileConnector extends AbstractConnector
 
     private boolean serialiseObjects = false;
 
-    private boolean streamFiles = true;
-    
     public FilenameParser filenameParser;
 
     /*
@@ -568,16 +566,4 @@ public class FileConnector extends AbstractConnector
         }
         return getFilenameParser().getFilename(message, pattern);
     }
-
-    public boolean isStreamFiles()
-    {
-        return streamFiles;
-    }
-
-    public void setStreamFiles(boolean streamFiles)
-    {
-        this.streamFiles = streamFiles;
-    }
-    
-    
 }

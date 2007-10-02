@@ -15,7 +15,6 @@ import org.mule.impl.model.MuleProxy;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.mule.TestMuleProxy;
 import org.mule.tck.testmodels.mule.TestSedaComponent;
-import org.mule.tck.testmodels.mule.TestSedaModel;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -68,18 +67,4 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         return (FunctionalTestComponent) component;
     }
 
-    protected Object lookupComponent(String modelName, String componentName) throws UMOException
-    {
-        UMOModel m = managementContext.getRegistry().lookupModel(modelName);
-        assertNotNull("Model " + m + " not found", m);
-        UMOComponent c = m.getComponent(componentName);
-        assertNotNull("Component " + c + " not found", c);
-        assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
-        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
-        assertNotNull("Component " + c + " does not have a proxy", proxy);
-        assertTrue("Proxy should be a TestMuleProxy", proxy instanceof TestMuleProxy);
-        Object component = ((TestMuleProxy) proxy).getComponent();
-        assertNotNull("No component for proxy", component);
-        return component;
-    }
 }

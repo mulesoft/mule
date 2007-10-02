@@ -144,9 +144,7 @@ public interface Registry extends Initialisable, Disposable
 
     UMOTransformer lookupTransformer(String name);
 
-    UMOTransformer lookupTransformer(Class input, Class output);
-    
-    UMODescriptor lookupService(String serviceName);
+    public UMODescriptor lookupService(String serviceName);
 
     UMOModel lookupModel(String name);
 

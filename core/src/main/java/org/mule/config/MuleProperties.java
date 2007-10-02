@@ -108,6 +108,7 @@ public interface MuleProperties
     String CONNECTOR_DISPATCHER_FACTORY = "dispatcher.factory";
     String CONNECTOR_TRANSACTION_FACTORY = "transaction.factory";
     String CONNECTOR_MESSAGE_ADAPTER = "message.adapter";
+    String CONNECTOR_STREAM_MESSAGE_ADAPTER = "stream.message.adapter";
     String CONNECTOR_INBOUND_TRANSFORMER = "inbound.transformer";
     String CONNECTOR_OUTBOUND_TRANSFORMER = "outbound.transformer";
     String CONNECTOR_RESPONSE_TRANSFORMER = "response.transformer";

@@ -10,22 +10,6 @@
 
 package org.mule.providers;
 
-import java.beans.ExceptionListener;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkListener;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.pool.KeyedPoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
 import org.mule.config.ThreadingProfile;
@@ -64,6 +48,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOSessionHandler;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -73,6 +58,20 @@ import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitableBoolean;
 
+import java.beans.ExceptionListener;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.resource.spi.work.WorkEvent;
+import javax.resource.spi.work.WorkListener;
+
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
@@ -81,6 +80,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.pool.KeyedPoolableObjectFactory;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all connectors
@@ -1763,6 +1766,31 @@ public abstract class AbstractConnector
         {
             throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"),
                 message, e);
+        }
+    }
+
+    /**
+     * Gets a {@link UMOStreamMessageAdapter} from the connector for the given
+     * message. This Adapter will correctly handle data streaming for this type of
+     * connector
+     *
+     * @param in the input stream to read the data from
+     * @param out the outputStream to write data to. This can be null.
+     * @return the {@link UMOStreamMessageAdapter} for the endpoint
+     * @throws MessagingException if the message parameter is not supported
+     * @see UMOStreamMessageAdapter
+     */
+    public UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out)
+        throws MessagingException
+    {
+        try
+        {
+            return serviceDescriptor.createStreamMessageAdapter(in, out);
+        }
+        catch (TransportServiceException e)
+        {
+            throw new MessagingException(CoreMessages.failedToCreate("Stream Message Adapter"),
+                in, e);
         }
     }
 

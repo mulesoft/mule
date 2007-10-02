@@ -11,17 +11,17 @@
 package org.mule.providers.tcp.integration;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.DefaultMessageAdapter;
+import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.model.UMOModel;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -73,8 +73,11 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
 
         MuleClient client = new MuleClient();
 
-        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) lookupComponent("echoModel", "testComponent");
+        UMOModel model = managementContext.getRegistry().lookupModel("echoModel");
+        FunctionalStreamingTestComponent ftc =
+                (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
         assertNotNull(ftc);
+//        assertEquals(1, ftc.getNumber());
 
         ftc.setEventCallback(callback, size);
 
@@ -85,11 +88,11 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         long timeStart = System.currentTimeMillis();
 
         BigInputStream stream = new BigInputStream(size, MESSAGES);
-        DefaultMessageAdapter adapter = new DefaultMessageAdapter(stream);
-        client.dispatch(endpoint, new MuleMessage(adapter));
+        UMOStreamMessageAdapter adapter = new StreamMessageAdapter(stream);
+        client.dispatchStream(endpoint, adapter);
 
         // if we assume 1MB/sec then we need at least...
-        int pause = (int) Math.max(size / ONE_MB, 10) + 100000;
+        int pause = (int) Math.max(size / ONE_MB, 10);
         logger.info("Waiting for up to " + pause + " seconds");
 
         latch.await(pause, TimeUnit.SECONDS);

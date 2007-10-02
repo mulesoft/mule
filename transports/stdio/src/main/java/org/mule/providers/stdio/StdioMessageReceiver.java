@@ -105,7 +105,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                 int i = in.read();
                 //Roll back our read
                 in.unread(i);
-                UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(in));
+                UMOMessage umoMessage = new MuleMessage(connector.getStreamMessageAdapter(in, null));
                 routeMessage(umoMessage, endpoint.isSynchronous());
             }
             else

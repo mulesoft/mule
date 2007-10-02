@@ -873,7 +873,7 @@ public class CoreMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 231, descriptor.getName(), descriptor.getModelName(), modelName);
     }
-    
+
     //These endpoint errors should go away once we make setting endpoints on routers typesafe
 
     public static Message inboundRouterMustUseInboundEndpoints(UMOInboundRouterCollection router, UMOImmutableEndpoint endpoint)
@@ -896,16 +896,6 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 235, endpoint, exceptionListener);
     }
 
-    public static Message noTransformerFoundForMessage(Class input, Class output)
-    {
-        return createMessage(BUNDLE_PATH, 237, input.getName(), output.getName());
-    }
-
-    public static Message errorReadingStream()
-    {
-        return createMessage(BUNDLE_PATH, 238);
-    }
-
     /**
      * Returns a message that is a product informatin.
      *
@@ -919,6 +909,7 @@ public class CoreMessages extends MessageFactory
                              StringUtils.defaultString(MuleManifest.getVendorName(), notset) + " " +
                              StringUtils.defaultString(MuleManifest.getVendorUrl(), notset));
     }
+
 
     public static Message noEntryPointFoundForNoArgsMethodUsingResolver(final Object component, final String methodName, UMOEntryPointResolver resolver)
     {

@@ -44,14 +44,6 @@
             <version>1.0</version>
             <scope>test</scope>
         </dependency>
-        
-        <!-- Java5 seems to need this -->
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>2.7.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <profiles>

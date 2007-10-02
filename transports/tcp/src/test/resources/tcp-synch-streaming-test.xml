@@ -2,6 +2,7 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+       xmlns:stream="http://www.mulesource.org/schema/mule/streaming/2.0"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -10,20 +11,20 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <tcp:connector name="default" validateConnections="false"
-                   tcpProtocolClassName="org.mule.providers.tcp.protocols.StreamingProtocol"/>
+                   tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
 
     <configuration serverId="TcpSynchStreaming" defaultSynchronousEndpoints="true"/>
 
-    <model name="main">
+    <stream:model name="main">
 
-        <service name="echo">
-            <component class="org.mule.components.simple.BridgeComponent"/>
-            <inbound-router>
-                <inbound-endpoint address="tcp://localhost:65432?endpointName=myEndpoint"/>
-            </inbound-router>
-        </service>
+        <stream:service name="echo">
+            <component class="org.mule.components.simple.StreamingBridgeComponent"/>
+            <stream:inbound-router>
+                <stream:inbound-endpoint address="tcp://localhost:65432"/>
+            </stream:inbound-router>
+        </stream:service>
 
-    </model>
+    </stream:model>
 
 
 </mule>

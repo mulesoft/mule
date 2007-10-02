@@ -16,6 +16,7 @@ import org.mule.providers.ftp.server.NamedPayload;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.model.UMOModel;
 
 import java.util.HashMap;
 
@@ -64,8 +65,9 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
     {
         MuleClient client = new MuleClient();
 
+        UMOModel model = managementContext.getRegistry().lookupModel("main");
         FunctionalStreamingTestComponent ftc =
-                (FunctionalStreamingTestComponent) lookupComponent("main", "testComponent");
+                (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
         assertNotNull(ftc);
 //        assertEquals(1, ftc.getNumber());
 

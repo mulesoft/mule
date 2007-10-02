@@ -89,11 +89,7 @@
         <service name="bothService1">
             <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
-            
-                <inbound-endpoint ref="both" responseTransformer-ref="appendResponse">
-                   <transformer ref="_muleObjectToString" />
-                   <transformer ref="appendString" />
-                </inbound-endpoint>
+                <inbound-endpoint ref="both" transformer-ref="appendString" responseTransformer-ref="appendResponse"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -105,11 +101,8 @@
         <service name="bothService2">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="vm://echo3" synchronous="true" 
-                				  responseTransformer-ref="appendResponse2">
-                  <transformer ref="_muleObjectToString" />
-                  <transformer ref="appendString2" />
-                </inbound-endpoint>
+                <inbound-endpoint address="vm://echo3" synchronous="true" transformer-ref="appendString2"
+                                  responseTransformer-ref="appendResponse2"/>
             </inbound-router>
         </service>
 

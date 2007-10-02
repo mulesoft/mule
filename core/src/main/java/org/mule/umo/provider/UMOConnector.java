@@ -81,20 +81,20 @@ public interface UMOConnector extends Lifecycle, Initialisable, ManagementContex
      * @see UMOMessageAdapter
      */
     UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException;
-//
-//    /**
-//     * Gets a {@link UMOStreamMessageAdapter} from the connector for the given
-//     * message. This Adapter will correctly handle data streaming for this type of
-//     * connector
-//     * 
-//     * @param in the input stream to read the data from
-//     * @param out the outputStream to write data to. This can be null.
-//     * @return the {@link UMOStreamMessageAdapter} for the endpoint
-//     * @throws MessagingException if the message parameter is not supported
-//     * @see UMOStreamMessageAdapter
-//     */
-//    UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out)
-//        throws MessagingException;
+
+    /**
+     * Gets a {@link UMOStreamMessageAdapter} from the connector for the given
+     * message. This Adapter will correctly handle data streaming for this type of
+     * connector
+     * 
+     * @param in the input stream to read the data from
+     * @param out the outputStream to write data to. This can be null.
+     * @return the {@link UMOStreamMessageAdapter} for the endpoint
+     * @throws MessagingException if the message parameter is not supported
+     * @see UMOStreamMessageAdapter
+     */
+    UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out)
+        throws MessagingException;
 
     /**
      * @return the name associated with the connector

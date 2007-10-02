@@ -43,14 +43,14 @@ public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWor
     {
         try
         {
-            Object message = null;
-            do 
+            Object message = getNextMessage(resource);
+            while (message != null)
             {
-                message = getNextMessage(resource);
                 messages.add(message);
                 super.doRun();
+                message = getNextMessage(resource);
             }
-            while (message != null && hasMoreMessages(message));
+
         }
         catch (Exception e)
         {
@@ -58,11 +58,6 @@ public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWor
         }
     }
 
-    protected boolean hasMoreMessages(Object message)
-    {
-        return true;
-    }
-    
     /**
      * The method used to read the next message from the underlying transport.
      * @param resource the resource to read from, this may be a socket, a directory or some higher level

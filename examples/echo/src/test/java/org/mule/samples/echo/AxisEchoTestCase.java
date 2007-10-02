@@ -95,7 +95,6 @@ public class AxisEchoTestCase extends FunctionalTestCase
             assertNull(result.getExceptionPayload());
         }
         assertFalse(result.getPayload() instanceof NullPayload);
-        
         XMLAssert.assertXMLEqual(expectedGetResponse, result.getPayloadAsString());
     }
 

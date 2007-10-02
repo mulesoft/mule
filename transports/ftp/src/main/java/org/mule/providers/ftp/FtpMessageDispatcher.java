@@ -16,10 +16,10 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,11 +52,10 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
         try
         {
-            if (data instanceof InputStream)
+            if (data instanceof UMOStreamMessageAdapter)
             {
-                InputStream is = ((InputStream) data);
-                IOUtils.copy(is, out);
-                is.close();
+                IOUtils.copy(((UMOStreamMessageAdapter) data).getInputStream(), out);
+                ((UMOStreamMessageAdapter) data).getOutputStream().close();
             }
             else
             {

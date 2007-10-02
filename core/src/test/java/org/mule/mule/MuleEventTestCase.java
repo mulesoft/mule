@@ -13,7 +13,6 @@ package org.mule.mule;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
@@ -38,8 +37,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         MuleDescriptor descriptor = getTestDescriptor("orange", Orange.class.getName());
 
         MuleEvent event = (MuleEvent)getTestEvent(data, descriptor);
-        RequestContext.setEvent(event);
-        
+
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
         assertEquals("Event data should equal " + data, data, event.getMessageAsString(null));
         assertEquals("Event data should equal " + data, data, event.getTransformedMessage());
@@ -67,8 +65,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint.setTransformers(CollectionUtils.singletonList(new TestEventTransformer()));
         UMOEvent event = getTestEvent(data, endpoint);
-        RequestContext.setEvent(event);
-        
+
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
         assertEquals("Event data should equal " + data, data, event.getMessageAsString(null));
         assertEquals("Event data should equal 'Transformed Test Data'", "Transformed Test Data", event

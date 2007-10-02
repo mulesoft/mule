@@ -38,12 +38,6 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
      */
     protected Object message;
 
-    
-    protected DefaultMessageAdapter()
-    {
-        super();
-    }
-
     /**
      * Creates a default message adapter with properties and attachments
      *
@@ -174,23 +168,12 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
                 return new String((byte[]) message);
             }
         }
-        else if (message instanceof String)
+        else
         {
-            return (String) message;
-        }
-        else 
-        {
-            // TODO-DD: We should consider having more default transformers 
-            // built into the class if transformer lookup takes too long
-            return (String) getPayload(String.class);
+            return message.toString();
         }
     }
 
-    public void setPayload(Object payload)
-    {
-        this.message = payload;
-    }
-    
     /**
      * Converts the message implementation into a String representation
      *

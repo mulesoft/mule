@@ -10,16 +10,15 @@
 
 package org.mule.tck.functional;
 
+import org.mule.impl.model.streaming.StreamingService;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.lifecycle.Callable;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * @see org.mule.tck.functional.EventCallback
  */
 
-public class FunctionalStreamingTestComponent implements Callable
+public class FunctionalStreamingTestComponent implements StreamingService
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -64,15 +63,14 @@ public class FunctionalStreamingTestComponent implements Callable
     {
         return summary;
     }
- 
+
     public int getNumber()
     {
         return number;
     }
 
-    public Object onCall(UMOEventContext context) throws Exception
+    public void call(InputStream in, OutputStream unused, UMOEventContext context) throws Exception
     {
-        InputStream in = (InputStream) context.getMessage().getPayload(InputStream.class);
         try
         {
             logger.debug("arrived at " + toString());
@@ -88,14 +86,13 @@ public class FunctionalStreamingTestComponent implements Callable
             int bytesRead = 0;
             while (bytesRead >= 0)
             {
-                bytesRead = read(in, buffer);
+                bytesRead = in.read(buffer);
                 if (bytesRead > 0)
                 {
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("read " + bytesRead + " bytes");
                     }
-                    
                     streamLength += bytesRead;
                     int startOfEndBytes = 0;
                     for (int i = 0; startDataSize < STREAM_SAMPLE_SIZE && i < bytesRead; ++i)
@@ -118,26 +115,15 @@ public class FunctionalStreamingTestComponent implements Callable
                 }
             }
 
-            in.close();
         }
         catch (Exception e)
         {
-            in.close();
-            
-            e.printStackTrace();
             if (logger.isDebugEnabled())
             {
                 logger.debug(e);
             }
             throw e;
         }
-        
-        return null;
-    }
-
-    protected int read(InputStream in, byte[] buffer) throws IOException
-    {
-        return in.read(buffer);
     }
 
     private void doCallback(byte[] startData, int startDataSize,

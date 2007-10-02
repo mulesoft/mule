@@ -11,13 +11,14 @@
 package org.mule.providers.tcp.issues;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.DefaultMessageAdapter;
+import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.UMOStreamMessageAdapter;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+
 
 public class SynchStreamingMule1687TestCase extends FunctionalTestCase
 {
@@ -37,12 +38,12 @@ public class SynchStreamingMule1687TestCase extends FunctionalTestCase
     public void testSendAndReceive() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage message = client.send("tcp://localhost:65432", 
-            new MuleMessage(new DefaultMessageAdapter(new ByteArrayInputStream(TEST_MESSAGE.getBytes()))));
+        UMOStreamMessageAdapter message = client.sendStream("tcp://localhost:65432", new StreamMessageAdapter(new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
         assertNotNull(message);
-
-        Object payload = message.getPayload();
-        assertTrue(payload instanceof InputStream);
+        String response = new BufferedReader(new InputStreamReader(message.getInputStream())).readLine();
+        assertNotNull(response);
+        // StreamingBridgeComponent simply copies input to output
+        assertEquals(response, TEST_MESSAGE);
     }
 
 }
