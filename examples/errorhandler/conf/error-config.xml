@@ -126,7 +126,7 @@
             <inbound-router>
                 <inbound-endpoint address="file://./test-data/in"
                                transformer-ref="XMLToExceptionBean ExceptionBeanToErrorMessage">
-                    <!-- Ignore other files than our XML error input. When runngin this example from
+                    <!-- Ignore other files than our XML error input. When running this example from
                          a svn checkout the file connector would try to process subversion's meta
                          dirs which is not what we want.
                     -->

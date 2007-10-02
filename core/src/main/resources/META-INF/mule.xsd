@@ -63,6 +63,7 @@
             <xsd:element ref="abstract-connector"/>
             <xsd:element ref="abstract-global-endpoint"/>
             <xsd:element ref="abstract-transformer"/>
+            <xsd:element ref="abstract-filter"/>
             <xsd:element ref="abstract-model"/>
         </xsd:choice>
     </xsd:group>
@@ -233,6 +234,7 @@
 
     <xsd:element name="abstract-filter" abstract="true" type="abstractFilterType"/>
     <xsd:complexType name="abstractFilterType">
+        <xsd:attribute name="name" type="xsd:string"/>
         <xsd:attribute name="not" type="substitutableBoolean"/>
     </xsd:complexType>
 
@@ -585,6 +587,15 @@
     <!--==============================================================-->
     <!--   Filter elements                                            -->
     <!--==============================================================-->
+
+    <xsd:element name="filter" type="filterRefType" substitutionGroup="abstract-filter"/>
+    <xsd:complexType name="filterRefType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractFilterType">
+                <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="not-filter" type="unitaryFilterType" substitutionGroup="abstract-filter"/>
     <xsd:complexType name="unitaryFilterType">

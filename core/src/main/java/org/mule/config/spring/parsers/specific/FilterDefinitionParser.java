@@ -9,28 +9,36 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.umo.UMOFilter;
 
 /**
- * Parses all the core filter types such as logic (AND OR NOT) and generic filters such as <i>Payload Type</i>,
- * <i>RegEX</i> and <i>Message Property</i>
- * 
+ * This allows a filter to be defined globally, or embedded within an endpoint.
  */
-public class FilterDefinitionParser extends ChildDefinitionParser
+public class FilterDefinitionParser extends ParentContextDefinitionParser
 {
 
-    public FilterDefinitionParser(Class clazz)
+    public static final String FILTER = "filter";
+    public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
+
+    public FilterDefinitionParser(Class filter)
     {
-        super("filter", clazz, UMOFilter.class, false);
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENTS,
+                new MuleOrphanDefinitionParser(filter, false).addIgnored(ATTRIBUTE_NAME));
+        otherwise(new ChildDefinitionParser(FILTER, filter, UMOFilter.class, false).addIgnored(ATTRIBUTE_NAME));
     }
 
     /**
-     * For custom filters that use the class attribute
+     * For custom transformers
      */
     public FilterDefinitionParser()
     {
-        super("filter", null, UMOFilter.class, true);
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENTS,
+                new MuleOrphanDefinitionParser(false).addIgnored(ATTRIBUTE_NAME));
+        otherwise(new ChildDefinitionParser(FILTER, null, UMOFilter.class, true).addIgnored(ATTRIBUTE_NAME));
     }
 
 }

@@ -21,14 +21,11 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 public class TransformerDefinitionParser extends ParentContextDefinitionParser
 {
 
-    public static final String ROOT_ELEMENTS =
-            AbstractMuleBeanDefinitionParser.ROOT_ELEMENT + " "
-                    + AbstractMuleBeanDefinitionParser.ROOT_UNSAFE_ELEMENT;
     public static final String TRANSFORMER = "transformer";
 
     public TransformerDefinitionParser(Class transformer)
     {
-        super(ROOT_ELEMENTS, new MuleOrphanDefinitionParser(transformer, false));
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENTS, new MuleOrphanDefinitionParser(transformer, false));
         otherwise(new ChildDefinitionParser(TRANSFORMER, transformer));
     }
 
@@ -37,7 +34,7 @@ public class TransformerDefinitionParser extends ParentContextDefinitionParser
      */
     public TransformerDefinitionParser()
     {
-        super(ROOT_ELEMENTS, new MuleOrphanDefinitionParser(false));
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENTS, new MuleOrphanDefinitionParser(false));
         otherwise(new ChildDefinitionParser(TRANSFORMER));
     }
 

@@ -290,6 +290,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("logging-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", LoggingCatchAllStrategy.class));
 
         //Common Filters
+        registerMuleDefinitionParser("filter", new ParentDefinitionParser()).addAlias("ref", "filter");
         registerBeanDefinitionParser("and-filter", new FilterDefinitionParser(AndFilter.class));
         registerBeanDefinitionParser("or-filter", new FilterDefinitionParser(OrFilter.class));
         registerBeanDefinitionParser("not-filter", new FilterDefinitionParser(NotFilter.class));
