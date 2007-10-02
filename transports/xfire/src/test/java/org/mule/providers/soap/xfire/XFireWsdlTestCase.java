@@ -49,9 +49,7 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
     public void testXFireWsdlServiceWithEndpointParam() throws Exception
     {
         // make sure the Mule is up when not using MuleClient
-        // TODO HH: track down why the dispatcher pool is derailed with an NPE
-        // without this - shouldn't it happen automatically?
-//        MuleManager.getInstance().start();
+        // MuleManager.getInstance().start();
 
         // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
         UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry().lookupOutboundEndpoint(TEST_URL_NOWSDL, managementContext);
@@ -68,5 +66,8 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
         Document response = (Document)reply.getPayload();
         assertNotNull(response);
         //TODO RM* URGENT XMLAssert.assertXpathEvaluatesTo("test1", "//*[namespace-uri()='http://applications.external.tck.mule.org' and local-name()='key']", response);
+        
+        // bye-bye
+        // MuleManager.getInstance().dispose();
     }
 }

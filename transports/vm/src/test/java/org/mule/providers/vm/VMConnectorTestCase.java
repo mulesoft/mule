@@ -16,7 +16,6 @@ import org.mule.umo.provider.UMOConnector;
 
 public class VMConnectorTestCase extends AbstractConnectorTestCase
 {
-    // @Override
     public UMOConnector createConnector() throws Exception
     {
         VMConnector conn = new VMConnector();
@@ -33,4 +32,5 @@ public class VMConnectorTestCase extends AbstractConnectorTestCase
     {
         return new MuleMessage("TestMessage");
     }
+
 }
