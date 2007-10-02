@@ -12,9 +12,9 @@ package org.mule.config.builders;
 
 import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -35,7 +35,8 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
     /**
      * Logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(getClass());    private ServletContext context;
+    protected transient final Log logger = LogFactory.getLog(getClass());
+    private ServletContext context;
 
     /**
      * Classpath within the servlet context (e.g., "WEB-INF/classes").  Mule will attempt to load config
@@ -44,7 +45,7 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
     private String webappClasspath;
 
     public WebappMuleXmlConfigurationBuilder(ServletContext context, String webappClasspath)
-        throws ConfigurationException
+            throws ConfigurationException
     {
         super();
         this.context = context;
@@ -57,9 +58,22 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
      */
     protected InputStream loadResource(String resource) throws ConfigurationException
     {
-        String resourcePath = FileUtils.newFile(webappClasspath, resource).getPath();
-        logger.debug("Searching for resource " + resourcePath + " in Servlet Context.");
-        InputStream is = context.getResourceAsStream(resourcePath);
+        String resourcePath = resource;
+        InputStream is = null;
+        if (webappClasspath != null)
+        {
+            resourcePath = new File(webappClasspath, resource).getPath();
+            is = context.getResourceAsStream(resourcePath);
+        }
+        if (is == null)
+        {
+            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
+        }
+        if (logger.isDebugEnabled() && is != null)
+        {
+            logger.debug("Resource " + resourcePath + " is found in Servlet Context.");
+        }
+
         if (is == null)
         {
             try
