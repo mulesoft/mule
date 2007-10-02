@@ -508,102 +508,102 @@ tr td.noformatting {
 }
 
 .header_name {
-	font-size: smaller;
-	padding: 2px;
-	padding-right: 1ex;
-	border-right: 1px solid #555;
-	background-color: #ccc;
+    font-size: smaller;
+    padding: 2px;
+    padding-right: 1ex;
+    border-right: 1px solid #555;
+    background-color: #ccc;
 }
 
 .header_value {
-	font-size: smaller;
-	background-color: #ddd;
-	padding: 2px;
+    font-size: smaller;
+    background-color: #ddd;
+    padding: 2px;
 }
 
 .header_fields {
-	width: 100%;
-	border: 1px solid #999;
-	background-color: #fff;
+    width: 100%;
+    border: 1px solid #999;
+    background-color: #fff;
 }
 
 .email_body {
-	margin: 2ex;
-	padding: 1ex;
-	padding-left: 2ex;
-	padding-right: 2ex;
-	border: 1px solid #999;
-	font-size: smaller;
+    margin: 2ex;
+    padding: 1ex;
+    padding-left: 2ex;
+    padding-right: 2ex;
+    border: 1px solid #999;
+    font-size: smaller;
 }
 
 .email_body pre {
-	padding: 0px;
-	margin: 0px;
+    padding: 0px;
+    margin: 0px;
 }
 
 .email_body blockquote {
-	padding: 0px;
-	margin: 0px;
-	border: 1px solid #ccc;
+    padding: 0px;
+    margin: 0px;
+    border: 1px solid #ccc;
 }
 
 .msg_navblock {
-	margin-bottom: 2ex;
-	border: 1px solid #999;
-	background-color: #fff;
+    margin-bottom: 2ex;
+    border: 1px solid #999;
+    background-color: #fff;
 }
 
 .msg_navblock th {
-	border: 1px solid #ccc;
-	font-size: smaller;
+    border: 1px solid #ccc;
+    font-size: smaller;
 }
 
 .msg_navblock td {
-	border: 1px solid #ccc;
-	font-size: smaller;
+    border: 1px solid #ccc;
+    font-size: smaller;
 }
 
 .single_entry {
-	border: 1px solid #aaa;
-	padding: .5ex;
-	padding-left: 1ex;
-	border-left: 1px solid #090;
-	margin: 2px;
-	background-color: #eee;
+    border: 1px solid #aaa;
+    padding: .5ex;
+    padding-left: 1ex;
+    border-left: 1px solid #090;
+    margin: 2px;
+    background-color: #eee;
 }
 
 .root_entry {
-	border: 1px solid #aaa;
-	padding: .5ex;
-	padding-left: 1ex;
-	border-left: 1px solid #090;
-	margin-top: 8px;
-	margin-bottom: 8px;
-	background-color: #eee;
+    border: 1px solid #aaa;
+    padding: .5ex;
+    padding-left: 1ex;
+    border-left: 1px solid #090;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    background-color: #eee;
 }
 
 .root_entry .sub_entry {
-	padding: .5ex;
-	padding-left: 1ex;
-	margin: 2px;
-	margin-left: 1ex;
-	border-left: 1px solid #999;
+    padding: .5ex;
+    padding-left: 1ex;
+    margin: 2px;
+    margin-left: 1ex;
+    border-left: 1px solid #999;
 }
 
 .list_entry {
-	border: 1px solid #aaa;
-	padding: 1ex;
-	margin-top: 1ex;
-	margin-bottom: 1ex;
+    border: 1px solid #aaa;
+    padding: 1ex;
+    margin-top: 1ex;
+    margin-bottom: 1ex;
 }
 
 .list_entry td {
-	border: 1px solid #999;
+    border: 1px solid #999;
 }
 
 .project_entry {
-	border: 1px solid #aaa;
-	padding: 1ex;
-	margin-top: 1ex;
-	margin-bottom: 1ex;
+    border: 1px solid #aaa;
+    padding: 1ex;
+    margin-top: 1ex;
+    margin-bottom: 1ex;
 }

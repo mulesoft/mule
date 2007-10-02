@@ -1,85 +1,85 @@
 /*
 body, p, td, table, tr, .bodytext, .stepfield {
-	font-family: Verdana, arial, sans-serif;
-	font-size: 12px;
-	line-height: 18px;
-	color: #000000;
-	font-weight: normal;
+    font-family: Verdana, arial, sans-serif;
+    font-size: 12px;
+    line-height: 18px;
+    color: #000000;
+    font-weight: normal;
 }
 */
 h1, .heading1 {
-	font-size: 24px;
-	line-height: normal;
-	font-weight: bold;
-	background-color: #f0f0f0;
-	color: #900;
- 	border-bottom: 1px solid #c00;
-	padding: 2px;
-	margin: 36px 0px 4px 0px;
+    font-size: 24px;
+    line-height: normal;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    color: #900;
+     border-bottom: 1px solid #c00;
+    padding: 2px;
+    margin: 36px 0px 4px 0px;
         color: #333;
 }
 
 h2, .heading2 {
-	font-size: 18px;
-	line-height: normal;
-	font-weight: bold;
-	background-color: #f0f0f0;
- 	border-bottom: 1px solid #c00;
-	padding: 2px;
-	margin: 27px 0px 4px 0px;
+    font-size: 18px;
+    line-height: normal;
+    font-weight: bold;
+    background-color: #f0f0f0;
+     border-bottom: 1px solid #c00;
+    padding: 2px;
+    margin: 27px 0px 4px 0px;
         color: #900;
 }
 
 h3, .blogheading {
-	font-size: 14px;
-	line-height: normal;
-	font-weight: bold;
-	background-color: #f0f0f0;
-	padding: 2px;
-	margin: 21px 0px 4px 0px;
+    font-size: 14px;
+    line-height: normal;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 2px;
+    margin: 21px 0px 4px 0px;
         border-bottom: 1px solid #900;
         color: #900;
 }
 
 h4, .heading4 {
-	font-size: 12px;
-	line-height: normal;
-	font-weight: bold;
-	background-color: #f0f0f0;
-	padding: 2px;
-	margin: 18px 0px 4px 0px;
+    font-size: 12px;
+    line-height: normal;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 2px;
+    margin: 18px 0px 4px 0px;
         color: #333;
 }
 
 h4.search {
-	font-size: 12px;
-	line-height: normal;
-	font-weight: normal;
-	background-color: #f0f0f0;
-	padding: 4px;
-	margin: 18px 0px 4px 0px;
+    font-size: 12px;
+    line-height: normal;
+    font-weight: normal;
+    background-color: #f0f0f0;
+    padding: 4px;
+    margin: 18px 0px 4px 0px;
 }
 
 h5 {
-	font-size: 10px;
-	line-height: normal;
-	font-weight: bold;
-	background-color: #f0f0f0;
-	padding: 2px;
-	margin: 14px 0px 4px 0px;
+    font-size: 10px;
+    line-height: normal;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 2px;
+    margin: 14px 0px 4px 0px;
 }
 
 h6 {
-	font-size: 8px;
-	line-height: normal;
-	font-weight: bold;
-	background-color: #f0f0f0;
-	padding: 2px;
-	margin: 14px 0px 4px 0px;
+    font-size: 8px;
+    line-height: normal;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 2px;
+    margin: 14px 0px 4px 0px;
 }
 
 a, #footer a {
-	color: #333;
+    color: #333;
 }
 
 #footer {
@@ -102,17 +102,17 @@ a:active, a:hover {
 }
 
 a[href], a[href] {
-	color: #333;
+    color: #333;
         font-weight: bold;
 }
 
 a[name], a[name], #page_title {
-	color: #900
+    color: #900
 }
 
 /*
 a[href ^= "http://"], a[href ^= "irc://"] {
-	color: #333;
+    color: #333;
 }*/
 
 a:active, a:hover {
@@ -132,7 +132,7 @@ a:active, a:hover {
 }
 
 #leftColumn {
-	width: 150px;
+    width: 150px;
         border-color: #ccc;
         padding: 0px;
         border-right: 1px;
