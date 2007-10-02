@@ -38,7 +38,7 @@ public class MuleAdminAgent extends AbstractAgent
 {
     public static final String DEFAULT_MANAGER_ENDPOINT = "_muleManagerEndpoint";
 
-    public static final String AGENT_NAME = "Mule Admin";
+    public static final String AGENT_NAME = "MuleAdmin";
 
     /**
      * logger used by this class
@@ -126,7 +126,7 @@ public class MuleAdminAgent extends AbstractAgent
 
                 MuleEndpoint writableEndpoint;
                 // Check to see if we have an endpoint identifier
-                UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(serverUri);
+                UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(serverUri, managementContext);
                 if(endpoint==null)
                 {
                     UMOEndpointURI endpointUri = new MuleEndpointURI(serverUri);
@@ -137,7 +137,7 @@ public class MuleAdminAgent extends AbstractAgent
                     {
                         connector.setName(DEFAULT_MANAGER_ENDPOINT);
                         connector.initialise();
-                        managementContext.getRegistry().registerConnector(connector);
+                        managementContext.getRegistry().registerConnector(connector, managementContext);
                     }
                     writableEndpoint = new MuleEndpoint();
                     writableEndpoint.setConnector(connector);
@@ -154,7 +154,7 @@ public class MuleAdminAgent extends AbstractAgent
                         RegistryContext.getConfiguration().getDefaultEncoding(),
                         RegistryContext.getConfiguration().getDefaultSynchronousEventTimeout());
 
-                ModelHelper.registerSystemComponent(descriptor);
+                managementContext.getRegistry().registerService(descriptor, managementContext);
             }
         }
         catch (UMOException e)
