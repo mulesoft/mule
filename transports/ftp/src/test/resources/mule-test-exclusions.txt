@@ -1,6 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-
-# Mule-2471
-org.mule.providers.ftp.FtpStreamingTestCase
