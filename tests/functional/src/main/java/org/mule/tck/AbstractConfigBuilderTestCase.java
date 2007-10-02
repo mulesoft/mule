@@ -240,9 +240,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(connectorMaxBufferSize, tp.getMaxBufferSize());
         assertEquals(defaultMaxThreadsActive, tp.getMaxThreadsActive());
         assertEquals(defaultMaxThreadsIdle, tp.getMaxThreadsIdle());
-        // TODO HH: MULE-2289 in progress
-        // assertEquals(defaultThreadPoolExhaustedAction, tp.getPoolExhaustedAction());
-        // assertEquals(defaultThreadTTL, tp.getThreadTTL());
+        // MULE-2469
+//        assertEquals(defaultThreadPoolExhaustedAction, tp.getPoolExhaustedAction());
+//        assertEquals(defaultThreadTTL, tp.getThreadTTL());
 
         // test per-component values
         MuleDescriptor descriptor = (MuleDescriptor) managementContext.getRegistry().lookupService(
@@ -252,8 +252,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(componentMaxThreadsActive, tp.getMaxThreadsActive());
         assertEquals(componentMaxThreadsIdle, tp.getMaxThreadsIdle());
         assertEquals(componentThreadPoolExhaustedAction, tp.getPoolExhaustedAction());
-        // TODO HH: MULE-2289 in progress
-        // assertEquals(defaultThreadTTL, tp.getThreadTTL());
+        // MULE-2469
+//         assertEquals(defaultThreadTTL, tp.getThreadTTL());
     }
 
     public void testPoolingConfig()

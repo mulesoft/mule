@@ -22,7 +22,6 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.providers.service.TransportServiceException;
-import org.mule.providers.service.TransportFactoryException;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
 import org.mule.routing.filters.WildcardFilter;
@@ -172,14 +171,14 @@ public abstract class AbstractConnector
     /**
      * Defines the dispatcher threading profile
      */
-    private volatile ThreadingProfile dispatcherThreadingProfile = RegistryContext.getConfiguration()
-        .getDefaultMessageDispatcherThreadingProfile();
+    private volatile ThreadingProfile dispatcherThreadingProfile =
+            RegistryContext.getConfiguration().getDefaultMessageDispatcherThreadingProfile();
 
     /**
      * Defines the receiver threading profile
      */
-    private volatile ThreadingProfile receiverThreadingProfile = RegistryContext.getConfiguration()
-        .getDefaultMessageReceiverThreadingProfile();
+    private volatile ThreadingProfile receiverThreadingProfile = 
+            RegistryContext.getConfiguration().getDefaultMessageReceiverThreadingProfile();
 
     /**
      * @see {@link #isCreateMultipleTransactedReceivers()}
