@@ -54,7 +54,6 @@ public class StreamingTestCase extends FunctionalTestCase
         {
             public synchronized void eventReceived(UMOEventContext context, Object component)
             {
-                System.out.println("Got callback");
                 try
                 {
                     logger.info("called " + loopCount.incrementAndGet() + " times");

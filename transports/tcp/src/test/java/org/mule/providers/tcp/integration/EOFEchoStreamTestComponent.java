@@ -27,7 +27,6 @@ public class EOFEchoStreamTestComponent
         }
         is.close();
         
-        System.out.println("EOFEchoStreamTestComponent Received: " + new String(buf));
         return new String(buf);
     }
 }
