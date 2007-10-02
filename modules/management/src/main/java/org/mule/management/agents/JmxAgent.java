@@ -156,7 +156,7 @@ public class JmxAgent extends AbstractAgent
         {
             return;
         }
-        //Obtain mBeanServer from objectFactory. 
+        //Obtain mBeanServer from objectFactory.
         //mBeanServerObjectFactory has priority over mBeanServer in intialization.
         if (mBeanServerObjectFactory != null)
         {
@@ -450,10 +450,11 @@ public class JmxAgent extends AbstractAgent
                     EndpointServiceMBean mBean = new EndpointService((UMOMessageReceiver) iterator.next());
                     final String rawName = mBean.getName();
                     final String name = jmxSupport.escape(rawName);
-                    if (logger.isInfoEnabled())
-                    {
-                        logger.info("Attempting to register service with name: " + jmxSupport.getDomainName(managementContext)
-                                + ":type=org.mule.umo.UMOEndpoint,name=" + name);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Attempting to register service with name: " + jmxSupport.getDomainName(managementContext) +
+                                                    ":type=org.mule.Endpoint,component=" +
+                                                    jmxSupport.escape(mBean.getComponentName()) +
+                                                    ",name=" + name);
                     }
                     ObjectName on = jmxSupport.getObjectName(
                                                     jmxSupport.getDomainName(managementContext) +
@@ -579,7 +580,7 @@ public class JmxAgent extends AbstractAgent
     {
         this.mBeanServer = mBeanServer;
     }
-    
+
     public void setMBeanServerObjectFactory(ObjectFactory mBeanServerObjectFactory)
     {
 
