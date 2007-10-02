@@ -92,13 +92,7 @@
 
     <!-- The packs section. We specify here our packs, i.e. the folders that will be installed with this installer -->
     <packs>
-        <pack name="Base" required="yes">
-            <description>The base files</description>
-            <file src="../resources/INSTALL.txt" targetdir="$INSTALL_PATH"/>
-            <file src="../resources/LICENSE.txt" targetdir="$INSTALL_PATH"/>
-            <file src="../resources/USAGE.txt" targetdir="$INSTALL_PATH"/>
-        </pack>
-        <pack name="bin" required="yes">
+        <pack name="Executibles" required="yes">
             <description>The compiled distribution code</description>
             <file src="../distribution/bin" targetdir="$INSTALL_PATH"/>
             <!-- make the scripts etc. executable -->
@@ -109,11 +103,11 @@
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/visualizer" stage="never"/>
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/bin/visualizer.groovy" stage="never"/>
         </pack>
-        <pack name="conf" required="yes">
+        <pack name="Configuration Files" required="yes">
             <description>The configuration files for Mule</description>
             <file src="../distribution/conf" targetdir="$INSTALL_PATH"/>
         </pack>
-        <pack name="standard library" id="standard library" required="yes" conditionid="show.lib.standard">
+        <pack name="Standard library" id="standard library" required="yes" conditionid="show.lib.standard">
             <description>Contains the standard Mule Library</description>
             <file src="../distribution/lib" targetdir="$INSTALL_PATH"/>
             <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot-2.0-M2-SNAPSHOT.jar:$INSTALL_PATH/lib/opt/commons-io-1.3.1.jar:$INSTALL_PATH/lib/opt/log4j-1.2.14.jar:$INSTALL_PATH/lib/opt/slf4j-log4j12-1.4.3.jar:$INSTALL_PATH/lib/opt/jcl104-over-slf4j-1.4.3.jar:$INSTALL_PATH/lib/opt/commons-lang-2.3.jar:$INSTALL_PATH/lib/opt/slf4j-api-1.4.3.jar:$INSTALL_PATH/lib/mule/mule-core-2.0-M2-SNAPSHOT.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
@@ -122,7 +116,7 @@
         </args>
         </executable>
         </pack>
-        <pack name="full library" id="full library" required="yes" conditionid="show.lib.full">
+        <pack name="Full Library" id="full library" required="yes" conditionid="show.lib.full">
             <description> Contains the standard Mule Library plus the third party libraries not distributed with mule</description>
             <file src="../distribution/lib" targetdir="$INSTALL_PATH"/>
             <executable targetfile="$INSTALL_PATH/lib/boot/mule-module-boot-2.0-M2-SNAPSHOT.jar:$INSTALL_PATH/lib/opt/commons-io-1.3.1.jar:$INSTALL_PATH/lib/opt/log4j-1.2.14.jar:$INSTALL_PATH/lib/opt/slf4j-log4j12-1.4.3.jar:$INSTALL_PATH/lib/opt/jcl104-over-slf4j-1.4.3.jar:$INSTALL_PATH/lib/opt/commons-lang-2.3.jar:$INSTALL_PATH/lib/opt/slf4j-api-1.4.3.jar:$INSTALL_PATH/lib/mule/mule-core-2.0-M2-SNAPSHOT.jar" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
@@ -140,9 +134,15 @@
             </args>
             </executable>
         </pack>
-        <pack name="licenses" required="yes">
+        <pack name="Licenses" required="yes">
             <description>The License files</description>
             <file src="../distribution/licenses" targetdir="$INSTALL_PATH"/>
+        </pack>
+        <pack name="Read Me Files" required="yes">
+            <description>The base files</description>
+            <file src="../resources/INSTALL.txt" targetdir="$INSTALL_PATH"/>
+            <file src="../resources/LICENSE.txt" targetdir="$INSTALL_PATH"/>
+            <file src="../resources/USAGE.txt" targetdir="$INSTALL_PATH"/>
         </pack>
 <!-- TODO: Not supported in 2.x yet
         <pack name="sbin" required="yes">
@@ -162,19 +162,19 @@
             <executable targetdir="$INSTALL_PATH" targetfile="$INSTALL_PATH/sbin/wrapper-solaris-x86-32" stage="never"/>
         </pack>
 -->
-        <pack name="src" required="yes">
+        <pack name="Sources" required="yes">
             <description>The sources</description>
             <file src="../distribution/src" targetdir="$INSTALL_PATH"/>
         </pack>
-        <pack name="logs" required="no">
+        <pack name="Log Files" required="yes">
             <description>The log files</description>
             <file src="../distribution/logs" targetdir="$INSTALL_PATH"/>
         </pack>
-        <pack name="docs" required="no">
+        <pack name="JavaDocs" required="no">
             <description>The documentation</description>
             <file src="../distribution/docs" targetdir="$INSTALL_PATH"/>
         </pack>
-        <pack name="examples" required="no">
+        <pack name="Example Applications" required="no">
             <description>The samples</description>
             <file src="../distribution/examples" targetdir="$INSTALL_PATH"/>
             <!-- make the example scripts executable -->
