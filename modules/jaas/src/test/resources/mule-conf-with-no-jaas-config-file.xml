@@ -25,7 +25,7 @@
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://test">
-                    <encryption-security-filter strategy-ref="PBE"/>
+                    <jaas:jaas-security-filter/>
                 </inbound-endpoint>
             </inbound-router>
         </service>

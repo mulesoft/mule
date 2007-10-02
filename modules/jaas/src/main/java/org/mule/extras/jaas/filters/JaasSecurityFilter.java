@@ -47,7 +47,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
                 event.getEndpoint(), this);
         }
 
-        UMOCredentials user = new MuleCredentials(userHeader);
+        UMOCredentials user = new MuleCredentials(userHeader, getSecurityManager());
         UMOAuthentication authResult;
         UMOAuthentication umoAuthentication = new JaasAuthentication(user);
         try
