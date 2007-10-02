@@ -10,8 +10,6 @@
 
 package org.mule.config.i18n;
 
-import java.util.Date;
-
 import org.mule.config.MuleManifest;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.umo.UMOImmutableDescriptor;
@@ -25,6 +23,8 @@ import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
+
+import java.util.Date;
 
 public class CoreMessages extends MessageFactory
 {

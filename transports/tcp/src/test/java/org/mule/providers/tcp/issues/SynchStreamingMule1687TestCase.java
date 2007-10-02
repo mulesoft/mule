@@ -10,14 +10,14 @@
 
 package org.mule.providers.tcp.issues;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class SynchStreamingMule1687TestCase extends FunctionalTestCase
 {

@@ -10,9 +10,6 @@
 
 package org.mule.providers.service;
 
-import java.util.List;
-import java.util.Properties;
-
 import org.mule.impl.endpoint.EndpointURIBuilder;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.umo.UMOComponent;
@@ -24,6 +21,9 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOSessionHandler;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * <code>TransportServiceDescriptor</code> describes the necessary information for
