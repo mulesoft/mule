@@ -11,7 +11,6 @@
 package org.mule.providers.http;
 
 import org.mule.RegistryContext;
-import org.mule.transformers.TransformerUtils;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -22,6 +21,7 @@ import org.mule.providers.ConnectException;
 import org.mule.providers.NullPayload;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.tcp.TcpMessageReceiver;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -199,22 +199,16 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             return transformResponse(response);
         }
 
-        protected HttpResponse doRequest(HttpRequest request, RequestLine requestLine) throws IOException, UMOException
+        protected HttpResponse doRequest(HttpRequest request, 
+                                         RequestLine requestLine) throws IOException, UMOException
         {
             Map headers = parseHeaders(request);
 
             // TODO Mule 2.0 generic way to set stream message adapter
-            UMOMessageAdapter adapter;
-            if (endpoint.isStreaming() && request.getBody() != null)
-            {
-                adapter = buildStreamingAdapter(request, headers);
-            }
-            else
-            {
-                adapter = buildStandardAdapter(request, headers);
-            }
+            UMOMessageAdapter adapter = buildStandardAdapter(request, headers);
+            
             UMOMessage message = new MuleMessage(adapter);
-
+            
             if (logger.isDebugEnabled())
             {
                 logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
@@ -281,20 +275,25 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             return transformResponse(response);
         }
 
-        protected UMOMessageAdapter buildStreamingAdapter(HttpRequest request, Map headers) throws MessagingException
+        protected UMOMessageAdapter buildStandardAdapter(final HttpRequest request, 
+                                                         final Map headers) throws MessagingException, TransformerException, IOException
         {
-            UMOMessageAdapter adapter = connector.getStreamMessageAdapter(request.getBody(), conn.getOutputStream());
-            for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
+            final RequestLine requestLine = request.getRequestLine();
+            
+            sendExpect100(headers, requestLine);
+            
+            Object body = request.getBody();
+            if (body == null)
             {
-                Map.Entry entry = (Map.Entry)iterator.next();
-                adapter.setProperty((String)entry.getKey(), entry.getValue());
+                body = requestLine.getUri();
             }
-            return adapter;
+            
+            return connector.getMessageAdapter(new Object[]{body, headers});
         }
 
-        protected UMOMessageAdapter buildStandardAdapter(HttpRequest request, Map headers) throws MessagingException, TransformerException, IOException
+        private void sendExpect100(Map headers, RequestLine requestLine)
+            throws TransformerException, IOException
         {
-            RequestLine requestLine = request.getRequestLine();
             // respond with status code 100, for Expect handshake
             // according to rfc 2616 and http 1.1
             // the processing will continue and the request will be fully
@@ -315,13 +314,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     conn.writeResponse(transformResponse(expected));
                 }
             }
-
-            Object body = request.getBodyBytes();
-            if (body == null)
-            {
-                body = requestLine.getUri();
-            }
-            return connector.getMessageAdapter(new Object[]{body, headers});
         }
 
         protected HttpResponse buildFailureResponse(RequestLine requestLine, UMOMessage message) throws TransformerException
@@ -474,11 +466,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // try again
             String uriStr = requestUri.toString();
             receiver = connector.lookupReceiver(uriStr);
-
-            if (receiver == null)
+            
+            if (receiver == null) 
             {
-                receiver = findReceiverByStem(connector.getReceivers(), uriStr);
-            }
+				receiver = findReceiverByStem(connector.getReceivers(), uriStr);
+			}
 
             if (receiver == null && logger.isWarnEnabled())
             {
@@ -497,7 +489,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return (HttpResponse) TransformerUtils.applyAllTransformersToObject(
                 connector.getDefaultResponseTransformers(), response);
     }
-
+    
     public static UMOMessageReceiver findReceiverByStem(Map receivers, String uriStr)
     {
         int match = 0;

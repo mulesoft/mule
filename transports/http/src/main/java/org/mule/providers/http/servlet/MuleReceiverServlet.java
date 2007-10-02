@@ -109,7 +109,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            UMOMessageReceiver receiver = getReceiverForURI(request);
+        	UMOMessageReceiver receiver = getReceiverForURI(request);
             UMOMessage responseMessage;
             UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
@@ -133,7 +133,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            UMOMessageReceiver receiver = getReceiverForURI(request);
+        	UMOMessageReceiver receiver = getReceiverForURI(request);
             UMOMessage responseMessage;
             UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
@@ -293,7 +293,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             // This is some bizarre piece of code so the XFire Servlet code works.
             // We should remove this at some point (see XFireWsdlCallTestCase for a failure
             // if this code is removed).
-            if (receiver == null)
+            if (receiver == null) 
             {
                 Map receivers = getReceivers();
                 Iterator iter = receivers.keySet().iterator();

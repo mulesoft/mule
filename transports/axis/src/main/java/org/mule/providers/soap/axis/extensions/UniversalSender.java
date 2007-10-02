@@ -144,6 +144,7 @@ public class UniversalSender extends BasicHandler
                 msgContext.getRequestMessage().writeTo(baos);
                 baos.close();
                 payload = baos.toByteArray();
+                System.out.println("Payload " + new String((byte[])payload));
             }
 
             Map props = new HashMap();

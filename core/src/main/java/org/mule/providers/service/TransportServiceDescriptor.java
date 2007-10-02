@@ -10,6 +10,9 @@
 
 package org.mule.providers.service;
 
+import java.util.List;
+import java.util.Properties;
+
 import org.mule.impl.endpoint.EndpointURIBuilder;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.umo.UMOComponent;
@@ -21,13 +24,6 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOSessionHandler;
-import org.mule.umo.provider.UMOStreamMessageAdapter;
-import org.mule.umo.transformer.UMOTransformer;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * <code>TransportServiceDescriptor</code> describes the necessary information for
@@ -40,8 +36,6 @@ import java.util.Properties;
 public interface TransportServiceDescriptor extends ServiceDescriptor
 {
     public UMOMessageAdapter createMessageAdapter(Object message) throws TransportServiceException;
-
-    public UMOStreamMessageAdapter createStreamMessageAdapter(InputStream in, OutputStream out) throws TransportServiceException;
 
     public UMOSessionHandler createSessionHandler() throws TransportServiceException;
 

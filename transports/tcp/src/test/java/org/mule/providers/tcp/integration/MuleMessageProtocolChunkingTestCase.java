@@ -66,6 +66,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
         for (int i = 0; i < messages; i++)
         {
             UMOMessage msg = client.receive("vm://out", WAIT_MS);
+            assertNotNull(msg);
             assertTrue(msg.getPayload() instanceof MessageObject);
             MessageObject received = (MessageObject)msg.getPayload();
             assertEquals(message.s, received.s);

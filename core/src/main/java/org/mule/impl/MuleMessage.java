@@ -17,6 +17,7 @@ import org.mule.providers.DefaultMessageAdapter;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.transformer.TransformerException;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -132,6 +133,11 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
     {
         adapter.setProperty(key, value);
     }
+    
+    public Object getPayload(Class outputType) throws TransformerException
+    {
+        return adapter.getPayload(outputType);
+    }
 
     /**
      * Converts the payload implementation into a String representation
@@ -189,6 +195,11 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
     public Object getPayload()
     {
         return adapter.getPayload();
+    }
+
+    public void setPayload(Object payload)
+    {
+        adapter.setPayload(payload);
     }
 
     public void addProperties(Map properties)

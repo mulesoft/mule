@@ -10,10 +10,6 @@
 
 package org.mule.modules.xml.functional;
 
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
 
 public class JXPathPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
 {

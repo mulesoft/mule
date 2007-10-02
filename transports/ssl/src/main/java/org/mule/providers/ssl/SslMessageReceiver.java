@@ -15,7 +15,6 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
@@ -43,14 +42,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
 
     protected Work createWork(Socket socket) throws IOException
     {
-        if (endpoint.isStreaming())
-        {
-            return new SslStreamWorker(socket, this);
-        }
-        else
-        {
-            return new SslWorker(socket, this);
-        }
+        return new SslWorker(socket, this);
     }
 
     private void preRoute(MuleMessage message) throws Exception
@@ -85,19 +77,4 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
             preRoute(message);
         }
     }
-
-    protected class SslStreamWorker extends TcpStreamWorker
-    {
-        public SslStreamWorker(Socket socket, AbstractMessageReceiver receiver) throws IOException
-        {
-            super(socket, receiver);
-            ((SSLSocket) socket).addHandshakeCompletedListener(SslMessageReceiver.this);
-        }
-
-        protected void preRouteMuleMessage(MuleMessage message) throws Exception
-        {
-            preRoute(message);
-        }
-    }
-
 }

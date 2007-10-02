@@ -87,6 +87,11 @@ public class BigInputStream extends InputStream
         }
     }
 
+    public int available() throws IOException
+    {
+        return (int) (size - sent);
+    }
+
 }
 
 

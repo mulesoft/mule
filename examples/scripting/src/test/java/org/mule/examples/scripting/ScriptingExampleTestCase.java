@@ -24,7 +24,7 @@ public class ScriptingExampleTestCase extends FunctionalTestCase
         
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-        assertEquals("[Hello, :-)]", reply.getPayloadAsString());
+        assertEquals("Hello|:-)", reply.getPayloadAsString());
     }
 
     protected String getConfigResources()

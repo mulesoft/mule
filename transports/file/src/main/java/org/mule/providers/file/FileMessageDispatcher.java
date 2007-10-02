@@ -10,6 +10,12 @@
 
 package org.mule.providers.file;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.InputStream;
+import java.net.URLDecoder;
+
 import org.mule.MuleException;
 import org.mule.RegistryContext;
 import org.mule.impl.MuleMessage;
@@ -20,12 +26,9 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.OutputHandler;
 import org.mule.util.FileUtils;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.net.URLDecoder;
+import org.mule.util.IOUtils;
 
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the filesystem
@@ -51,25 +54,33 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         // Wrap the transformed message before passing it to the filename parser
         UMOMessage message = new MuleMessage(data, event.getMessage());
 
-        byte[] buf;
-        if (data instanceof byte[])
-        {
-            buf = (byte[]) data;
-        }
-        else
-        {
-            buf = data.toString().getBytes(event.getEncoding());
-        }
-
         FileOutputStream fos = (FileOutputStream) connector.getOutputStream(event.getEndpoint(), message);
-        if (event.getMessage().getStringProperty(FileConnector.PROPERTY_FILENAME, null) == null)
+        try 
         {
-            event.getMessage().setStringProperty(FileConnector.PROPERTY_FILENAME,
-                message.getStringProperty(FileConnector.PROPERTY_FILENAME, ""));
-        }
-        try
-        {
-            fos.write(buf);
+            if (event.getMessage().getStringProperty(FileConnector.PROPERTY_FILENAME, null) == null)
+            {
+                event.getMessage().setStringProperty(FileConnector.PROPERTY_FILENAME,
+                    message.getStringProperty(FileConnector.PROPERTY_FILENAME, ""));
+            }
+            
+            if (data instanceof byte[])
+            {
+                fos.write((byte[]) data);
+            }
+            else if (data instanceof String)
+            {
+                fos.write(data.toString().getBytes(event.getEncoding()));
+            }
+            else if (data instanceof OutputHandler)
+            {
+                ((OutputHandler) data).write(event, fos);
+            }
+            else
+            {
+                InputStream is = (InputStream) event.getTransformedMessage(InputStream.class);
+                IOUtils.copyLarge(is, fos);
+                is.close();
+            }
         }
         finally
         {

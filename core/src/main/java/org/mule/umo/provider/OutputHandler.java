@@ -14,7 +14,6 @@ import org.mule.umo.UMOEvent;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
 
 /**
  * The OutputHandler is a strategy class that is set on the StreamMessageAdapter to
@@ -36,12 +35,4 @@ public interface OutputHandler
      */
     void write(UMOEvent event, OutputStream out) throws IOException;
 
-    /**
-     * Used to obtain a set of headers that will be sent with this stream payload.
-     * Headers are typically set independently from a stream payload.
-     * 
-     * @param event the current event
-     * @return a Map of headers or an empty map if there are no headers
-     */
-    Map getHeaders(UMOEvent event);
 }

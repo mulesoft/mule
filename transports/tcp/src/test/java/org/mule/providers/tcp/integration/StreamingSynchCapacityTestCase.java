@@ -30,7 +30,7 @@ public class StreamingSynchCapacityTestCase extends AbstractStreamingCapacityTes
 
     public StreamingSynchCapacityTestCase()
     {
-        super(100 * ONE_MB, "tcp://localhost:65432");
+        super(10 * ONE_MB, "tcp://localhost:65432");
     }
 
     protected String getConfigResources()

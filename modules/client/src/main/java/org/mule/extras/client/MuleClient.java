@@ -10,6 +10,15 @@
 
 package org.mule.extras.client;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
@@ -47,21 +56,11 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and
@@ -282,84 +281,6 @@ public class MuleClient implements Disposable
             throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), 
                 event.getMessage(), event.getEndpoint(), e);
         }
-    }
-
-    /**
-     * Dispatches a Stream event asynchronously to a endpointUri via a mule server.
-     * the Url determines where to dispathc the event to, this can be in the form of
-     * 
-     * @param url the Mule url used to determine the destination and transport of the
-     *            message
-     * @param message the message to send
-     * @throws org.mule.umo.UMOException
-     */
-    public void dispatchStream(String url, UMOStreamMessageAdapter message) throws UMOException
-    {
-        UMOEvent event = getEvent(new MuleMessage(message), url, false, true);
-        try
-        {
-            event.getSession().dispatchEvent(event);
-        }
-        catch (UMOException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), 
-                event.getMessage(), event.getEndpoint(), e);
-        }
-    }
-
-    public UMOStreamMessageAdapter sendStream(String url, UMOStreamMessageAdapter message)
-        throws UMOException
-    {
-        return sendStream(url, message, UMOEvent.TIMEOUT_NOT_SET_VALUE);
-    }
-
-    /**
-     * Sends a streaming event synchronously to a endpointUri via a mule server and a
-     * resulting stream is set on the passed Stream Mesage Adapter.
-     * 
-     * @param url the Mule url used to determine the destination and transport of the
-     *            message
-     * @param message The message to send
-     * @param timeout The time in milliseconds the the call should block waiting for
-     *            a response
-     * @throws org.mule.umo.UMOException
-     */
-    public UMOStreamMessageAdapter sendStream(String url, UMOStreamMessageAdapter message, int timeout)
-        throws UMOException
-    {
-        UMOEvent event = getEvent(new MuleMessage(message), url, true, true);
-        event.setTimeout(timeout);
-        try
-        {
-            UMOMessage result = event.getSession().sendEvent(event);
-            if (result != null)
-            {
-                if (result.getAdapter() instanceof UMOStreamMessageAdapter)
-                {
-                    return (UMOStreamMessageAdapter)result.getAdapter();
-                }
-                else
-                {
-                    // TODO i18n (though this case should never happen...)
-                    throw new IllegalStateException(
-                        "Mismatch of stream states. A stream was used for outbound channel, but a stream was not used for the response");
-                }
-            }
-        }
-        catch (UMOException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), 
-                event.getMessage(), event.getEndpoint(), e);
-        }
-        return null;
     }
 
     /**

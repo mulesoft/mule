@@ -13,7 +13,7 @@ package org.mule.providers.http.servlet;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ThreadSafeAccess;
-import org.mule.providers.AbstractMessageAdapter;
+import org.mule.providers.DefaultMessageAdapter;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.i18n.ServletMessages;
 import org.mule.umo.MessagingException;
@@ -38,14 +38,12 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
  * javax.servletHttpServletRequest objects.
  */
 
-public class HttpRequestMessageAdapter extends AbstractMessageAdapter
+public class HttpRequestMessageAdapter extends DefaultMessageAdapter
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = -4238448252206941125L;
-
-    private Object message = null;
 
     private HttpServletRequest request;
 

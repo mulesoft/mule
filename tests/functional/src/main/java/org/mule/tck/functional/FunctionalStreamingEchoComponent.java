@@ -7,17 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.impl.model.resolvers;
 
-/**
- * This resolver can be removed once we move to the API refactoring
- *
- * @deprecated
- */
-public class StreamingEntryPointResolverSet extends DefaultEntryPointResolverSet
+package org.mule.tck.functional;
+
+import java.io.InputStream;
+
+public class FunctionalStreamingEchoComponent
 {
-    public StreamingEntryPointResolverSet()
+    public InputStream echo(InputStream stream)
     {
-        addEntryPointResolver(new StreamingEntryPointResolver());
+        return stream;
     }
 }
+
+

@@ -15,7 +15,6 @@ import org.mule.providers.ftp.server.NamedPayload;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.model.UMOModel;
 
 import java.util.HashMap;
 
@@ -26,8 +25,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 /**
  * We don't have an integrated ftp server (yet), and synchronous return doesn't work
- * with streaming, as far as i can tell, so the best we can do here is dispatch
- * a through a streaming bridge to the test server, then pull it back again (again,
+ * with streaming, as far as i can tell, so the best we can do here is dispatch a
+ * through a streaming bridge to the test server, then pull it back again (again,
  * through the streaming model).
  */
 public class FtpStreamingTestCase extends AbstractFtpServerTestCase
@@ -75,11 +74,9 @@ public class FtpStreamingTestCase extends AbstractFtpServerTestCase
 
         MuleClient client = new MuleClient();
 
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
-        FunctionalStreamingTestComponent ftc =
-                (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
+        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) lookupComponent("main", "testComponent");
         assertNotNull(ftc);
-//        assertEquals(1, ftc.getNumber());
+        // assertEquals(1, ftc.getNumber());
 
         ftc.setEventCallback(callback, TEST_MESSAGE.length());
 

@@ -10,21 +10,18 @@
 
 package org.mule.providers.tcp.integration;
 
+import java.util.HashMap;
+
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.model.UMOModel;
-
-import java.util.HashMap;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This test is more about testing the streaming model than the TCP provider, really.
@@ -32,10 +29,10 @@ import org.apache.commons.logging.LogFactory;
 public class StreamingTestCase extends FunctionalTestCase
 {
 
-    private static final Log logger = LogFactory.getLog(StreamingTestCase.class);
-    public static final int TIMEOUT = 3000;
+    public static final int TIMEOUT = 300000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
+
 
     public StreamingTestCase()
     {
@@ -57,6 +54,7 @@ public class StreamingTestCase extends FunctionalTestCase
         {
             public synchronized void eventReceived(UMOEventContext context, Object component)
             {
+                System.out.println("Got callback");
                 try
                 {
                     logger.info("called " + loopCount.incrementAndGet() + " times");
@@ -78,29 +76,10 @@ public class StreamingTestCase extends FunctionalTestCase
 
         MuleClient client = new MuleClient();
 
-        // this just creates another class - not the one used
-//        FunctionalStreamingTestComponent ftc =
-//                (FunctionalStreamingTestComponent) MuleManager.getInstance()
-//                        .getContainerContext().getComponent(
-//                        new ContainerKeyPair("mule", "testComponent"));
-
-        // this creates a new instance too
-//        UMOModel model = (UMOModel) MuleManager.getInstance().getModels().get("echo");
-//        FunctionalStreamingTestComponent ftc =
-//                (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
-
-        // this works only if singleton set in descriptor
-        UMOModel model = managementContext.getRegistry().lookupModel("echoModel");
-        FunctionalStreamingTestComponent ftc =
-                (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
+        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) 
+            lookupComponent("echoModel", "testComponent");
         assertNotNull(ftc);
-
-        // this works with or without singleton, but required adding getComponent method
-//        UMOModel model = (UMOModel) MuleManager.getInstance().getModels().get("echo");
-//        UMOSession session = model.getComponentSession("testComponent");
-//        StreamingComponent component = (StreamingComponent) session.getComponent();
-//        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component.getComponent();
-
+        
         ftc.setEventCallback(callback, TEST_MESSAGE.length());
 
         client.dispatch("tcp://localhost:65432", TEST_MESSAGE, new HashMap());
@@ -108,5 +87,6 @@ public class StreamingTestCase extends FunctionalTestCase
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT, message.get());
     }
+
 
 }

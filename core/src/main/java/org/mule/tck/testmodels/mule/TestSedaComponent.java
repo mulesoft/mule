@@ -29,6 +29,7 @@ public class TestSedaComponent extends SedaComponent
         super(descriptor, model);
     }
 
+
     public MuleProxy createComponentProxy(Object component, MuleDescriptor descriptor, UMOModel model, ObjectPool proxyPool) 
         throws UMOException
     {

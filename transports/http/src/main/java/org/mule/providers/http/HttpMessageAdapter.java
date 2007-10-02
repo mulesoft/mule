@@ -11,10 +11,7 @@
 package org.mule.providers.http;
 
 import org.mule.impl.ThreadSafeAccess;
-import org.mule.providers.AbstractMessageAdapter;
-import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.providers.DefaultMessageAdapter;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -27,44 +24,49 @@ import org.apache.commons.httpclient.NameValuePair;
  * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making the
  * payload and headers available as standard message adapter.
  */
-public class HttpMessageAdapter extends AbstractMessageAdapter
+public class HttpMessageAdapter extends DefaultMessageAdapter
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = -1544495479333000422L;
 
-    private static final UMOTransformer transformer = new SerializableToByteArray();
-
-    private final Object message;
     private boolean http11 = true;
 
-    public HttpMessageAdapter(Object message) throws MessageTypeNotSupportedException
+    public HttpMessageAdapter(Object message)
     {
         if (message instanceof Object[])
         {
-            this.message = ((Object[])message)[0];
-            if (((Object[])message).length > 1)
+            // This case comes from the HttpMessageReceiver...
+
+            this.message = ((Object[]) message)[0];
+            if (((Object[]) message).length > 1)
             {
-                Map props = (Map)((Object[])message)[1];
-                for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
+                Object second = ((Object[]) message)[1];
+                if (second instanceof Map)
                 {
-                    Map.Entry e = (Map.Entry)iterator.next();
-                    String key = (String)e.getKey();
-                    Object value = e.getValue();
-                    // skip incoming null values
-                    if (value != null)
+                    Map props = (Map) second;
+                    for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
                     {
-                        setProperty(key, value);
+                        Map.Entry e = (Map.Entry) iterator.next();
+                        String key = (String) e.getKey();
+                        Object value = e.getValue();
+                        // skip incoming null values
+                        if (value != null)
+                        {
+                            setProperty(key, value);
+                        }
+                    }
+                }
+                else if (second instanceof Header[])
+                {
+                    Header[] headers = (Header[]) second;
+                    for (int i = 0; i < headers.length; i++)
+                    {
+                        setProperty(headers[i].getName(), headers[i].getValue());
                     }
                 }
             }
-        }
-        else if (message instanceof byte[])
-        {
-            this.message = message;
-            // If the adapter is being created as part of a response flow, just wrap
-            // the HttpResponse
         }
         else if (message instanceof HttpResponse)
         {
@@ -73,8 +75,9 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         }
         else
         {
-            throw new MessageTypeNotSupportedException(message, getClass());
+            this.message = message;
         }
+
         String temp = getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, null);
         if (HttpConstants.HTTP10.equalsIgnoreCase(temp))
         {
@@ -102,62 +105,6 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         super(template);
         message = template.message;
         http11 = template.http11;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.providers.UMOMessageAdapter#getPayload()
-     */
-    public Object getPayload()
-    {
-        return message;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsBytes()
-     */
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-        if (message instanceof byte[])
-        {
-            return (byte[])message;
-        }
-        else if (message instanceof String)
-        {
-            return message.toString().getBytes();
-        }
-        else
-        {
-            return (byte[])transformer.transform(message);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsString(String
-     *      encoding)
-     */
-    public String getPayloadAsString(String encoding) throws Exception
-    {
-        if (message instanceof byte[])
-        {
-            if (encoding != null)
-            {
-                return new String((byte[])message, encoding);
-            }
-            else
-            {
-                return new String((byte[])message);
-            }
-        }
-        else
-        {
-            return message.toString();
-        }
     }
 
     /*

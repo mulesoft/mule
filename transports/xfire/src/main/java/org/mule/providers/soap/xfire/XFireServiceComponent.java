@@ -23,7 +23,6 @@ import org.mule.providers.soap.xfire.transport.MuleLocalChannel;
 import org.mule.providers.soap.xfire.transport.MuleLocalTransport;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.providers.streaming.OutStreamMessageAdapter;
-import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
@@ -33,11 +32,9 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -229,28 +226,9 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
      * @return The inputstream for the current message
      * @throws UMOException
      */
-
     protected InputStream getMessageStream(UMOEventContext context) throws UMOException
     {
-        InputStream is;
-        UMOMessage eventMsg = context.getMessage();
-        Object eventMsgPayload = eventMsg.getPayload();
-
-        if (eventMsgPayload instanceof InputStream)
-        {
-            is = (InputStream)eventMsgPayload;
-        }
-        else if (eventMsg.getAdapter() instanceof UMOStreamMessageAdapter)
-        {
-            StreamMessageAdapter sma = (StreamMessageAdapter)eventMsg.getAdapter();
-            is = sma.getInputStream();
-
-        }
-        else
-        {
-            is = new ByteArrayInputStream(context.getTransformedMessageAsBytes());
-        }
-        return is;
+        return (InputStream) context.getMessage().getPayload(InputStream.class);
     }
 
     /**

@@ -79,6 +79,7 @@ public class AxisEchoTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
+        System.out.println(result.getPayloadAsString());
         XMLAssert.assertXMLEqual(expectedPostResponse, result.getPayloadAsString());
     }
 
@@ -95,6 +96,7 @@ public class AxisEchoTestCase extends FunctionalTestCase
             assertNull(result.getExceptionPayload());
         }
         assertFalse(result.getPayload() instanceof NullPayload);
+        
         XMLAssert.assertXMLEqual(expectedGetResponse, result.getPayloadAsString());
     }
 

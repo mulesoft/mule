@@ -10,12 +10,6 @@
 
 package org.mule.providers.tcp.protocols;
 
-import org.mule.providers.tcp.TcpProtocol;
-import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.provider.UMOStreamMessageAdapter;
-import org.mule.util.ClassUtils;
-import org.mule.util.IOUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +20,10 @@ import java.net.SocketTimeoutException;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.providers.tcp.TcpProtocol;
+import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
 
 /**
  * This Abstract class has been introduced so as to have the byte protocols (i.e. the
@@ -57,13 +55,11 @@ public abstract class ByteProtocol implements TcpProtocol
 
     public void write(OutputStream os, Object data) throws IOException
     {
-        if (data instanceof UMOStreamMessageAdapter)
+        if (data instanceof InputStream)
         {
             if (streamOk)
             {
-                IOUtils.copy(((UMOStreamMessageAdapter) data).getInputStream(), os);
-                os.flush();
-                os.close();
+                copyStream((InputStream)data, os);
             }
             else
             {
@@ -83,7 +79,8 @@ public abstract class ByteProtocol implements TcpProtocol
         {
             // TODO SF: encoding is lost/ignored; it is probably a good idea to have
             // a separate "stringEncoding" property on the protocol
-            writeByteArray(os, ((String) data).getBytes());
+            String s = (String) data;
+            writeByteArray(os, s.getBytes(getStringEncoding(s)));
         }
         else if (data instanceof Serializable)
         {
@@ -93,6 +90,20 @@ public abstract class ByteProtocol implements TcpProtocol
         {
             throw new IllegalArgumentException("Cannot serialize data: " + data);
         }
+    }
+
+    protected void copyStream(InputStream is, OutputStream os) throws IOException
+    {
+        IOUtils.copy((InputStream) is, os);
+    }
+
+    /**
+     * Override this if you'd like to change the String encoding for a message.
+     * @return
+     */
+    protected String getStringEncoding(String s)
+    {
+        return "UTF-8";
     }
 
     protected void writeByteArray(OutputStream os, byte[] data) throws IOException

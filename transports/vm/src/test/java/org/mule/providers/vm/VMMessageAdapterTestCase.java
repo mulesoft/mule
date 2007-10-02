@@ -11,6 +11,7 @@
 package org.mule.providers.vm;
 
 import org.mule.impl.MuleMessage;
+import org.mule.providers.DefaultMessageAdapter;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -32,11 +33,11 @@ public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     {
         if (payload instanceof UMOMessage)
         {
-            return new VMMessageAdapter((UMOMessage)payload);
+            return new DefaultMessageAdapter((UMOMessage)payload);
         }
         else
         {
-            throw new MessageTypeNotSupportedException(payload, VMMessageAdapter.class);
+            throw new MessageTypeNotSupportedException(payload, DefaultMessageAdapter.class);
         }
     }
 

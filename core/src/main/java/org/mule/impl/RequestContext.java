@@ -10,7 +10,6 @@
 
 package org.mule.impl;
 
-import org.mule.config.MuleManifest;
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;

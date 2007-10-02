@@ -16,6 +16,7 @@ import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.endpoint.EndpointURIBuilder;
 import org.mule.providers.NullPayload;
 import org.mule.registry.AbstractServiceDescriptor;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransactionFactory;
@@ -25,15 +26,11 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOSessionHandler;
-import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.object.ObjectFactory;
-import org.mule.transformers.TransformerUtils;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Properties;
 
@@ -51,7 +48,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 {
 
     private String messageAdapter;
-    private String streamMessageAdapter;
     private String messageReceiver;
     private Properties exceptionMappings = new Properties();
 
@@ -77,7 +73,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
         messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
         messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
-        streamMessageAdapter = props.getProperty(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER);
 
         registerService(MuleProperties.CONNECTOR_CLASS, null, props);
         registerService(MuleProperties.CONNECTOR_FACTORY, null, props);
@@ -86,7 +81,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         registerService(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, null, props);
         registerService(MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS, null, props);
         registerService(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, null, props);
-        registerService(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER, null, props);
         registerService(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, null, props);
         registerService(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, null, props);
         registerService(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER, null, props);
@@ -125,38 +119,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     public UMOMessageAdapter createMessageAdapter(Object message) throws TransportServiceException
     {
         return createMessageAdapter(message, messageAdapter);
-    }
-
-    /* (non-Javadoc)
-     * @see org.mule.providers.service.TransportServiceDescriptor#createStreamMessageAdapter(java.io.InputStream, java.io.OutputStream)
-     */
-    public UMOStreamMessageAdapter createStreamMessageAdapter(InputStream in, OutputStream out)
-    throws TransportServiceException
-    {
-        if (streamMessageAdapter == null)
-        {
-    
-            // If the stream.message.adapter is not set streaming should not be used
-            throw new TransportServiceException(CoreMessages.objectNotSetInService(
-                    MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER, service));
-        }
-        try
-        {
-            if (out == null)
-            {
-                return (UMOStreamMessageAdapter)ClassUtils.instanciateClass(streamMessageAdapter,
-                    new Object[]{in});
-            }
-            else
-            {
-                return (UMOStreamMessageAdapter)ClassUtils.instanciateClass(streamMessageAdapter,
-                    new Object[]{in, out});
-            }
-        }
-        catch (Exception e)
-        {
-            throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("Message Adapter", streamMessageAdapter), e);
-        }
     }
 
     protected UMOMessageAdapter createMessageAdapter(Object message, String clazz)

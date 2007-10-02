@@ -13,7 +13,7 @@ package org.mule.providers.tcp.issues;
 /**
  * This fails to work as described in the issue, but isn't HTTP...
  */
-public class StreamingDownloadMule1389TestCase extends AbstractStreamingDownloadMule1389TestCase
+public abstract class StreamingDownloadMule1389TestCase extends AbstractStreamingDownloadMule1389TestCase
 {
 
     public StreamingDownloadMule1389TestCase()

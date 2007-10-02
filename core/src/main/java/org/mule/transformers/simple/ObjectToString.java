@@ -10,12 +10,17 @@
 
 package org.mule.transformers.simple;
 
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.mule.config.i18n.CoreMessages;
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.util.IOUtils;
 
 /**
  * <code>ObjectToString</code> transformer is useful for debugging. It will return
@@ -36,7 +41,32 @@ public class ObjectToString extends AbstractTransformer
     {
         String output = "";
 
-        if (src instanceof Map)
+        if (src instanceof InputStream)
+        {
+            InputStream is = (InputStream) src;
+            try
+            {
+                ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+                IOUtils.copy(is, byteOut);
+                output = new String(byteOut.toByteArray(), encoding);
+            }
+            catch (IOException e)
+            {
+                throw new TransformerException(CoreMessages.errorReadingStream(), e);
+            }
+            finally
+            {
+                try
+                {
+                    is.close();
+                }
+                catch (IOException e)
+                {
+                    logger.warn("Could not close stream: " + e.getMessage());
+                }
+            }
+        }
+        else if (src instanceof Map)
         {
             Iterator iter = ((Map) src).entrySet().iterator();
             if (iter.hasNext())
