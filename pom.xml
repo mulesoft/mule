@@ -816,6 +816,12 @@
             </plugin>
             -->
 
+            <!-- test exclusions report -->
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>mule-test-exclusions-report-plugin</artifactId>
+            </plugin>
+
             <!-- Javadoc settings -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
