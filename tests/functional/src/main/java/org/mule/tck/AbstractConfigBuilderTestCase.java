@@ -200,17 +200,17 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         // expected default values from the configuration;
         // these should differ from the programmatic values!
-        
+
         // globals
         int defaultMaxBufferSize = 42;
         int defaultMaxThreadsActive = 16;
         int defaultMaxThreadsIdle = 3;
         int defaultThreadPoolExhaustedAction = ThreadingProfile.WHEN_EXHAUSTED_WAIT;
         int defaultThreadTTL = 60001;
-        
+
         // for the connector
         int connectorMaxBufferSize = 2;
-        
+
         // for the component
         int componentMaxBufferSize = 6;
         int componentMaxThreadsActive = 12;
@@ -237,7 +237,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         AbstractConnector c = (AbstractConnector) managementContext.getRegistry().lookupConnector(
             "dummyConnector");
         tp = c.getDispatcherThreadingProfile();
+        // this value is configured
         assertEquals(connectorMaxBufferSize, tp.getMaxBufferSize());
+        // these values are inherited
         assertEquals(defaultMaxThreadsActive, tp.getMaxThreadsActive());
         assertEquals(defaultMaxThreadsIdle, tp.getMaxThreadsIdle());
         // MULE-2469
@@ -248,10 +250,12 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         MuleDescriptor descriptor = (MuleDescriptor) managementContext.getRegistry().lookupService(
             "appleComponent2");
         tp = descriptor.getThreadingProfile();
+        // these values are configured
         assertEquals(componentMaxBufferSize, tp.getMaxBufferSize());
         assertEquals(componentMaxThreadsActive, tp.getMaxThreadsActive());
         assertEquals(componentMaxThreadsIdle, tp.getMaxThreadsIdle());
         assertEquals(componentThreadPoolExhaustedAction, tp.getPoolExhaustedAction());
+        // this value is inherited
         // MULE-2469
 //         assertEquals(defaultThreadTTL, tp.getThreadTTL());
     }
