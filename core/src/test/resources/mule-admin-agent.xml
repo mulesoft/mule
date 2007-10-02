@@ -8,7 +8,7 @@
 
     <admin-agent serverUri="test://12345">
         <spring:property name="wireFormat">
-            <spring:bean class="org.mule.transformers.wire.SerializationWireFormat"/>
+            <spring:bean class="org.mule.transformers.wire.TransformerPairWireFormat"/>
         </spring:property>
     </admin-agent>
 </mule>

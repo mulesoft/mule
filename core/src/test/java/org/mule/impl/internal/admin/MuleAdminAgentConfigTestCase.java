@@ -10,7 +10,7 @@
 package org.mule.impl.internal.admin;
 
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformers.wire.WireFormat;
+import org.mule.transformers.wire.TransformerPairWireFormat;
 
 public class MuleAdminAgentConfigTestCase extends AbstractMuleTestCase
 {
@@ -25,7 +25,7 @@ public class MuleAdminAgentConfigTestCase extends AbstractMuleTestCase
         assertNotNull(agent.getServerUri());
         assertEquals("test://12345",agent.getServerUri());
         assertNotNull(agent.getWireFormat());
-        assertTrue(agent.getWireFormat() instanceof WireFormat);
+        assertTrue(agent.getWireFormat() instanceof TransformerPairWireFormat);
     }
     
 }
