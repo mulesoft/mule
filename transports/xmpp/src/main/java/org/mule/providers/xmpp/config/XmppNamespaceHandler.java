@@ -10,7 +10,7 @@
 
 package org.mule.providers.xmpp.config;
 
-import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.providers.xmpp.XmppConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -23,6 +23,6 @@ public class XmppNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         this.registerBeanDefinitionParser("connector", 
-            new MuleChildDefinitionParser(XmppConnector.class, true));
+            new MuleOrphanDefinitionParser(XmppConnector.class, true));
     }
 }

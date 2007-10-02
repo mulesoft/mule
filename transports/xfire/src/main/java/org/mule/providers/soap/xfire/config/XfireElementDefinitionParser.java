@@ -10,10 +10,10 @@
 
 package org.mule.providers.soap.xfire.config;
 
-import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.providers.soap.xfire.XFireConnector;
 
-public class XfireElementDefinitionParser extends MuleChildDefinitionParser
+public class XfireElementDefinitionParser extends MuleOrphanDefinitionParser
 {
     public XfireElementDefinitionParser()
     {

@@ -18,18 +18,18 @@ import org.w3c.dom.Element;
 /**
  * A parser for direct children of the <mule> element.
  */
-public class MuleChildDefinitionParser extends OrphanDefinitionParser
+public class MuleOrphanDefinitionParser extends OrphanDefinitionParser
 {
     
     /**
      * This constructor assumes that the class name will be explicitly specified as an attribute on the element.
      */
-    public MuleChildDefinitionParser(boolean singleton)
+    public MuleOrphanDefinitionParser(boolean singleton)
     {
         super(singleton);
     }
 
-    public MuleChildDefinitionParser(Class beanClass, boolean singleton)
+    public MuleOrphanDefinitionParser(Class beanClass, boolean singleton)
     {
         super(beanClass, singleton);
     }

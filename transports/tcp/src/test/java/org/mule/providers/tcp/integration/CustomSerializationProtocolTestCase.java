@@ -45,7 +45,7 @@ public class CustomSerializationProtocolTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "CustomSerialisation-mule-config.xml";
+        return "custom-serialisation-mule-config.xml";
     }
 
 }

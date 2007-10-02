@@ -11,11 +11,11 @@
 package org.mule.scripting.config;
 
 import org.mule.components.script.refreshable.GroovyRefreshableBeanBuilder;
-import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
 import org.w3c.dom.Element;
 
-public class GroovyRefreshableBeanBuilderParser extends MuleChildDefinitionParser
+public class GroovyRefreshableBeanBuilderParser extends MuleOrphanDefinitionParser
 {
 
     public GroovyRefreshableBeanBuilderParser(boolean singleton)

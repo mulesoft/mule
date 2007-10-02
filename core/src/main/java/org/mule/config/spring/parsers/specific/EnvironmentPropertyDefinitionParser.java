@@ -10,12 +10,12 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
 import org.springframework.util.SystemPropertyUtils;
 import org.w3c.dom.Element;
 
-public class EnvironmentPropertyDefinitionParser extends MuleChildDefinitionParser
+public class EnvironmentPropertyDefinitionParser extends MuleOrphanDefinitionParser
 {
     private final String VALUE_ATTR = "value";
     private final String NAME_ATTR = "name";

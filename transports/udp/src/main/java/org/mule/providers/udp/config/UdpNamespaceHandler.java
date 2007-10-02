@@ -9,7 +9,7 @@
  */
 package org.mule.providers.udp.config;
 
-import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.providers.udp.UdpConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -22,6 +22,6 @@ public class UdpNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(UdpConnector.class, true));
+        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(UdpConnector.class, true));
     }
 }

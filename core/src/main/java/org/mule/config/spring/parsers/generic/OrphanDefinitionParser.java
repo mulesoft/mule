@@ -18,7 +18,7 @@ import org.w3c.dom.Element;
  * This parser can be configured to automatically set the class of the object, the init and destroy methods
  * and whether this object is a singleton.
  *
- * <p>Typically, you should use {@link org.mule.config.spring.parsers.generic.MuleChildDefinitionParser}
+ * <p>Typically, you should use {@link MuleOrphanDefinitionParser}
  * instead of this class, since these elements occur in the <mule> top level element.</p>
  */
 public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser

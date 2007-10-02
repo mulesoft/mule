@@ -9,7 +9,7 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.UnaddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildAddressDefinitionParser;
 import org.mule.providers.email.ImapConnector;
@@ -28,7 +28,7 @@ public class ImapNamespaceHandler extends NamespaceHandlerSupport
 
     public void init()
     {
-        registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(ImapConnector.class, true));
+        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(ImapConnector.class, true));
         registerBeanDefinitionParser("endpoint", new UnaddressedEndpointDefinitionParser(GlobalEndpoint.class));
         registerBeanDefinitionParser("inbound-endpoint", new UnaddressedEndpointDefinitionParser(InboundEndpoint.class));
         registerBeanDefinitionParser("outbound-endpoint", new UnaddressedEndpointDefinitionParser(OutboundEndpoint.class));

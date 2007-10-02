@@ -26,7 +26,9 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="tcp://localhost:9994" transformer-ref="NoAction"/>
+                    <outbound-endpoint address="tcp://localhost:9994">
+                        <custom-transformer class="org.mule.transformers.NoActionTransformer"/>
+                    </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

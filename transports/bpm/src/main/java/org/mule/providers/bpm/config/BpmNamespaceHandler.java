@@ -9,7 +9,7 @@
  */
 package org.mule.providers.bpm.config;
 
-import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.providers.bpm.ProcessConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -21,6 +21,6 @@ public class BpmNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("connector", new MuleChildDefinitionParser(ProcessConnector.class, true));
+        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(ProcessConnector.class, true));
     }
 }

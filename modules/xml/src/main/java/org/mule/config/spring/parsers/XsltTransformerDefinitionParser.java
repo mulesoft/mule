@@ -11,7 +11,7 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.transformers.xml.XsltTransformer;
 
 import javax.xml.transform.Result;
@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class XsltTransformerDefinitionParser extends MuleChildDefinitionParser
+public class XsltTransformerDefinitionParser extends MuleOrphanDefinitionParser
 {
 
     public static final String STYLESHEET = "stylesheet";

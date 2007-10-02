@@ -11,7 +11,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
@@ -28,8 +28,17 @@ public class TransformerDefinitionParser extends ParentContextDefinitionParser
 
     public TransformerDefinitionParser(Class transformer)
     {
-        super(ROOT_ELEMENTS, new MuleChildDefinitionParser(transformer, false));
-        otherwise( new ChildDefinitionParser(TRANSFORMER, transformer));
+        super(ROOT_ELEMENTS, new MuleOrphanDefinitionParser(transformer, false));
+        otherwise(new ChildDefinitionParser(TRANSFORMER, transformer));
+    }
+
+    /**
+     * For custom transformers
+     */
+    public TransformerDefinitionParser()
+    {
+        super(ROOT_ELEMENTS, new MuleOrphanDefinitionParser(false));
+        otherwise(new ChildDefinitionParser(TRANSFORMER));
     }
 
 }
