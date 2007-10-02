@@ -129,7 +129,7 @@
                 <outbound-endpoint address="test://orange.exceptions"/>
             </default-component-exception-strategy>
 
-            <meta-info>
+            <properties>
                 <spring:entry key="brand" value="Juicy Baby!"/>
                 <spring:entry key="segments" value="9"/>
                 <spring:entry key="radius" value="4.21"/>
@@ -153,7 +153,7 @@
                         <spring:value>prop6</spring:value>
                     </spring:list>
                 </spring:entry>
-            </meta-info>
+            </properties>
         </service>
 
         <service name="appleComponent">

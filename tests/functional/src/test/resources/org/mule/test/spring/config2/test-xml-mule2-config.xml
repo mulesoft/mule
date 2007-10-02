@@ -163,7 +163,7 @@
                     <mule:outbound-endpoint address="test://orange.exceptions"/>
                 </mule:default-connector-exception-strategy>
 
-                <mule:meta-info>
+                <mule:properties>
                     <entry key="brand" value="Juicy Baby!"/>
                     <entry key="segments" value="9"/>
                     <entry key="radius" value="4.21"/>
@@ -187,7 +187,7 @@
                             <value>prop6</value>
                         </list>
                     </entry>
-                </mule:meta-info>
+                </mule:properties>
 
             </mule:service>
 

@@ -177,7 +177,7 @@
                     <xsd:element ref="abstract-pooling-profile" minOccurs="0"/>
                     <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-                    <xsd:element name="meta-info" type="mapType" minOccurs="0"/>
+                    <xsd:element name="properties" type="mapType" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="xsd:string" use="required"/>
                 <!-- Disabled until it actually does something!

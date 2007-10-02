@@ -17,13 +17,13 @@
                 <mule:inbound-router>
                     <mule:inbound-endpoint address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"/>
                 </mule:inbound-router>
-                <mule:meta-info>
+                <mule:properties>
                     <entry key="factoryObject" value-ref="factoryObject"/>
                     <entry key="containerObject" value-ref="anApple"/>
                     <entry key="osVersion" value="${os.version}"/>
                     <entry key="test1" value="test1"/>
                     <entry key="test2" value="test2"/>
-                </mule:meta-info>
+                </mule:properties>
             </mule:service>
 
         </mule:model>
