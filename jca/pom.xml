@@ -64,6 +64,10 @@
                     <artifactId>mule-module-jbossts</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.yourkit</groupId>
+                    <artifactId>yjp-controller-api-redist</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>xalan</groupId>
                     <artifactId>xalan</artifactId>
                 </exclusion>
