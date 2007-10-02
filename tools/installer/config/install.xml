@@ -92,7 +92,7 @@
 
     <!-- The packs section. We specify here our packs, i.e. the folders that will be installed with this installer -->
     <packs>
-        <pack name="Executibles" required="yes">
+        <pack name="Executables" required="yes">
             <description>The compiled distribution code</description>
             <file src="../distribution/bin" targetdir="$INSTALL_PATH"/>
             <!-- make the scripts etc. executable -->
