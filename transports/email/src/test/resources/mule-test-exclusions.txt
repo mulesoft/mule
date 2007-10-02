@@ -1,5 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-# MULE-2441
-org.mule.providers.email.issues.ExceptionHandlingMule2167TestCase

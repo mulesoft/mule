@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.util.StringUtils;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -39,6 +40,8 @@ import org.w3c.dom.Element;
  */
 public abstract class AbstractChildDefinitionParser extends AbstractHierarchicalDefinitionParser
 {
+
+    private static AtomicInteger idCounter = new AtomicInteger(0);
 
     protected final void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
@@ -76,12 +79,18 @@ public abstract class AbstractChildDefinitionParser extends AbstractHierarchical
             {
                 parentId = "." + parentId;
             }
-            return parentId + ":" + e.getLocalName();
+            return parentId + ":" + getBeanName(e);
         }
         else
         {
             return id;
         }
+    }
+
+    // guarantee a unique value
+    protected String getBeanName(Element e)
+    {
+        return e.getLocalName() + "/" + idCounter.incrementAndGet();
     }
 
     public abstract String getPropertyName(Element element);
