@@ -1187,13 +1187,21 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="correlation-aggregator-router" type="correlationRouterType" substitutionGroup="abstract-inbound-router"/>
     <xsd:element name="message-chunking-aggregator-router" type="correlationRouterType" substitutionGroup="abstract-inbound-router"/>
     <xsd:element name="correlation-resequencer-router" type="correlationRouterType" substitutionGroup="abstract-inbound-router"/>
     <xsd:complexType name="correlationRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
                 <xsd:attribute name="correlationExpression" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="correlation-aggregator-router" type="correlationAggregatorRouterType" substitutionGroup="abstract-inbound-router"/>
+    <xsd:complexType name="correlationAggregatorRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="correlationRouterType">
+                <xsd:attribute name="class" type="xsd:string" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

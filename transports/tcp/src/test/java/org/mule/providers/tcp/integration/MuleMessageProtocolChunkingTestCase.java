@@ -91,7 +91,7 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "MuleMessageProtocol-mule-config.xml";
+        return "mule-message-protocol-mule-config.xml";
     }
 
 }

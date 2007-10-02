@@ -69,7 +69,6 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.filters.logic.OrFilter;
-import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.CorrelationEventResequencer;
 import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.IdempotentSecureHashReceiver;
@@ -250,7 +249,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("idempotent-secure-hash-receiver-router", new RouterDefinitionParser("router", IdempotentSecureHashReceiver.class));
         registerBeanDefinitionParser("selective-consumer-router", new RouterDefinitionParser("router", SelectiveConsumer.class));
         registerBeanDefinitionParser("wire-tap-router", new RouterDefinitionParser("router", WireTap.class));
-        registerBeanDefinitionParser("correlation-aggregator-router", new RouterDefinitionParser("router", CorrelationAggregator.class));
+        registerBeanDefinitionParser("correlation-aggregator-router", new RouterDefinitionParser("router"));
         registerBeanDefinitionParser("message-chunking-aggregator-router", new RouterDefinitionParser("router", MessageChunkingAggregator.class));
         registerBeanDefinitionParser("correlation-resequencer-router", new RouterDefinitionParser("router", CorrelationEventResequencer.class));
         registerBeanDefinitionParser("custom-inbound-router", new RouterDefinitionParser("router", null));
