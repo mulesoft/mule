@@ -30,22 +30,13 @@ public class ${TransportName}MessageReceiver extends #if( $PollingMessageReceive
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
-#if( $PollingMessageReceiver == "y")
-    public ${TransportName}MessageReceiver(UMOConnector connector, UMOComponent component,
-                              UMOEndpoint endpoint, long pollingFrequency)
-            throws CreateException
-    {
-        super(connector, component, endpoint);
-        setFrequency(pollingFrequency);
-    }
-#else
     public ${TransportName}MessageReceiver(UMOConnector connector, UMOComponent component,
                               UMOEndpoint endpoint)
             throws CreateException
     {
         super(connector, component, endpoint);
     }
-#end
+
     public void doConnect() throws ConnectException
     {
         /* IMPLEMENTATION NOTE: This method should make a connection to the underlying

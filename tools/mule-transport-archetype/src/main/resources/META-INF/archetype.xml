@@ -87,8 +87,8 @@
             </description>
             <defvalue>r</defvalue>
         </variable>
-
     </variables>
+
     <templates>
         <!-- the template pom should be run fisrt since it sets up some other variables -->
         <template>
@@ -102,6 +102,12 @@
         <template>
             <file>src/main/resources/META-INF/services/org/mule/providers/csd.vm</file>
             <output>src/main/resources/META-INF/services/org/mule/providers/${TransportNameLower}.properties</output>
+        </template>
+        <template>
+            <file>src/main/java/org/mule/providers/Messages.vm</file>
+            <output>
+                src/main/java/org/mule/providers/${TransportNameLower}/i18n/${TransportName}Messages.java
+            </output>
         </template>
         <template>
             <file>src/main/resources/META-INF/services/org/mule/i18n/messages.vm</file>

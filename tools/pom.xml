@@ -17,20 +17,9 @@
     <modules>
         <!--  <module>visualizer</module> -->
         <module>bobberplus</module>
-<!--         <module>mule-transport-archetype</module> -->
+        <module>mule-transport-archetype</module>
         <module>mule-assembly-verifier</module>
     </modules>
-
-<!--    <pluginRepositories>
-        <pluginRepository>
-            <id>mule-plugins</id>
-            <name>Mule Plugin Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>-->
 
     <build>
         <plugins>

@@ -11,7 +11,6 @@
 package org.mule.providers.${TransportNameLower};
 
 import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.umo.TransactionException;
@@ -25,16 +24,9 @@ import org.mule.umo.TransactionException;
  */
 public class ${TransportName}Transaction extends AbstractSingleResourceTransaction
 {
-
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMOTransaction#bindResource(java.lang.Object,
-     *      java.lang.Object)
-     */
     public void bindResource(Object key, Object resource) throws TransactionException
     {
         /* IMPLEMENTATION NOTE: Validate as necessary, the resource here and
@@ -52,11 +44,6 @@ public class ${TransportName}Transaction extends AbstractSingleResourceTransacti
         super.bindResource(key, resource);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doBegin()
-     */
     protected void doBegin() throws TransactionException
     {
         /* IMPLEMENTATION NOTE: Sometimes the resource has already begun the
@@ -72,11 +59,6 @@ public class ${TransportName}Transaction extends AbstractSingleResourceTransacti
         */
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doCommit()
-     */
     protected void doCommit() throws TransactionException
     {
         /* IMPLEMENTATION NOTE: Commit the transaction here.  Throw an
@@ -90,11 +72,6 @@ public class ${TransportName}Transaction extends AbstractSingleResourceTransacti
         */
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.transaction.AbstractSingleResourceTransaction#doRollback()
-     */
     protected void doRollback() throws TransactionException
     {
         /* IMPLEMENTATION NOTE: Rollback the transaction here.  Throw an
@@ -107,5 +84,4 @@ public class ${TransportName}Transaction extends AbstractSingleResourceTransacti
              }
         */
     }
-
 }
