@@ -2,6 +2,3 @@
 org.mule.extras.wssecurity.testcases.XfireMultipleConnectorsWSSecurityTestCase
 org.mule.extras.wssecurity.testcases.XfireWsSecurityOnOutboundTestCase
 org.mule.extras.wssecurity.testcases.XfireWsSecurityOnOutboundUsingPropertiesTestCase
-
-# MULE-2118
-org.mule.extras.wssecurity.testcases.AxisWsSecurityOnOutboundTestCase
