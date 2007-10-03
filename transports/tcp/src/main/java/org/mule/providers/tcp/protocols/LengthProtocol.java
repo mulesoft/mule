@@ -28,23 +28,23 @@ import org.apache.commons.logging.LogFactory;
  * <p>Note that use of this protocol must be symmetric - both the sending and receiving
  * connectors must use the same protocol.</p>
  */
-public class LengthProtocol extends DefaultProtocol
+public class LengthProtocol extends DirectProtocol
 {
     private static final Log logger = LogFactory.getLog(LengthProtocol.class);
     // TODO - can we not get this from the API somewhere?
     private static final int SIZE_INT = 4;
     public static final int NO_MAX_LENGTH = -1;
-    private int maxLength;
+    private int maxMessageLength;
 
     public LengthProtocol()
     {
         this(NO_MAX_LENGTH);
     }
 
-    public LengthProtocol(int maxLength)
+    public LengthProtocol(int maxMessageLength)
     {
         super(NO_STREAM, SIZE_INT);
-        this.maxLength = maxLength;
+        this.setMaxMessageLength(maxMessageLength);
     }
 
     public Object read(InputStream is) throws IOException
@@ -69,9 +69,9 @@ public class LengthProtocol extends DefaultProtocol
             logger.debug("length: " + length);
         }
 
-        if (length < 0 || (maxLength > 0 && length > maxLength))
+        if (length < 0 || (getMaxMessageLength() > 0 && length > getMaxMessageLength()))
         {
-            throw new IOException("Length " + length + " exceeds limit: " + maxLength);
+            throw new IOException("Length " + length + " exceeds limit: " + getMaxMessageLength());
         }
 
         // finally read the rest of the data
@@ -108,4 +108,14 @@ public class LengthProtocol extends DefaultProtocol
         return true;
     }
 
+    public int getMaxMessageLength()
+    {
+        return maxMessageLength;
+    }
+
+    public void setMaxMessageLength(int maxMessageLength)
+    {
+        this.maxMessageLength = maxMessageLength;
+    }
+    
 }

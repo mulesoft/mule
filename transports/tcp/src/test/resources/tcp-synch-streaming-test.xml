@@ -10,8 +10,9 @@
        http://www.mulesource.org/schema/mule/streaming/2.0 http://www.mulesource.org/schema/mule/streaming/2.0/mule-streaming.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <tcp:connector name="default" validateConnections="false"
-                   tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
+    <tcp:connector name="default" validateConnections="false">
+        <tcp:direct-protocol payloadOnly="true"/>
+    </tcp:connector>
 
     <configuration serverId="TcpSynchStreaming" defaultSynchronousEndpoints="true"/>
 

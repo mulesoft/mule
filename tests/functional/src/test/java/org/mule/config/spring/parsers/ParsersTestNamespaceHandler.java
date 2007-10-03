@@ -37,6 +37,7 @@ import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
  */
 public class ParsersTestNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
+
     public void init()
     {
         registerMuleDefinitionParser("orphan", new OrphanDefinitionParser(OrphanBean.class, true)).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");

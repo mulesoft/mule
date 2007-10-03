@@ -115,7 +115,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="tcpConnectorType">
+    <!-- xsd:complexType name="tcpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="noProtocolTcpConnectorType">
                 <xsd:attribute name="tcpProtocolClassName" type="xsd:NMTOKEN">
@@ -128,6 +128,67 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType -->
+
+    <xsd:complexType name="tcpConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="noProtocolTcpConnectorType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-protocol" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The class name for the protocol handler. This controls how the raw data stream is converted
+                                into messages. By default messages are constructed as dara are received, with no correction
+                                for multiple packets or fragmentation. You nearly always want to change this (or use a
+                                transport that includes a protocol, like HTTP).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-protocol" abstract="true" type="abstractProtocolType"/>
+    <xsd:element name="xml-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol"/>
+    <xsd:element name="xml-eof-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol"/>
+    <xsd:complexType name="abstractProtocolType"/>
+
+    <xsd:element name="eof-protocol" type="byteOrMessageProtocolType" substitutionGroup="abstract-protocol"/>
+    <xsd:element name="direct-protocol" type="byteOrMessageProtocolType" substitutionGroup="abstract-protocol"/>
+    <xsd:complexType name="byteOrMessageProtocolType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractProtocolType">
+                <xsd:attribute name="payloadOnly" type="mule:substitutableBoolean" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="safe-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol"/>
+    <xsd:element name="length-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol"/>
+    <xsd:complexType name="lengthProtocolType">
+        <xsd:complexContent>
+            <xsd:extension base="byteOrMessageProtocolType">
+                <xsd:attribute name="maxMessageLength" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An optional maximum length for the number of bytes in a single message.
+                            Messages larger than this will trigger an error in the receiver, but
+                            give an assurance that no out-of-memory error will occur.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-protocol" type="customProtocolType" substitutionGroup="abstract-protocol"/>
+    <xsd:complexType name="customProtocolType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractProtocolType">
+                <xsd:attribute name="class" type="xsd:string" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -19,8 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * The DefaultProtocol class is an application level tcp protocol that does nothing.
- * The socket is read until no more bytes are (momentariy) available
+ * The DirectProtocol class is an application level tcp protocol that does nothing.
+ * The socket is read until no more bytes are (momentarily) available
  * (previously the transfer buffer also had to be full on the previous read, which made
  * stronger requirements on the underlying network).  On slow networks
  * {@link org.mule.providers.tcp.protocols.EOFProtocol} and
@@ -28,22 +28,21 @@ import org.apache.commons.logging.LogFactory;
  *
  * <p>Writing simply writes the data to the socket.</p>
  */
-public class DefaultProtocol extends ByteProtocol
+public class DirectProtocol extends AbstractByteProtocol
 {
 
-    private static final Log logger = LogFactory.getLog(DefaultProtocol.class);
+    private static final Log logger = LogFactory.getLog(DirectProtocol.class);
     private static final int DEFAULT_BUFFER_SIZE = 8192;
     private static final int UNLIMITED = -1;
 
-
     private int bufferSize;
 
-    public DefaultProtocol()
+    public DirectProtocol()
     {
         this(STREAM_OK, DEFAULT_BUFFER_SIZE);
     }
 
-    public DefaultProtocol(boolean streamOk, int bufferSize)
+    public DirectProtocol(boolean streamOk, int bufferSize)
     {
         super(streamOk);
         this.bufferSize = bufferSize;

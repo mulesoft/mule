@@ -24,7 +24,7 @@ public class DefaultProtocolTestCase extends AbstractMuleTestCase
         // for old (full buffer) condition in DefaultProtocol
 //        this(new DefaultProtocol(), 1);
 
-        this(new DefaultProtocol(), SlowInputStream.FULL_LENGTH);
+        this(new DirectProtocol(), SlowInputStream.FULL_LENGTH);
     }
 
     public DefaultProtocolTestCase(TcpProtocol protocol, int expectedLength)

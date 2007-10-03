@@ -8,8 +8,9 @@
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
-    <tcp:connector name="tcpConnector"
-                   tcpProtocolClassName="org.mule.providers.tcp.protocols.MuleMessageLengthProtocol"/>
+    <tcp:connector name="tcpConnector">
+        <tcp:length-protocol payloadOnly="false"/>
+    </tcp:connector>
 
     <endpoint address="tcp://localhost:60198" synchronous="true" name="clientEndpoint"/>
 

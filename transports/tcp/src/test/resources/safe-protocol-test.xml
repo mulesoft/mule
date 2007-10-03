@@ -9,7 +9,9 @@
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
     <tcp:connector name="safe"/>
-    <tcp:connector name="unsafe" tcpProtocolClassName="org.mule.providers.tcp.protocols.DefaultProtocol"/>
+    <tcp:connector name="unsafe">
+        <tcp:direct-protocol payloadOnly="true"/>
+    </tcp:connector>
 
     <model name="main">
         <service name="service">

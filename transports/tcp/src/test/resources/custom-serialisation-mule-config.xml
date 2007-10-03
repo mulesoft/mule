@@ -12,8 +12,9 @@
 
     <vm:connector name="quedvm" queueEvents="true"/>
 
-    <tcp:connector name="tcpConnector"
-                   tcpProtocolClassName="org.mule.providers.tcp.integration.CustomSerializationProtocol"/>
+    <tcp:connector name="tcpConnector">
+        <tcp:custom-protocol class="org.mule.providers.tcp.integration.CustomSerializationProtocol"/>
+    </tcp:connector>
 
     <custom-transformer name="NoAction" class="org.mule.transformers.NoActionTransformer"/>
 

@@ -12,7 +12,9 @@
 
     <environment-property name="test.endpoint" value="tcp://localhost:45441"/>
     <configuration serverId="server id" defaultRemoteSync="false"/>
-    <tcp:connector name="tcpConnector" clientSoTimeout="60000" serverSoTimeout="60000" tcpProtocolClassName="org.mule.providers.tcp.protocols.LengthProtocol"/>
+    <tcp:connector name="tcpConnector" clientSoTimeout="60000" serverSoTimeout="60000">
+        <tcp:length-protocol payloadOnly="true"/>
+    </tcp:connector>
 
     <endpoint name="clientEndpoint" address="${test.endpoint}"/>
 

@@ -12,8 +12,9 @@
 
     <vm:connector name="quedvm" queueEvents="true"/>
 
-    <tcp:connector name="tcpConnector" tcpProtocolClassName="org.mule.providers.tcp.protocols.MuleMessageEOFProtocol"
-                   keepSendSocketOpen="false"/>
+    <tcp:connector name="tcpConnector" keepSendSocketOpen="false">
+        <tcp:eof-protocol payloadOnly="false"/>
+    </tcp:connector>
 
     <model name="main">
         <service name="BridgeIn">

@@ -11,7 +11,7 @@
 package org.mule.providers.ssl;
 
 import org.mule.providers.tcp.TcpConnector;
-import org.mule.providers.tcp.protocols.DefaultProtocol;
+import org.mule.providers.tcp.protocols.DirectProtocol;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.TlsDirectKeyStore;
@@ -48,7 +48,7 @@ public class SslConnector extends TcpConnector
     {
         setSocketFactory(new SslSocketFactory(tls));
         setServerSocketFactory(new SslServerSocketFactory(tls));
-        setTcpProtocolClassName(DefaultProtocol.class.getName());
+        setTcpProtocol(new DirectProtocol());
         // setting this true causes problems as socket closes before handshake finishes
         setValidateConnections(false);
     }

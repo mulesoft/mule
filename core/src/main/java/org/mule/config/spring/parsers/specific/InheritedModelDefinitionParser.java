@@ -22,9 +22,10 @@ public class InheritedModelDefinitionParser extends AbstractBeanDefinitionParser
 {
 
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
-     {
-         String parent = element.getAttribute("name");
-         element.setAttribute("id", parent);
-         return (AbstractBeanDefinition)parserContext.getRegistry().getBeanDefinition(parent);
-     }
+    {
+        String parent = element.getAttribute("name");
+        element.setAttribute("id", parent);
+        return (AbstractBeanDefinition)parserContext.getRegistry().getBeanDefinition(parent);
+    }
+
 }

@@ -8,23 +8,26 @@
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
-    <tcp:connector name="openConnector" keepSendSocketOpen="true"/>
-
-    <tcp:connector name="openConnectorLength" keepSendSocketOpen="true">
-        <tcp:length-protocol payloadOnly="true"/>
+    <tcp:connector name="safe-connector">
+        <tcp:safe-protocol payloadOnly="true" maxMessageLength="10"/>
     </tcp:connector>
 
-    <tcp:connector name="closeConnectorLength">
-        <tcp:length-protocol payloadOnly="true"/>
+    <tcp:connector name="length-connector">
+        <tcp:length-protocol payloadOnly="true" maxMessageLength="10"/>
     </tcp:connector>
-
-    <endpoint address="tcp://localhost:60198?connector=openConnector" name="clientEndpoint" synchronous="true"/>
 
     <model name="main">
-        <service name="testComponent">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+        <service name="service">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="addReceived" value="false"/>
+                </properties>
+            </component>
             <inbound-router>
-                <inbound-endpoint ref="clientEndpoint"/>
+                <inbound-endpoint name="safe" address="tcp://localhost:65432"
+                                  connector-ref="safe-connector" synchronous="true"/>
+                <inbound-endpoint name="length" address="tcp://localhost:65433"
+                                  connector-ref="length-connector" synchronous="true"/>
             </inbound-router>
         </service>
     </model>

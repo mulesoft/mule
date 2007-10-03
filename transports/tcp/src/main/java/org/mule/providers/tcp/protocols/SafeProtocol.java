@@ -106,4 +106,9 @@ public class SafeProtocol implements TcpProtocol
                 + "paying particular attention to the protocol parameter.").initCause(e);
     }
 
+    public void setMaxMessageLength(int maxMessageLength)
+    {
+        delegate = new LengthProtocol(maxMessageLength);
+    }
+
 }

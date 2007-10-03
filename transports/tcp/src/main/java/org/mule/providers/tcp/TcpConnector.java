@@ -21,7 +21,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.ClassUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -61,7 +60,6 @@ public class TcpConnector extends AbstractConnector
     private boolean validateConnections = true;
     private Boolean reuseAddress = Boolean.TRUE; // this could be null for Java default
     private int socketSoLinger = INT_VALUE_NOT_SET;
-    private String tcpProtocolClassName;
     private TcpProtocol tcpProtocol;
     private boolean keepSendSocketOpen = false;
     private boolean keepAlive = false;
@@ -76,7 +74,7 @@ public class TcpConnector extends AbstractConnector
     {
         setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
-        setTcpProtocolClassName(SafeProtocol.class.getName());
+        setTcpProtocol(new SafeProtocol());
     }
 
     public void configureSocket(boolean client, Socket socket) throws SocketException
@@ -121,18 +119,6 @@ public class TcpConnector extends AbstractConnector
 
     protected void doInitialise() throws InitialisationException
     {
-        if (tcpProtocol == null)
-        {
-            try
-            {
-                tcpProtocol = (TcpProtocol) ClassUtils.instanciateClass(tcpProtocolClassName, null);
-            }
-            catch (Exception e)
-            {
-                throw new InitialisationException(TcpMessages.failedToInitMessageReader(), e, this);
-            }
-        }
-
         dispatcherSocketsPool.setFactory(getSocketFactory());
         dispatcherSocketsPool.setTestOnBorrow(true);
         dispatcherSocketsPool.setTestOnReturn(true);
@@ -365,16 +351,6 @@ public class TcpConnector extends AbstractConnector
     public void setTcpProtocol(TcpProtocol tcpProtocol)
     {
         this.tcpProtocol = tcpProtocol;
-    }
-
-    public String getTcpProtocolClassName()
-    {
-        return tcpProtocolClassName;
-    }
-
-    public void setTcpProtocolClassName(String protocolClassName)
-    {
-        this.tcpProtocolClassName = protocolClassName;
     }
 
     public boolean isRemoteSyncEnabled()

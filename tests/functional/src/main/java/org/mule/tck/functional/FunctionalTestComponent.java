@@ -52,6 +52,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     private boolean appendComponentName = false;
     private boolean throwException = false;
     private boolean enableMessageHistory = true;
+    private boolean addReceived = true;
 
     /**
      * Keeps a list of any messages received on this component. Note that only references
@@ -95,7 +96,8 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         }
         else
         {
-            replyMessage = received(contents) + (appendComponentName ? " " + context.getComponentDescriptor().getName() : "");
+            replyMessage = (addReceived ? received(contents) : contents)
+                    + (appendComponentName ? " " + context.getComponentDescriptor().getName() : "");
         }
 
         context.getManagementContext().fireNotification(
@@ -346,6 +348,16 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         {
             return null;
         }
+    }
+
+    public boolean isAddReceived()
+    {
+        return addReceived;
+    }
+
+    public void setAddReceived(boolean addReceived)
+    {
+        this.addReceived = addReceived;
     }
 }
 

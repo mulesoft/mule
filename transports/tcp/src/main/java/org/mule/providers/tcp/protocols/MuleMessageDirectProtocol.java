@@ -20,7 +20,7 @@ import java.io.OutputStream;
  * IDs in order to be able to aggregate messages after chunking.  Data are read until
  * no more are (momentarily) available.
  */
-public class MuleMessageProtocol extends DefaultProtocol
+public class MuleMessageDirectProtocol extends DirectProtocol
 {
 
     // @Override

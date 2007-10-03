@@ -14,7 +14,7 @@ package org.mule.providers.tcp.protocols;
  * The EOFProtocol class is an application level tcp protocol that does nothing.
  * Reading is terminated by the stream being closed by the client.
  */
-public class EOFProtocol extends DefaultProtocol
+public class EOFProtocol extends DirectProtocol
 {
 
     /**

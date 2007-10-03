@@ -10,7 +10,7 @@
 
 package org.mule.providers.tcp.integration;
 
-import org.mule.providers.tcp.protocols.DefaultProtocol;
+import org.mule.providers.tcp.protocols.DirectProtocol;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +18,7 @@ import java.io.OutputStream;
 
 import org.apache.commons.lang.SerializationUtils;
 
-public class CustomSerializationProtocol extends DefaultProtocol
+public class CustomSerializationProtocol extends DirectProtocol
 {
 
     // @Override

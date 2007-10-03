@@ -49,7 +49,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
  * be read later.
  * </p>
  */
-public class XmlMessageProtocol extends ByteProtocol
+public class XmlMessageProtocol extends AbstractByteProtocol
 {
     private static final String XML_PATTERN = "<?xml";
 

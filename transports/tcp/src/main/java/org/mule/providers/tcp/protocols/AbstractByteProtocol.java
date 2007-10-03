@@ -39,9 +39,9 @@ import org.apache.commons.logging.LogFactory;
  * will, via {@link #write(java.io.OutputStream, Object)}, dispatch to
  * {@link #writeByteArray(java.io.OutputStream, byte[])}.</p>.
  */
-public abstract class ByteProtocol implements TcpProtocol
+public abstract class AbstractByteProtocol implements TcpProtocol
 {
-    private static final Log logger = LogFactory.getLog(DefaultProtocol.class);
+    private static final Log logger = LogFactory.getLog(DirectProtocol.class);
     private static final long PAUSE_PERIOD = 100;
     public static final int EOF = -1;
 
@@ -50,7 +50,7 @@ public abstract class ByteProtocol implements TcpProtocol
     public static final boolean NO_STREAM = false;
     private boolean streamOk;
 
-    public ByteProtocol(boolean streamOk)
+    public AbstractByteProtocol(boolean streamOk)
     {
         this.streamOk = streamOk;
     }
