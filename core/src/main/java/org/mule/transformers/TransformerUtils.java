@@ -16,20 +16,19 @@ import org.mule.impl.VoidTransformer;
 import org.mule.providers.NullPayload;
 import org.mule.providers.service.TransportFactoryException;
 import org.mule.providers.service.TransportServiceDescriptor;
-import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.CollectionUtils;
 
-import com.sun.tools.jdi.EventSetImpl.Itr;
-
 import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.Collections;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
