@@ -24,41 +24,38 @@ public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
         return "endpoint-retrieval-mule-2021-test.xml";
     }
 
-    public void testGetEndpointFromUri() throws UMOException
+    public void testLookupEndpoint() throws UMOException
+    {
+        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry().lookupEndpoint("Endpoint",managementContext);
+        assertEndpointOk(endpoint1);
+        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry().lookupEndpoint("axis:http://localhost:18081/mule/Service?method=toString",managementContext);
+        // Null expected because lookupEndpoint does not create endpoints.
+        assertEquals(null,endpoint2);
+    }
+    
+    public void testLookupOutboundEndpoint() throws UMOException
     {
         UMOImmutableEndpoint endpoint1 = managementContext.getRegistry().lookupOutboundEndpoint("Endpoint",managementContext);
         assertEndpointOk(endpoint1);
-//        UMOEndpointURI uri = endpoint1.getEndpointURI();
-//        UMOEndpoint endpoint2 = managementContext.getRegistry().getEndpointFromUri(uri);
-//        assertEndpointOk(endpoint2);
+        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry().lookupOutboundEndpoint("axis:http://localhost:18081/mule/Service?method=toString",managementContext);
+        assertEndpointOk(endpoint2);
     }
 
-    public void testGetEndpointFromName() throws UMOException
+    public void testLookupInboundEndpoint() throws UMOException
     {
-        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry().lookupEndpoint("Endpoint");
+        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry().lookupInboundEndpoint("Endpoint",managementContext);
         assertEndpointOk(endpoint1);
-//        UMOEndpointURI uri = endpoint1.getEndpointURI();
-//        UMOEndpoint endpoint2 = managementContext.getRegistry().getEndpointFromUri(uri);
-//        assertEndpointOk(endpoint2);
+        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry().lookupInboundEndpoint("axis:http://localhost:18081/mule/Service?method=toString",managementContext);
+        assertEndpointOk(endpoint2);
     }
 
-//    public void testGetOrCreateEndpointForUri() throws UMOException
-//    {
-//        UMOEndpoint endpoint1 = managementContext.getRegistry().getEndpointFromUri("Endpoint");
-//        assertEndpointOk(endpoint1);
-//        UMOEndpointURI uri = endpoint1.getEndpointURI();
-//        UMOEndpoint endpoint2 = managementContext.getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-//        assertEndpointOk(endpoint2);
-//    }
-//
-//    public void testGetOrCreateEndpointForUriFromName() throws UMOException
-//    {
-//        UMOEndpoint endpoint1 = managementContext.getRegistry().lookupEndpoint("Endpoint");
-//        assertEndpointOk(endpoint1);
-//        UMOEndpointURI uri = endpoint1.getEndpointURI();
-//        UMOEndpoint endpoint2 = managementContext.getRegistry().getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-//        assertEndpointOk(endpoint2);
-//    }
+    public void testLookupResponseEndpoint() throws UMOException
+    {
+        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry().lookupResponseEndpoint("Endpoint",managementContext);
+        assertEndpointOk(endpoint1);
+        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry().lookupResponseEndpoint("axis:http://localhost:18081/mule/Service?method=toString",managementContext);
+        assertEndpointOk(endpoint2);
+    }
 
     private void assertEndpointOk(UMOImmutableEndpoint endpoint)
     {
