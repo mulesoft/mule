@@ -12,14 +12,14 @@ package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
-import org.mule.impl.endpoint.GlobalEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 
 public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDefinitionParser
 {
 
     public TransportGlobalEndpointDefinitionParser(String protocol)
     {
-        super(protocol, new OrphanEndpointDefinitionParser(GlobalEndpoint.class));
+        super(protocol, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
     }
 
 }

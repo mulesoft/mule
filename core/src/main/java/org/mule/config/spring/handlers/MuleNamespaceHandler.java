@@ -17,6 +17,9 @@ import org.mule.components.simple.NullComponent;
 import org.mule.components.simple.PassThroughComponent;
 import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
+import org.mule.config.spring.factories.InboundEndpointFactoryBean;
+import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
+import org.mule.config.spring.factories.ResponseEndpointFactoryBean;
 import org.mule.config.spring.parsers.collection.AttributeMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -43,15 +46,13 @@ import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionConfigDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.GenericGlobalEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.container.JndiContainerContext;
 import org.mule.impl.container.PropertiesContainerContext;
 import org.mule.impl.container.RmiContainerContext;
-import org.mule.impl.endpoint.InboundEndpoint;
-import org.mule.impl.endpoint.OutboundEndpoint;
-import org.mule.impl.endpoint.ResponseEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
 import org.mule.impl.security.SecretKeyEncryptionStrategy;
@@ -199,10 +200,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transaction-manager-websphere", new MuleOrphanDefinitionParser(WebsphereTransactionManagerLookupFactory.class, true));
 
         //Endpoint elements
-        registerBeanDefinitionParser("endpoint", new GenericGlobalEndpointDefinitionParser());
-        registerBeanDefinitionParser("inbound-endpoint", new GenericEndpointDefinitionParser(InboundEndpoint.class));
-        registerBeanDefinitionParser("outbound-endpoint", new GenericEndpointDefinitionParser(OutboundEndpoint.class));
-        registerBeanDefinitionParser("response-endpoint", new GenericEndpointDefinitionParser(ResponseEndpoint.class));
+        registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
+        registerBeanDefinitionParser("inbound-endpoint", new GenericEndpointDefinitionParser(InboundEndpointFactoryBean.class));
+        registerBeanDefinitionParser("outbound-endpoint", new GenericEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
+        registerBeanDefinitionParser("response-endpoint", new GenericEndpointDefinitionParser(ResponseEndpointFactoryBean.class));
         registerBeanDefinitionParser("transaction", new TransactionConfigDefinitionParser());
         registerBeanDefinitionParser("transaction-factory", new ObjectFactoryDefinitionParser("factory"));
 

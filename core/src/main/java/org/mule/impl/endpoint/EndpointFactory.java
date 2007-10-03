@@ -13,12 +13,10 @@ package org.mule.impl.endpoint;
 import org.mule.RegistryContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,87 +33,65 @@ public class EndpointFactory implements UMOEndpointFactory
     public static final int USE_CONNECTOR = 3;
 
     public UMOImmutableEndpoint createInboundEndpoint(String uri, UMOManagementContext managementContext)
-            throws UMOException
+        throws UMOException
     {
-        UMOImmutableEndpoint globalEndpoint = lookupEndpoint(uri);
-        UMOImmutableEndpoint endpoint = null;
-        if (globalEndpoint != null)
+        logger.debug("EndpointFactory request for inbound endpoint for uri: " + uri);
+        UMOEndpointBuilder endpointBuilder = lookupEndpointBuilder(uri);
+        if (endpointBuilder == null)
         {
-            // Copy for now.  Once global endpoints are builders we will invoke builder here
-            endpoint = new InboundEndpoint(globalEndpoint);
+            logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
+            endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
         }
-        else
-        {
-            UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
-            return endpointBuilder.buildInboundEndpoint();
-        }
-        return endpoint;
+        return endpointBuilder.buildInboundEndpoint();
     }
 
     public UMOImmutableEndpoint createOutboundEndpoint(String uri, UMOManagementContext managementContext)
-            throws UMOException
+        throws UMOException
     {
-        UMOImmutableEndpoint globalEndpoint = lookupEndpoint(uri);
-        UMOImmutableEndpoint endpoint = null;
-        if (globalEndpoint != null)
+        logger.debug("EndpointFactory request for outbound endpoint for uri: " + uri);
+        UMOEndpointBuilder endpointBuilder = lookupEndpointBuilder(uri);
+        if (endpointBuilder == null)
         {
-            // Copy for now.  Once global endpoints are builders we will invoke builder here
-            endpoint = new OutboundEndpoint(globalEndpoint);
+            logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
+            endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
         }
-        else
-        {
-            UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
-            return endpointBuilder.buildOutboundEndpoint();
-        }
-        return endpoint;
+        return endpointBuilder.buildOutboundEndpoint();
     }
 
     public UMOImmutableEndpoint createResponseEndpoint(String uri, UMOManagementContext managementContext)
-            throws UMOException
+        throws UMOException
     {
-        UMOImmutableEndpoint globalEndpoint = lookupEndpoint(uri);
-        UMOImmutableEndpoint endpoint = null;
-        if (globalEndpoint != null)
+        logger.debug("EndpointFactory request for response endpoint for uri: " + uri);
+        UMOEndpointBuilder endpointBuilder = lookupEndpointBuilder(uri);
+        if (endpointBuilder == null)
         {
-            // Copy for now.  Once global endpoints are builders we will invoke builder here
-            endpoint = new ResponseEndpoint(globalEndpoint);
+            logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
+            endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
+        }
+        return endpointBuilder.buildResponseEndpoint();
+    }
+
+    /** @deprecated */
+    public UMOImmutableEndpoint createEndpoint(UMOEndpointURI uri, String type, UMOManagementContext managementContext)
+        throws UMOException
+    {
+        logger.debug("EndpointFactory request for endpoint of type: " + type + ", for uri: " + uri);
+        UMOEndpointBuilder endpointBuilder = null;
+        // IF EndpointURI has a name lookup
+        if (uri.getEndpointName() != null)
+        {
+            endpointBuilder = lookupEndpointBuilder(uri.getEndpointName());
+            if (endpointBuilder == null)
+            {
+                throw new IllegalArgumentException("The endpoint with name: " + uri.getEndpointName()
+                                                   + "was not found.");
+            }
         }
         else
         {
-            UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
-            return endpointBuilder.buildResponseEndpoint();
+            logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
+            endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         }
-        return endpoint;
-    }
-
-    /** @deprecated  */
-    public UMOImmutableEndpoint createEndpoint(UMOEndpointURI uri,
-                                               String type,
-                                               UMOManagementContext managementContext) throws UMOException
-    {
-        UMOImmutableEndpoint endpoint = null;
-        if (uri.getEndpointName() != null)
-        {
-            endpoint = lookupEndpoint(uri.getEndpointName());
-        }
-        if (endpoint == null)
-        {
-            endpoint = buidNewEndpoint(uri, type, managementContext);
-        }
-        return endpoint;
-    }
-
-    protected UMOImmutableEndpoint lookupEndpoint(String poiendpointNamentName)
-    {
-        return RegistryContext.getRegistry().lookupEndpoint(poiendpointNamentName);
-    }
-
-    protected UMOImmutableEndpoint buidNewEndpoint(UMOEndpointURI uri,
-                                                   String type,
-                                                   UMOManagementContext managementContext)
-            throws InitialisationException, EndpointException
-    {
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
             return endpointBuilder.buildInboundEndpoint();
@@ -135,31 +111,17 @@ public class EndpointFactory implements UMOEndpointFactory
         }
     }
 
-    protected UMOImmutableEndpoint buidNewInboundEndpoint(UMOEndpointURI uri,
-                                                          String type,
-                                                          UMOManagementContext managementContext)
-            throws InitialisationException, EndpointException
+    protected UMOEndpointBuilder lookupEndpointBuilder(String endpointName)
     {
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
-        return endpointBuilder.buildInboundEndpoint();
-    }
-
-    protected UMOImmutableEndpoint buidNewOutboundEndpoint(UMOEndpointURI uri,
-                                                           String type,
-                                                           UMOManagementContext managementContext)
-            throws InitialisationException, EndpointException
-    {
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
-        return endpointBuilder.buildOutboundEndpoint();
-    }
-
-    protected UMOImmutableEndpoint buidNewResponeEndpoint(UMOEndpointURI uri,
-                                                          String type,
-                                                          UMOManagementContext managementContext)
-            throws InitialisationException, EndpointException
-    {
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
-        return endpointBuilder.buildResponseEndpoint();
+        logger.debug("Looking up EndpointBuilder with name:" + endpointName + " in registry");
+        // TODO DF: Do some simple parsing of endpointName to not lookup endpoint builder if endpointName is
+        // obviously a uri and not a substituted name ??
+        UMOEndpointBuilder endpointBuilder = RegistryContext.getRegistry().lookupEndpointBuilder(endpointName);
+        if (endpointBuilder != null)
+        {
+            logger.debug("EndpointBuilder with name:" + endpointName + " FOUND");
+        }
+        return endpointBuilder;
     }
 
 }

@@ -31,6 +31,7 @@ import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -79,8 +80,16 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testGlobalEndpointConfig()
     {
         super.testGlobalEndpointConfig();
-
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("fruitBowlEndpoint", managementContext);
+        UMOImmutableEndpoint endpoint = null;
+        try
+        {
+            endpoint = managementContext.getRegistry().lookupInboundEndpoint("fruitBowlEndpoint", managementContext);
+        }
+        catch (UMOException e)
+        {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
         assertNotNull(endpoint.getFilter());
@@ -97,7 +106,16 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         super.testEndpointConfig();
 
         // test that endpoints have been resolved on endpoints
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("waterMelonEndpoint", managementContext);
+        UMOImmutableEndpoint endpoint = null;
+        try
+        {
+            endpoint = managementContext.getRegistry().lookupInboundEndpoint("waterMelonEndpoint", managementContext);
+        }
+        catch (UMOException e)
+        {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
         assertNotNull(endpoint);
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 

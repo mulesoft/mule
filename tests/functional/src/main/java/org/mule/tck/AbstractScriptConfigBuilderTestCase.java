@@ -23,6 +23,7 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.ObjectNotFoundException;
@@ -235,7 +236,15 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(TransformerUtils.firstOrNull(endpoint.getTransformers()) instanceof TestCompressionTransformer);
 
         // check the global endpoint
-        endpoint = managementContext.getRegistry().lookupEndpoint("appleInEndpoint");
+        try
+        {
+            endpoint = managementContext.getRegistry().lookupInboundEndpoint("appleInEndpoint", managementContext);
+        }
+        catch (UMOException e)
+        {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
         assertNotNull(endpoint);
         assertTrue(TransformerUtils.isUndefined(endpoint.getTransformers()));
 
@@ -256,7 +265,15 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(TransformerUtils.firstOrNull(endpoint.getTransformers()) instanceof TestCompressionTransformer);
 
         // check the global endpoint
-        endpoint = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
+        try
+        {
+            endpoint = managementContext.getRegistry().lookupInboundEndpoint("orangeEndpoint", managementContext);
+        }
+        catch (UMOException e)
+        {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
         assertNotNull(endpoint);
         assertTrue(TransformerUtils.isUndefined(endpoint.getTransformers()));
     }

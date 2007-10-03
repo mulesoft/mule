@@ -24,6 +24,8 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.CollectionUtils;
 
+import com.sun.tools.jdi.EventSetImpl.Itr;
+
 import java.util.Iterator;
 import java.util.List;
 

@@ -15,6 +15,7 @@ import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.ManagementContextAware;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.service.TransportFactory;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;
@@ -26,7 +27,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
-import org.mule.transformers.TransformerUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -51,24 +51,25 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
         super(null, null, null, TransformerUtils.UNDEFINED, ENDPOINT_TYPE_SENDER_AND_RECEIVER, 0, null, null);
     }
 
-    public MuleEndpoint(String name,
-                        UMOEndpointURI endpointUri,
-                        UMOConnector connector,
-                        List transformers,
-                        String type,
-                        int createConnector,
-                        String endpointEncoding,
-                        Map props)
-    {
-        super(name, endpointUri, connector, transformers, type, createConnector, endpointEncoding, props);
-    }
-
+    /**
+     * 
+     * @param endpoint
+     * @throws UMOException
+     * @deprecated MULE-2270
+     */
     public MuleEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
     {
         super(endpoint);
         this.setManagementContext(endpoint.getManagementContext());
     }
 
+    /**
+     * 
+     * @param uri
+     * @param receiver
+     * @throws UMOException
+     * @deprecated MULE-2270
+     */
     public MuleEndpoint(String uri, boolean receiver) throws UMOException
     {
         super(uri, receiver);
@@ -93,16 +94,13 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
         {
             properties.putAll(endpointUri.getParams());
         }
-        if(initialised.get())
+        try
         {
-            try
-            {
-                endpointUri.initialise();
-            }
-            catch (InitialisationException e)
-            {
-                throw new EndpointException(e);
-            }
+            endpointUri.initialise();
+        }
+        catch (InitialisationException e)
+        {
+            throw new EndpointException(e);
         }
     }
 

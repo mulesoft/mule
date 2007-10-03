@@ -13,7 +13,7 @@ package org.mule.impl.internal.admin;
 import org.mule.RegistryContext;
 import org.mule.impl.AbstractAgent;
 import org.mule.impl.AlreadyInitialisedException;
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.ModelHelper;
 import org.mule.providers.service.TransportFactory;
@@ -21,8 +21,8 @@ import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.StringUtils;
@@ -123,14 +123,16 @@ public class MuleAdminAgent extends AbstractAgent
                     throw new AlreadyInitialisedException("Server Components", this);
                 }
 
-
-                MuleEndpoint writableEndpoint;
                 // Check to see if we have an endpoint identifier
-                UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(serverUri, managementContext);
-                if(endpoint==null)
+                UMOEndpointBuilder endpointBuilder = managementContext.getRegistry().lookupEndpointBuilder(serverUri);
+                // Check to see if we have an endpoint identifier
+                if (endpointBuilder == null)
                 {
-                    UMOEndpointURI endpointUri = new MuleEndpointURI(serverUri);
-                    UMOConnector connector = TransportFactory.getOrCreateConnectorByProtocol(endpointUri, managementContext);
+                    UMOEndpointURI uri = new MuleEndpointURI(serverUri);
+                    endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+
+                    // TODO DF: Doesn't the EndpointBuilder do this?
+                    UMOConnector connector = TransportFactory.getOrCreateConnectorByProtocol(uri, managementContext);
                     // If this connector has already been initialised i.e. it's a
                     // pre-existing connector don't reinit
                     if (managementContext.getRegistry().lookupConnector(connector.getName()) == null)
@@ -139,20 +141,12 @@ public class MuleAdminAgent extends AbstractAgent
                         connector.initialise();
                         managementContext.getRegistry().registerConnector(connector, managementContext);
                     }
-                    writableEndpoint = new MuleEndpoint();
-                    writableEndpoint.setConnector(connector);
-                    writableEndpoint.setEndpointURI(endpointUri);
+                    endpointBuilder.setConnector(connector);
                 }
-                else
-                {
-                    writableEndpoint = new MuleEndpoint(endpoint);
-                }
-
-
                 logger.info("Registering Admin listener on: " + serverUri);
-                UMODescriptor descriptor = MuleManagerComponent.getDescriptor(writableEndpoint, wireFormat,
-                        RegistryContext.getConfiguration().getDefaultEncoding(),
-                        RegistryContext.getConfiguration().getDefaultSynchronousEventTimeout());
+                UMODescriptor descriptor = MuleManagerComponent.getDescriptor(endpointBuilder, wireFormat,
+                    RegistryContext.getConfiguration().getDefaultEncoding(), RegistryContext.getConfiguration()
+                        .getDefaultSynchronousEventTimeout());
 
                 managementContext.getRegistry().registerService(descriptor, managementContext);
             }
@@ -177,7 +171,6 @@ public class MuleAdminAgent extends AbstractAgent
     {
         this.wireFormat = wireFormat;
     }
-
 
     public String getServerUri()
     {

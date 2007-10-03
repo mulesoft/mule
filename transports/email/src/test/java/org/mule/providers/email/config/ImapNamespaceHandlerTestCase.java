@@ -12,6 +12,7 @@ package org.mule.providers.email.config;
 import org.mule.providers.email.ImapConnector;
 import org.mule.providers.email.ImapsConnector;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
@@ -65,7 +66,7 @@ public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
-    public void testEndpoint()
+    public void testEndpoint() throws UMOException
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("global");
         assertNotNull(endpoint);

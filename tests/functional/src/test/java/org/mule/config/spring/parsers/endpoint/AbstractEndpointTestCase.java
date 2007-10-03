@@ -11,13 +11,14 @@
 package org.mule.config.spring.parsers.endpoint;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public abstract class AbstractEndpointTestCase extends FunctionalTestCase
 {
 
-    public void doTest(String name)
+    public void doTest(String name) throws UMOException
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(name);
         assertNotNull(endpoint);

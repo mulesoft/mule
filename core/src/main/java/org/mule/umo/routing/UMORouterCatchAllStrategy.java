@@ -12,7 +12,7 @@ package org.mule.umo.routing;
 
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>UMORouterCatchAllStrategy</code> TODO
@@ -20,9 +20,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 
 public interface UMORouterCatchAllStrategy
 {
-    void setEndpoint(UMOEndpoint endpoint);
+    void setEndpoint(UMOImmutableEndpoint endpoint);
 
-    UMOEndpoint getEndpoint();
+    UMOImmutableEndpoint getEndpoint();
 
     UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException;

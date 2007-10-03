@@ -12,15 +12,18 @@ package org.mule.tck.functional;
 
 import org.mule.RegistryContext;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 
@@ -105,13 +108,18 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
      * outbound endpoint
      * 
      * @return
+     * @throws EndpointException 
+     * @throws InitialisationException 
      */
-    protected UMOEndpoint createOutboundEndpoint()
+    protected UMOImmutableEndpoint createOutboundEndpoint() throws InitialisationException, EndpointException
     {
         if (getOutDest() != null)
         {
-            return new MuleEndpoint("testOut", getOutDest(), connector, null,
-                UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, null);
+            UMOEndpointBuilder builder=new EndpointURIEndpointBuilder(getOutDest(), managementContext);
+            builder.setName("testOut");
+            builder.setConnector(connector);
+            builder.setSynchronous(true);
+            return builder.buildOutboundEndpoint();
         }
         else
         {
@@ -124,13 +132,16 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
      * inbound endpoint
      * 
      * @return
+     * @throws EndpointException 
+     * @throws InitialisationException 
      */
-    protected UMOEndpoint createInboundEndpoint()
+    protected UMOImmutableEndpoint createInboundEndpoint() throws InitialisationException, EndpointException
     {
-        UMOEndpoint ep = new MuleEndpoint("testIn", getInDest(), connector, null,
-            UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);
-        ep.setSynchronous(true);
-        return ep;
+        UMOEndpointBuilder builder=new EndpointURIEndpointBuilder(getInDest(), managementContext);
+        builder.setName("testIn");
+        builder.setConnector(connector);
+        builder.setSynchronous(true);
+        return builder.buildInboundEndpoint();
     }
 
     public void afterInitialise() throws Exception

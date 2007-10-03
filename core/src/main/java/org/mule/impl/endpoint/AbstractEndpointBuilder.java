@@ -43,10 +43,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Abstract endpoint builder used for externalizing the complex creation logic of endpoints out of the
+ * endpoint instance itself. <br/> The use of a builder allows i) Endpoints to be configured once and created
+ * in a repeatable fashion (global endpoints), ii) Allow for much more extensibility in endpoint creation for
+ * transport specific endpoints, streaming endpoints etc.<br/>
+
+ */
 public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 {
     public static final int GET_OR_CREATE_CONNECTOR = 0;
     public static final int ALWAYS_CREATE_CONNECTOR = 1;
+
     public static final int NEVER_CREATE_CONNECTOR = 2;
     public static final int USE_CONNECTOR = 3;
 
@@ -58,7 +66,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     protected Map properties;
     protected UMOTransactionConfig transactionConfig;
     protected UMOFilter filter;
-    protected boolean deleteUnacceptedMessages = false;
+    protected Boolean deleteUnacceptedMessages;
     protected UMOEndpointSecurityFilter securityFilter;
     protected Boolean synchronous;
     protected Boolean remoteSync;
@@ -86,7 +94,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         return doBuildResponseEndpoint();
     }
 
-    protected void configureEndpoint(MuleEndpoint ep) throws EndpointException, InitialisationException
+    protected void configureEndpoint(MuleEndpoint ep) throws InitialisationException, EndpointException
     {
         // protected String registryId = null; ??
         endpointURI.initialise();
@@ -109,20 +117,50 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         ep.setInitialState(getInitialState(connector));
         ep.setRemoteSyncTimeout(getRemoteSyncTimeout(connector));
         ep.setStreaming(getStreaming(connector));
-        ep.setRemoteSync(getRemoteSync(connector));
-        ep.setSynchronous(getSynchronous(connector));
-        
-        ep.setManagementContext(managementContext);
-        
-        ep.initialise();
 
+        boolean remoteSync = getRemoteSync(connector);
+        ep.setRemoteSync(remoteSync);
+        if (remoteSync)
+        {
+            ep.setSynchronous(true);
+        }
+        else
+        {
+            // Don't use default values for sync when configuring endpoint as with other attributes as
+            // itcauses issue with XFireConnector. For now null=unset, and
+            // default value is resolved in isSynchronous() method.
+            if (synchronous != null)
+            {
+                ep.setSynchronous(synchronous.booleanValue());
+            }
+        }
+        ep.setManagementContext(managementContext);
     }
 
-    protected abstract UMOImmutableEndpoint doBuildInboundEndpoint() throws EndpointException, InitialisationException;
+    protected UMOImmutableEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException
+    {
+        InboundEndpoint ep = new InboundEndpoint();
+        configureEndpoint(ep);
+        ep.setTransformers(getInboundTransformers(ep.getConnector(), ep.getEndpointURI()));
+        ep.setResponseTransformers(getResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
+        return ep;
+    }
 
-    protected abstract UMOImmutableEndpoint doBuildOutboundEndpoint() throws EndpointException, InitialisationException;
+    protected UMOImmutableEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
+    {
+        OutboundEndpoint ep = new OutboundEndpoint();
+        configureEndpoint(ep);
+        ep.setTransformers(getOutboundTransformers(ep.getConnector(), ep.getEndpointURI()));
+        return ep;
+    }
 
-    protected abstract UMOImmutableEndpoint doBuildResponseEndpoint() throws EndpointException, InitialisationException;
+    protected UMOImmutableEndpoint doBuildResponseEndpoint() throws InitialisationException, EndpointException
+    {
+        ResponseEndpoint ep = new ResponseEndpoint();
+        configureEndpoint(ep);
+        ep.setTransformers(getInboundTransformers(ep.getConnector(), ep.getEndpointURI()));
+        return ep;
+    }
 
     protected boolean getStreaming(UMOConnector connector)
     {
@@ -156,7 +194,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected UMOEndpointSecurityFilter getSecurityFilter()
     {
-        return null;
+        return securityFilter != null ? securityFilter : getDefaultSecurityFilter();
     }
 
     protected UMOEndpointSecurityFilter getDefaultSecurityFilter()
@@ -176,7 +214,14 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected int getCreateConnector()
     {
-        return createConnector != null ? createConnector.intValue() : getDefaultCreateConnector();
+        if (createConnector != null)
+        {
+            return createConnector.intValue();
+        }
+        else
+        {
+            return endpointURI.getCreateConnector();
+        }
     }
 
     protected int getDefaultCreateConnector()
@@ -184,7 +229,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         return GET_OR_CREATE_CONNECTOR;
     }
 
-    protected String getName(UMOImmutableEndpoint endpoint) throws EndpointException
+    protected String getName(UMOImmutableEndpoint endpoint)
     {
         return name != null ? name : ObjectNameHelper.getEndpointName(endpoint);
     }
@@ -193,26 +238,21 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     {
         // Add properties from builder, endpointURI and then seal (make unmodifiable)
         Map props = new HashMap();
-        props.putAll(properties);
-        props.putAll(endpointURI.getParams());
+        if (properties != null)
+        {
+            props.putAll(properties);
+        }
+        if (endpointURI.getParams() != null)
+        {
+            props.putAll(endpointURI.getParams());
+        }
         props = Collections.unmodifiableMap(props);
         return props;
     }
 
-    protected boolean getSynchronous(UMOConnector connector)
-    {
-        return synchronous != null ? synchronous.booleanValue() : getDefaultSynchronous(connector);
-
-    }
-
-    protected boolean getDefaultSynchronous(UMOConnector connector)
-    {
-        return managementContext.getRegistry().getConfiguration().isDefaultSynchronousEndpoints();
-    }
-
     protected boolean getRemoteSync(UMOConnector connector)
     {
-        return synchronous != null ? synchronous.booleanValue() : getDefaultRemoteSync(connector);
+        return remoteSync != null ? remoteSync.booleanValue() : getDefaultRemoteSync(connector);
 
     }
 
@@ -223,7 +263,9 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected boolean getDeleteUnacceptedMessages(UMOConnector connector)
     {
-        return synchronous != null ? synchronous.booleanValue() : getDefaultDeleteUnacceptedMessages(connector);
+        return deleteUnacceptedMessages != null
+                                               ? deleteUnacceptedMessages.booleanValue()
+                                               : getDefaultDeleteUnacceptedMessages(connector);
 
     }
 
@@ -239,7 +281,14 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected String getDefaultEndpointEncoding(UMOConnector connector)
     {
-        return managementContext.getRegistry().getConfiguration().getDefaultEncoding();
+        if (managementContext != null)
+        {
+            return managementContext.getRegistry().getConfiguration().getDefaultEncoding();
+        }
+        else
+        {
+            return System.getProperty("file.encoding");
+        }
     }
 
     protected UMOFilter getFilter(UMOConnector connector)
@@ -278,7 +327,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     protected List getInboundTransformers(UMOConnector connector, UMOEndpointURI endpointURI)
         throws TransportFactoryException
     {
-        //  #1 Transformers set on builder
+        // #1 Transformers set on builder
         if (TransformerUtils.isDefined(transformers))
         {
             return transformers;
@@ -299,8 +348,8 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     {
         try
         {
-            return TransformerUtils.getDefaultInboundTransformers(
-                    getNonNullServiceDescriptor(endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
+            return TransformerUtils.getDefaultInboundTransformers(getNonNullServiceDescriptor(
+                endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -308,9 +357,10 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         }
     }
 
-    protected List getOutboundTransformers(UMOConnector connector, UMOEndpointURI endpointURI) throws TransportFactoryException
+    protected List getOutboundTransformers(UMOConnector connector, UMOEndpointURI endpointURI)
+        throws TransportFactoryException
     {
-        //  #1 Transformers set on builder
+        // #1 Transformers set on builder
         if (TransformerUtils.isDefined(transformers))
         {
             return transformers;
@@ -331,8 +381,8 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     {
         try
         {
-            return TransformerUtils.getDefaultOutboundTransformers(
-                    getNonNullServiceDescriptor(endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
+            return TransformerUtils.getDefaultOutboundTransformers(getNonNullServiceDescriptor(
+                endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -340,9 +390,10 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         }
     }
 
-    protected List getResponseTransformers(UMOConnector connector, UMOEndpointURI endpointURI) throws TransportFactoryException
+    protected List getResponseTransformers(UMOConnector connector, UMOEndpointURI endpointURI)
+        throws TransportFactoryException
     {
-        //  #1 Transformers set on builder
+        // #1 Transformers set on builder
         if (TransformerUtils.isDefined(responseTransformers))
         {
             return responseTransformers;
@@ -363,8 +414,8 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     {
         try
         {
-            return TransformerUtils.getDefaultResponseTransformers(
-                    getNonNullServiceDescriptor(endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
+            return TransformerUtils.getDefaultResponseTransformers(getNonNullServiceDescriptor(
+                endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -400,7 +451,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     }
 
     private TransportServiceDescriptor getNonNullServiceDescriptor(String scheme, Properties overrides)
-            throws ServiceException
+        throws ServiceException
     {
         TransportServiceDescriptor sd = (TransportServiceDescriptor) RegistryContext.getRegistry()
             .lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, overrides);
@@ -421,11 +472,11 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         UMOConnector connector;
         try
         {
-            if (endpointURI.getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
+            if (getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
             {
                 connector = TransportFactory.createConnector(endpointURI, managementContext);
             }
-            else if (endpointURI.getCreateConnector() == NEVER_CREATE_CONNECTOR)
+            else if (getCreateConnector() == NEVER_CREATE_CONNECTOR)
             {
                 connector = TransportFactory.getConnectorByProtocol(scheme);
             }
@@ -464,119 +515,129 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     // Builder setters
 
-    public UMOEndpointBuilder setConnector(UMOConnector connector)
+    public void setConnector(UMOConnector connector)
     {
         this.connector = connector;
-        return this;
+
     }
 
-
-    public UMOEndpointBuilder setTransformers(List transformers)
+    public void setTransformers(List transformers)
     {
         this.transformers = transformers;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setResponseTransformers(List responseTransformers)
+    public void setResponseTransformers(List responseTransformers)
     {
         this.responseTransformers = responseTransformers;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setName(String name)
+    public void setName(String name)
     {
         this.name = name;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setProperties(Map properties)
+    public void setProperties(Map properties)
     {
         this.properties = properties;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setTransactionConfig(UMOTransactionConfig transactionConfig)
+    public void setTransactionConfig(UMOTransactionConfig transactionConfig)
     {
         this.transactionConfig = transactionConfig;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setFilter(UMOFilter filter)
+    public void setFilter(UMOFilter filter)
     {
         this.filter = filter;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages)
+    public void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages)
     {
-        this.deleteUnacceptedMessages = deleteUnacceptedMessages;
-        return this;
+        this.deleteUnacceptedMessages = new Boolean(deleteUnacceptedMessages);
+
     }
 
-    public UMOEndpointBuilder setSecurityFilter(UMOEndpointSecurityFilter securityFilter)
+    public void setSecurityFilter(UMOEndpointSecurityFilter securityFilter)
     {
         this.securityFilter = securityFilter;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setSynchronous(Boolean synchronous)
+    public void setSynchronous(boolean synchronous)
     {
-        this.synchronous = synchronous;
-        return this;
+        this.synchronous = new Boolean(synchronous);
+
     }
 
-    public UMOEndpointBuilder setRemoteSync(Boolean remoteSync)
+    public void setRemoteSync(boolean remoteSync)
     {
-        this.remoteSync = remoteSync;
-        return this;
+        this.remoteSync = new Boolean(remoteSync);
+
     }
 
-    public UMOEndpointBuilder setRemoteSyncTimeout(int remoteSyncTimeout)
+    public void setRemoteSyncTimeout(int remoteSyncTimeout)
     {
         this.remoteSyncTimeout = new Integer(remoteSyncTimeout);
-        return this;
+
     }
 
-    public UMOEndpointBuilder setStreaming(boolean streaming)
+    public void setStreaming(boolean streaming)
     {
         this.streaming = new Boolean(streaming);
-        return this;
+
     }
 
-    public UMOEndpointBuilder setInitialState(String initialState)
+    public void setInitialState(String initialState)
     {
         this.initialState = initialState;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setEndpointEncoding(String endpointEncoding)
+    public void setEndpointEncoding(String endpointEncoding)
     {
         this.endpointEncoding = endpointEncoding;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setCreateConnector(int createConnector)
+    public void setCreateConnector(int createConnector)
     {
         this.createConnector = new Integer(createConnector);
-        return this;
+
     }
 
-    public UMOEndpointBuilder setRegistryId(String registryId)
+    public void setRegistryId(String registryId)
     {
         this.registryId = registryId;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setManagementContext(UMOManagementContext managementContext)
+    public void setManagementContext(UMOManagementContext managementContext)
     {
         this.managementContext = managementContext;
-        return this;
+
     }
 
-    public UMOEndpointBuilder setConnectionStrategy(ConnectionStrategy connectionStrategy)
+    public void setConnectionStrategy(ConnectionStrategy connectionStrategy)
     {
         this.connectionStrategy = connectionStrategy;
-        return this;
+
+    }
+
+    public UMOEndpointURI getEndpointURI()
+    {
+        return endpointURI;
+    }
+
+    public void setEndpointURI(UMOEndpointURI endpointURI)
+    {
+        this.endpointURI = endpointURI;
+
     }
 
 }

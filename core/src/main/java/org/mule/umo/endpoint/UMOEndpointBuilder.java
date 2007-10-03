@@ -36,8 +36,7 @@ public interface UMOEndpointBuilder
      * @throws EndpointException
      * @throws InitialisationException
      */
-    public abstract UMOImmutableEndpoint buildInboundEndpoint()
-        throws EndpointException, InitialisationException;
+    UMOImmutableEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException;
 
     /**
      * Constructs outbound endpoints
@@ -46,8 +45,7 @@ public interface UMOEndpointBuilder
      * @throws EndpointException
      * @throws InitialisationException
      */
-    public abstract UMOImmutableEndpoint buildOutboundEndpoint()
-        throws EndpointException, InitialisationException;
+    UMOImmutableEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException;
 
     /**
      * Constructs response endpoints See MULE-2293
@@ -56,45 +54,46 @@ public interface UMOEndpointBuilder
      * @throws EndpointException
      * @throws InitialisationException
      */
-    public abstract UMOImmutableEndpoint buildResponseEndpoint()
-        throws EndpointException, InitialisationException;
-    
-    public abstract UMOEndpointBuilder setConnector(UMOConnector connector);
+    UMOImmutableEndpoint buildResponseEndpoint() throws EndpointException, InitialisationException;
 
-    public abstract UMOEndpointBuilder setTransformers(List transformers);
+    void setConnector(UMOConnector connector);
 
-    public abstract UMOEndpointBuilder setResponseTransformers(List responseTransformer);
+    void setTransformers(List transformers);
 
-    public abstract UMOEndpointBuilder setName(String name);
+    void setResponseTransformers(List responseTransformer);
 
-    public abstract UMOEndpointBuilder setProperties(Map properties);
+    void setName(String name);
 
-    public abstract UMOEndpointBuilder setTransactionConfig(UMOTransactionConfig transactionConfig);
+    void setProperties(Map properties);
 
-    public abstract UMOEndpointBuilder setFilter(UMOFilter filter);
+    void setTransactionConfig(UMOTransactionConfig transactionConfig);
 
-    public abstract UMOEndpointBuilder setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages);
+    void setFilter(UMOFilter filter);
 
-    public abstract UMOEndpointBuilder setSecurityFilter(UMOEndpointSecurityFilter securityFilter);
+    void setDeleteUnacceptedMessages(boolean deleteUnacceptedMessages);
 
-    public abstract UMOEndpointBuilder setSynchronous(Boolean synchronous);
+    void setSecurityFilter(UMOEndpointSecurityFilter securityFilter);
 
-    public abstract UMOEndpointBuilder setRemoteSync(Boolean remoteSync);
+    void setSynchronous(boolean synchronous);
 
-    public abstract UMOEndpointBuilder setRemoteSyncTimeout(int remoteSyncTimeout);
+    void setRemoteSync(boolean remoteSync);
 
-    public abstract UMOEndpointBuilder setStreaming(boolean streaming);
+    void setRemoteSyncTimeout(int remoteSyncTimeout);
 
-    public abstract UMOEndpointBuilder setInitialState(String initialState);
+    void setStreaming(boolean streaming);
 
-    public abstract UMOEndpointBuilder setEndpointEncoding(String endpointEncoding);
+    void setInitialState(String initialState);
 
-    public abstract UMOEndpointBuilder setCreateConnector(int createConnector);
+    void setEndpointEncoding(String endpointEncoding);
 
-    public abstract UMOEndpointBuilder setRegistryId(String registryId);
+    void setCreateConnector(int createConnector);
 
-    public abstract UMOEndpointBuilder setManagementContext(UMOManagementContext managementContext);
+    void setRegistryId(String registryId);
 
-    public abstract UMOEndpointBuilder setConnectionStrategy(ConnectionStrategy connectionStrategy);
+    void setManagementContext(UMOManagementContext managementContext);
+
+    void setConnectionStrategy(ConnectionStrategy connectionStrategy);
+
+    void setEndpointURI(UMOEndpointURI endpointURI);
 
 }

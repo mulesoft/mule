@@ -10,6 +10,8 @@
 
 package org.mule.config.spring.parsers.endpoint;
 
+import org.mule.umo.UMOException;
+
 public class AddressedEndpointTestCase extends AbstractEndpointTestCase
 {
 
@@ -18,12 +20,12 @@ public class AddressedEndpointTestCase extends AbstractEndpointTestCase
         return "org/mule/config/spring/parsers/endpoint/addressed-endpoint-test.xml";
     }
 
-    public void testAddressed()
+    public void testAddressed() throws UMOException
     {
         doTest("addressed");
     }
 
-    public void testAddressedOrphan()
+    public void testAddressedOrphan() throws UMOException
     {
         doTest("addressed-orphan");
     }

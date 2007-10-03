@@ -12,21 +12,21 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
 import org.mule.util.StringMessageUtils;
 
 public class TestCatchAllStrategy implements UMORouterCatchAllStrategy
 {
-    private UMOEndpoint endpoint;
+    private UMOImmutableEndpoint endpoint;
 
-    public void setEndpoint(UMOEndpoint endpoint)
+    public void setEndpoint(UMOImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
     }
 
-    public UMOEndpoint getEndpoint()
+    public UMOImmutableEndpoint getEndpoint()
     {
         return endpoint;
     }

@@ -31,7 +31,7 @@ public class EndpointTransformerTestCase extends AbstractMuleTestCase
     {
         managementContext.getRegistry().registerTransformer(new NoActionTransformer(), managementContext);
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
-            .lookupOutboundEndpoint("test:///tmp?responseTransformers=NoActionTransformer", managementContext);
+            .lookupInboundEndpoint("test:///tmp?responseTransformers=NoActionTransformer", managementContext);
         assertEquals("NoActionTransformer", TransformerUtils.firstOrNull(endpoint.getResponseTransformers()).getName());
     }
 }

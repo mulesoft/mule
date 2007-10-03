@@ -10,6 +10,8 @@
 
 package org.mule.config.spring.parsers.endpoint;
 
+import org.mule.umo.UMOException;
+
 public class StringAddressEndpointTestCase extends AbstractEndpointTestCase
 {
 
@@ -18,17 +20,17 @@ public class StringAddressEndpointTestCase extends AbstractEndpointTestCase
         return "org/mule/config/spring/parsers/endpoint/string-address-endpoint-test.xml";
     }
 
-    public void testStringAddress()
+    public void testStringAddress() throws UMOException
     {
         doTest("string");
     }
 
-    public void testOrphanAddress()
+    public void testOrphanAddress() throws UMOException
     {
         doTest("orphan");
     }
 
-    public void testChildAddress()
+    public void testChildAddress() throws UMOException
     {
         doTest("child");
     }

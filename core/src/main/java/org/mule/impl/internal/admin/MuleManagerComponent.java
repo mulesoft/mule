@@ -25,8 +25,8 @@ import org.mule.impl.message.ExceptionPayload;
 import org.mule.impl.model.ModelHelper;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
-import org.mule.transformers.wire.WireFormat;
 import org.mule.transformers.TransformerUtils;
+import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
@@ -34,6 +34,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -234,20 +235,19 @@ public class MuleManagerComponent implements Callable, Initialisable
     }
 
 
-    public static final UMODescriptor getDescriptor(UMOEndpoint endpoint,
+    public static final UMODescriptor getDescriptor(UMOEndpointBuilder endpointBuilder,
                                                     WireFormat wireFormat,
                                                     String encoding,
                                                     int eventTimeout) throws UMOException
     {
         try
         {
-            endpoint.setName(MANAGER_ENDPOINT_NAME);
-            endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+            endpointBuilder.setName(MANAGER_ENDPOINT_NAME);
     
             MuleDescriptor descriptor = new MuleDescriptor();
             descriptor.setName(MANAGER_COMPONENT_NAME);
     
-            descriptor.getInboundRouter().addEndpoint(endpoint);
+            descriptor.getInboundRouter().addEndpoint(endpointBuilder.buildInboundEndpoint());
 
             Map props = new HashMap();
             props.put("wireFormat", wireFormat);
@@ -305,7 +305,6 @@ public class MuleManagerComponent implements Callable, Initialisable
     {
         this.wireFormat = wireFormat;
     }
-
 
     public String getEncoding()
     {

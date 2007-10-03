@@ -15,6 +15,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -80,6 +81,16 @@ public interface Registry extends Initialisable, Disposable
      * @deprecated
      */
     UMOImmutableEndpoint lookupEndpoint(String name);
+    
+    /**
+     * Looks-up endpoint builders which can be used to repeatably create endpoints with the same configuration.
+     * These endpoint builder are either global endpoints or they are builders used to create named
+     * endpoints configured on routers and exception strategies.
+     * 
+     * @param name
+     * @return
+     */
+    UMOEndpointBuilder lookupEndpointBuilder(String name);
     
     /**
      * Returns immutable endpoint instance with the "INBOUND" role. <br/><br/> The uri paramater can be one

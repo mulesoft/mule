@@ -22,6 +22,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -245,12 +246,51 @@ public abstract class AbstractRegistry implements Registry
 
     public UMOImmutableEndpoint lookupEndpoint(String name, UMOManagementContext managementContext)
     {
-        return (UMOImmutableEndpoint) lookupObject(name);
+        Object o = lookupObject(name);
+        if (o instanceof UMOEndpointBuilder)
+        {
+            try
+            {
+                o = ((UMOEndpointBuilder) o).buildInboundEndpoint();
+            }
+            catch (UMOException e)
+            {
+                logger.error(e);
+                return null;
+            }
+        }
+        return (UMOImmutableEndpoint) o;
     }
 
     public UMOImmutableEndpoint lookupEndpoint(String name)
     {
-        return (UMOImmutableEndpoint) lookupObject(name);
+        return (UMOImmutableEndpoint) lookupEndpoint(name, MuleServer.getManagementContext());
+    }
+    
+    public UMOEndpointBuilder lookupEndpointBuilder(String name)
+    {
+        // TODO DF: This is spring spefic because if uses "&" to lookup FactoryBean and thus builder.
+        Object o = lookupObject(name);
+        if (o instanceof UMOEndpointBuilder)
+        {
+            logger.debug("Global endpoint EndpointBuilder for name: " + name + "found");
+            return (UMOEndpointBuilder) o;
+        }
+        else
+        {
+            logger.debug("Global endpoint EndpointBuilder not found, attempting to lookup named concrete endpoint builder with name: "
+                         + name);
+            UMOEndpointBuilder endpointBuilder = (UMOEndpointBuilder) lookupObject("&" + name);
+            if (endpointBuilder != null)
+            {
+                logger.debug("Endpoint builder for concrete endpoint with name: " + name + " found.");
+            }
+            else
+            {
+                logger.debug("Endpoint builder for concrete endpoint with name: " + name + " NOT found.");
+            }
+            return endpointBuilder;
+        }
     }
 
     protected UMOEndpointFactory lookupEndpointFactory()

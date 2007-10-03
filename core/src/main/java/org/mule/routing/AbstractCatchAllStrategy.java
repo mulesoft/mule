@@ -11,7 +11,7 @@
 package org.mule.routing;
 
 import org.mule.management.stats.RouterStatistics;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
 
 import org.apache.commons.logging.Log;
@@ -31,16 +31,16 @@ public abstract class AbstractCatchAllStrategy implements UMORouterCatchAllStrat
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected UMOEndpoint endpoint;
+    protected UMOImmutableEndpoint endpoint;
 
     protected RouterStatistics statistics;
 
-    public void setEndpoint(UMOEndpoint endpoint)
+    public void setEndpoint(UMOImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
     }
 
-    public UMOEndpoint getEndpoint()
+    public UMOImmutableEndpoint getEndpoint()
     {
         return endpoint;
     }

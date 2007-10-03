@@ -8,18 +8,22 @@
  * LICENSE.txt file.
  */
 
-package org.mule.impl.endpoint;
+package org.mule.config.spring.factories;
 
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-
-public class GlobalEndpoint extends MuleEndpoint
+/**
+ * Spring FactoryBean used to create concrete instances of response endpoints
+ */
+public class ResponseEndpointFactoryBean extends AbstractEndpointFactoryBean
 {
 
-    private static final long serialVersionUID = 987360887269899791L;
-
-    public String getType()
+    public ResponseEndpointFactoryBean()
     {
-        return UMOImmutableEndpoint.ENDPOINT_TYPE_GLOBAL;
+        super();
+    }
+
+    public Object doGetObject() throws Exception
+    {
+        return buildResponseEndpoint();
     }
 
 }
