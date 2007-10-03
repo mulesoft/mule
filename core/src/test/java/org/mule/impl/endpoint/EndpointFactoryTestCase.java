@@ -16,7 +16,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-public class EndpointFactoryTest extends AbstractMuleTestCase
+public class EndpointFactoryTestCase extends AbstractMuleTestCase
 {
 
     public void testCreateInboundEndpoint() throws UMOException
