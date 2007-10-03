@@ -60,6 +60,16 @@ public class DefaultBeanAssembler implements BeanAssembler
         return target;
     }
 
+    protected PropertyConfiguration getBeanConfig()
+    {
+        return beanConfig;
+    }
+
+    protected PropertyConfiguration getTargetConfig()
+    {
+        return targetConfig;
+    }
+
     /**
      * Add a property defined by an attribute to the bean we are constructing.
      *

@@ -60,8 +60,7 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
             String parentBean = getParentBeanName(element);
             if (StringUtils.isBlank(parentBean))
             {
-                throw new IllegalStateException("No parent for " +
-                        CoreXMLUtils.elementToString(element));
+                throw new IllegalStateException("No parent for " + CoreXMLUtils.elementToString(element));
             }
             return getRegistry().getBeanDefinition(parentBean);
         }
@@ -77,7 +76,7 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
     protected BeanAssembler getBeanAssembler(Element element, BeanDefinitionBuilder bean)
     {
         BeanDefinition target = getParentBeanDefinition(element);
-        return beanAssemblerFactory.newBeanAssembler(
+        return getBeanAssemblerFactory().newBeanAssembler(
                 beanPropertyConfiguration, bean, targetPropertyConfiguration, target);
     }
 

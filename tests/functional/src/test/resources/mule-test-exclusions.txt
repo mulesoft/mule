@@ -1,1 +1,4 @@
 org.mule.test.spring.GlobalPropertiesMule2458TestCase
+
+# this doesn't work because child elements invoked after insertion
+org.mule.config.spring.parsers.MapMule2478TestCase

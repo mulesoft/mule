@@ -53,7 +53,7 @@ public class NameTransferDefinitionParser extends ParentDefinitionParser
     public NameTransferDefinitionParser(String componentAttributeName)
     {
         this.componentAttributeName = componentAttributeName;
-        this.beanAssemblerFactory = new LocalBeanAssemblerFactory();
+        setBeanAssemblerFactory(new LocalBeanAssemblerFactory());
     }
 
     // this is a bit of a hack - we transfer the name to the provider

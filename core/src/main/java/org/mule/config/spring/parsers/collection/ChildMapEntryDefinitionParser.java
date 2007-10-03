@@ -37,7 +37,6 @@ public class ChildMapEntryDefinitionParser extends AbstractChildDefinitionParser
     private String keyName;
     private String valueName;
 
-
     public ChildMapEntryDefinitionParser(String mapName, String keyName, String valueName)
     {
         this.propertyName = mapName;
@@ -67,7 +66,6 @@ public class ChildMapEntryDefinitionParser extends AbstractChildDefinitionParser
     {
         private String key;
         private Object value;
-
 
         public KeyValuePair()
         {
