@@ -17,7 +17,7 @@ import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AllAttributeChildDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
-import org.mule.config.spring.parsers.delegate.SimpleSingleParentFamilyDefinitionParser;
+import org.mule.config.spring.parsers.delegate.SingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
@@ -30,6 +30,10 @@ import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpoin
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildAddressDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.ComplexComponentDefinitionParser;
+import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
+import org.mule.config.spring.parsers.beans.ChildBean;
+import org.mule.config.spring.parsers.beans.OrphanBean;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 
 /**
@@ -67,11 +71,16 @@ public class ParsersTestNamespaceHandler extends AbstractIgnorableNamespaceHandl
 
         registerBeanDefinitionParser("list-element-test-1", new AttributeListEntryDefinitionParser("kids", "listAttribute"));
         registerBeanDefinitionParser("list-element-test-2",
-                new SimpleSingleParentFamilyDefinitionParser(
+                new SingleParentFamilyDefinitionParser(
                         new OrphanDefinitionParser(OrphanBean.class, true))
-                        .addDelegate("kid1", new AttributeListEntryDefinitionParser("kids", "kid1"))
-                        .addDelegate("kid2", new AttributeListEntryDefinitionParser("kids", "kid2")));
+                        .addChildDelegate("kid1", new AttributeListEntryDefinitionParser("kids", "kid1"))
+                        .addChildDelegate("kid2", new AttributeListEntryDefinitionParser("kids", "kid2")));
         registerBeanDefinitionParser("list-element-test-3", new AllAttributeChildDefinitionParser(new AttributeListEntryDefinitionParser("kids")));
+
+        registerBeanDefinitionParser("factory",
+                new ComplexComponentDefinitionParser(
+                        new SimpleComponentDefinitionParser("object", ChildBean.class),
+                        (ChildDefinitionParser) new ChildDefinitionParser("child", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"))); 
     }
 
 }

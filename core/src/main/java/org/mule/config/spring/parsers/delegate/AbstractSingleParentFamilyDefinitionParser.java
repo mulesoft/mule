@@ -10,9 +10,8 @@
 
 package org.mule.config.spring.parsers.delegate;
 
+import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -24,31 +23,35 @@ import org.w3c.dom.Element;
  *
  * <p>Note that this make a lot of assumptions about what type of parser is used.
  */
-public abstract class AbstractSingleParentFamilyDefinitionParser extends AbstractSerialDelegatingDefinitionParser
+public abstract class AbstractSingleParentFamilyDefinitionParser
+        extends AbstractSerialDelegatingDefinitionParser
 {
 
     private AbstractBeanDefinition parent;
 
+    protected void addChildDelegate(MuleChildDefinitionParser delegate)
+    {
+        super.addDelegate(delegate);
+    }
+
     protected void addDelegate(MuleDefinitionParser delegate)
     {
-        if (size() > 0
-                && delegate instanceof AbstractMuleBeanDefinitionParser
-                && !(delegate instanceof AbstractHierarchicalDefinitionParser))
+        if (size() > 0)
         {
-            throw new IllegalStateException(
-                    "Child parsers must be used - only the first delegate's bean is returned to Spring");
+            throw new IllegalStateException("Children must implement child interface");
         }
         super.addDelegate(delegate);
     }
 
-    protected AbstractBeanDefinition doSingleBean(int index, MuleDefinitionParser parser, Element element, ParserContext parserContext)
+    protected AbstractBeanDefinition doSingleBean(int index, MuleDefinitionParser parser,
+                                                  Element element, ParserContext parserContext)
     {
         if (0 != index)
         {
-            ((AbstractHierarchicalDefinitionParser) parser).forceParent(parent);
+            ((MuleChildDefinitionParser) parser).forceParent(parent);
             // we need this because we often block "everything but" which would mean
             // being unable to set ourselves on the parent
-            ((AbstractHierarchicalDefinitionParser) parser).getTargetPropertyConfiguration().setIgnoredDefault(false);
+            ((MuleChildDefinitionParser) parser).getTargetPropertyConfiguration().setIgnoredDefault(false);
         }
         try
         {

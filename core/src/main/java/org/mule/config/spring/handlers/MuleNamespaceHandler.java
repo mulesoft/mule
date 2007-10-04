@@ -26,7 +26,7 @@ import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
-import org.mule.config.spring.parsers.delegate.SimpleSingleParentFamilyDefinitionParser;
+import org.mule.config.spring.parsers.delegate.SingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
@@ -237,11 +237,11 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("echo-component", new SimpleComponentDefinitionParser("serviceFactory", EchoComponent.class));
         registerBeanDefinitionParser("null-component", new SimpleComponentDefinitionParser("serviceFactory", NullComponent.class));
         registerBeanDefinitionParser("rest-service-component",
-                                     new SimpleSingleParentFamilyDefinitionParser(new SimpleComponentDefinitionParser("serviceFactory", RestServiceWrapper.class,RestServiceWrapper.RestSingletonObjectFactory.class))
-                                             .addDelegate("httpMethod", new AttributeMapDefinitionParser("properties"))
-                                             .addDelegate("serviceUrl", new AttributeMapDefinitionParser("properties"))
-                                             .addDelegate("urlFromMessage", new AttributeMapDefinitionParser("properties"))
-                                             .addDelegate("errorExpression", new AttributeMapDefinitionParser("properties"))
+                                     new SingleParentFamilyDefinitionParser(new SimpleComponentDefinitionParser("serviceFactory", RestServiceWrapper.class,RestServiceWrapper.RestSingletonObjectFactory.class))
+                                             .addChildDelegate("httpMethod", new AttributeMapDefinitionParser("properties"))
+                                             .addChildDelegate("serviceUrl", new AttributeMapDefinitionParser("properties"))
+                                             .addChildDelegate("urlFromMessage", new AttributeMapDefinitionParser("properties"))
+                                             .addChildDelegate("errorExpression", new AttributeMapDefinitionParser("properties"))
         );
 
 

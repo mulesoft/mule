@@ -14,8 +14,6 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 
-
-
 /**
  * Simple object factory which always returns the same object instance.
  */
@@ -88,4 +86,5 @@ public class SingletonObjectFactory extends SimpleObjectFactory implements Initi
     {
         this.instance = instance;
     }
+
 }

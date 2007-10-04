@@ -8,8 +8,8 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/parsers-test/2.0 http://www.mulesource.org/schema/mule/parsers-test/2.0/mule-parsers-test.xsd">
 
-    <bean name="child1" class="org.mule.config.spring.parsers.ChildBean"/>
+    <bean name="child1" class="org.mule.config.spring.parsers.beans.ChildBean"/>
 
-    <bean name="child1" class="org.mule.config.spring.parsers.ChildBean"/>
+    <bean name="child1" class="org.mule.config.spring.parsers.beans.ChildBean"/>
 
 </beans>

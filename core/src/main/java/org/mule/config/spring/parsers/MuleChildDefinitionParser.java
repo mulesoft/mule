@@ -10,6 +10,18 @@
 
 package org.mule.config.spring.parsers;
 
-public class ChildBean extends AbstractBean
+import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+
+import org.springframework.beans.factory.config.BeanDefinition;
+
+/**
+ * Extra functionality exposed by child parsers
+ */
+public interface MuleChildDefinitionParser extends MuleDefinitionParser
 {
+
+    public void forceParent(BeanDefinition parent);
+
+    public PropertyConfiguration getTargetPropertyConfiguration();
+
 }

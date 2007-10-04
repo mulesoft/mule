@@ -10,18 +10,13 @@
 
 package org.mule.config.spring.parsers.delegate;
 
+import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-public class SimpleSingleParentFamilyDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
+public class SingleParentFamilyDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
 {
 
-    private Map attributeNames = new HashMap();
-
-    public SimpleSingleParentFamilyDefinitionParser(MuleDefinitionParser parent)
+    public SingleParentFamilyDefinitionParser(MuleDefinitionParser parent)
     {
         // avoid the overriden method here
         super.addDelegate(parent);
@@ -33,15 +28,14 @@ public class SimpleSingleParentFamilyDefinitionParser extends AbstractSinglePare
         throw new UnsupportedOperationException("Delegates must be associated with attribute names");
     }
 
-    public SimpleSingleParentFamilyDefinitionParser addDelegate(String attribute, MuleDefinitionParser delegate)
+    public SingleParentFamilyDefinitionParser addChildDelegate(String attribute, MuleChildDefinitionParser delegate)
     {
-        return addDelegate(new String[]{attribute}, delegate);
+        return addChildDelegate(new String[]{attribute}, delegate);
     }
 
-    public SimpleSingleParentFamilyDefinitionParser addDelegate(String[] attributes, MuleDefinitionParser delegate)
+    public SingleParentFamilyDefinitionParser addChildDelegate(String[] attributes, MuleChildDefinitionParser delegate)
     {
-        attributeNames.put(delegate, Arrays.asList(attributes));
-        super.addDelegate(delegate);
+        super.addChildDelegate(delegate);
         delegate.setIgnoredDefault(true);
         for (int i = 0; i < attributes.length; i++)
         {

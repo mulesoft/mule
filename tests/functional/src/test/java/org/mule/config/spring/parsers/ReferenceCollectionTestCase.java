@@ -10,6 +10,8 @@
 
 package org.mule.config.spring.parsers;
 
+import org.mule.config.spring.parsers.beans.OrphanBean;
+
 import java.util.Collection;
 
 /**

@@ -11,8 +11,10 @@
 package org.mule.config.spring.parsers.delegate;
 
 import org.mule.config.spring.parsers.MuleDefinitionParser;
+import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.MapBeanAssemblerFactory;
+import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import java.util.HashMap;
@@ -20,6 +22,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.w3c.dom.Element;
 
 /**
@@ -29,7 +32,7 @@ import org.w3c.dom.Element;
  */
 public class MapDefinitionParserMutator
         extends AbstractDelegatingDefinitionParser
-        implements MapBeanAssemblerFactory.BeanAssemblerStore
+        implements MapBeanAssemblerFactory.BeanAssemblerStore, MuleChildDefinitionParser
 {
 
     private String setter;
@@ -60,7 +63,7 @@ public class MapDefinitionParserMutator
             // when the store callback is called, we can associate the assembler with this
             // element
             currentElement = element;
-            return getDelegate(0).parseDelegate(element, parserContext);
+            return getChildDelegate().parseDelegate(element, parserContext);
         }
     }
 
@@ -68,6 +71,21 @@ public class MapDefinitionParserMutator
     {
         // this is called by the bean assembler from inside parseDelegate above.
         pendingAssemblers.put(currentElement, beanAssembler);
+    }
+
+    protected ChildDefinitionParser getChildDelegate()
+    {
+        return (ChildDefinitionParser) getDelegate(0);
+    }
+
+    public void forceParent(BeanDefinition parent)
+    {
+        getChildDelegate().forceParent(parent);
+    }
+
+    public PropertyConfiguration getTargetPropertyConfiguration()
+    {
+        return getChildDelegate().getTargetPropertyConfiguration();
     }
 
 }

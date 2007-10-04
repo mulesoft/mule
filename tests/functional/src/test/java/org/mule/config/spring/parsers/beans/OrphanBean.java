@@ -8,7 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.beans;
+
+import org.mule.config.spring.parsers.beans.AbstractBean;
+import org.mule.config.spring.parsers.beans.ChildBean;
 
 import java.util.Collection;
 
@@ -25,6 +28,8 @@ public class OrphanBean extends AbstractBean
 
     // test simple setter/getter
     private ChildBean child;
+
+    private Object object;
 
     public ChildBean getChild()
     {
@@ -54,6 +59,16 @@ public class OrphanBean extends AbstractBean
     public void setOffspring(Collection offspring)
     {
         this.offspring = offspring;
+    }
+
+    public Object getObject()
+    {
+        return object;
+    }
+
+    public void setObject(Object object)
+    {
+        this.object = object;
     }
     
 }

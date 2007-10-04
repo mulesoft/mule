@@ -38,7 +38,9 @@ import org.w3c.dom.Element;
  * @see org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser.KeyValuePair
  * @see AbstractMuleBeanDefinitionParser
  */
-public abstract class AbstractChildDefinitionParser extends AbstractHierarchicalDefinitionParser
+public abstract class AbstractChildDefinitionParser
+        extends AbstractHierarchicalDefinitionParser
+        implements MuleChildDefinitionParser
 {
 
     private static AtomicInteger idCounter = new AtomicInteger(0);

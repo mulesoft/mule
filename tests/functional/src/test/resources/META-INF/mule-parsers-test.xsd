@@ -26,6 +26,7 @@
                     <xsd:element name="parent" type="parentType" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="child" type="childType" minOccurs="0"/>
                     <xsd:element name="mapped-child" type="childType" minOccurs="0"/>
+                    <xsd:element name="factory" type="childType" minOccurs="0"/>
                     <xsd:element name="kid" type="childType" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element ref="list-element-test-1" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element ref="list-element-test-3" minOccurs="0" maxOccurs="unbounded"/>

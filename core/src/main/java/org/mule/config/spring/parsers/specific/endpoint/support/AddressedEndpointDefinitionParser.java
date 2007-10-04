@@ -11,10 +11,11 @@
 package org.mule.config.spring.parsers.specific.endpoint.support;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.preprocessors.DisableByAttribute;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,10 +50,10 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         addDelegate(endpointParser);
 
         // the next delegate parses the address.  it will see the endpoint as parent automatically.
-        MuleDefinitionParser addressParser = new ChildAddressDefinitionParser(protocol);
+        MuleChildDefinitionParser addressParser = new ChildAddressDefinitionParser(protocol);
         // it should see only the endpoint attributes
         enableAttributes(addressParser, LazyEndpointURI.ATTRIBUTES);
-        addDelegate(addressParser);
+        addChildDelegate(addressParser);
 
         // this handles the "ref problem" and is specific to the endpoint/address element.
         // we don't want this parser to be used if a "ref" defines the address

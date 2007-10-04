@@ -10,6 +10,10 @@
 
 package org.mule.config.spring.parsers;
 
+import org.mule.config.spring.parsers.beans.AbstractBean;
+import org.mule.config.spring.parsers.beans.ChildBean;
+import org.mule.config.spring.parsers.beans.OrphanBean;
+
 public class AliasTestCase extends AbstractNamespaceTestCase
 {
 

@@ -21,6 +21,7 @@ import java.util.Map;
  */
 public class SimpleObjectFactory implements ObjectFactory
 {
+
     String objectClassName;
     Class objectClass = null;
     Map properties = null;

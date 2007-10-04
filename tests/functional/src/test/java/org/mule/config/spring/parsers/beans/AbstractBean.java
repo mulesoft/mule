@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers;
+package org.mule.config.spring.parsers.beans;
 
 import java.util.List;
 import java.util.Map;
