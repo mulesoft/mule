@@ -22,6 +22,11 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
+/**
+ * This changes a {@link org.mule.config.spring.parsers.generic.ChildDefinitionParser}
+ * so that it generates a map instead of a bean definition.  This is useful for converting
+ * parsers to work with the object factory (which requires a map).
+ */
 public class MapDefinitionParserMutator
         extends AbstractDelegatingDefinitionParser
         implements MapBeanAssemblerFactory.BeanAssemblerStore
