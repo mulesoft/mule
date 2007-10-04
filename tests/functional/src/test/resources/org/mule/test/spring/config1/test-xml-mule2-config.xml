@@ -88,34 +88,7 @@
         <custom-entrypoint-resolver class="org.mule.tck.testmodels.mule.TestEntryPointResolverSet"/>
 
         <service name="orangeComponent">
-            <singleton-object instance-ref="orange">
-                <properties>
-                    <spring:entry key="brand" value="Juicy Baby!"/>
-                    <spring:entry key="segments" value="9"/>
-                    <spring:entry key="radius" value="4.21"/>
-                    <spring:entry key="mapProperties">
-                        <spring:map>
-                            <spring:entry key="prop1" value="prop1"/>
-                            <spring:entry key="prop2" value="prop2"/>
-                        </spring:map>
-                    </spring:entry>
-                    <spring:entry key="listProperties">
-                        <spring:list>
-                            <spring:value>prop1</spring:value>
-                            <spring:value>prop2</spring:value>
-                            <spring:value>prop3</spring:value>
-                        </spring:list>
-                    </spring:entry>
-                    <spring:entry key="arrayProperties">
-                        <spring:list>
-                            <spring:value>prop4</spring:value>
-                            <spring:value>prop5</spring:value>
-                            <spring:value>prop6</spring:value>
-                        </spring:list>
-                    </spring:entry>
-                </properties>
-            </singleton-object>
-            
+            <component scope="singleton" instance-ref="orange"/>
             <inbound-router>
 
                 <forwarding-catch-all-strategy>
@@ -155,10 +128,36 @@
             <default-component-exception-strategy>
                 <outbound-endpoint address="test://orange.exceptions"/>
             </default-component-exception-strategy>
+
+            <properties>
+                <spring:entry key="brand" value="Juicy Baby!"/>
+                <spring:entry key="segments" value="9"/>
+                <spring:entry key="radius" value="4.21"/>
+                <spring:entry key="mapProperties">
+                    <spring:map>
+                        <spring:entry key="prop1" value="prop1"/>
+                        <spring:entry key="prop2" value="prop2"/>
+                    </spring:map>
+                </spring:entry>
+                <spring:entry key="listProperties">
+                    <spring:list>
+                        <spring:value>prop1</spring:value>
+                        <spring:value>prop2</spring:value>
+                        <spring:value>prop3</spring:value>
+                    </spring:list>
+                </spring:entry>
+                <spring:entry key="arrayProperties">
+                    <spring:list>
+                        <spring:value>prop4</spring:value>
+                        <spring:value>prop5</spring:value>
+                        <spring:value>prop6</spring:value>
+                    </spring:list>
+                </spring:entry>
+            </properties>
         </service>
 
         <service name="appleComponent">
-            <singleton-object instance-ref="apple"/>
+            <component scope="singleton" instance-ref="apple"/>
             <inbound-router>
                 <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <inbound-endpoint ref="appleInEndpoint"/>

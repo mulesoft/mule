@@ -13,9 +13,7 @@
         <mule:model name="main" inherit="true">
 
             <mule:service name="appleComponent2">
-                <mule:component class="org.mule.tck.testmodels.fruit.Apple">
-                    <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT" initialisationPolicy="INITIALISE_ALL"/>
-                </mule:component>
+                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                                                                
                 <mule:inbound-router>
                     <mule:inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
@@ -62,6 +60,7 @@
 
                 <mule:threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6"
                                         poolExhaustedAction="WAIT" threadTTL="60001"/>
+                <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT" initialisationPolicy="INITIALISE_ALL"/>
                 <mule:queue-profile maxOutstandingMessages="102"/>
 
             </mule:service>

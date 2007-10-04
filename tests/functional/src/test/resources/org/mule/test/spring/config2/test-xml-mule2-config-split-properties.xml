@@ -13,10 +13,17 @@
         <mule:model name="main" inherit="true">
 
             <mule:service name="testPropertiesComponent">
-                <mule:singleton-object instance-ref="prop-test-ref"/>
+                <mule:component scope="singleton" instance-ref="prop-test-ref"/>
                 <mule:inbound-router>
                     <mule:inbound-endpoint address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"/>
                 </mule:inbound-router>
+                <mule:properties>
+                    <entry key="factoryObject" value-ref="factoryObject"/>
+                    <entry key="containerObject" value-ref="anApple"/>
+                    <entry key="osVersion" value="${os.version}"/>
+                    <entry key="test1" value="test1"/>
+                    <entry key="test2" value="test2"/>
+                </mule:properties>
             </mule:service>
 
         </mule:model>
@@ -26,8 +33,6 @@
     <bean name="anApple" class="org.mule.tck.testmodels.fruit.Apple"/>
 
     <bean name="prop-test-ref" class="org.mule.tck.testmodels.fruit.Apple">
-        <property name="bitten" value="true"/>
-        <property name="washed" value="true"/>
     </bean>
 
     <bean name="factory-test" class="org.mule.tck.testmodels.mule.TestDependentObject"/>
