@@ -16,11 +16,26 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 public class MapBeanAssemblerFactory implements BeanAssemblerFactory
 {
 
+    private BeanAssemblerStore store;
+
+    public MapBeanAssemblerFactory(BeanAssemblerStore store)
+    {
+        this.store = store;
+    }
+
     public BeanAssembler newBeanAssembler(
             PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
             PropertyConfiguration targetConfig, BeanDefinition target)
     {
-        return new MapBeanAssembler(beanConfig, bean, targetConfig, target);
+        return new MapBeanAssembler(store, beanConfig, bean, targetConfig, target);
     }
+
+    public interface BeanAssemblerStore
+    {
+
+        public void saveBeanAssembler(BeanAssembler beanAssembler);
+
+    }
+
 
 }

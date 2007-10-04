@@ -46,7 +46,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     public static final String MULE_REPEAT_PARSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE";
     public static final String MULE_NO_RECURSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE";
     public static final String MULE_NO_REGISTRATION = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION";
-
+    public static final String MULE_POST_CHILDREN = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_POST_CHILDREN";
     private DefaultBeanDefinitionDocumentReader spring;
 
     protected static final Log logger = LogFactory.getLog(MuleHierarchicalBeanDefinitionParserDelegate.class);
@@ -94,7 +94,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             // other custom name-spaces e.g spring-jee.
 
             // We also avoid parsing inside elements that have constructed a factory bean
-            // because that means we're dealing with (something like) ChildmapDefinitionParser,
+            // because that means we're dealing with (something like) ChildMapDefinitionParser,
             // which handles iteration internally (this is a hack needed because Spring doesn't
             // expose the DP for "<spring:entry>" elements directly).
 
@@ -109,6 +109,15 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                     }
                 }
             }
+
+            // If a parser requests post-processing we call again after children called
+
+            if (testFlag(finalChild, MULE_POST_CHILDREN))
+            {
+                ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
+                finalChild = handler.parse(element, parserContext);
+            }
+
             return finalChild;
         }
     }

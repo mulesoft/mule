@@ -472,5 +472,4 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     {
         this.beanAssemblerFactory = beanAssemblerFactory;
     }
-
 }

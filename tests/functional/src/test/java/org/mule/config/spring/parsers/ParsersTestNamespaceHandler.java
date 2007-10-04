@@ -18,7 +18,7 @@ import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AllAttributeChildDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
 import org.mule.config.spring.parsers.delegate.SimpleSingleParentFamilyDefinitionParser;
-import org.mule.config.spring.parsers.delegate.MapDefinitionParserAdapter;
+import org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
@@ -43,7 +43,7 @@ public class ParsersTestNamespaceHandler extends AbstractIgnorableNamespaceHandl
     {
         registerMuleDefinitionParser("orphan", new OrphanDefinitionParser(OrphanBean.class, true)).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
         registerMuleDefinitionParser("child", new ChildDefinitionParser("child", ChildBean.class)).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
-        registerDelegateDefinitionParser("mapped-child", new MapDefinitionParserAdapter(new ChildDefinitionParser("map", ChildBean.class))).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
+        registerDelegateDefinitionParser("mapped-child", new MapDefinitionParserMutator("map", new ChildDefinitionParser("child", ChildBean.class))).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
         registerMuleDefinitionParser("kid", new ChildDefinitionParser("kid", ChildBean.class)).addAlias("bar", "foo").addIgnored("ignored");
         registerMuleDefinitionParser("parent", new ParentDefinitionParser()).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
         registerMuleDefinitionParser("orphan1", new NamedDefinitionParser("orphan1")).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
