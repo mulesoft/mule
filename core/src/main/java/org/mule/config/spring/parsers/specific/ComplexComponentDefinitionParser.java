@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractDelegatingDefinitionParser;
 import org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.util.ClassUtils;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -24,19 +25,21 @@ import org.w3c.dom.Element;
  * to {@link org.mule.config.spring.parsers.delegate.SingleParentFamilyDefinitionParser}
  * with {@link org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator}, allowing
  * a single element to be used to configure both the factory (if any confiuration is needed)
- * and set proeprties for the component.  Nested component contents will also be handled
+ * and set properties for the component.  Nested component contents will also be handled
  * correctly.
+ *
+ * <p>This is stateful, in a limited sense - it cannot be nested.</p>
  */
 public class ComplexComponentDefinitionParser extends AbstractDelegatingDefinitionParser
 {
 
     private static final int START = 0;
     private static final int POST_CHILDREN = 1;
-    private static final int COMPLETE = 2;
 
     private MuleChildDefinitionParser objectFactoryParser;
     private MapDefinitionParserMutator componentParser;
     private int state = START;
+    private Element currentElement;
 
     public ComplexComponentDefinitionParser(MuleChildDefinitionParser objectFactoryParser,
                                             ChildDefinitionParser componentParser)
@@ -78,19 +81,25 @@ public class ComplexComponentDefinitionParser extends AbstractDelegatingDefiniti
             // in the mutator
             AbstractBeanDefinition componentDefn1 = componentParser.parseDelegate(element, parserContext);
             state = POST_CHILDREN;
+            // save the element to check below
+            currentElement = element;
             // we return the component definition, which will be associated with this element.
             // child nodes will then extend that definition.  once they are processed we will
             // be called again.
             return componentDefn1;
         case POST_CHILDREN:
+            // check we are still processing the same element
+            if (!currentElement.equals(element))
+            {
+                throw new IllegalStateException("Cannot nest " + ClassUtils.getSimpleName(getClass()));
+            }
             // child nodes have now been processed, so we can set the properties in the factory.
             AbstractBeanDefinition componentDefn2 = componentParser.parseDelegate(element, parserContext);
-            // that should be it.  since we are stateful we make sure that any duplicate call
-            // triggers an error
-            state = COMPLETE;
+            // that should be it, so reset state for next use.
+            state = START;
             return componentDefn2;
         default:
-            throw new IllegalStateException("Statefil definition parser cannot be resued");
+            throw new IllegalStateException("Unexpected state in " + ClassUtils.getSimpleName(getClass()));
 
         }
     }
