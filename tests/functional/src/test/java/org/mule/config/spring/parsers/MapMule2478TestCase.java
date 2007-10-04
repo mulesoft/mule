@@ -24,10 +24,10 @@ public class MapMule2478TestCase extends AbstractNamespaceTestCase
     public void testMap()
     {
         OrphanBean orphan = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
-//        ChildBean child1 = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
-//        assertEquals("string1", child1.getString());
-//        assertNotNull(child1.getList());
-//        assertEquals("list1", child1.getList().get(0));
+        ChildBean child1 = (ChildBean) assertContentExists(orphan.getChild(), ChildBean.class);
+        assertEquals("string1", child1.getString());
+        assertNotNull(child1.getList());
+        assertEquals("list1", child1.getList().get(0));
         Map map = orphan.getMap();
         assertNotNull(map);
         assertTrue(map.containsKey("string"));

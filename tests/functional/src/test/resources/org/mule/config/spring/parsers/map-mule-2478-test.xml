@@ -9,9 +9,9 @@
        http://www.mulesource.org/schema/mule/parsers-test/2.0 http://www.mulesource.org/schema/mule/parsers-test/2.0/mule-parsers-test.xsd">
 
     <parsers-test:orphan name="orphan">
-        <!-- parsers-test:child name="child1" string="string1">
+        <parsers-test:child name="child1" string="string1">
             <parsers-test:list-entry>list1</parsers-test:list-entry>
-        </parsers-test:child -->
+        </parsers-test:child>
         <parsers-test:mapped-child name="child2" string="string2">
             <parsers-test:list-entry>list2</parsers-test:list-entry>
         </parsers-test:mapped-child>
