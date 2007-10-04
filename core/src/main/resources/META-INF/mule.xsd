@@ -390,6 +390,15 @@
         </xsd:annotation>
     </xsd:element>
 
+
+    <xsd:element name="rest-service-component" type="restServiceWrapperType" substitutionGroup="abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                Built-in RestServiceWrapper can used to proxy REST style services as local Mule Components.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="no-args-call-component" type="noArgsCallWrapperType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
@@ -418,6 +427,30 @@
     <xsd:complexType name="noArgsCallDelegateInstanceType">
         <xsd:attribute name="delegateInstance-ref" type="xsd:NMTOKEN" use="required"/>
         <xsd:attribute name="delegateMethod" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="restServiceWrapperType">
+        <xsd:complexContent>
+            <xsd:extension base="componentShortcutType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-filter" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="payloadParameterNames" type="listOrSetType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="requiredParams" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="optionalParams" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="httpMethod" default="GET" use="optional">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="GET"/>
+                            <xsd:enumeration value="POST"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="serviceUrl" use="required"/>
+                <xsd:attribute name="urlFromMessage" default="false" use="optional" type="xsd:boolean"/>
+                <xsd:attribute name="errorExpression" use="optional" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
 

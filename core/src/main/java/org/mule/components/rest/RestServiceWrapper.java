@@ -21,6 +21,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.util.object.SingletonObjectFactory;
 import org.mule.util.properties.MessagePropertyExtractor;
 import org.mule.util.properties.PropertyExtractor;
 
@@ -187,7 +188,7 @@ public class RestServiceWrapper implements Callable, Initialisable
             if (tempUrl == null)
             {
                 throw new IllegalArgumentException(
-                    CoreMessages.propertyIsNotSetOnEvent(REST_SERVICE_URL).toString());
+                        CoreMessages.propertyIsNotSetOnEvent(REST_SERVICE_URL).toString());
             }
         }
         else
@@ -195,11 +196,11 @@ public class RestServiceWrapper implements Callable, Initialisable
             tempUrl = serviceUrl;
         }
         StringBuffer urlBuffer = new StringBuffer(tempUrl);
-        
+
         if (GET.equalsIgnoreCase(this.httpMethod))
         {
             requestBody = NullPayload.getInstance();
-            
+
             setRESTParams(urlBuffer, eventContext.getMessage(), request, requiredParams, false, null);
             setRESTParams(urlBuffer, eventContext.getMessage(), request, optionalParams, true, null);
         }
@@ -207,10 +208,8 @@ public class RestServiceWrapper implements Callable, Initialisable
         {
             StringBuffer requestBodyBuffer = new StringBuffer();
             eventContext.getMessage().setProperty(CONTENT_TYPE, CONTENT_TYPE_VALUE);
-            
             setRESTParams(urlBuffer, eventContext.getMessage(), request, requiredParams, false, requestBodyBuffer);
             setRESTParams(urlBuffer, eventContext.getMessage(), request, optionalParams, true, requestBodyBuffer);
-            
             requestBody = requestBodyBuffer.toString();
         }
 
@@ -220,16 +219,16 @@ public class RestServiceWrapper implements Callable, Initialisable
         eventContext.getMessage().setProperty(HTTP_METHOD, httpMethod);
 
         UMOMessage result = eventContext.sendEvent(new MuleMessage(requestBody, eventContext.getMessage()),
-            tempUrl);
+                                                   tempUrl);
 
         if (isErrorPayload(result))
         {
             handleException(
-                new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result), result);
+                    new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), result), result);
         }
         return result;
     }
-    
+
     private String getSeparator(String url)
     {
         String sep;
@@ -242,17 +241,17 @@ public class RestServiceWrapper implements Callable, Initialisable
         {
             sep = "?";
         }
-        
+
         return sep;
     }
-    
+
     private String updateSeparator(String sep)
     {
         if (sep.compareTo("?") == 0 || sep.compareTo("") == 0)
         {
             return ("&");
         }
-        
+
         return sep;
     }
 
@@ -261,7 +260,7 @@ public class RestServiceWrapper implements Callable, Initialisable
     private void setRESTParams(StringBuffer url, UMOMessage msg, Object body, Map args, boolean optional, StringBuffer requestBodyBuffer)
     {
         String sep;
-        
+
         if (requestBodyBuffer == null)
         {
             sep = getSeparator(url.toString());
@@ -295,7 +294,7 @@ public class RestServiceWrapper implements Callable, Initialisable
                 url.append(sep);
                 url.append(name).append('=').append(value);
             }
-            
+
             sep = updateSeparator(sep);
         }
 
@@ -303,8 +302,8 @@ public class RestServiceWrapper implements Callable, Initialisable
         {
             if (body instanceof Object[])
             {
-                Object[] requestArray = (Object[])body;
-                for(int i=0; i<payloadParameterNames.size(); i++)
+                Object[] requestArray = (Object[]) body;
+                for (int i = 0; i < payloadParameterNames.size(); i++)
                 {
                     if (requestBodyBuffer != null)
                     {
@@ -314,7 +313,7 @@ public class RestServiceWrapper implements Callable, Initialisable
                     {
                         url.append(sep).append(payloadParameterNames.get(i)).append('=').append(requestArray[i].toString());
                     }
-                    
+
                     sep = updateSeparator(sep);
                 }
             }
@@ -330,7 +329,7 @@ public class RestServiceWrapper implements Callable, Initialisable
                     {
                         url.append(sep).append(payloadParameterNames.get(0)).append('=').append(body.toString());
                     }
-                } 
+                }
             }
         }
     }
@@ -344,4 +343,83 @@ public class RestServiceWrapper implements Callable, Initialisable
     {
         throw e;
     }
+
+    //TODO it's temporary solution, depends on MULE-2478 (Transparent Support for SimpleObjectFactory)
+    public static class RestSingletonObjectFactory extends SingletonObjectFactory
+    {
+        private UMOFilter filter;
+        private List payloadParameterNames;
+        private Map requiredParams;
+        private Map optionalParams;
+
+        public RestSingletonObjectFactory()
+        {
+        }
+
+        public RestSingletonObjectFactory(String objectClassName)
+        {
+            super(objectClassName);
+        }
+
+        public RestSingletonObjectFactory(Class objectClass)
+        {
+            super(objectClass);
+        }
+
+        public RestSingletonObjectFactory(Object instance)
+        {
+            super(instance);
+        }
+
+        public UMOFilter getFilter()
+        {
+            return filter;
+        }
+
+        public void setFilter(UMOFilter filter)
+        {
+            this.filter = filter;
+        }
+
+        public List getPayloadParameterNames()
+        {
+            return payloadParameterNames;
+        }
+
+        public void setPayloadParameterNames(List payloadParameterNames)
+        {
+            this.payloadParameterNames = payloadParameterNames;
+        }
+
+        public Map getRequiredParams()
+        {
+            return requiredParams;
+        }
+
+        public void setRequiredParams(Map requiredParams)
+        {
+            this.requiredParams = requiredParams;
+        }
+
+        public Map getOptionalParams()
+        {
+            return optionalParams;
+        }
+
+        public void setOptionalParams(Map optionalParams)
+        {
+            this.optionalParams = optionalParams;
+        }
+
+        public void initialise() throws InitialisationException
+        {
+            getProperties().put("errorFilter", getFilter());
+            getProperties().put("payloadParameterNames", getPayloadParameterNames());
+            getProperties().put("requiredParams", getRequiredParams());
+            getProperties().put("optionalParams", getOptionalParams());
+            super.initialise();
+        }
+    }
+
+
 }

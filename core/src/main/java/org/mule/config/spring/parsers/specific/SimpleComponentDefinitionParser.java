@@ -33,12 +33,21 @@ public class SimpleComponentDefinitionParser extends ChildDefinitionParser
 {
 
     private Class simpleComponentClass;
+    private Class beanClass=SingletonObjectFactory.class;
 
     public SimpleComponentDefinitionParser(String setterMethod, Class simpleComponentClass)
     {
         super(setterMethod, null);
         this.simpleComponentClass = simpleComponentClass;
     }
+
+    public SimpleComponentDefinitionParser(String setterMethod, Class simpleComponentClass, Class beanClass)
+    {
+        super(setterMethod, null);
+        this.simpleComponentClass = simpleComponentClass;
+        this.beanClass=beanClass;
+    }
+
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
@@ -48,7 +57,7 @@ public class SimpleComponentDefinitionParser extends ChildDefinitionParser
 
     protected Class getBeanClass(Element element)
     {
-        return SingletonObjectFactory.class;
+        return beanClass;
     }
 
 }
