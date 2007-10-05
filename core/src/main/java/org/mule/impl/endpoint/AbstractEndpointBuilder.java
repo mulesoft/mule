@@ -36,6 +36,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
+import org.mule.util.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -231,7 +232,9 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected String getName(UMOImmutableEndpoint endpoint)
     {
-        return name != null ? name : ObjectNameHelper.getEndpointName(endpoint);
+        String uriName = endpointURI.getEndpointName();
+        return name != null ? name :
+                (StringUtils.isNotEmpty(uriName) ? uriName : ObjectNameHelper.getEndpointName(endpoint));
     }
 
     protected Map getProperties()
