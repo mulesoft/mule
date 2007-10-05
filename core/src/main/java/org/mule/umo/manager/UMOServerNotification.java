@@ -15,7 +15,6 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
 import java.util.EventObject;
-import java.util.HashMap;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
