@@ -23,3 +23,6 @@ org.mule.providers.tcp.issues.KeepSendSocketOpenMule1491TestCase
 
 # this isn't really a bug - see note in test and MULE-2449
 org.mule.providers.tcp.issues.SafeProtocolMule2227TestCase
+
+# MULE-2489
+org.mule.providers.tcp.TcpSyncTestCase
