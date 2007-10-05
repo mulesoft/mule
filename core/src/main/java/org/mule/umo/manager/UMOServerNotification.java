@@ -18,6 +18,8 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 /**
  * <code>UMOServerNotification</code> is an event triggered by something happening
  * in the Server itself such as the server starting or a component being registered.
@@ -53,8 +55,8 @@ public abstract class UMOServerNotification extends EventObject
     protected long timestamp;
 
     protected int action = NULL_ACTION;
-    private static Map actionIdToName = new HashMap();
-    private static Map actionNameToId = new HashMap();
+    private static Map actionIdToName = new ConcurrentHashMap();
+    private static Map actionNameToId = new ConcurrentHashMap();
 
     /**
      * The resourceIdentifier is used when firing inbound server notifications such
