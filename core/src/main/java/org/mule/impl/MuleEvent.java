@@ -703,6 +703,7 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
 
             if (TransformerUtils.isUndefined(endpoint.getTransformers()))
             {
+                //TODO DF: MULE-2291 Resolve pending endpoint mutability issues
                 ((UMOEndpoint) endpoint).setTransformers(transformers);
             }
         }

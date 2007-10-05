@@ -446,6 +446,7 @@ public final class MuleSession implements UMOSession
         {
             if (endpoint.getConnector() instanceof AbstractConnector)
             {
+                //TODO DF: MULE-2291 Resolve pending endpoint mutability issues
                 ((UMOEndpoint)endpoint).setTransformers(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformers());
                 logger.debug("Using default connector outbound transformer: " + endpoint.getTransformers());
             }
