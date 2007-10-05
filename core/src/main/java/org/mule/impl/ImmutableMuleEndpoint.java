@@ -83,13 +83,10 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     protected String name = null;
 
-    // TODO Remove MULE-2266
-    protected static String ENDPOINT_TYPE_SENDER_AND_RECEIVER = "senderAndReceiver";
-
     /**
      * Determines whether the endpoint is a receiver or sender or both
      */
-    protected String type = ENDPOINT_TYPE_SENDER_AND_RECEIVER;
+    protected String type;
 
     /**
      * Any additional properties for the endpoint
