@@ -11,7 +11,6 @@
 package org.mule.impl.endpoint;
 
 import org.mule.MuleServer;
-import org.mule.impl.registry.TransientRegistry;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
@@ -22,12 +21,13 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
 
     public void testBuildInboundEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
         String uri = "test://address";
         UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, MuleServer.getManagementContext());
         try
         {
             UMOImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
+            assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
         }
         catch (Exception e)
         {
@@ -37,12 +37,13 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
 
     public void testBuildOutboundEndpoint() throws UMOException
     {
-        TransientRegistry.createNew();
         String uri = "test://address";
         UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, MuleServer.getManagementContext());
         try
         {
             UMOImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
+            assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
         }
         catch (Exception e)
         {
@@ -52,12 +53,13 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
 
     public void testBuildResponseEndpoint() throws UMOException
     {
-        TransientRegistry.createNew();
         String uri = "test://address";
         UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, MuleServer.getManagementContext());
         try
         {
             UMOImmutableEndpoint ep = endpointBuilder.buildResponseEndpoint();
+            assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
         }
         catch (Exception e)
         {

@@ -31,6 +31,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -247,7 +248,11 @@ public class MuleManagerComponent implements Callable, Initialisable
             MuleDescriptor descriptor = new MuleDescriptor();
             descriptor.setName(MANAGER_COMPONENT_NAME);
     
-            descriptor.getInboundRouter().addEndpoint(endpointBuilder.buildInboundEndpoint());
+            UMOManagementContext managementContext = MuleServer.getManagementContext();
+            UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+                .lookupEndpointFactory()
+                .createInboundEndpoint(endpointBuilder, managementContext);
+            descriptor.getInboundRouter().addEndpoint(endpoint);
 
             Map props = new HashMap();
             props.put("wireFormat", wireFormat);

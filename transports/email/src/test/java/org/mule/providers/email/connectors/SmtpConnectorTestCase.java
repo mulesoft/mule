@@ -87,7 +87,8 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         UMOComponent component = model.getComponent(d.getName());
         UMOEndpointBuilder builder=new EndpointURIEndpointBuilder(getTestEndpointURI(), managementContext);
         builder.setName("test");
-        UMOImmutableEndpoint endpoint = builder.buildOutboundEndpoint();
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+            builder, managementContext);
         try
         {
             connector.registerListener(component, endpoint);

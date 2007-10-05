@@ -15,6 +15,7 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -83,6 +84,8 @@ public interface Registry extends Initialisable, Disposable
      * 
      */
     UMOEndpointBuilder lookupEndpointBuilder(String name);
+    
+    UMOEndpointFactory lookupEndpointFactory();
     
     /**
      * Returns immutable endpoint instance with the "INBOUND" role. <br/><br/> The uri paramater can be one
@@ -202,8 +205,10 @@ public interface Registry extends Initialisable, Disposable
         throws UMOException;
 
     /** @deprecated Use registerEndpoint(UMOEndpoint endpoint, UMOManagementContext managementContext) instead. */
-    void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException;;
+    void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException;
 
+    public void registerEndpointBuilder(String name, UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
+    
     UMOImmutableEndpoint unregisterEndpoint(String endpointName);
 
     void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext)

@@ -66,6 +66,36 @@ public interface UMOEndpointFactory
     UMOImmutableEndpoint createResponseEndpoint(String uri, UMOManagementContext managementContext) throws UMOException;
 
     /**
+     * Creates an endpoint with the "INBOUND" role using the builder provided.
+     * 
+     * @param builder
+     * @param managementContext
+     * @return
+     * @throws UMOException
+     */
+    UMOImmutableEndpoint createInboundEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
+
+    /**
+     * Creates an endpoint with the "OUTBOUND" role using the builder provided.
+     * 
+     * @param builder
+     * @param managementContext
+     * @return
+     * @throws UMOException
+     */
+    UMOImmutableEndpoint createOutboundEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
+
+    /**
+     * Creates an endpoint with the "RESPONSE" role using the builder provided.
+     * 
+     * @param builder
+     * @param managementContext
+     * @return
+     * @throws UMOException
+     */
+    UMOImmutableEndpoint createResponseEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
+
+    /**
      * @param endpointUri
      * @param endpointType
      * @param managementContext

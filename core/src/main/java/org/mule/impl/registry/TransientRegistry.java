@@ -59,6 +59,7 @@ import org.mule.registry.ServiceException;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -390,6 +391,11 @@ public class TransientRegistry extends AbstractRegistry
     public void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext) throws UMOException
     {
         registerObject(endpoint.getName(), endpoint, UMOImmutableEndpoint.class, managementContext);
+    }
+
+    public void registerEndpointBuilder(String name, UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException
+    {
+        registerObject(name, builder, UMOEndpointBuilder.class, managementContext);
     }
 
     //@java.lang.Override

@@ -19,10 +19,9 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 
@@ -107,10 +106,9 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
      * outbound endpoint
      * 
      * @return
-     * @throws EndpointException 
-     * @throws InitialisationException 
+     * @throws UMOException 
      */
-    protected UMOImmutableEndpoint createOutboundEndpoint() throws InitialisationException, EndpointException
+    protected UMOImmutableEndpoint createOutboundEndpoint() throws UMOException
     {
         if (getOutDest() != null)
         {
@@ -118,7 +116,9 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
             builder.setName("testOut");
             builder.setConnector(connector);
             builder.setSynchronous(true);
-            return builder.buildOutboundEndpoint();
+            
+            return managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(builder,
+                managementContext);
         }
         else
         {
@@ -131,16 +131,19 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
      * inbound endpoint
      * 
      * @return
-     * @throws EndpointException 
-     * @throws InitialisationException 
+     * @throws UMOException 
      */
-    protected UMOImmutableEndpoint createInboundEndpoint() throws InitialisationException, EndpointException
+    protected UMOImmutableEndpoint createInboundEndpoint() throws UMOException
     {
         UMOEndpointBuilder builder=new EndpointURIEndpointBuilder(getInDest(), managementContext);
         builder.setName("testIn");
         builder.setConnector(connector);
         builder.setSynchronous(true);
-        return builder.buildInboundEndpoint();
+        
+
+        return managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .createInboundEndpoint(builder, managementContext);
     }
 
     public void afterInitialise() throws Exception

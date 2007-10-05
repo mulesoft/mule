@@ -13,6 +13,7 @@ package org.mule.impl.endpoint;
 import org.mule.impl.registry.TransientRegistry;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
@@ -21,7 +22,6 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateInboundEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
         String uri = "test://address";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -29,6 +29,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointFactory.createInboundEndpoint(uri, managementContext);
             assertEquals(InboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
         }
         catch (Exception e)
         {
@@ -38,9 +39,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateInboundEndpointFromGlobalEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder("test://address", managementContext),
-            managementContext);
+        managementContext.getRegistry().registerEndpointBuilder("myGlobalEndpoint",
+            new EndpointURIEndpointBuilder("test://address", managementContext), managementContext);
         String uri = "myGlobalEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -48,6 +48,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointFactory.createInboundEndpoint(uri, managementContext);
             assertEquals(InboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
         }
         catch (Exception e)
         {
@@ -57,9 +58,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateInboundEndpointFromNamedConcreteEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder("test://address",
-            managementContext), managementContext);
+        managementContext.getRegistry().registerEndpointBuilder("&myNamedConcreateEndpoint",
+            new EndpointURIEndpointBuilder("test://address", managementContext), managementContext);
         String uri = "&myNamedConcreateEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -67,6 +67,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointFactory.createInboundEndpoint(uri, managementContext);
             assertEquals(InboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
         }
         catch (Exception e)
         {
@@ -76,7 +77,6 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateOutboundEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
         String uri = "test://address";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -84,6 +84,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointFactory.createOutboundEndpoint(uri, managementContext);
             assertEquals(OutboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
         }
         catch (Exception e)
         {
@@ -93,9 +94,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateoutboundEndpointFromGlobalEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder("test://address", managementContext),
-            managementContext);
+        managementContext.getRegistry().registerEndpointBuilder("myGlobalEndpoint",
+            new EndpointURIEndpointBuilder("test://address", managementContext), managementContext);
         String uri = "myGlobalEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -103,6 +103,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointFactory.createOutboundEndpoint(uri, managementContext);
             assertEquals(OutboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
         }
         catch (Exception e)
         {
@@ -112,9 +113,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateoutboundEndpointFromNamedConcreteEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder("test://address",
-            managementContext), managementContext);
+        managementContext.getRegistry().registerEndpointBuilder("&myNamedConcreateEndpoint",
+            new EndpointURIEndpointBuilder("test://address", managementContext), managementContext);
         String uri = "&myNamedConcreateEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -122,6 +122,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointFactory.createOutboundEndpoint(uri, managementContext);
             assertEquals(OutboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
         }
         catch (Exception e)
         {
@@ -131,7 +132,6 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateResponseEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
         String uri = "test://address";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -139,6 +139,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointFactory.createResponseEndpoint(uri, managementContext);
             assertEquals(ResponseEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
         }
         catch (Exception e)
         {
@@ -148,9 +149,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateResponseEndpointFromGlobalEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder("test://address", managementContext),
-            managementContext);
+        managementContext.getRegistry().registerEndpointBuilder("myGlobalEndpoint",
+            new EndpointURIEndpointBuilder("test://address", managementContext), managementContext);
         String uri = "myGlobalEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -158,6 +158,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointFactory.createResponseEndpoint(uri, managementContext);
             assertEquals(ResponseEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
         }
         catch (Exception e)
         {
@@ -167,9 +168,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateResponseEndpointFromNamedConcreteEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder("test://address",
-            managementContext), managementContext);
+        managementContext.getRegistry().registerEndpointBuilder("&myNamedConcreateEndpoint",
+            new EndpointURIEndpointBuilder("test://address", managementContext), managementContext);
         String uri = "&myNamedConcreateEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -177,6 +177,58 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointFactory.createResponseEndpoint(uri, managementContext);
             assertEquals(ResponseEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
+        }
+        catch (Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+    public void testCreateInboundEndpointWithBuilder() throws UMOException
+    {
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("test://address", managementContext);
+        UMOEndpointFactory endpointFactory = new EndpointFactory();
+        try
+        {
+            UMOImmutableEndpoint ep = endpointFactory.createInboundEndpoint(builder, managementContext);
+            assertEquals(InboundEndpoint.class, ep.getClass());
+            assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+        }
+        catch (Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+    public void testCreateOutboundEndpointWithBuilder() throws UMOException
+    {
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("test://address", managementContext);
+        UMOEndpointFactory endpointFactory = new EndpointFactory();
+        try
+        {
+            UMOImmutableEndpoint ep = endpointFactory.createOutboundEndpoint(builder, managementContext);
+            assertEquals(OutboundEndpoint.class, ep.getClass());
+            assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
+        }
+        catch (Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+    public void testCreateResponseEndpointWithBuilder() throws UMOException
+    {
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("test://address", managementContext);
+        UMOEndpointFactory endpointFactory = new EndpointFactory();
+        try
+        {
+            UMOImmutableEndpoint ep = endpointFactory.createResponseEndpoint(builder, managementContext);
+            assertEquals(ResponseEndpoint.class, ep.getClass());
+            assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
         }
         catch (Exception e)
         {
@@ -186,7 +238,6 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
         String uri = "test://address";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try

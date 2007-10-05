@@ -251,7 +251,7 @@ public abstract class AbstractRegistry implements Registry
         {
             try
             {
-                o = ((UMOEndpointBuilder) o).buildInboundEndpoint();
+                o = lookupEndpointFactory().createInboundEndpoint((UMOEndpointBuilder) o, managementContext);
             }
             catch (UMOException e)
             {
@@ -293,7 +293,7 @@ public abstract class AbstractRegistry implements Registry
         }
     }
 
-    protected UMOEndpointFactory lookupEndpointFactory()
+    public UMOEndpointFactory lookupEndpointFactory()
     {
         return (UMOEndpointFactory) lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
@@ -745,4 +745,10 @@ public abstract class AbstractRegistry implements Registry
     }
 
     protected abstract MuleConfiguration getLocalConfiguration();
+
+    public void registerEndpointBuilder(String name, UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException
+    {
+        unsupportedOperation("registerEndpointBuilder", builder);
+    }
+
 }

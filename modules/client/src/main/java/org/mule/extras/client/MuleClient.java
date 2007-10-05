@@ -29,7 +29,6 @@ import org.mule.impl.model.ModelHelper;
 import org.mule.impl.registry.TransientRegistry;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.service.TransportFactory;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.transformers.TransformerUtils;
@@ -48,7 +47,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.StringUtils;
@@ -896,17 +894,11 @@ public class MuleClient implements Disposable
         }
         else
         {
-            UMOConnector connector = null;
-            UMOEndpointURI defaultEndpointUri = new MuleEndpointURI("vm://mule.client");
-            connector = TransportFactory.createConnector(defaultEndpointUri, managementContext);
-            managementContext.getRegistry().registerConnector(connector);
-            connector.start();
-            UMOEndpointBuilder builder=new EndpointURIEndpointBuilder(defaultEndpointUri, managementContext);
+            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("vm://mule.client", managementContext);
             builder.setName("muleClientProvider");
-            endpoint = builder.buildInboundEndpoint();
+            endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+                managementContext);
         }
-
-       managementContext.getRegistry().registerEndpoint(endpoint);
         return endpoint;
     }
 

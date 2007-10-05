@@ -81,16 +81,15 @@ public final class MuleTestUtils
         endpointBuilder.setName(name);
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
-            return (UMOEndpoint) endpointBuilder.buildInboundEndpoint();
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createInboundEndpoint(endpointBuilder, context);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
-            return (UMOEndpoint) endpointBuilder.buildOutboundEndpoint();
-
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createOutboundEndpoint(endpointBuilder, context);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
         {
-            return (UMOEndpoint) endpointBuilder.buildResponseEndpoint();
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createResponseEndpoint(endpointBuilder, context);
         }
         else
         {
@@ -117,16 +116,15 @@ public final class MuleTestUtils
         endpointBuilder.setName(name);
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
-            return (UMOEndpoint) endpointBuilder.buildInboundEndpoint();
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createInboundEndpoint(endpointBuilder, context);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
-            return (UMOEndpoint) endpointBuilder.buildOutboundEndpoint();
-
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createOutboundEndpoint(endpointBuilder, context);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
         {
-            return (UMOEndpoint) endpointBuilder.buildResponseEndpoint();
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createResponseEndpoint(endpointBuilder, context);
         }
         else
         {
