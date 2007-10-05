@@ -10,15 +10,17 @@
 
 package org.mule.providers.soap;
 
+import org.mule.MuleServer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.UMODescriptorAware;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.NullPayload;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -26,7 +28,6 @@ import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.logging.Log;
@@ -123,8 +124,11 @@ public class WSProxyService implements Callable, UMODescriptorAware, Initialisab
                 eventContext.setStopFurtherProcessing(true);
                 return wsdlFileContents;
             }
+            UMOManagementContext managementContext = MuleServer.getManagementContext();
+            UMOImmutableEndpoint webServiceEndpoint = managementContext.getRegistry()
+                .lookupEndpointFactory()
+                .createOutboundEndpoint(this.wsdlEndpoint, managementContext);
 
-            UMOEndpoint webServiceEndpoint = new MuleEndpoint(this.wsdlEndpoint, false);
             UMOMessage replyWSDL = eventContext.sendEvent(new MuleMessage(NullPayload.getInstance()), webServiceEndpoint);
 
             wsdlString = replyWSDL.getPayloadAsString();

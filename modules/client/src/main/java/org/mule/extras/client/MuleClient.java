@@ -23,7 +23,6 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.ModelHelper;
 import org.mule.impl.registry.TransientRegistry;
@@ -881,10 +880,10 @@ public class MuleClient implements Disposable
                 }
                 else
                 {
-                    endpoint = new MuleEndpoint(endpoint);
-                    // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-                    ((UMOEndpoint) endpoint).setTransformers(new LinkedList());
-                    return endpoint;
+                    UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
+                    builder.setTransformers(new LinkedList());
+                    return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+                        managementContext);
                 }
             }
             else

@@ -19,6 +19,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.queue.Queue;
@@ -40,7 +41,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     private VMConnector connector;
     private final Object lock = new Object();
 
-    public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+    public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
     {
         super(connector, component, endpoint);

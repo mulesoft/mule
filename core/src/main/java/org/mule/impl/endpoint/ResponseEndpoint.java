@@ -10,7 +10,6 @@
 
 package org.mule.impl.endpoint;
 
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class ResponseEndpoint extends MuleEndpoint
@@ -20,12 +19,7 @@ public class ResponseEndpoint extends MuleEndpoint
 
     public ResponseEndpoint()
     {
-        // TODO Auto-generated constructor stub
-    }
-    
-    public ResponseEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
-    {
-        super(endpoint);
+        super();
     }
 
     public String getType()

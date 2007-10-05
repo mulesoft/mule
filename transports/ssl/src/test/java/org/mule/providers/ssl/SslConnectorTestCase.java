@@ -17,6 +17,7 @@ import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
@@ -101,14 +102,15 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
             // expected
         }
 
-        endpoint = new MuleEndpoint();
-        MuleEndpointURI uri = new MuleEndpointURI("ssl://localhost:30303");
-        uri.initialise();
-        endpoint.setEndpointURI(uri);
-        connector.registerListener(component, endpoint);
+        
+        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .createOutboundEndpoint("ssl://localhost:30303", managementContext);
+
+        connector.registerListener(component, endpoint2);
         try
         {
-            connector.registerListener(component, endpoint);
+            connector.registerListener(component, endpoint2);
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)

@@ -10,8 +10,11 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IOUtils;
 
@@ -40,8 +43,11 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
         UMOTransformer trans = new DomDocumentToXml();
         trans.setReturnClass(String.class);
 
-        UMOEndpoint endpoint = new MuleEndpoint();
-        endpoint.setEncoding("US-ASCII");
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", managementContext);
+        builder.setEndpointEncoding("US-ASCII");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+            builder, managementContext);
+
         trans.setEndpoint(endpoint);
         return trans;
     }

@@ -10,12 +10,12 @@
 
 package org.mule.providers.http;
 
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.http.transformers.UMOMessageToHttpResponse;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.CollectionUtils;
 
@@ -34,10 +34,11 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
-    public UMOEndpoint getEndpoint() throws Exception
+    public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        endpoint = new MuleEndpoint("http://localhost:6789", true);
-        endpoint.setResponseTransformers(CollectionUtils.singletonList(new UMOMessageToHttpResponse()));
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+            "http://localhost:6789", managementContext);
+        ((UMOEndpoint) endpoint).setResponseTransformers(CollectionUtils.singletonList(new UMOMessageToHttpResponse()));
         return endpoint;
     }
 }

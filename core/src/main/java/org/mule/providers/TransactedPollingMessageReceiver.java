@@ -16,6 +16,7 @@ import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
@@ -42,7 +43,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     public TransactedPollingMessageReceiver(UMOConnector connector,
                                             UMOComponent component,
-                                            final UMOEndpoint endpoint) throws CreateException
+                                            final UMOImmutableEndpoint endpoint) throws CreateException
     {
         super(connector, component, endpoint);
         this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().getFactory() != null);
@@ -55,7 +56,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
      */
     public TransactedPollingMessageReceiver(UMOConnector connector,
                                             UMOComponent component,
-                                            final UMOEndpoint endpoint,
+                                            final UMOImmutableEndpoint endpoint,
                                             long frequency) throws CreateException
     {
         this(connector, component, endpoint);

@@ -10,12 +10,11 @@
 
 package org.mule.providers.tcp;
 
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;
@@ -33,9 +32,9 @@ public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
-    public UMOEndpoint getEndpoint() throws Exception
+    public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        endpoint = new MuleEndpoint("tcp://localhost:1234", true);
-        return endpoint;
+        return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint("tcp://localhost:1234",
+            managementContext);
     }
 }

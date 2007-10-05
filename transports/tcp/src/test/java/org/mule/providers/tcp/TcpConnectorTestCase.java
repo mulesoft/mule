@@ -11,7 +11,6 @@
 package org.mule.providers.tcp;
 
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -44,7 +43,11 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
     {
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
-        UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), true);
+        
+        UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .createInboundEndpoint(getTestEndpointURI(), managementContext);
+
         UMOConnector connector = getConnector();
 
         try

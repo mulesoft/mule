@@ -15,15 +15,15 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.providers.udp.i18n.UdpMessages;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.transformers.TransformerUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -47,7 +47,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     private URI uri;
     protected List responseTransformers = null;
 
-    public UdpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+    public UdpMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
     {
 

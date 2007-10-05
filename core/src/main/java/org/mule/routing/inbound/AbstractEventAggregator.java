@@ -10,14 +10,17 @@
 
 package org.mule.routing.inbound;
 
+import org.mule.MuleServer;
 import org.mule.impl.MuleEvent;
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.AggregationException;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.LinkedList;
 
@@ -91,19 +94,23 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
                     if (this.shouldAggregateEvents(group))
                     {
                         UMOMessage returnMessage = this.aggregateEvents(group);
-                        UMOEndpoint endpoint;
+                        UMOImmutableEndpoint endpoint;
 
                         try
                         {
-                            endpoint = new MuleEndpoint(event.getEndpoint());
+                            UMOManagementContext managementContext = MuleServer.getManagementContext();
+                            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(event.getEndpoint(),
+                                managementContext);
+                            // TODO - is this correct? it stops other transformers from being used
+                            builder.setTransformers(new LinkedList());
+                            builder.setName(this.getClass().getName());
+                            endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+                                builder, managementContext);
                         }
                         catch (UMOException e)
                         {
                             throw new MessagingException(e.getI18nMessage(), returnMessage, e);
                         }
-                        // TODO - is this correct?  it stops other transformers from being used
-                        endpoint.setTransformers(new LinkedList());
-                        endpoint.setName(this.getClass().getName());
                         UMOEvent returnEvent = new MuleEvent(returnMessage, endpoint, event.getComponent(),
                             event);
                         result = new UMOEvent[]{returnEvent};

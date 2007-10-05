@@ -11,10 +11,9 @@
 package org.mule;
 
 import org.mule.config.i18n.MessageFactory;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.ManagerException;
 import org.mule.umo.routing.RoutingException;
 
@@ -42,7 +41,8 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
 
     public final void testRoutingExceptionNullUMOMessageValidUMOImmutableEndpoint() throws UMOException
     {
-        UMOEndpoint endpoint = new MuleEndpoint("test://outbound", false);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+            "test://outbound", managementContext);
         assertNotNull(endpoint);
 
         RoutingException rex = new RoutingException(null, endpoint);

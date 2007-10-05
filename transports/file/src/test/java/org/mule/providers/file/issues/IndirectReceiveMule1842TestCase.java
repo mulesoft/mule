@@ -11,10 +11,10 @@
 package org.mule.providers.file.issues;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.file.AbstractFileFunctionalTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.model.UMOModel;
 
 import java.io.File;
@@ -36,7 +36,10 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         assertNotNull(relay);
         String url = fileToUrl(target) + "?connector=receiveConnector";
         logger.debug(url);
-        relay.getDescriptor().getInboundRouter().addEndpoint(new MuleEndpoint(url, true));
+        
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+            url, managementContext);
+        relay.getDescriptor().getInboundRouter().addEndpoint(endpoint);
 
         // then read from the queue that the polling receiver will write to
         MuleClient client = new MuleClient();

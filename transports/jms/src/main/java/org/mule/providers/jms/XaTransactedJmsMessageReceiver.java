@@ -18,7 +18,7 @@ import org.mule.providers.jms.filters.JmsSelectorFilter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -72,7 +72,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         }
     }
 
-    public XaTransactedJmsMessageReceiver(UMOConnector umoConnector, UMOComponent component, UMOEndpoint endpoint)
+    public XaTransactedJmsMessageReceiver(UMOConnector umoConnector, UMOComponent component, UMOImmutableEndpoint endpoint)
         throws CreateException
     {
         super(umoConnector, component, endpoint);

@@ -11,7 +11,6 @@
 package org.mule.impl;
 
 import org.mule.impl.endpoint.InboundEndpoint;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.OutboundEndpoint;
 import org.mule.impl.endpoint.OutboundStreamingEndpoint;
 import org.mule.routing.outbound.AbstractOutboundRouter;
@@ -37,7 +36,7 @@ public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
     {
         AbstractOutboundRouter router=new TransformerRouter();
         try{
-            router.addEndpoint(new MuleEndpoint());
+            router.addEndpoint(new InboundEndpoint());
             fail("Invalid endpoint: Exception expected");
         }
         catch(Exception e){
@@ -93,7 +92,7 @@ public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
     {
         List list= new ArrayList();
         list.add(new OutboundStreamingEndpoint());
-        list.add(new MuleEndpoint());
+        list.add(new InboundEndpoint());
         list.add(new OutboundEndpoint());
         AbstractOutboundRouter router=new TransformerRouter();
         try{

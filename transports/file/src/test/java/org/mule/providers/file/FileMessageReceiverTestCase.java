@@ -10,11 +10,10 @@
 
 package org.mule.providers.file;
 
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.FileUtils;
 
@@ -51,8 +50,9 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             endpoint, read.getAbsolutePath(), move.getAbsolutePath(), null, 1000);
     }
 
-    public UMOEndpoint getEndpoint() throws Exception
+    public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        return new MuleEndpoint("file://./simple", true);
+        return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+            "file://./simple", managementContext);
     }
 }

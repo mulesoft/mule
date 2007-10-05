@@ -23,7 +23,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.DisposeException;
@@ -60,7 +60,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 {
     private ServerSocket serverSocket = null;
 
-    public TcpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+    public TcpMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
     {
         super(connector, component, endpoint);

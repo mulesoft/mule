@@ -11,10 +11,11 @@
 package org.mule.providers.jms;
 
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.object.SingletonObjectFactory;
@@ -81,10 +82,12 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         return JmsConnectorTestCase.getMessage();
     }
 
-    public UMOEndpoint getEndpoint() throws Exception
+    public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        endpoint = new MuleEndpoint("jms://testcase", true);
-        endpoint.setConnector(getConnector());
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("jms://testcase", managementContext);
+        builder.setConnector(getConnector());
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+            managementContext);
         return endpoint;
     }
 

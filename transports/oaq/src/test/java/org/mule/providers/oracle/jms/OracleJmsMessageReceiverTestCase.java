@@ -10,11 +10,12 @@
 
 package org.mule.providers.oracle.jms;
 
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -42,17 +43,18 @@ public class OracleJmsMessageReceiverTestCase extends AbstractMessageReceiverTes
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         getConnector();
-        endpoint = new MuleEndpoint("jms://TEST_QUEUE", true);
-        endpoint.setConnector(getConnector());
+        endpoint = getEndpoint();
         Mock mockComponent = new Mock(UMOComponent.class);
         return new OracleJmsMessageReceiver((AbstractConnector)endpoint.getConnector(),
             (UMOComponent)mockComponent.proxy(), endpoint);
     }
 
-    public UMOEndpoint getEndpoint() throws Exception
+    public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        endpoint = new MuleEndpoint("jms://TEST_QUEUE", true);
-        endpoint.setConnector(getConnector());
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("jms://TEST_QUEUE", managementContext);
+        builder.setConnector(getConnector());
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+            managementContext);
         return endpoint;
     }
 }

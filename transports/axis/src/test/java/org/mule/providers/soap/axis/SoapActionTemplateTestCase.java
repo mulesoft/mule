@@ -10,7 +10,6 @@
 
 package org.mule.providers.soap.axis;
 
-import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -24,8 +23,8 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 {
     public void testHostInfoReplace() throws Exception
     {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
-            "axis:http://mycompany.com:8080/services/myService?method=foo", false);
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+            "axis:http://mycompany.com:8080/services/myService?method=foo", managementContext);
         
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         UMOEvent event = getTestEvent("test,", ep);
@@ -36,9 +35,8 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 
     public void testHostReplace() throws Exception
     {
-        UMOImmutableEndpoint ep = new ImmutableMuleEndpoint(
-            "axis:http://mycompany.com:8080/services/myService?method=foo", false);
-
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+            "axis:http://mycompany.com:8080/services/myService?method=foo", managementContext);
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         UMOEvent event = getTestEvent("test,", ep);
         event.getComponent().getDescriptor().setName("myService");

@@ -12,16 +12,18 @@ package org.mule.providers.ejb;
 
 import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.providers.rmi.RmiConnector;
 import org.mule.providers.rmi.i18n.RmiMessages;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 
 import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * test RMI object invocations
@@ -86,8 +88,14 @@ public class EjbFunctionalTestCase extends FunctionalTestCase
     {
         // moving this to xml config requires endpoint properties
         // MULE-1790
-        UMOEndpoint ep = new MuleEndpoint("ejb://localhost/TestService?method=reverseString", false);
-        ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("ejb://localhost/TestService?method=reverseString",
+            managementContext);
+        Properties props = new Properties();
+        props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
+        builder.setProperties(props);
+
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+            builder, managementContext);
         try
         {
             ep.send(getTestEvent("hello", ep));
@@ -102,8 +110,15 @@ public class EjbFunctionalTestCase extends FunctionalTestCase
     {
         // moving this to xml config requires endpoint properties
         // MULE-1790
-        UMOEndpoint ep = new MuleEndpoint("ejb://localhost/TestService?method=reverseString", false);
-        ep.setProperty(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, String.class.getName());
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("ejb://localhost/TestService?method=reverseString",
+            managementContext);
+        Properties props = new Properties();
+        props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
+        builder.setProperties(props);
+        
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+            builder, managementContext);
+        
         try
         {
             ep.send(getTestEvent("hello", ep));

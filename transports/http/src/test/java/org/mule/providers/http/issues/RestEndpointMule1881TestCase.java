@@ -10,24 +10,25 @@
 
 package org.mule.providers.http.issues;
 
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.http.jetty.JettyConnector;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class RestEndpointMule1881TestCase extends AbstractMuleTestCase
 {
     
     public void testJettyRestEndpointCreation() throws Exception
     {
-        MuleEndpoint ep = new MuleEndpoint("jetty:rest://localhost:8080/loanbroker", true);
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+            "jetty:rest://localhost:8080/loanbroker", managementContext);
         assertNotNull(ep);
         assertTrue(ep.getConnector() instanceof JettyConnector);
-
     }
 
     public void testJettyHttpEndpointCreation() throws Exception
     {
-        MuleEndpoint ep = new MuleEndpoint("jetty:http://localhost:8080/loanbroker", true);
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+            "jetty:rest://localhost:8080/loanbroker", managementContext);
         assertNotNull(ep);
         assertTrue(ep.getConnector() instanceof JettyConnector);
     }

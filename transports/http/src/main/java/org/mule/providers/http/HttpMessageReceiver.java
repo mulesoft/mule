@@ -11,7 +11,6 @@
 package org.mule.providers.http;
 
 import org.mule.RegistryContext;
-import org.mule.transformers.TransformerUtils;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -22,12 +21,12 @@ import org.mule.providers.ConnectException;
 import org.mule.providers.NullPayload;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.tcp.TcpMessageReceiver;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
@@ -57,7 +56,7 @@ import org.apache.commons.httpclient.cookie.MalformedCookieException;
 public class HttpMessageReceiver extends TcpMessageReceiver
 {
 
-    public HttpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+    public HttpMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
     {
         super(connector, component, endpoint);

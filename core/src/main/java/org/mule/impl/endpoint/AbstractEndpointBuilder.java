@@ -64,7 +64,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     protected List transformers = TransformerUtils.UNDEFINED;
     protected List responseTransformers = TransformerUtils.UNDEFINED;
     protected String name;
-    protected Map properties;
+    protected Map properties = new HashMap();
     protected UMOTransactionConfig transactionConfig;
     protected UMOFilter filter;
     protected Boolean deleteUnacceptedMessages;

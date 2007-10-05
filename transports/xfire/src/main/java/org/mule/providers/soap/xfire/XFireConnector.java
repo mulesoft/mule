@@ -12,6 +12,7 @@ package org.mule.providers.soap.xfire;
 
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
@@ -24,7 +25,7 @@ import org.mule.providers.soap.MethodFixInterceptor;
 import org.mule.providers.soap.xfire.i18n.XFireMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -353,33 +354,37 @@ public class XFireConnector extends AbstractConnector
                 sync = true;
             }
         }
-       
-
-        UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
-        serviceEndpoint.setSynchronous(sync);
-        serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
+        
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
+        builder.setSynchronous(sync);
+        builder.setName(ep.getScheme() + ":" + serviceName);
 
         // Set the transformers on the endpoint too
-        serviceEndpoint.setTransformers(receiver.getEndpoint().getTransformers());
+        builder.setTransformers(receiver.getEndpoint().getTransformers());
         // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
         ((MuleEndpoint) receiver.getEndpoint()).setTransformers(new LinkedList());
 
-        serviceEndpoint.setResponseTransformers(receiver.getEndpoint().getResponseTransformers());
+        builder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers());
         // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
         ((MuleEndpoint) receiver.getEndpoint()).setResponseTransformers(new LinkedList());
 
         // set the filter on the axis endpoint on the real receiver endpoint
-        serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
+        builder.setFilter(receiver.getEndpoint().getFilter());
         // Remove the Axis filter now
         // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
         ((MuleEndpoint) receiver.getEndpoint()).setFilter(null);
 
         // set the Security filter on the axis endpoint on the real receiver
         // endpoint
-        serviceEndpoint.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
+        builder.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
         // Remove the Axis Receiver Security filter now
         // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
         ((MuleEndpoint) receiver.getEndpoint()).setSecurityFilter(null);
+
+        UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .createInboundEndpoint(builder, managementContext);
+        
         xfireDescriptor.getInboundRouter().addEndpoint(serviceEndpoint);
     }
 

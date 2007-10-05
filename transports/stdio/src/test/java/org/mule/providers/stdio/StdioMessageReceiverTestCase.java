@@ -12,11 +12,10 @@ package org.mule.providers.stdio;
 
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -65,9 +64,10 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
         return new StdioMessageReceiver(endpoint.getConnector(), component, endpoint, 1000);
     }
 
-    public UMOEndpoint getEndpoint() throws Exception
+    public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        endpoint = new MuleEndpoint("stdio://System", true);
-        return endpoint;
+        return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint("stdio://System",
+            managementContext);
+
     }
 }

@@ -18,7 +18,7 @@ import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
@@ -48,7 +48,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
     protected Session session;
     protected boolean startOnConnect = false;
 
-    public JmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+    public JmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
     {
         super(connector, component, endpoint);

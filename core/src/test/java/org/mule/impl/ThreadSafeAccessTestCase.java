@@ -11,20 +11,19 @@
 package org.mule.impl;
 
 import org.mule.config.MuleProperties;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.direct.DirectComponent;
 import org.mule.providers.DefaultMessageAdapter;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.Map;
 
-import junit.framework.TestCase;
-
-public class ThreadSafeAccessTestCase extends TestCase
+public class ThreadSafeAccessTestCase extends AbstractMuleTestCase
 {
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         System.setProperty(MuleProperties.MULE_THREAD_UNSAFE_MESSAGES_PROPERTY, "false");
     }
@@ -43,7 +42,7 @@ public class ThreadSafeAccessTestCase extends TestCase
         resetAccessControl(new DefaultMessageAdapter(new Object()));
     }
 
-    public void testEvent() throws InterruptedException, MalformedEndpointException
+    public void testEvent() throws Exception
     {
         basicPattern(dummyEvent());
         newCopy(dummyEvent());
@@ -66,11 +65,12 @@ public class ThreadSafeAccessTestCase extends TestCase
         }
     }
 
-    protected ThreadSafeAccess dummyEvent()
+    protected ThreadSafeAccess dummyEvent() throws Exception
     {
-        UMOMessage message = new MuleMessage(new Object(), (Map)null);
-        return new MuleEvent(message, new MuleEndpoint(),
-                new MuleSession(new DirectComponent(new MuleDescriptor(""), null)), false);
+        UMOMessage message = new MuleMessage(new Object(), (Map) null);
+        return new MuleEvent(message, MuleTestUtils.getTestEndpoint("test",
+            UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext), new MuleSession(new DirectComponent(
+            new MuleDescriptor(""), null)), false);
     }
 
     protected void resetAccessControl(ThreadSafeAccess target) throws InterruptedException

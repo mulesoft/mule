@@ -11,15 +11,17 @@
 package org.mule.util;
 
 import org.mule.MuleException;
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
-import org.mule.transformers.TransformerUtils;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
 
@@ -78,7 +80,7 @@ public final class MuleObjectHelper
         }
     }
 
-    public static UMOEndpoint getEndpointByProtocol(String protocol) throws UMOException
+    public static UMOImmutableEndpoint getEndpointByProtocol(String protocol) throws UMOException
     {
         UMOImmutableEndpoint iprovider;
         Collection endpoints = RegistryContext.getRegistry().getEndpoints();
@@ -87,13 +89,16 @@ public final class MuleObjectHelper
             iprovider = (UMOImmutableEndpoint) iterator.next();
             if (iprovider.getProtocol().equals(protocol))
             {
-                return new MuleEndpoint(iprovider);
+                UMOManagementContext managementContext = MuleServer.getManagementContext();
+                UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(iprovider, managementContext);
+                return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+                    managementContext);
             }
         }
         return null;
     }
 
-    public static UMOEndpoint getEndpointByEndpointUri(String endpointUri, boolean wildcardMatch) throws UMOException
+    public static UMOImmutableEndpoint getEndpointByEndpointUri(String endpointUri, boolean wildcardMatch) throws UMOException
     {
         ObjectFilter filter;
 
@@ -114,7 +119,10 @@ public final class MuleObjectHelper
             iprovider = (UMOImmutableEndpoint) iterator.next();
             if (filter.accept(iprovider.getEndpointURI()))
             {
-                return new MuleEndpoint(iprovider);
+                UMOManagementContext managementContext = MuleServer.getManagementContext();
+                UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(iprovider, managementContext);
+                return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+                    managementContext);
             }
         }
 

@@ -11,7 +11,6 @@
 package org.mule.routing.outbound;
 
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -22,6 +21,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
@@ -43,11 +43,18 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         Mock session = MuleTestUtils.getMockSession();
         OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
+ 
+        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .createOutboundEndpoint("test://Dummy1", managementContext);
 
-        UMOEndpoint endpoint1 = new MuleEndpoint("test://Dummy1", false);
-        UMOEndpoint endpoint2 = new MuleEndpoint("test://Dummy2", false);
+        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .createOutboundEndpoint("test://Dummy2", managementContext);
 
-        UMOEndpoint endpoint3 = new MuleEndpoint("test://Dummy3", false);
+        UMOImmutableEndpoint endpoint3 = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .createOutboundEndpoint("test://Dummy3", managementContext);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         RegExFilter filter = new RegExFilter("(.*) event");
@@ -90,8 +97,13 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOEndpoint endpoint1 = new MuleEndpoint("test://AlwaysFail", false);
-        UMOEndpoint endpoint2 = new MuleEndpoint("test://AlwaysFail", false);
+        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .createOutboundEndpoint("test://AlwaysFail", managementContext);
+
+        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .createOutboundEndpoint("test://AlwaysFail", managementContext);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         RegExFilter filter = new RegExFilter("(.*) event");

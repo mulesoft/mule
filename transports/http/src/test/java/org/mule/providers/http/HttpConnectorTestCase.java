@@ -11,7 +11,6 @@
 package org.mule.providers.http;
 
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -47,7 +46,8 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     {
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
-        UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), true);
+        UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+            getTestEndpointURI(), managementContext);
 
         try
         {

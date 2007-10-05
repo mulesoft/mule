@@ -10,7 +10,6 @@
 
 package org.mule.providers.ftp;
 
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -87,7 +86,9 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
     {
         final String testObject = "custom object";
 
-        final UMOEndpoint endpoint = new MuleEndpoint("ftp://test:test@example.com", false);
+        final UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .createOutboundEndpoint("ftp://test:test@example.com", managementContext);
         final UMOEndpointURI endpointURI = endpoint.getEndpointURI();
 
         FtpConnectionFactory testFactory = new TestFtpConnectionFactory(endpointURI);

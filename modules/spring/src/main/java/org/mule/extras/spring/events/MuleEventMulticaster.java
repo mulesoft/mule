@@ -13,7 +13,6 @@ package org.mule.extras.spring.events;
 import org.mule.MuleException;
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
-import org.mule.transformers.TransformerUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.extras.spring.i18n.SpringMessages;
@@ -23,12 +22,13 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
@@ -37,6 +37,7 @@ import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
@@ -643,7 +644,11 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
             {
                 endpoint = (String) iterator.next();
-                MuleEndpoint ep = new MuleEndpoint(endpoint, true);
+                
+                UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
+                UMOImmutableEndpoint ep = managementContext.getRegistry()
+                    .lookupEndpointFactory()
+                    .createInboundEndpoint(builder, managementContext);
 
                 // check whether the endpoint has already been set on the MuleEventMulticastor
                 if (descriptor.getInboundRouter().getEndpoint(ep.getName()) == null)
@@ -702,8 +707,11 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             Map.Entry entry;
             for (Iterator iterator = endpointMappings.entrySet().iterator(); iterator.hasNext();)
             {
-                entry = (Map.Entry)iterator.next();
-                managementContext.getRegistry().registerEndpoint(new MuleEndpoint((String)entry.getKey(), true));
+                entry = (Map.Entry) iterator.next();
+                UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+                    .lookupEndpointFactory()
+                    .createInboundEndpoint((String) entry.getKey(), managementContext);
+                managementContext.getRegistry().registerEndpoint(endpoint);
             }
         }
     }
@@ -800,7 +808,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         if (subscriptions == null)
         {
             logger.info("No receive endpoints have been set, using default '*'");
-            descriptor.getInboundRouter().addEndpoint(new MuleEndpoint("vm://*", true));
+            descriptor.getInboundRouter().addEndpoint(
+                managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint("vm://*",
+                    managementContext));
         }
         else
         {

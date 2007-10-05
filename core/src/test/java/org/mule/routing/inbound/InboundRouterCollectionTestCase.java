@@ -12,7 +12,6 @@ package org.mule.routing.inbound;
 
 import org.mule.impl.endpoint.InboundEndpoint;
 import org.mule.impl.endpoint.InboundStreamingEndpoint;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.InvalidEndpointTypeException;
@@ -30,18 +29,6 @@ public class InboundRouterCollectionTestCase extends AbstractMuleTestCase
         router.addEndpoint(endpoint);
         assertNotNull(router.getEndpoints());
         assertTrue(router.getEndpoints().contains(endpoint));
-    }
-
-    public void testAddBadEndpoint()
-    {
-        InboundRouterCollection router=new InboundRouterCollection();
-        try{
-            router.addEndpoint(new MuleEndpoint());
-            fail("Invalid endpoint: Exception expected");
-        }
-        catch(Exception e){
-            assertEquals(InvalidEndpointTypeException.class, e.getClass());
-        }
     }
 
     public void testAddBadEndpoint2()
@@ -92,8 +79,8 @@ public class InboundRouterCollectionTestCase extends AbstractMuleTestCase
     {
         List list= new ArrayList();
         list.add(new InboundEndpoint());
-        list.add(new MuleEndpoint());
         list.add(new InboundStreamingEndpoint());
+        list.add(new OutboundEndpoint());
         InboundRouterCollection router=new InboundRouterCollection();
         try{
             router.setEndpoints(list);

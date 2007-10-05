@@ -19,7 +19,7 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.impl.model.ModelHelper;
@@ -134,9 +134,12 @@ public class MuleManagerComponent implements Callable, Initialisable
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type
-            UMOEndpoint ep = new MuleEndpoint(RequestContext.getEvent().getEndpoint());
+            UMOManagementContext managementContext = MuleServer.getManagementContext();
+            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint(), managementContext);
             // TODO - is this correct?  it stops any other transformer from being set
-            ep.setTransformers(new LinkedList());
+            builder.setTransformers(new LinkedList());
+            UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+                managementContext);
             UMOEvent event = new MuleEvent(action.getMessage(), ep, context.getSession(),
                 context.isSynchronous());
             event = RequestContext.setEvent(event);

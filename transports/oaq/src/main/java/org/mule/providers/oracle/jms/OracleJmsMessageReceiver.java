@@ -13,7 +13,7 @@ package org.mule.providers.oracle.jms;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.XaTransactedJmsMessageReceiver;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 public class OracleJmsMessageReceiver extends XaTransactedJmsMessageReceiver
 {
 
-    public OracleJmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+    public OracleJmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
     {
         super(connector, component, endpoint);

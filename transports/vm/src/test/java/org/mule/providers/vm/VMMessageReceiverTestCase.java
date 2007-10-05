@@ -10,9 +10,8 @@
 
 package org.mule.providers.vm;
 
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
@@ -36,9 +35,9 @@ public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         return receiver;
     }
 
-    public UMOEndpoint getEndpoint() throws Exception
+    public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        endpoint = new MuleEndpoint("vm://test", true);
-        return endpoint;
+        return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint("vm://test",
+            managementContext);
     }
 }

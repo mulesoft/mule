@@ -13,11 +13,11 @@ package org.mule.providers.soap.axis.functional;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.soap.axis.AxisMessageDispatcher;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.io.File;
 
@@ -43,10 +43,9 @@ public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
 
     protected void sendTestData(int iterations) throws Exception
     {
-        MuleEndpoint ep = new MuleEndpoint(
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
             "axis:http://localhost:60198/mule/services/testComponent?method=receiveMessageWithAttachments",
-            false);
-        ep.setManagementContext(managementContext);
+            managementContext);
 
         AxisMessageDispatcher client = new AxisMessageDispatcher(ep);
         for (int i = 0; i < iterations; i++)
