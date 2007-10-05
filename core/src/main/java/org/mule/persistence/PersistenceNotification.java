@@ -24,6 +24,7 @@ public class PersistenceNotification extends UMOServerNotification
         registerAction("ready", PERSISTABLE_READY);
         registerAction("not ready", PERSISTABLE_NOT_READY);
     }
+    
     public PersistenceNotification(Persistable object, int action)
     {
         super(object, action);

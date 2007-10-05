@@ -38,16 +38,16 @@ public class ModelNotification extends UMOServerNotification implements Blocking
     public static final int MODEL_DISPOSED = MODEL_EVENT_ACTION_START_RANGE + 10;
 
     static {
-        registerAction("initialising", MODEL_INITIALISING);
-        registerAction("initialised", MODEL_INITIALISED);
-        registerAction("initialising listener", MODEL_INITIALISING_LISTENERS);
-        registerAction("initialised listener", MODEL_INITIALISED_LISTENERS);
-        registerAction("starting", MODEL_STARTING);
-        registerAction("started", MODEL_STARTED);
-        registerAction("stopping", MODEL_STOPPING);
-        registerAction("stopped", MODEL_STOPPED);
-        registerAction("disposing", MODEL_DISPOSING);
-        registerAction("disposed", MODEL_DISPOSED);
+        registerAction("model initialising", MODEL_INITIALISING);
+        registerAction("model initialised", MODEL_INITIALISED);
+        registerAction("model initialising listener", MODEL_INITIALISING_LISTENERS);
+        registerAction("model initialised listener", MODEL_INITIALISED_LISTENERS);
+        registerAction("model starting", MODEL_STARTING);
+        registerAction("model started", MODEL_STARTED);
+        registerAction("model stopping", MODEL_STOPPING);
+        registerAction("model stopped", MODEL_STOPPED);
+        registerAction("model disposing", MODEL_DISPOSING);
+        registerAction("model disposed", MODEL_DISPOSED);
     }
 
     public ModelNotification(UMOModel model, int action)

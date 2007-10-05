@@ -41,20 +41,20 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
     public static final int MANAGER_STOPPED_MODELS = MANAGER_EVENT_ACTION_START_RANGE + 14;
 
     static {
-        registerAction("initialising", MANAGER_INITIALISING);
-        registerAction("initialised", MANAGER_INITIALISED);
-        registerAction("starting", MANAGER_STARTING);
-        registerAction("started", MANAGER_STARTED);
-        registerAction("stopping", MANAGER_STOPPING);
-        registerAction("stopped", MANAGER_STOPPED);
-        registerAction("disposing", MANAGER_DISPOSING);
-        registerAction("disposed", MANAGER_DISPOSED);
-        registerAction("disposing connectors", MANAGER_DISPOSING_CONNECTORS);
-        registerAction("disposed connectors", MANAGER_DISPOSED_CONNECTORS);
-        registerAction("starting models", MANAGER_STARTING_MODELS);
-        registerAction("started models", MANAGER_STARTED_MODELS);
-        registerAction("stopping models", MANAGER_STOPPING_MODELS);
-        registerAction("stopped models", MANAGER_STOPPED_MODELS);
+        registerAction("manager initialising", MANAGER_INITIALISING);
+        registerAction("manager initialised", MANAGER_INITIALISED);
+        registerAction("manager starting", MANAGER_STARTING);
+        registerAction("manager started", MANAGER_STARTED);
+        registerAction("manager stopping", MANAGER_STOPPING);
+        registerAction("manager stopped", MANAGER_STOPPED);
+        registerAction("manager disposing", MANAGER_DISPOSING);
+        registerAction("manager disposed", MANAGER_DISPOSED);
+        registerAction("manager disposing connectors", MANAGER_DISPOSING_CONNECTORS);
+        registerAction("manager disposed connectors", MANAGER_DISPOSED_CONNECTORS);
+        registerAction("manager starting models", MANAGER_STARTING_MODELS);
+        registerAction("manager started models", MANAGER_STARTED_MODELS);
+        registerAction("manager stopping models", MANAGER_STOPPING_MODELS);
+        registerAction("manager stopped models", MANAGER_STOPPED_MODELS);
     }
 
     private String clusterId;
@@ -99,4 +99,5 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
                 + ", timestamp=" + timestamp + "}";
     }
+    
 }

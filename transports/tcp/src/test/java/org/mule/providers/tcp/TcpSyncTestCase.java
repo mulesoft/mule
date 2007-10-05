@@ -52,7 +52,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
     {
         TcpConnector tcp = (TcpConnector)managementContext.getRegistry().lookupConnector("tcpConnector");
         tcp.setBufferSize(1024 * 16);
-        byte[] data = new byte[tcp.getBufferSize()];
+        byte[] data = fillBuffer(new byte[tcp.getBufferSize()]);
         UMOMessage message = send(data);
         assertNotNull(message);
         byte[] response = message.getPayloadAsBytes();
@@ -60,14 +60,38 @@ public class TcpSyncTestCase extends FunctionalTestCase
         assertTrue(Arrays.equals(data, response));
     }
 
+    public void testManySyncResponseOfBufferSize() throws Exception
+    {
+        TcpConnector tcp = (TcpConnector)managementContext.getRegistry().lookupConnector("tcpConnector");
+        tcp.setBufferSize(1024 * 16);
+        byte[] data = fillBuffer(new byte[tcp.getBufferSize()]);
+        for (int i = 0; i < 20; ++i)
+        {
+            UMOMessage message = send(data);
+            assertNotNull(message);
+            byte[] response = message.getPayloadAsBytes();
+            assertEquals(data.length, response.length);
+            assertTrue(Arrays.equals(data, response));
+        }
+    }
+
     public void testSyncResponseVeryBig() throws Exception
     {
-        byte[] data = new byte[1024 * 1024];
+        byte[] data = fillBuffer(new byte[1024 * 1024]);
         UMOMessage message = send(data);
         assertNotNull(message);
         byte[] response = message.getPayloadAsBytes();
         assertEquals(data.length, response.length);
         assertTrue(Arrays.equals(data, response));
+    }
+
+    protected byte[] fillBuffer(byte[] buffer)
+    {
+        for (int i = 0; i < buffer.length; ++i)
+        {
+            buffer[i] = (byte) (i % 255);
+        }
+        return buffer;
     }
 
 }

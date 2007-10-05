@@ -34,10 +34,10 @@ public class RegistryNotification extends UMOServerNotification
     public static final int REGISTRY_DISPOSED = REGISTRY_EVENT_ACTION_START_RANGE + 4;
 
     static {
-        registerAction("initialising", REGISTRY_INITIALISING);
-        registerAction("initialised", REGISTRY_INITIALISED);
-        registerAction("disposing", REGISTRY_DISPOSING);
-        registerAction("disposed", REGISTRY_DISPOSED);
+        registerAction("registry initialising", REGISTRY_INITIALISING);
+        registerAction("registry initialised", REGISTRY_INITIALISED);
+        registerAction("registry disposing", REGISTRY_DISPOSING);
+        registerAction("registry disposed", REGISTRY_DISPOSED);
     }
 
     public RegistryNotification(Registry registry, String action)
