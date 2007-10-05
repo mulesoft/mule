@@ -16,7 +16,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.email.MailProperties;
 import org.mule.providers.email.SmtpConnector;
 import org.mule.tck.MuleTestUtils;
@@ -86,7 +85,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
 
         managementContext.getRegistry().registerService(d);
         UMOComponent component = model.getComponent(d.getName());
-        UMOEndpointBuilder builder=new EndpointURIEndpointBuilder(new MuleEndpointURI(getTestEndpointURI()), managementContext);
+        UMOEndpointBuilder builder=new EndpointURIEndpointBuilder(getTestEndpointURI(), managementContext);
         builder.setName("test");
         UMOImmutableEndpoint endpoint = builder.buildOutboundEndpoint();
         try

@@ -22,49 +22,47 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
 
     public void testBuildInboundEndpoint() throws UMOException
     {
-        TransientRegistry r=TransientRegistry.createNew();
-        String uri="test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri),MuleServer.getManagementContext());
+        TransientRegistry r = TransientRegistry.createNew();
+        String uri = "test://address";
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, MuleServer.getManagementContext());
         try
         {
-            UMOImmutableEndpoint ep= endpointBuilder.buildInboundEndpoint();
+            UMOImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
         }
         catch (Exception e)
         {
-            fail("Unexpected exception: "+e.getMessage());
+            fail("Unexpected exception: " + e.getMessage());
         }
     }
 
     public void testBuildOutboundEndpoint() throws UMOException
     {
         TransientRegistry.createNew();
-        String uri="test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri),MuleServer.getManagementContext());
+        String uri = "test://address";
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, MuleServer.getManagementContext());
         try
         {
-            UMOImmutableEndpoint ep= endpointBuilder.buildOutboundEndpoint();
+            UMOImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
         }
         catch (Exception e)
         {
-            fail("Unexpected exception: "+e.getStackTrace());
+            fail("Unexpected exception: " + e.getStackTrace());
         }
     }
 
     public void testBuildResponseEndpoint() throws UMOException
     {
         TransientRegistry.createNew();
-        String uri="test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri),MuleServer.getManagementContext());
+        String uri = "test://address";
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, MuleServer.getManagementContext());
         try
         {
-            UMOImmutableEndpoint ep= endpointBuilder.buildResponseEndpoint();
+            UMOImmutableEndpoint ep = endpointBuilder.buildResponseEndpoint();
         }
         catch (Exception e)
         {
-            fail("Unexpected exception: "+e.getStackTrace());
+            fail("Unexpected exception: " + e.getStackTrace());
         }
     }
 
 }
-
-

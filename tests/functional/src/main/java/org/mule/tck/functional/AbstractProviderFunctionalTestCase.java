@@ -21,7 +21,6 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
@@ -177,9 +176,9 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
     protected abstract void receiveAndTestResults() throws Exception;
 
-    protected abstract UMOEndpointURI getInDest();
+    protected abstract String getInDest();
 
-    protected abstract UMOEndpointURI getOutDest();
+    protected abstract String getOutDest();
 
     protected abstract UMOConnector createConnector() throws Exception;
 

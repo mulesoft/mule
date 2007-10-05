@@ -40,7 +40,7 @@ public class EndpointFactory implements UMOEndpointFactory
         if (endpointBuilder == null)
         {
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
+            endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         }
         return endpointBuilder.buildInboundEndpoint();
     }
@@ -53,7 +53,7 @@ public class EndpointFactory implements UMOEndpointFactory
         if (endpointBuilder == null)
         {
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
+            endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         }
         return endpointBuilder.buildOutboundEndpoint();
     }
@@ -66,7 +66,7 @@ public class EndpointFactory implements UMOEndpointFactory
         if (endpointBuilder == null)
         {
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI(uri), managementContext);
+            endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         }
         return endpointBuilder.buildResponseEndpoint();
     }

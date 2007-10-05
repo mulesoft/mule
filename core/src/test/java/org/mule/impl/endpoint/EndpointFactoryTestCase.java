@@ -39,8 +39,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateInboundEndpointFromGlobalEndpoint() throws UMOException
     {
         TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder(new MuleEndpointURI("test://address"),
-            managementContext), managementContext);
+        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder("test://address", managementContext),
+            managementContext);
         String uri = "myGlobalEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -58,8 +58,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateInboundEndpointFromNamedConcreteEndpoint() throws UMOException
     {
         TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder(new MuleEndpointURI(
-            "test://address"), managementContext), managementContext);
+        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder("test://address",
+            managementContext), managementContext);
         String uri = "&myNamedConcreateEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -94,8 +94,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateoutboundEndpointFromGlobalEndpoint() throws UMOException
     {
         TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder(new MuleEndpointURI("test://address"),
-            managementContext), managementContext);
+        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder("test://address", managementContext),
+            managementContext);
         String uri = "myGlobalEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -113,8 +113,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateoutboundEndpointFromNamedConcreteEndpoint() throws UMOException
     {
         TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder(new MuleEndpointURI(
-            "test://address"), managementContext), managementContext);
+        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder("test://address",
+            managementContext), managementContext);
         String uri = "&myNamedConcreateEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -149,8 +149,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateResponseEndpointFromGlobalEndpoint() throws UMOException
     {
         TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder(new MuleEndpointURI("test://address"),
-            managementContext), managementContext);
+        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder("test://address", managementContext),
+            managementContext);
         String uri = "myGlobalEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -168,8 +168,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateResponseEndpointFromNamedConcreteEndpoint() throws UMOException
     {
         TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder(new MuleEndpointURI(
-            "test://address"), managementContext), managementContext);
+        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder("test://address",
+            managementContext), managementContext);
         String uri = "&myNamedConcreateEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -203,8 +203,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateEndpointFromGlobalEndpoint() throws UMOException
     {
         TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder(new MuleEndpointURI("test://address"),
-            managementContext), managementContext);
+        r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder("test://address", managementContext),
+            managementContext);
         String uri = "myGlobalEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
@@ -221,8 +221,8 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateEndpointFromNamedConcreteEndpoint() throws UMOException
     {
         TransientRegistry r = TransientRegistry.createNew();
-        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder(new MuleEndpointURI(
-            "test://address"), managementContext), managementContext);
+        r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder("test://address",
+            managementContext), managementContext);
         String uri = "&myNamedConcreateEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try

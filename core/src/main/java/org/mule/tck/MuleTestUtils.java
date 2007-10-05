@@ -76,7 +76,7 @@ public final class MuleTestUtils
         connector.setManagementContext(context);
         connector.initialise();
 
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI("test://test"),context);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://test",context);
         endpointBuilder.setConnector(connector);
         endpointBuilder.setName(name);
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
@@ -112,7 +112,7 @@ public final class MuleTestUtils
         connector.initialise();
         connector.registerSupportedProtocol(protocol);
 
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new MuleEndpointURI("test:" + protocol + "://test"),context);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test:" + protocol + "://test",context);
         endpointBuilder.setConnector(connector);
         endpointBuilder.setName(name);
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))

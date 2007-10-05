@@ -12,6 +12,7 @@ package org.mule.impl.endpoint;
 
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOManagementContext;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implements ManagementContextAware
@@ -22,10 +23,22 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
         super();
     }
 
-    public EndpointURIEndpointBuilder(final UMOEndpointURI endpointURI, UMOManagementContext managementContext)
+    /**
+     * @param endpointURI
+     * @param managementContext
+     * @deprecated
+     */
+    public EndpointURIEndpointBuilder(UMOEndpointURI endpointURI, UMOManagementContext managementContext)
     {
         this.managementContext = managementContext;
         this.endpointURI = endpointURI;
+    }
+
+    public EndpointURIEndpointBuilder(final String uri, UMOManagementContext managementContext)
+        throws EndpointException
+    {
+        this.managementContext = managementContext;
+        this.endpointURI = new MuleEndpointURI(uri);
     }
 
 }
