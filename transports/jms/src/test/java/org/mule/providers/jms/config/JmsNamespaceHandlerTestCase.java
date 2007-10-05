@@ -84,6 +84,9 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(c.isEagerConsumer());
         assertTrue(c.isJndiDestinations());
         assertTrue(c.isForceJndiDestinations());
+
+        // MULE-2491
+        //assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }
     
 //    public void testJndi() throws Exception
