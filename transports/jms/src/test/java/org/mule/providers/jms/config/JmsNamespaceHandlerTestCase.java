@@ -59,9 +59,9 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(c.isForceJndiDestinations());
     }
     
-    public void testConfig() throws Exception
+    public void testConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector1");
+        JmsConnector c = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector1");
         assertNotNull(c);
 
         assertNotNull(c.getConnectionFactory());
@@ -85,8 +85,15 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isJndiDestinations());
         assertTrue(c.isForceJndiDestinations());
 
-        // MULE-2491
-        //assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
+        assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
+    }
+
+    public void testCustomConnectorConfig() throws Exception
+    {
+        JmsConnector c = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector2");
+        assertNotNull(c);
+
+        assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }
     
 //    public void testJndi() throws Exception

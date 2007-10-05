@@ -24,9 +24,16 @@
                    recoverJmsConnections="false"
                    eagerConsumer="false"
                    jndiDestinations="true"
-                   forceJndiDestinations="true">
+                   forceJndiDestinations="true"
+                   specification="1.1">
         <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"
                                username="myuser" password="mypass" />
         <jms:redelivery-handler class="org.mule.providers.jms.test.TestRedeliveryHandler" />
     </jms:connector>
+
+    <jms:custom-connector name="jmsConnector2" class="org.mule.providers.jms.JmsConnector"
+                          specification="1.1">
+        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
+    </jms:custom-connector>
+
 </mule>

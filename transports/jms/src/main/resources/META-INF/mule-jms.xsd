@@ -71,6 +71,15 @@
         <xsd:attribute name="eagerConsumer" type="mule:substitutableBoolean"/>
         <xsd:attribute name="jndiDestinations" type="mule:substitutableBoolean"/>
         <xsd:attribute name="forceJndiDestinations" type="mule:substitutableBoolean"/>
+        <!-- Defaults to org.mule.providers.jms.JmsConstants.JMS_SPECIFICATION_102B  -->
+        <xsd:attribute name="specification" default="1.0.2b">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="1.0.2b"/>
+                    <xsd:enumeration value="1.1"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:complexType name="connectionFactoryType">
