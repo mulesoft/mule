@@ -49,6 +49,10 @@ public class TransportEndpointDefinitionParser extends AddressedEndpointDefiniti
                 new CheckExclusiveAttributes(new String[][]{
                         new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},
                         LazyEndpointURI.ATTRIBUTES}));
+        registerPreProcessor(
+                new CheckExclusiveAttributes(new String[][]{
+                        new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},
+                        properties}));
     }
 
 }
