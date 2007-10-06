@@ -20,7 +20,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedMap;
 
-public class AbstractMapBeanAssembler extends DefaultBeanAssembler
+public abstract class AbstractMapBeanAssembler extends DefaultBeanAssembler
 {
 
     public AbstractMapBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
