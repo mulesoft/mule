@@ -24,8 +24,8 @@ public class ComplexEndpointTestCase extends AbstractEndpointTestCase
     public void testComplex() throws UMOException
     {
         UMOImmutableEndpoint endpoint = doTest("complex");
-        assertNotNull(endpoint.getProperty("bar"));
-        assertEquals(endpoint.getProperty("bar"), "123");
+        assertNotNull(endpoint.getProperty("foo"));
+        assertEquals(endpoint.getProperty("foo"), "123");
         assertNotNull(endpoint.getProperty("string"));
         assertEquals(endpoint.getProperty("string"), "hello world");
     }
