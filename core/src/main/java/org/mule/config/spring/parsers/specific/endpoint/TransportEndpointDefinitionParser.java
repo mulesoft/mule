@@ -33,7 +33,18 @@ public class TransportEndpointDefinitionParser extends AddressedEndpointDefiniti
 
     public TransportEndpointDefinitionParser(String protocol, Class endpoint)
     {
-        super(protocol, new ChildEndpointDefinitionParser(endpoint));
+        this(protocol, endpoint, new String[]{});
+    }
+
+    /**
+     * @param protocol The transport protocol ("tcp" etc)
+     * @param endpoint The endpoint class
+     * @param properties A list of attribute names which will be set as properties on the
+     * endpointParser
+     */
+    public TransportEndpointDefinitionParser(String protocol, Class endpoint, String[] properties)
+    {
+        super(protocol, new ChildEndpointDefinitionParser(endpoint), properties);
         registerPreProcessor(
                 new CheckExclusiveAttributes(new String[][]{
                         new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},

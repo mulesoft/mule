@@ -175,6 +175,25 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- this combines standard global endpoint elements, address-specific attributes, and
+          transport-specific attributes -->
+    <xsd:element name="complex-endpoint" type="complexEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="complexEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractGlobalEndpointType">
+                <!-- standard endpoint elements -->
+                <xsd:group ref="mule:defaultEndpointElements"/>
+                <!-- standard endpoint attributes -->
+                <xsd:attribute name="address" type="xsd:string"/>
+                <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
+                <!-- these are for child bean and will be set as properties
+                     - they could be any transport related values -->
+                <xsd:attribute name="string" type="xsd:string"/>
+                <xsd:attribute name="bar" type="xsd:int"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="list-element-test-1">
         <xsd:complexType>
             <xsd:attribute name="listAttribute" type="xsd:string"/>

@@ -13,6 +13,7 @@ package org.mule.config.spring.parsers.specific.endpoint.support;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
+import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.preprocessors.DisableByAttribute;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
@@ -45,8 +46,22 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
     public AddressedEndpointDefinitionParser(String protocol, MuleDefinitionParser endpointParser)
     {
-        // the first delegate, the parent, is an endpoint; we block address related attributes
+        this(protocol, endpointParser, new String[]{});
+    }
+
+    /**
+     * @param protocol The transport protocol ("tcp" etc)
+     * @param endpointParser The parser for the endpoint
+     * @param propertyAttributes A list of attribute names which will be set as properties on the
+     * endpointParser
+     */
+    public AddressedEndpointDefinitionParser(String protocol, MuleDefinitionParser endpointParser,
+                                             String[] propertyAttributes)
+    {
+        // the first delegate, the parent, is an endpoint; we block address and property
+        // related attributes
         disableAttributes(endpointParser, LazyEndpointURI.ATTRIBUTES);
+        disableAttributes(endpointParser, propertyAttributes);
         addDelegate(endpointParser);
 
         // the next delegate parses the address.  it will see the endpoint as parent automatically.
@@ -55,11 +70,16 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         enableAttributes(addressParser, LazyEndpointURI.ATTRIBUTES);
         addChildDelegate(addressParser);
 
-        // this handles the "ref problem" and is specific to the endpoint/address element.
-        // we don't want this parser to be used if a "ref" defines the address
-        // so add a preprocessor to check for that and indicate that the exception should
-        // be handled internally, rather than shown to the user
+        // the next delegate parses property attributes
+        MuleChildDefinitionParser propertiesParser = new AttributePropertiesDefinitionParser("properties");
+        enableAttributes(propertiesParser, propertyAttributes);
+        addChildDelegate(propertiesParser);
+
+        // this handles the "ref problem" - we don't want these parsers to be used if a "ref"
+        // defines the address so add a preprocessor to check for that and indicate that the
+        // exception should be handled internally, rather than shown to the user
         addressParser.registerPreProcessor(new DisableByAttribute(BAD_ADDRESS_ATTRIBUTES));
+        propertiesParser.registerPreProcessor(new DisableByAttribute(BAD_ADDRESS_ATTRIBUTES));
         addHandledException(DisableByAttribute.DisableByAttributeException.class);
     }
 

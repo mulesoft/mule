@@ -13,7 +13,7 @@ package org.mule.config.spring.parsers.delegate;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.MapBeanAssemblerFactory;
+import org.mule.config.spring.parsers.assembly.TwoStageMapBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  */
 public class MapDefinitionParserMutator
         extends AbstractDelegatingDefinitionParser
-        implements MapBeanAssemblerFactory.BeanAssemblerStore, MuleChildDefinitionParser
+        implements TwoStageMapBeanAssemblerFactory.BeanAssemblerStore, MuleChildDefinitionParser
 {
 
     private String setter;
@@ -44,7 +44,7 @@ public class MapDefinitionParserMutator
         super(new MuleDefinitionParser[]{delegate});
         this.setter = setter;
         // this is where we set the callback
-        delegate.setBeanAssemblerFactory(new MapBeanAssemblerFactory(this));
+        delegate.setBeanAssemblerFactory(new TwoStageMapBeanAssemblerFactory(this));
     }
 
     public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)

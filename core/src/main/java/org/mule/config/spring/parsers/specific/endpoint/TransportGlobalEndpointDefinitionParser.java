@@ -19,7 +19,17 @@ public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDe
 
     public TransportGlobalEndpointDefinitionParser(String protocol)
     {
-        super(protocol, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
+        this(protocol, new String[]{});
+    }
+
+    /**
+     * @param protocol The transport protocol ("tcp" etc)
+     * @param properties A list of attribute names which will be set as properties on the
+     * endpointParser
+     */
+    public TransportGlobalEndpointDefinitionParser(String protocol, String[] properties)
+    {
+        super(protocol, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class), properties);
     }
 
 }
