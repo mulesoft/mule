@@ -36,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescriptor
 {
+
     /** logger used by this class */
     private static Log logger = LogFactory.getLog(MuleDescriptor.class);
 
@@ -229,6 +230,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      */
     public void setEntryPointResolverSet(UMOEntryPointResolverSet resolverSet)
     {
-        this.entryPointResolverSet = entryPointResolverSet;
+        this.entryPointResolverSet = resolverSet;
     }
+
 }
