@@ -79,11 +79,11 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         this.endpoints.clear();
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            addEndpoint((UMOEndpoint) iterator.next());
+            addEndpoint((UMOImmutableEndpoint) iterator.next());
         }
     }
 
-    public void addEndpoint(UMOEndpoint endpoint)
+    public void addEndpoint(UMOImmutableEndpoint endpoint)
     {
         if (endpoint != null)
         {
@@ -96,7 +96,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
         }
     }
 
-    public boolean removeEndpoint(UMOEndpoint endpoint)
+    public boolean removeEndpoint(UMOImmutableEndpoint endpoint)
     {
         return endpoints.remove(endpoint);
     }
@@ -222,7 +222,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      */
     protected void routeException(UMOMessage message, UMOImmutableEndpoint failedEndpoint, Throwable t)
     {
-        UMOEndpoint endpoint = getEndpoint(t);
+        UMOImmutableEndpoint endpoint = getEndpoint(t);
         if (endpoint != null)
         {
             try
@@ -301,11 +301,11 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * @return The endpoint used to dispatch an exception message on or null if there
      *         are no endpoints registered
      */
-    protected UMOEndpoint getEndpoint(Throwable t)
+    protected UMOImmutableEndpoint getEndpoint(Throwable t)
     {
         if (endpoints.size() > 0)
         {
-            return (UMOEndpoint) endpoints.get(0);
+            return (UMOImmutableEndpoint) endpoints.get(0);
         }
         else
         {

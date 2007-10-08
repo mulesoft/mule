@@ -548,6 +548,17 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     }
 
+    /**
+     * Sets a property on the endpoint
+     *
+     * @param key the property key
+     * @param value the value of the property
+     */
+    public void setProperty(String key, Object value)
+    {
+        properties.put(key, value);
+    }
+
     public void setTransactionConfig(UMOTransactionConfig transactionConfig)
     {
         this.transactionConfig = transactionConfig;

@@ -15,7 +15,6 @@ import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
@@ -96,7 +95,7 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
 
     protected void routeException(UMOMessage message, UMOImmutableEndpoint failedEndpoint, Throwable t)
     {
-        UMOEndpoint ep = getEndpoint(t);
+        UMOImmutableEndpoint ep = getEndpoint(t);
         if (ep != null)
         {
             super.routeException(message, failedEndpoint, t);

@@ -13,7 +13,7 @@ package org.mule.umo.routing;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public interface UMONestedRouter extends UMORouter
 {
@@ -40,7 +40,7 @@ public interface UMONestedRouter extends UMORouter
      */
     UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws MessagingException;
 
-    void setEndpoint(UMOEndpoint endpoint);
+    void setEndpoint(UMOImmutableEndpoint endpoint);
 
     UMOOutboundRouter getOutboundRouter();
 

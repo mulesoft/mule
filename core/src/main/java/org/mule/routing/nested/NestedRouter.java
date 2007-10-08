@@ -16,7 +16,7 @@ import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMONestedRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 
@@ -98,7 +98,7 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
         this.outboundRouter = router;
     }
 
-    public void setEndpoint(UMOEndpoint e)
+    public void setEndpoint(UMOImmutableEndpoint e)
     {
         outboundRouter = new OutboundPassThroughRouter();
         outboundRouter.addEndpoint(e);
