@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
-            <version>${version}</version>
+            <version>${muleVersion}</version>
         </dependency>
     </dependencies>
 
