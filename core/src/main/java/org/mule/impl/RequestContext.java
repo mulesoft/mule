@@ -194,7 +194,7 @@ public final class RequestContext
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("copying " + type, new Exception());
+            logger.debug("copying " + type);//, new Exception());
         }
     }
 
