@@ -22,16 +22,14 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * <code>IdempotentSecureHashReceiver</code> ensures that only unique messages are
- * received by a component. It does this by calculating the SHA-256 hash of the
- * message itself. This provides a value with an infinitesimally small chance of a
- * collision. This can be used to filter message duplicates. Please keep in mind that
- * the hash is calculated over the entire byte array representing the message, so any
- * leading or trailing spaces or extraneous bytes (like padding) can produce
- * different hash values for the same semantic message content. Care should be taken
- * to ensure that messages do not contain extraneous bytes. This class is useful when
- * the message does not support unique identifiers. This implementation provides for
- * a persistent store of message hash values via the underlying file system and is
- * suitable in failover environments.
+ * received by a component. It does this by calculating the SHA-256 hash of the message
+ * itself. This provides a value with an infinitesimally small chance of a collision. This
+ * can be used to filter message duplicates. Please keep in mind that the hash is
+ * calculated over the entire byte array representing the message, so any leading or
+ * trailing spaces or extraneous bytes (like padding) can produce different hash values
+ * for the same semantic message content. Care should be taken to ensure that messages do
+ * not contain extraneous bytes. This class is useful when the message does not support
+ * unique identifiers.
  */
 
 public class IdempotentSecureHashReceiver extends IdempotentReceiver
@@ -41,7 +39,7 @@ public class IdempotentSecureHashReceiver extends IdempotentReceiver
     private final SerializableToByteArray objectToByteArray = new SerializableToByteArray();
     private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
-    // //@Override
+    // @Override
     protected Object getIdForEvent(UMOEvent event) throws MessagingException
     {
         try

@@ -21,7 +21,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 
 import com.mockobjects.dynamic.C;
@@ -30,21 +29,10 @@ import com.mockobjects.dynamic.Mock;
 public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 {
 
-    public void testIdempotentReceiverWithoutPersistence() throws Exception
+    public void testIdempotentReceiver() throws Exception
     {
         IdempotentReceiver router = new IdempotentReceiver();
-        router.setDisablePersistence(true);
-        doTestIdempotentReceiver(router);
-    }
 
-    public void testIdempotentReceiverWithPersistence() throws Exception
-    {
-        IdempotentReceiver router = new IdempotentReceiver();
-        doTestIdempotentReceiver(router);
-    }
-
-    private void doTestIdempotentReceiver(UMOInboundRouter router) throws Exception
-    {
         Mock session = MuleTestUtils.getMockSession();
         UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
 
@@ -56,9 +44,9 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage("test event");
 
         UMOEndpoint endpoint = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        UMOEvent event = new MuleEvent(message, endpoint, (UMOSession)session.proxy(), false);
+        UMOEvent event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
         // called by idempotent receiver as this is the fist event it will try
-        // and load the id store
+        // and initialize the id store
         session.expectAndReturn("getComponent", testComponent);
 
         assertTrue(router.isMatch(event));
@@ -73,7 +61,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 
         session.verify();
         message = new MuleMessage("test event");
-        event = new MuleEvent(message, endpoint, (UMOSession)session.proxy(), true);
+        event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), true);
 
         session.expectAndReturn("sendEvent", C.eq(event), message);
         // called by idempotent receiver
@@ -89,12 +77,12 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         // called by idempotent receiver
         session.expectAndReturn("getComponent", testComponent);
 
-        event = new MuleEvent(message, endpoint, (UMOSession)session.proxy(), false);
+        event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
         // we've already received this message
         assertTrue(!router.isMatch(event));
 
         messageRouter.route(event);
         session.verify();
-
     }
+
 }

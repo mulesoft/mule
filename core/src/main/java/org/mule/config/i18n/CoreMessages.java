@@ -392,9 +392,9 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 93, endpoint, String.valueOf(timeout));
     }
 
-    public static Message failedToWriteMessageToStore(Object id, String path)
+    public static Message failedToWriteMessageToStore(Object id, String storeName)
     {
-        return createMessage(BUNDLE_PATH, 94, id, path);
+        return createMessage(BUNDLE_PATH, 94, id, storeName);
     }
 
     public static Message failedToReadFromStore(String absolutePath)

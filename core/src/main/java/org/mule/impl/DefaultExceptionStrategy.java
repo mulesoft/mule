@@ -18,8 +18,7 @@ import org.mule.util.ObjectUtils;
 
 /**
  * <code>DefaultExceptionStrategy</code> provides a default exception handling
- * strategy. The class final thus to change exception handling behaviour the user
- * must reimplemented the ExceptionListener Interface
+ * strategy.
  */
 
 public class DefaultExceptionStrategy extends AbstractExceptionListener

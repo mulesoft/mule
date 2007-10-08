@@ -10,196 +10,151 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.RegistryContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.routing.RoutingException;
-import org.mule.util.FileUtils;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * <code>IdempotentReceiver</code> ensures that only unique messages are received
- * by a component. It does this by checking the unique id of the incoming message.
- * Note that the underlying endpoint must support unique message Ids for this to
- * work, otherwise a <code>UniqueIdNotSupportedException</code> is thrown. This
- * implementation is simple and not suitable in a failover environment, this is
- * because previously received message Ids are stored in memory and not persisted.
- * 
+ * <code>IdempotentReceiver</code> ensures that only unique messages are received by a
+ * component. It does this by checking the unique ID of the incoming message. Note that
+ * the underlying endpoint must support unique message IDs for this to work, otherwise a
+ * <code>UniqueIdNotSupportedException</code> is thrown.<br>
+ * By default this implementation uses an instance of
+ * {@link IdempotentInMemoryMessageIdStore}.
  */
-//TODO MULE-1300: fix memory leak
 public class IdempotentReceiver extends SelectiveConsumer
 {
-    private static final String DEFAULT_STORE_PATH = "./idempotent";
+    protected volatile IdempotentMessageIdStore idStore;
+    protected volatile String assignedComponentName;
 
-    private Set messageIds;
-    private File idStore;
-    private String componentName;
-    private boolean disablePersistence = false;
-    private String storePath;
+    // The maximum number of messages to keep in the store; exact interpretation of this
+    // limit is up to the store implementation. By default the store is unbounded.
+    protected volatile int maxMessages = -1;
+
+    // The number of seconds each message ID is kept in the store;
+    // by default each entry is kept for 5 minutes
+    protected volatile int messageTTL = (60 * 5);
+
+    // The number of seconds between expiration intervals;
+    // by default we expire every minute
+    protected volatile int expirationInterval = 60;
 
     public IdempotentReceiver()
     {
-        messageIds = new HashSet();
-        setStorePath(RegistryContext.getConfiguration().getWorkingDirectory() + DEFAULT_STORE_PATH);
+        super();
     }
 
-    // //@Override
+    public int getMaxMessages()
+    {
+        return maxMessages;
+    }
+
+    public void setMaxMessages(int maxMessages)
+    {
+        this.maxMessages = maxMessages;
+    }
+
+    public int getMessageTTL()
+    {
+        return messageTTL;
+    }
+
+    public void setMessageTTL(int messageTTL)
+    {
+        this.messageTTL = messageTTL;
+    }
+
+    public int getExpirationInterval()
+    {
+        return expirationInterval;
+    }
+
+    public void setExpirationInterval(int expirationInterval)
+    {
+        if (expirationInterval <= 0)
+        {
+            throw new IllegalArgumentException(CoreMessages.propertyHasInvalidValue("expirationInterval",
+                new Integer(expirationInterval)).toString());
+        }
+
+        this.expirationInterval = expirationInterval;
+    }
+
+    protected void initialize(UMOEvent event) throws RoutingException
+    {
+        if (assignedComponentName == null && idStore == null)
+        {
+            this.assignedComponentName = event.getComponent().getDescriptor().getName();
+            this.idStore = this.createMessageIdStore();
+        }
+    }
+
+    protected IdempotentMessageIdStore createMessageIdStore()
+    {
+        return new IdempotentInMemoryMessageIdStore(assignedComponentName, maxMessages, messageTTL,
+            expirationInterval);
+    }
+
+    // @Override
     public boolean isMatch(UMOEvent event) throws MessagingException
     {
         if (idStore == null)
         {
-            // we need to load this of fist request as we need the component
-            // name
-            this.load(event);
+            // we need to load this on the first request as we need the component name
+            synchronized (this)
+            {
+                this.initialize(event);
+            }
         }
-        return !messageIds.contains(this.getIdForEvent(event));
+
+        try
+        {
+            return !idStore.containsId(this.getIdForEvent(event));
+        }
+        catch (Exception ex)
+        {
+            throw new RoutingException(event.getMessage(), event.getEndpoint(), ex);
+        }
     }
 
-    // //@Override
+    // @Override
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
-        if (isMatch(event))
+        String eventComponentName = event.getComponent().getDescriptor().getName();
+        if (!assignedComponentName.equals(eventComponentName))
         {
-            try
-            {
-                checkComponentName(event.getComponent().getDescriptor().getName());
-            }
-            catch (IllegalArgumentException e)
-            {
-                throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
-            }
+            IllegalArgumentException iex = new IllegalArgumentException(
+                "This receiver is assigned to component: " + assignedComponentName
+                                + " but has received an event for component: " + eventComponentName
+                                + ". Please check your config to make sure each component"
+                                + "has its own instance of IdempotentReceiver.");
+            throw new RoutingException(event.getMessage(), event.getEndpoint(), iex);
+        }
 
-            Object id = this.getIdForEvent(event);
-            try
+        Object id = this.getIdForEvent(event);
+
+        try
+        {
+            if (idStore.storeId(id))
             {
-                this.storeId(id);
                 return new UMOEvent[]{event};
             }
-            catch (IOException e)
+            else
             {
-                throw new RoutingException(
-                    CoreMessages.failedToWriteMessageToStore(id, idStore.getAbsolutePath()),
-                    event.getMessage(), event.getEndpoint(), e);
+                return null;
             }
         }
-        else
+        catch (Exception e)
         {
-            return null;
+            throw new RoutingException(CoreMessages.failedToWriteMessageToStore(id, assignedComponentName),
+                event.getMessage(), event.getEndpoint(), e);
         }
     }
 
     protected Object getIdForEvent(UMOEvent event) throws MessagingException
     {
         return event.getMessage().getUniqueId();
-    }
-
-    private void checkComponentName(String name) throws IllegalArgumentException
-    {
-        if (!componentName.equals(name))
-        {
-            throw new IllegalArgumentException("This receiver is assigned to component: " + componentName
-                                               + " but has received an event for component: " + name
-                                               + ". Please check your config to make sure each component"
-                                               + "has its own instance of IdempotentReceiver");
-        }
-    }
-
-    protected synchronized void load(UMOEvent event) throws RoutingException
-    {
-        this.componentName = event.getComponent().getDescriptor().getName();
-        
-        if (idStore == null)
-        {
-            idStore = FileUtils.newFile(storePath + "/muleComponent_" + componentName + ".store");
-        }
-
-        if (disablePersistence)
-        {
-            return;
-        }
-
-        try
-        {
-            if (idStore.exists())
-            {
-                BufferedReader reader = null;
-                try
-                {
-                    reader = new BufferedReader(new FileReader(idStore));
-                    String id;
-                    while ((id = reader.readLine()) != null)
-                    {
-                        messageIds.add(id);
-                    }
-                }
-                finally
-                {
-                    if (reader != null)
-                    {
-                        reader.close();
-                    }
-                }
-            }
-            else
-            {
-                idStore = FileUtils.createFile(idStore.getAbsolutePath());
-            }
-        }
-        catch (IOException e)
-        {
-            throw new RoutingException(
-                CoreMessages.failedToReadFromStore(idStore.getAbsolutePath()),
-                event.getMessage(), event.getEndpoint(), e);
-        }
-    }
-
-    protected synchronized void storeId(Object id) throws IOException
-    {
-        messageIds.add(id);
-        if (disablePersistence)
-        {
-            return;
-        }
-        FileUtils.stringToFile(idStore.getAbsolutePath(), id.toString(), true, true);
-    }
-
-    public boolean isDisablePersistence()
-    {
-        return disablePersistence;
-    }
-
-    public void setDisablePersistence(boolean disablePersistence)
-    {
-        this.disablePersistence = disablePersistence;
-    }
-
-    public String getStorePath()
-    {
-        return storePath;
-    }
-
-    public void setStorePath(String storePath)
-    {
-        if (storePath == null)
-        {
-            this.storePath = DEFAULT_STORE_PATH;
-        }
-        else if (storePath.endsWith("/"))
-        {
-            storePath = storePath.substring(0, storePath.length() - 1);
-            this.storePath = storePath;
-        }
-        else
-        {
-            this.storePath = storePath;
-        }
     }
 
 }
