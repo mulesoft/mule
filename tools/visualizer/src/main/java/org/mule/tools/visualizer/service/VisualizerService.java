@@ -12,12 +12,12 @@ package org.mule.tools.visualizer.service;
 import org.mule.RegistryContext;
 import org.mule.config.ConfigurationException;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.UMODescriptorAware;
+import org.mule.impl.UMOComponentAware;
 import org.mule.tools.visualizer.MuleVisualizer;
 import org.mule.tools.visualizer.config.GraphConfig;
 import org.mule.tools.visualizer.config.GraphEnvironment;
 import org.mule.tools.visualizer.maven.MuleVisualizerPlugin;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Callable;
@@ -34,16 +34,16 @@ import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
 /** TODO */
-public class VisualizerService extends MuleVisualizerPlugin implements Callable, Initialisable, UMODescriptorAware
+public class VisualizerService extends MuleVisualizerPlugin implements Callable, Initialisable, UMOComponentAware
 {
     protected GraphConfig config;
     protected GraphEnvironment environment;
     protected MuleVisualizer visualizer;
-    protected UMODescriptor descriptor;
+    protected UMOComponent component;
 
-    public void setDescriptor(UMODescriptor descriptor) throws ConfigurationException
+    public void setComponent(UMOComponent component) throws ConfigurationException
     {
-        this.descriptor = descriptor;
+        this.component = component;
     }
 
     public void initialise() throws InitialisationException

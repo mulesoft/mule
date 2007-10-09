@@ -15,10 +15,11 @@
         <ssl:ssl-server trustStore="trustStore" trustStorePassword="mulepassword"/>
     </ssl:connector>
 
-    <model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
+    <model name="main">
 
-        <service name="testComponent">
-            <component scope="singleton" class="org.mule.tck.functional.FunctionalTestComponent"/>
+        <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+
             <inbound-router>
                 <inbound-endpoint name="in" address="ssl://localhost:61655" synchronous="false"/>
             </inbound-router>

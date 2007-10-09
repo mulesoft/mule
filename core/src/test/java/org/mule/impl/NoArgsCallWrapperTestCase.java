@@ -40,12 +40,12 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
         properties.put("delegateMethod", "toString");
 
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
-        MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
-        managementContext.getRegistry().registerService(desc, managementContext);
+        UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, properties, managementContext);
+        managementContext.getRegistry().registerComponent(component, managementContext);
 
-        UMOComponent component = managementContext.getRegistry().lookupSystemModel().getComponent("WrapperUMO");
+        component = managementContext.getRegistry().lookupComponent("WrapperUMO");
 
-        UMOEvent event = getTestEvent("Test", desc, endpoint);
+        UMOEvent event = getTestEvent("Test", component, endpoint);
         UMOMessage reply = component.sendEvent(event);
 
         assertNotNull(reply);
@@ -60,12 +60,12 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
         properties.put("delegateMethod", "wash");
 
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
-        MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
-        managementContext.getRegistry().registerService(desc, managementContext);
+        UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, properties, managementContext);
+        managementContext.getRegistry().registerComponent(component, managementContext);
 
-        UMOComponent component = managementContext.getRegistry().lookupSystemModel().getComponent("WrapperUMO");
+        component = managementContext.getRegistry().lookupComponent("WrapperUMO");
 
-        UMOEvent event = getTestEvent("Test", desc, endpoint);
+        UMOEvent event = getTestEvent("Test", component, endpoint);
         UMOMessage reply = component.sendEvent(event);
 
         assertNotNull(reply);
@@ -81,12 +81,12 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
         properties.put("delegateMethod", "methodReturningNull");
 
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
-        MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
-        managementContext.getRegistry().registerService(desc, managementContext);
+        UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, properties, managementContext);
+        managementContext.getRegistry().registerComponent(component, managementContext);
 
-        UMOComponent component = managementContext.getRegistry().lookupSystemModel().getComponent("WrapperUMO");
+        component = managementContext.getRegistry().lookupComponent("WrapperUMO");
 
-        UMOEvent event = getTestEvent("Test", desc, endpoint);
+        UMOEvent event = getTestEvent("Test", component, endpoint);
         UMOMessage reply = component.sendEvent(event);
         
         assertNull(reply);
@@ -97,9 +97,8 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
     {
         try
         {
-            UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
-            MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, Collections.EMPTY_MAP);
-            managementContext.getRegistry().registerService(desc, managementContext);
+            UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, Collections.EMPTY_MAP, managementContext);
+            managementContext.getRegistry().registerComponent(component, managementContext);
         }
         catch (UMOException e)
         {
@@ -117,9 +116,8 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
 
         try
         {
-            UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
-            MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
-            managementContext.getRegistry().registerService(desc, managementContext);
+            UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, properties, managementContext);
+            managementContext.getRegistry().registerComponent(component, managementContext);
         }
         catch (UMOException e)
         {
@@ -137,9 +135,8 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
 
         try
         {
-            UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
-            MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
-            managementContext.getRegistry().registerService(desc, managementContext);
+            UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, properties, managementContext);
+            managementContext.getRegistry().registerComponent(component, managementContext);
         }
         catch (UMOException e)
         {
@@ -158,9 +155,8 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
 
         try
         {
-            UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
-            MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
-            managementContext.getRegistry().registerService(desc, managementContext);
+            UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, properties, managementContext);
+            managementContext.getRegistry().registerComponent(component, managementContext);
         }
         catch (UMOException e)
         {
@@ -178,9 +174,8 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
 
         try
         {
-            UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint("test://in", managementContext);
-            MuleDescriptor desc = (MuleDescriptor) MuleTestUtils.createDescriptor(NoArgsCallWrapper.class.getName(), "WrapperUMO", endpoint, null, properties);
-            managementContext.getRegistry().registerService(desc, managementContext);
+            UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, properties, managementContext);
+            managementContext.getRegistry().registerComponent(component, managementContext);
         }
         catch (UMOException e)
         {

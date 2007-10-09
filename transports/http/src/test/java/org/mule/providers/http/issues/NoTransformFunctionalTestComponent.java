@@ -54,7 +54,7 @@ public class NoTransformFunctionalTestComponent implements Callable
     {
         String contents = context.getMessageAsString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                + context.getComponentDescriptor().getName() + ". Content is: "
+                + context.getComponent().getName() + ". Content is: "
                 + StringMessageUtils.truncate(contents, 100, true), '*', 80);
 
         logger.info(msg);
@@ -71,7 +71,7 @@ public class NoTransformFunctionalTestComponent implements Callable
         }
         else
         {
-            replyMessage = received(contents) + (appendComponentName ? " " + context.getComponentDescriptor().getName() : "");
+            replyMessage = received(contents) + (appendComponentName ? " " + context.getComponent().getName() : "");
         }
 
         context.getManagementContext().fireNotification(
@@ -110,7 +110,7 @@ public class NoTransformFunctionalTestComponent implements Callable
 
         String contents = data.toString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                + context.getComponentDescriptor().getName() + ". Content is: "
+                + context.getComponent().getName() + ". Content is: "
                 + StringMessageUtils.truncate(contents, 100, true), '*', 80);
 
         logger.info(msg);

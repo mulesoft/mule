@@ -11,7 +11,7 @@
 package org.mule.registry;
 
 import org.mule.config.MuleConfiguration;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
@@ -138,7 +138,9 @@ public interface Registry extends Initialisable, Disposable
 
     UMOTransformer lookupTransformer(String name);
 
-    public UMODescriptor lookupService(String serviceName);
+    UMOComponent lookupComponent(String component);
+
+    Collection/*<UMOComponent>*/ lookupComponents(String model);
 
     UMOModel lookupModel(String name);
 
@@ -222,13 +224,8 @@ public interface Registry extends Initialisable, Disposable
 
     UMOTransformer unregisterTransformer(String transformerName);
 
-    public void registerService(UMODescriptor service, UMOManagementContext managementContext)
-        throws UMOException;
-
-    /** @deprecated Use registerService(UMODescriptor service, UMOManagementContext managementContext) instead. */
-    public void registerService(UMODescriptor service) throws UMOException;
-
-    public UMODescriptor unregisterService(String serviceName);
+    void registerComponent(UMOComponent component, UMOManagementContext managementContext) throws UMOException;
+    UMOComponent unregisterComponent(String componentName);
 
     void registerModel(UMOModel model, UMOManagementContext managementContext) throws UMOException;
 

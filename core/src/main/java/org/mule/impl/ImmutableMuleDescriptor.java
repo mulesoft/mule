@@ -12,7 +12,6 @@ package org.mule.impl;
 
 import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
-import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.routing.inbound.InboundPassThroughRouter;
@@ -29,9 +28,6 @@ import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.util.object.ObjectFactory;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
@@ -56,7 +52,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected ExceptionListener exceptionListener;
 
     /** Factory which creates an instance of the actual service object. */
-    protected ObjectFactory serviceFactory;
+    //protected ObjectFactory serviceFactory;
 
     /** The descriptor name */
     protected String name;
@@ -67,12 +63,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * @deprecated MULE-1933 Properties for the underlying service should be set on the ServiceFactory instead.
      */
     protected Map properties = new HashMap();
-
-    /** The descriptors version */
-    protected String version = "1.0";
-
-    /** A list of UMOinteceptors that will be executed when the Mule UMO executed */
-    protected List intecerptorList = new CopyOnWriteArrayList();
 
     protected UMOInboundRouterCollection inboundRouter;
 
@@ -89,12 +79,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected ThreadingProfile threadingProfile;
 
     /**
-     * The pooling profile to use for this component. If this is not set a default
-     * will be provided by the server
-     */
-    protected PoolingProfile poolingProfile;
-
-    /**
      * The queue profile to use for this component. If this is not set a default
      * will be provided by the server
      */
@@ -106,12 +90,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      */
     protected String initialState = INITIAL_STATE_STARTED;
 
-    /** Determines if this component is a singleton */
-    protected boolean singleton = false;
-
     protected List initialisationCallbacks = new ArrayList();
-
-    protected String registryId = null;
 
     /** The name of the model that this descriptor is associated with */
     protected String modelName;
@@ -132,16 +111,13 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         outboundRouter = descriptor.getOutboundRouter();
         responseRouter = descriptor.getResponseRouter();
         nestedRouter = descriptor.getNestedRouter();
-        serviceFactory = descriptor.getServiceFactory();
-        version = descriptor.getVersion();
-        intecerptorList = descriptor.getInterceptors();
+        //serviceFactory = descriptor.getServiceFactory();
         properties = descriptor.getProperties();
         name = descriptor.getName();
 
         threadingProfile = descriptor.getThreadingProfile();
         exceptionListener = descriptor.getExceptionListener();
         initialState = descriptor.getInitialState();
-        singleton = descriptor.isSingleton();
         modelName = descriptor.getModelName();
         entryPointResolverSet = descriptor.getEntryPointResolverSet();
     }
@@ -193,6 +169,10 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 //            nestedRouter.initialise();
 //        }
 
+//        if (serviceFactory != null)
+//        {
+//            serviceFactory.initialise();
+//        }
     }
 
     /*
@@ -228,31 +208,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return properties;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMODescriptor#getVersion()
-     */
-    public String getVersion()
-    {
-        return version;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMODescriptor#getinteceptorList()
-     */
-    public List getInterceptors()
-    {
-        return intecerptorList;
-    }
-
     /** Factory which creates an instance of the actual service object. */
-    public ObjectFactory getServiceFactory()
-    {
-        return serviceFactory;
-    }
+//    public ObjectFactory getServiceFactory()
+//    {
+//        return serviceFactory;
+//    }
 
     public UMOInboundRouterCollection getInboundRouter()
     {
@@ -278,11 +238,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return threadingProfile;
     }
 
-    public PoolingProfile getPoolingProfile()
-    {
-        return poolingProfile;
-    }
-
     public QueueProfile getQueueProfile()
     {
         return queueProfile;
@@ -301,11 +256,6 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public UMOResponseRouterCollection getResponseRouter()
     {
         return responseRouter;
-    }
-
-    public boolean isSingleton()
-    {
-        return singleton;
     }
 
     public String getInitialState()
@@ -340,13 +290,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         final StringBuffer sb = new StringBuffer();
         sb.append("ImmutableMuleDescriptor");
         sb.append("{exceptionListener=").append(exceptionListener);
-        sb.append(", serviceFactory=").append(serviceFactory);
+        //sb.append(", serviceFactory=").append(serviceFactory);
         sb.append(", name='").append(name).append('\'');
         sb.append(", properties=").append(properties);
-        sb.append(", version='").append(version).append('\'');
         sb.append(", threadingProfile=").append(threadingProfile);
         sb.append(", initialState='").append(initialState).append('\'');
-        sb.append(", singleton=").append(singleton);
         sb.append(", modelName='").append(modelName).append('\'');
         sb.append(", entryPointResolver='").append(entryPointResolverSet).append('\'');
         sb.append('}');

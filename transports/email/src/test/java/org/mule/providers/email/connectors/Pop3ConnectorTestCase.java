@@ -18,22 +18,12 @@ import org.mule.umo.provider.UMOConnector;
  */
 public class Pop3ConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
-
-    public Pop3ConnectorTestCase()
-    {
-        super("Pop3Connector");
-    }
-    
-    public UMOConnector createConnector(boolean init) throws Exception
+    public UMOConnector createConnector() throws Exception
     {
         Pop3Connector connector = new Pop3Connector();
-        connector.setName(getConnectorName());
+        connector.setName("Pop3Connector");
         connector.setCheckFrequency(POLL_PERIOD_MS);
         connector.setServiceOverrides(newEmailToStringServiceOverrides());
-        if (init)
-        {
-            connector.initialise();
-        }
         return connector;
     }
 

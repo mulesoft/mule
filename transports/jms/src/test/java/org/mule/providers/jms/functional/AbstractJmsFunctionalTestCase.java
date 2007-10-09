@@ -83,7 +83,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     public Connection getSenderConnection() throws Exception
     {
-        ConnectionFactory cf = (ConnectionFactory) connector.getConnectionFactory().create();
+        ConnectionFactory cf = (ConnectionFactory) connector.getConnectionFactory().getOrCreate();
         return cf.createConnection();
     }
 

@@ -22,9 +22,9 @@
 
         <!--Accessing an XFire hosted web-service using Axis-->
         <service name="BridgeToXfireHello">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://xfire.in"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

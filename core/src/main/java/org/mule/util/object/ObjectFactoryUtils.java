@@ -20,7 +20,7 @@ public class ObjectFactoryUtils
         Object result;
         if (source instanceof ObjectFactory)
         {
-            result = ((ObjectFactory) source).create();
+            result = ((ObjectFactory) source).getOrCreate();
         }
         else
         {

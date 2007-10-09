@@ -15,9 +15,9 @@
 
     <model name="Sample">
         <service name="Console I/O">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="stdio://System.in"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <!--

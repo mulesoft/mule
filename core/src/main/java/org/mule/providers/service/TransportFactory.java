@@ -103,7 +103,6 @@ public class TransportFactory
 //                props = PropertiesUtils.removeNamespaces(props);
 //                BeanUtils.populateWithoutFail(connector, props, true);
 //            }
-            RegistryContext.getRegistry().registerConnector(connector, managementContext);
 
             return connector;
         }
@@ -126,6 +125,9 @@ public class TransportFactory
         return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), endpoint.getCreateConnector(), managementContext);
     }
 
+    /**
+     * Returns an initialized connector.
+     */
     private static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, int create, UMOManagementContext managementContext)
         throws TransportFactoryException
     {
@@ -148,12 +150,13 @@ public class TransportFactory
             try
             {
                 BeanUtils.populate(connector, uri.getParams());
-
+                connector.setManagementContext(managementContext);
+                managementContext.applyLifecycle(connector);
+                managementContext.getRegistry().registerConnector(connector, managementContext);
             }
             catch (Exception e)
             {
-                throw new TransportFactoryException(
-                    CoreMessages.failedToSetPropertiesOn("Connector"), e);
+                throw new TransportFactoryException(e);
             }
         }
         else if (create == NEVER_CREATE_CONNECTOR && connector == null)

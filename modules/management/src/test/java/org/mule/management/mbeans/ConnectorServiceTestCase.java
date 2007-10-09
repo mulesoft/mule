@@ -21,6 +21,7 @@ import javax.management.ObjectName;
 
 public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
+    // TODO Why 5?  Document the magic number!
     private static final int NUMBER_OF_COMPONENTS = 5;
 
     public void testUndeploy() throws Exception

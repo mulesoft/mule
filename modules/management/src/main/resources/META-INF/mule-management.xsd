@@ -18,7 +18,7 @@
             <xsd:extension base="mule:abstractAgentType">
                 <xsd:sequence>
                     <xsd:element name="connector-server" type="connectorServerType" minOccurs="0" />
-                    <xsd:element name="mBeanServer" type="mule:objectFactoryType" minOccurs="0" />
+                    <xsd:element name="mBeanServer" type="mule:abstractObjectFactoryType" minOccurs="0" />
                     <xsd:element name="credentials" type="mule:mapType" minOccurs="0" />
                 </xsd:sequence>
                 <xsd:attribute name="locateServer" type="mule:substitutableBoolean" default="true" />

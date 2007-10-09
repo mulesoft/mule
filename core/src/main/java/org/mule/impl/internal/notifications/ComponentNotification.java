@@ -11,7 +11,7 @@
 package org.mule.impl.internal.notifications;
 
 import org.mule.impl.MuleDescriptor;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.manager.UMOServerNotification;
 
 /**
@@ -46,7 +46,7 @@ public class ComponentNotification extends UMOServerNotification
         registerAction("disposed", COMPONENT_DISPOSED);
     }
 
-    public ComponentNotification(UMODescriptor message, int action)
+    public ComponentNotification(UMOComponent message, int action)
     {
         super(message, action);
         resourceIdentifier = message.getName();

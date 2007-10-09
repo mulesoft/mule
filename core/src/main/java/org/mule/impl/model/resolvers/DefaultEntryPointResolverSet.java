@@ -15,11 +15,12 @@ import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,7 +38,7 @@ public class DefaultEntryPointResolverSet implements UMOEntryPointResolverSet
     protected transient final Log logger = LogFactory.getLog(DefaultEntryPointResolverSet.class);
 
     private final Set entryPointResolvers = new LinkedHashSet(4);
-    private List exceptions = new ArrayList(4);
+    private List exceptions = new CopyOnWriteArrayList();
 
     public Object invoke(Object component, UMOEventContext context) throws Exception
     {

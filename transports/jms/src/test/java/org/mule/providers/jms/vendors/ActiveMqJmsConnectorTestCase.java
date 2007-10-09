@@ -33,7 +33,7 @@ public class ActiveMqJmsConnectorTestCase extends FunctionalTestCase
 
         assertFalse(c.isEagerConsumer());
         
-        ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory().create();
+        ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory().getOrCreate();
         assertTrue(cf instanceof ActiveMQConnectionFactory);
         assertEquals(ActiveMqJmsConnector.BROKER_URL, ((ActiveMQConnectionFactory) cf).getBrokerURL());
         

@@ -53,6 +53,7 @@ import javax.transaction.TransactionManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 
@@ -102,7 +103,7 @@ public class JdbcConnector extends AbstractConnector
             // datasource name
             if (dataSourceFactory != null)
             {
-                dataSource = (DataSource) dataSourceFactory.create();
+                dataSource = (DataSource) dataSourceFactory.getOrCreate();
             }
             else
             {
@@ -130,22 +131,35 @@ public class JdbcConnector extends AbstractConnector
             {
                 // Add defaults
                 propertyExtractors = new HashSet();
-                propertyExtractors.add(new SimpleObjectFactory(MessagePropertyExtractor.class));
-                propertyExtractors.add(new SimpleObjectFactory(NowPropertyExtractor.class));
-                propertyExtractors.add(new SimpleObjectFactory(PayloadPropertyExtractor.class));
-                propertyExtractors.add(new SimpleObjectFactory(MapPropertyExtractor.class));
-                propertyExtractors.add(new SimpleObjectFactory(BeanPropertyExtractor.class));
+                ObjectFactory of;
+                of = new SimpleObjectFactory(MessagePropertyExtractor.class);
+                of.initialise();
+                propertyExtractors.add(of);
+                of = new SimpleObjectFactory(NowPropertyExtractor.class);
+                of.initialise();
+                propertyExtractors.add(of);
+                of = new SimpleObjectFactory(PayloadPropertyExtractor.class);
+                of.initialise();
+                propertyExtractors.add(of);
+                of = new SimpleObjectFactory(MapPropertyExtractor.class);
+                of.initialise();
+                propertyExtractors.add(of);
+                of = new SimpleObjectFactory(BeanPropertyExtractor.class);
+                of.initialise();
+                propertyExtractors.add(of);
 
                 if (ClassUtils.isClassOnPath("org.mule.util.properties.Dom4jPropertyExtractor", getClass()))
                 {
-                    propertyExtractors.add(new SimpleObjectFactory(
-                        "org.mule.util.properties.Dom4jPropertyExtractor"));
+                    of = new SimpleObjectFactory("org.mule.util.properties.Dom4jPropertyExtractor");
+                    of.initialise();
+                    propertyExtractors.add(of);
                 }
 
                 if (ClassUtils.isClassOnPath("org.mule.util.properties.JDomPropertyExtractor", getClass()))
                 {
-                    propertyExtractors.add(new SimpleObjectFactory(
-                        "org.mule.util.properties.JDomPropertyExtractor"));
+                    of = new SimpleObjectFactory("org.mule.util.properties.JDomPropertyExtractor");
+                    of.initialise();
+                    propertyExtractors.add(of);
                 }
             }
         }
@@ -524,7 +538,7 @@ public class JdbcConnector extends AbstractConnector
         {
             if (resultSetHandler != null)
             {
-                return (ResultSetHandler) resultSetHandler.create();
+                return (ResultSetHandler) resultSetHandler.getOrCreate();
             }
             else
             {
@@ -576,7 +590,7 @@ public class JdbcConnector extends AbstractConnector
         {
             if (queryRunner != null)
             {
-                return (QueryRunner) queryRunner.create();
+                return (QueryRunner) queryRunner.getOrCreate();
             }
             else
             {

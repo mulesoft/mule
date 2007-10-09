@@ -39,6 +39,8 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
+        rmiRegistryAgent.setManagementContext(managementContext);
+        rmiRegistryAgent.initialise();
         RegistryContext.getRegistry().registerAgent(rmiRegistryAgent, managementContext);
         
         // simulate a running environment with Log4j MBean already registered

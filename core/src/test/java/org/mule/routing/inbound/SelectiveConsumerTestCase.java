@@ -35,7 +35,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
     public void testSelectiveConsumer() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
+        UMOComponent testComponent = getTestComponent("test", Apple.class);
 
         UMOInboundRouterCollection messageRouter = new InboundRouterCollection();
         SelectiveConsumer router = new SelectiveConsumer();
@@ -80,7 +80,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
     public void testSelectiveConsumerWithTransformer() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
+        UMOComponent testComponent = getTestComponent("test", Apple.class);
 
         UMOInboundRouterCollection messageRouter = new InboundRouterCollection();
         SelectiveConsumer router = new SelectiveConsumer();

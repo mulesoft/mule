@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: SimpleComponentDefinitionParser.java 8848 2007-10-04 22:52:30Z acooke $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -28,6 +28,8 @@ import org.w3c.dom.Element;
  * <b>This DefinitionParser should only be used for state-less components.</b> <p/>
  * In order to further customize components and use serviceFactory properties the
  * &lt;mule:component/&gt; element should be used.
+ * 
+ * @deprecated Use SimplePojoServiceDefinitionParser instead
  */
 public class SimpleComponentDefinitionParser extends ChildDefinitionParser
 {

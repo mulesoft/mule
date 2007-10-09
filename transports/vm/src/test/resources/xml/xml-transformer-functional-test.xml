@@ -47,9 +47,9 @@
     <model name="xml transformer tests">
 
         <service name="xml to ...">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="xml-in"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
@@ -68,9 +68,9 @@
         </service>
 
         <service name="object to xml">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="object-in"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
@@ -85,9 +85,9 @@
 
         <!-- Need to split this across two service to avoid MULE-2136 -->
         <service name="object to xml 2">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="object-in-2"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
@@ -100,9 +100,9 @@
         </service>
 
         <service name="dom to xml">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="dom-in"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>

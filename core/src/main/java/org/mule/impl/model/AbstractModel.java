@@ -10,34 +10,25 @@
 
 package org.mule.impl.model;
 
-import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultLifecycleAdapterFactory;
 import org.mule.impl.ImmutableMuleDescriptor;
-import org.mule.impl.MuleSession;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.UMOSession;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.manager.UMOServerNotification;
-import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.model.UMOModel;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import java.beans.ExceptionListener;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,12 +48,12 @@ public abstract class AbstractModel implements UMOModel
     private UMOEntryPointResolverSet entryPointResolverSet = new LegacyEntryPointResolverSet();
     private UMOLifecycleAdapterFactory lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
 
-    private Map components = new ConcurrentSkipListMap();
+    //private Map components = new ConcurrentSkipListMap();
 
     protected UMOManagementContext managementContext;
 
     /** Collection for mule descriptors registered in this Manager */
-    protected Map descriptors = new ConcurrentHashMap();
+    //protected Map descriptors = new ConcurrentHashMap();
 
     private AtomicBoolean initialised = new AtomicBoolean(false);
 
@@ -77,8 +68,8 @@ public abstract class AbstractModel implements UMOModel
         // resolver and exceptionstrategy.
         entryPointResolverSet = new LegacyEntryPointResolverSet();
         lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
-        components = new ConcurrentSkipListMap();
-        descriptors = new ConcurrentHashMap();
+        //components = new ConcurrentSkipListMap();
+        //descriptors = new ConcurrentHashMap();
     }
 
 
@@ -122,94 +113,94 @@ public abstract class AbstractModel implements UMOModel
         this.entryPointResolverSet = entryPointResolverSet;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOModel#isUMORegistered(java.lang.String)
-     */
-    public boolean isComponentRegistered(String name)
-    {
-        return (components.get(name) != null);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOModel#registerUMO(org.mule.umo.UMODescriptor)
-     */
-    public void registerComponent(UMODescriptor descriptor) throws UMOException
-    {
-        if (descriptor == null)
-        {
-            throw new ModelException(CoreMessages.objectIsNull("UMO Descriptor"));
-        }
-
-        if (descriptor.getModelName() == null)
-        {
-            descriptor.setModelName(getName());
-        }
-        else if (!descriptor.getModelName().equals(getName()))
-        {
-            throw new ModelException(CoreMessages.modelNameDoesNotMatchModel(descriptor, getName()));
-        }
-
-        // Set the es if one wasn't set in the configuration
-        if (descriptor.getExceptionListener() == null)
-        {
-            descriptor.setExceptionListener(exceptionListener);
-        }
-
-        // detect duplicate descriptor declarations
-        if (descriptors.get(descriptor.getName()) != null)
-        {
-            throw new ModelException(CoreMessages.descriptorAlreadyExists(descriptor.getName()));
-        }
-
-        UMOComponent component = (UMOComponent) components.get(descriptor.getName());
-
-        if (component == null)
-        {
-            component = createComponent(descriptor);
-            component.setManagementContext(managementContext);
-            descriptors.put(descriptor.getName(), descriptor);
-            components.put(descriptor.getName(), component);
-        }
-
-        logger.debug("Added Mule UMO: " + descriptor.getName());
-
-        if (initialised.get())
-        {
-            logger.info("Initialising component: " + descriptor.getName());
-            component.initialise();
-        }
-        if (started.get())
-        {
-            startComponent(descriptor.getName());
-        }
-    }
-
-
-    public void unregisterComponent(UMODescriptor descriptor) throws UMOException
-    {
-        if (descriptor == null)
-        {
-            throw new ModelException(CoreMessages.objectIsNull("UMO Descriptor"));
-        }
-
-        if (!isComponentRegistered(descriptor.getName()))
-        {
-            throw new ModelException(CoreMessages.componentNotRegistered(descriptor.getName()));
-        }
-        UMOComponent component = (UMOComponent) components.remove(descriptor.getName());
-
-        if (component != null)
-        {
-            component.stop();
-            descriptors.remove(descriptor.getName());
-            component.dispose();
-            logger.info("The component: " + descriptor.getName() + " has been unregistered and disposing");
-        }
-    }
+//    /*
+//     * (non-Javadoc)
+//     * 
+//     * @see org.mule.umo.UMOModel#isUMORegistered(java.lang.String)
+//     */
+//    public boolean isComponentRegistered(String name)
+//    {
+//        return (components.get(name) != null);
+//    }
+//    
+//    /*
+//     * (non-Javadoc)
+//     * 
+//     * @see org.mule.umo.UMOModel#registerUMO(org.mule.umo.UMODescriptor)
+//     */
+//    public void registerComponent(UMODescriptor descriptor) throws UMOException
+//    {
+//        if (descriptor == null)
+//        {
+//            throw new ModelException(CoreMessages.objectIsNull("UMO Descriptor"));
+//        }
+//
+//        if (descriptor.getModelName() == null)
+//        {
+//            descriptor.setModelName(getName());
+//        }
+//        else if (!descriptor.getModelName().equals(getName()))
+//        {
+//            throw new ModelException(CoreMessages.modelNameDoesNotMatchModel(descriptor, getName()));
+//        }
+//
+//        // Set the es if one wasn't set in the configuration
+//        if (descriptor.getExceptionListener() == null)
+//        {
+//            descriptor.setExceptionListener(exceptionListener);
+//        }
+//
+//        // detect duplicate descriptor declarations
+//        if (descriptors.get(descriptor.getName()) != null)
+//        {
+//            throw new ModelException(CoreMessages.descriptorAlreadyExists(descriptor.getName()));
+//        }
+//
+//        UMOComponent component = (UMOComponent) components.get(descriptor.getName());
+//
+//        if (component == null)
+//        {
+//            component = createComponent(descriptor);
+//            component.setManagementContext(managementContext);
+//            descriptors.put(descriptor.getName(), descriptor);
+//            components.put(descriptor.getName(), component);
+//        }
+//
+//        logger.debug("Added Mule UMO: " + descriptor.getName());
+//
+//        if (initialised.get())
+//        {
+//            logger.info("Initialising component: " + descriptor.getName());
+//            component.initialise();
+//        }
+//        if (started.get())
+//        {
+//            startComponent(descriptor.getName());
+//        }
+//    }
+//
+//
+//    public void unregisterComponent(UMODescriptor descriptor) throws UMOException
+//    {
+//        if (descriptor == null)
+//        {
+//            throw new ModelException(CoreMessages.objectIsNull("UMO Descriptor"));
+//        }
+//
+//        if (!isComponentRegistered(descriptor.getName()))
+//        {
+//            throw new ModelException(CoreMessages.componentNotRegistered(descriptor.getName()));
+//        }
+//        UMOComponent component = (UMOComponent) components.remove(descriptor.getName());
+//
+//        if (component != null)
+//        {
+//            component.stop();
+//            descriptors.remove(descriptor.getName());
+//            component.dispose();
+//            logger.info("The component: " + descriptor.getName() + " has been unregistered and disposing");
+//        }
+//    }
 
     /*
      * (non-Javadoc)
@@ -236,46 +227,48 @@ public abstract class AbstractModel implements UMOModel
     {
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSING));
 
-        for (Iterator i = components.values().iterator(); i.hasNext();)
-        {
-            UMOComponent component = (UMOComponent) i.next();
-            try
-            {
-                component.dispose();
-                logger.info(component + " has been destroyed successfully");
-            }
-            catch (Exception e1)
-            {
-                // TODO MULE-863: So what do we do about this?
-                logger.warn("Failed to dispose component: " + e1.getMessage());
-            }
-        }
+//        Collection components = managementContext.getRegistry().lookupComponents(getName());
+//        UMOComponent component;
+//        for (Iterator i = components.iterator(); i.hasNext();)
+//        {
+//            component = (UMOComponent) i.next();
+//            try
+//            {
+//                component.dispose();
+//                logger.info(component + " has been destroyed successfully");
+//            }
+//            catch (Exception e1)
+//            {
+//                // TODO MULE-863: So what do we do about this?
+//                logger.warn("Failed to dispose component: " + e1.getMessage());
+//            }
+//        }
 
-        components.clear();
-        descriptors.clear();
+        //components.clear();
+        //descriptors.clear();
 
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSED));
     }
 
-    /**
-     * Returns a valid component for the given Mule name
-     *
-     * @param muleName the Name of the Mule for which the component is required
-     * @return a component for the specified name
-     */
-    public UMOSession getComponentSession(String muleName)
-    {
-        UMOComponent component = (UMOComponent) components.get(muleName);
-        if (component == null)
-        {
-            logger.warn("Component: " + muleName + " not found returning null session");
-            return null;
-        }
-        else
-        {
-            return new MuleSession(component);
-        }
-    }
+//    /**
+//     * Returns a valid component for the given Mule name
+//     *
+//     * @param muleName the Name of the Mule for which the component is required
+//     * @return a component for the specified name
+//     */
+//    public UMOSession getComponentSession(String muleName)
+//    {
+//        UMOComponent component = (UMOComponent) components.get(muleName);
+//        if (component == null)
+//        {
+//            logger.warn("Component: " + muleName + " not found returning null session");
+//            return null;
+//        }
+//        else
+//        {
+//            return new MuleSession(component);
+//        }
+//    }
 
     /**
      * Stops any registered components
@@ -285,12 +278,15 @@ public abstract class AbstractModel implements UMOModel
     public void stop() throws UMOException
     {
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPING));
-        for (Iterator i = components.values().iterator(); i.hasNext();)
-        {
-            UMOComponent component = (UMOComponent) i.next();
-            component.stop();
-            logger.info("Component " + component + " has been stopped successfully");
-        }
+        
+//        Collection components = managementContext.getRegistry().lookupComponents(getName());
+//        UMOComponent component;
+//        for (Iterator i = components.iterator(); i.hasNext();)
+//        {
+//            component = (UMOComponent) i.next();
+//            stopComponent(component);
+//            logger.info("Component " + component + " has been stopped successfully");
+//        }
         started.set(false);
 
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPED));
@@ -312,11 +308,13 @@ public abstract class AbstractModel implements UMOModel
         {
             fireNotification(new ModelNotification(this, ModelNotification.MODEL_STARTING));
 
-            for (Iterator i = components.values().iterator(); i.hasNext();)
-            {
-                AbstractComponent component = (AbstractComponent) i.next();
-                startComponent(component.getDescriptor().getName());
-            }
+//            Collection components = managementContext.getRegistry().lookupComponents(getName());
+//            UMOComponent component;
+//            for (Iterator i = components.iterator(); i.hasNext();)
+//            {
+//                component = (UMOComponent) i.next();
+//                startComponent(component);
+//            }
             started.set(true);
             fireNotification(new ModelNotification(this, ModelNotification.MODEL_STARTED));
         }
@@ -334,39 +332,32 @@ public abstract class AbstractModel implements UMOModel
      * @throws UMOException if the MuleUMO is not registered or the component failed
      *                      to start
      */
-    public void startComponent(String name) throws UMOException
+    public void startComponent(UMOComponent component) throws UMOException
     {
-        AbstractComponent component = (AbstractComponent) components.get(name);
-        if (component == null)
+        if (component.isStarted())
         {
-            throw new ModelException(CoreMessages.componentNotRegistered(name));
+            logger.info("Component is already started: " + component);
+        }
+        else if (component.getInitialState().equals(
+                ImmutableMuleDescriptor.INITIAL_STATE_STARTED))
+        {
+            component.start();
+            logger.info("Component " + component + " has been started successfully");
+        }
+        else if (component.getInitialState().equals(
+                ImmutableMuleDescriptor.INITIAL_STATE_PAUSED))
+        {
+            // TODO Why should we have to cast here?
+            ((AbstractComponent) component).start(true);
+            logger.info("Component " + component
+                    + " has been started and paused (initial state = 'paused')");
         }
         else
         {
-            if (component.isStarted())
-            {
-                logger.info("Component is already started: " + component);
-            }
-            else if (component.getDescriptor().getInitialState().equals(
-                    ImmutableMuleDescriptor.INITIAL_STATE_STARTED))
-            {
-                component.start();
-                logger.info("Component " + component + " has been started successfully");
-            }
-            else if (component.getDescriptor().getInitialState().equals(
-                    ImmutableMuleDescriptor.INITIAL_STATE_PAUSED))
-            {
-                component.start(true);
-                logger.info("Component " + component
-                        + " has been started and paused (initial state = 'paused')");
-            }
-            else
-            {
-                logger.info("Component " + component
-                        + " has not been started (initial state = 'stopped')");
-            }
-            logger.info("Mule " + component.toString() + " has been started successfully");
+            logger.info("Component " + component
+                    + " has not been started (initial state = 'stopped')");
         }
+        logger.info("Mule " + component.toString() + " has been started successfully");
     }
 
     /**
@@ -376,18 +367,10 @@ public abstract class AbstractModel implements UMOModel
      * @param name the name of the Mule UMO to stop
      * @throws UMOException if the MuleUMO is not registered
      */
-    public void stopComponent(String name) throws UMOException
+    public void stopComponent(UMOComponent component) throws UMOException
     {
-        UMOComponent component = (UMOComponent) components.get(name);
-        if (component == null)
-        {
-            throw new ModelException(CoreMessages.componentNotRegistered(name));
-        }
-        else
-        {
-            component.stop();
-            logger.info("Mule " + name + " has been stopped successfully");
-        }
+        component.stop();
+        logger.info("Mule " + name + " has been stopped successfully");
     }
 
     /**
@@ -403,19 +386,10 @@ public abstract class AbstractModel implements UMOModel
      *                                   component failed to pause.
      * @see org.mule.config.MuleConfiguration
      */
-    public void pauseComponent(String name) throws UMOException
+    public void pauseComponent(UMOComponent component) throws UMOException
     {
-        UMOComponent component = (UMOComponent) components.get(name);
-
-        if (component != null)
-        {
-            component.pause();
-            logger.info("Mule Component " + name + " has been paused successfully");
-        }
-        else
-        {
-            throw new ModelException(CoreMessages.componentNotRegistered(name));
-        }
+        component.pause();
+        logger.info("Mule Component " + name + " has been paused successfully");
     }
 
     /**
@@ -426,28 +400,19 @@ public abstract class AbstractModel implements UMOModel
      * @throws org.mule.umo.UMOException if the MuleUMO is not registered or the
      *                                   component failed to resume
      */
-    public void resumeComponent(String name) throws UMOException
+    public void resumeComponent(UMOComponent component) throws UMOException
     {
-        UMOComponent component = (UMOComponent) components.get(name);
-
-        if (component != null)
-        {
-            component.resume();
-            logger.info("Mule Component " + name + " has been resumed successfully");
-        }
-        else
-        {
-            throw new ModelException(CoreMessages.componentNotRegistered(name));
-        }
+        component.resume();
+        logger.info("Mule Component " + name + " has been resumed successfully");
     }
 
-    public void setServiceDescriptors(List descriptors) throws UMOException
-    {
-        for (Iterator iterator = descriptors.iterator(); iterator.hasNext();)
-        {
-            registerComponent((UMODescriptor) iterator.next());
-        }
-    }
+//    public void setServiceDescriptors(List descriptors) throws UMOException
+//    {
+//        for (Iterator iterator = descriptors.iterator(); iterator.hasNext();)
+//        {
+//            registerComponent((UMODescriptor) iterator.next());
+//        }
+//    }
 
     public void initialise() throws InitialisationException
     {
@@ -460,20 +425,20 @@ public abstract class AbstractModel implements UMOModel
 //            {
 //                ((ManagementContextAware) exceptionListener).setManagementContext(managementContext);
 //            }
-            if (exceptionListener instanceof Initialisable)
-            {
-                ((Initialisable) exceptionListener).initialise();
-            }
-            UMOComponent component = null;
-            for (Iterator i = components.values().iterator(); i.hasNext();)
-            {
-                component = (UMOComponent) i.next();
-
-                component.initialise();
-
-                logger.info("Component " + component.getDescriptor().getName()
-                        + " has been started successfully");
-            }
+//            if (exceptionListener instanceof Initialisable)
+//            {
+//                ((Initialisable) exceptionListener).initialise();
+//            }
+//            Collection components = managementContext.getRegistry().lookupComponents(this.name);
+//            UMOComponent component;
+//            for (Iterator i = components.iterator(); i.hasNext();)
+//            {
+//                component = (UMOComponent) i.next();
+//                component.initialise();
+//
+//                logger.info("Component " + component.getName()
+//                        + " has been started successfully");
+//            }
             initialised.set(true);
             fireNotification(new ModelNotification(this, ModelNotification.MODEL_INITIALISED));
         }
@@ -498,20 +463,20 @@ public abstract class AbstractModel implements UMOModel
 //        return (UMODescriptor) descriptors.get(name);
 //    }
 
-    public UMOComponent getComponent(String name)
-    {
-        return (UMOComponent) components.get(name);
-    }
-
-    /**
-     * Gets an iterator of all component names registered in the model
-     *
-     * @return an iterator of all component names
-     */
-    public Iterator getComponentNames()
-    {
-        return components.keySet().iterator();
-    }
+//    public UMOComponent getComponent(String name)
+//    {
+//        return (UMOComponent) components.get(name);
+//    }
+//
+//    /**
+//     * Gets an iterator of all component names registered in the model
+//     *
+//     * @return an iterator of all component names
+//     */
+//    public Iterator getComponentNames()
+//    {
+//        return components.keySet().iterator();
+//    }
 
     void fireNotification(UMOServerNotification notification)
     {
@@ -530,5 +495,5 @@ public abstract class AbstractModel implements UMOModel
         this.managementContext = context;
     }
 
-    protected abstract UMOComponent createComponent(UMODescriptor descriptor);
+//    protected abstract UMOComponent createComponent(UMODescriptor descriptor);
 }

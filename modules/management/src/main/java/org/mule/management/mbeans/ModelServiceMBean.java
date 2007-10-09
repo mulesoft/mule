@@ -23,19 +23,19 @@ public interface ModelServiceMBean
 
     void stop() throws UMOException;
 
-    boolean isComponentRegistered(String name);
-
-    UMODescriptor getComponentDescriptor(String name);
-
-    void startComponent(String name) throws UMOException;
-
-    void stopComponent(String name) throws UMOException;
-
-    void pauseComponent(String name) throws UMOException;
-
-    void resumeComponent(String name) throws UMOException;
-
-    void unregisterComponent(String name) throws UMOException;
+//    boolean isComponentRegistered(String name);
+//
+//    UMODescriptor getComponentDescriptor(String name);
+//
+//    void startComponent(String name) throws UMOException;
+//
+//    void stopComponent(String name) throws UMOException;
+//
+//    void pauseComponent(String name) throws UMOException;
+//
+//    void resumeComponent(String name) throws UMOException;
+//
+//    void unregisterComponent(String name) throws UMOException;
 
     String getName();
 

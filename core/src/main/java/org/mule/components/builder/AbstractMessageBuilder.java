@@ -13,8 +13,8 @@ package org.mule.components.builder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.UMODescriptorAware;
-import org.mule.umo.UMODescriptor;
+import org.mule.impl.UMOComponentAware;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
  * A component that will invoke all outbound endpoints configured on the component
  * allow the result of each endpoint invocation to be aggregated to a single message.
  */
-public abstract class AbstractMessageBuilder implements UMODescriptorAware, Callable, MessageBuilder
+public abstract class AbstractMessageBuilder implements UMOComponentAware, Callable, MessageBuilder
 {
 
     /**
@@ -41,11 +41,11 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected UMODescriptor descriptor;
+    protected UMOComponent component;
 
-    public void setDescriptor(UMODescriptor descriptor) throws ConfigurationException
+    public void setComponent(UMOComponent component) throws ConfigurationException
     {
-        this.descriptor = descriptor;
+        this.component = component;
     }
 
     public Object onCall(UMOEventContext eventContext) throws Exception
@@ -57,10 +57,10 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
         UMOMessage responseMessage = requestMessage;
         Object builtMessage;
 
-        if (descriptor.getOutboundRouter().hasEndpoints())
+        if (component.getOutboundRouter().hasEndpoints())
         {
             List endpoints = new ArrayList();
-            for (Iterator iterator = descriptor.getOutboundRouter().getRouters().iterator(); iterator.hasNext();)
+            for (Iterator iterator = component.getOutboundRouter().getRouters().iterator(); iterator.hasNext();)
             {
                 UMOOutboundRouter router = (UMOOutboundRouter) iterator.next();
                 endpoints.addAll(router.getEndpoints());
@@ -114,7 +114,7 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
         }
         else
         {
-            logger.info("There are currently no endpoints configured on component: " + descriptor.getName());
+            logger.info("There are currently no endpoints configured on component: " + component.getName());
         }
         eventContext.setStopFurtherProcessing(true);
         return responseMessage;

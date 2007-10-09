@@ -28,7 +28,7 @@ public class FloridaSunnyOrangeFactory implements ObjectFactory
         // nothing to do
     }
 
-    public Object create() throws Exception
+    public Object getOrCreate() throws Exception
     {
         return new Orange(segments, radius, "Florida Sunny");
     }
@@ -51,5 +51,15 @@ public class FloridaSunnyOrangeFactory implements ObjectFactory
     public void setSegments(Integer segments)
     {
         this.segments = segments;
+    }
+    
+    public Object lookup(String id) throws Exception
+    {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void release(Object object) throws Exception
+    {
+        throw new UnsupportedOperationException();
     }
 }

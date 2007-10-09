@@ -1,1 +1,11 @@
 org.mule.test.spring.GlobalPropertiesMule2458TestCase
+
+# TODO Update these tests to use TestSedaModel so that we can have access to the underlying ServiceFactory. 
+org.mule.test.components.ServiceDescriptorTestCase
+# TODO Update this test to use TestSedaModel so that we can have access to the underlying ServiceFactory. 
+org.mule.test.components.ServiceDescriptorLegacyTestCase
+# Get the PoolingProfile from the PoolingObjectFactory now.  Update the config to use scope="pooled" after MULE-2233
+org.mule.test.spring.PoolingProfileTestCase
+# Delete after MULE-2233
+org.mule.test.config.CommonsPoolProxyPoolTestCase
+

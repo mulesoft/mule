@@ -20,6 +20,7 @@ import java.util.List;
 
 /**
  * <code>InterceptorsInvoker</code> is used to trigger an interceptor chain.
+ * @deprecated MULE-1282
  */
 
 public class InterceptorsInvoker extends Invocation

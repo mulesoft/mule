@@ -12,7 +12,6 @@ package org.mule.providers.soap.xfire;
 
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.SoapConstants;
-import org.mule.registry.Registry;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -62,12 +61,11 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            Map props = new HashMap(component.getDescriptor().getProperties());
+            Map props = new HashMap(component.getProperties());
             props.putAll(endpoint.getProperties());
 
             // check if there is the namespace property on the component
-            String namespace = (String) component.getDescriptor().getProperties().get(
-                SoapConstants.SOAP_NAMESPACE_PROPERTY);
+            String namespace = (String) component.getProperties().get(SoapConstants.SOAP_NAMESPACE_PROPERTY);
 
             // check for namespace set as annotation
             if (connector.isEnableJSR181Annotations())
@@ -77,8 +75,9 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 // at this point, the object hasn't been created in the descriptor so
                 // we have to retrieve the implementation classname and create a
                 // class for it
-                WebServiceAnnotation webServiceAnnotation = wa.getWebServiceAnnotation(Class.forName(((SimpleObjectFactory)component.getDescriptor()
-                    .getServiceFactory()).getObjectClassName()));
+                WebServiceAnnotation webServiceAnnotation = 
+                    wa.getWebServiceAnnotation(Class.forName(
+                        ((SimpleObjectFactory)component.getServiceFactory()).getObjectClassName()));
                 namespace = webServiceAnnotation.getTargetNamespace();
             }
 
@@ -110,12 +109,12 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 rewriteProperty(props, "schemas");
             }
 
-            serviceInterfaces = (List)component.getDescriptor().getProperties().get("serviceInterfaces");
+            serviceInterfaces = (List)component.getProperties().get("serviceInterfaces");
             Class exposedInterface;
 
             if (serviceInterfaces == null)
             {
-                exposedInterface = component.getDescriptor().getServiceFactory().create().getClass();
+                exposedInterface = component.getServiceFactory().getOrCreate().getClass();
             }
             else
             {
@@ -129,18 +128,17 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 }
             }
 
-            String wsdlUrl = (String) component.getDescriptor().getProperties().get(
-                SoapConstants.WSDL_URL_PROPERTY);
+            String wsdlUrl = (String) component.getProperties().get(SoapConstants.WSDL_URL_PROPERTY);
 
             if (StringUtils.isBlank(wsdlUrl))
             {
                 service = connector.getServiceFactory().create(exposedInterface,
-                    component.getDescriptor().getName(), namespace, props);
+                    component.getName(), namespace, props);
             }
             else
             {
                 service = connector.getServiceFactory().create(exposedInterface,
-                    new QName(namespace, component.getDescriptor().getName()), new URL(wsdlUrl), props);
+                    new QName(namespace, component.getName()), new URL(wsdlUrl), props);
             }
 
             List inList = connector.getServerInHandlers();

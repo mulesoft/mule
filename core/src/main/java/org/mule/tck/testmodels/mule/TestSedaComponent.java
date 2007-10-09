@@ -10,13 +10,8 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.impl.MuleDescriptor;
-import org.mule.impl.model.MuleProxy;
 import org.mule.impl.model.seda.SedaComponent;
-import org.mule.impl.model.seda.SedaModel;
 import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOModel;
-import org.mule.util.object.ObjectPool;
 
 
 /**
@@ -24,20 +19,14 @@ import org.mule.util.object.ObjectPool;
  */
 public class TestSedaComponent extends SedaComponent
 {
-    public TestSedaComponent(MuleDescriptor descriptor, SedaModel model)
+    public TestSedaComponent()
     {
-        super(descriptor, model);
+        super();
     }
 
-    public MuleProxy createComponentProxy(Object component, MuleDescriptor descriptor, UMOModel model, ObjectPool proxyPool) 
-        throws UMOException
+    //@Override
+    public Object getOrCreateService() throws UMOException
     {
-        return new TestMuleProxy(component, descriptor, model, null);
-    }    
-    
-    // Change from protected to public
-    public MuleProxy getProxy() throws UMOException
-    {
-        return super.getProxy();
+        return super.getOrCreateService();
     }
 }

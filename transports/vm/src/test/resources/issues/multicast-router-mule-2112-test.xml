@@ -12,8 +12,8 @@
     <vm:endpoint name="endpointHop1" address="hop1"/>
     <vm:endpoint name="endpointHop2" address="hop2"/>
 
-    <model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
-        <service name="multicastComponent">
+    <model name="main">
+        <service name="multicastComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
             <pass-through-component/>
             <inbound-router>
                 <vm:inbound-endpoint ref="inbound" synchronous="true"/>
@@ -26,15 +26,15 @@
             </outbound-router>
         </service>
 
-        <service name="hop1">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+        <service name="hop1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <vm:inbound-endpoint ref="endpointHop1"/>
             </inbound-router>
         </service>
 
-        <service name="hop2">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+        <service name="hop2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <vm:inbound-endpoint ref="endpointHop2"/>
             </inbound-router>

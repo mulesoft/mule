@@ -10,29 +10,29 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.DefaultMuleProxy;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOModel;
-import org.mule.util.object.ObjectPool;
+import org.mule.umo.UMOManagementContext;
 
 /**
- * Makes the underlying component object available for unit testing.
+ * Makes the underlying POJO service object available for unit testing.
  */
 public class TestMuleProxy extends DefaultMuleProxy
 {
-    private Object component;
+    private Object pojoService;
     
-    public TestMuleProxy(Object component, MuleDescriptor descriptor, UMOModel model, ObjectPool proxyPool)
+    public TestMuleProxy(Object pojoService, UMOComponent component, UMOManagementContext managementContext)
         throws UMOException
     {
-        super(component, descriptor, model, proxyPool);
-        this.component = component;
+        super(pojoService, component, managementContext);
+        this.pojoService = pojoService;
     }
 
-    public Object getComponent()
+    /** Returns the underlying POJO service object for unit testing. */
+    public Object getPojoService() throws Exception
     {
-        return component;
+        return pojoService;
     }
 }
 

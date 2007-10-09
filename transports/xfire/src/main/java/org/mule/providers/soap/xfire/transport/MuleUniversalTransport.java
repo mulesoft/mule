@@ -10,7 +10,9 @@
 
 package org.mule.providers.soap.xfire.transport;
 
+import org.mule.impl.RequestContext;
 import org.mule.providers.soap.xfire.MuleInvoker;
+import org.mule.umo.UMOEvent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +46,7 @@ public class MuleUniversalTransport extends AbstractTransport
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
-
+    
     public MuleUniversalTransport()
     {
         SoapTransportHelper.createSoapTransport(this);
@@ -92,6 +94,14 @@ public class MuleUniversalTransport extends AbstractTransport
 
     public String getName()
     {
+        UMOEvent event = RequestContext.getEvent();
+        if (event != null && event.getEndpoint() != null)
+        {
+            String scheme = event.getEndpoint().getEndpointURI().getScheme();
+            return scheme.substring(0, 1).toUpperCase() + scheme.substring(1);
+            
+        }
+        
         return "Mule";
     }
 

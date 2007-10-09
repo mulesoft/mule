@@ -12,7 +12,7 @@ package org.mule.impl.model.streaming;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.MessagingException;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -127,10 +127,10 @@ public class DeferredOutputStream extends OutputStream
 
     protected OutputStream getOutputStreamFromRouter() throws IOException
     {
-        UMODescriptor descriptor = event.getComponentDescriptor();
+        UMOComponent component = event.getComponent();
         UMOEndpointURI endpoint = event.getEndpointURI();
 
-        UMOOutboundRouterCollection messageRouter = descriptor.getOutboundRouter();
+        UMOOutboundRouterCollection messageRouter = component.getOutboundRouter();
         if (messageRouter.hasEndpoints())
         {
             for (Iterator iterator = messageRouter.getRouters().iterator(); iterator.hasNext();)
@@ -150,7 +150,7 @@ public class DeferredOutputStream extends OutputStream
                     if (router.getEndpoints().size() != 1)
                     {
                         throw new IOException(
-                            CoreMessages.streamingComponentMustHaveOneEndpoint(descriptor.getName()).toString());
+                            CoreMessages.streamingComponentMustHaveOneEndpoint(component.getName()).toString());
                     }
                     else
                     {
@@ -169,7 +169,7 @@ public class DeferredOutputStream extends OutputStream
             }
             //If we got to here there are no matching outbound Routers
             throw new IOException(
-                CoreMessages.streamingComponentMustHaveOneEndpoint(descriptor.getName()).toString());
+                CoreMessages.streamingComponentMustHaveOneEndpoint(component.getName()).toString());
         }
         if (logger.isDebugEnabled())
         {

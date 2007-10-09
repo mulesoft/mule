@@ -12,7 +12,7 @@ package org.mule.components.rest;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,8 +30,8 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
     public void testResetServiceNamespaceHandler() throws Exception
     {
 
-        UMODescriptor descriptor = managementContext.getRegistry().lookupService(SERVICE_NAME);
-        Object object = descriptor.getServiceFactory().create();
+        UMOComponent component = managementContext.getRegistry().lookupComponent(SERVICE_NAME);
+        Object object = component.getServiceFactory().getOrCreate();
         assertEquals(object.getClass().getName(), RestServiceWrapper.class.getName());
         RestServiceWrapper restServiceWrapper = (RestServiceWrapper) object;
         assertEquals(restServiceWrapper.getServiceUrl(), SERVICE_URL);

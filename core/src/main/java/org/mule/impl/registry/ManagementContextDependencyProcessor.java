@@ -15,7 +15,7 @@ import org.mule.umo.UMOManagementContext;
 
 /**
  * TODO
- * @deprecated This class is not even being used.
+ * @deprecated This class is not being used.
  */
 public class ManagementContextDependencyProcessor implements ObjectProcessor
 {

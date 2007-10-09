@@ -32,10 +32,17 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
+        
         RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
+        rmiRegistryAgent.setManagementContext(managementContext);
+        rmiRegistryAgent.initialise();
+        managementContext.getRegistry().registerAgent(rmiRegistryAgent);
+
         jmxAgent = new JmxAgent();
         jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
-        managementContext.getRegistry().registerAgent(rmiRegistryAgent);
+        jmxAgent.setManagementContext(managementContext);
+        jmxAgent.initialise();
+        
         managementContext.setId(DOMAIN);
     }
 

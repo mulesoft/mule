@@ -11,17 +11,11 @@
 package org.mule.umo.model;
 
 import org.mule.impl.ManagementContextAware;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 
 import java.beans.ExceptionListener;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * The <code>UMOModel</code> encapsulates and manages the runtime behaviour of a
@@ -73,33 +67,33 @@ public interface UMOModel extends Lifecycle, Initialisable, ManagementContextAwa
      */
     void setEntryPointResolverSet(UMOEntryPointResolverSet entryPointResolver);
 
-    /**
-     * Registers a <code>UMODescriptor</code> with the <code>MuleManager</code>.
-     * The manager will take care of creating the Mule UMO and, it's component and
-     * proxies.
-     *
-     * @param descriptor the <code>UMODescriptor</code> to register
-     */
-    void registerComponent(UMODescriptor descriptor) throws UMOException;
-
-    /**
-     * Unregisters a component From the model
-     *
-     * @param descriptor the descriptor of the componnt to remove
-     * @throws UMOException if the component is not registered or it failed to be
-     *                      disposing or the descriptor is null
-     */
-    void unregisterComponent(UMODescriptor descriptor) throws UMOException;
-
-    /**
-     * Determines if a UMO component descriptor by the given name is regestered with
-     * the model
-     *
-     * @param name the name of the UMO
-     * @return true if the UMO's descriptor has benn registered with the model
-     * @see UMODescriptor
-     */
-    boolean isComponentRegistered(String name);
+//    /**
+//     * Registers a <code>UMODescriptor</code> with the <code>MuleManager</code>.
+//     * The manager will take care of creating the Mule UMO and, it's component and
+//     * proxies.
+//     *
+//     * @param descriptor the <code>UMODescriptor</code> to register
+//     */
+//    void registerComponent(UMODescriptor descriptor) throws UMOException;
+//
+//    /**
+//     * Unregisters a component From the model
+//     *
+//     * @param descriptor the descriptor of the componnt to remove
+//     * @throws UMOException if the component is not registered or it failed to be
+//     *                      disposing or the descriptor is null
+//     */
+//    void unregisterComponent(UMODescriptor descriptor) throws UMOException;
+//
+//    /**
+//     * Determines if a UMO component descriptor by the given name is regestered with
+//     * the model
+//     *
+//     * @param name the name of the UMO
+//     * @return true if the UMO's descriptor has benn registered with the model
+//     * @see UMODescriptor
+//     */
+//    boolean isComponentRegistered(String name);
 
     /**
      * The lifecycle adapter is used by the model to translate Mule lifecycle event
@@ -123,24 +117,24 @@ public interface UMOModel extends Lifecycle, Initialisable, ManagementContextAwa
      */
     void setLifecycleAdapterFactory(UMOLifecycleAdapterFactory lifecycleAdapterFactory);
 
-    /**
-     * Returns the Component for the given Mule name.
-     *
-     * @param muleName the Name of the Mule Component to obtain a session for
-     * @return a UMOSession for the given name or null if the component is not
-     *         registered
-     */
-    UMOSession getComponentSession(String muleName);
-
-    /**
-     * A convenience method to set a list of components on the model. This method
-     * will most likely be used when the model is being constructed from an IoC
-     * container
-     *
-     * @param descriptors
-     * @throws UMOException
-     */
-    void setServiceDescriptors(List descriptors) throws UMOException;
+//    /**
+//     * Returns the Component for the given Mule name.
+//     *
+//     * @param muleName the Name of the Mule Component to obtain a session for
+//     * @return a UMOSession for the given name or null if the component is not
+//     *         registered
+//     */
+//    UMOSession getComponentSession(String muleName);
+//
+//    /**
+//     * A convenience method to set a list of components on the model. This method
+//     * will most likely be used when the model is being constructed from an IoC
+//     * container
+//     *
+//     * @param descriptors
+//     * @throws UMOException
+//     */
+//    void setServiceDescriptors(List descriptors) throws UMOException;
 
     /**
      * The exception strategy to use by components managed by the model. The
@@ -182,58 +176,58 @@ public interface UMOModel extends Lifecycle, Initialisable, ManagementContextAwa
      *         is no component registered by that name
      * @see UMOComponent
      */
-    UMOComponent getComponent(String name);
+    //UMOComponent getComponent(String name);
 
-    /**
-     * Stops a single Mule Component. This can be useful when stopping and starting
-     * some Mule UMOs while letting others continue. When a component is stopped all
-     * listeners for that component are unregistered.
-     *
-     * @param name the name of the Mule UMO to stop
-     * @throws UMOException if the MuleUMO is not registered or the component failed
-     *                      to stop
-     */
-    void stopComponent(String name) throws UMOException;
-
-    /**
-     * Starts a single Mule Component. This can be useful when stopping and starting
-     * some Mule UMOs while letting others continue.
-     *
-     * @param name the name of the Mule UMO to start
-     * @throws UMOException if the MuleUMO is not registered or the component failed
-     *                      to start
-     */
-    void startComponent(String name) throws UMOException;
-
-    /**
-     * Pauses event processing for a single Mule Component. Unlike stopComponent(), a
-     * paused component will still consume messages from the underlying transport,
-     * but those messages will be queued until the component is resumed. In order to
-     * persist these queued messages you can set the 'recoverableMode' property on
-     * the Muleconfiguration to true. this causes all internal queues to store their
-     * state.
-     *
-     * @param name the name of the Mule UMO to stop
-     * @throws UMOException if the MuleUMO is not registered or the component failed
-     *                      to pause.
-     * @see org.mule.config.MuleConfiguration
-     */
-    void pauseComponent(String name) throws UMOException;
-
-    /**
-     * Resumes a single Mule Component that has been paused. If the component is not
-     * paused nothing is executed.
-     *
-     * @param name the name of the Mule UMO to resume
-     * @throws UMOException if the MuleUMO is not registered or the component failed
-     *                      to resume
-     */
-    void resumeComponent(String name) throws UMOException;
-
-    /**
-     * Gets an iterator of all component names registered in the model
-     *
-     * @return an iterator of all component names
-     */
-    Iterator getComponentNames();
+//    /**
+//     * Stops a single Mule Component. This can be useful when stopping and starting
+//     * some Mule UMOs while letting others continue. When a component is stopped all
+//     * listeners for that component are unregistered.
+//     *
+//     * @param name the name of the Mule UMO to stop
+//     * @throws UMOException if the MuleUMO is not registered or the component failed
+//     *                      to stop
+//     */
+//    void stopComponent(String name) throws UMOException;
+//
+//    /**
+//     * Starts a single Mule Component. This can be useful when stopping and starting
+//     * some Mule UMOs while letting others continue.
+//     *
+//     * @param name the name of the Mule UMO to start
+//     * @throws UMOException if the MuleUMO is not registered or the component failed
+//     *                      to start
+//     */
+//    void startComponent(String name) throws UMOException;
+//
+//    /**
+//     * Pauses event processing for a single Mule Component. Unlike stopComponent(), a
+//     * paused component will still consume messages from the underlying transport,
+//     * but those messages will be queued until the component is resumed. In order to
+//     * persist these queued messages you can set the 'recoverableMode' property on
+//     * the Muleconfiguration to true. this causes all internal queues to store their
+//     * state.
+//     *
+//     * @param name the name of the Mule UMO to stop
+//     * @throws UMOException if the MuleUMO is not registered or the component failed
+//     *                      to pause.
+//     * @see org.mule.config.MuleConfiguration
+//     */
+//    void pauseComponent(String name) throws UMOException;
+//
+//    /**
+//     * Resumes a single Mule Component that has been paused. If the component is not
+//     * paused nothing is executed.
+//     *
+//     * @param name the name of the Mule UMO to resume
+//     * @throws UMOException if the MuleUMO is not registered or the component failed
+//     *                      to resume
+//     */
+//    void resumeComponent(String name) throws UMOException;
+//
+//    /**
+//     * Gets an iterator of all component names registered in the model
+//     *
+//     * @return an iterator of all component names
+//     */
+//    Iterator getComponentNames();
 }

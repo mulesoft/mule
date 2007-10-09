@@ -67,6 +67,6 @@ public class MulticastConnector extends UdpConnector
     {
         //you can have multiple Multicast sockets bound to a single port,
         // so store listeners with the component name too
-        return endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName();
+        return endpoint.getEndpointURI().getAddress() + "/" + component.getName();
     }
 }

@@ -14,11 +14,10 @@ import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ThreadingProfile;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.seda.SedaComponent;
 import org.mule.providers.AbstractConnector;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOException;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -166,14 +165,15 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 messageEndpoint = endpointFactory.createEndpoint(null);
 
                 String name = "JcaComponent#" + messageEndpoint.hashCode();
-                MuleDescriptor descriptor = new MuleDescriptor(name);
-                descriptor.getInboundRouter().addEndpoint(endpoint);
-                descriptor.setServiceFactory(new SingletonObjectFactory(messageEndpoint));
-                managementContext.getRegistry().lookupModel(JcaModel.JCA_MODEL_TYPE).registerComponent(descriptor);
+                UMOComponent component = new SedaComponent();
+                component.setName(name);
+                component.getInboundRouter().addEndpoint(endpoint);
+                component.setServiceFactory(new SingletonObjectFactory(messageEndpoint));
+                managementContext.getRegistry().registerComponent(component, managementContext);
 
                 MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec)activationSpec);
 
-                endpoints.put(key, descriptor);
+                endpoints.put(key, component);
             }
             catch (Exception e)
             {
@@ -198,21 +198,13 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         if (activationSpec.getClass().equals(MuleActivationSpec.class))
         {
             MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec)activationSpec);
-            UMODescriptor descriptor = (UMODescriptor)endpoints.get(key);
-            if (descriptor == null)
+            UMOComponent component = (UMOComponent)endpoints.get(key);
+            if (component == null)
             {
                 logger.warn("No endpoint was registered with key: " + key);
                 return;
             }
-            try
-            {
-                managementContext.getRegistry().lookupModel(JcaModel.JCA_MODEL_TYPE).unregisterComponent(descriptor);
-            }
-            catch (UMOException e)
-            {
-                logger.error(e.getMessage(), e);
-            }
-
+            managementContext.getRegistry().unregisterComponent(component.getName());
         }
 
     }

@@ -21,7 +21,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -126,7 +126,7 @@ public class UniversalSender extends BasicHandler
             if (requestEndpoint.getConnector() instanceof AxisConnector)
             {
                 msgContext.setTypeMappingRegistry(((AxisConnector)requestEndpoint.getConnector())
-                    .getAxisServer().getTypeMappingRegistry());
+                    .getAxis().getTypeMappingRegistry());
             }
             Object payload = null;
             int contentLength = 0;
@@ -256,11 +256,11 @@ public class UniversalSender extends BasicHandler
 
     protected UMOImmutableEndpoint lookupEndpoint(String uri) throws UMOException
     {
-        UMODescriptor axis = RegistryContext.getRegistry().lookupService(
-            AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
+        UMOComponent axis = RegistryContext.getRegistry().lookupComponent(AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
         UMOEndpointURI endpoint = new MuleEndpointURI(uri);
         UMOManagementContext managementContext = MuleServer.getManagementContext(); 
         UMOImmutableEndpoint ep;
+
         if (axis != null)
         {
             synchronized (endpointsCache)
@@ -274,8 +274,8 @@ public class UniversalSender extends BasicHandler
                     {
                         logger.debug("Dispatch Endpoint uri: " + uri
                                      + " not found on the cache. Creating the endpoint instead.");
-                        ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(uri,
-                            managementContext);
+                        ep = managementContext.getRegistry().lookupEndpointFactory()
+                                .createOutboundEndpoint(uri, managementContext);
                     }
                     else
                     {
@@ -290,8 +290,8 @@ public class UniversalSender extends BasicHandler
         }
         else
         {
-            ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(uri,
-                managementContext);
+            ep = managementContext.getRegistry().lookupEndpointFactory()
+                    .createOutboundEndpoint(uri, managementContext);
         }
         return ep;
     }

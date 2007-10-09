@@ -11,14 +11,11 @@
 package org.mule.tck;
 
 import org.mule.RegistryContext;
-import org.mule.impl.model.MuleProxy;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.testmodels.mule.TestMuleProxy;
 import org.mule.tck.testmodels.mule.TestSedaComponent;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.model.UMOModel;
 
 /**
  * Is a base tast case for tests that initialise Mule using a configuration file. The
@@ -52,19 +49,13 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
 
     protected FunctionalTestComponent lookupTestComponent(String modelName, String componentName) throws UMOException
     {    
-        // TODO MULE-1995 Simplify this lookup
-        UMOModel m = managementContext.getRegistry().lookupModel(modelName);
-        assertNotNull("Model " + m + " not found", m);
-        UMOComponent c = m.getComponent(componentName);
+        UMOComponent c = managementContext.getRegistry().lookupComponent(componentName);
         assertNotNull("Component " + c + " not found", c);
         assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
-        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
-        assertNotNull("Component " + c + " does not have a proxy", proxy);
-        assertTrue("Proxy should be a TestMuleProxy", proxy instanceof TestMuleProxy);
-        Object component = ((TestMuleProxy) proxy).getComponent();
-        assertNotNull("No component for proxy", component);
-        assertTrue("Component should be a FunctionalTestComponent", component instanceof FunctionalTestComponent);
-        return (FunctionalTestComponent) component;
+        Object pojoService = ((TestSedaComponent) c).getOrCreateService();
+        assertNotNull(pojoService);
+        assertTrue("Service should be a FunctionalTestComponent", pojoService instanceof FunctionalTestComponent);
+        return (FunctionalTestComponent) pojoService;
     }
 
 }

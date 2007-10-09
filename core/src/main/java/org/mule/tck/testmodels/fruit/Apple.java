@@ -128,4 +128,14 @@ public class Apple implements Fruit, Callable
     {
         return "Just an apple.";
     }
+
+    public void setBitten(boolean bitten)
+    {
+        this.bitten = bitten;
+    }
+
+    public void setWashed(boolean washed)
+    {
+        this.washed = washed;
+    }
 }

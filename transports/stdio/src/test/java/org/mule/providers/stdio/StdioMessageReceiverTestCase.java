@@ -11,7 +11,6 @@
 package org.mule.providers.stdio;
 
 import org.mule.impl.DefaultExceptionStrategy;
-import org.mule.impl.MuleDescriptor;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
@@ -36,10 +35,7 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
     {
         StdioMessageReceiver receiver = (StdioMessageReceiver) getMessageReceiver();
 
-        MuleDescriptor descriptor = getTestDescriptor("orange", Orange.class.getName());
-        assertNotNull(descriptor);
-
-        UMOComponent component = getTestComponent(descriptor);
+        UMOComponent component = getTestComponent("orange", Orange.class);
         assertNotNull(component);
 
         endpoint.getConnector().start();

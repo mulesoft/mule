@@ -10,10 +10,10 @@
 
 package org.mule.providers.jdbc;
 
-import org.mule.RegistryContext;
 import org.mule.providers.jdbc.test.TestDataSource;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.util.object.ObjectFactory;
 import org.mule.util.object.SimpleObjectFactory;
 
 import java.sql.Connection;
@@ -28,12 +28,23 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
 
     public void testCustomResultSetHandlerIsNotIgnored() throws Exception
     {
-        
         JdbcConnector connector = new JdbcConnector();
-        connector.setQueryRunner(new SimpleObjectFactory(TestQueryRunner.class));
-        connector.setResultSetHandler(new SimpleObjectFactory(TestResultSetHandler.class));
-        connector.setDataSourceFactory(new SimpleObjectFactory(TestDataSource.class));
-        RegistryContext.getRegistry().registerConnector(connector);
+        
+        ObjectFactory of;
+        of = new SimpleObjectFactory(TestQueryRunner.class);
+        of.initialise();
+        connector.setQueryRunner(of);
+        of = new SimpleObjectFactory(TestResultSetHandler.class);
+        of.initialise();
+        connector.setResultSetHandler(of);
+        of = new SimpleObjectFactory(TestDataSource.class);
+        of.initialise();
+        connector.setDataSourceFactory(of);
+        
+        connector.setManagementContext(managementContext);
+        managementContext.applyLifecycle(connector);
+        managementContext.getRegistry().registerConnector(connector, managementContext);
+        
         
         UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
             "jdbc://select * from test", managementContext);

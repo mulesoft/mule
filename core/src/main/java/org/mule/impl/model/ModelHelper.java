@@ -37,59 +37,59 @@ public final class ModelHelper
         return "seda";
     }
     
-    public static boolean isComponentRegistered(String name)
-    {
-        for (Iterator iterator = RegistryContext.getRegistry().getModels().iterator(); iterator.hasNext();)
-        {
-            UMOModel m = (UMOModel) iterator.next();
-            if (m.isComponentRegistered(name))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static UMOComponent getComponent(String name)
-    {
-        for (Iterator iterator = RegistryContext.getRegistry().getModels().iterator(); iterator.hasNext();)
-        {
-            UMOModel m = (UMOModel) iterator.next();
-            if (m.isComponentRegistered(name))
-            {
-                return m.getComponent(name);
-            }
-        }
-        return null;
-    }
-
-    public static UMODescriptor getDescriptor(String name)
-    {
-        return RegistryContext.getRegistry().lookupService(name);
-//        for (Iterator iterator = RegistryContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
+//    public static boolean isComponentRegistered(String name)
+//    {
+//        for (Iterator iterator = RegistryContext.getRegistry().getModels().iterator(); iterator.hasNext();)
 //        {
 //            UMOModel m = (UMOModel) iterator.next();
 //            if (m.isComponentRegistered(name))
 //            {
-//                return m.getDescriptor(name);
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    public static UMOComponent getComponent(String name)
+//    {
+//        for (Iterator iterator = RegistryContext.getRegistry().getModels().iterator(); iterator.hasNext();)
+//        {
+//            UMOModel m = (UMOModel) iterator.next();
+//            if (m.isComponentRegistered(name))
+//            {
+//                return m.getComponent(name);
 //            }
 //        }
 //        return null;
-    }
-
-    //TODO RM*: Move this method
-    public static void registerSystemComponent(UMODescriptor d) throws UMOException
-    {
-        UMOModel model = RegistryContext.getRegistry().lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
-        if(model==null)
-        {
-            model = ModelFactory.createModel("seda");
-            model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
-            RegistryContext.getRegistry().registerModel(model);
-        }
-        d.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
-        RegistryContext.getRegistry().registerService(d);
-    }
+//    }
+//
+//    public static UMODescriptor getDescriptor(String name)
+//    {
+//        return RegistryContext.getRegistry().lookupService(name);
+////        for (Iterator iterator = RegistryContext.getRegistry().getModels().values().iterator(); iterator.hasNext();)
+////        {
+////            UMOModel m = (UMOModel) iterator.next();
+////            if (m.isComponentRegistered(name))
+////            {
+////                return m.getDescriptor(name);
+////            }
+////        }
+////        return null;
+//    }
+//
+//    //TODO RM*: Move this method
+//    public static void registerSystemComponent(UMODescriptor d) throws UMOException
+//    {
+//        UMOModel model = RegistryContext.getRegistry().lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
+//        if(model==null)
+//        {
+//            model = ModelFactory.createModel("seda");
+//            model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
+//            RegistryContext.getRegistry().registerModel(model);
+//        }
+//        d.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
+//        RegistryContext.getRegistry().registerService(d);
+//    }
 
     public static UMOModel getFirstUserModel() throws UMOException
     {

@@ -19,11 +19,11 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
-                    <xsd:element name="dataSource" type="mule:objectFactoryType" />
+                    <xsd:element name="dataSource" type="mule:genericObjectFactoryType" />
                     <xsd:element name="queries" type="mule:mapType" minOccurs="0"/>
                     <xsd:element name="extractors" type="extractorsType" minOccurs="0"/>
-                    <xsd:element name="resultSetHandler" type="mule:objectFactoryType" minOccurs="0" />
-                    <xsd:element name="queryRunner" type="mule:objectFactoryType" minOccurs="0" />
+                    <xsd:element name="resultSetHandler" type="mule:genericObjectFactoryType" minOccurs="0" />
+                    <xsd:element name="queryRunner" type="mule:genericObjectFactoryType" minOccurs="0" />
                 </xsd:sequence>
                 <xsd:attribute name="pollingFrequency" type="mule:substitutableLong" />
             </xsd:extension>

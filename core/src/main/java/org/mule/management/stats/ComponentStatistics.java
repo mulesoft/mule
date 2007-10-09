@@ -46,6 +46,11 @@ public class ComponentStatistics implements Statistics
     private RouterStatistics inboundRouterStat = null;
     private RouterStatistics outboundRouterStat = null;
 
+    public ComponentStatistics(String name)
+    {
+        this(name, 0);
+    }
+
     /**
      * The constructor
      *

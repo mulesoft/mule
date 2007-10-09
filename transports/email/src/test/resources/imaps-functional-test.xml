@@ -21,11 +21,11 @@
     <model name="test">
 
         <service name="relay">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="imaps://bob:password@localhost:65444">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </inbound-endpoint>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

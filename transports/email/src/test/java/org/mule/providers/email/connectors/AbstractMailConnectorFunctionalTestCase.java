@@ -55,12 +55,11 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     private MimeMessage message;
     private Servers servers;
     private boolean initialEmail = false;
-    private String connectorName;
     
-    protected AbstractMailConnectorFunctionalTestCase(boolean initialEmail, String connectorName)
+    protected AbstractMailConnectorFunctionalTestCase(boolean initialEmail)
     {
+        super();
         this.initialEmail = initialEmail;
-        this.connectorName = connectorName;
     }
     
     // @Override
@@ -135,18 +134,6 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         return message;
     }
     
-    public String getConnectorName() 
-    {
-        return connectorName;
-    }
-    
-    public UMOConnector createConnector() throws Exception
-    {
-        return createConnector(false);
-    }
-    
-    public abstract UMOConnector createConnector(boolean init) throws Exception;
-        
     protected String getPop3TestEndpointURI()
     {
         return buildEndpoint("pop3", servers.getPop3().getPort());

@@ -23,6 +23,6 @@
         <axis:supported-scheme>http</axis:supported-scheme>
     </axis:connector>
 
-    <axis:connector name="axisConnector2" axisServer-ref="axisServer" clientProvider-ref="mockProvider"
+    <axis:connector name="axisConnector2" axis-ref="axisServer" clientProvider-ref="mockProvider"
                     serverProvider-ref="mockProvider"/>
 </mule>

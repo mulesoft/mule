@@ -84,7 +84,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
             addRouter(new InboundPassThroughRouter());
         }
 
-        String componentName = event.getSession().getComponent().getDescriptor().getName();
+        String componentName = event.getSession().getComponent().getName();
 
         UMOEvent[] eventsToRoute = null;
         boolean noRoute = true;
@@ -208,7 +208,6 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
 
     public UMOMessage send(UMOEvent event) throws UMOException
     {
-
         return event.getSession().sendEvent(event);
     }
 

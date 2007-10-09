@@ -10,17 +10,14 @@
 
 package org.mule.umo;
 
-import org.mule.config.PoolingProfile;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.util.object.ObjectFactory;
 
 import java.beans.ExceptionListener;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,29 +45,14 @@ public interface UMOImmutableDescriptor extends Initialisable
      * Returns any properties configured on this descriptor.
      *
      * @return properties defined for the descriptor.
-     * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
+     * @deprecated MULE-1933 Properties for the underlying service should be set on the ServiceFactory instead.
      */
     Map getProperties();
 
     /**
-     * Returns a list of interceptor objects that will be executed before/after the
-     * Mule UMO has executed
-     *
-     * @return a list of interceptor objects that will be executed before/after the
-     *         Mule UMO has executed
+     * @return Factory which creates an instance of the actual service object.
      */
-    List getInterceptors();
-
-    /**
-     * The version on the Mule UMO. This is currently not used by the mule run-time
-     * but may be used in future.
-     *
-     * @return the Descriptor Version
-     */
-    String getVersion();
-
-    /** @return Factory which creates an instance of the actual service object. */
-    ObjectFactory getServiceFactory();
+    //ObjectFactory getServiceFactory();
 
     /**
      * Inbound Routers control how events are received by a component. If no router
@@ -108,16 +90,6 @@ public interface UMOImmutableDescriptor extends Initialisable
     UMOResponseRouterCollection getResponseRouter();
 
     /**
-     * Determines if only a single instance of this component is created. This is
-     * useful when a component hands off event processing to another engine such as
-     * Rules processing or Bpel and the processing engine allocates and manages its
-     * own threads.
-     *
-     * @return true if this component is a singleton
-     */
-    boolean isSingleton();
-
-    /**
      * Returns the initial state of this component
      *
      * @return the initial state of this component
@@ -131,8 +103,6 @@ public interface UMOImmutableDescriptor extends Initialisable
      *         if this descriptor has not been registered with a model yet
      */
     String getModelName();
-
-    PoolingProfile getPoolingProfile();
 
     /**
      * A descriptor can have a custom entrypoint resolver for its own object.

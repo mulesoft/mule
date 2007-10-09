@@ -11,19 +11,15 @@
 package org.mule.impl.model.pipeline;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
-import org.mule.impl.model.ComponentFactory;
 import org.mule.impl.model.direct.DirectComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.DispatchException;
 
 public class PipelineComponent extends DirectComponent
@@ -35,9 +31,9 @@ public class PipelineComponent extends DirectComponent
 
     private Callable callable;
 
-    public PipelineComponent(MuleDescriptor descriptor, UMOModel model)
+    public PipelineComponent()
     {
-        super(descriptor, model);
+        super();
     }
 
     protected void doInitialise() throws InitialisationException
@@ -47,7 +43,7 @@ public class PipelineComponent extends DirectComponent
         Object component = null;
         try
         {
-            component = ComponentFactory.createService(getDescriptor());
+            component = getOrCreateService();
         }
         catch (UMOException e)
         {
@@ -91,9 +87,9 @@ public class PipelineComponent extends DirectComponent
                 // if (context != null) {
                 // returnMessage.addProperties(context);
                 // }
-                if (descriptor.getOutboundRouter().hasEndpoints())
+                if (outboundRouter.hasEndpoints())
                 {
-                    UMOMessage outboundReturnMessage = descriptor.getOutboundRouter().route(returnMessage,
+                    UMOMessage outboundReturnMessage = outboundRouter.route(returnMessage,
                         event.getSession(), event.isSynchronous());
                     if (outboundReturnMessage != null)
                     {
@@ -102,7 +98,7 @@ public class PipelineComponent extends DirectComponent
                 }
                 else
                 {
-                    logger.debug("Outbound router on component '" + descriptor.getName()
+                    logger.debug("Outbound router on component '" + name
                                  + "' doesn't have any endpoints configured.");
                 }
             }
@@ -122,9 +118,13 @@ public class PipelineComponent extends DirectComponent
 
     protected void doDispose()
     {
-        if (callable instanceof Disposable)
+        try
         {
-            ((Disposable) callable).dispose();
+            serviceFactory.release(callable);
+        }
+        catch (Exception e)
+        {
+            logger.warn(e);
         }
     }
 }

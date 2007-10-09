@@ -39,13 +39,13 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
 
         assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory().create() instanceof TestConnectionFactory);
+        assertTrue(c.getConnectionFactory().getOrCreate() instanceof TestConnectionFactory);
         assertEquals(Session.AUTO_ACKNOWLEDGE, c.getAcknowledgementMode());
         assertNull(c.getUsername());
         assertNull(c.getPassword());
 
         assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler().create() instanceof DefaultRedeliveryHandler);
+        assertTrue(c.getRedeliveryHandler().getOrCreate() instanceof DefaultRedeliveryHandler);
         
         assertNull(c.getClientId());
         assertFalse(c.isDurable());
@@ -66,13 +66,13 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertNotNull(c.getConnectionFactory());
         
-        assertTrue(c.getConnectionFactory().create() instanceof TestConnectionFactory);
+        assertTrue(c.getConnectionFactory().getOrCreate() instanceof TestConnectionFactory);
         assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
         assertEquals("myuser", c.getUsername());
         assertEquals("mypass", c.getPassword());
 
         assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler().create() instanceof TestRedeliveryHandler);
+        assertTrue(c.getRedeliveryHandler().getOrCreate() instanceof TestRedeliveryHandler);
         
         assertEquals("myClient", c.getClientId());
         assertTrue(c.isDurable());

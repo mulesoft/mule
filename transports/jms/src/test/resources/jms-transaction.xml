@@ -8,9 +8,9 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <model name="transactionTestModel" class="org.mule.tck.testmodels.mule.TestSedaModel">
-        <service name="component1">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+    <model name="transactionTestModel">
+        <service name="component1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="jms://component1In">
                     <transaction action="NONE"/>
@@ -23,8 +23,8 @@
             </outbound-router>
         </service>
 
-        <service name="component2">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+        <service name="component2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="jms://component2In">
                     <transaction action="ALWAYS_BEGIN">
@@ -41,8 +41,8 @@
             </outbound-router>
         </service>
 
-        <service name="component3">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+        <service name="component3" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="jms://component3In">
                     <transaction action="NONE">

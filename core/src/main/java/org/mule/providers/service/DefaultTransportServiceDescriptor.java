@@ -317,7 +317,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             if (context.containsBean(MuleProperties.CONNECTOR_FACTORY))
             {
                 ObjectFactory factory = (ObjectFactory)context.getBean(MuleProperties.CONNECTOR_FACTORY);
-                newConnector = (UMOConnector)factory.create();
+                newConnector = (UMOConnector)factory.getOrCreate();
             }
             else
             {

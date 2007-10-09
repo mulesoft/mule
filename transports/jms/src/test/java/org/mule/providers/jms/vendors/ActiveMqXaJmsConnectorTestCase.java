@@ -34,7 +34,7 @@ public class ActiveMqXaJmsConnectorTestCase extends FunctionalTestCase
         JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector");
         assertNotNull(c);
         
-        Object cf = c.getConnectionFactory().create();
+        Object cf = c.getConnectionFactory().getOrCreate();
         assertTrue(cf instanceof ActiveMQXAConnectionFactory);
 
         ConnectionFactoryWrapper wrapper = new ConnectionFactoryWrapper(cf);

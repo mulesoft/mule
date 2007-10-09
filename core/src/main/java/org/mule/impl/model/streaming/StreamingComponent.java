@@ -11,44 +11,39 @@
 package org.mule.impl.model.streaming;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.impl.model.AbstractComponent;
-import org.mule.impl.model.ComponentFactory;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOEntryPointResolverSet;
-import org.mule.umo.model.UMOModel;
 
 import java.util.Iterator;
 
 /** TODO */
 public class StreamingComponent extends AbstractComponent
 {
-
     private static final long serialVersionUID = 2967438446264425730L;
 
-    protected Object component;
+    protected Object service;
 
     protected UMOEntryPointResolverSet entryPointResolverSet;
 
-    public StreamingComponent(MuleDescriptor descriptor, UMOModel model)
+    public StreamingComponent()
     {
-        super(descriptor, model);
+        super();
     }
 
     protected void doInitialise() throws InitialisationException
     {
         try
         {
-            component = ComponentFactory.createService(getDescriptor());
+            service = getOrCreateService();
         }
         catch (UMOException e)
         {
@@ -57,7 +52,7 @@ public class StreamingComponent extends AbstractComponent
 
         // Validate the component
         // Right now we do not support transformers on the Streaming model
-        for (Iterator iterator = descriptor.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();)
+        for (Iterator iterator = inboundRouter.getEndpoints().iterator(); iterator.hasNext();)
         {
             // Ensure streaming type is correct
             UMOEndpoint ep = (UMOEndpoint) iterator.next();
@@ -72,9 +67,9 @@ public class StreamingComponent extends AbstractComponent
                         CoreMessages.streamingEndpointsDoNotSupportTransformers(), this);
             }
         }
-        if (component instanceof Initialisable)
+        if (service instanceof Initialisable)
         {
-            ((Initialisable) component).initialise();
+            ((Initialisable) service).initialise();
         }
 
         if (entryPointResolverSet == null)
@@ -94,7 +89,7 @@ public class StreamingComponent extends AbstractComponent
 
         try
         {
-            entryPointResolverSet.invoke(component, RequestContext.getEventContext());
+            entryPointResolverSet.invoke(service, RequestContext.getEventContext());
         }
         catch (UMOException e)
         {
@@ -108,9 +103,13 @@ public class StreamingComponent extends AbstractComponent
 
     protected void doDispose()
     {
-        if (component instanceof Disposable)
+        try
         {
-            ((Disposable) component).dispose();
+            serviceFactory.release(service);
+        }
+        catch (Exception e)
+        {
+            logger.warn(e);
         }
     }
 

@@ -21,6 +21,7 @@ import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Disposable;
@@ -121,7 +122,6 @@ public class ManagementContext implements UMOManagementContext
     protected Directories directories;
 
     protected String systemName;
-
 
     public ManagementContext(UMOLifecycleManager lifecycleManager)
     {
@@ -791,5 +791,10 @@ public class ManagementContext implements UMOManagementContext
     public Registry getRegistry()
     {
         return RegistryContext.getRegistry();
+    }
+    
+    public void applyLifecycle(Object object) throws UMOException
+    {
+        lifecycleManager.applyLifecycle(this, object);
     }
 }

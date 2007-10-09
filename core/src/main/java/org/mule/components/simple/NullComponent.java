@@ -24,9 +24,14 @@ import org.mule.umo.lifecycle.Callable;
  */
 public class NullComponent implements Callable
 {
+    public NullComponent()
+    {
+        //System.out.println("NullComponent created");
+    }
+    
     public Object onCall(UMOEventContext context) throws Exception
     {
         throw new UnsupportedOperationException("This component cannot receive messages. Component is: "
-                                                + context.getComponentDescriptor().getName());
+                                                + context.getComponent().getName());
     }
 }

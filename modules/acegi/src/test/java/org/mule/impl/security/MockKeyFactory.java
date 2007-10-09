@@ -10,24 +10,35 @@
 
 package org.mule.impl.security;
 
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.object.ObjectFactory;
+
 
 /**
  * Empty mock for tests
  */
 public class MockKeyFactory extends Named implements ObjectFactory
 {
-
-    public Object create() throws Exception
+    public Object getOrCreate() throws Exception
     {
         return null;
     }
 
-    public void initialise()
+    public Object lookup(String id) throws Exception
+    {
+        return null;
+    }
+
+    public void release(Object object) throws Exception
     {
         // nothing to do
     }
 
+    public void initialise() throws InitialisationException
+    {
+        // nothing to do
+    }
+    
     public void dispose()
     {
         // nothing to do

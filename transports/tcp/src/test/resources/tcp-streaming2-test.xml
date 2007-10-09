@@ -33,8 +33,8 @@
             </stream:outbound-router>
         </stream:service>
 
-        <stream:service name="testComponent">
-            <component scope="singleton" class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
+        <stream:service name="testComponent" class="org.mule.tck.testmodels.mule.TestStreamingComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
             <stream:inbound-router>
                 <stream:inbound-endpoint address="tcp://localhost:65433" synchronous="false"/>
             </stream:inbound-router>

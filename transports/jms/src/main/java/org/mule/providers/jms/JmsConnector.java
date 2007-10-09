@@ -252,7 +252,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
         try
         {
-            cf = (ConnectionFactory) connectionFactory.create();
+            cf = (ConnectionFactory) connectionFactory.getOrCreate();
             if (cf instanceof XAConnectionFactory && managementContext.getTransactionManager() != null)
             {
                 cf = new ConnectionFactoryWrapper(cf);
@@ -388,7 +388,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     protected Object getReceiverKey(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
-        return component.getDescriptor().getName() + "~" + endpoint.getEndpointURI().getAddress();
+        return component.getName() + "~" + endpoint.getEndpointURI().getAddress();
     }
 
     public Session getSessionFromTransaction()

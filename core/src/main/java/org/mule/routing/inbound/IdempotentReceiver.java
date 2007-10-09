@@ -85,7 +85,7 @@ public class IdempotentReceiver extends SelectiveConsumer
     {
         if (assignedComponentName == null && idStore == null)
         {
-            this.assignedComponentName = event.getComponent().getDescriptor().getName();
+            this.assignedComponentName = event.getComponent().getName();
             this.idStore = this.createMessageIdStore();
         }
     }
@@ -121,7 +121,7 @@ public class IdempotentReceiver extends SelectiveConsumer
     // @Override
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
-        String eventComponentName = event.getComponent().getDescriptor().getName();
+        String eventComponentName = event.getComponent().getName();
         if (!assignedComponentName.equals(eventComponentName))
         {
             IllegalArgumentException iex = new IllegalArgumentException(

@@ -326,7 +326,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         protected void handleResults(List messages) throws Exception
         {
             //should send back only if remote synch is set or no outbound endpoints
-            if (endpoint.isRemoteSync() || !component.getDescriptor().getOutboundRouter().hasEndpoints())
+            if (endpoint.isRemoteSync() || !component.getOutboundRouter().hasEndpoints())
             {
                 for (Iterator iterator = messages.iterator(); iterator.hasNext();)
                 {

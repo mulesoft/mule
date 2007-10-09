@@ -13,6 +13,7 @@ package org.mule.providers.soap.axis;
 import org.mule.config.MuleManifest;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -86,15 +87,15 @@ public class AxisServiceComponent implements Initialisable, Callable
     public static final String DEFAULT_AXIS_HOME = "/axisHome";
 
     private String transportName = "http";
-    private ServletSecurityProvider securityProvider;
-    private boolean enableList;
+    private ServletSecurityProvider securityProvider = null;
+    private boolean enableList = true;
     private String homeDir;
-    private AxisServer axisServer;
+    private AxisServer axis;
 
+    /** For IoC */
     public AxisServiceComponent()
     {
-        securityProvider = null;
-        enableList = true;
+        // do nothing
     }
 
     /**
@@ -135,7 +136,10 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     public void initialise() throws InitialisationException
     {
-        // template method
+        if (axis == null)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("No Axis instance, this component has not been initialized properly."), this);
+        }        
     }
 
     public void doGet(UMOEventContext context, WriterMessageAdapter response)
@@ -157,7 +161,7 @@ public class AxisServiceComponent implements Initialisable, Callable
                 endpointUri.initialise();
             }
 
-            AxisEngine engine = getAxisServer();
+            AxisEngine engine = getAxis();
             String pathInfo = endpointUri.getPath();
             boolean wsdlRequested = false;
             boolean listRequested = false;
@@ -302,7 +306,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     protected void processWsdlRequest(MessageContext msgContext, WriterMessageAdapter response)
         throws AxisFault
     {
-        AxisEngine engine = getAxisServer();
+        AxisEngine engine = getAxis();
         try
         {
             engine.generateWSDL(msgContext);
@@ -348,7 +352,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         try
         {
             ByteArrayInputStream istream = new ByteArrayInputStream(msgtxt.getBytes("ISO-8859-1"));
-            AxisEngine engine = getAxisServer();
+            AxisEngine engine = getAxis();
             Message msg = new Message(istream, false);
             msgContext.setRequestMessage(msg);
             engine.invoke(msgContext);
@@ -385,7 +389,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     protected void processListRequest(WriterMessageAdapter response) throws AxisFault
     {
-        AxisEngine engine = getAxisServer();
+        AxisEngine engine = getAxis();
         response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
         if (enableList)
         {
@@ -425,7 +429,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     protected void reportAvailableServices(UMOEventContext context, WriterMessageAdapter response)
         throws ConfigurationException, AxisFault
     {
-        AxisEngine engine = getAxisServer();
+        AxisEngine engine = getAxis();
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
         response.write("<h2>And now... Some Services</h2>");
         String version = MuleManifest.getProductVersion();
@@ -516,7 +520,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         String soapAction;
         Message responseMsg;
-        AxisEngine engine = getAxisServer();
+        AxisEngine engine = getAxis();
         if (engine == null)
         {
 
@@ -827,13 +831,13 @@ public class AxisServiceComponent implements Initialisable, Callable
         this.homeDir = homeDir;
     }
 
-    public AxisServer getAxisServer()
+    public AxisServer getAxis()
     {
-        return axisServer;
+        return axis;
     }
 
-    public void setAxisServer(AxisServer axisServer)
+    public void setAxis(AxisServer axisServer)
     {
-        this.axisServer = axisServer;
+        this.axis = axisServer;
     }
 }

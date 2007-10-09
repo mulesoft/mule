@@ -47,7 +47,7 @@ public class ScriptComponent extends Scriptable implements Callable
         namespace.put("eventContext", context);
         namespace.put("managementContext", context.getManagementContext());
         namespace.put("message", context.getMessage());
-        namespace.put("descriptor", context.getComponentDescriptor());
+        namespace.put("descriptor", context.getComponent());
         namespace.put("componentNamespace", this.bindings);
         namespace.put("log", new MuleLogger(logger));
         namespace.put("result", new Object());

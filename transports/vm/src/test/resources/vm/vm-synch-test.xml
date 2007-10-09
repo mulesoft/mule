@@ -11,9 +11,9 @@
     <model name="synchTestModel">
 
         <service name="bridge">
-            <bridge-component/>
             <inbound-router>
                 <inbound-endpoint address="vm://bridge" synchronous="true"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

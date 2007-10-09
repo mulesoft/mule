@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * TODO
+ * @deprecated This class is not being used.
  */
 public class RegisteredServiceProcessor implements ObjectProcessor
 {

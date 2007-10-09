@@ -34,7 +34,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         IdempotentReceiver router = new IdempotentReceiver();
 
         Mock session = MuleTestUtils.getMockSession();
-        UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
+        UMOComponent testComponent = getTestComponent("test", Apple.class);
 
         UMOInboundRouterCollection messageRouter = new InboundRouterCollection();
 

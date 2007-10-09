@@ -20,7 +20,6 @@
     <model name="main">
 
         <service name="source">
-            <bridge-component/>
             <inbound-router>
                 <pop3:inbound-endpoint>
                     <pop3:address username="bob" password="secret" hostname="localhost" port="62002"/>
@@ -28,6 +27,7 @@
                         <email:transform-mime-to-rfc-822/>
                     </pop3:transformers>
                 </pop3:inbound-endpoint>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -39,11 +39,11 @@
         </service>
 
         <service name="sink">
-            <bridge-component/>
             <inbound-router>
                 <vm:inbound-endpoint connector-ref="default">
                     <vm:address name="sink"/>
                 </vm:inbound-endpoint>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>

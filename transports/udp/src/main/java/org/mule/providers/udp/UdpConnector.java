@@ -188,6 +188,6 @@ public class UdpConnector extends AbstractConnector
 
     protected Object getReceiverKey(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
-        return endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName();
+        return endpoint.getEndpointURI().getAddress() + "/" + component.getName();
     }
 }

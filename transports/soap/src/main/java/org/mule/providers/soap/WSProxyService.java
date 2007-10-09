@@ -12,10 +12,11 @@ package org.mule.providers.soap;
 
 import org.mule.MuleServer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.UMODescriptorAware;
+import org.mule.impl.UMOComponentAware;
 import org.mule.providers.NullPayload;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
@@ -53,7 +54,7 @@ import org.apache.commons.logging.LogFactory;
  * (with no xfire or axis).
  * 
  */
-public class WSProxyService implements Callable, UMODescriptorAware, Initialisable
+public class WSProxyService implements Callable, UMOComponentAware, Initialisable
 {
 
     private String urlWebservice;
@@ -61,6 +62,8 @@ public class WSProxyService implements Callable, UMODescriptorAware, Initialisab
     private String wsdlFile;
     private String wsdlFileContents;
     private boolean useFile = false;
+
+    private UMOComponent component;
 
     private static final String HTTP_REQUEST = "http.request";
     private static final String WSDL_PARAM_1 = "?wsdl";
@@ -156,9 +159,19 @@ public class WSProxyService implements Callable, UMODescriptorAware, Initialisab
     }
 
     // called once upon initialisation
-    public void setDescriptor(UMODescriptor descriptor)
+    public void setComponent(UMOComponent component)
     {
-        UMOOutboundRouter router = (UMOOutboundRouter)descriptor.getOutboundRouter().getRouters().get(0);
+        this.component = component;
+    }
+
+    public void initialise() throws InitialisationException
+    {
+        if (component == null)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("Component not set, this service has not been initialized properly."), this);
+        }
+        
+        UMOOutboundRouter router = (UMOOutboundRouter)component.getOutboundRouter().getRouters().get(0);
         UMOEndpoint endpoint = (UMOEndpoint)router.getEndpoints().get(0);
         this.urlWebservice = endpoint.getEndpointURI().getAddress();
 
@@ -168,10 +181,7 @@ public class WSProxyService implements Callable, UMODescriptorAware, Initialisab
         {
             this.urlWebservice = this.urlWebservice.substring(0, paramIndex);
         }
-    }
 
-    public void initialise() throws InitialisationException
-    {
         // if the wsdlFile property is not empty, the onCall() will use this file for WSDL requests
         if (StringUtils.isNotBlank(this.wsdlFile))
         {
@@ -197,6 +207,10 @@ public class WSProxyService implements Callable, UMODescriptorAware, Initialisab
             // url of the webservice followed by ?WSDL
             if (StringUtils.isBlank(this.wsdlEndpoint))
             {
+                if (urlWebservice == null)
+                {
+                    throw new InitialisationException(MessageFactory.createStaticMessage("urlWebservice has not been set, service has not been initialized properly"), this);
+                }
                 this.wsdlEndpoint = this.urlWebservice.concat("?WSDL");
                 logger.info("Defaulting to: " + this.wsdlEndpoint);
             }

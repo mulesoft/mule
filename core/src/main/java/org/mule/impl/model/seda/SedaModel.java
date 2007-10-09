@@ -13,10 +13,7 @@ package org.mule.impl.model.seda;
 import org.mule.RegistryContext;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
 
 /**
@@ -76,11 +73,6 @@ public class SedaModel extends AbstractModel
             poolingProfile = new PoolingProfile();
         }
         super.initialise();
-    }
-
-    protected UMOComponent createComponent(UMODescriptor descriptor)
-    {
-        return new SedaComponent((MuleDescriptor) descriptor, this);
     }
 
     public int getQueueTimeout()

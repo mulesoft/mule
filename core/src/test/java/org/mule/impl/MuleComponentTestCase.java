@@ -10,13 +10,13 @@
 
 package org.mule.impl;
 
+import org.mule.components.simple.EchoComponent;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -31,12 +31,12 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     
     public void testSendToPausedComponent() throws Exception
     {
-        managementContext.getRegistry().registerService(
-            MuleTestUtils.createDescriptor(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null, managementContext),
-            managementContext);
+        UMOComponent c = MuleTestUtils.getTestComponent("orangeComponent", Orange.class, managementContext);
+        c.setInitialState(ImmutableMuleDescriptor.INITIAL_STATE_STOPPED);
+        managementContext.getRegistry().registerComponent(c, managementContext);
 
         // TODO MULE-1995
-        final UMOComponent comp = managementContext.getRegistry().lookupSystemModel().getComponent("orangeComponent");
+        final UMOComponent comp = managementContext.getRegistry().lookupComponent("orangeComponent");
         assertTrue(comp.isStarted());
         comp.pause();
         new Thread(new Runnable()
@@ -71,9 +71,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
 
     public void testSendToStoppedComponent() throws Exception
     {
-        MuleDescriptor descriptor = getTestDescriptor("myComponent",
-            "org.mule.components.simple.EchoComponent");
-        UMOComponent comp = getTestComponent(descriptor);
+        UMOComponent comp = getTestComponent("myComponent", EchoComponent.class);
         // Component is stopped because it has not been registered.
         assertTrue(!comp.isStarted());
 
@@ -104,13 +102,12 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
         // Test connector
         managementContext.getRegistry().registerConnector(getTestConnector(), managementContext);
         // Test component
-        UMODescriptor d = 
-            MuleTestUtils.createDescriptor(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null, managementContext);
-        d.setInitialState(ImmutableMuleDescriptor.INITIAL_STATE_STOPPED);
-        managementContext.getRegistry().registerService(d, managementContext);
+        UMOComponent c = MuleTestUtils.getTestComponent("orangeComponent", Orange.class, managementContext);
+        c.setInitialState(ImmutableMuleDescriptor.INITIAL_STATE_STOPPED);
+        managementContext.getRegistry().registerComponent(c, managementContext);
 
         // TODO MULE-1995
-        final UMOComponent c = managementContext.getRegistry().lookupSystemModel().getComponent("orangeComponent");
+        c = managementContext.getRegistry().lookupComponent("orangeComponent");
         // Component initially stopped
         assertFalse(c.isStarted());
 
@@ -140,12 +137,11 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
         // Test connector
         managementContext.getRegistry().registerConnector(getTestConnector(), managementContext);
         // Test component
-        managementContext.getRegistry().registerService(
-            MuleTestUtils.createDescriptor(Orange.class.getName(), "orangeComponent", "test://in", "test://out", null, managementContext),
-            managementContext);
+        UMOComponent c = MuleTestUtils.getTestComponent("orangeComponent", Orange.class, managementContext);
+        managementContext.getRegistry().registerComponent(c, managementContext);
 
         // TODO MULE-1995
-        final UMOComponent c = managementContext.getRegistry().lookupSystemModel().getComponent("orangeComponent");
+        c = managementContext.getRegistry().lookupComponent("orangeComponent");
         assertTrue(c.isStarted());
 
         // The listeners should be registered and started.

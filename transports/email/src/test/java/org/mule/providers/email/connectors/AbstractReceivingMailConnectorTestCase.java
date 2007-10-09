@@ -12,10 +12,14 @@ package org.mule.providers.email.connectors;
 
 import org.mule.config.MuleProperties;
 import org.mule.providers.email.transformers.EmailMessageToString;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.routing.UMOInboundRouterCollection;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,13 +34,13 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMailConnectorFunctionalTestCase
 {
-
     public static final int POLL_PERIOD_MS = 1000; 
     public static final int WAIT_PERIOD_MS = 3 * POLL_PERIOD_MS;
 
-    protected AbstractReceivingMailConnectorTestCase(String connectorName)
+    protected AbstractReceivingMailConnectorTestCase()
     {
-        super(true, connectorName);
+        super(/*initialEmail*/true);
+        setStartContext(false);
     }
 
     public void testReceiver() throws Exception
@@ -69,13 +73,21 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
             }
         });
 
-        managementContext.getRegistry().registerConnector(createConnector(false), managementContext);
-        managementContext.getRegistry().registerService(
-            MuleTestUtils.createDescriptor(FunctionalTestComponent.class.getName(), 
-                                           uniqueName("testComponent"), getTestEndpointURI(),
-                                           null, props, managementContext),
-            managementContext);
-
+        UMOComponent component = MuleTestUtils.getTestComponent(uniqueName("testComponent"), FunctionalTestComponent.class, props, managementContext, /*initialize*/false);
+        UMOImmutableEndpoint ep = 
+            managementContext.getRegistry().lookupEndpointFactory()
+                .createInboundEndpoint(getTestEndpointURI(), managementContext);
+        ep.initialise();
+        UMOInboundRouterCollection inboundRouter = new InboundRouterCollection();
+        inboundRouter.addEndpoint(ep);
+        component.setInboundRouter(inboundRouter);
+        managementContext.getRegistry().registerComponent(component, managementContext);
+        managementContext.applyLifecycle(component);
+        if (managementContext.isStarted() == false)
+        {
+            managementContext.start();
+        }
+            
         logger.debug("waiting for count down");
         assertTrue(countDown.await(WAIT_PERIOD_MS, TimeUnit.MILLISECONDS));
     }
@@ -87,5 +99,4 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
                 EmailMessageToString.class.getName());
         return serviceOverrides;
     }
-
 }

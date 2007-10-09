@@ -10,17 +10,14 @@
 
 package org.mule.umo;
 
-import org.mule.config.PoolingProfile;
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.util.object.ObjectFactory;
 
 import java.beans.ExceptionListener;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,26 +26,6 @@ import java.util.Map;
  */
 public interface UMODescriptor extends UMOImmutableDescriptor, ManagementContextAware
 {
-    /**
-     * Interceptors are executable objects that can be chained together. Interceptors
-     * are executed in the order they are added, for example if INTERCEPTOR_1 is
-     * added and then INTERCEPTOR_2 is added to UMO_A the execution order will be:
-     * INTERCEPTOR_1 -> INTERCEPTOR_2 -> UMO_A.
-     *
-     * @param interceptor the interceptor to add.
-     */
-    void addInterceptor(UMOInterceptor interceptor);
-
-    /**
-     * Interceptors are executable objects that can be chained together. Interceptors
-     * are executed in the order they are added, for example if INTERCEPTOR_1 is
-     * added and then INTERCEPTOR_2 is added to UMO_A the execution order will be:
-     * INTERCEPTOR_1 -> INTERCEPTOR_2 -> UMO_A.
-     *
-     * @param interceptorList A list of interceptors to associate.
-     */
-    void setInterceptors(List interceptorList);
-
     /**
      * The exception strategy to use to handle exceptions in the Mule UMO.
      *
@@ -68,20 +45,14 @@ public interface UMODescriptor extends UMOImmutableDescriptor, ManagementContext
      * @param props the properties for the descriptor. These will be passed to the
      *              UMO when it's initialise method is called or set as bean properties
      *              whe the UMO is created
-     * @deprecated Properties for the underlying service should be set on the ServiceFactory instead.
+     * @deprecated MULE-1933 Properties for the underlying service should be set on the ServiceFactory instead.
      */
     void setProperties(Map props);
 
     /**
-     * The version on the Mule UMO. This is currently not used by the mule run-time
-     * but may be used in future.
-     *
-     * @param ver the version of the Mule descriptor
+     * @param Factory which creates an instance of the actual service object.
      */
-    void setVersion(String ver);
-
-    /** @param Factory which creates an instance of the actual service object. */
-    void setServiceFactory(ObjectFactory serviceFactory);
+    //void setServiceFactory(ObjectFactory serviceFactory);
 
     /**
      * Inbound Routers control how events are received by a component. If no router
@@ -118,16 +89,6 @@ public interface UMODescriptor extends UMOImmutableDescriptor, ManagementContext
     void setResponseRouter(UMOResponseRouterCollection router);
 
     /**
-     * Determines if only a single instance of this component is created. This is
-     * useful when a component hands off event processing to another engine such as
-     * Rules processing or Bpel and the processing engine allocates and manages its
-     * own threads.
-     *
-     * @param singleton true if this component is a singleton
-     */
-    void setSingleton(boolean singleton);
-
-    /**
      * Sets the initial state of this component
      *
      * @param state the initial state of this component
@@ -144,8 +105,6 @@ public interface UMODescriptor extends UMOImmutableDescriptor, ManagementContext
      */
     void setModelName(String modelName);
 
-    void setPoolingProfile(PoolingProfile profile);
-
     /**
      * A descriptor can have a custom entrypoint resolver for its own object.
      * By default this is null. When set this resolver will override the resolver on the model
@@ -154,5 +113,4 @@ public interface UMODescriptor extends UMOImmutableDescriptor, ManagementContext
      *                    on this component
      */
     void setEntryPointResolverSet(UMOEntryPointResolverSet resolverSet);
-
 }

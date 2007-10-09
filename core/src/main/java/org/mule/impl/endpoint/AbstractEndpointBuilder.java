@@ -478,6 +478,9 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
             if (getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
             {
                 connector = TransportFactory.createConnector(endpointURI, managementContext);
+                connector.setManagementContext(managementContext);
+                managementContext.applyLifecycle(connector);
+                managementContext.getRegistry().registerConnector(connector, managementContext);
             }
             else if (getCreateConnector() == NEVER_CREATE_CONNECTOR)
             {
@@ -498,6 +501,9 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
                 if (connector == null)
                 {
                     connector = TransportFactory.createConnector(endpointURI, managementContext);
+                    connector.setManagementContext(managementContext);
+                    managementContext.applyLifecycle(connector);
+                    managementContext.getRegistry().registerConnector(connector, managementContext);
                 }
             }
         }

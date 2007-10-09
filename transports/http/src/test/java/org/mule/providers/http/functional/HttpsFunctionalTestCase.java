@@ -15,11 +15,9 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpsConnector;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.testmodels.mule.TestMuleProxy;
 import org.mule.tck.testmodels.mule.TestSedaComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.model.UMOModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,11 +33,8 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 
     public void testSend() throws Exception
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
-
-        final TestSedaComponent testSedaComponent = (TestSedaComponent) model.getComponent("testComponent");
-        TestMuleProxy proxy = (TestMuleProxy) testSedaComponent.getProxy();
-        FunctionalTestComponent testComponent = (FunctionalTestComponent) proxy.getComponent();
+        final TestSedaComponent testSedaComponent = (TestSedaComponent) managementContext.getRegistry().lookupComponent("testComponent");
+        FunctionalTestComponent testComponent = (FunctionalTestComponent) testSedaComponent.getOrCreateService();
         assertNotNull(testComponent);
 
         final AtomicBoolean callbackMade = new AtomicBoolean(false);

@@ -12,7 +12,6 @@
 
     <model name="model">
         <service name="service">
-            <bridge-component/>
             <inbound-router>
                 <parsers-test:child-endpoint address="test://foo" name="child"/>
             </inbound-router>

@@ -10,11 +10,12 @@
 
 package org.mule.mule;
 
-import org.mule.config.MuleConfiguration;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.model.seda.SedaComponent;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
@@ -23,14 +24,11 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 {
     public void testDescriptorDefaults() throws Exception
     {
-        MuleDescriptor descriptor = new MuleDescriptor();
-        descriptor.initialise();
-        MuleConfiguration config = new MuleConfiguration();
-
-        assertNotNull(descriptor.getInterceptors());
-        assertEquals(0, descriptor.getInterceptors().size());
+        UMOComponent component = new SedaComponent();
+        component.initialise();
 
         //TODO RM*
+//        MuleConfiguration config = new MuleConfiguration();
 //        assertEquals(config.getQueueProfile().getMaxOutstandingMessages(), 
 //                     descriptor.getQueueProfile().getMaxOutstandingMessages());
 //        assertEquals(config.getThreadingProfile().getMaxBufferSize(), 
@@ -41,18 +39,17 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 //        assertEquals("1.0", descriptor.getVersion());
         // assertEquals(2, descriptor.getInitialisationPolicy());
 
-        assertNull(descriptor.getServiceFactory());
-        assertNull(descriptor.getName());
-        assertEquals(0, descriptor.getProperties().size());
+        assertNull("Factory should be null but is " + component.getServiceFactory(), component.getServiceFactory());
+        assertNull(component.getName());
+        //assertEquals(0, component.getProperties().size());
     }
 
     public void testDescriptorNullValidation() throws Exception
     {
-        UMODescriptor descriptor = new MuleDescriptor();
-
+        UMOComponent component = new SedaComponent();
         try
         {
-            descriptor.setExceptionListener(null);
+            component.setExceptionListener(null);
             fail("setting exeption strategy to null should fail");
         }
         catch (RuntimeException e)
@@ -62,7 +59,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
         try
         {
-            descriptor.setName(null);
+            component.setName(null);
             fail("setting name to null should fail");
         }
         catch (RuntimeException e)
@@ -72,7 +69,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
         try
         {
-            descriptor.setServiceFactory(null);
+            component.setServiceFactory(null);
             fail("setting serviceFactory to null should fail");
         }
         catch (RuntimeException e)
@@ -84,11 +81,10 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
     public void testImplementationValidation() throws Exception
     {
-        UMODescriptor descriptor = new MuleDescriptor();
-
+        UMOComponent component = new SedaComponent();
         try
         {
-            descriptor.setServiceFactory(null);
+            component.setServiceFactory(null);
             fail("setting serviceFactory to null should fail");
         }
         catch (RuntimeException e)
@@ -100,17 +96,17 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
     public void testEndpointValidation() throws Exception
     {
-        UMODescriptor descriptor = getTestDescriptor("Terry", Orange.class.getName());
+        UMOComponent component = getTestComponent("Terry", Orange.class);
         TestExceptionStrategy es = new TestExceptionStrategy();
-        descriptor.setExceptionListener(es);
-        assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
-        UMOEndpoint ep = (UMOEndpoint)((UMOOutboundRouter)descriptor.getOutboundRouter().getRouters().get(0)).getEndpoints().get(0);
+        component.setExceptionListener(es);
+        assertEquals(1, component.getOutboundRouter().getRouters().size());
+        UMOEndpoint ep = (UMOEndpoint)((UMOOutboundRouter)component.getOutboundRouter().getRouters().get(0)).getEndpoints().get(0);
         assertNotNull(ep);
         assertNotNull(ep.getConnector().getExceptionListener());
 
         // create receive endpoint
         UMOEndpoint endpoint = getTestEndpoint("test2", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-        descriptor.getInboundRouter().addEndpoint(endpoint);
+        component.getInboundRouter().addEndpoint(endpoint);
         // Add receive endpoint, this shoulbe set as default
         assertNotNull(endpoint.getConnector().getExceptionListener());
     }

@@ -16,7 +16,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.TransactionException;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
@@ -118,7 +118,7 @@ public class MuleEventContext implements UMOEventContext
         else
         {
             throw new TransformerException(
-                CoreMessages.transformOnObjectNotOfSpecifiedType(this.getComponentDescriptor().getName(), expectedType),
+                CoreMessages.transformOnObjectNotOfSpecifiedType(this.getComponent().getName(), expectedType),
                     this.event.getEndpoint().getTransformers());
         }
     }
@@ -576,16 +576,9 @@ public class MuleEventContext implements UMOEventContext
     /**
      * @return the component descriptor of the component that received this event
      */
-    public UMODescriptor getComponentDescriptor()
+    public UMOComponent getComponent()
     {
-        if (event.getComponent() != null)
-        {
-            return event.getComponent().getDescriptor();
-        }
-        else
-        {
-            return null;
-        }
+        return event.getComponent();
     }
 
     /**
@@ -722,7 +715,6 @@ public class MuleEventContext implements UMOEventContext
     {
         return event.toString();
     }
-
 
     public UMOManagementContext getManagementContext()
     {

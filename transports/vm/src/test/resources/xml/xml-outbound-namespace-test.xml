@@ -13,7 +13,9 @@
     <model name="xml outbound namespace tests">
 
         <service name="fancy config splitter">
-            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <forwarding-router/>
+            </inbound-router>
             <outbound-router>
                 <mxml:message-splitter splitExpression="/expression" enableCorrelation="ALWAYS"
                                        externalSchemaLocation="external" honorSynchronicity="true"
@@ -25,7 +27,9 @@
         </service>
 
         <service name="fancy config round robin">
-            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <forwarding-router/>
+            </inbound-router>
             <outbound-router>
                 <mxml:round-robin-splitter splitExpression="/expression" enableCorrelation="IF_NOT_SET"
                                            externalSchemaLocation="external" honorSynchronicity="true"

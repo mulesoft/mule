@@ -10,19 +10,10 @@
 
 package org.mule.impl.model.direct;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 
 public class DirectModel extends AbstractModel
 {
-
-    protected UMOComponent createComponent(UMODescriptor descriptor)
-    {
-        return new DirectComponent((MuleDescriptor) descriptor, this);
-    }
-
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model

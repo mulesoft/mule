@@ -13,11 +13,11 @@
 
     <model name="MultilpleConnectorsTestModel">
         <service name="testDescriptor">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <!-- if the connector-ref was removed this would give an error
                      since we have multiple connectors -->
                 <inbound-endpoint address="tcp://localhost:12345" connector-ref="tcpConnector2"/>
+                <forwarding-router/>
             </inbound-router>
         </service>
     </model>

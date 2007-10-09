@@ -10,7 +10,7 @@
 
 package org.mule.impl;
 
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
@@ -39,11 +39,11 @@ public class DefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFactor
      * @see org.mule.umo.lifecycle.UMOLifecycleAdapterFactory#create(java.lang.Object,
      *      org.mule.umo.UMODescriptor)
      */
-    public UMOLifecycleAdapter create(Object component,
-                                      UMODescriptor descriptor,
+    public UMOLifecycleAdapter create(Object pojoService,
+                                      UMOComponent component,
                                       UMOEntryPointResolverSet resolver) throws UMOException
     {
-        return new DefaultLifecycleAdapter(component, descriptor, resolver);
+        return new DefaultLifecycleAdapter(pojoService, component, resolver);
     }
 
 }

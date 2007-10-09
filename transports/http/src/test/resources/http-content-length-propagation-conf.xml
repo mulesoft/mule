@@ -17,13 +17,13 @@
     <model name="PSMaxIntegration">
         
         <service name="PSMaxMsg1">
-            <bridge-component/>
             <inbound-router>
                 <inbound-endpoint name="httpEndpoint" address="http://localhost:8085" transformer-ref="Xslt">
                     <properties>
                         <spring:entry key="Content-Type" value="text/xml"/>
                     </properties>
                 </inbound-endpoint>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -33,9 +33,9 @@
         </service>
 
         <service name="PSMaxMsg2">
-            <bridge-component/>
             <inbound-router>
                 <inbound-endpoint address="http://localhost:8087"/>
+                <forwarding-router/>
             </inbound-router>
         </service>
 

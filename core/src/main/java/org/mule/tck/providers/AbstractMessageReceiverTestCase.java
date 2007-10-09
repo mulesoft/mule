@@ -23,13 +23,13 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
 
     protected void doSetUp() throws Exception
     {
-        component = getTestComponent(getTestDescriptor("orange", Orange.class.getName()));
+        component = getTestComponent("orange", Orange.class);
         endpoint = getEndpoint();
     }
 
     public void testCreate() throws Exception
     {
-        UMOComponent component = getTestComponent(getTestDescriptor("orange", Orange.class.getName()));
+        UMOComponent component = getTestComponent("orange", Orange.class);
         UMOImmutableEndpoint endpoint = getTestEndpoint("Test", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         UMOMessageReceiver receiver = getMessageReceiver();
 

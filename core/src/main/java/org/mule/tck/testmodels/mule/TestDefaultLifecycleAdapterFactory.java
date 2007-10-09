@@ -10,7 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
@@ -19,10 +19,6 @@ import org.mule.umo.model.UMOEntryPointResolverSet;
 
 public class TestDefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFactory
 {
-
-    /**
-     *
-     */
     public TestDefaultLifecycleAdapterFactory()
     {
         super();
@@ -34,11 +30,11 @@ public class TestDefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFa
      * @see org.mule.umo.lifecycle.UMOLifecycleAdapterFactory#create(java.lang.Object,
      *      org.mule.umo.UMODescriptor, org.mule.umo.model.UMOEntryPointResolver)
      */
-    public UMOLifecycleAdapter create(Object component,
-                                      UMODescriptor descriptor,
+    public UMOLifecycleAdapter create(Object pojoService,
+                                      UMOComponent component,
                                       UMOEntryPointResolverSet resolver) throws UMOException
     {
-        return new TestDefaultLifecycleAdapter(component, descriptor, resolver);
+        return new TestDefaultLifecycleAdapter(pojoService, component, resolver);
     }
 
 }

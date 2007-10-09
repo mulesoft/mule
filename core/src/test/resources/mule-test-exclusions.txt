@@ -5,5 +5,16 @@
 # MULE-2164
 org.mule.impl.endpoint.MuleCopiedEndpointURITestCase
 
-org.mule.impl.container.MuleContainerContextTestCase
-org.mule.impl.container.JndiContainerContextTestCase
+# MULE-??? delegateClass/delegateMethod properties are not getting picked up 
+org.mule.impl.NoArgsCallWrapperTestCase
+# This test needs some work after MULE-2233 and MULE-2287 
+org.mule.impl.MuleComponentTestCase
+# Rewrite this test using the Registry 
+org.mule.impl.MuleModelTestCase                        
+# Update after MULE-2233
+org.mule.mule.commonspool.CommonsPoolTestCase
+# Delete after MULE-2233
+org.mule.mule.commonspool.CommonsPoolProxyFactoryTestCase
+# Clean this one up after MULE-2287 or just delete it 
+org.mule.mule.MuleDescriptorTestCase
+

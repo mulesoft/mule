@@ -51,7 +51,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         super.doSetUp();
         
         JmsConnector connector = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector");
-        ConnectionFactory cf = (ConnectionFactory) connector.getConnectionFactory().create();
+        ConnectionFactory cf = (ConnectionFactory) connector.getConnectionFactory().getOrCreate();
         
         session = cf.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);                
     }

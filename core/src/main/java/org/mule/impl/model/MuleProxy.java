@@ -13,14 +13,13 @@ package org.mule.impl.model;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.util.queue.QueueSession;
 
 import javax.resource.spi.work.Work;
 
 /**
- * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that that
+ * <code>MuleProxy</code> is a proxy to a UMO. It is an object that 
  * can be executed in it's own thread.
  */
 
@@ -71,11 +70,4 @@ public interface MuleProxy extends Work, Lifecycle
      * Triggers the UMO to resume processing of events if it is suspended
      */
     void resume();
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOLifecycleAdapter#getDescriptor()
-     */
-    UMOImmutableDescriptor getDescriptor();
 }

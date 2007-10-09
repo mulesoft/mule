@@ -53,9 +53,9 @@
     -->
     <model name="Sample-SOAP">
         <service name="Console I/O">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="stdio://System.in"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <!--
@@ -74,9 +74,9 @@
             For this example we use Vm.
         -->
         <service name="serviceProxy">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://stockquote"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

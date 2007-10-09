@@ -34,14 +34,14 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         
         ObjectFactory dsf = c.getDataSourceFactory();
         assertNotNull(dsf);
-        Object ds=dsf.create();
+        Object ds=dsf.getOrCreate();
         assertNotNull(ds);
         assertEquals(TestDataSource.class, ds.getClass());
         
         assertTrue(c.getPropertyExtractors().size() >= 5);
         assertTrue(c.getPropertyExtractors().size() <= 7);
         assertTrue(ObjectFactory.class.isAssignableFrom((c.getPropertyExtractors().toArray()[0]).getClass()));
-        assertTrue(((ObjectFactory)c.getPropertyExtractors().toArray()[0]).create() instanceof PropertyExtractor);
+        assertTrue(((ObjectFactory)c.getPropertyExtractors().toArray()[0]).getOrCreate() instanceof PropertyExtractor);
         assertNull(c.getQueries());
         
     }
@@ -53,14 +53,14 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         
         ObjectFactory dsf = c.getDataSourceFactory();
         assertNotNull(dsf);
-        Object ds=dsf.create();
+        Object ds=dsf.getOrCreate();
         assertNotNull(ds);
         assertEquals(TestDataSource.class, ds.getClass());
         
         assertTrue(c.getPropertyExtractors().size()>=5);
         assertTrue(c.getPropertyExtractors().size()<=7);
         assertTrue(ObjectFactory.class.isAssignableFrom((c.getPropertyExtractors().toArray()[0]).getClass()));
-        assertTrue(((ObjectFactory)c.getPropertyExtractors().toArray()[0]).create() instanceof PropertyExtractor);
+        assertTrue(((ObjectFactory)c.getPropertyExtractors().toArray()[0]).getOrCreate() instanceof PropertyExtractor);
         assertNull(c.getQueries());
         
         assertTrue(c.isConnected());
@@ -74,7 +74,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         
         ObjectFactory dsf = c.getDataSourceFactory();
         assertNotNull(dsf);
-        Object ds=dsf.create();
+        Object ds=dsf.getOrCreate();
         assertNotNull(ds);
         assertEquals(TestDataSource.class, ds.getClass());
         

@@ -28,7 +28,7 @@ public class LifecycleException extends UMOException
      * @param message   the exception message
      * @param component the object that failed during a lifecycle method call
      */
-    protected LifecycleException(Message message, Object component)
+    public LifecycleException(Message message, Object component)
     {
         super(message);
         this.component = component;

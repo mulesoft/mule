@@ -11,21 +11,20 @@
 package org.mule.impl;
 
 import org.mule.config.ConfigurationException;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 
 /**
- * <code>UMODescriptorAware</code> is an injector interface that will supply a
- * UMODescriptor to the object. This interface should be implemented by components
- * managed by mule that want to receive their UMODescriptor instance. The
- * UMODescriptor will be set before any initialisation method is called. i.e. if the
+ * <code>UMOComponentAware</code> is an injector interface that will supply a
+ * UMOComponent to the object. This interface should be implemented by services
+ * managed by Mule that want to receive their UMOComponent instance. The
+ * UMOComponent will be set before any initialisation method is called. i.e. if the
  * component implements org.mule.umo.lifecycle.Initialisable, the descriptor will be
  * set before initialise() method is called.
  * 
  * @see org.mule.umo.lifecycle.Initialisable
- * @see UMODescriptor
+ * @see UMOComponent
  */
-
-public interface UMODescriptorAware
+public interface UMOComponentAware
 {
-    void setDescriptor(UMODescriptor descriptor) throws ConfigurationException;
+    void setComponent(UMOComponent component) throws ConfigurationException;
 }

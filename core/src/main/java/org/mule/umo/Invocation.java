@@ -15,6 +15,7 @@ import org.mule.impl.RequestContext;
 /**
  * <code>Invocation</code> represents a link in an interceptor chain. Interceptors
  * can be configured om Mule Managed components.
+ * @deprecated MULE-1282
  */
 // @ThreadSafe
 public class Invocation

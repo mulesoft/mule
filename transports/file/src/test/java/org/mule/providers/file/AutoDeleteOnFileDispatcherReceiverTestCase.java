@@ -86,7 +86,9 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
     public UMOConnector getConnector() throws Exception {
         UMOConnector connector = new FileConnector();
         connector.setName("FileConnector");
-        managementContext.getRegistry().registerConnector(connector);
+        connector.setManagementContext(managementContext);
+        managementContext.applyLifecycle(connector);
+        managementContext.getRegistry().registerConnector(connector, managementContext);
         return connector;
     }
 

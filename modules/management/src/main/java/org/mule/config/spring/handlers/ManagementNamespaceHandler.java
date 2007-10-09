@@ -10,8 +10,8 @@
 package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.JmxAgentDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;

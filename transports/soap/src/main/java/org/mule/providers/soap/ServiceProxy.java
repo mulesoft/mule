@@ -35,13 +35,13 @@ public class ServiceProxy
         throws UMOException, ClassNotFoundException
     {
         Class[] interfaces;
-        List ifaces = (List)component.getDescriptor().getProperties().get("serviceInterfaces");
+        List ifaces = (List)component.getProperties().get("serviceInterfaces");
         if (ifaces == null || ifaces.size() == 0)
         {
             final Class implementationClass;
             try
             {
-                implementationClass = component.getDescriptor().getServiceFactory().create().getClass();
+                implementationClass = component.getServiceFactory().getOrCreate().getClass();
             }
             catch (Exception e)
             {

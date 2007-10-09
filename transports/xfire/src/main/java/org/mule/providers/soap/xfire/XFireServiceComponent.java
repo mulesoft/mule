@@ -10,21 +10,14 @@
 
 package org.mule.providers.soap.xfire;
 
-import org.mule.MuleRuntimeException;
-import org.mule.config.ConfigurationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleDescriptor;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.UMODescriptorAware;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.xfire.transport.MuleLocalChannel;
-import org.mule.providers.soap.xfire.transport.MuleLocalTransport;
-import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.providers.streaming.OutStreamMessageAdapter;
 import org.mule.providers.streaming.StreamMessageAdapter;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -32,15 +25,12 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
-import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.util.Enumeration;
 
 import javax.xml.stream.XMLStreamException;
@@ -49,7 +39,6 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.XFireFactory;
 import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.service.ServiceRegistry;
 import org.codehaus.xfire.transport.Transport;
@@ -61,70 +50,26 @@ import org.codehaus.xfire.transport.http.HtmlServiceWriter;
  * marshalls requests and responses
  * 
  */
-public class XFireServiceComponent implements Callable, Initialisable, Lifecycle, UMODescriptorAware
+public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 {
+
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
+    
     protected XFire xfire;
 
     // manager to the component
     protected Transport transport;
-    protected Transport universalTransport;
     protected String transportClass;
+    
 
-    public void setDescriptor(UMODescriptor descriptor) throws ConfigurationException
+    /** For IoC */
+    public XFireServiceComponent(XFireMessageReceiver receiver) 
     {
-        UMOWorkManager wm = ((MuleDescriptor)descriptor).getThreadingProfile().createWorkManager(
-            "xfire-local-transport");
-        try
-        {
-            wm.start();
-        }
-        catch (UMOException e)
-        {
-            throw new MuleRuntimeException(CoreMessages.failedToStart("local channel work manager"), e);
-        }
-        if(transportClass == null)
-        {
-            transport = new MuleLocalTransport(wm);
-        }
-        else
-        {
-            try {
-                Class transportClazz = ClassUtils.loadClass(transportClass, this.getClass());
-                try{
-                    Constructor constructor = transportClazz.getConstructor(new Class[]{UMOWorkManager.class});
-                    transport = (Transport)constructor.newInstance(new Object[]{wm});
-                }
-                catch(NoSuchMethodException ne)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug(ne.getCause());
-                    }
-                }
-            if(transport == null)
-            {
-                Constructor constructor = transportClazz.getConstructor(null);
-                transport = (Transport)constructor.newInstance(null);
-            }
-        }
-        catch(Exception e)
-        {
-            throw new MuleRuntimeException(CoreMessages.failedToLoad("xfire service transport"), e);
-        }
-    }
-        
-        universalTransport = new MuleUniversalTransport();
-        
-        if(xfire == null){
-            xfire = XFireFactory.newInstance().getXFire();
-        }
-        getTransportManager().register(transport);
-        getTransportManager().register(universalTransport);
+        super();
     }
    
     public Object onCall(UMOEventContext eventContext) throws Exception
@@ -164,6 +109,11 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         }
         else
         {
+            if (transport == null)
+            {
+                throw new InitialisationException(MessageFactory.createStaticMessage("transport is null, this service has not been initialized properly"), this);
+            }
+            
             MuleLocalChannel channel = (MuleLocalChannel)transport.createChannel(eventContext.getEndpointURI()
                 .getFullScheme());
             return channel.onCall(eventContext);
@@ -185,7 +135,7 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
     {
         if (xfire == null)
         {
-            throw new InitialisationException(CoreMessages.objectIsNull("xfire"), this);
+            throw new InitialisationException(MessageFactory.createStaticMessage("No XFire instance, this component has not been initialized properly."), this);
         }
     }
 
@@ -244,7 +194,6 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         {
             StreamMessageAdapter sma = (StreamMessageAdapter)eventMsg.getAdapter();
             is = sma.getInputStream();
-
         }
         else
         {

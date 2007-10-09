@@ -20,9 +20,9 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringMessageUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import java.util.List;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -84,7 +84,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
         String contents = context.getTransformedMessageAsString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                + context.getComponentDescriptor().getName() + ". Content is: "
+                + context.getComponent().getName() + ". Content is: "
                 + StringMessageUtils.truncate(contents, 100, true), '*', 80);
 
         logger.info(msg);
@@ -97,7 +97,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         else
         {
             replyMessage = (addReceived ? received(contents) : contents)
-                    + (appendComponentName ? " " + context.getComponentDescriptor().getName() : "");
+                    + (appendComponentName ? " " + context.getComponent().getName() : "");
         }
 
         context.getManagementContext().fireNotification(
@@ -142,7 +142,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         UMOEventContext context = RequestContext.getEventContext();
         String contents = data.toString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                + context.getComponentDescriptor().getName() + ". Content is: "
+                + context.getComponent().getName() + ". Content is: "
                 + StringMessageUtils.truncate(contents, 100, true), '*', 80);
 
         logger.info(msg);

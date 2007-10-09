@@ -10,23 +10,19 @@
 
 package org.mule.impl.model.direct;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.model.AbstractComponent;
-import org.mule.impl.model.ComponentFactory;
-import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.model.UMOModel;
 
 import java.util.List;
 
 /**
- * A direct component invokes the service component directly without any threading or
- * pooling, even when the invocation is asynchronous
+ * A direct component invokes the service component directly without any threading, 
+ * even when the invocation is asynchronous
  */
 public class DirectComponent extends AbstractComponent
 {
@@ -37,25 +33,38 @@ public class DirectComponent extends AbstractComponent
 
     protected List interceptorList = null;
     protected MuleProxy proxy;
+    protected Object pojoService;
 
-    public DirectComponent(MuleDescriptor descriptor, UMOModel model)
+    public DirectComponent()
     {
-        super(descriptor, model);
+        super();
     }
 
     protected void doInitialise() throws InitialisationException
     {
-
         try
         {
-            Object component = ComponentFactory.createService(getDescriptor());
-            proxy = new DefaultMuleProxy(component, descriptor, model, null);
-            proxy.setStatistics(getStatistics());
+            pojoService = getOrCreateService();
+            proxy = createComponentProxy(pojoService);
         }
         catch (UMOException e)
         {
             throw new InitialisationException(e, this);
         }
+    }
+
+    protected void doDispose()
+    {
+        try
+        {
+            serviceFactory.release(pojoService);
+        }
+        catch (Exception e)
+        {
+            logger.warn(e);
+        }
+        
+        //proxy.dispose();
     }
 
     protected UMOMessage doSend(UMOEvent event) throws UMOException
@@ -95,10 +104,5 @@ public class DirectComponent extends AbstractComponent
     protected void doResume()
     {
         proxy.resume();
-    }
-
-    protected void doDispose()
-    {
-        proxy.dispose();
     }
 }

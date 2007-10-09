@@ -11,9 +11,11 @@
 package org.mule.impl.model.seda.optimised;
 
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.model.MuleProxy;
 import org.mule.impl.model.seda.SedaComponent;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.object.ObjectPool;
+import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.model.UMOModel;
 
 /**
  * Same as <code>SedaComponent</code> except that it assumes that components implement the Callable 
@@ -29,15 +31,22 @@ public class OptimisedSedaComponent extends SedaComponent
     /**
      * Default constructor
      */
-    public OptimisedSedaComponent(MuleDescriptor descriptor, OptimisedSedaModel model)
+    public OptimisedSedaComponent()
     {
-        super(descriptor, model);
+        super();
     }
 
-    // @Override
-    protected ObjectPool createPool() throws InitialisationException
+    //@Override
+    protected MuleProxy createComponentProxy(Object component, MuleDescriptor descriptor, UMOModel model) 
+    throws UMOException
     {
-        return this.getPoolingProfile().getPoolFactory().createPool(descriptor, model,
-            new OptimisedProxyFactory(descriptor, model), getPoolingProfile());
+        if (!(component instanceof Callable))
+        {
+            throw new IllegalArgumentException("Components for the Optimised Mule proxy must implement: "
+                                               + Callable.class.getName());
+        }
+        MuleProxy proxy = new OptimisedMuleProxy((Callable) component, descriptor);
+        proxy.setStatistics(getStatistics());
+        return proxy;
     }
 }

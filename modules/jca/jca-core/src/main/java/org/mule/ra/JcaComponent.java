@@ -13,11 +13,10 @@ package org.mule.ra;
 import org.mule.MuleException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.impl.ManagementContextAware;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
+import org.mule.impl.model.AbstractComponent;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -33,7 +32,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
  * inside an app server using JCA. In the future we might want to use one of the
  * existing models.
  */
-public class JcaComponent implements UMOComponent, ManagementContextAware
+public class JcaComponent extends AbstractComponent //implements UMOComponent, ManagementContextAware
 {
     /**
      * Serial version
@@ -103,12 +102,12 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
         throw new UnsupportedOperationException("sendEvent()");
     }
 
-    public void pause() throws UMOException
+    public void doPause() throws UMOException
     {
         // nothing to do
     }
 
-    public void resume() throws UMOException
+    public void doResume() throws UMOException
     {
         // nothing to do
     }
@@ -128,12 +127,12 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
         started.set(false);
     }
 
-    public void dispose()
+    public void doDispose()
     {
         managementContext.getStatistics().remove(stats);
     }
 
-    public synchronized void initialise() throws InitialisationException
+    public synchronized void doInitialise() throws InitialisationException
     {
         throw new InitialisationException(MessageFactory.createStaticMessage("This component needs to be reviewed for Mule 2.0 (see MULE-1910)"), this);
         /*
@@ -214,5 +213,16 @@ public class JcaComponent implements UMOComponent, ManagementContextAware
     public Object getInstance() throws UMOException
     {
         return component;
+    }
+
+    protected void doDispatch(UMOEvent event) throws UMOException
+    {
+        // nothing to do?
+    }
+
+    protected UMOMessage doSend(UMOEvent event) throws UMOException
+    {
+        // nothing to do?
+        return null;
     }
 }

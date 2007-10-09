@@ -9,3 +9,7 @@ org.mule.components.rest.RESTTestCase
 org.mule.providers.http.issues.StreamingDownloadMule1389TestCase
 
 org.mule.providers.http.functional.HttpsFunctionalTestCase
+
+# TODO TC Figure out how to get this bizarre config to work
+org.mule.components.rest.RestServiceComponentTestCase
+

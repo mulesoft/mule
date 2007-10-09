@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.MuleServer;
 import org.mule.impl.MuleMessage;
 import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOException;
@@ -164,7 +165,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
         if (null != endpoint)
         {
-            endpoint.initialise();
+            MuleServer.getManagementContext().applyLifecycle(endpoint);
         }
         return endpoint;
     }

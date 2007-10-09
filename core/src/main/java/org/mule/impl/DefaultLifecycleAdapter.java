@@ -16,7 +16,7 @@ import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.nested.NestedInvocationHandler;
 import org.mule.umo.ComponentException;
 import org.mule.umo.Invocation;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -50,8 +50,8 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
     /** logger used by this class */
     protected static final Log logger = LogFactory.getLog(DefaultLifecycleAdapter.class);
 
-    private Object component;
-    private UMODescriptor descriptor;
+    private Object pojoService;
+    private UMOComponent component;
     private boolean isStoppable = false;
     private boolean isStartable = false;
     private boolean isDisposable = false;
@@ -61,44 +61,40 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
 
     private UMOEntryPointResolverSet entryPointResolver;
 
-    public DefaultLifecycleAdapter(Object component, UMODescriptor descriptor) throws UMOException
+    public DefaultLifecycleAdapter(Object pojoService, UMOComponent component) throws UMOException
     {
-        this(component, descriptor, new LegacyEntryPointResolverSet());
+        this(pojoService, component, new LegacyEntryPointResolverSet());
     }
 
-    public DefaultLifecycleAdapter(Object component,
-                                   UMODescriptor descriptor,
+    public DefaultLifecycleAdapter(Object pojoService,
+                                   UMOComponent component,
                                    UMOEntryPointResolverSet epResolver) throws UMOException
     {
-        initialise(component, descriptor, epResolver);
+        initialise(pojoService, component, epResolver);
     }
 
-    protected void initialise(Object component, UMODescriptor descriptor, UMOEntryPointResolverSet entryPointResolver)
+    protected void initialise(Object pojoService, UMOComponent component, UMOEntryPointResolverSet entryPointResolver)
             throws UMOException
     {
-        if (component == null)
+        if (pojoService == null)
         {
-            throw new IllegalArgumentException("Component cannot be null");
-        }
-        if (descriptor == null)
-        {
-            throw new IllegalArgumentException("Descriptor cannot be null");
+            throw new IllegalArgumentException("POJO Service cannot be null");
         }
         if (entryPointResolver == null)
         {
             entryPointResolver = new LegacyEntryPointResolverSet();
         }
+        this.pojoService = pojoService;
         this.component = component;
         this.entryPointResolver = entryPointResolver;
-        this.descriptor = descriptor;
 
         isStartable = Startable.class.isInstance(component);
         isStoppable = Stoppable.class.isInstance(component);
         isDisposable = Disposable.class.isInstance(component);
 
-        if (component instanceof UMODescriptorAware)
+        if (pojoService instanceof UMOComponentAware)
         {
-            ((UMODescriptorAware) component).setDescriptor(descriptor);
+            ((UMOComponentAware) pojoService).setComponent(component);
         }
         configureNestedRouter();
     }
@@ -114,7 +110,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             catch (Exception e)
             {
                 throw new MuleException(
-                        CoreMessages.failedToStart("UMO Component: " + descriptor.getName()), e);
+                    CoreMessages.failedToStart("UMO Component: " + component.getName()), e);
             }
         }
         started = true;
@@ -131,7 +127,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             catch (Exception e)
             {
                 throw new MuleException(
-                        CoreMessages.failedToStop("UMO Component: " + descriptor.getName()), e);
+                    CoreMessages.failedToStop("UMO Component: " + component.getName()), e);
             }
         }
         started = false;
@@ -148,7 +144,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             catch (Exception e)
             {
                 // TODO MULE-863: Handle or fail
-                logger.error("failed to dispose: " + descriptor.getName(), e);
+                logger.error("failed to dispose: " + component.getName(), e);
             }
         }
         disposed = true;
@@ -166,16 +162,12 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         return disposed;
     }
 
-    public UMODescriptor getDescriptor()
-    {
-        return descriptor;
-    }
-
     public void handleException(Object message, Exception e)
     {
-        descriptor.getExceptionListener().exceptionThrown(e);
+        component.getExceptionListener().exceptionThrown(e);
     }
 
+    // Note: Invocation argument is not even used!
     public UMOMessage intercept(Invocation invocation) throws UMOException
     {
         // Invoke method
@@ -185,23 +177,21 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         try
         {
             //Use the overriding entrypoint resolver if one is set
-            if (descriptor.getEntryPointResolverSet() != null)
+            if (component.getEntryPointResolverSet() != null)
             {
-                result = descriptor.getEntryPointResolverSet().invoke(component, RequestContext.getEventContext());
+                result = component.getEntryPointResolverSet().invoke(pojoService, RequestContext.getEventContext());
 
             }
             else
             {
-                result = entryPointResolver.invoke(component, RequestContext.getEventContext());
+                result = entryPointResolver.invoke(pojoService, RequestContext.getEventContext());
             }
         }
         catch (Exception e)
         {
             // should all Exceptions caught here be a ComponentException?!?
             // TODO MULE-863: See above
-            throw new ComponentException(
-                    CoreMessages.failedToInvoke(component.getClass().getName()),
-                    invocation.getMessage(), event.getComponent(), e);
+            throw new ComponentException(RequestContext.getEventContext().getMessage(), component, e);
         }
 
         UMOMessage resultMessage = null;
@@ -235,10 +225,10 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
     protected void configureNestedRouter() throws UMOException
     {
         // Initialise the nested router and bind the endpoints to the methods using a Proxy
-        if (descriptor.getNestedRouter() != null)
+        if (component.getNestedRouter() != null)
         {
             Map bindings = new HashMap();
-            for (Iterator it = descriptor.getNestedRouter().getRouters().iterator(); it.hasNext();)
+            for (Iterator it = component.getNestedRouter().getRouters().iterator(); it.hasNext();)
             {
                 UMONestedRouter nestedRouter = (UMONestedRouter) it.next();
                 Object proxy = bindings.get(nestedRouter.getInterface());
@@ -249,7 +239,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     // and just routes away using a mule client
                     // ( using the high level Mule client is probably
                     // a bit agricultural but this is just POC stuff )
-                    proxy = nestedRouter.createProxy(component);
+                    proxy = nestedRouter.createProxy(pojoService);
                     bindings.put(nestedRouter.getInterface(), proxy);
 
                     //Now lets set the proxy on the Service object
@@ -257,7 +247,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
 
 
                     List methods =
-                            ClassUtils.getSatisfiableMethods(component.getClass(),
+                            ClassUtils.getSatisfiableMethods(pojoService.getClass(),
                                     new Class[]{nestedRouter.getInterface()}, true, false, null);
                     if (methods.size() == 1)
                     {
@@ -266,23 +256,23 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     else if (methods.size() > 1)
                     {
                         throw new TooManySatisfiableMethodsException(
-                                component.getClass(), new Class[]{nestedRouter.getInterface()});
+                            pojoService.getClass(), new Class[]{nestedRouter.getInterface()});
                     }
                     else
                     {
                         throw new NoSatisfiableMethodsException(
-                                component.getClass(), new Class[]{nestedRouter.getInterface()});
+                            pojoService.getClass(), new Class[]{nestedRouter.getInterface()});
                     }
 
                     try
                     {
-                        setterMethod.invoke(component, new Object[]{proxy});
+                        setterMethod.invoke(pojoService, new Object[]{proxy});
                     }
                     catch (Exception e)
                     {
                         throw new InitialisationException(
                                 CoreMessages.failedToSetProxyOnService(nestedRouter,
-                                        component.getClass()), e, this);
+                                    pojoService.getClass()), e, this);
                     }
                 }
                 else
@@ -292,5 +282,10 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                 }
             }
         }
+    }
+
+    public UMOComponent getComponent()
+    {
+        return component;
     }
 }

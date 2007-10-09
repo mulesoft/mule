@@ -15,15 +15,14 @@ import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.impl.MuleDescriptor;
+import org.mule.impl.model.seda.SedaComponent;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -67,8 +66,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyExtractorConfig() throws Exception
     {
-        UMODescriptor d = managementContext
-            .getRegistry().lookupService("propertyExtractorTestComponent");
+        UMOComponent d = managementContext.getRegistry().lookupComponent("propertyExtractorTestComponent");
         assertNotNull(d);
         UMOOutboundRouterCollection router = d.getOutboundRouter();
         assertNotNull(router);
@@ -84,8 +82,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyExtractorResponseRouterConfig() throws Exception
     {
-        UMODescriptor d = managementContext.getRegistry().lookupService(
-            "propertyExtractorResponseRouterTestComponent");
+        UMOComponent d = managementContext.getRegistry().lookupComponent("propertyExtractorResponseRouterTestComponent");
         assertNotNull(d);
         UMOResponseRouterCollection router = d.getResponseRouter();
         assertNotNull(router);
@@ -101,18 +98,13 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyTypesConfig() throws Exception
     {
-        UMODescriptor d = managementContext.getRegistry().lookupService("testPropertiesComponent");
-        assertNotNull(d);
-        assertNotNull(d.getProperties().get("factoryObject"));
-        assertTrue(d.getProperties().get("factoryObject") instanceof Orange);
-        assertNotNull(d.getProperties().get("containerObject"));
-        assertTrue(d.getProperties().get("containerObject") instanceof Apple);
-        assertNull(d.getProperties().get("doesNotExist"));
-        assertEquals(System.getProperty("os.version"), d.getProperties().get("osVersion"));
-        // MULE-2183
-//        assertEquals("defaultValue", d.getProperties().get("notASystemProperty"));
-        assertEquals("test1", d.getProperties().get("test1"));
-        assertEquals("test2", d.getProperties().get("test2"));
+        UMOComponent c = managementContext.getRegistry().lookupComponent("testPropertiesComponent");
+        assertNotNull(c);
+        Object obj = c.getServiceFactory().getOrCreate();
+        assertNotNull(obj);
+        assertTrue(obj instanceof Apple);
+        assertTrue(((Apple) obj).isBitten()); 
+        assertTrue(((Apple) obj).isWashed()); 
     }
 
     // no equivalent in 2.x for these
@@ -154,7 +146,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testEndpointURIParamsConfig()
     {
-        UMODescriptor d = managementContext.getRegistry().lookupService("testPropertiesComponent");
+        UMOComponent d = managementContext.getRegistry().lookupComponent("testPropertiesComponent");
         assertNotNull(d);
         final UMOInboundRouterCollection router = d.getInboundRouter();
         assertNotNull(router);
@@ -236,9 +228,9 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertEquals(0, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
 
-        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
-            "appleComponent2");
-        tp = descriptor.getThreadingProfile();
+        UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent2");
+        assertTrue("component must be SedaComponent to get threading profile", component instanceof SedaComponent);
+        tp = ((SedaComponent) component).getThreadingProfile();
         assertEquals(6, tp.getMaxBufferSize());
         assertEquals(12, tp.getMaxThreadsActive());
         assertEquals(6, tp.getMaxThreadsIdle());

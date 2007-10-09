@@ -17,20 +17,19 @@ import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.extras.spring.i18n.SpringMessages;
 import org.mule.impl.ManagementContextAware;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.seda.SedaComponent;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -163,11 +162,6 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     protected ApplicationContext applicationContext;
 
     /**
-     * The Mule descriptor that belongs to this component instnace in Mule
-     */
-    protected UMODescriptor descriptor;
-
-    /**
      * The mule instance compoennt for the Multicaster
      */
     protected UMOComponent component;
@@ -276,7 +270,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             {
                 try
                 {
-                    registerMulticasterDescriptor();
+                    registerMulticasterComponent();
                 }
                 catch (UMOException ex)
                 {
@@ -553,14 +547,14 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             // See if there has been a discriptor explicitly configured
             if (applicationContext.containsBean(EVENT_MULTICASTER_DESCRIPTOR_NAME))
             {
-                descriptor = (UMODescriptor)applicationContext.getBean(EVENT_MULTICASTER_DESCRIPTOR_NAME);
+                component = (UMOComponent)applicationContext.getBean(EVENT_MULTICASTER_DESCRIPTOR_NAME);
             }
             // If the mule manager has been initialised in the contain
             // there is not need to do anything here
             if (applicationContext.containsBean("muleManager"))
             {
                 // Register the multicaster descriptor
-                registerMulticasterDescriptor();
+                registerMulticasterComponent();
                 return;
             }
 
@@ -583,7 +577,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             registerGlobalEndpoints();
 
             // Register the multicaster descriptor
-            registerMulticasterDescriptor();
+            registerMulticasterComponent();
 
             if (!managementContext.isStarted())
             {
@@ -596,21 +590,20 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
     }
 
-    protected void registerMulticasterDescriptor() throws UMOException
+    protected void registerMulticasterComponent() throws UMOException
     {
         // A discriptor hasn't been explicitly configured, so create a default
-        if (descriptor == null)
+        if (component == null)
         {
-            descriptor = getDefaultDescriptor();
-            setSubscriptionsOnDescriptor((MuleDescriptor)descriptor);
-            descriptor.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
-            managementContext.getRegistry().registerService(descriptor);
-            UMOModel model = managementContext.getRegistry().lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
-            component = model.getComponent(descriptor.getName());
+            component = getDefaultComponent();
+            setSubscriptionsOnComponent(component);
+            //component.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
+            managementContext.getRegistry().registerComponent(component, managementContext);
+            component = managementContext.getRegistry().lookupComponent(component.getName());
         }
     }
 
-    protected void setSubscriptionsOnDescriptor(MuleDescriptor descriptor) throws UMOException
+    protected void setSubscriptionsOnComponent(UMOComponent component) throws UMOException
     {
         String[] subscriptions;
         List endpoints = new ArrayList();
@@ -651,9 +644,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     .createInboundEndpoint(builder, managementContext);
 
                 // check whether the endpoint has already been set on the MuleEventMulticastor
-                if (descriptor.getInboundRouter().getEndpoint(ep.getName()) == null)
+                if (component.getInboundRouter().getEndpoint(ep.getName()) == null)
                 {
-                    descriptor.getInboundRouter().addEndpoint(ep);
+                    component.getInboundRouter().addEndpoint(ep);
                 }
             }
         }
@@ -788,7 +781,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
     }
 
-    protected UMODescriptor getDefaultDescriptor() throws UMOException
+    protected UMOComponent getDefaultComponent() throws UMOException
     {
         // When the the beanFactory is refreshed all the beans get
         // reloaded so we need to unregister the component from Mule
@@ -799,23 +792,23 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
             managementContext.getRegistry().registerModel(model);
         }
-        UMODescriptor descriptor = managementContext.getRegistry().lookupService(EVENT_MULTICASTER_DESCRIPTOR_NAME);
-        if (descriptor != null)
+        UMOComponent component = managementContext.getRegistry().lookupComponent(EVENT_MULTICASTER_DESCRIPTOR_NAME);
+        if (component != null)
         {
-            model.unregisterComponent(descriptor);
+            managementContext.getRegistry().unregisterComponent(component.getName());
         }
-        descriptor = new MuleDescriptor(EVENT_MULTICASTER_DESCRIPTOR_NAME);
+        component = new SedaComponent();
+        component.setName(EVENT_MULTICASTER_DESCRIPTOR_NAME);
         if (subscriptions == null)
         {
             logger.info("No receive endpoints have been set, using default '*'");
-            descriptor.getInboundRouter().addEndpoint(
-                managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint("vm://*",
-                    managementContext));
+            component.getInboundRouter().addEndpoint(
+                managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint("vm://*", managementContext));
         }
         else
         {
             // Set multiple inbound subscriptions on the descriptor
-            UMOInboundRouterCollection messageRouter = descriptor.getInboundRouter();
+            UMOInboundRouterCollection messageRouter = component.getInboundRouter();
 
             for (int i = 0; i < subscriptions.length; i++)
             {
@@ -832,8 +825,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
         // TODO RM: Need to put the actual instance here (not just the name reference), 
         // please review whether the following is correct?
-        descriptor.setServiceFactory(new SimpleObjectFactory(MuleEventMulticaster.class));
-        return descriptor;
+        component.setServiceFactory(new SimpleObjectFactory(MuleEventMulticaster.class));
+        return component;
     }
 
     protected ObjectFilter createFilter(String pattern)

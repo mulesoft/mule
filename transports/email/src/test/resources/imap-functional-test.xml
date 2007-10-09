@@ -16,11 +16,11 @@
     <model name="test">
 
         <service name="relay">
-            <bridge-component/>
             <inbound-router>
                 <inbound-endpoint address="imap://bob:password@localhost:65433">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </inbound-endpoint>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

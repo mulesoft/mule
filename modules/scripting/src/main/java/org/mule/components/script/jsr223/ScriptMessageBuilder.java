@@ -65,7 +65,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
     {
         namespace.put("request", request);
         namespace.put("response", response);
-        namespace.put("descriptor", descriptor);
+        namespace.put("component", component);
         namespace.put("componentNamespace", namespace);
         namespace.put("log", logger);
     }
@@ -119,7 +119,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
     {
         namespace.put("context", context);
         namespace.put("message", context.getMessage());
-        namespace.put("descriptor", context.getComponentDescriptor());
+        namespace.put("descriptor", context.getComponent());
         namespace.put("componentNamespace", namespace);
         namespace.put("log", logger);
         namespace.put("result", new Object());

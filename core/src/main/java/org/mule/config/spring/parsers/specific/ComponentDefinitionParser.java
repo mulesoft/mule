@@ -10,15 +10,35 @@
 
 package org.mule.config.spring.parsers.specific;
 
-public class ComponentDefinitionParser extends ObjectFactoryDefinitionParser
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
+
+public class ComponentDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
+    Class beanClass;
     
-    public ComponentDefinitionParser(String setterMethod)
+    public ComponentDefinitionParser(Class beanClass)
     {
-        super(setterMethod);
-        addAlias("factory", "serviceFactory");
+        this.beanClass = beanClass;
+    }
+    
+    protected Class getBeanClass(Element element)
+    {
+        return beanClass;
+    }
+
+    //@java.lang.Override
+    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
+    {
+        // The model for this component should theoretically be the grandparent node.
+        Element parent = (Element) element.getParentNode();
+        String modelName = parent.getAttribute(ATTRIBUTE_NAME);
+        builder.addPropertyReference("model", modelName);
+
+        super.doParse(element, parserContext, builder);
     }
 
 }
-
-

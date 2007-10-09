@@ -16,11 +16,11 @@
 
     <http:connector name="HttpConnector"/>
 
-    <model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
+    <model name="main">
 
         <!-- singleton for easier testing only -->
-        <service name="Test">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+        <service name="Test" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
                                   address="http://localhost:60206/TestServer"/>
@@ -33,11 +33,11 @@
         </service>
 
         <service name="TestServer">
-            <component class="org.mule.components.simple.StaticComponent">
+            <singleton-object class="org.mule.components.simple.StaticComponent">
                 <properties>
                     <spring:entry key="data" value="Here's your content."/>
                 </properties>
-            </component>
+            </singleton-object>
             <inbound-router>
                 <inbound-endpoint address="http://localhost:60206" connector-ref="HttpConnector"/>
             </inbound-router>

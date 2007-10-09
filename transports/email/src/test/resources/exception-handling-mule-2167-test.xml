@@ -18,9 +18,9 @@
 
     <model name="main">
         <service name="default config">
-            <bridge-component/>
             <inbound-router>
                 <vm:inbound-endpoint address="in-default" connector-ref="defaultVm"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <exception-based-router>

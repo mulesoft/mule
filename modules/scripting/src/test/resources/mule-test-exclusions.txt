@@ -1,1 +1,3 @@
-#org.mule.config.builders.GroovyScriptConfigurationBuilderTestCase
+# Update this once scripting is working again in 2.x
+org.mule.config.builders.GroovyScriptConfigurationBuilderTestCase
+

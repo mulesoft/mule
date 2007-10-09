@@ -10,7 +10,6 @@
 
 package org.mule.mule;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.ResponseOutputStream;
@@ -34,9 +33,8 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     public void testEventInitialise() throws Exception
     {
         String data = "Test Data";
-        MuleDescriptor descriptor = getTestDescriptor("orange", Orange.class.getName());
 
-        MuleEvent event = (MuleEvent)getTestEvent(data, descriptor);
+        MuleEvent event = (MuleEvent)getTestEvent(data, getTestComponent("orange", Orange.class));
 
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
         assertEquals("Event data should equal " + data, data, event.getMessageAsString(null));
@@ -80,7 +78,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint.setTransformers(CollectionUtils.singletonList(new TestEventTransformer()));
         MuleEvent event = new MuleEvent(new MuleMessage(data), endpoint,
-            getTestSession(getTestComponent(getTestDescriptor("apple", Apple.class.getName()))), true,
+            getTestSession(getTestComponent("apple", Apple.class)), true,
             new ResponseOutputStream(System.out));
 
         assertNotNull(event.getId());

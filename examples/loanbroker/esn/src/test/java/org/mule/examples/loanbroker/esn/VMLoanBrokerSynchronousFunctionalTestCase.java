@@ -43,7 +43,7 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
 
     protected void assertComponent(SedaModel model, String name)
     {
-        UMOComponent component = model.getComponent(name);
+        UMOComponent component = managementContext.getRegistry().lookupComponent(name);
         assertNotNull(name + " missing", component);
     }
 

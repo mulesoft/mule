@@ -15,23 +15,13 @@ import org.mule.umo.provider.UMOConnector;
 
 public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
 {
-    
-    public SmtpsConnectorTestCase()
-    {
-        super("SmtpsConnector");
-    }
-    
     // @Override
-    public UMOConnector createConnector(boolean init) throws Exception
+    public UMOConnector createConnector() throws Exception
     {
         SmtpsConnector connector = new SmtpsConnector();
-        connector.setName(getConnectorName());
+        connector.setName("SmtpsConnector");
         connector.setTrustStorePassword("password");
         connector.setTrustStore("greenmail-truststore");
-        if (init)
-        {
-            connector.initialise();
-        }
         return connector;
     }
 

@@ -36,9 +36,9 @@
     <model name="sample">
 
         <service name="TestUMO">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://testin"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>

@@ -23,10 +23,10 @@
     <model name="receiveModel">
 
         <service name="relay">
-            <component class="org.mule.components.simple.BridgeComponent" scope="singleton"/>
             <inbound-router>
                 <!-- will be set at runtime, once connector has readFromDirectory -->
                 <!-- mule:endpoint address="file:///tmp/foo"/ -->
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

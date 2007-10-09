@@ -35,6 +35,7 @@ import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
 import org.mule.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.providers.AbstractConnector;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
@@ -44,8 +45,6 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.object.ObjectFactory;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,6 +65,8 @@ import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnectorServer;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -162,7 +163,7 @@ public class JmxAgent extends AbstractAgent
         {
             try
             {
-                mBeanServer = (MBeanServer) mBeanServerObjectFactory.create();
+                mBeanServer = (MBeanServer) mBeanServerObjectFactory.getOrCreate();
             }
             catch (Exception e)
             {
@@ -416,21 +417,16 @@ public class JmxAgent extends AbstractAgent
     protected void registerComponentServices() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (Iterator iterator = managementContext.getRegistry().getModels().iterator(); iterator.hasNext();)
+        String rawName;
+        for (Iterator iterator = managementContext.getRegistry().lookupObjects(UMOComponent.class).iterator(); iterator.hasNext();)
         {
-            UMOModel model = (UMOModel) iterator.next();
-            Iterator iter = model.getComponentNames();
-
-            String rawName;
-            while (iter.hasNext()) {
-                rawName = iter.next().toString();
-                final String name = jmxSupport.escape(rawName);
-                ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":type=org.mule.Component,name=" + name);
-                ComponentServiceMBean serviceMBean = new ComponentService(rawName);
-                logger.debug("Registering component with name: " + on);
-                mBeanServer.registerMBean(serviceMBean, on);
-                registeredMBeans.add(on);
-            }
+            rawName = ((UMOComponent) iterator.next()).getName();
+            final String name = jmxSupport.escape(rawName);
+            ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":type=org.mule.Component,name=" + name);
+            ComponentServiceMBean serviceMBean = new ComponentService(rawName);
+            logger.debug("Registering component with name: " + on);
+            mBeanServer.registerMBean(serviceMBean, on);
+            registeredMBeans.add(on);
         }
 
     }

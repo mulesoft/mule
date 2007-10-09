@@ -18,6 +18,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ManagementContextAware;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -39,6 +40,8 @@ import org.mule.util.UUID;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,7 +82,6 @@ public abstract class AbstractRegistry implements Registry
     {
         this(id);
         setParent(parent);
-        lifecycleManager = createLifecycleManager();
     }
 
     protected abstract UMOLifecycleManager createLifecycleManager();
@@ -383,9 +385,27 @@ public abstract class AbstractRegistry implements Registry
         return (UMOAgent) lookupObject(name);
     }
 
-    public UMODescriptor lookupService(String name)
+    public UMOComponent lookupComponent(String name)
     {
-        return (UMODescriptor) lookupObject(name);
+        return (UMOComponent) lookupObject(name);
+    }
+
+    public Collection/*<UMOComponent>*/ lookupComponents(String model)
+    {
+        Collection/*<UMOComponent>*/ components = lookupObjects(UMOComponent.class);
+        List modelComponents = new ArrayList();
+        Iterator it = components.iterator();
+        UMOComponent component;
+        while (it.hasNext())
+        {
+            component = (UMOComponent) it.next();
+            // TODO Make this comparison more robust.
+            if (model.equals(component.getModel().getName()))
+            {
+                modelComponents.add(component);
+            }
+        }
+        return modelComponents;
     }
 
     public final Object lookupObject(String key, int scope)
@@ -414,7 +434,7 @@ public abstract class AbstractRegistry implements Registry
         return o;
     }
 
-    public Collection lookupObjects(Class type)
+    public final Collection lookupObjects(Class type)
     {
         return lookupObjects(type, getDefaultScope());
     }
@@ -611,20 +631,14 @@ public abstract class AbstractRegistry implements Registry
     }
 
     /** {@inheritDoc} */
-    public void registerService(UMODescriptor service) throws UMOException
+    public void registerComponent(UMOComponent component, UMOManagementContext managementContext) throws UMOException
     {
-        registerService(service, MuleServer.getManagementContext());
+        unsupportedOperation("registerComponent", component);
     }
 
-    public void registerService(UMODescriptor service, UMOManagementContext managementContext)
-        throws UMOException
+    public UMOComponent unregisterComponent(String componentName)
     {
-        unsupportedOperation("registerService", service);
-    }
-
-    public UMODescriptor unregisterService(String serviceName)
-    {
-        unsupportedOperation("unregisterService", serviceName);
+        unsupportedOperation("unregisterComponent", componentName);
         return null;
     }
 
@@ -744,7 +758,38 @@ public abstract class AbstractRegistry implements Registry
         defaultScope = scope;
     }
 
-    protected abstract MuleConfiguration getLocalConfiguration();
+    /**
+     * TODO MULE-2162
+     * @return the MuleConfiguration for this MuleManager. This object is immutable
+     *         once the manager has initialised.
+     */
+    protected MuleConfiguration getLocalConfiguration()
+    {
+        Collection collection = lookupObjects(MuleConfiguration.class);
+        if (collection == null)
+        {
+            logger.warn("No MuleConfiguration was found in registry");
+            return null;
+        }
+
+        if (collection.size() > 1)
+        {
+            //logger.warn("More than one MuleConfiguration was found in registry");
+        }
+        return (MuleConfiguration) collection.iterator().next();
+    }
+
+    /** {@inheritDoc} */
+//    public TransactionManager getTransactionManager()
+//    {
+//        Map m = applicationContext.getBeansOfType(TransactionManager.class);
+//        if (m.size() > 0)
+//        {
+//            return (TransactionManager) m.values().iterator().next();
+//        }
+//        return null;
+//    }
+
 
     public void registerEndpointBuilder(String name, UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException
     {

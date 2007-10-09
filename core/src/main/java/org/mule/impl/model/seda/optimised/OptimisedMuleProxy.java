@@ -17,7 +17,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.model.MuleProxy;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.management.stats.SedaComponentStatistics;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
@@ -29,7 +28,6 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.model.ModelException;
-import org.mule.util.object.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
 import org.apache.commons.logging.Log;
@@ -62,8 +60,6 @@ public class OptimisedMuleProxy implements MuleProxy
      */
     private boolean suspended = true;
 
-    private ObjectPool proxyPool;
-
     private ComponentStatistics stat = null;
 
     private Callable umo;
@@ -78,11 +74,10 @@ public class OptimisedMuleProxy implements MuleProxy
      * @param component the underlying object that with receive events
      * @param descriptor the UMOComponent descriptor associated with the component
      */
-    public OptimisedMuleProxy(Callable component, MuleDescriptor descriptor, ObjectPool proxyPool)
+    public OptimisedMuleProxy(Callable component, MuleDescriptor descriptor)
         throws UMOException
     {
         this.descriptor = new ImmutableMuleDescriptor(descriptor);
-        this.proxyPool = proxyPool;
         umo = component;
     }
 
@@ -450,17 +445,12 @@ public class OptimisedMuleProxy implements MuleProxy
 
             try
             {
-                proxyPool.returnObject(this);
+                //descriptor.getServiceFactory().release(umo);
             }
             catch (Exception e2)
             {
                 // TODO MULE-863: If this is an error, do something about it
                 logger.error("Failed to return proxy: " + e2.getMessage(), e2);
-            }
-            //TODO RM* clean this up
-            if (getStatistics() instanceof SedaComponentStatistics)
-            {
-                ((SedaComponentStatistics) getStatistics()).setComponentPoolSize(proxyPool.getSize());
             }
         }
     }

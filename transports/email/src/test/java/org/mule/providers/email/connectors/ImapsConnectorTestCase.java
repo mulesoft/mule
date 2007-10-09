@@ -18,24 +18,14 @@ import org.mule.umo.provider.UMOConnector;
  */
 public class ImapsConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
-    
-    public ImapsConnectorTestCase()
-    {
-        super("ImapsConnector");
-    }
-
-    public UMOConnector createConnector(boolean init) throws Exception
+    public UMOConnector createConnector() throws Exception
     {
         ImapsConnector connector = new ImapsConnector();
-        connector.setName(getConnectorName());
+        connector.setName("ImapsConnector");
         connector.setCheckFrequency(POLL_PERIOD_MS);
         connector.setServiceOverrides(newEmailToStringServiceOverrides());
         connector.setTrustStorePassword("password");
         connector.setTrustStore("greenmail-truststore");
-        if (init) 
-        {
-            connector.initialise();
-        }
         return connector;
     }
 

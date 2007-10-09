@@ -12,49 +12,37 @@ package org.mule.impl.model;
 
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.ImmutableMuleDescriptor;
-import org.mule.impl.InterceptorsInvoker;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.OptimizedRequestContext;
 import org.mule.impl.RequestContext;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.management.stats.SedaComponentStatistics;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
 import org.mule.providers.ReplyToHandler;
 import org.mule.umo.MessagingException;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionPayload;
-import org.mule.umo.UMOImmutableDescriptor;
-import org.mule.umo.UMOInterceptor;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.model.UMOModel;
-import org.mule.util.object.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that that
- * can be executed in it's own thread.
+ * <code>MuleProxy</code> is a proxy to an UMO. It can be executed in its own thread.
  */
-
 public class DefaultMuleProxy implements MuleProxy
 {
     /** logger used by this class */
@@ -67,19 +55,17 @@ public class DefaultMuleProxy implements MuleProxy
     private UMOLifecycleAdapter umo;
 
     /** holds the UMO descriptor */
-    private ImmutableMuleDescriptor descriptor;
+    private UMOComponent component;
 
     /** Determines if the proxy is suspended */
     private boolean suspended = true;
-
-    private List interceptorList;
-
-    private ObjectPool proxyPool;
 
     private ComponentStatistics stat = null;
 
     private QueueSession queueSession = null;
 
+    protected UMOManagementContext managementContext;
+    
     /**
      * Constructs a Proxy using the UMO's AbstractMessageDispatcher and the UMO
      * itself
@@ -87,36 +73,16 @@ public class DefaultMuleProxy implements MuleProxy
      * @param component  the underlying object that with receive events
      * @param descriptor the UMOComponent descriptor associated with the component
      */
-    public DefaultMuleProxy(Object component, MuleDescriptor descriptor, UMOModel model, ObjectPool proxyPool)
+    public DefaultMuleProxy(Object pojoService, UMOComponent component, UMOManagementContext managementContext)
             throws UMOException
     {
-        this.descriptor = new ImmutableMuleDescriptor(descriptor);
-        this.proxyPool = proxyPool;
+        //this.pojoService = pojoService;
+        this.component = component;
+        this.managementContext = managementContext;
 
+        UMOModel model = component.getModel();
         UMOEntryPointResolverSet resolver = model.getEntryPointResolverSet();
-        umo = model.getLifecycleAdapterFactory().create(component, descriptor, resolver);
-
-        interceptorList = new ArrayList(descriptor.getInterceptors().size() + 1);
-        interceptorList.addAll(descriptor.getInterceptors());
-        interceptorList.add(umo);
-
-        for (Iterator iter = interceptorList.iterator(); iter.hasNext();)
-        {
-            UMOInterceptor interceptor = (UMOInterceptor) iter.next();
-            if (interceptor instanceof Initialisable)
-            {
-                try
-                {
-                    ((Initialisable) interceptor).initialise();
-                }
-                catch (Exception e)
-                {
-                    throw new ModelException(
-                            CoreMessages.objectFailedToInitialise(
-                                    "Component '" + descriptor.getName() + "'"), e);
-                }
-            }
-        }
+        umo = model.getLifecycleAdapterFactory().create(pojoService, component, resolver);
     }
 
     public void start() throws UMOException
@@ -131,7 +97,7 @@ public class DefaultMuleProxy implements MuleProxy
             catch (Exception e)
             {
                 throw new ModelException(
-                        CoreMessages.failedToStart("Component '" + descriptor.getName() + "'"), e);
+                    CoreMessages.failedToStart("Component '" + component.getName() + "'"), e);
             }
         }
 
@@ -154,7 +120,7 @@ public class DefaultMuleProxy implements MuleProxy
             catch (Exception e)
             {
                 throw new ModelException(
-                        CoreMessages.failedToStop("Component '" + descriptor.getName() + "'"), e);
+                    CoreMessages.failedToStop("Component '" + component.getName() + "'"), e);
             }
         }
     }
@@ -162,23 +128,6 @@ public class DefaultMuleProxy implements MuleProxy
     public void dispose()
     {
         checkDisposed();
-        for (Iterator iter = interceptorList.iterator(); iter.hasNext();)
-        {
-            UMOInterceptor interceptor = (UMOInterceptor) iter.next();
-            if (interceptor instanceof Disposable)
-            {
-                try
-                {
-                    ((Disposable) interceptor).dispose();
-                }
-                catch (Exception e)
-                {
-                    // TODO MULE-863: If this is an error, do something
-                    logger.error(
-                            CoreMessages.failedToDispose("Component '" + descriptor.getName() + "'"), e);
-                }
-            }
-        }
     }
 
     private void checkDisposed()
@@ -221,7 +170,7 @@ public class DefaultMuleProxy implements MuleProxy
     {
         if (logger.isTraceEnabled())
         {
-            logger.trace("MuleProxy: sync call for Mule UMO " + descriptor.getName());
+            logger.trace("MuleProxy: sync call for Mule UMO " + component.getName());
         }
 
         UMOMessage returnMessage = null;
@@ -232,8 +181,6 @@ public class DefaultMuleProxy implements MuleProxy
                 event = OptimizedRequestContext.unsafeSetEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
                 ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
-                InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor,
-                        event.getMessage());
 
                 // stats
                 long startTime = 0;
@@ -241,7 +188,21 @@ public class DefaultMuleProxy implements MuleProxy
                 {
                     startTime = System.currentTimeMillis();
                 }
-                returnMessage = invoker.execute();
+
+                if (component.getName().startsWith("_xfireServiceComponent") ||
+                    component.getName().startsWith("_axisServiceComponent"))
+                {
+                    // TODO MULE-2099 This is what the MethodFixInterceptor from Axis/XFire was doing.
+                    event.getMessage().setBooleanProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY, true);
+                }
+                returnMessage = umo.intercept(null);
+                
+                if (component.getName().startsWith("_xfireServiceComponent") ||
+                    component.getName().startsWith("_axisServiceComponent"))
+                {
+                    // TODO MULE-2099 This is what the MethodFixInterceptor from Axis/XFire was doing.
+                    returnMessage.removeProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY);
+                }
 
                 // stats
                 if (stat.isEnabled())
@@ -256,9 +217,9 @@ public class DefaultMuleProxy implements MuleProxy
                 }
                 if (returnMessage != null && !event.isStopFurtherProcessing())
                 {
-                    if (descriptor.getOutboundRouter().hasEndpoints())
+                    if (component.getOutboundRouter().hasEndpoints())
                     {
-                        UMOMessage outboundReturnMessage = descriptor.getOutboundRouter().route(
+                        UMOMessage outboundReturnMessage = component.getOutboundRouter().route(
                                 returnMessage, event.getSession(), event.isSynchronous());
                         if (outboundReturnMessage != null)
                         {
@@ -267,25 +228,25 @@ public class DefaultMuleProxy implements MuleProxy
                     }
                     else
                     {
-                        logger.debug("Outbound router on component '" + descriptor.getName()
+                        logger.debug("Outbound router on component '" + component.getName()
                                 + "' doesn't have any endpoints configured.");
                     }
                 }
 
                 // Process Response Router
                 // TODO Alan C. - responseRouter is initialized to empty (no endpoints) in Mule 2.x, this line can be part of a solution
-                //if (returnMessage != null && descriptor.getResponseRouter() != null && !descriptor.getResponseRouter().getEndpoints().isEmpty())
-                if (returnMessage != null && descriptor.getResponseRouter() != null)
+                //if (returnMessage != null && component.getResponseRouter() != null && !component.getResponseRouter().getEndpoints().isEmpty())
+                if (returnMessage != null && component.getResponseRouter() != null)
                 {
                     logger.debug("Waiting for response router message");
-                    returnMessage = descriptor.getResponseRouter().getResponse(returnMessage);
+                    returnMessage = component.getResponseRouter().getResponse(returnMessage);
                 }
 
                 // process replyTo if there is one
                 if (returnMessage != null && replyToHandler != null)
                 {
                     String requestor = (String) returnMessage.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-                    if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null)
+                    if ((requestor != null && !requestor.equals(component.getName())) || requestor == null)
                     {
                         replyToHandler.processReplyTo(event, returnMessage, replyTo);
                     }
@@ -314,9 +275,9 @@ public class DefaultMuleProxy implements MuleProxy
             else
             {
                 handleException(
-                        new MessagingException(
-                                CoreMessages.eventProcessingFailedFor(descriptor.getName()),
-                                event.getMessage(), e));
+                    new MessagingException(
+                        CoreMessages.eventProcessingFailedFor(component.getName()), 
+                        event.getMessage(), e));
             }
 
             if (returnMessage == null)
@@ -341,12 +302,12 @@ public class DefaultMuleProxy implements MuleProxy
      */
     public void handleException(Exception exception)
     {
-        descriptor.getExceptionListener().exceptionThrown(exception);
+        component.getExceptionListener().exceptionThrown(exception);
     }
 
     public String toString()
     {
-        return "proxy for: " + descriptor.toString();
+        return "proxy for: " + component.toString();
     }
 
     /**
@@ -397,11 +358,9 @@ public class DefaultMuleProxy implements MuleProxy
             }
 
             // get the endpointUri for this uri
-            UMOImmutableEndpoint endpoint = descriptor.getManagementContext()
-                    .getRegistry()
-                    .lookupOutboundEndpoint(returnMessage.getReplyTo().toString(),
-                            descriptor.getManagementContext());
-
+            UMOImmutableEndpoint endpoint = 
+                managementContext.getRegistry().lookupOutboundEndpoint(
+                    returnMessage.getReplyTo().toString(), managementContext);
             // make sure remove the replyTo property as not cause a a forever
             // replyto loop
             returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
@@ -428,7 +387,7 @@ public class DefaultMuleProxy implements MuleProxy
     {
         if (logger.isTraceEnabled())
         {
-            logger.trace("MuleProxy: async onEvent for Mule UMO " + descriptor.getName());
+            logger.trace("MuleProxy: async onEvent for Mule UMO " + component.getName());
         }
 
         try
@@ -439,8 +398,6 @@ public class DefaultMuleProxy implements MuleProxy
                 event = OptimizedRequestContext.criticalSetEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
                 ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
-                InterceptorsInvoker invoker =
-                        new InterceptorsInvoker(interceptorList, descriptor, event.getMessage());
 
                 // do stats
                 long startTime = 0;
@@ -448,7 +405,22 @@ public class DefaultMuleProxy implements MuleProxy
                 {
                     startTime = System.currentTimeMillis();
                 }
-                UMOMessage result = invoker.execute();
+                
+                if (component.getName().startsWith("_xfireServiceComponent") ||
+                    component.getName().startsWith("_axisServiceComponent"))
+                {
+                    // TODO MULE-2099 This is what the MethodFixInterceptor from Axis/XFire was doing.
+                    event.getMessage().setBooleanProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY, true);
+                }
+                UMOMessage result = umo.intercept(null);
+                
+                if (component.getName().startsWith("_xfireServiceComponent") ||
+                    component.getName().startsWith("_axisServiceComponent"))
+                {
+                    // TODO MULE-2099 This is what the MethodFixInterceptor from Axis/XFire was doing.
+                    result.removeProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY);
+                }
+                
                 if (stat.isEnabled())
                 {
                     stat.addExecutionTime(System.currentTimeMillis() - startTime);
@@ -457,14 +429,14 @@ public class DefaultMuleProxy implements MuleProxy
                 event = RequestContext.getEvent();
                 if (result != null && !event.isStopFurtherProcessing())
                 {
-                    descriptor.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
+                    component.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
                 }
 
                 // process replyTo if there is one
                 if (result != null && replyToHandler != null)
                 {
                     String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-                    if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null)
+                    if ((requestor != null && !requestor.equals(component.getName())) || requestor == null)
                     {
                         replyToHandler.processReplyTo(event, result, replyTo);
                     }
@@ -490,26 +462,9 @@ public class DefaultMuleProxy implements MuleProxy
             else
             {
                 handleException(
-                        new MessagingException(
-                                CoreMessages.eventProcessingFailedFor(descriptor.getName()),
-                                event.getMessage(), e));
-            }
-        }
-        finally
-        {
-            try
-            {
-                proxyPool.returnObject(this);
-            }
-            catch (Exception e2)
-            {
-                // TODO MULE-863: If this is an error, do something about it
-                logger.error("Failed to return proxy: " + e2.getMessage(), e2);
-            }
-            //TODO RM* clean this up
-            if (getStatistics() instanceof SedaComponentStatistics)
-            {
-                ((SedaComponentStatistics) getStatistics()).setComponentPoolSize(proxyPool.getSize());
+                    new MessagingException(
+                        CoreMessages.eventProcessingFailedFor(component.getName()), 
+                        event.getMessage(), e));
             }
         }
     }
@@ -517,10 +472,5 @@ public class DefaultMuleProxy implements MuleProxy
     public void release()
     {
         // nothing to do
-    }
-
-    public UMOImmutableDescriptor getDescriptor()
-    {
-        return descriptor;
     }
 }

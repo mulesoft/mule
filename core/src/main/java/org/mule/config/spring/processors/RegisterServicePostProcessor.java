@@ -23,6 +23,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
  * TODO
+ * @deprecated MULE-2393 The model should be injected into its components via IoC, not the other way around.
  */
 public class RegisterServicePostProcessor implements BeanPostProcessor
 {
@@ -32,29 +33,29 @@ public class RegisterServicePostProcessor implements BeanPostProcessor
     protected transient final Log logger = LogFactory.getLog(RegisterServicePostProcessor.class);
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException
     {
-        if (bean instanceof UMODescriptor)
-        {
-            UMODescriptor descriptor = (UMODescriptor) bean;
-            if(descriptor.getModelName()==null)
-            {
-                logger.warn("No model name set on the service descriptor. Attempting to use default: " + ModelFactory.DEFAULT_MODEL_NAME);
-                descriptor.setModelName(ModelFactory.DEFAULT_MODEL_NAME);
-               // throw new NullPointerException(new Message(Messages.X_IS_NULL, descriptor.getName() + ":UMODescriptor.getModelName()").getMessage());
-            }
-            UMOModel model = RegistryContext.getRegistry().lookupModel(descriptor.getModelName());
-            if (model == null)
-            {
-                throw new IllegalArgumentException("No model named '" + descriptor.getModelName() + "' registered. Offending service is: " + descriptor);
-            }
-            try
-            {
-                model.registerComponent(descriptor);
-            }
-            catch (UMOException e)
-            {
-                throw new BeanInitializationException("failed to register service with model: " + descriptor, e);
-            }
-        }
+//        if (bean instanceof UMODescriptor)
+//        {
+//            UMODescriptor descriptor = (UMODescriptor) bean;
+//            if(descriptor.getModelName()==null)
+//            {
+//                logger.warn("No model name set on the service descriptor. Attempting to use default: " + ModelFactory.DEFAULT_MODEL_NAME);
+//                descriptor.setModelName(ModelFactory.DEFAULT_MODEL_NAME);
+//               // throw new NullPointerException(new Message(Messages.X_IS_NULL, descriptor.getName() + ":UMODescriptor.getModelName()").getMessage());
+//            }
+//            UMOModel model = RegistryContext.getRegistry().lookupModel(descriptor.getModelName());
+//            if (model == null)
+//            {
+//                throw new IllegalArgumentException("No model named '" + descriptor.getModelName() + "' registered. Offending service is: " + descriptor);
+//            }
+//            try
+//            {
+//                model.registerComponent(descriptor);
+//            }
+//            catch (UMOException e)
+//            {
+//                throw new BeanInitializationException("failed to register service with model: " + descriptor, e);
+//            }
+//        }
         return bean;
     }
 

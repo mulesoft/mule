@@ -238,4 +238,6 @@ public interface UMOManagementContext extends Initialisable, Lifecycle
     void setLifecycleManager(UMOLifecycleManager lifecycleManager);
     
     Registry getRegistry();
+    
+    void applyLifecycle(Object object) throws UMOException;
 }

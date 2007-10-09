@@ -15,7 +15,6 @@
     <!--   Structure                                                  -->
     <!--==============================================================-->
 
-
     <!-- This defines the structure in abstract terms (except for a few simple/unique things like
          environment properties).  We then provide some implementations below.  Other modules
          can provide other implementations. -->
@@ -94,6 +93,10 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!--==============================================================-->
+    <!--   Abstract Types                                             -->
+    <!--==============================================================-->
+    
     <xsd:element name="abstract-extension" abstract="true" type="abstractExtensionType">
         <xsd:annotation>
             <xsd:documentation>
@@ -127,74 +130,6 @@
         <xsd:attribute name="ignoreBadInput" type="substitutableBoolean"/>
     </xsd:complexType>
 
-    <xsd:element name="abstract-model" abstract="true" type="abstractModelType"/>
-    <xsd:complexType name="abstractModelType">
-        <xsd:sequence>
-            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-        </xsd:sequence>
-        <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="class" type="xsd:NMTOKEN"/>
-    </xsd:complexType>
-
-    <!-- from seda-model - really, each model should be in a separate namespace -->
-
-    <xsd:element name="abstract-pooling-profile" abstract="true" type="abstractPoolingProfileType"/>
-    <xsd:complexType name="abstractPoolingProfileType"/>
-
-    <xsd:element name="abstract-queue-profile" abstract="true" type="abstractQueueProfileType"/>
-    <xsd:complexType name="abstractQueueProfileType"/>
-
-    <xsd:element name="abstract-entrypoint-resolver" abstract="true" type="abstractEntrypointResolverType"/>
-    <xsd:complexType name="abstractEntrypointResolverType"/>
-
-    <xsd:element name="abstract-component-pool-factory" abstract="true" type="abstractComponentPoolFactoryType"/>
-    <xsd:complexType name="abstractComponentPoolFactoryType"/>
-
-    <xsd:element name="abstract-seda-service" abstract="true" type="abstractSedaServiceType"/>
-    <xsd:complexType name="abstractSedaServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="defaultServiceType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!-- this is extended by the (should be abstract, but some undeveloped) services for
-         particular models so has no element -->
-    <xsd:complexType name="abstractServiceType"/>
-
-    <xsd:complexType name="defaultServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractServiceType">
-                <xsd:sequence>
-                    <xsd:choice>
-                        <xsd:element ref="component"/> <!-- hardwired to allow objectFactoryType -->
-                        <xsd:element ref="abstract-component"/>
-                    </xsd:choice>
-                    <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
-                    <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0"/>
-                    <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
-                    <xsd:element name="response-router" type="responseRouterCollectionType" minOccurs="0"/>
-                    <xsd:element ref="abstract-threading-profile" minOccurs="0"/>
-                    <xsd:element ref="abstract-pooling-profile" minOccurs="0"/>
-                    <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-                    <xsd:element name="properties" type="mapType" minOccurs="0"/>
-                </xsd:sequence>
-                <xsd:attribute name="name" type="xsd:string" use="required"/>
-                <!-- Disabled until it actually does something!
-                <xsd:attribute name="version" type="xsd:string"/>
-                -->
-                <xsd:attribute name="initialState" default="started">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="started"/>
-                            <xsd:enumeration value="stopped"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:complexType name="environmentPropertyType">
 <!--         <xsd:sequence>
             <xsd:choice minOccurs="0" maxOccurs="1">
@@ -212,9 +147,6 @@
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <xsd:attribute name="value" type="xsd:string" use="required"/>
     </xsd:complexType>
-
-    <xsd:element name="abstract-component" abstract="true" type="abstractComponentType"/>
-    <xsd:complexType name="abstractComponentType"/>
 
     <!-- seemed pointless making these simple container types abstract -->
     <xsd:complexType name="inboundRouterCollectionType">
@@ -332,30 +264,78 @@
 
 
     <!--==============================================================-->
-    <!--   Component elements                                         -->
+    <!--  Components                                                  -->
     <!--==============================================================-->
 
-    <xsd:element name="component" type="objectFactoryType">
+    <xsd:element name="service" type="defaultComponentType" substitutionGroup="abstract-component"/>
+    
+    <xsd:element name="abstract-component" abstract="true" type="abstractComponentType"/>
+    <xsd:complexType name="abstractComponentType">
         <xsd:annotation>
-            <xsd:documentation>The underlying service component (your business logic)</xsd:documentation>
+            <xsd:documentation>The model-based wrapper around the POJO service (SEDA, Streaming, etc.)</xsd:documentation>
         </xsd:annotation>
-    </xsd:element>
+        <xsd:sequence>
+            <!-- minOccurs="0" to allow for <forwarding-router> which doesn't need a service. -->
+            <xsd:element ref="abstract-object-factory" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>Factory to create the user's POJO service</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
+            <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0"/>
+            <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
+            <xsd:element name="response-router" type="responseRouterCollectionType" minOccurs="0"/>
+            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+            <xsd:element name="meta-info" type="mapType" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="initialState" default="started">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="started"/>
+                    <xsd:enumeration value="stopped"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
 
-    <xsd:complexType name="componentShortcutType">
+    <xsd:complexType name="defaultComponentType">
         <xsd:complexContent>
-            <xsd:extension base="abstractComponentType"/>
+            <xsd:extension base="sedaComponentType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="seda-component" type="sedaComponentType" substitutionGroup="abstract-component"/>
+    <xsd:complexType name="sedaComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractComponentType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-threading-profile" minOccurs="0"/>
+                    <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="queueTimeout" type="xsd:integer"/>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="bridge-component" type="componentShortcutType" substitutionGroup="abstract-component">
-        <xsd:annotation>
-            <xsd:documentation>
-                Built-in BridgeComponent that enables a bridge between an inbound and outbound endpoints.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
 
-    <xsd:element name="pass-through-component" type="componentShortcutType" substitutionGroup="abstract-component">
+    <!--==============================================================-->
+    <!-- POJO services                                                -->
+    <!--==============================================================-->
+
+    <!-- This element should be called "service" but in order to not break everything at once, 
+         let's continue to call it "component" for now.  
+    <xsd:element name="service" type="defaultServiceType" substitutionGroup="abstract-object-factory"/>
+    -->
+    <xsd:element name="component" type="defaultServiceType" substitutionGroup="abstract-object-factory"/>
+    <xsd:complexType name="defaultServiceType">
+        <xsd:complexContent>
+            <xsd:extension base="pooledObjectFactoryType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="pass-through-component" type="defaultServiceType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in PassThroughComponent that enables a bridge between an inbound and outbound endpoints.
@@ -365,7 +345,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="echo-component" type="componentShortcutType" substitutionGroup="abstract-component">
+    <xsd:element name="echo-component" type="defaultServiceType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in EchoComponent that logs the message and returns the payload back as the result.
@@ -373,7 +353,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="log-component" type="componentShortcutType" substitutionGroup="abstract-component">
+    <xsd:element name="log-component" type="defaultServiceType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in LogComponent that simply logs the message content (or content length if it is a
@@ -382,7 +362,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="null-component" type="componentShortcutType" substitutionGroup="abstract-component">
+    <xsd:element name="null-component" type="defaultServiceType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in NullComponent that will throw an exception if it receives a message.
@@ -390,8 +370,7 @@
         </xsd:annotation>
     </xsd:element>
 
-
-    <xsd:element name="rest-service-component" type="restServiceWrapperType" substitutionGroup="abstract-component">
+    <xsd:element name="rest-service-component" type="restServiceWrapperType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in RestServiceWrapper can used to proxy REST style services as local Mule Components.
@@ -399,7 +378,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="no-args-call-component" type="noArgsCallWrapperType" substitutionGroup="abstract-component">
+    <xsd:element name="no-args-call-component" type="noArgsCallWrapperType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in NoArgsCallWrapper
@@ -410,7 +389,7 @@
 
     <xsd:complexType name="noArgsCallWrapperType">
         <xsd:complexContent>
-            <xsd:extension base="componentShortcutType">
+            <xsd:extension base="defaultServiceType">
                 <xsd:choice minOccurs="1" maxOccurs="1">
                         <xsd:element name="delegateClass" type="noArgsCallDelegateClassType"/>
                         <xsd:element name="delegateInstance" type="noArgsCallDelegateInstanceType"/>
@@ -431,7 +410,7 @@
 
     <xsd:complexType name="restServiceWrapperType">
         <xsd:complexContent>
-            <xsd:extension base="componentShortcutType">
+            <xsd:extension base="defaultServiceType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-filter" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="payloadParameterNames" type="listOrSetType" minOccurs="0" maxOccurs="unbounded"/>
@@ -454,7 +433,9 @@
     </xsd:complexType>
 
 
-    <!-- Transaction Managers -->
+    <!--==============================================================-->
+    <!--   Transactions                                               -->
+    <!--==============================================================-->
 
     <xsd:complexType name="transactionManagerType">
         <xsd:complexContent>
@@ -594,7 +575,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractTransactionType">
                 <xsd:sequence>
-                    <xsd:element name="transaction-factory" type="objectFactoryType" minOccurs="0"/>
+                    <xsd:element name="transaction-factory" type="abstractObjectFactoryType" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="action">
                     <xsd:simpleType>
@@ -788,36 +769,6 @@
         </xsd:sequence>
         <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
         <xsd:attribute name="name" type="xsd:string"/>
-    </xsd:complexType>
-
-    <xsd:element name="pooling-profile" type="poolingProfileType" substitutionGroup="abstract-pooling-profile"/>
-    <xsd:complexType name="poolingProfileType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractPoolingProfileType">
-                <xsd:attribute name="maxActive" type="xsd:string"/>
-                <xsd:attribute name="maxIdle" type="xsd:string"/>
-                <xsd:attribute name="initialisationPolicy" default="INITIALISE_ONE">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="INITIALISE_NONE"/>
-                            <xsd:enumeration value="INITIALISE_ONE"/>
-                            <xsd:enumeration value="INITIALISE_ALL"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="exhaustedAction" default="WHEN_EXHAUSTED_GROW">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="WHEN_EXHAUSTED_GROW"/>
-                            <xsd:enumeration value="WHEN_EXHAUSTED_WAIT"/>
-                            <xsd:enumeration value="WHEN_EXHAUSTED_FAIL"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="maxWait" type="xsd:string"/>
-                <!-- <xsd:attribute name="factory" type="xsd:string" default="org.mule.config.pool.CommonsPoolFactory"/> -->
-            </xsd:extension>
-        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="queue-profile" type="queueProfileType" substitutionGroup="abstract-queue-profile"/>
@@ -1074,41 +1025,47 @@
 
 
     <!--==============================================================-->
-    <!--   Model Types (should be in separate namespaces)             -->
+    <!-- Models                                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="model" type="sedaModelType" substitutionGroup="abstract-model"/>
+    <xsd:element name="model" type="defaultModelType" substitutionGroup="abstract-model"/>
+
+    <xsd:element name="abstract-model" abstract="true" type="abstractModelType"/>
+    <xsd:complexType name="abstractModelType">
+        <xsd:sequence>
+            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+            <xsd:element ref="abstract-entrypoint-resolver" minOccurs="0"/>
+            <xsd:element ref="abstract-component" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="defaultModelType">
+        <xsd:complexContent>
+            <xsd:extension base="sedaModelType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+            
+    <xsd:element name="seda-model" type="sedaModelType" substitutionGroup="abstract-model"/>
     <xsd:complexType name="sedaModelType">
         <xsd:complexContent>
             <xsd:extension base="abstractModelType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-pooling-profile" minOccurs="0"/>
                     <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
-                    <xsd:element ref="abstract-entrypoint-resolver" minOccurs="0"/>
-                    <xsd:element ref="abstract-component-pool-factory" minOccurs="0"/>
-                    <xsd:element ref="abstract-seda-service" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="inherit" type="xsd:boolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- Model elements -->
 
-    <!--==============================================================-->
-    <!--   Model elements                                          -->
-    <!--==============================================================-->
+    <xsd:element name="abstract-queue-profile" abstract="true" type="abstractQueueProfileType"/>
+    <xsd:complexType name="abstractQueueProfileType"/>
 
-    <xsd:element name="component-pool-factory" type="componentPoolFactoryType" substitutionGroup="abstract-component-pool-factory"/>
-    <xsd:complexType name="componentPoolFactoryType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractComponentPoolFactoryType">
-                <xsd:sequence>
-                    <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
+    <xsd:element name="abstract-entrypoint-resolver" abstract="true" type="abstractEntrypointResolverType"/>
+    <xsd:complexType name="abstractEntrypointResolverType"/>
 
     <xsd:element name="custom-entrypoint-resolver" type="customEntrypointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
     <xsd:complexType name="customEntrypointResolverType">
@@ -1131,23 +1088,7 @@
 
 
     <!--==============================================================-->
-    <!--   Mule Service Descriptor                                    -->
-    <!--==============================================================-->
-
-    <xsd:element name="service" type="sedaServiceType" substitutionGroup="abstract-seda-service"/>
-    <xsd:complexType name="sedaServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractSedaServiceType">
-                <xsd:attribute name="queueTimeout" type="xsd:integer"/>
-                <xsd:attribute name="enablePooling" type="xsd:boolean"/>
-                <xsd:attribute name="componentPerRequest" type="xsd:boolean"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-
-    <!--==============================================================-->
-    <!--  Routers Core                                                -->
+    <!--  Routers                                                     -->
     <!--==============================================================-->
 
     <!--Nested Binding-->
@@ -1168,6 +1109,17 @@
 
 
     <!-- Inbound Router implementations -->
+
+    <xsd:element name="forwarding-router" type="forwardingRouterType" substitutionGroup="abstract-inbound-router"/>
+    <xsd:complexType name="forwardingRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="filteredInboundRouterType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="idempotent-secure-hash-receiver-router" type="filteredInboundRouterType" substitutionGroup="abstract-inbound-router"/>
     <xsd:element name="inbound-pass-through-router" type="filteredInboundRouterType" substitutionGroup="abstract-inbound-router"/>
@@ -1245,7 +1197,7 @@
             <xsd:extension base="filteredInboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>
@@ -1480,12 +1432,12 @@
     </xsd:complexType>
 
 
-
     <!--==============================================================-->
-    <!--  Utils / Standard Types                                      -->
+    <!--  Object Factories                                            -->
     <!--==============================================================-->
 
-    <xsd:complexType name="objectFactoryType">
+    <xsd:element name="abstract-object-factory" abstract="true" type="abstractObjectFactoryType"/>
+    <xsd:complexType name="abstractObjectFactoryType">
         <xsd:annotation>
             <xsd:documentation>
                 A factory which will be used by Mule to create new instances of this object
@@ -1497,41 +1449,135 @@
                     <xsd:documentation>Properties to be set on the created object</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element ref="abstract-pooling-profile" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>Pooling profile to use if scope="pooled"</xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
         </xsd:sequence>
-        <xsd:attribute name="scope" default="prototype">
-            <xsd:annotation>
-                <xsd:documentation>Creation strategy</xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="singleton"/>
-                    <xsd:enumeration value="prototype"/>
-                    <xsd:enumeration value="pooled"/>
-                    <xsd:enumeration value="custom"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
-        <xsd:attribute name="class" type="xsd:NMTOKEN">
-            <xsd:annotation>
-                <xsd:documentation>Class name</xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="instance-ref" type="xsd:NMTOKEN">
-            <xsd:annotation>
-                <xsd:documentation>Singleton instance to use if scope="singleton"</xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
-            <xsd:annotation>
-                <xsd:documentation>Custom factory bean</xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
     </xsd:complexType>
+
+    <!-- Transitory, for backwards-compatibility only -->
+    <xsd:complexType name="genericObjectFactoryType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractObjectFactoryType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-pooling-profile" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>Pooling profile to use if scope="pooled"</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="scope" default="prototype">
+                    <xsd:annotation>
+                        <xsd:documentation>Creation strategy</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="singleton"/>
+                            <xsd:enumeration value="prototype"/>
+                            <xsd:enumeration value="pooled"/>
+                            <xsd:enumeration value="custom"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="class" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>Class name</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="instance-ref" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>Singleton object instance to use</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+            
+    <xsd:element name="singleton-object" type="singletonObjectFactoryType" substitutionGroup="abstract-object-factory"/>
+    <xsd:complexType name="singletonObjectFactoryType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractObjectFactoryType">
+                <xsd:attribute name="class" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>Class name</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="instance-ref" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>Singleton object instance to use</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="prototype-object" type="prototypeObjectFactoryType" substitutionGroup="abstract-object-factory"/>
+    <xsd:complexType name="prototypeObjectFactoryType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractObjectFactoryType">
+                <xsd:attribute name="class" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>Class name</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="pooled-object" type="pooledObjectFactoryType" substitutionGroup="abstract-object-factory"/>
+    <xsd:complexType name="pooledObjectFactoryType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractObjectFactoryType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-pooling-profile" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>Pooling profile to use if scope="pooled"</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>Class name</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-pooling-profile" abstract="true" type="abstractPoolingProfileType"/>
+    <xsd:complexType name="abstractPoolingProfileType"/>
+
+    <xsd:element name="pooling-profile" type="poolingProfileType" substitutionGroup="abstract-pooling-profile"/>
+    <xsd:complexType name="poolingProfileType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractPoolingProfileType">
+                <xsd:attribute name="maxActive" type="xsd:string"/>
+                <xsd:attribute name="maxIdle" type="xsd:string"/>
+                <xsd:attribute name="initialisationPolicy" default="INITIALISE_ONE">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="INITIALISE_NONE"/>
+                            <xsd:enumeration value="INITIALISE_ONE"/>
+                            <xsd:enumeration value="INITIALISE_ALL"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="exhaustedAction" default="WHEN_EXHAUSTED_GROW">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="WHEN_EXHAUSTED_GROW"/>
+                            <xsd:enumeration value="WHEN_EXHAUSTED_WAIT"/>
+                            <xsd:enumeration value="WHEN_EXHAUSTED_FAIL"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="maxWait" type="xsd:string"/>
+                <!-- <xsd:attribute name="factory" type="xsd:string" default="org.mule.config.pool.CommonsPoolFactory"/> -->
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <!--==============================================================-->
+    <!--  Utils / Standard Types                                      -->
+    <!--==============================================================-->
 
     <!-- corresponds to TlsIndirectKeyStore, named as tls-client in transport namespace -->
     <xsd:complexType name="tlsClientKeyStoreType">
@@ -1864,7 +1910,7 @@
          <xsd:complexContent>
              <xsd:extension base="connectorType">
                  <xsd:sequence>
-                     <xsd:element name="jndi-provider-properties" type="spring:mapType" minOccurs="0">
+                     <xsd:element name="jndi-provider-properties" type="mapType" minOccurs="0">
                          <xsd:annotation>
                              <xsd:documentation>
                                  Direct setting of JNDI properties.

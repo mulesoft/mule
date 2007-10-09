@@ -36,6 +36,7 @@ public class ComponentStatsTestCase extends AbstractMuleJmxTestCase
 
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);
 
+        // TODO Why 3?  Document the magic number!
         assertEquals("Unexpected components registered in the domain.", 3, mbeans.size());
 
         mBeanServer.unregisterMBean(name);

@@ -39,43 +39,43 @@ public class ModelService implements ModelServiceMBean
         model.stop();
     }
 
-    public void startComponent(String name) throws UMOException
-    {
-        model.startComponent(name);
-    }
-
-    public void stopComponent(String name) throws UMOException
-    {
-        model.stopComponent(name);
-    }
-
-    public void pauseComponent(String name) throws UMOException
-    {
-        model.pauseComponent(name);
-    }
-
-    public void resumeComponent(String name) throws UMOException
-    {
-        model.resumeComponent(name);
-    }
-
-    public void unregisterComponent(String name) throws UMOException
-    {
-        RegistryContext.getRegistry().unregisterService(name);
-        //model.unregisterComponent(model.getDescriptor(name));
-    }
-
-    public boolean isComponentRegistered(String name)
-    {
-        return model.isComponentRegistered(name);
-    }
-
-    public UMODescriptor getComponentDescriptor(String name)
-    {
-        return RegistryContext.getRegistry().lookupService(name);
-
-        //return model.getDescriptor(name);
-    }
+//    public void startComponent(String name) throws UMOException
+//    {
+//        model.startComponent(name);
+//    }
+//
+//    public void stopComponent(String name) throws UMOException
+//    {
+//        model.stopComponent(name);
+//    }
+//
+//    public void pauseComponent(String name) throws UMOException
+//    {
+//        model.pauseComponent(name);
+//    }
+//
+//    public void resumeComponent(String name) throws UMOException
+//    {
+//        model.resumeComponent(name);
+//    }
+//
+//    public void unregisterComponent(String name) throws UMOException
+//    {
+//        RegistryContext.getRegistry().unregisterService(name);
+//        //model.unregisterComponent(model.getDescriptor(name));
+//    }
+//
+//    public boolean isComponentRegistered(String name)
+//    {
+//        return model.isComponentRegistered(name);
+//    }
+//
+//    public UMODescriptor getComponentDescriptor(String name)
+//    {
+//        return RegistryContext.getRegistry().lookupService(name);
+//
+//        //return model.getDescriptor(name);
+//    }
 
     public String getName()
     {

@@ -10,21 +10,17 @@
 
 package org.mule.impl;
 
-import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMONestedRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.util.object.ObjectFactory;
 
 import java.beans.ExceptionListener;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -65,11 +61,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setThreadingProfile(ThreadingProfile threadingProfile)
     {
         this.threadingProfile = threadingProfile;
-    }
-
-    public void setPoolingProfile(PoolingProfile poolingProfile)
-    {
-        this.poolingProfile = poolingProfile;
     }
 
     public void setQueueProfile(QueueProfile queueProfile)
@@ -114,43 +105,15 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         properties = props;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMODescriptor#setVersion(long)
-     */
-    public void setVersion(String ver)
-    {
-        version = ver;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.UMODescriptor#addinteceptor(org.mule.umo.UMOInterceptor)
-     */
-    public void addInterceptor(UMOInterceptor inteceptor)
-    {
-        if (inteceptor != null)
-        {
-            intecerptorList.add(inteceptor);
-        }
-    }
-
-    public void setInterceptors(List inteceptorList)
-    {
-        this.intecerptorList = inteceptorList;
-    }
-
     /** Factory which creates an instance of the actual service object. */
-    public void setServiceFactory(ObjectFactory serviceFactory)
-    {
-        if (serviceFactory == null)
-        {
-            throw new IllegalArgumentException("ServiceFactory cannot be null");
-        }
-        this.serviceFactory = serviceFactory;
-    }
+//    public void setServiceFactory(ObjectFactory serviceFactory)
+//    {
+//        if (serviceFactory == null)
+//        {
+//            throw new IllegalArgumentException("ServiceFactory cannot be null");
+//        }
+//        this.serviceFactory = serviceFactory;
+//    }
 
     public void setInboundRouter(UMOInboundRouterCollection router)
     {
@@ -188,19 +151,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     }
 
     /**
-     * Determines if only a single instance of this component is created. This is
-     * useful when a component hands off event processing to another engine such as
-     * Rules processing or Bpel and the processing engine allocates and manages its
-     * own threads.
-     *
-     * @param singleton true if this component is a singleton
-     */
-    public void setSingleton(boolean singleton)
-    {
-        this.singleton = singleton;
-    }
-
-    /**
      * Sets the initial state of this component
      *
      * @param state the initial state of this component
@@ -214,7 +164,6 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     {
         this.modelName = modelName;
     }
-
 
     public void setManagementContext(UMOManagementContext context)
     {

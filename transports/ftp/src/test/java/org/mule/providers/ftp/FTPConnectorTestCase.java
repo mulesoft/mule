@@ -11,6 +11,7 @@
 package org.mule.providers.ftp;
 
 import org.mule.tck.providers.AbstractConnectorTestCase;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -56,7 +57,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
     public void testConnectorPollingFrequency() throws Exception
     {
         UMOEndpoint endpoint = getTestEndpoint("mock", UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
-        UMOComponent component = getTestComponent(getDescriptor());
+        UMOComponent component = getTestComponent("apple", Apple.class);
         FtpConnector connector = (FtpConnector)getConnector();
         UMOMessageReceiver receiver = connector.createReceiver(component, endpoint);
         assertEquals("Connector's polling frequency must not be ignored.", POLLING_FREQUENCY,
@@ -75,7 +76,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
         props.put(FtpConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
         endpoint.setProperties(props);
 
-        UMOComponent component = getTestComponent(getDescriptor());
+        UMOComponent component = getTestComponent("apple", Apple.class);
         FtpConnector connector = (FtpConnector)getConnector();
         UMOMessageReceiver receiver = connector.createReceiver(component, endpoint);
         assertEquals("Polling frequency endpoint override must not be ignored.", POLLING_FREQUENCY_OVERRIDE,

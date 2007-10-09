@@ -10,33 +10,33 @@
 
 package org.mule.util.object;
 
+import org.mule.config.i18n.MessageFactory;
 import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 
+import java.util.Map;
+
 /**
- * Simple object factory which always returns the same object instance.
+ * Creates an instance of the object once and then always returns the same instance.
  */
-public class SingletonObjectFactory extends SimpleObjectFactory implements Initialisable, Disposable
+public class SingletonObjectFactory extends AbstractObjectFactory 
 {
     private Object instance = null;
 
     /** For Spring only */
-    public SingletonObjectFactory()
-    {
-        // nop
-    }
+    public SingletonObjectFactory() { super(); }
     
-    public SingletonObjectFactory(String objectClassName)
-    {
-        super(objectClassName);
-    }
+    public SingletonObjectFactory(String objectClassName) { super(objectClassName); }
 
-    public SingletonObjectFactory(Class objectClass)
-    {
-        super(objectClass);
-    }
+    public SingletonObjectFactory(String objectClassName, Map properties) { super(objectClassName, properties); }
 
+    public SingletonObjectFactory(Class objectClass) { super(objectClass); }
+
+    public SingletonObjectFactory(Class objectClass, Map properties) { super(objectClass, properties); }
+    
+    /**
+     * Create the singleton based on a previously created object.
+     */
     public SingletonObjectFactory(Object instance)
     {
         this.instance = instance;
@@ -48,7 +48,7 @@ public class SingletonObjectFactory extends SimpleObjectFactory implements Initi
         {
             try
             {
-                instance = super.create();
+                instance = super.getOrCreate();
             }
             catch (Exception e)
             {
@@ -59,24 +59,61 @@ public class SingletonObjectFactory extends SimpleObjectFactory implements Initi
 
     public void dispose()
     {
+        //logger.debug("Disposing object instance");
         if (instance != null && instance instanceof Disposable)
         {
             ((Disposable) instance).dispose();
         }
+        instance = null;
     }
 
     /**
      * Always returns the same instance of the object.
      */
-    public Object create() throws Exception
+    public Object getOrCreate() throws Exception
     {
-        if (instance == null)
+        if (instance != null)
         {
-            initialise();
+            return instance;
         }
-        return instance;
+        else 
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
+        }
     }
 
+    /** {@inheritDoc} */
+    public Object lookup(String id) throws Exception
+    {
+        // If IDs are specified, make sure they match.
+        if (instance != null && instance instanceof Identifiable && id != null)
+        {
+            if (id.equals(((Identifiable) instance).getId()))
+            {
+                return instance;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        // Otherwise just return the singleton instance if it exists.
+        else
+        {
+            return instance;
+        }
+    }
+
+    /** {@inheritDoc} */
+    public void release(Object object) throws Exception
+    {
+        // nothing to do for a singleton
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // Getters and Setters
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
     public Object getInstance()
     {
         return instance;

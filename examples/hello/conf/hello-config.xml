@@ -119,10 +119,9 @@
         <!-- This error handler returns user error messages to caller. Errors could also be routed elsewhere,
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
-            <bridge-component/>
-                
             <inbound-router>
                 <inbound-endpoint address="vm://userErrorHandler" transformer-ref="ExceptionToString"/>
+                <forwarding-router/>
             </inbound-router>
             
             <outbound-router>
@@ -135,10 +134,9 @@
         <!-- Handle any unexpected errors. Errors could also be routed elsewhere,
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="SystemErrorHandler">
-            <bridge-component/>
-                
             <inbound-router>
                 <inbound-endpoint address="vm://systemErrorHandler"/>
+                <forwarding-router/>
             </inbound-router>
                 
             <outbound-router>

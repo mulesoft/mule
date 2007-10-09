@@ -15,8 +15,6 @@ import org.mule.routing.outbound.FilteringXmlMessageSplitter;
 import org.mule.routing.outbound.RoundRobinXmlSplitter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.model.UMOModel;
 import org.mule.util.properties.Dom4jPropertyExtractor;
 
 import java.util.List;
@@ -47,10 +45,8 @@ public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
 
     protected Object getRouter(String name, Class clazz)
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("xml outbound namespace tests");
-        UMOComponent component = model.getComponent(name);
-        UMODescriptor descriptor = component.getDescriptor();
-        List routers = descriptor.getOutboundRouter().getRouters();
+        UMOComponent component = managementContext.getRegistry().lookupComponent(name);
+        List routers = component.getOutboundRouter().getRouters();
         assertEquals(1, routers.size());
         assertTrue(routers.get(0).getClass().getName(), clazz.isAssignableFrom(routers.get(0).getClass()));
         return routers.get(0);

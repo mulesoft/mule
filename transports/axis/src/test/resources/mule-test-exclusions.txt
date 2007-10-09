@@ -13,3 +13,11 @@ org.mule.providers.soap.axis.AxisServletBindingTestCase
 
 # MULE-2164
 org.mule.providers.soap.axis.AxisEndpointMule2164TestCase
+
+# TODO TC Only testComponentWithoutInterfaces() is failing
+# Axis is supposed to throw an exception if the service does not implement at least one interface.
+org.mule.providers.soap.axis.AxisConnectorHttpFunctionalTestCase
+
+# TODO TC Only testAxisOverJmsWithoutSettingMethodOnEndpoint() is failing
+# Axis is supposed to throw an exception if method is not set on endpoint
+org.mule.providers.soap.axis.AxisConnectorJmsEndpointFormatTestCase

@@ -34,7 +34,7 @@ public class JmsConnectionFactoryTestCase extends FunctionalTestCase
         JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector1");
         assertNotNull(c);
 
-        ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory().create();
+        ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory().getOrCreate();
         assertTrue(cf instanceof TestConnectionFactory);
         assertEquals("Provider properties should not be passed to the ConnectionFactory.", "NOT_SET",
             ((TestConnectionFactory)cf).getProviderProperty());
@@ -49,7 +49,7 @@ public class JmsConnectionFactoryTestCase extends FunctionalTestCase
         JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector2");
         assertNotNull(c);
 
-        ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory().create();
+        ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory().getOrCreate();
         assertTrue(cf instanceof TestConnectionFactory);
         assertEquals("ConnectionFactory properties should be passed to the ConnectionFactory.", "TEST_VALUE",
             ((TestConnectionFactory)cf).getConnectionFactoryProperty());

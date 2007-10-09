@@ -10,14 +10,10 @@
 
 package org.mule.config;
 
-import org.mule.config.pool.CommonsPoolFactory;
-import org.mule.umo.model.UMOPoolFactory;
-import org.mule.util.MapUtils;
-import org.mule.util.object.ObjectPool;
-
 import java.util.Map;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
+
 
 /**
  * <code>PoolingProfile</code> is a configuration object used to define the object
@@ -42,6 +38,13 @@ public class PoolingProfile
      */
     public static final int INITIALISE_ALL = 2;
 
+    // Constants used to determine the exhausted action of the pool
+    public static final int WHEN_EXHAUSTED_FAIL = 0;
+    /** @deprecated use WHEN_EXHAUSTED_WAIT instead */
+    public static final int WHEN_EXHAUSTED_BLOCK = 1;
+    public static final int WHEN_EXHAUSTED_WAIT = 1;
+    public static final int WHEN_EXHAUSTED_GROW = 2;
+
     /**
      * Controls the maximum number of Mule UMOs that can be borrowed from a component
      * pool at one time. When non-positive, there is no limit to the number of
@@ -49,7 +52,7 @@ public class PoolingProfile
      * pool is said to be exhausted. You can specify this value on the descriptor
      * declaration. If none is set this value will be used.
      */
-    public static final int DEFAULT_MAX_POOL_ACTIVE = ObjectPool.DEFAULT_MAX_SIZE;
+    public static final int DEFAULT_MAX_POOL_ACTIVE = 5;
 
     /**
      * Controls the maximum number of Mule UMOs that can sit idle in the pool at any
@@ -58,14 +61,14 @@ public class PoolingProfile
      * If none is set this value will be used. If this value is not set then a system
      * default of '5' will be used.
      */
-    public static final int DEFAULT_MAX_POOL_IDLE = ObjectPool.DEFAULT_MAX_SIZE;
+    public static final int DEFAULT_MAX_POOL_IDLE = 5;
 
     /**
      * When the threadPoolExhaustedAction is set to WHEN_EXHAUSTED_WAIT this can
      * specify the maximum milliseconds the pool should block before throwing a
      * NoSuchElementException
      */
-    public static final long DEFAULT_MAX_POOL_WAIT = ObjectPool.DEFAULT_MAX_WAIT;
+    public static final long DEFAULT_MAX_POOL_WAIT = 4000;
 
     /**
      * Specifies the behaviour of the Mule UMO pool when the pool is exhausted:
@@ -80,7 +83,7 @@ public class PoolingProfile
      * milliseconds, after which a NoSuchElementException will be thrown. If maxWait
      * is non-positive, it will block indefinitely.
      */
-    public static final int DEFAULT_POOL_EXHAUSTED_ACTION = ObjectPool.WHEN_EXHAUSTED_GROW;
+    public static final int DEFAULT_POOL_EXHAUSTED_ACTION = WHEN_EXHAUSTED_GROW;
 
     /**
      * Determines how components in a pool should be initialised. The possible values
@@ -104,13 +107,13 @@ public class PoolingProfile
             // if the values were an actual enum in ObjectPool we could iterate
             // properly.. :/
 
-            Integer value = new Integer(ObjectPool.WHEN_EXHAUSTED_WAIT);
+            Integer value = new Integer(WHEN_EXHAUSTED_WAIT);
             this.put("WHEN_EXHAUSTED_WAIT", value);
 
-            value = new Integer(ObjectPool.WHEN_EXHAUSTED_FAIL);
+            value = new Integer(WHEN_EXHAUSTED_FAIL);
             this.put("WHEN_EXHAUSTED_FAIL", value);
 
-            value = new Integer(ObjectPool.WHEN_EXHAUSTED_GROW);
+            value = new Integer(WHEN_EXHAUSTED_GROW);
             this.put("WHEN_EXHAUSTED_GROW", value);
         }
     };
@@ -143,7 +146,7 @@ public class PoolingProfile
 
     private int initialisationPolicy = DEFAULT_POOL_INITIALISATION_POLICY;
 
-    private UMOPoolFactory poolFactory = new CommonsPoolFactory();
+//    private UMOPoolFactory poolFactory = new CommonsPoolFactory();
 
     public PoolingProfile()
     {
@@ -157,10 +160,10 @@ public class PoolingProfile
         this.maxWait = pp.getMaxWait();
         this.exhaustedAction = pp.getExhaustedAction();
         this.initialisationPolicy = pp.getInitialisationPolicy();
-        if (pp.getPoolFactory() != null)
-        {
-            poolFactory = pp.getPoolFactory();
-        }
+//        if (pp.getPoolFactory() != null)
+//        {
+//            poolFactory = pp.getPoolFactory();
+//        }
     }
 
     public PoolingProfile(int maxActive,
@@ -240,14 +243,14 @@ public class PoolingProfile
         this.exhaustedAction = exhaustedAction;
     }
 
-    public UMOPoolFactory getPoolFactory()
-    {
-        return poolFactory;
-    }
-
-    public void setPoolFactory(UMOPoolFactory poolFactory)
-    {
-        this.poolFactory = poolFactory;
-    }
+//    public UMOPoolFactory getPoolFactory()
+//    {
+//        return poolFactory;
+//    }
+//
+//    public void setPoolFactory(UMOPoolFactory poolFactory)
+//    {
+//        this.poolFactory = poolFactory;
+//    }
 
 }

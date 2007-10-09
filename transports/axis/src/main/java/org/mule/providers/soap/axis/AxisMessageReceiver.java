@@ -11,7 +11,6 @@
 package org.mule.providers.soap.axis;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleDescriptor;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.ServiceProxy;
@@ -74,7 +73,6 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     protected void create() throws Exception
     {
         AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
-        MuleDescriptor descriptor = (MuleDescriptor) component.getDescriptor();
         // TODO RM: these are endpoint properties now
 //        String style = (String)descriptor.getProperties().get("style");
 //        String use = (String)descriptor.getProperties().get("use");
@@ -84,9 +82,9 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         String doc = (String) endpoint.getProperties().get("documentation");
 
         UMOEndpointURI uri = endpoint.getEndpointURI();
-        String serviceName = component.getDescriptor().getName();
+        String serviceName = component.getName();
 
-        SOAPService existing = this.connector.getAxisServer().getService(serviceName);
+        SOAPService existing = this.connector.getAxis().getService(serviceName);
         if (existing != null)
         {
             service = existing;
@@ -110,7 +108,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
                 service = new SOAPService(new MuleRPCProvider(connector));
             }
 
-            service.setEngine(connector.getAxisServer());
+            service.setEngine(connector.getAxis());
         }
 
         String servicePath = uri.getPath();
@@ -155,7 +153,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         Map methods = (Map) endpoint.getProperties().get("soapMethods");
         if (methods == null)
         {
-            methods = (Map) descriptor.getProperties().get("soapMethods");
+            methods = (Map) component.getProperties().get("soapMethods");
         }
         if (methods != null)
         {
@@ -315,7 +313,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         service.setName(serviceName);
 
         // Add initialisation callback for the Axis service
-        descriptor.addInitialisationCallback(new AxisInitialisationCallback(service));
+        component.addInitialisationCallback(new AxisInitialisationCallback(service));
 
         if (uri.getScheme().equalsIgnoreCase("servlet"))
         {

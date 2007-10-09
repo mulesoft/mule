@@ -8,10 +8,10 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <model name="testModel" class="org.mule.tck.testmodels.mule.TestSedaModel">
+    <model name="testModel">
 
-        <service name="queueComponent">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+        <service name="queueComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="jms://in"/>
             </inbound-router>
@@ -22,8 +22,8 @@
             </outbound-router>
         </service>
 
-        <service name="topicComponent">
-            <component class="org.mule.tck.functional.FunctionalTestComponent" scope="singleton"/>
+        <service name="topicComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="jms://topic:in"/>
             </inbound-router>

@@ -28,7 +28,7 @@ public class LogComponent implements Callable, LogService
     public Object onCall(UMOEventContext context) throws Exception
     {
         String contents = context.getMessageAsString();
-        String msg = "Message received in component: " + context.getComponentDescriptor().getName();
+        String msg = "Message received in component: " + context.getComponent().getName();
         msg = StringMessageUtils.getBoilerPlate(msg + ". Content is: '"
                         + StringMessageUtils.truncate(contents, 100, true) + "'");
         log(msg);

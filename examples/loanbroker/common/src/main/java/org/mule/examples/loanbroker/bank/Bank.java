@@ -15,8 +15,8 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.examples.loanbroker.LocaleMessage;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanQuote;
-import org.mule.impl.UMODescriptorAware;
-import org.mule.umo.UMODescriptor;
+import org.mule.impl.UMOComponentAware;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.io.Serializable;
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * quotes.
  */
 
-public class Bank implements UMODescriptorAware, Serializable, BankService
+public class Bank implements UMOComponentAware, Serializable, BankService
 {
     /**
      * Serial version
@@ -66,11 +66,11 @@ public class Bank implements UMODescriptorAware, Serializable, BankService
 
     // TODO This method doesn't help us with the Static Recipient list because the list of banks is created 
     // programatically in DefaultLenderService (they should be looked up from the config/registry).
-    public void setDescriptor(UMODescriptor descriptor) throws ConfigurationException 
+    public void setComponent(UMOComponent component) throws ConfigurationException 
     {
-        this.bankName = descriptor.getName(); 
+        this.bankName = component.getName(); 
 
-        List endpoints = descriptor.getInboundRouter().getEndpoints();
+        List endpoints = component.getInboundRouter().getEndpoints();
         if ((endpoints == null) || (endpoints.size() != 1))
         {
             throw new ConfigurationException(MessageFactory.createStaticMessage("Bank is expected to have exactly 1 incoming endpoint."));

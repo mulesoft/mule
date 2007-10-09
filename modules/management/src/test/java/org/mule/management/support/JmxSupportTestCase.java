@@ -32,6 +32,8 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
 
         managementContext.setId(managerId);
         JmxAgent agent = new JmxAgent();
+        agent.setManagementContext(managementContext);
+        agent.initialise();
         managementContext.getRegistry().registerAgent(agent);
         managementContext.start();
 
@@ -61,6 +63,8 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
 
         managementContext.setId(managerId);
         JmxAgent agent = new JmxAgent();
+        agent.setManagementContext(managementContext);
+        agent.initialise();
         managementContext.getRegistry().registerAgent(agent);
         managementContext.start();
 

@@ -15,6 +15,10 @@ package org.mule.mule.model;
  */
 public class MultiplePayloadsTestObject
 {
+    public MultiplePayloadsTestObject()
+    {
+        // nothing to do
+    }
 
     public void someBusinessMethod(String parameter)
     {

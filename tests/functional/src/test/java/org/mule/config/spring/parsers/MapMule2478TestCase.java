@@ -52,7 +52,7 @@ public class MapMule2478TestCase extends AbstractNamespaceTestCase
         OrphanBean orphan = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
         ObjectFactory factory = (ObjectFactory) orphan.getObject();
         assertNotNull(factory);
-        Object product = factory.create();
+        Object product = factory.getOrCreate();
         assertNotNull(product);
         assertTrue(product instanceof ChildBean);
         ChildBean child3 = (ChildBean) product;

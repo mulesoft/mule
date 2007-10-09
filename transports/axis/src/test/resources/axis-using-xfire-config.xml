@@ -26,9 +26,9 @@
 
         <!-- Bridge Component used to test the ExceptionBasedRouting on Axis -->
         <service name="test">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://localhost.test"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <exception-based-router>
@@ -40,9 +40,9 @@
 
         <!-- Accessing an Axis hosted web-service using XFire dynamic client -->
         <service name="BridgeToAxisService">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://axis.in"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

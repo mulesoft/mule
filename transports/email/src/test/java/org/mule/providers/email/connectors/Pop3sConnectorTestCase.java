@@ -18,24 +18,15 @@ import org.mule.umo.provider.UMOConnector;
  */
 public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
-    
-    public Pop3sConnectorTestCase() 
-    {
-        super("Pop3sConnector");
-    }
-    
-    public UMOConnector createConnector(boolean init) throws Exception
+    public UMOConnector createConnector() throws Exception
     {
         Pop3sConnector connector = new Pop3sConnector();
-        connector.setName(getConnectorName());
+        connector.setName("Pop3sConnector");
         connector.setCheckFrequency(POLL_PERIOD_MS);
         connector.setServiceOverrides(newEmailToStringServiceOverrides());
         connector.setTrustStorePassword("password");
         connector.setTrustStore("greenmail-truststore");
-        if (init)
-        {
-            connector.initialise();
-        }
+        connector.setManagementContext(managementContext);
         return connector;
     }
 

@@ -19,7 +19,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractModelType">
                 <xsd:sequence>
-                    <xsd:element name="service" type="streamingServiceType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="service" type="streamingComponentType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -27,36 +27,16 @@
 
     <!-- this is a minimal, incomplete implementation to match the existing examples -->
 
-    <xsd:complexType name="streamingServiceType">
+    <xsd:complexType name="streamingComponentType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractServiceType">
+            <xsd:extension base="mule:abstractComponentType">
+                <xsd:annotation>
+                    <xsd:documentation>Override of the generic component schema to support streaming</xsd:documentation>
+                </xsd:annotation>
                 <xsd:sequence>
-                    <xsd:choice>
-                        <xsd:element ref="mule:component"/> <!-- hardwired to allow objectFactoryType -->
-                        <xsd:element ref="mule:abstract-component"/>
-                    </xsd:choice>
                     <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
-                    <!-- xsd:element name="nested-router" type="mule:nestedRouterCollectionType" minOccurs="0"/ -->
                     <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
-                    <!-- xsd:element name="response-router" type="mule:responseRouterCollectionType" minOccurs="0"/ -->
-                    <xsd:element ref="mule:abstract-threading-profile" minOccurs="0"/>
-                    <xsd:element ref="mule:abstract-pooling-profile" minOccurs="0"/>
-                    <xsd:element ref="mule:abstract-queue-profile" minOccurs="0"/>
-                    <xsd:element ref="mule:abstract-exception-strategy" minOccurs="0"/>
-                    <xsd:element name="meta-info" type="mule:mapType" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attribute name="name" type="xsd:string" use="required"/>
-                <!-- Disabled until it actually does something!
-                <xsd:attribute name="version" type="xsd:string"/>
-                -->
-                <xsd:attribute name="initialState" default="started">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="started"/>
-                            <xsd:enumeration value="stopped"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

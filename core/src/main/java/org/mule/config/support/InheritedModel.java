@@ -9,28 +9,17 @@
  */
 package org.mule.config.support;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.impl.model.AbstractModel;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.model.UMOModel;
 
 /**
  * TODO
  */
 public class InheritedModel extends AbstractModel
 {
-
-    protected UMOComponent createComponent(UMODescriptor descriptor)
-    {
-        //throw new UnsupportedOperationException("createComponent()");
-        return new InheritedComponent((MuleDescriptor)descriptor,  this);
-    }
-
     public String getType()
     {
         return "inherited";
@@ -55,11 +44,9 @@ public class InheritedModel extends AbstractModel
 
     private class InheritedComponent extends AbstractComponent
     {
-
-
-        public InheritedComponent(MuleDescriptor descriptor, UMOModel model)
+        public InheritedComponent()
         {
-            super(descriptor, model);
+            super();
         }
 
         protected UMOMessage doSend(UMOEvent event) throws UMOException

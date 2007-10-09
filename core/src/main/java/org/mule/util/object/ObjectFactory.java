@@ -15,8 +15,27 @@ import org.mule.umo.lifecycle.Initialisable;
 
 /**
  * <code>ObjectFactory</code> is a generic Factory interface.
+ * TODO MULE-2137 Rename to ObjectReference
  */
 public interface ObjectFactory extends Initialisable, Disposable
 {
-    Object create() throws Exception;
+    /**
+     * Retrieve an instance of the object.  This may create a new instance or look up 
+     * an existing instance depending on the implementation.  If a new instance
+     * is created it will also be initialized by this method (Initilisable.initialise()).
+     */
+    Object getOrCreate() throws Exception;
+    
+    /**
+     * Look up a previously created object instance by ID.
+     */
+    Object lookup(String id) throws Exception;
+
+    /**
+     * Inform the object factory/container that this object is no longer in use.  
+     * This may return the object to a pool, deallocate resources, or do something
+     * else depending on the implementation.  If appropriate, the object will be disposed
+     * by this method (Disposable.dispose()).
+     */
+    void release(Object object) throws Exception;
 }

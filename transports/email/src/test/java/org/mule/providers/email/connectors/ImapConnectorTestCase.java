@@ -18,23 +18,13 @@ import org.mule.umo.provider.UMOConnector;
  */
 public class ImapConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
-
-    public ImapConnectorTestCase()
-    {
-        super("ImapConnector");
-    }
-    
     // @Override
-    public UMOConnector createConnector(boolean init) throws Exception
+    public UMOConnector createConnector() throws Exception
     {
         ImapConnector connector = new ImapConnector();
-        connector.setName(getConnectorName());
+        connector.setName("ImapConnector");
         connector.setCheckFrequency(POLL_PERIOD_MS);
         connector.setServiceOverrides(newEmailToStringServiceOverrides());
-        if (init)
-        {
-            connector.initialise();
-        }
         return connector;
     }
 

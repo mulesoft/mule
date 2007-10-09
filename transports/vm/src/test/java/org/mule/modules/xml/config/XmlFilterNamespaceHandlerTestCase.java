@@ -16,8 +16,6 @@ import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.model.UMOModel;
 
 import java.util.List;
 import java.util.Map;
@@ -35,10 +33,8 @@ public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
      */
     public void testIsXmlFilter()
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("xml filter test");
-        UMOComponent component = model.getComponent("test for xml");
-        UMODescriptor descriptor = component.getDescriptor();
-        List routers = descriptor.getOutboundRouter().getRouters();
+        UMOComponent component = managementContext.getRegistry().lookupComponent("test for xml");
+        List routers = component.getOutboundRouter().getRouters();
         assertEquals(2, routers.size());
         assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
         assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof IsXmlFilter);
@@ -49,10 +45,8 @@ public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testJXPathFilter()
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("xml filter test");
-        UMOComponent component = model.getComponent("filter xml for content");
-        UMODescriptor descriptor = component.getDescriptor();
-        List routers = descriptor.getOutboundRouter().getRouters();
+        UMOComponent component = managementContext.getRegistry().lookupComponent("filter xml for content");
+        List routers = component.getOutboundRouter().getRouters();
         assertEquals(1, routers.size());
         assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
         assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof JXPathFilter);

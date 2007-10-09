@@ -10,14 +10,10 @@
 
 package org.mule.test.components;
 
-import org.mule.impl.model.MuleProxy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.services.UniqueComponent;
-import org.mule.tck.testmodels.mule.TestMuleProxy;
 import org.mule.tck.testmodels.mule.TestSedaComponent;
-import org.mule.tck.testmodels.mule.TestSedaModel;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.model.UMOModel;
 
 public class ComponentPoolingTestCase extends FunctionalTestCase
 {
@@ -28,23 +24,9 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
 
     public void testConfigSanity() throws Exception
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
-        assertTrue("Model should be a TestSedaModel", model instanceof TestSedaModel);
-        UMOComponent c = model.getComponent("unique1");
+        UMOComponent c = managementContext.getRegistry().lookupComponent("unique1");
         assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
-        try
-        {
-            c.getInstance();
-            fail("Should not be able to call getInstance() for a SedaComponent");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
-        
-        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
-        assertTrue("Proxy should be a TestMuleProxy", proxy instanceof TestMuleProxy);
-        Object component = ((TestMuleProxy) proxy).getComponent();
+        Object component = ((TestSedaComponent) c).getOrCreateService();
         assertNotNull(component);
         assertTrue("Component should be of type UniqueComponent", component instanceof UniqueComponent);
         String id1 = ((UniqueComponent) component).getId();
@@ -53,15 +35,12 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
 
     public void testSimpleFactory() throws Exception
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
-        UMOComponent c = model.getComponent("unique1");        
+        UMOComponent c = managementContext.getRegistry().lookupComponent("unique1");        
         
-        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
-        Object component = ((TestMuleProxy) proxy).getComponent();
+        Object component = ((TestSedaComponent) c).getOrCreateService();
         String id1 = ((UniqueComponent) component).getId();
 
-        proxy = ((TestSedaComponent) c).getProxy();
-        component = ((TestMuleProxy) proxy).getComponent();
+        component = ((TestSedaComponent) c).getOrCreateService();
         String id2 = ((UniqueComponent) component).getId();
         
         assertFalse("Component IDs " + id1 + " and " + id2 + " should be different", id1.equals(id2));
@@ -69,15 +48,12 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
 
     public void testSingletonFactoryWithClassName() throws Exception
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
-        UMOComponent c = model.getComponent("unique2");        
+        UMOComponent c = managementContext.getRegistry().lookupComponent("unique2");        
         
-        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
-        Object component = ((TestMuleProxy) proxy).getComponent();
+        Object component = ((TestSedaComponent) c).getOrCreateService();
         String id1 = ((UniqueComponent) component).getId();
 
-        proxy = ((TestSedaComponent) c).getProxy();
-        component = ((TestMuleProxy) proxy).getComponent();
+        component = ((TestSedaComponent) c).getOrCreateService();
         String id2 = ((UniqueComponent) component).getId();
         
         assertTrue("Component IDs " + id1 + " and " + id2 + " should be the same", id1.equals(id2));
@@ -85,15 +61,12 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
 
     public void testSingletonFactoryWithBean() throws Exception
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
-        UMOComponent c = model.getComponent("unique3");        
+        UMOComponent c = managementContext.getRegistry().lookupComponent("unique3");        
         
-        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
-        Object component = ((TestMuleProxy) proxy).getComponent();
+        Object component = ((TestSedaComponent) c).getOrCreateService();
         String id1 = ((UniqueComponent) component).getId();
 
-        proxy = ((TestSedaComponent) c).getProxy();
-        component = ((TestMuleProxy) proxy).getComponent();
+        component = ((TestSedaComponent) c).getOrCreateService();
         String id2 = ((UniqueComponent) component).getId();
         
         assertTrue("Component IDs " + id1 + " and " + id2 + " should be the same", id1.equals(id2));

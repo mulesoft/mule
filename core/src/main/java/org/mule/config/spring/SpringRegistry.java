@@ -9,7 +9,6 @@
  */
 package org.mule.config.spring;
 
-import org.mule.config.MuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.container.MultiContainerContext;
@@ -19,25 +18,14 @@ import org.mule.impl.registry.AbstractRegistry;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
-
-import javax.transaction.TransactionManager;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -51,15 +39,17 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
 
     protected ApplicationContext applicationContext;
 
+    /**
+     * TODO MULE-1908
+     * @deprecated Should MultiContainerContext still be used in 2.x? MULE-1908
+     */     
     protected MultiContainerContext containerContext;
 
-    /** Default Constructor */
     public SpringRegistry()
     {
         super(REGISTRY_ID);
     }
 
-    /** Default Constructor */
     public SpringRegistry(String id)
     {
         super(id);
@@ -95,7 +85,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         }
         try
         {
-            return applicationContext.getBean(key.toString());
+            return applicationContext.getBean(key);
         }
         catch (NoSuchBeanDefinitionException e)
         {
@@ -109,30 +99,35 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         }
     }
 
-    protected Object doLookupInContainerContext(String key, Class returntype) throws ObjectNotFoundException
-    {
-        if (containerContext == null)
-        {
-            containerContext = new MultiContainerContext();
+//  TODO MULE-1908
+//    protected Object doLookupInContainerContext(String key, Class returntype) throws ObjectNotFoundException
+//    {
+//        if(containerContext==null)
+//        {
+//            containerContext = new MultiContainerContext();
+//
+//            Collection containers = doLookupObjects(UMOContainerContext.class);
+//            if(containers.size()>0)
+//            {
+//                for (Iterator iterator = containers.iterator(); iterator.hasNext();)
+//                {
+//                    UMOContainerContext context = (UMOContainerContext) iterator.next();
+//                    containerContext.addContainer(context);
+//                }
+//            }
+//        }
+//        Object o = containerContext.getComponent(key);
+//        return o;
+//    }
 
-            Collection containers = doLookupObjects(UMOContainerContext.class);
-            if (containers.size() > 0)
-            {
-                for (Iterator iterator = containers.iterator(); iterator.hasNext();)
-                {
-                    UMOContainerContext context = (UMOContainerContext) iterator.next();
-                    containerContext.addContainer(context);
-                }
-            }
-        }
-        Object o = containerContext.getComponent(key);
-        return o;
+    protected Collection doLookupObjects(Class type)
+    {
+        return applicationContext.getBeansOfType(type).values();
     }
 
-
-    protected Collection doLookupObjects(Class returntype)
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
-        return applicationContext.getBeansOfType(returntype).values();
+        this.applicationContext = applicationContext;
     }
 
     public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
@@ -144,66 +139,6 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         }
         return ServiceDescriptorFactory.create(type, name, props, overrides, applicationContext);
     }
-
-    /**
-     * @return the MuleConfiguration for this MuleManager. This object is immutable
-     *         once the manager has initialised.
-     */
-    protected synchronized MuleConfiguration getLocalConfiguration()
-    {
-        Map temp = applicationContext.getBeansOfType(MuleConfiguration.class, true, false);
-        if (temp.size() > 0)
-        {
-            return (MuleConfiguration) temp.values().toArray()[temp.size() - 1];
-        }
-        return null;
-    }
-
-
-    /** {@inheritDoc} */
-    public TransactionManager getTransactionManager()
-    {
-        Map m = applicationContext.getBeansOfType(TransactionManager.class);
-        if (m.size() > 0)
-        {
-            return (TransactionManager) m.values().iterator().next();
-        }
-        return null;
-    }
-
-    public Collection getModels()
-    {
-        return applicationContext.getBeansOfType(UMOModel.class).values();
-    }
-
-    /** {@inheritDoc} */
-    public Collection getConnectors()
-    {
-        return applicationContext.getBeansOfType(UMOConnector.class).values();
-    }
-
-    public Collection getAgents()
-    {
-        return applicationContext.getBeansOfType(UMOAgent.class).values();
-    }
-
-    /** {@inheritDoc} */
-    public Collection getEndpoints()
-    {
-        return applicationContext.getBeansOfType(UMOImmutableEndpoint.class).values();
-    }
-
-    /** {@inheritDoc} */
-    public Collection getTransformers()
-    {
-        return applicationContext.getBeansOfType(UMOTransformer.class).values();
-    }
-
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
-    {
-        this.applicationContext = applicationContext;
-    }
-
 
     public boolean isReadOnly()
     {

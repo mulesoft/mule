@@ -10,7 +10,7 @@
 
 package org.mule.umo.lifecycle;
 
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOInterceptor;
 
 /**
@@ -22,5 +22,5 @@ public interface UMOLifecycleAdapter extends Lifecycle, Initialisable, UMOInterc
 
     boolean isDisposed();
 
-    UMODescriptor getDescriptor();
+    UMOComponent getComponent();
 }

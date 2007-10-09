@@ -125,9 +125,9 @@
             </mule:service>
 
             <mule:service name="LenderGatewayService">
-                <mule:bridge-component />
                 <mule:inbound-router>
                     <mule:inbound-endpoint ref="LenderGateway" />
+                    <mule:forwarding-router/>
                 </mule:inbound-router>
                 <mule:outbound-router>
                     <mule:chaining-router>
@@ -146,9 +146,9 @@
             </mule:service>
 
             <mule:service name="BankingGatewayService">
-                <mule:bridge-component />
                 <mule:inbound-router>
                     <mule:inbound-endpoint ref="BankingGateway" />
+                    <mule:forwarding-router/>
                 </mule:inbound-router>
                 <mule:outbound-router>
                     <mule:static-recipient-list-router>

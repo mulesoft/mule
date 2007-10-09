@@ -21,9 +21,9 @@
     <model name="model">
 
         <service name="service">
-            <bridge-component/>
             <inbound-router>
                 <vm:inbound-endpoint address="in" connector-ref="default"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>

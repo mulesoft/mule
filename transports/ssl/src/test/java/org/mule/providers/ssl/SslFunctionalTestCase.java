@@ -11,16 +11,13 @@
 package org.mule.providers.ssl;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.model.MuleProxy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.testmodels.mule.TestMuleProxy;
 import org.mule.tck.testmodels.mule.TestSedaComponent;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.model.UMOModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,11 +55,9 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
             assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         }
 
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
-        UMOComponent c = model.getComponent("testComponent2");
+        UMOComponent c = managementContext.getRegistry().lookupComponent("testComponent2");
         assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
-        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
-        Object ftc = ((TestMuleProxy) proxy).getComponent();
+        Object ftc = ((TestSedaComponent) c).getOrCreateService();
         assertNotNull("Functional Test Component not found in the model.", ftc);
         assertTrue("Service should be a FunctionalTestComponent", ftc instanceof FunctionalTestComponent);
 

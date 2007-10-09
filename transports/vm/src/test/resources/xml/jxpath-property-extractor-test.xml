@@ -18,9 +18,9 @@
     <model name="jxpath property extractor test">
 
         <service name="test">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="in"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <exception-based-router>
@@ -31,9 +31,9 @@
         </service>
 
         <service name="unreliable">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://unreliable" connector-ref="default"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <endpoint-selector-router selectorProperty="endpoint" extractorEnabled="true">

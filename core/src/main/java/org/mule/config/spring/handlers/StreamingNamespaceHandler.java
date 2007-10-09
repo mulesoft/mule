@@ -15,9 +15,10 @@ import org.mule.config.spring.factories.OutboundStreamingEndpointFactoryBean;
 import org.mule.config.spring.factories.ResponseStreamingEndpointFactoryBean;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
-import org.mule.config.spring.parsers.specific.ServiceDescriptorDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
+import org.mule.impl.model.streaming.StreamingComponent;
 import org.mule.impl.model.streaming.StreamingModel;
 import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
@@ -31,7 +32,9 @@ public class StreamingNamespaceHandler  extends NamespaceHandlerSupport
     public void init()
     {
         registerBeanDefinitionParser("model", new OrphanDefinitionParser(StreamingModel.class, true));
-        registerBeanDefinitionParser("service", new ServiceDescriptorDefinitionParser());
+
+        registerBeanDefinitionParser("service", new ComponentDefinitionParser(StreamingComponent.class));
+
         registerBeanDefinitionParser("inbound-router", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-pass-through-router", new RouterDefinitionParser("router", OutboundPassThroughRouter.class));

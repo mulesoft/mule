@@ -10,10 +10,7 @@
 
 package org.mule.impl.model.seda.optimised;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.seda.SedaModel;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 
 /**
  * Same as <code>SedaModel</code> except that it assumes that components implement the Callable 
@@ -30,10 +27,5 @@ public class OptimisedSedaModel extends SedaModel
     public String getType()
     {
         return "seda-optimised";
-    }
-
-    protected UMOComponent createComponent(UMODescriptor descriptor)
-    {
-        return new OptimisedSedaComponent((MuleDescriptor) descriptor, this);
     }
 }

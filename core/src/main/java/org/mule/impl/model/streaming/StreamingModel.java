@@ -9,12 +9,9 @@
  */
 package org.mule.impl.model.streaming;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
 import org.mule.impl.model.resolvers.StreamingEntryPointResolver;
 import org.mule.impl.model.resolvers.StreamingEntryPointResolverSet;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 
 /** TODO */
@@ -27,11 +24,6 @@ public class StreamingModel extends AbstractModel
         super();
         //Set this entrypoint respolver by default
         getEntryPointResolverSet().addEntryPointResolver(new StreamingEntryPointResolver());
-    }
-
-    protected UMOComponent createComponent(UMODescriptor descriptor)
-    {
-        return new StreamingComponent((MuleDescriptor) descriptor, this);
     }
 
     public String getType()

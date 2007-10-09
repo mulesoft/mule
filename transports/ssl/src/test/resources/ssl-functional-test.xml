@@ -21,48 +21,42 @@
 
     <endpoint name="asyncEndpoint" address="ssl://localhost:60196" synchronous="false"/>
 
-    <spring:bean id="reply" class="org.mule.tck.functional.FunctionalTestComponent">
-        <spring:property name="eventCallback">
-            <spring:bean class="org.mule.tck.functional.CounterCallback"/>
-        </spring:property>
-    </spring:bean>
+    <model name="main">
 
-    <spring:bean id="countAndReply" class="org.mule.tck.functional.FunctionalTestComponent">
-        <spring:property name="eventCallback">
-            <spring:bean class="org.mule.tck.functional.CounterCallback"/>
-        </spring:property>
-    </spring:bean>
-
-    <spring:bean id="asynchronous" class="org.mule.tck.functional.FunctionalTestComponent">
-        <spring:property name="eventCallback">
-            <spring:bean class="org.mule.tck.functional.ResponseWriterCallback"/>
-        </spring:property>
-    </spring:bean>
-
-    <model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
-
-        <service name="testComponent1">
-            <!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
-                figure out how to set the eventCallback bean as a property within mule:properties -->
-            <component scope="singleton" instance-ref="reply"/>
+        <service name="testComponent1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="eventCallback">
+                        <spring:bean class="org.mule.tck.functional.CounterCallback"/>
+                    </spring:entry>
+                </properties>
+            </component>
             <inbound-router>
                 <inbound-endpoint ref="sendEndpoint"/>
             </inbound-router>
         </service>
 
-        <service name="testComponent2">
-            <!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
-                figure out how to set the eventCallback bean as a property within mule:properties -->
-            <component scope="singleton" instance-ref="countAndReply"/>
+        <service name="testComponent2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="eventCallback">
+                        <spring:bean class="org.mule.tck.functional.CounterCallback"/>
+                    </spring:entry>
+                </properties>
+            </component>
             <inbound-router>
                 <inbound-endpoint ref="sendManyEndpoint"/>
             </inbound-router>
         </service>
 
-        <service name="testComponent3">
-            <!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
-                figure out how to set the eventCallback bean as a property within mule:properties -->
-            <component scope="singleton" instance-ref="asynchronous"/>
+        <service name="testComponent3" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="eventCallback">
+                        <spring:bean class="org.mule.tck.functional.ResponseWriterCallback"/>
+                    </spring:entry>
+                </properties>
+            </component>
             <inbound-router>
                 <inbound-endpoint ref="asyncEndpoint"/>
             </inbound-router>

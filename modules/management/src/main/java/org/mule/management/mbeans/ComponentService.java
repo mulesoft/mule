@@ -10,8 +10,8 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.MuleServer;
 import org.mule.impl.model.AbstractComponent;
-import org.mule.impl.model.ModelHelper;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.UMOComponent;
@@ -211,7 +211,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     private AbstractComponent getComponent()
     {
-        return (AbstractComponent)ModelHelper.getComponent(getName());
+        return (AbstractComponent)MuleServer.getManagementContext().getRegistry().lookupComponent(getName());
     }
 
     // ///// Component stats impl /////////

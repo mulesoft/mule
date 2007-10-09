@@ -16,9 +16,9 @@
     <model name="OGNL Functional TestCase">
 
         <service name="OGNLServiceWrapper1">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://in" connector-ref="VMConnector"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>

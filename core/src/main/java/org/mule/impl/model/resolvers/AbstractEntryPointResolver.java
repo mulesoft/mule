@@ -18,10 +18,10 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,7 +67,7 @@ public abstract class AbstractEntryPointResolver implements UMOEntryPointResolve
 
     protected Method getMethodByName(String methodName, UMOEventContext context)
     {
-        StringBuffer key = new StringBuffer(24).append(context.getComponentDescriptor().getName())
+        StringBuffer key = new StringBuffer(24).append(context.getComponent().getName())
                 .append(".").append(methodName);
         System.out.println("Looking up: " + key.toString());
         Method method = (Method) methodCache.get(key);
@@ -77,7 +77,7 @@ public abstract class AbstractEntryPointResolver implements UMOEntryPointResolve
 
     protected Method addMethodByName(Method method, UMOEventContext context)
     {
-        StringBuffer key = new StringBuffer(24).append(context.getComponentDescriptor().getName())
+        StringBuffer key = new StringBuffer(24).append(context.getComponent().getName())
                 .append(".").append(method.getName());
         Method previousMethod = (Method) methodCache.putIfAbsent(key, method);
         return (previousMethod != null ? previousMethod : method);

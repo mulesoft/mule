@@ -40,6 +40,7 @@ public class ObjectFactoryUtilsTestCase extends AbstractMuleTestCase
     public void testCreateIfNecessaryFactory() throws Exception
     {
         ObjectFactory factory = new SimpleObjectFactory(SubClass.class);
+        factory.initialise();
         Object result = ObjectFactoryUtils.createIfNecessary(factory, Interface.class);
         assertTrue(result instanceof Interface);
     }
@@ -48,7 +49,9 @@ public class ObjectFactoryUtilsTestCase extends AbstractMuleTestCase
     {
         try
         {
-            ObjectFactoryUtils.createIfNecessary(new SimpleObjectFactory(SubClass.class), Double.class);
+            ObjectFactory of = new SimpleObjectFactory(SubClass.class);
+            of.initialise();
+            ObjectFactoryUtils.createIfNecessary(of, Double.class);
             fail("no exception");
         }
         catch (IllegalArgumentException e)

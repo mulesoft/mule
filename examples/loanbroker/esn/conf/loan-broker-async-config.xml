@@ -93,9 +93,9 @@
         </service>
 
         <service name="TheBankGateway">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="BankGateway"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <logging-catch-all-strategy/>

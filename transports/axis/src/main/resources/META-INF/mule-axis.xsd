@@ -26,7 +26,7 @@
                     <xsd:element name="bean-type" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
                     <xsd:element name="supported-scheme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
                 </xsd:sequence>
-                <xsd:attribute name="axisServer-ref" type="xsd:string">
+                <xsd:attribute name="axis-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             Bean reference to the axis server that should be used.

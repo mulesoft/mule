@@ -25,7 +25,7 @@ public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
 {
     public void testCorrelationGroupSizePropertySet() throws Exception
     {
-        UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
+        UMOComponent testComponent = getTestComponent("test", Apple.class);
         UMOSession session = getTestSession(testComponent);
 
         UMOEndpoint endpoint = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);

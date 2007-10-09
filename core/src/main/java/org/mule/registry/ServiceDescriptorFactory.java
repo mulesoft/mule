@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationContext;
 
 /**
  * Factory used to create a new service descriptor.
+ * @deprecated TODO MULE-2102
  */
 public class ServiceDescriptorFactory 
 {

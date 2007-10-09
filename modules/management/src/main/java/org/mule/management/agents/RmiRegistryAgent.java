@@ -10,6 +10,7 @@
 
 package org.mule.management.agents;
 
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.AbstractAgent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -69,8 +70,12 @@ public class RmiRegistryAgent extends AbstractAgent
 
     public void start() throws UMOException
     {
+        if (serverUri == null)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("serverUri has not been set, this agent has not been initialized properly."), this);
+        }
+        
         URI uri;
-
         try
         {
             uri = new URI(serverUri);

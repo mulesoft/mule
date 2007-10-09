@@ -32,9 +32,9 @@ public class ConnectorCreationTestCase extends FunctionalTestCase
         managementContext = getBuilder().configure("/org/mule/test/config/connector-creation-using-param.xml");
         MuleServer.setManagementContext(managementContext);
         managementContext.start();
-        UMOComponent c = managementContext.getRegistry().lookupModel("main").getComponent("echo");
-        UMOConnector con1 = c.getDescriptor().getInboundRouter().getEndpoint("in").getConnector();
-        UMOConnector con2 = ((UMOOutboundRouter)c.getDescriptor().getOutboundRouter().getRouters().get(0)).getEndpoint("out").getConnector();
+        UMOComponent c = managementContext.getRegistry().lookupComponent("echo");
+        UMOConnector con1 = c.getInboundRouter().getEndpoint("in").getConnector();
+        UMOConnector con2 = ((UMOOutboundRouter)c.getOutboundRouter().getRouters().get(0)).getEndpoint("out").getConnector();
         assertTrue(!con1.equals(con2));
         managementContext.stop();
     }
@@ -45,10 +45,10 @@ public class ConnectorCreationTestCase extends FunctionalTestCase
         managementContext = getBuilder().configure("/org/mule/test/config/connector-create-once.xml");
         MuleServer.setManagementContext(managementContext);
         managementContext.start();
-        UMOComponent c = managementContext.getRegistry().lookupModel("main").getComponent("echo");
+        UMOComponent c = managementContext.getRegistry().lookupComponent("echo");
 
-        assertEquals(c.getDescriptor().getInboundRouter().getEndpoint("in").getConnector(),
-            ((UMOOutboundRouter)c.getDescriptor().getOutboundRouter().getRouters().get(0)).getEndpoint("out").getConnector());
+        assertEquals(c.getInboundRouter().getEndpoint("in").getConnector(),
+            ((UMOOutboundRouter)c.getOutboundRouter().getRouters().get(0)).getEndpoint("out").getConnector());
         managementContext.stop();
     }
 

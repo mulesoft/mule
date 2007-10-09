@@ -369,7 +369,7 @@ public interface UMOEventContext
      */
     UMOMessage receiveEvent(UMOEndpointURI endpoint, long timeout) throws UMOException;
 
-    UMODescriptor getComponentDescriptor();
+    UMOComponent getComponent();
 
     /**
      * Determines whether the default processing for this event will be executed. By

@@ -14,6 +14,7 @@ import org.mule.config.ConfigurationException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.FruitBowl;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
@@ -72,21 +73,20 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
      */
     public void testExternalUMOReference() throws Exception
     {
-        getAndVerifyExternalReference(
-                getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl"));
+        getAndVerifyExternalReference(getTestComponent("fruit Bowl", FruitBowl.class));
     }
 
-    protected void getAndVerifyExternalReference(UMODescriptor descriptor) throws Exception
+    protected void getAndVerifyExternalReference(UMOComponent component) throws Exception
     {
-        verifyExternalReference(getExternalReference(descriptor));
+        verifyExternalReference(getExternalReference(component));
     }
 
-    protected Object getExternalReference(UMODescriptor descriptor) throws Exception
+    protected Object getExternalReference(UMOComponent component) throws Exception
     {
         UMOContainerContext container = getContainerContext();
         assertNotNull(container);
         container.initialise();
-        descriptor.initialise();
+        component.initialise();
         FruitBowl fruitBowl = (FruitBowl) container.getComponent(getFruitBowlComponentName());
         fail("Need to figure out whether this test is relevant for Mule 2.0");
         // TODO MULE-1908

@@ -6,15 +6,15 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <model name="main" class="org.mule.tck.testmodels.mule.TestSedaModel">
-        <service name="unique1">
+    <model name="main">
+        <service name="unique1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
             <component class="org.mule.tck.services.UniqueComponent" />
         </service>
-        <service name="unique2">
-            <component scope="singleton" class="org.mule.tck.services.UniqueComponent" />
+        <service name="unique2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.services.UniqueComponent" />
         </service>
-        <service name="unique3">
-            <component scope="singleton" instance-ref="myUniqueBean" />
+        <service name="unique3" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object instance-ref="myUniqueBean" />
         </service>
         <!-- SEDA-specific attributes 
         <service name="unique4" serviceFactory-ref="genericFactory" enablePooling="false"/>

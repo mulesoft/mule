@@ -80,6 +80,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -309,7 +310,10 @@ public abstract class AbstractConnector
     {
         if (initialised.get())
         {
-            throw new AlreadyInitialisedException("Connector '" + getProtocol() + "." + getName() + "'", this);
+            InitialisationException e = new AlreadyInitialisedException("Connector '" + getProtocol() + "." + getName() + "'", this);
+            throw e;
+            // Just log a warning since initializing twice is bad but might not be the end of the world.
+            //logger.warn(e);
         }
 
         if (logger.isInfoEnabled())
@@ -829,7 +833,7 @@ public abstract class AbstractConnector
             throw new ConnectorException(CoreMessages.endpointIsNullForListener(), this);
         }
 
-        logger.info("Registering listener: " + component.getDescriptor().getName() + " on endpointUri: "
+        logger.info("Registering listener: " + component.getName() + " on endpointUri: "
                         + endpointUri.toString());
 
         UMOMessageReceiver receiver = this.getReceiver(component, endpoint);
@@ -971,16 +975,28 @@ public abstract class AbstractConnector
 
     public List getDefaultInboundTransformers()
     {
+        if (serviceDescriptor == null)
+        {
+            throw new RuntimeException("serviceDescriptor not initialized");
+        }
         return TransformerUtils.getDefaultInboundTransformers(serviceDescriptor);
     }
 
     public List getDefaultResponseTransformers()
     {
+        if (serviceDescriptor == null)
+        {
+            throw new RuntimeException("serviceDescriptor not initialized");
+        }
         return TransformerUtils.getDefaultResponseTransformers(serviceDescriptor);
     }
 
     public List getDefaultOutboundTransformers()
     {
+        if (serviceDescriptor == null)
+        {
+            throw new RuntimeException("serviceDescriptor not initialized");
+        }
         return TransformerUtils.getDefaultOutboundTransformers(serviceDescriptor);
     }
 
@@ -1054,7 +1070,22 @@ public abstract class AbstractConnector
 
     public UMOMessageReceiver getReceiver(UMOComponent component, UMOImmutableEndpoint endpoint)
     {
-        return (UMOMessageReceiver) receivers.get(this.getReceiverKey(component, endpoint));
+        if (receivers != null)
+        {
+            Object key = getReceiverKey(component, endpoint);
+            if (key != null)
+            {
+                return (UMOMessageReceiver) receivers.get(key);
+            }
+            else
+            {
+                throw new RuntimeException("getReceiverKey() returned a null key");
+            }
+        }
+        else 
+        {
+            throw new RuntimeException("Connector has not been initialized.");
+        }
     }
 
     /**

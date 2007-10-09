@@ -10,18 +10,10 @@
 
 package org.mule.impl.model.pipeline;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 
 public class PipelineModel extends AbstractModel
 {
-    protected UMOComponent createComponent(UMODescriptor descriptor)
-    {
-        return new PipelineComponent((MuleDescriptor) descriptor, this);
-    }
-
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model

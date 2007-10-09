@@ -21,9 +21,9 @@
     <model name="xml filter test">
 
         <service name="test for xml">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="in"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>
@@ -40,9 +40,9 @@
         </service>
 
         <service name="filter xml for content">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://xml" connector-ref="default"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <forwarding-catch-all-strategy>

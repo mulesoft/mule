@@ -14,13 +14,10 @@ import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.impl.MuleDescriptor;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -44,9 +41,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -451,6 +450,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestEndpoint(name, type, managementContext);
     }
 
+    public static UMOEvent getTestEvent(Object data, UMOComponent component) throws Exception
+    {
+        return MuleTestUtils.getTestEvent(data, component, managementContext);
+    }
+
     public static UMOEvent getTestEvent(Object data) throws Exception
     {
         return MuleTestUtils.getTestEvent(data, managementContext);
@@ -461,14 +465,9 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestEventContext(data, managementContext);
     }
 
-    public static UMOTransformer getTestTransformer()
+    public static UMOTransformer getTestTransformer() throws Exception
     {
         return MuleTestUtils.getTestTransformer();
-    }
-
-    public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor) throws Exception
-    {
-        return MuleTestUtils.getTestEvent(data, descriptor, managementContext);
     }
 
     public static UMOEvent getTestEvent(Object data, UMOImmutableEndpoint endpoint) throws Exception
@@ -476,10 +475,10 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestEvent(data, endpoint, managementContext);
     }
 
-    public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOImmutableEndpoint endpoint)
-            throws UMOException
+    public static UMOEvent getTestEvent(Object data, UMOComponent component, UMOImmutableEndpoint endpoint)
+        throws Exception
     {
-        return MuleTestUtils.getTestEvent(data, descriptor, endpoint);
+        return MuleTestUtils.getTestEvent(data, component, endpoint, managementContext);
     }
 
     public static UMOSession getTestSession(UMOComponent component)
@@ -487,24 +486,24 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestSession(component);
     }
 
-    public static TestConnector getTestConnector()
+    public static TestConnector getTestConnector() throws Exception
     {
-        return MuleTestUtils.getTestConnector();
+        return MuleTestUtils.getTestConnector(managementContext);
     }
 
-    public static UMOComponent getTestComponent(MuleDescriptor descriptor)
+    public static UMOComponent getTestComponent() throws Exception
     {
-        return MuleTestUtils.getTestComponent(descriptor);
+        return MuleTestUtils.getTestComponent(managementContext);
     }
 
-    public static MuleDescriptor getTestDescriptor() throws Exception
+    public static UMOComponent getTestComponent(String name, Class clazz) throws Exception
     {
-        return getTestDescriptor("appleService", Apple.class.getName());
+        return MuleTestUtils.getTestComponent(name, clazz, managementContext);
     }
 
-    public static MuleDescriptor getTestDescriptor(String name, String implementation) throws Exception
+    public static UMOComponent getTestComponent(String name, Class clazz, Map props) throws Exception
     {
-        return MuleTestUtils.getTestDescriptor(name, implementation, managementContext);
+        return MuleTestUtils.getTestComponent(name, clazz, props, managementContext);
     }
 
     public static class TestInfo

@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.util.StringUtils;
+import org.mule.util.object.PooledObjectFactory;
 import org.mule.util.object.SimpleObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
 
@@ -23,7 +24,15 @@ import org.w3c.dom.Element;
 public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
 {
     public static final String FACTORY_REF = "factory-ref";
+    
+    protected Class beanClass = null;
 
+    public ObjectFactoryDefinitionParser(Class beanClass, String setterMethod)
+    {
+        this(setterMethod);
+        this.beanClass = beanClass;
+    }                                                             
+    
     public ObjectFactoryDefinitionParser(String setterMethod)
     {
         super(setterMethod, null);
@@ -33,6 +42,11 @@ public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
     
     protected Class getBeanClass(Element element)
     {
+        if (beanClass != null)
+        {
+            return beanClass;
+        }
+        
         String scope = element.getAttribute("scope");
         // Default scope is "prototype"
         if (StringUtils.isBlank(scope))
@@ -48,6 +62,10 @@ public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
         else if (scope.equals("singleton"))
         {
             return SingletonObjectFactory.class;
+        }
+        else if (scope.equals("pooled"))
+        {
+            return PooledObjectFactory.class;
         }
         else
         {

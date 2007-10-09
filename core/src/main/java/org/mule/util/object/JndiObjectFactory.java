@@ -121,13 +121,25 @@ public class JndiObjectFactory implements ObjectFactory, Initialisable, Disposab
         }
     }
     
-    public Object create() throws Exception
+    public Object getOrCreate() throws Exception
     {
         if (_object == null || lookupOnEachCall == true)
         {
             _object = _context.lookup(objectName);
         }    
         return _object;
+    }
+    
+    /** {@inheritDoc} */
+    public Object lookup(String id) throws Exception
+    {
+        throw new UnsupportedOperationException();
+    }
+    
+    /** {@inheritDoc} */
+    public void release(Object object) throws Exception
+    {
+        throw new UnsupportedOperationException();
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////

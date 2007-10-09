@@ -44,7 +44,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
             (AxisConnector)managementContext.getRegistry().lookupConnector("axisConnector2");
 
         assertNotNull(connector);
-        assertEquals(MockAxisServer.class, connector.getAxisServer().getClass());
+        assertEquals(MockAxisServer.class, connector.getAxis().getClass());
         assertEquals(MockProvider.class, connector.getClientProvider().getClass());
     }
 }

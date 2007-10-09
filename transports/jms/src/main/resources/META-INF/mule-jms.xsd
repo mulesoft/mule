@@ -47,7 +47,7 @@
 
     <xsd:group name="jmsConnectorElements">
         <xsd:sequence>
-            <xsd:element name="redelivery-handler" type="mule:objectFactoryType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="redelivery-handler" type="mule:genericObjectFactoryType" minOccurs="0" maxOccurs="1"/>
         </xsd:sequence>
     </xsd:group>
 
@@ -84,7 +84,7 @@
 
     <xsd:complexType name="connectionFactoryType">
         <xsd:complexContent>
-            <xsd:extension base="mule:objectFactoryType">
+            <xsd:extension base="mule:genericObjectFactoryType">
                 <xsd:attribute name="username" type="xsd:string"/>
                 <xsd:attribute name="password" type="xsd:string"/>
             </xsd:extension>

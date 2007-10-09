@@ -124,6 +124,10 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.filterAddress = filterAddress;
     }
 
+    /**
+     * Creates but does not initialize the endpoint URI.  It is up to the caller
+     * to call initialise() at some point.
+     */
     public MuleEndpointURI(String uri) throws EndpointException
     {
         uri = uri.trim().replaceAll(" ", "%20");
@@ -146,30 +150,6 @@ public class MuleEndpointURI implements UMOEndpointURI
         {
             throw new MalformedEndpointException(uri, e);
         }
-
-//        try
-//        {
-//            initialise();
-//        }
-//        catch (InitialisationException e)
-//        {
-//            throw new EndpointException(e);
-//        }
-
-//        try
-//        {
-//            String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
-//            TransportServiceDescriptor sd;
-//            sd = (TransportServiceDescriptor)RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, scheme, null);
-//            if (sd == null)
-//            {
-//                throw new ServiceException(Message.createStaticMessage("No service descriptor found for transport: " + scheme + ".  This transport does not appear to be installed."));
-//            }
-//        }
-//        catch (Exception e)
-//        {
-//            throw new EndpointException(e);
-//        }
     }
 
 

@@ -49,7 +49,7 @@ public class EndpointService implements EndpointServiceMBean
         }
         this.endpoint = receiver.getEndpoint();
         this.receiver = receiver;
-        this.componentName = receiver.getComponent().getDescriptor().getName();
+        this.componentName = receiver.getComponent().getName();
         init();
     }
 

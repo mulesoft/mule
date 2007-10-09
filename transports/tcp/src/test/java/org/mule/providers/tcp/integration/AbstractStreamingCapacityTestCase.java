@@ -15,13 +15,15 @@ import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
+import org.mule.tck.testmodels.mule.TestStreamingComponent;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOStreamMessageAdapter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -73,11 +75,11 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
 
         MuleClient client = new MuleClient();
 
-        UMOModel model = managementContext.getRegistry().lookupModel("echoModel");
-        FunctionalStreamingTestComponent ftc =
-                (FunctionalStreamingTestComponent) model.getComponent("testComponent").getInstance();
+        UMOComponent component = managementContext.getRegistry().lookupComponent("testComponent");
+        assertTrue(component instanceof TestStreamingComponent);
+        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) ((TestStreamingComponent) component).getOrCreateService();
         assertNotNull(ftc);
-//        assertEquals(1, ftc.getNumber());
+        //assertEquals(1, ftc.getNumber());
 
         ftc.setEventCallback(callback, size);
 

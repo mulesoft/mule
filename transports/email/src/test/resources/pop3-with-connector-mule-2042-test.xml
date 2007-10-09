@@ -16,13 +16,13 @@
     <model name="test">
 
         <service name="relay">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <!-- adding the connector-ref here was causing issues
                      this should be identical to pop3-fucntional-test apart from this -->
                 <inbound-endpoint address="pop3://bob:password@localhost:65435" connector-ref="pop3Connector">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </inbound-endpoint>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

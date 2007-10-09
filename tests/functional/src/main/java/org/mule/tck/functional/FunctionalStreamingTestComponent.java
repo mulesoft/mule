@@ -155,7 +155,7 @@ public class FunctionalStreamingTestComponent implements StreamingService
         summary = result.toString();
 
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                + context.getComponentDescriptor().getName() + ". " + summary
+                + context.getComponent().getName() + ". " + summary
                 + "\n callback: " + eventCallback,
                 '*', 80);
 

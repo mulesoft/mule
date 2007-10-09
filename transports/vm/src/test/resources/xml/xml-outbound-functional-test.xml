@@ -30,9 +30,9 @@
              services via message-splitter.  the service name is then used in the
              jxpath-filter to send each service to a separate endpoint -->
         <service name="service splitter">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="split"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <mxml:message-splitter splitExpression="/mule:mule/mule:model/mule:service">
@@ -54,9 +54,9 @@
         </service>
 
         <service name="round robin deterministic">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="roundrobin-det"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <mxml:round-robin-splitter splitExpression="/mule:mule/mule:model/mule:service">
@@ -69,9 +69,9 @@
         </service>
 
         <service name="round robin indeterministic">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="roundrobin-indet"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <mxml:round-robin-splitter splitExpression="/mule:mule/mule:model/mule:service" deterministic="false">

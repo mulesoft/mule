@@ -11,8 +11,8 @@
 package org.mule.impl.model.seda;
 
 import org.mule.MuleRuntimeException;
-import org.mule.impl.MuleDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.object.SimpleObjectFactory;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
@@ -27,8 +27,10 @@ public class SedaComponentTestCase extends AbstractMuleTestCase
         {
             // getTestComponent() currently already returns a SedaComponent, but
             // here we are safe-guarding for any future changes
-            MuleDescriptor descriptor = getTestDescriptor("test", "java.lang.Object");
-            SedaComponent component = new SedaComponent(descriptor, new SedaModel());
+            SedaComponent component = new SedaComponent();
+            component.setName("test");
+            component.setServiceFactory(new SimpleObjectFactory(Object.class));
+            component.setModel(new SedaModel());
 
             component.handleWorkException(getTestWorkEvent(), "workRejected");
         }

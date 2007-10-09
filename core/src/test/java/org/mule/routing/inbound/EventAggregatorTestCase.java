@@ -32,7 +32,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
 
     public void testMessageAggregator() throws Exception
     {
-        UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
+        UMOComponent testComponent = getTestComponent("test", Apple.class);
         UMOSession session = getTestSession(testComponent);
 
         UMOInboundRouterCollection messageRouter = new InboundRouterCollection();

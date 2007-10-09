@@ -22,7 +22,7 @@ import org.mule.umo.routing.UMOOutboundRouterCollection;
 /**
  * <code>ForwardingConsumer</code> is used to forward an incoming event over
  * another transport without invoking a component. This can be used to implement a
- * bridge accross defferent transports.
+ * bridge accross different transports.
  */
 public class ForwardingConsumer extends SelectiveConsumer
 {
@@ -31,7 +31,7 @@ public class ForwardingConsumer extends SelectiveConsumer
     {
         if (super.process(event) != null)
         {
-            UMOOutboundRouterCollection router = event.getComponent().getDescriptor().getOutboundRouter();
+            UMOOutboundRouterCollection router = event.getComponent().getOutboundRouter();
 
             // Set the stopFurtherProcessing flag to true to inform the
             // InboundRouterCollection not to route these events to the component

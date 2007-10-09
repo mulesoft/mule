@@ -35,20 +35,12 @@
 
     <axis:connector name="UnsecuredConnector"/>
 
-    <model name="_system">
-        <service name="_axisServiceComponent">
-            <component class="org.mule.providers.soap.axis.AxisServiceComponent"/>
-            <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20"/>
-            <pooling-profile exhaustedAction="WHEN_EXHAUSTED_GROW" maxActive="20" maxIdle="20"/>
-        </service>
-    </model>
-
     <model name="WebServiceExample">
 
         <service name="SecureBridge">
-            <bridge-component/>
             <inbound-router>
                 <inbound-endpoint address="vm://secured"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -60,9 +52,9 @@
         </service>
 
         <service name="UnSecureBridge1">
-            <bridge-component/>
             <inbound-router>
                 <inbound-endpoint address="vm://unsecured1"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -73,9 +65,9 @@
         </service>
 
         <service name="UnSecureBridge2">
-            <bridge-component/>
             <inbound-router>
                 <inbound-endpoint address="vm://unsecured2"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

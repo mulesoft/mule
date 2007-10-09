@@ -112,7 +112,7 @@ public class MuleLocalChannel extends AbstractChannel
         }
     }
 
-    protected Service getService(XFire xfire, String uri) throws XFireException
+	protected Service getService(XFire xfire, String uri) throws XFireException
     {
         if (null == xfire)
         {
@@ -342,7 +342,7 @@ public class MuleLocalChannel extends AbstractChannel
         {
             MessageContext context = new MessageContext();
   
-            XFire xfire = (XFire)ctx.getComponentDescriptor().getProperties().get(
+            XFire xfire = (XFire)ctx.getComponent().getProperties().get(
                 XFireConnector.XFIRE_PROPERTY);
 
             context.setService(xfire.getServiceRegistry().getService(getService(ctx)));

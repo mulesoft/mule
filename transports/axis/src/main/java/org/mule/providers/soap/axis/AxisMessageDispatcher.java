@@ -569,7 +569,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
                                                    ? ":" + String.valueOf(endpointURI.getPort()) : ""));
         if (event.getComponent() != null)
         {
-            properties.put("serviceName", event.getComponent().getDescriptor().getName());
+            properties.put("serviceName", event.getComponent().getName());
         }
 
         TemplateParser tp = TemplateParser.createSquareBracesStyleParser();

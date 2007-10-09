@@ -15,11 +15,10 @@ import org.mule.impl.AbstractAgent;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.model.ModelHelper;
 import org.mule.providers.service.TransportFactory;
 import org.mule.transformers.wire.SerializationWireFormat;
 import org.mule.transformers.wire.WireFormat;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -112,7 +111,7 @@ public class MuleAdminAgent extends AbstractAgent
             }
 
             // Check for override
-            if (ModelHelper.isComponentRegistered(MuleManagerComponent.MANAGER_COMPONENT_NAME))
+            if (managementContext.getRegistry().lookupComponent(MuleManagerComponent.MANAGER_COMPONENT_NAME) != null)
             {
                 logger.info("Mule manager component has already been initialised, ignoring server url");
             }
@@ -144,11 +143,10 @@ public class MuleAdminAgent extends AbstractAgent
                     endpointBuilder.setConnector(connector);
                 }
                 logger.info("Registering Admin listener on: " + serverUri);
-                UMODescriptor descriptor = MuleManagerComponent.getDescriptor(endpointBuilder, wireFormat,
+                UMOComponent component = MuleManagerComponent.getComponent(endpointBuilder, wireFormat,
                     RegistryContext.getConfiguration().getDefaultEncoding(), RegistryContext.getConfiguration()
                         .getDefaultSynchronousEventTimeout());
-
-                managementContext.getRegistry().registerService(descriptor, managementContext);
+                managementContext.getRegistry().registerComponent(component, managementContext);
             }
         }
         catch (UMOException e)

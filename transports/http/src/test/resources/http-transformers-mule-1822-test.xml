@@ -35,9 +35,9 @@
     <model name="baseModel">
 
         <service name="baseService1">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="base"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -61,9 +61,9 @@
     <model name="responseModel">
 
         <service name="responseService1">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="response" responseTransformer-ref="appendResponse"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -87,9 +87,9 @@
     <model name="bothModel">
 
         <service name="bothService1">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="both" transformer-ref="appendString" responseTransformer-ref="appendResponse"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

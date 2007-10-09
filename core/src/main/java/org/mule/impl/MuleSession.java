@@ -131,11 +131,11 @@ public final class MuleSession implements UMOSession
             throw new IllegalStateException(CoreMessages.objectIsNull("Component").getMessage());
         }
 
-        UMOOutboundRouterCollection router = component.getDescriptor().getOutboundRouter();
+        UMOOutboundRouterCollection router = component.getOutboundRouter();
         if (router == null)
         {
             throw new EndpointNotFoundException(
-                CoreMessages.noOutboundRouterSetOn(component.getDescriptor().getName()));
+                CoreMessages.noOutboundRouterSetOn(component.getName()));
         }
         router.route(message, this, false);
     }
@@ -180,11 +180,11 @@ public final class MuleSession implements UMOSession
         {
             throw new IllegalStateException(CoreMessages.objectIsNull("Component").getMessage());
         }
-        UMOOutboundRouterCollection router = component.getDescriptor().getOutboundRouter();
+        UMOOutboundRouterCollection router = component.getOutboundRouter();
         if (router == null)
         {
             throw new EndpointNotFoundException(
-                CoreMessages.noOutboundRouterSetOn(component.getDescriptor().getName()));
+                CoreMessages.noOutboundRouterSetOn(component.getName()));
         }
         UMOMessage result = router.route(message, this, true);
         if (result != null)
@@ -269,7 +269,7 @@ public final class MuleSession implements UMOSession
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("dispatching event to component: " + component.getDescriptor().getName()
+                logger.debug("dispatching event to component: " + component.getName()
                              + ", event is: " + event);
             }
             component.dispatchEvent(event);
@@ -345,7 +345,7 @@ public final class MuleSession implements UMOSession
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("sending event to component: " + component.getDescriptor().getName()
+                logger.debug("sending event to component: " + component.getName()
                              + " event is: " + event);
             }
             return component.sendEvent(event);

@@ -15,7 +15,7 @@ import org.mule.routing.AbstractRouterCollection;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.MessagingException;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -57,9 +57,9 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
                 matchfound = true;
                 // Manage outbound only transactions here
                 final UMOOutboundRouter router = umoOutboundRouter;
-                UMODescriptor descriptor = session.getComponent().getDescriptor();
+                UMOComponent component = session.getComponent();
                 TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig(),
-                    descriptor.getExceptionListener(), managementContext);
+                    component.getExceptionListener(), managementContext);
 
                 TransactionCallback cb = new TransactionCallback()
                 {
@@ -89,7 +89,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
             if (logger.isDebugEnabled())
             {
                 logger.debug("Message did not match any routers on: "
-                             + session.getComponent().getDescriptor().getName()
+                             + session.getComponent().getName()
                              + " invoking catch all strategy");
             }
             return catchAll(message, session, synchronous);
@@ -97,7 +97,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
         else if (!matchfound)
         {
             logger.warn("Message did not match any routers on: "
-                        + session.getComponent().getDescriptor().getName()
+                        + session.getComponent().getName()
                         + " and there is no catch all strategy configured on this router.  Disposing message.");
         }
         return message;
