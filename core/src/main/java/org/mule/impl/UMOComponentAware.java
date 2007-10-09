@@ -26,5 +26,7 @@ import org.mule.umo.UMOComponent;
  */
 public interface UMOComponentAware
 {
+
     void setComponent(UMOComponent component) throws ConfigurationException;
+
 }

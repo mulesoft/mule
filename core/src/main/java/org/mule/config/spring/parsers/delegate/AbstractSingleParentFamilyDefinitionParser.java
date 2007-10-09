@@ -29,18 +29,33 @@ public abstract class AbstractSingleParentFamilyDefinitionParser
 
     private AbstractBeanDefinition parent;
 
-    protected void addChildDelegate(MuleChildDefinitionParser delegate)
+    protected MuleChildDefinitionParser addChildDelegate(MuleChildDefinitionParser delegate)
     {
-        super.addDelegate(delegate);
+        return (MuleChildDefinitionParser) super.addDelegate(delegate);
     }
 
-    protected void addDelegate(MuleDefinitionParser delegate)
+    protected MuleDefinitionParser addDelegate(MuleDefinitionParser delegate)
     {
         if (size() > 0)
         {
+            return addDelegateAsChild(delegate);
+        }
+        else
+        {
+            return super.addDelegate(delegate);
+        }
+    }
+
+    protected MuleChildDefinitionParser addDelegateAsChild(MuleDefinitionParser delegate)
+    {
+        if (delegate instanceof MuleChildDefinitionParser)
+        {
+            return addChildDelegate((MuleChildDefinitionParser) delegate);
+        }
+        else
+        {
             throw new IllegalStateException("Children must implement child interface");
         }
-        super.addDelegate(delegate);
     }
 
     protected AbstractBeanDefinition doSingleBean(int index, MuleDefinitionParser parser,

@@ -23,7 +23,7 @@ public class SingleParentFamilyDefinitionParser extends AbstractSingleParentFami
         parent.setIgnoredDefault(false);
     }
 
-    protected void addDelegate(MuleDefinitionParser delegate)
+    protected MuleDefinitionParser addDelegate(MuleDefinitionParser delegate)
     {
         throw new UnsupportedOperationException("Delegates must be associated with attribute names");
     }

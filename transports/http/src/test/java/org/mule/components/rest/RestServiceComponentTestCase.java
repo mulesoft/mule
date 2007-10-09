@@ -14,11 +14,9 @@ import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOComponent;
 
-/**
- * Created by IntelliJ IDEA.
- */
 public class RestServiceComponentTestCase extends FunctionalTestCase
 {
+    
     public static final String SERVICE_NAME = "WORMS";
     public static final String SERVICE_URL = "http://www.webservicex.net/stockquote.asmx/GetQuote";
 

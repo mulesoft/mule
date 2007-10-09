@@ -16,22 +16,14 @@ import org.mule.umo.lifecycle.Callable;
 /**
  * <code>NullComponent</code> is a component that is used as a placeholder. This
  * implementation will throw an exception if a message is received for it.
- *
- * @deprecated This component used to be used together with the Forwarding
- *             consumer inbound router. You can now use the BridgeComponent that
- *             takes care of configuring the inbound router for you.
- * (Note - this is still used in tests as a placeholder)
  */
 public class NullComponent implements Callable
 {
-    public NullComponent()
-    {
-        //System.out.println("NullComponent created");
-    }
-    
+
     public Object onCall(UMOEventContext context) throws Exception
     {
         throw new UnsupportedOperationException("This component cannot receive messages. Component is: "
                                                 + context.getComponent().getName());
     }
+
 }

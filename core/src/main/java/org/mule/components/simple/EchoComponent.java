@@ -18,6 +18,7 @@ import org.mule.umo.UMOEventContext;
  */
 public class EchoComponent extends LogComponent implements EchoService
 {
+
     public Object onCall(UMOEventContext context) throws Exception
     {
         super.onCall(context);
@@ -28,4 +29,5 @@ public class EchoComponent extends LogComponent implements EchoService
     {
         return echo;
     }
+
 }

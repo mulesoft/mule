@@ -10,34 +10,26 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class ComponentDefinitionParser extends AbstractMuleBeanDefinitionParser
+public class ComponentDefinitionParser extends OrphanDefinitionParser
 {
-    Class beanClass;
-    
-    public ComponentDefinitionParser(Class beanClass)
+
+    public ComponentDefinitionParser(Class clazz)
     {
-        this.beanClass = beanClass;
-    }
-    
-    protected Class getBeanClass(Element element)
-    {
-        return beanClass;
+        super(clazz, true);
     }
 
     //@java.lang.Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        // The model for this component should theoretically be the grandparent node.
         Element parent = (Element) element.getParentNode();
         String modelName = parent.getAttribute(ATTRIBUTE_NAME);
         builder.addPropertyReference("model", modelName);
-
         super.doParse(element, parserContext, builder);
     }
 

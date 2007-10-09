@@ -32,6 +32,7 @@ import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.BridgeServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
@@ -237,9 +238,10 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
         // Components
         BeanDefinitionParser bdpSedaComponent = new ComponentDefinitionParser(SedaComponent.class);
-        registerBeanDefinitionParser("seda-component", bdpSedaComponent);        
+        registerBeanDefinitionParser("seda-component", bdpSedaComponent);
         registerBeanDefinitionParser("service", bdpSedaComponent);
-        
+        registerBeanDefinitionParser("bridge-service", new BridgeServiceDefinitionParser());
+
         // Common POJO Services
         registerBeanDefinitionParser("pass-through-component", new SimplePojoServiceDefinitionParser(PassThroughComponent.class));
         registerBeanDefinitionParser("log-component", new SimplePojoServiceDefinitionParser(LogComponent.class));
@@ -258,9 +260,9 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("singleton-object", new PojoServiceDefinitionParser(SingletonObjectFactory.class));
         registerBeanDefinitionParser("prototype-object", new PojoServiceDefinitionParser(PrototypeObjectFactory.class));
         BeanDefinitionParser bpdPooledObject = new PojoServiceDefinitionParser(PooledObjectFactory.class);
-        registerBeanDefinitionParser("pooled-object", bpdPooledObject);        
+        registerBeanDefinitionParser("pooled-object", bpdPooledObject);
         registerBeanDefinitionParser("component", bpdPooledObject);
-        
+
         //Routers
         registerBeanDefinitionParser("inbound-router", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));

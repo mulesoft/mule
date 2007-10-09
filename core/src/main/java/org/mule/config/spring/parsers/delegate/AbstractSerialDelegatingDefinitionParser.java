@@ -98,7 +98,7 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
         return parser.parseDelegate(element, parserContext);
     }
 
-    protected void addDelegate(MuleDefinitionParser delegate)
+    protected MuleDefinitionParser addDelegate(MuleDefinitionParser delegate)
     {
         delegate.registerPreProcessor(new PreProcessor()
         {
@@ -115,7 +115,7 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
                 }
             }
         });
-        super.addDelegate(delegate);
+        return super.addDelegate(delegate);
     }
 
     protected void resetNameAndId(Element element)

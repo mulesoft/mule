@@ -4,6 +4,8 @@
 
 # MULE-2164
 org.mule.impl.endpoint.MuleCopiedEndpointURITestCase
+# MULE-2509
+org.mule.util.concurrent.WaitPolicyTestCase
 
 # This test needs some work after MULE-2233 and MULE-2287 
 org.mule.impl.MuleComponentTestCase

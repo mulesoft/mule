@@ -52,9 +52,10 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         this.delegates = delegates;
     }
 
-    protected void addDelegate(MuleDefinitionParser delegate)
+    protected MuleDefinitionParser addDelegate(MuleDefinitionParser delegate)
     {
         delegates = (MuleDefinitionParser[]) ArrayUtils.add(delegates, delegate);
+        return delegate;
     }
 
     protected int size()

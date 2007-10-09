@@ -22,6 +22,11 @@
             </outbound-router>
         </service>
 
+        <!-- bridge-service name="bridge">
+            <inbound-endpoint address="vm://bridge" synchronous="true"/>
+            <outbound-endpoint address="vm://responder" synchronous="true"/>
+        </bridge-service -->
+
         <service name="responder">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
