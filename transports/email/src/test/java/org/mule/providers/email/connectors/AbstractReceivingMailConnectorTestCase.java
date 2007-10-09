@@ -34,21 +34,16 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMailConnectorFunctionalTestCase
 {
-    public static final int POLL_PERIOD_MS = 1000; 
+    
+    public static final int POLL_PERIOD_MS = 1000;
     public static final int WAIT_PERIOD_MS = 3 * POLL_PERIOD_MS;
 
     protected AbstractReceivingMailConnectorTestCase()
     {
-        super(/*initialEmail*/true);
-        setStartContext(false);
+        super(SEND_INITIAL_EMAIL);
     }
 
     public void testReceiver() throws Exception
-    {
-        repeatTest("doTestReceiver");
-    }
-
-    public void doTestReceiver() throws Exception
     {
         final CountDownLatch countDown = new CountDownLatch(1);
 
@@ -99,4 +94,5 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
                 EmailMessageToString.class.getName());
         return serviceOverrides;
     }
+
 }

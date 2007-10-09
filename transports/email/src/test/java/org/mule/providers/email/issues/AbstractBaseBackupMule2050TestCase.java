@@ -35,12 +35,12 @@ public abstract class AbstractBaseBackupMule2050TestCase extends ImapConnectorTe
         return connector;
     }
 
-    public void doTestReceiver() throws Exception
+    public void testReceiver() throws Exception
     {
         File dir = FileUtils.newFile(managementContext.getRegistry().getConfiguration().getWorkingDirectory() + "/mail/INBOX");
         assertFalse("Mail backup file already exists: " + dir.getAbsolutePath(), dir.exists());
         debug(dir);
-        super.doTestReceiver();
+        super.testReceiver();
         debug(dir);
         assertTrue(dir.getAbsolutePath(), dir.exists() == backupEnabled);
     }

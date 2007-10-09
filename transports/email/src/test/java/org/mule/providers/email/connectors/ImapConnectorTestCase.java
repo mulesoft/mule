@@ -18,6 +18,7 @@ import org.mule.umo.provider.UMOConnector;
  */
 public class ImapConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
+
     // @Override
     public UMOConnector createConnector() throws Exception
     {

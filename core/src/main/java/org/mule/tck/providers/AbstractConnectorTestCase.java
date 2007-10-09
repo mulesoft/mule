@@ -91,8 +91,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         if (connector instanceof AbstractConnector)
         {
             ehandlerMock.expect("exceptionThrown", C.isA(Exception.class));
-            ((AbstractConnector) connector).exceptionThrown(new MuleException(
-                MessageFactory.createStaticMessage("Dummy")));
+            ((AbstractConnector) connector).exceptionThrown(
+                    new MuleException(MessageFactory.createStaticMessage("Dummy")));
         }
 
         ehandlerMock.verify();
@@ -277,5 +277,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     public abstract Object getValidMessage() throws Exception;
 
-    public abstract String getTestEndpointURI();    
+    public abstract String getTestEndpointURI();
+
 }

@@ -46,8 +46,12 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     public static final String EMAIL = USER + "@" + PROVIDER;
     public static final String PASSWORD = "secret";
     public static final String MESSAGE = "Test Email Message";
-    public static final long STARTUP_PERIOD_MS = 100;
-    
+    public static final long STARTUP_PERIOD_MS = 1000;
+
+    // for constructor
+    public static final boolean SEND_INITIAL_EMAIL = true;
+    public static final boolean NO_INITIAL_EMAIL = false;
+
     private static final AtomicInteger nextPort = new AtomicInteger(INITIAL_SERVER_PORT);
     private static final Log staticLogger = LogFactory.getLog(AbstractMailConnectorFunctionalTestCase.class);
     private static final AtomicInteger nameCount = new AtomicInteger(0);
@@ -90,6 +94,8 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         if (initialEmail)
         {
             storeEmail();
+            // give greenmail time to stabilise(!?) (only needed for receive tests)
+            Thread.sleep(STARTUP_PERIOD_MS);
         }
     }
 
@@ -183,44 +189,6 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         assertNotNull(received.getRecipients(Message.RecipientType.TO));
         assertEquals(1, received.getRecipients(Message.RecipientType.TO).length);
         assertEquals(received.getRecipients(Message.RecipientType.TO)[0].toString(), EMAIL);
-    }
-
-    /**
-     * Tests are intermittently failing due to busy ports.  Here we repeat a test a number of times
-     * (more than twice should not be necessary!) to make sure that the first failure was not due to
-     * an active port.
-     *
-     * @param method The method name of the test
-     * @throws Exception If the failure occurs repeatedly
-     */
-    protected void repeatTest(String method) throws Exception
-    {
-        boolean success = false;
-
-        for (int count = 1; !success; ++count)
-        {
-            try
-            {
-                getClass().getMethod(method, new Class[0]).invoke(this, new Object[0]);
-                success = true;
-            }
-            catch (Exception e)
-            {
-                if (count >= RETRY_LIMIT)
-                {
-                    logger.warn("Test attempt " + count + " for " + method
-                            + " failed (will fail): " + e.getMessage());
-                    throw e;
-                }
-                else
-                {
-                    logger.warn("Test attempt " + count + " for " + method
-                            + " failed (will retry): " + e.getMessage());
-                    stopServers();
-                    startServers();
-                }
-            }
-        }
     }
 
     protected String uniqueName(String root)

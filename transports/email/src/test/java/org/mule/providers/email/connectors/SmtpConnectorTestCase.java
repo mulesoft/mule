@@ -37,7 +37,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     
     public SmtpConnectorTestCase() 
     {
-        super(false);
+        super(NO_INITIAL_EMAIL);
     }
 
    public UMOConnector createConnector() throws Exception
@@ -81,11 +81,6 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     }
 
     public void testSend() throws Exception
-    {
-        repeatTest("doTestSend");
-    }
-
-    public void doTestSend() throws Exception
     {
         //managementContext.getRegistry().registerConnector(createConnector(false), managementContext);
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
