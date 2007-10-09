@@ -6,8 +6,8 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/parsers-test/2.0 http://www.mulesource.org/schema/mule/parsers-test/2.0/mule-parsers-test.xsd">
 
-    <parsers-test:addressed-endpoint name="addressed" address="foo"/>
+    <parsers-test:addressed-endpoint name="addressed" path="foo"/>
 
-    <parsers-test:addressed-orphan-endpoint name="addressed-orphan" address="foo"/>
+    <parsers-test:addressed-orphan-endpoint name="addressed-orphan" path="foo"/>
 
 </mule>

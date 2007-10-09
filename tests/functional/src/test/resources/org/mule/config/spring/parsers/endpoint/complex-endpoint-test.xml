@@ -6,6 +6,6 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/parsers-test/2.0 http://www.mulesource.org/schema/mule/parsers-test/2.0/mule-parsers-test.xsd">
 
-    <parsers-test:complex-endpoint name="complex" address="foo" bar="123" string="hello world"/>
+    <parsers-test:complex-endpoint name="complex" path="foo" bar="123" string="hello world"/>
 
 </mule>
