@@ -5,8 +5,6 @@
 # MULE-2164
 org.mule.impl.endpoint.MuleCopiedEndpointURITestCase
 
-# MULE-??? delegateClass/delegateMethod properties are not getting picked up 
-org.mule.impl.NoArgsCallWrapperTestCase
 # This test needs some work after MULE-2233 and MULE-2287 
 org.mule.impl.MuleComponentTestCase
 # Rewrite this test using the Registry 
