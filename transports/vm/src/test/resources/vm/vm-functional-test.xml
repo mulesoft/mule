@@ -20,12 +20,12 @@
             </component>
 
             <inbound-router>
-                <vm:inbound-endpoint address="in" connector-ref="asynchVm"/>
+                <vm:inbound-endpoint path="in" connector-ref="asynchVm"/>
             </inbound-router>
 
             <outbound-router>
                 <outbound-pass-through-router>
-                    <vm:outbound-endpoint address="out" connector-ref="asynchVm"/>
+                    <vm:outbound-endpoint path="out" connector-ref="asynchVm"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

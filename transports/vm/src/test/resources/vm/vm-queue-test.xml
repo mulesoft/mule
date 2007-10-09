@@ -11,14 +11,14 @@
     <vm:connector name="vm-normal" queueEvents="false"/>
     <vm:connector name="vm-queue" queueEvents="true"/>
 
-    <vm:endpoint name="queue" address="foo" connector-ref="vm-queue"/>
-    <vm:endpoint name="entry" address="entry" connector-ref="vm-normal"/>
+    <vm:endpoint name="queue" path="foo" connector-ref="vm-queue"/>
+    <vm:endpoint name="entry" path="entry" connector-ref="vm-normal"/>
 
     <model name="main">
         <service name="testService">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <vm:inbound-endpoint address="entry" connector-ref="vm-normal"/>
+                <vm:inbound-endpoint path="entry" connector-ref="vm-normal"/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

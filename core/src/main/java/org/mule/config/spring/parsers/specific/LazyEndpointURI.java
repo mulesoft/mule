@@ -20,14 +20,25 @@ import java.net.URI;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * This has the following logic:
+ * - if address is specified, it is used verbatim.  this is consistent with the generic case
+ * - otherwise, we construct from components, omitting things that aren't specified as much as possible
+ * (use required attributes to guarantee entries)
+ *
+ * TODO - check that we have sufficient control via XML (what about empty strings?)
+ */
 public class LazyEndpointURI implements UMOEndpointURI
 {
+
+    private static final String DOTS_SLASHES = "://";
 
     public static final String ADDRESS = "address";
     // TODO - pull out other strings as needed
     public static final String[] ATTRIBUTES =
             new String[]{"protocol", "username", "password", "hostname", ADDRESS, "port", "path"};
 
+    private String address;
     private String protocol;
     private String username;
     private String password;
@@ -55,9 +66,10 @@ public class LazyEndpointURI implements UMOEndpointURI
         this.hostname = hostname;
     }
 
-    public void setAddress(String hostname)
+    public void setAddress(String address)
     {
-        setHostname(hostname);
+        assertNotYetInjected();
+        this.address = address;
     }
 
     public void setPort(int port)
@@ -80,31 +92,45 @@ public class LazyEndpointURI implements UMOEndpointURI
 
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(protocol);
-        buffer.append("://");
-        if (null != username)
+        if (null != address)
         {
-            buffer.append(username);
-            if (null != password)
+            return address;
+        }
+        else
+        {
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(protocol);
+            buffer.append(DOTS_SLASHES);
+            if (null != username)
             {
-                buffer.append(":");
-                buffer.append(password);
+                buffer.append(username);
+                if (null != password)
+                {
+                    buffer.append(":");
+                    buffer.append(password);
+                }
+                buffer.append("@");
             }
-            buffer.append("@");
+            if (null != hostname)
+            {
+                buffer.append(hostname);
+                if (null != port)
+                {
+                    buffer.append(":");
+                    buffer.append(port);
+                }
+            }
+            if (null != path)
+            {
+                // this allows us to use path for vm://foo, for example
+                if (buffer.length() > DOTS_SLASHES.length())
+                {
+                    buffer.append("/");
+                }
+                buffer.append(path);
+            }
+            return buffer.toString();
         }
-        buffer.append(hostname);
-        if (null != port)
-        {
-            buffer.append(":");
-            buffer.append(port);
-        }
-        if (null != path)
-        {
-            buffer.append("/");
-            buffer.append(path);
-        }
-        return buffer.toString();
     }
 
     protected void assertNotYetInjected()

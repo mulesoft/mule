@@ -8,9 +8,9 @@
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <vm:endpoint name="inbound" address="inbound"/>
-    <vm:endpoint name="endpointHop1" address="hop1"/>
-    <vm:endpoint name="endpointHop2" address="hop2"/>
+    <vm:endpoint name="inbound" path="inbound"/>
+    <vm:endpoint name="endpointHop1" path="hop1"/>
+    <vm:endpoint name="endpointHop2" path="hop2"/>
 
     <model name="main">
         <service name="multicastComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">

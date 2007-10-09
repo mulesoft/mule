@@ -15,11 +15,11 @@
         <service name="Receiver">
             <bridge-component/>
             <inbound-router>
-                <vm:inbound-endpoint address="inbound.channel"/>
+                <vm:inbound-endpoint path="inbound.channel"/>
             </inbound-router>
             <outbound-router>
                 <message-chunking-router messageSize="2">
-                    <vm:outbound-endpoint address="chunking.channel"/>
+                    <vm:outbound-endpoint path="chunking.channel"/>
                 </message-chunking-router>
             </outbound-router>
         </service>
@@ -27,7 +27,7 @@
         <service name="ChunkingReceiver">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <vm:inbound-endpoint address="chunking.channel"/>
+                <vm:inbound-endpoint path="chunking.channel"/>
                 <!-- message-chunking-aggregator-router/ -->
                 <correlation-aggregator-router class="org.mule.routing.inbound.MessageChunkingAggregator"/>
             </inbound-router>

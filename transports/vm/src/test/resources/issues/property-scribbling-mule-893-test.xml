@@ -11,8 +11,8 @@
     <vm:connector name="default" queueEvents="false"/>
     <vm:connector name="queue" queueEvents="true"/>
 
-    <vm:endpoint name="dispatch" address="bridge" connector-ref="default"/>
-    <vm:endpoint name="receive" address="result" connector-ref="queue"/>
+    <vm:endpoint name="dispatch" path="bridge" connector-ref="default"/>
+    <vm:endpoint name="receive" path="result" connector-ref="queue"/>
 
     <model name="scribblingTestModel">
 
@@ -23,7 +23,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <vm:outbound-endpoint address="responder" synchronous="false"
+                    <vm:outbound-endpoint path="responder" synchronous="false"
                                           remoteSync="true" connector-ref="default"/>
                 </outbound-pass-through-router>
             </outbound-router>
@@ -32,7 +32,7 @@
         <service name="responder">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <vm:inbound-endpoint address="responder" synchronous="false" connector-ref="default"/>
+                <vm:inbound-endpoint path="responder" synchronous="false" connector-ref="default"/>
             </inbound-router>
         </service>
 

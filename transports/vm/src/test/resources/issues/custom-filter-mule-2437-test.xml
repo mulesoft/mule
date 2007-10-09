@@ -22,18 +22,18 @@
 
         <service name="service">
             <inbound-router>
-                <vm:inbound-endpoint address="in" connector-ref="default"/>
+                <vm:inbound-endpoint path="in" connector-ref="default"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <vm:outbound-endpoint address="vowels" connector-ref="queue"/>
+                    <vm:outbound-endpoint path="vowels" connector-ref="queue"/>
                     <custom-filter class="org.mule.routing.filters.RegExFilter">
                         <spring:property name="pattern" value="^[aeiou]+$"/>
                     </custom-filter>
                 </filtering-router>
                 <filtering-router>
-                    <vm:outbound-endpoint address="consonants" connector-ref="queue"/>
+                    <vm:outbound-endpoint path="consonants" connector-ref="queue"/>
                     <filter ref="consonant-filter"/>
                 </filtering-router>
             </outbound-router>

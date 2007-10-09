@@ -29,19 +29,19 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <vm:outbound-endpoint connector-ref="default" address="sink"/>
+                    <vm:outbound-endpoint connector-ref="default" path="sink"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
 
         <service name="sink">
             <inbound-router>
-                <vm:inbound-endpoint connector-ref="default" address="sink"/>
+                <vm:inbound-endpoint connector-ref="default" path="sink"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-                    <vm:outbound-endpoint connector-ref="queue" address="rfc822"/>
+                    <vm:outbound-endpoint connector-ref="queue" path="rfc822"/>
                     <outbound-endpoint address="smtp://alice:secret@localhost:62000">
                         <transformer ref="rfc822-mime"/>
                     </outbound-endpoint>

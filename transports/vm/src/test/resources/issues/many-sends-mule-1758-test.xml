@@ -20,7 +20,7 @@
                 </properties>
             </component>
             <inbound-router>
-                <vm:inbound-endpoint address="s-in" synchronous="true"/>
+                <vm:inbound-endpoint path="s-in" synchronous="true"/>
             </inbound-router>
         </service>
     </model>

@@ -19,13 +19,13 @@
     <model name="main">
         <service name="default config">
             <inbound-router>
-                <vm:inbound-endpoint address="in-default" connector-ref="defaultVm"/>
+                <vm:inbound-endpoint path="in-default" connector-ref="defaultVm"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <exception-based-router>
                     <outbound-endpoint address="smtp://error@localhost:65540" connector-ref="smtp"/>
-                    <vm:outbound-endpoint address="out-default" connector-ref="queue"/>
+                    <vm:outbound-endpoint path="out-default" connector-ref="queue"/>
                 </exception-based-router>
             </outbound-router>
         </service>

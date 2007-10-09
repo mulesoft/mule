@@ -20,23 +20,23 @@
         <spring:property name="message" value=" response"/>
     </custom-transformer>
 
-    <vm:endpoint name="in-global-name-global-transformer" address="in-global-name-global-transformer" connector-ref="default"/>
-    <vm:endpoint name="out-global-name-global-transformer" address="out-global-name-global-transformer" connector-ref="queue"/>
-    <vm:endpoint name="global-name-global-transformer" address="global-name-global-transformer" connector-ref="default" responseTransformer-ref="response" synchronous="true"/>
+    <vm:endpoint name="in-global-name-global-transformer" path="in-global-name-global-transformer" connector-ref="default"/>
+    <vm:endpoint name="out-global-name-global-transformer" path="out-global-name-global-transformer" connector-ref="queue"/>
+    <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer" connector-ref="default" responseTransformer-ref="response" synchronous="true"/>
 
-    <vm:endpoint name="in-global-name-url-transformer" address="in-global-name-url-transformer" connector-ref="default"/>
-    <vm:endpoint name="out-global-name-url-transformer" address="out-global-name-url-transformer" connector-ref="queue"/>
-    <vm:endpoint name="global-name-url-transformer" address="global-name-url-transformer?responseTransformers=response" connector-ref="default" synchronous="true"/>
+    <vm:endpoint name="in-global-name-url-transformer" path="in-global-name-url-transformer" connector-ref="default"/>
+    <vm:endpoint name="out-global-name-url-transformer" path="out-global-name-url-transformer" connector-ref="queue"/>
+    <vm:endpoint name="global-name-url-transformer" path="global-name-url-transformer?responseTransformers=response" connector-ref="default" synchronous="true"/>
 
-    <vm:endpoint name="in-global-name-local-transformer" address="in-global-name-local-transformer" connector-ref="default"/>
-    <vm:endpoint name="out-global-name-local-transformer" address="out-global-name-local-transformer" connector-ref="queue"/>
-    <vm:endpoint name="global-name-local-transformer" address="global-name-local-transformer" connector-ref="default" synchronous="true"/>
+    <vm:endpoint name="in-global-name-local-transformer" path="in-global-name-local-transformer" connector-ref="default"/>
+    <vm:endpoint name="out-global-name-local-transformer" path="out-global-name-local-transformer" connector-ref="queue"/>
+    <vm:endpoint name="global-name-local-transformer" path="global-name-local-transformer" connector-ref="default" synchronous="true"/>
 
-    <vm:endpoint name="in-local-name-local-transformer" address="in-local-name-local-transformer" connector-ref="default"/>
-    <vm:endpoint name="out-local-name-local-transformer" address="out-local-name-local-transformer" connector-ref="queue"/>
+    <vm:endpoint name="in-local-name-local-transformer" path="in-local-name-local-transformer" connector-ref="default"/>
+    <vm:endpoint name="out-local-name-local-transformer" path="out-local-name-local-transformer" connector-ref="queue"/>
 
-    <vm:endpoint name="in-local-name-url-transformer" address="in-local-name-url-transformer" connector-ref="default"/>
-    <vm:endpoint name="out-local-name-url-transformer" address="out-local-name-url-transformer" connector-ref="queue"/>
+    <vm:endpoint name="in-local-name-url-transformer" path="in-local-name-url-transformer" connector-ref="default"/>
+    <vm:endpoint name="out-local-name-url-transformer" path="out-local-name-url-transformer" connector-ref="queue"/>
 
     <model name="response transformer tests">
 
@@ -107,7 +107,7 @@
             </inbound-router>
             <outbound-router>
                 <chaining-router>
-                    <vm:outbound-endpoint address="local-name-local-transformer" responseTransformer-ref="response" synchronous="true" connector-ref="default"/>
+                    <vm:outbound-endpoint path="local-name-local-transformer" responseTransformer-ref="response" synchronous="true" connector-ref="default"/>
                     <outbound-endpoint ref="out-local-name-local-transformer"/>
                 </chaining-router>
             </outbound-router>
@@ -116,7 +116,7 @@
         <service name="lnlt-bounce">
             <echo-component/>
             <inbound-router>
-                <vm:inbound-endpoint address="local-name-local-transformer" connector-ref="default"/>
+                <vm:inbound-endpoint path="local-name-local-transformer" connector-ref="default"/>
             </inbound-router>
         </service>
 
@@ -127,7 +127,7 @@
             </inbound-router>
             <outbound-router>
                 <chaining-router>
-                    <vm:outbound-endpoint address="local-name-url-transformer?responseTransformers=response" synchronous="true" connector-ref="default"/>
+                    <vm:outbound-endpoint path="local-name-url-transformer?responseTransformers=response" synchronous="true" connector-ref="default"/>
                     <outbound-endpoint ref="out-local-name-url-transformer"/>
                 </chaining-router>
             </outbound-router>
@@ -136,7 +136,7 @@
         <service name="lnut-bounce">
             <echo-component/>
             <inbound-router>
-                <vm:inbound-endpoint address="local-name-url-transformer" connector-ref="default"/>
+                <vm:inbound-endpoint path="local-name-url-transformer" connector-ref="default"/>
             </inbound-router>
         </service>
 

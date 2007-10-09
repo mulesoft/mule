@@ -60,7 +60,7 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="address" type="xsd:string"/>
+        <xsd:attribute name="path" type="xsd:string"/>
     </xsd:attributeGroup>
 
 </xsd:schema>

@@ -16,6 +16,6 @@
         <vm:queueProfile maxOutstandingMessages="10" persistent="true"/>
     </vm:connector>
 
-    <vm:endpoint address="queue" name="vmEndpoint" connector-ref="vmConnector1"/>
+    <vm:endpoint path="queue" name="vmEndpoint" connector-ref="vmConnector1"/>
 
 </mule>

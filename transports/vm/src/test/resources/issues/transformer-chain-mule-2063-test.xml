@@ -14,7 +14,7 @@
         <service name="service1">
             <pass-through-component/>
             <inbound-router>
-                <vm:inbound-endpoint address="test1-in">
+                <vm:inbound-endpoint path="test1-in">
                     <transformer-append-string message="1"/>
                     <transformer-append-string message="2"/>
                     <transformer-append-string message="3"/>
@@ -22,7 +22,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <vm:outbound-endpoint address="test1-out"/>
+                    <vm:outbound-endpoint path="test1-out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -36,7 +36,7 @@
         <service name="service2">
             <pass-through-component/>
             <inbound-router>
-                <vm:inbound-endpoint address="test2-in">
+                <vm:inbound-endpoint path="test2-in">
                     <!-- TODO Travis had better syntax -->
                     <transformer ref="1"/>
                     <transformer ref="2"/>
@@ -45,7 +45,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <vm:outbound-endpoint address="test2-out"/>
+                    <vm:outbound-endpoint path="test2-out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -55,7 +55,7 @@
         <service name="service3">
             <pass-through-component/>
             <inbound-router>
-                <vm:inbound-endpoint address="test3-in">
+                <vm:inbound-endpoint path="test3-in">
                     <transformer-append-string message="1"/>
                     <transformer-append-string message="2"/>
                     <transformer-append-string message="3"/>
@@ -63,7 +63,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <vm:outbound-endpoint address="test3-out">
+                    <vm:outbound-endpoint path="test3-out">
                         <transformer-append-string message="a"/>
                         <transformer-append-string message="b"/>
                         <transformer-append-string message="c"/>
