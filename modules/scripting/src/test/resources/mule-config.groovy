@@ -27,7 +27,8 @@ import org.mule.routing.outbound.OutboundPassThroughRouter
 import org.mule.impl.DefaultComponentExceptionStrategy
 import org.mule.routing.inbound.InboundRouterCollection
 
-// TODO:
+// TODO: MULE-2520 Management context binding is not working in ScriptConfigurationBuilder
+// remove this string when fixed
 UMOManagementContext managementContext = MuleServer.managementContext
 
 managementContext.registry.registerObject("doCompression", "true", managementContext);
