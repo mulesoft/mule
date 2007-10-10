@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector"/>
+
+    <endpoint name="in" address="jms://in" connector-ref="jmsConnector"/>
+    <endpoint name="middle" address="jms://middle" connector-ref="jmsConnector"/>
+    <endpoint name="out" address="jms://out" connector-ref="jmsConnector"/>
+
+    <spring:bean name="txFactory" class="org.mule.providers.jms.JmsTransactionFactory"/>
+
+    <custom-transformer name="ObjectToJMSMessage"
+                        class="org.mule.providers.jms.transformers.ObjectToJMSMessage"
+                        returnClass="javax.jms.TextMessage"/>
+
+    <model name="jmsTest">
+
+        <service name="InputPart">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <inbound-endpoint ref="in">
+                    <transaction action="ALWAYS_BEGIN">
+                        <transaction-factory factory-ref="txFactory" />
+                    </transaction>
+                </inbound-endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="middle" transformer-ref="ObjectToJMSMessage"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+        <service name="OutputPart">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
+                </properties>
+            </singleton-object>
+            <inbound-router>
+                <inbound-endpoint ref="middle">
+                    <transaction action="BEGIN_OR_JOIN">
+                        <transaction-factory factory-ref="txFactory"/>
+                    </transaction>
+                </inbound-endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="out" transformer-ref="ObjectToJMSMessage"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+
+    </model>
+</mule>
