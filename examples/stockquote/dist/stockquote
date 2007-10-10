@@ -31,11 +31,6 @@ echo "  3. SOAP"
 echo "Select the one you wish to execute and press Enter..."
 read i
 
-# Use the SpringConfigurationBuilder because the MuleXmlConfigurationBuilder (Commons Digester) has issues 
-# when merging config files.
-# Note: We can't use it for stockquote-soap-config.xml, because Spring chokes on the line:
-#   <property name="soapAction" value="${methodNamespace}${method}"/>
-
 if [ 1 = $i ]
 then
     exec "$MULE_BASE/bin/mule" -config "stdio-config.xml,stockquote-rest-config.xml"
