@@ -224,9 +224,9 @@ do
         'amd64' | 'athlon' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64' | 'i86pc')
             DIST_ARCH="x86"
             break;;
-	    'ia32' | 'ia64')
- 	        DIST_ARCH="ia"
-	        break;;
+        'ia32' | 'ia64')
+             DIST_ARCH="ia"
+            break;;
         'ip27')
             DIST_ARCH="mips"
             break;;
