@@ -19,7 +19,7 @@ by simply running "ant" or "mvn".  This will generate a WAR file in the "target"
 directory which can be deployed to any standard JEE web server.
 
 By default, the "mvn" build will automatically start up the WAR in Jetty! (Note that
-this only works with JDK5 and above)  Just surf to the following URL in your browser:
+this only works with JDK 5 and above)  Just surf to the following URL in your browser:
 
 http://localhost:8090/mule-examples
 
