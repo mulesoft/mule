@@ -45,6 +45,8 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jdbc</artifactId>
             <version>${muleVersion}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
