@@ -18,23 +18,25 @@
     </bean>
 
     <!-- "implementation" is a class name -->
-    <bean class="org.mule.impl.MuleDescriptor" depends-on="main" name="orange1">
+    <bean class="org.mule.impl.model.seda.SedaComponent" depends-on="main" name="orange1">
+        <property name="name" value="orange1"/>
         <property name="serviceFactory">
             <bean class="org.mule.util.object.SimpleObjectFactory">
                 <property name="objectClassName" value="org.mule.tck.testmodels.fruit.Orange" />
             </bean>
         </property>
-        <property name="modelName" value="main" />
+        <property name="model" ref="main" />
     </bean>
 
     <!-- "implementation" is a container reference -->
-    <bean class="org.mule.impl.MuleDescriptor" depends-on="main" name="orange2">
+    <bean class="org.mule.impl.model.seda.SedaComponent" depends-on="main" name="orange2">
+        <property name="name" value="orange2"/>
         <property name="serviceFactory">
             <bean class="org.mule.util.object.SingletonObjectFactory">
                 <property name="instance" ref="myOrange" />
             </bean>
         </property>
-        <property name="modelName" value="main" />
+        <property name="model" ref="main" />
     </bean>
 
     <bean name="myOrange" class="org.mule.tck.testmodels.fruit.Orange" />

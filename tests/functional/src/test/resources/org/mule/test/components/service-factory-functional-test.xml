@@ -22,12 +22,14 @@
         </service>
 
         <service name="orange3">
-            <component scope="singleton" instance-ref="myOnlyOrange"/>
+            <singleton-object instance-ref="myOnlyOrange"/>
         </service>
 
+        <!-- TODO MULE-2060  
         <service name="orange4">
             <component factory-ref="myCustomFactory"/>
         </service>
+        -->
     </model>
 
     <!-- Singleton instance -->
