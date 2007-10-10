@@ -67,11 +67,11 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
         }
         if (is == null)
         {
-            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
+            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
         }
         if (logger.isDebugEnabled() && is != null)
         {
-            logger.debug("Resource " + resourcePath + " is found in Servlet Context.");
+            logger.debug("Resource " + resource + " is found in Servlet Context.");
         }
 
         if (is == null)
