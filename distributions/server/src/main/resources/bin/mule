@@ -212,7 +212,7 @@ esac
 
 # Resolve the architecture
 UNAME_PROC_OPTION="-m"
-if [ "$DIST_OS" == "aix" ]; then
+if [ "$DIST_OS" = "aix" ]; then
     UNAME_PROC_OPTION="-p"
 fi
 
