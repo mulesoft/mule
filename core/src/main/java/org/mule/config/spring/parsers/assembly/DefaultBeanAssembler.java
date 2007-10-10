@@ -10,9 +10,9 @@
 
 package org.mule.config.spring.parsers.assembly;
 
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.util.ClassUtils;
 import org.mule.util.CoreXMLUtils;
 
@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -106,7 +107,10 @@ public class DefaultBeanAssembler implements BeanAssembler
         {
             if (newValue instanceof String)
             {
-                bean.addPropertyReference(newName, (String) newValue);
+                for (StringTokenizer ref = new StringTokenizer((String) newValue); ref.hasMoreTokens();)
+                {
+                    bean.addPropertyReference(newName, ref.nextToken());
+                }
             }
             else
             {
@@ -151,7 +155,10 @@ public class DefaultBeanAssembler implements BeanAssembler
         {
             if (newValue instanceof String)
             {
-                target.getPropertyValues().addPropertyValue(newName, new RuntimeBeanReference((String) newValue));
+                for (StringTokenizer ref = new StringTokenizer((String) newValue); ref.hasMoreTokens();)
+                {
+                    target.getPropertyValues().addPropertyValue(newName, new RuntimeBeanReference(ref.nextToken()));
+                }
             }
             else
             {

@@ -1,2 +1,6 @@
+#
+# Test cases listed in this file are not run.
+#
+
 org.mule.examples.loanbroker.esb.LoanBrokerEsbContainerTestCase
 org.mule.examples.loanbroker.esb.LoanBrokerEsbTestCase
