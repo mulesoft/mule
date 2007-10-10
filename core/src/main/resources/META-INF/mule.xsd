@@ -575,7 +575,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractTransactionType">
                 <xsd:sequence>
-                    <xsd:element name="transaction-factory" type="abstractObjectFactoryType" minOccurs="0"/>
+                    <xsd:element name="transaction-factory" type="genericObjectFactoryType" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="action">
                     <xsd:simpleType>
@@ -1484,6 +1484,11 @@
                 <xsd:attribute name="instance-ref" type="xsd:NMTOKEN">
                     <xsd:annotation>
                         <xsd:documentation>Singleton object instance to use</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>Custom factory bean</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
