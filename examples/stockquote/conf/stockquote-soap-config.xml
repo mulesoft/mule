@@ -30,17 +30,16 @@
         </spring:property>
     </spring:bean>
 
-    <stdio:connector name="SystemStreamConnector"
-                     promptMessageCode="2"
-                     resourceBundle="messages.stockquote-example-messages"
-                     messageDelayTime="1000"/>
-
-    <!-- proxyPort cannot be substituted here - see MULE-1887 -->
     <http:connector name="HttpConnector"
                     proxyHostname="${proxyHostname}"
                     proxyPassword="${proxyPassword}"
                     proxyPort="${proxyPort}"
                     proxyUsername="${proxyUsername}"/>
+
+    <stdio:connector name="SystemStreamConnector"
+                     promptMessageCode="2"
+                     resourceBundle="messages.stockquote-example-messages"
+                     messageDelayTime="1000"/>
 
     <custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
     <transformer-xml-entity-decoder name="XmlDecoder"/>
