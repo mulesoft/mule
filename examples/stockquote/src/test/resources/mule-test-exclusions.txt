@@ -2,6 +2,7 @@
 # Test cases listed in this file are not run.
 #
 
+org.mule.examples.stockquote.WsdlStockQuoteFunctionalTestCase
 org.mule.examples.stockquote.SoapStockQuoteFunctionalTestCase
 org.mule.examples.stockquote.LoanBrokerEsbContainerTestCase
 org.mule.examples.stockquote.RestStockQuoteFunctionalTestCase
