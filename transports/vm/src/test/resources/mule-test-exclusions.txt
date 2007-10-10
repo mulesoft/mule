@@ -13,3 +13,5 @@ org.mule.issues.ResponseTransformerMule2165TestCase
 # MULE-2136
 org.mule.issues.MulticastRouterMule2136TestCase
 
+# MULE-2523
+org.mule.modules.xml.functional.XmlFilterFunctionalTestCase
