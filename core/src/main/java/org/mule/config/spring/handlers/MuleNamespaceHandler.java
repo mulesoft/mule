@@ -22,7 +22,6 @@ import org.mule.config.spring.factories.ResponseEndpointFactoryBean;
 import org.mule.config.spring.parsers.collection.AttributeMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
@@ -334,7 +333,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("environment", new ChildMapDefinitionParser("environment"));
 
         //Security
-        registerMuleDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER)).addIgnored("type");
+        registerMuleDefinitionParser("security-manager", new NamedDefinitionParser(MuleProperties.OBJECT_SECURITY_MANAGER)).addIgnored("type").addIgnored("name");
         registerBeanDefinitionParser("custom-security-provider", new NameTransferDefinitionParser("providers"));
         registerMuleDefinitionParser("custom-encryption-strategy", new NameTransferDefinitionParser("encryptionStrategies")).addAlias("strategy", "encryptionStrategy");
         registerBeanDefinitionParser("password-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", PasswordBasedEncryptionStrategy.class));

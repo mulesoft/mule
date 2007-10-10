@@ -1,7 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-
-# MULE-2524
-org.mule.extras.acegi.AcegiNamespaceHandlerTestCase
-org.mule.impl.security.SecurityNamespaceHandlerTestCase

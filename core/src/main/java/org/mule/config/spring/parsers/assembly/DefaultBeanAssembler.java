@@ -87,6 +87,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         String oldName = CoreXMLUtils.attributeName(attribute);
         if (!beanConfig.isIgnored(oldName))
         {
+            logger.debug(attribute + " for " + bean.getBeanDefinition().getBeanClassName());
             String oldValue = attribute.getNodeValue();
             String newName = bestGuessName(beanConfig, oldName, bean.getBeanDefinition().getBeanClassName());
             String newValue = beanConfig.translateValue(oldName, oldValue);
@@ -146,6 +147,7 @@ public class DefaultBeanAssembler implements BeanAssembler
      */
     public void insertBeanInTarget(String oldName)
     {
+        logger.debug("insert " + bean.getBeanDefinition().getBeanClassName() + " -> " + target.getBeanClassName());
         assertTargetPresent();
         String newName = bestGuessName(targetConfig, oldName, target.getBeanClassName());
         Object source = bean.getBeanDefinition().getSource();
@@ -198,6 +200,7 @@ public class DefaultBeanAssembler implements BeanAssembler
      */
     public void copyBeanToTarget()
     {
+        logger.debug("copy " + bean.getBeanDefinition().getBeanClassName() + " -> " + target.getBeanClassName());
         assertTargetPresent();
         MutablePropertyValues targetProperties = target.getPropertyValues();
         MutablePropertyValues beanProperties = bean.getBeanDefinition().getPropertyValues();
@@ -222,9 +225,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         }
     }
 
-    // below is most of the generic logic (static to guarantee not associated with bean or target)
-
-    protected static void addPropertyWithReference(MutablePropertyValues properties, SingleProperty config,
+    protected void addPropertyWithReference(MutablePropertyValues properties, SingleProperty config,
                                             String name, Object value)
     {
         if (!config.isIgnored())
@@ -254,11 +255,12 @@ public class DefaultBeanAssembler implements BeanAssembler
         }
     }
 
-    protected static void addPropertyWithoutReference(MutablePropertyValues properties, SingleProperty config,
+    protected void addPropertyWithoutReference(MutablePropertyValues properties, SingleProperty config,
                                                String name, Object value)
     {
         if (!config.isIgnored())
         {
+            logger.debug(name + ": " + value);
             Object oldValue = null;
             if (properties.contains(name))
             {

@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.SingleProperty;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -95,12 +96,12 @@ public class NameTransferDefinitionParser extends ParentDefinitionParser
             super(beanConfig, bean, targetConfig, target);
         }
 
-        public void extendBean(String newName, Object newValue, boolean isReference)
+        protected void addPropertyWithReference(MutablePropertyValues properties, SingleProperty config, String name, Object value)
         {
             // intercept setting of name
-            if (ATTRIBUTE_NAME.equals(newName) && newValue instanceof String)
+            if (ATTRIBUTE_NAME.equals(name) && value instanceof String)
             {
-                name = (String) newValue;
+                NameTransferDefinitionParser.this.name = (String) value;
                 // name is set after component
                 if (null != componentAttributeValue)
                 {
@@ -109,21 +110,20 @@ public class NameTransferDefinitionParser extends ParentDefinitionParser
             }
             else
             {
-                super.extendBean(newName, newValue, isReference);
+                super.addPropertyWithReference(properties, config, name, value);
 
                 // intercept setting of component
-                if (componentAttributeName.equals(newName) && newValue instanceof String)
+                if (componentAttributeName.equals(name) && value instanceof String)
                 {
-                    componentAttributeValue = (String) newValue;
+                    componentAttributeValue = (String) value;
                     // name was set before component
-                    if (null != name)
+                    if (null != NameTransferDefinitionParser.this.name)
                     {
                         setName();
                     }
                 }
             }
         }
-
     }
 
     private class LocalBeanAssemblerFactory implements BeanAssemblerFactory
