@@ -9,7 +9,6 @@
  */
 package org.mule.config.spring.handlers;
 
-import org.mule.components.rest.RestServiceWrapper;
 import org.mule.components.simple.EchoComponent;
 import org.mule.components.simple.LogComponent;
 import org.mule.components.simple.NoArgsCallWrapper;
@@ -25,7 +24,6 @@ import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
-import org.mule.config.spring.parsers.delegate.SingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
@@ -247,13 +245,6 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("log-component", new SimplePojoServiceDefinitionParser(LogComponent.class));
         registerBeanDefinitionParser("echo-component", new SimplePojoServiceDefinitionParser(EchoComponent.class));
         registerBeanDefinitionParser("null-component", new SimplePojoServiceDefinitionParser(NullComponent.class));
-        registerBeanDefinitionParser("rest-service-component",
-                                     new SingleParentFamilyDefinitionParser(new SimplePojoServiceDefinitionParser(RestServiceWrapper.class))
-                                             .addChildDelegate("httpMethod", new AttributeMapDefinitionParser("properties"))
-                                             .addChildDelegate("serviceUrl", new AttributeMapDefinitionParser("properties"))
-                                             .addChildDelegate("urlFromMessage", new AttributeMapDefinitionParser("properties"))
-                                             .addChildDelegate("errorExpression", new AttributeMapDefinitionParser("properties"))
-        );
         registerBeanDefinitionParser("no-args-call-component", new SimplePojoServiceDefinitionParser(NoArgsCallWrapper.class));
 
         //Object Factories
@@ -268,11 +259,6 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
         registerBeanDefinitionParser("nested-router", new ChildDefinitionParser("nestedRouter", NestedRouterCollection.class));
         registerBeanDefinitionParser("response-router", new ChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
-
-        //rest-service-component
-        registerBeanDefinitionParser("payloadParameterNames", new ChildListDefinitionParser("payloadParameterNames"));
-        registerBeanDefinitionParser("requiredParams", new ChildMapEntryDefinitionParser("requiredParams","key","value"));
-        registerBeanDefinitionParser("optionalParams", new ChildMapEntryDefinitionParser("optionalParams","key","value"));
 
         //NoArgsCallWrapper
         registerBeanDefinitionParser("delegateClass", new AttributeMapDefinitionParser("properties"));

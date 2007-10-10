@@ -13,7 +13,7 @@
     <model name="REST Functional TestCase">
 
         <service name="RESTServiceWrapper1">
-            <component class="org.mule.components.rest.RestServiceWrapper">
+            <component class="org.mule.providers.http.components.RestServiceWrapper">
                 <properties>
                     <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
                     <spring:entry key="httpMethod" value="POST"/>
@@ -30,7 +30,7 @@
         </service>
 
         <service name="RESTServiceWrapper2">
-            <component class="org.mule.components.rest.RestServiceWrapper">
+            <component class="org.mule.providers.http.components.RestServiceWrapper">
                 <properties>
                     <spring:entry key="serviceUrl"
                                   value="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"/>
@@ -49,7 +49,7 @@
         </service>
 
         <service name="RESTServiceWrapper3">
-            <component class="org.mule.components.rest.RestServiceWrapper">
+            <component class="org.mule.providers.http.components.RestServiceWrapper">
                 <properties>
                     <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
                     <spring:entry key="httpMethod" value="GET"/>
@@ -66,7 +66,7 @@
         </service>
 
         <service name="RESTServiceWrapper4">
-            <component class="org.mule.components.rest.RestServiceWrapper">
+            <component class="org.mule.providers.http.components.RestServiceWrapper">
                 <properties>
                     <spring:entry key="serviceUrl"
                                   value="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"/>

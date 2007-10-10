@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.components.rest;
+package org.mule.providers.http.components;
 
 import org.mule.config.i18n.Message;
 import org.mule.umo.MessagingException;

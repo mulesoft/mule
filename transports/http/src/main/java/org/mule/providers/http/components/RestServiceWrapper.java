@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.components.rest;
+package org.mule.providers.http.components;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
@@ -21,7 +21,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.object.SingletonObjectFactory;
 import org.mule.util.properties.MessagePropertyExtractor;
 import org.mule.util.properties.PropertyExtractor;
 
@@ -42,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RestServiceWrapper implements Callable, Initialisable
 {
+
     public static final String REST_SERVICE_URL = "rest.service.url";
     public static final String GET = "GET";
     public static final String CONTENT_TYPE = "Content-Type";
@@ -124,12 +124,12 @@ public class RestServiceWrapper implements Callable, Initialisable
         this.payloadParameterNames = payloadParameterNames;
     }
 
-    public UMOFilter getErrorFilter()
+    public UMOFilter getFilter()
     {
         return errorFilter;
     }
 
-    public void setErrorFilter(UMOFilter errorFilter)
+    public void setFilter(UMOFilter errorFilter)
     {
         this.errorFilter = errorFilter;
     }
@@ -343,83 +343,5 @@ public class RestServiceWrapper implements Callable, Initialisable
     {
         throw e;
     }
-
-    //TODO it's temporary solution, depends on MULE-2478 (Transparent Support for SimpleObjectFactory)
-    public static class RestSingletonObjectFactory extends SingletonObjectFactory
-    {
-        private UMOFilter filter;
-        private List payloadParameterNames;
-        private Map requiredParams;
-        private Map optionalParams;
-
-        public RestSingletonObjectFactory()
-        {
-        }
-
-        public RestSingletonObjectFactory(String objectClassName)
-        {
-            super(objectClassName);
-        }
-
-        public RestSingletonObjectFactory(Class objectClass)
-        {
-            super(objectClass);
-        }
-
-        public RestSingletonObjectFactory(Object instance)
-        {
-            super(instance);
-        }
-
-        public UMOFilter getFilter()
-        {
-            return filter;
-        }
-
-        public void setFilter(UMOFilter filter)
-        {
-            this.filter = filter;
-        }
-
-        public List getPayloadParameterNames()
-        {
-            return payloadParameterNames;
-        }
-
-        public void setPayloadParameterNames(List payloadParameterNames)
-        {
-            this.payloadParameterNames = payloadParameterNames;
-        }
-
-        public Map getRequiredParams()
-        {
-            return requiredParams;
-        }
-
-        public void setRequiredParams(Map requiredParams)
-        {
-            this.requiredParams = requiredParams;
-        }
-
-        public Map getOptionalParams()
-        {
-            return optionalParams;
-        }
-
-        public void setOptionalParams(Map optionalParams)
-        {
-            this.optionalParams = optionalParams;
-        }
-
-        public void initialise() throws InitialisationException
-        {
-            getProperties().put("errorFilter", getFilter());
-            getProperties().put("payloadParameterNames", getPayloadParameterNames());
-            getProperties().put("requiredParams", getRequiredParams());
-            getProperties().put("optionalParams", getOptionalParams());
-            super.initialise();
-        }
-    }
-
 
 }

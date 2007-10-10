@@ -41,6 +41,15 @@ public class ComplexComponentDefinitionParser extends AbstractDelegatingDefiniti
     private int state = START;
     private Element currentElement;
 
+    /**
+     * If there's no parser defined for the object "normally", you can use this, but there
+     * will be no automatic detection of collections etc.
+     */
+    public ComplexComponentDefinitionParser(MuleChildDefinitionParser objectFactoryParser)
+    {
+        this(objectFactoryParser, new ChildDefinitionParser("placeholder", java.lang.Object.class));
+    }
+
     public ComplexComponentDefinitionParser(MuleChildDefinitionParser objectFactoryParser,
                                             ChildDefinitionParser componentParser)
     {

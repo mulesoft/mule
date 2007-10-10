@@ -39,7 +39,7 @@
 
     <model name="Sample-Rest">
         <service name="HTTPPostSample">
-            <component class="org.mule.components.rest.RestServiceWrapper">
+            <component class="org.mule.providers.http.components.RestServiceWrapper">
                 <properties>
                     <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
                     <spring:entry key="payloadParameterNames">

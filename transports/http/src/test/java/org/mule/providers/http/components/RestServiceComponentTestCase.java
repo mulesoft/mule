@@ -7,12 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.components.rest;
+package org.mule.providers.http.components;
 
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOComponent;
+import org.mule.providers.http.components.RestServiceWrapper;
 
 public class RestServiceComponentTestCase extends FunctionalTestCase
 {
@@ -36,9 +37,9 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
         assertEquals(restServiceWrapper.getHttpMethod(), "POST");
         assertEquals(restServiceWrapper.isUrlFromMessage(), true);
         assertEquals(restServiceWrapper.getErrorExpression(), "ErrorExp");
-        assertNotNull(restServiceWrapper.getErrorFilter());
-        assertEquals(restServiceWrapper.getErrorFilter().getClass(), NotFilter.class);
-        NotFilter filter = (NotFilter) restServiceWrapper.getErrorFilter();
+        assertNotNull(restServiceWrapper.getFilter());
+        assertEquals(NotFilter.class, restServiceWrapper.getFilter().getClass());
+        NotFilter filter = (NotFilter) restServiceWrapper.getFilter();
         assertEquals(filter.getFilter().getClass(), WildcardFilter.class);
         WildcardFilter innerFilter = (WildcardFilter) filter.getFilter();
         assertEquals(innerFilter.getPattern(), "*xyz*");
