@@ -12,9 +12,10 @@ package org.mule.test.spring;
 
 import org.mule.config.PoolingProfile;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
+import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.PooledObjectFactory;
 
-// TODO Get the PoolingProfile from the PoolingObjectFactory now.  Update the config to use scope="pooled"
 public class PoolingProfileTestCase  extends FunctionalTestCase
 {
     protected String getConfigResources()
@@ -24,42 +25,44 @@ public class PoolingProfileTestCase  extends FunctionalTestCase
 
     public void testDefault()
     {
-//        doTest("default", PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION,
-//                PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY,
-//                PoolingProfile.DEFAULT_MAX_POOL_ACTIVE,
-//                PoolingProfile.DEFAULT_MAX_POOL_IDLE,
-//                PoolingProfile.DEFAULT_MAX_POOL_WAIT);
+        doTest("default", PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION,
+                PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY,
+                PoolingProfile.DEFAULT_MAX_POOL_ACTIVE,
+                PoolingProfile.DEFAULT_MAX_POOL_IDLE,
+                PoolingProfile.DEFAULT_MAX_POOL_WAIT);
     }
-//
-//    public void testFailAll()
-//    {
-//        doTest("fail_all", PoolingProfile.WHEN_EXHAUSTED_FAIL,
-//                PoolingProfile.INITIALISE_ALL, 1, 2, 3);
-//    }
-//
-//    public void testGrowOne()
-//    {
-//        doTest("grow_one", PoolingProfile.WHEN_EXHAUSTED_GROW,
-//                PoolingProfile.INITIALISE_ONE, 2, 3, 4);
-//    }
-//
-//    public void testWaitNone()
-//    {
-//        doTest("wait_none", PoolingProfile.WHEN_EXHAUSTED_WAIT,
-//                PoolingProfile.INITIALISE_NONE, 3, 4, 5);
-//    }
-//
-//    protected void doTest(String service, int exhausted, int initialisation,
-//                          int active, int idle, long wait)
-//    {
-//        UMODescriptor descriptor = managementContext.getRegistry().lookupService(service);
-//        assertNotNull(service, descriptor);
-//        PoolingProfile profile = descriptor.getPoolingProfile();
-//        assertNotNull(profile);
-//        assertEquals("exhausted:", exhausted, profile.getExhaustedAction());
-//        assertEquals("initialisation:", initialisation, profile.getInitialisationPolicy());
-//        assertEquals("active:", active, profile.getMaxActive());
-//        assertEquals("idle:", idle, profile.getMaxIdle());
-//        assertEquals("wait:", wait, profile.getMaxWait());
-//    }
+
+    public void testFailAll()
+    {
+        doTest("fail_all", PoolingProfile.WHEN_EXHAUSTED_FAIL,
+                PoolingProfile.INITIALISE_ALL, 1, 2, 3);
+    }
+
+    public void testGrowOne()
+    {
+        doTest("grow_one", PoolingProfile.WHEN_EXHAUSTED_GROW,
+                PoolingProfile.INITIALISE_ONE, 2, 3, 4);
+    }
+
+    public void testWaitNone()
+    {
+        doTest("wait_none", PoolingProfile.WHEN_EXHAUSTED_WAIT,
+                PoolingProfile.INITIALISE_NONE, 3, 4, 5);
+    }
+
+    protected void doTest(String service, int exhausted, int initialisation,
+                          int active, int idle, long wait)
+    {
+        UMOComponent c = managementContext.getRegistry().lookupComponent(service);
+        assertNotNull(service, c);
+        ObjectFactory of = c.getServiceFactory();
+        assertTrue(of instanceof PooledObjectFactory);
+        PoolingProfile profile = ((PooledObjectFactory) of).getPoolingProfile();
+        assertNotNull(profile);
+        assertEquals("exhausted:", exhausted, profile.getExhaustedAction());
+        assertEquals("initialisation:", initialisation, profile.getInitialisationPolicy());
+        assertEquals("active:", active, profile.getMaxActive());
+        assertEquals("idle:", idle, profile.getMaxIdle());
+        assertEquals("wait:", wait, profile.getMaxWait());
+    }
 }

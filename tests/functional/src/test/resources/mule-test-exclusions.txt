@@ -1,7 +1,5 @@
 org.mule.test.spring.GlobalPropertiesMule2458TestCase
 
-# Get the PoolingProfile from the PoolingObjectFactory now.  Update the config to use scope="pooled" after MULE-2233
-org.mule.test.spring.PoolingProfileTestCase
 # Delete after MULE-2233
 org.mule.test.config.CommonsPoolProxyPoolTestCase
 
