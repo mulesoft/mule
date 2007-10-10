@@ -20,9 +20,9 @@
     <spring:bean id="errorManager" class="org.mule.samples.errorhandler.ErrorManager">
         <spring:property name="handlers">
             <spring:list>
-                <ref local="fatalHandler"/>
-                <ref local="defaultHandler"/>
-                <ref local="businessHandler"/>
+                <spring:ref local="fatalHandler"/>
+                <spring:ref local="defaultHandler"/>
+                <spring:ref local="businessHandler"/>
             </spring:list>
         </spring:property>
     </spring:bean>
@@ -30,21 +30,21 @@
     <spring:bean id="defaultHandler" class="org.mule.samples.errorhandler.handlers.DefaultHandler">
         <spring:property name="endpointName" value="ExceptionFileWriter"/>
         <spring:property name="errorManager">
-            <ref local="errorManager"/>
+            <spring:ref local="errorManager"/>
         </spring:property>
     </spring:bean>
 
     <spring:bean id="fatalHandler" class="org.mule.samples.errorhandler.handlers.FatalHandler">
         <spring:property name="endpointName" value="ExceptionEmailer"/>
         <spring:property name="errorManager">
-            <ref local="errorManager"/>
+            <spring:ref local="errorManager"/>
         </spring:property>
     </spring:bean>
 
     <spring:bean id="businessHandler" class="org.mule.samples.errorhandler.handlers.BusinessHandler">
         <spring:property name="endpointName" value="ExceptionQueue"/>
         <spring:property name="errorManager">
-            <ref local="errorManager"/>
+            <spring:ref local="errorManager"/>
         </spring:property>
     </spring:bean>
     
@@ -116,9 +116,9 @@
                 <properties>
                     <spring:entry key="handlers">
                         <spring:list>
-                            <ref local="fatalHandler"/>
-                            <ref local="defaultHandler"/>
-                            <ref local="businessHandler"/>
+                            <spring:ref local="fatalHandler"/>
+                            <spring:ref local="defaultHandler"/>
+                            <spring:ref local="businessHandler"/>
                         </spring:list>
                     </spring:entry>
                 </properties>
