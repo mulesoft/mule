@@ -24,7 +24,7 @@ import org.springframework.core.Conventions;
 import org.springframework.util.StringUtils;
 
 /**
- * A direct implementation of SimplePropertyConfiguration
+ * A direct implementation of {@link PropertyConfiguration}
  */
 public class SimplePropertyConfiguration implements PropertyConfiguration
 {
@@ -38,7 +38,7 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
     public void addReference(String propertyName)
     {
-        references.add(propertyName);
+        references.add(dropRef(propertyName));
     }
 
     public void addMapping(String propertyName, Map mappings)
@@ -58,17 +58,17 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
     public void addCollection(String propertyName)
     {
-        collections.add(propertyName);
+        collections.add(dropRef(propertyName));
     }
 
     public void addIgnored(String propertyName)
     {
-        ignored.put(propertyName, Boolean.TRUE);
+        ignored.put(dropRef(propertyName), Boolean.TRUE);
     }
 
     public void removeIgnored(String propertyName)
     {
-        ignored.put(propertyName, Boolean.FALSE);
+        ignored.put(dropRef(propertyName), Boolean.FALSE);
     }
 
     public void setIgnoredDefault(boolean ignoreAll)
@@ -88,14 +88,15 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
     public boolean isCollection(String propertyName)
     {
-        return collections.contains(propertyName);
+        return collections.contains(dropRef(propertyName));
     }
 
     public boolean isIgnored(String propertyName)
     {
-        if (ignored.containsKey(propertyName))
+        String name = dropRef(propertyName);
+        if (ignored.containsKey(name))
         {
-            return ((Boolean) ignored.get(propertyName)).booleanValue();
+            return ((Boolean) ignored.get(name)).booleanValue();
         }
         else
         {
@@ -108,11 +109,16 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
      * or it can simply use the "-ref" suffix.
      * @param attributeName true if the name appears to correspond to a reference
      */
-    public boolean isBeanReference(String attributeName)
+    public boolean isReference(String attributeName)
     {
-        return (references.contains(attributeName)
+        return (references.contains(dropRef(attributeName))
                 || attributeName.endsWith(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX)
                 || attributeName.equals(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
+    }
+
+    public SingleProperty getSingleProperty(String name)
+    {
+        return new SinglePropertyWrapper(name, this);
     }
 
      /**
@@ -130,7 +136,7 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
     public String translateName(String oldName)
     {
         // Remove the bean reference suffix if any.
-        String name = org.mule.util.StringUtils.chomp(oldName, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX);
+        String name = dropRef(oldName);
         // Map to the real property name if necessary.
         name = getAttributeMapping(name);
         // JavaBeans property convention.
@@ -140,6 +146,11 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
             throw new IllegalStateException("Illegal property name for " + oldName + ": cannot be null or empty.");
         }
         return name;
+    }
+
+    protected String dropRef(String name)
+    {
+        return org.mule.util.StringUtils.chomp(name, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX);
     }
 
     public String translateValue(String name, String value)

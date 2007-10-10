@@ -34,7 +34,6 @@
                 <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="child-ref" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="kid-ref" type="xsd:NMTOKEN"/>
-                <xsd:attribute name="kids-ref" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="offspring-ref" type="xsd:NMTOKEN"/>
              </xsd:extension>
         </xsd:complexContent>

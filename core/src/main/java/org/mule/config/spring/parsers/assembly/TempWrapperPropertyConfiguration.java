@@ -95,9 +95,14 @@ public class TempWrapperPropertyConfiguration implements PropertyConfiguration
         }
     }
 
-    public boolean isBeanReference(String attributeName)
+    public boolean isReference(String attributeName)
     {
-        return extra.isBeanReference(attributeName) || delegate.isBeanReference(attributeName);
+        return extra.isReference(attributeName) || delegate.isReference(attributeName);
+    }
+
+    public SingleProperty getSingleProperty(String propertyName)
+    {
+        return new SinglePropertyWrapper(propertyName, this);
     }
 
     public String translateName(String oldName)

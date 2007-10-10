@@ -16,6 +16,9 @@ import java.util.Map;
  * This collects together various constraints/rewrites that can be applied to attributes.  It
  * was extracted from AbstractMuleBeanDefinitionParser and should be used as a delegate
  * (see that class for an example).
+ *
+ * <p>Ignored, reference and collection flags are all keyed off the "old" name (before any alias
+ * or mapping), with any "-ref" dropped.  No normalisation of mapping or aliases is attempted.</p>
  */
 public interface PropertyConfiguration
 {
@@ -47,8 +50,10 @@ public interface PropertyConfiguration
      * or it can simply use the "-ref" suffix.
      * @param attributeName true if the name appears to correspond to a reference
      */
-    boolean isBeanReference(String attributeName);
-    
+    boolean isReference(String attributeName);
+
+    SingleProperty getSingleProperty(String propertyName);
+
      /**
      * Extract a JavaBean property name from the supplied attribute name.
      * <p>The default implementation uses the {@link org.springframework.core.Conventions#attributeNameToPropertyName(String)}

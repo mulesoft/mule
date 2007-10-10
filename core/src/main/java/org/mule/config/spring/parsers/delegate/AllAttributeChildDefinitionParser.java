@@ -141,7 +141,7 @@ public class AllAttributeChildDefinitionParser
 
     public boolean isBeanReference(String attributeName)
     {
-        return configuration.isBeanReference(attributeName);
+        return configuration.isReference(attributeName);
     }
 
     public String translateName(String oldName)

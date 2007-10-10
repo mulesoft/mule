@@ -31,7 +31,7 @@ public abstract class AbstractMapBeanAssembler extends DefaultBeanAssembler
 
     protected void insertDefinitionAsMap(String oldName)
     {
-        // being called for the second time, so translate definition to map and insert
+        // translate definition to map and insert
         String newName = bestGuessName(getTargetConfig(), oldName, getTarget().getBeanClassName());
         if (! getTargetConfig().isIgnored(oldName))
         {

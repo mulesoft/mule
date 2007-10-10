@@ -96,9 +96,14 @@ public class ReusablePropertyConfiguration implements PropertyConfiguration
         return delegate.isIgnored(propertyName);
     }
 
-    public boolean isBeanReference(String attributeName)
+    public boolean isReference(String attributeName)
     {
-        return delegate.isBeanReference(attributeName);
+        return delegate.isReference(attributeName);
+    }
+
+    public SingleProperty getSingleProperty(String propertyName)
+    {
+        return new SinglePropertyWrapper(propertyName, this);
     }
 
     public String translateName(String oldName)
