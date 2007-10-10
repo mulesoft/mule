@@ -140,7 +140,7 @@ public abstract class AbstractOracleJmsConnector extends JmsConnector
             session = getJmsSupport().createSession(connection, topic, transacted || tx != null,
                     getAcknowledgementMode(), isNoLocal());
             if (tx != null) {
-                logger.debug("Binding session to current transaction");
+                logger.debug("Binding session " + session + " to current transaction " + tx);
                 try {
                     tx.bindResource(connection, session);
                 }

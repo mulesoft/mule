@@ -84,7 +84,7 @@ public final class TransactionCoordination
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("Binding new transaction (" + txCounter + ")");
+                logger.debug("Binding new transaction (" + txCounter + ") " + transaction);
             }
         }
     }

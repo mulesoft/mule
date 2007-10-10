@@ -102,7 +102,7 @@ public class TransactionTemplate
                     }
                     else
                     {
-                        logger.debug("Committing transaction");
+                        logger.debug("Committing transaction " + tx);
                         tx.commit();
                     }
                 }

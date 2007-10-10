@@ -90,7 +90,7 @@ public abstract class AbstractTransaction implements UMOTransaction
     {
         try
         {
-            logger.debug("Committing transaction");
+            logger.debug("Committing transaction " + this);
 
             if (isRollbackOnly())
             {

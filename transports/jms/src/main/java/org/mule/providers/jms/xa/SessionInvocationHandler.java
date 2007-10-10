@@ -74,9 +74,9 @@ public class SessionInvocationHandler implements InvocationHandler
      */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
-        if (ConnectionFactoryWrapper.logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
         {
-            ConnectionFactoryWrapper.logger.debug("Invoking " + method);
+            logger.debug("Invoking " + method);
         }
         if (underlyingObject.get() == null)
         {
@@ -124,15 +124,16 @@ public class SessionInvocationHandler implements InvocationHandler
             return;
         }
 
-        if (ConnectionFactoryWrapper.logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
         {
-            ConnectionFactoryWrapper.logger.debug("Enlistment request: " + this);
+            logger.debug("Enlistment request: " + this);
         }
 
         UMOTransaction transaction = TransactionCoordination.getInstance().getTransaction();
-        if (transaction == null && ConnectionFactoryWrapper.logger.isDebugEnabled())
+        if (transaction == null)
         {
-            ConnectionFactoryWrapper.logger.debug("Mule transaction is null, but enlist method is called");
+            // TODO AP: This could really be a foul, throw exception?
+            logger.warn("Mule transaction is null, but enlist method is called");
         }
         if (transaction != null && !(transaction instanceof XaTransaction))
         {
