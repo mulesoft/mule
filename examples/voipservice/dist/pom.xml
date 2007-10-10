@@ -11,7 +11,7 @@
     <description>The Voip Service example is taken from a Java.net featured article, Provisioning Services Through ESB (http://today.java.net/pub/a/today/2005/10/18/service-provisioning-through-esb.html) describes how to orchestrate services through abstraction, providing a VOIP provisioning example developed using Mule.</description>
 
     <properties>
-        <muleVersion>2.0-M2-SNAPSHOT</muleVersion>
+        <muleVersion>2.0.0-M3-SNAPSHOT</muleVersion>
     </properties>
 
     <dependencies>
