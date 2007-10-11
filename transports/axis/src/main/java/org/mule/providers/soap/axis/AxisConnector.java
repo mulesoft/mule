@@ -89,6 +89,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     public static final String SERVICE_PROPERTY_SERVCE_PATH = "servicePath";
 
     public static final String WSDL_URL_PROPERTY = "wsdlUrl";
+    public static final String AXIS = "axis";
 
     private String serverConfig = DEFAULT_MULE_AXIS_SERVER_CONFIG;
     private AxisServer axis = null;
@@ -285,7 +286,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
     public String getProtocol()
     {
-        return "axis";
+        return AXIS;
     }
 
     /**
@@ -387,9 +388,9 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             // if the axis server hasn't been set, set it now. The Axis server
             // may be set
             // externally
-            if (axisComponent.getProperties().get("axis") == null)
+            if (axisComponent.getProperties().get(AXIS) == null)
             {
-                axisComponent.getProperties().put("axis", axis);
+                axisComponent.getProperties().put(AXIS, axis);
             }
         }
         String serviceName = receiver.getComponent().getName();
@@ -504,7 +505,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             c.initialise();
             
             Map props = new HashMap();
-            props.put("axis", axis);
+            props.put(AXIS, axis);
             SingletonObjectFactory of = new SingletonObjectFactory(AxisServiceComponent.class, props);
             of.initialise();
             c.setServiceFactory(of);

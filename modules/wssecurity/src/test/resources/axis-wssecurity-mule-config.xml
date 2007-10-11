@@ -23,9 +23,9 @@
 
     <configuration serverId="testServer" defaultSynchronousEndpoints="false"/>
 
-    <axis:connector name="axisConnector" clientConfig="mule-axis-secure-client-config.wsdd"
-                    serverConfig="mule-axis-secure-server-config.wsdd">
-    </axis:connector>
+    <axis:connector name="axisConnector"
+                    clientConfig="mule-axis-secure-client-config.wsdd"
+                    serverConfig="mule-axis-secure-server-config.wsdd"/>
 
     <model name="test">
         <service name="MySecuredUMO">

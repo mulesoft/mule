@@ -20,8 +20,10 @@ import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
-{     
-    public void testGoodUserNameTokenAuthentication() throws Exception{  
+{
+
+    public void testGoodUserNameTokenAuthentication() throws Exception
+    {
             MuleClient client = new MuleClient();       
             Properties props = new Properties();   
             
@@ -37,10 +39,11 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             UMOMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             assertNotNull(m);
             assertTrue(m.getPayload() instanceof String);
-            assertTrue(((String)m.getPayload()).equals("Test"));
+            assertTrue(((String) m.getPayload()).equals("Test"));
         } 
     
-        public void testBadUserNameTokenAuthentication() throws Exception{  
+        public void testBadUserNameTokenAuthentication() throws Exception
+        {
             MuleClient client = new MuleClient();       
             Properties props = new Properties();   
             
@@ -53,17 +56,17 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             // Callback used to retrive password for given user.
             props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
             
-            UMOMessage m = null;
             try{
-                m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
+                client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
+                fail("Expected exception");
             }
             catch(Exception e){
                 assertNotNull(e);
             }
-            assertNull(m);
         }
         
-        public void testGoodUserNameEncrypted() throws Exception{  
+        public void testGoodUserNameEncrypted() throws Exception
+        {
             MuleClient client = new MuleClient();       
             Properties props = new Properties();   
             
@@ -79,10 +82,11 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             UMOMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             assertNotNull(m);
             assertTrue(m.getPayload() instanceof String);
-            assertTrue(((String)m.getPayload()).equals("Test"));
+            assertTrue(((String) m.getPayload()).equals("Test"));
         }
     
-        public void testBadUserNameEncrypted() throws Exception{  
+        public void testBadUserNameEncrypted() throws Exception
+        {
             MuleClient client = new MuleClient();       
             Properties props = new Properties();   
             
@@ -95,17 +99,17 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             // Property file containing the Encryption properties
             props.setProperty(WSHandlerConstants.ENC_PROP_FILE,"out-encrypted-security.properties");
             
-            UMOMessage m = null;
             try{
-                m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
+                client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
+                fail("Expected exception");
             }
             catch(Exception e){
                 assertNotNull(e);
             }
-            assertNull(m);
         }
         
-        public void testSignedSoapMessage() throws Exception{
+        public void testSignedSoapMessage() throws Exception
+        {
             MuleClient client = new MuleClient();       
             Properties props = new Properties();   
             
@@ -123,10 +127,11 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             UMOMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             assertNotNull(m);
             assertTrue(m.getPayload() instanceof String);
-            assertTrue(((String)m.getPayload()).equals("Test"));    
+            assertTrue(((String) m.getPayload()).equals("Test"));
         }
                     
-        protected String getConfigResources() {
+        protected String getConfigResources()
+        {
             return "wssecurity-mule-config-for-inbound.xml";
         } 
     }

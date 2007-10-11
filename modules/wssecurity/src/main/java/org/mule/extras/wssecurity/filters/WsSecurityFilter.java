@@ -181,12 +181,12 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
                 }
             }
         }
-        else if (properties.containsKey("axisServer"))
+        else if (properties.containsKey(AxisConnector.AXIS))
         {
             AxisServer server = (AxisServer)event.getSession()
                 .getComponent()
                 .getProperties()
-                .get("axisServer");
+                .get(AxisConnector.AXIS);
             MuleConfigProvider provider = (MuleConfigProvider)server.getConfig();
 
             String prefix = event.getEndpoint().getProtocol() + ":";

@@ -20,6 +20,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 
 public class AxisWsSecurityOnInboundTestCase extends FunctionalTestCase
 {
+
     public void testGoodUserNameEncrypted() throws Exception
     {
         MuleClient client = new MuleClient(managementContext);
@@ -55,16 +56,15 @@ public class AxisWsSecurityOnInboundTestCase extends FunctionalTestCase
         // Property file containing the Encryption properties
         props.setProperty(WSHandlerConstants.ENC_PROP_FILE, "out-encrypted-security.properties");
 
-        UMOMessage m = null;
         try
         {
-            m = client.send("axis:http://localhost:64282/MySecuredUMO?method=echo", "Test", props);
+            client.send("axis:http://localhost:64282/MySecuredUMO?method=echo", "Test", props);
+            fail("Expected exception");
         }
         catch (Exception e)
         {
             assertNotNull(e);
         }
-        assertNull(m);
     }
 
     protected String getConfigResources()

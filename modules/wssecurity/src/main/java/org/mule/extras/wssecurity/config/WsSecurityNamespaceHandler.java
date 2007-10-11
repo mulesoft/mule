@@ -10,13 +10,10 @@
 
 package org.mule.extras.wssecurity.config;
 
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.generic.DescendentDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.extras.wssecurity.filters.WsSecurityFilter;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Registers a Bean Definition Parser for handling WsSecurity related elements.
@@ -25,8 +22,7 @@ public class WsSecurityNamespaceHandler extends AbstractIgnorableNamespaceHandle
 {
     public void init()
     {
-        registerBeanDefinitionParser("security-filters", new ParentDefinitionParser());
-        registerMuleDefinitionParser("security-filter", new DescendentDefinitionParser("securityFilter", WsSecurityFilter.class)).addAlias("decryptionFile", "wsDecryptionFile").addAlias("signatureFile", "wsSignatureFile");
+        registerMuleDefinitionParser("security-filter", new ChildDefinitionParser("securityFilter", WsSecurityFilter.class)).addAlias("decryptionFile", "wsDecryptionFile").addAlias("signatureFile", "wsSignatureFile");
         registerBeanDefinitionParser("property", new ChildMapEntryDefinitionParser("addOutboundProperties", "key", "value"));
     }
 }
