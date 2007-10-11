@@ -26,6 +26,8 @@ import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
+import com.icegreen.greenmail.util.ServerSetup;
+
 import javax.mail.internet.MimeMessage;
 
 /**
@@ -34,22 +36,22 @@ import javax.mail.internet.MimeMessage;
 public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCase
 {    
     public static final long DELIVERY_DELAY_MS = 5000;
-    
-    public SmtpConnectorTestCase() 
+
+    public SmtpConnectorTestCase()
     {
-        super(NO_INITIAL_EMAIL);
+        this(ServerSetup.PROTOCOL_SMTP, 50007);
+    }
+    
+    public SmtpConnectorTestCase(String protocol, int port)
+    {
+        super(NO_INITIAL_EMAIL, protocol, port);
     }
 
-   public UMOConnector createConnector() throws Exception
+    public UMOConnector createConnector() throws Exception
     {
         SmtpConnector c = new SmtpConnector();
         c.setName("SmtpConnector");
         return c;
-    }
-
-    public String getTestEndpointURI()
-    {
-        return getSmtpTestEndpointURI();
     }
 
     /**

@@ -12,7 +12,6 @@ package org.mule.providers.email.connectors;
 
 import org.mule.providers.email.GreenMailUtilities;
 import org.mule.tck.providers.AbstractConnectorTestCase;
-import org.mule.umo.provider.UMOConnector;
 
 import com.icegreen.greenmail.util.ServerSetup;
 import com.icegreen.greenmail.util.Servers;
@@ -21,25 +20,13 @@ import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Start a (greenmail) mail server with a known message, for use in subclasses.
- * Each test gets a new set of ports to avoid conflicts (shouldn't be needed, but
- * greenmail doesn't seem to be closing ports).  Also contains utility methods
- * for comparing emails, building endpoints, etc.
  */
 public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractConnectorTestCase
 {
 
-    // something odd happening here?  50006 seems to have failed a 
-    // couple of times?
-    public static final int INITIAL_SERVER_PORT = 50007;
-    // large enough to jump away from a group of related ports
-    public static final int PORT_INCREMENT = 17;
-    // ie must succeed within RETRY_LIMIT attempts
-    public static final int RETRY_LIMIT = 2;
     public static final String LOCALHOST = "127.0.0.1";
     public static final String USER = "bob";
     public static final String PROVIDER = "example.com";
@@ -52,18 +39,20 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     public static final boolean SEND_INITIAL_EMAIL = true;
     public static final boolean NO_INITIAL_EMAIL = false;
 
-    private static final AtomicInteger nextPort = new AtomicInteger(INITIAL_SERVER_PORT);
-    private static final Log staticLogger = LogFactory.getLog(AbstractMailConnectorFunctionalTestCase.class);
     private static final AtomicInteger nameCount = new AtomicInteger(0);
 
     private MimeMessage message;
     private Servers servers;
     private boolean initialEmail = false;
-    
-    protected AbstractMailConnectorFunctionalTestCase(boolean initialEmail)
+    private String protocol;
+    private int port;
+
+    protected AbstractMailConnectorFunctionalTestCase(boolean initialEmail, String protocol, int port)
     {
         super();
         this.initialEmail = initialEmail;
+        this.protocol = protocol;
+        this.port = port;
     }
     
     // @Override
@@ -94,27 +83,13 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         if (initialEmail)
         {
             storeEmail();
-            // give greenmail time to stabilise(!?) (only needed for receive tests)
-            Thread.sleep(STARTUP_PERIOD_MS);
+            GreenMailUtilities.waitForStartup(LOCALHOST, port, 10, STARTUP_PERIOD_MS);
         }
     }
 
-    private static ServerSetup[] getSetups()
+    private ServerSetup[] getSetups()
     {
-        staticLogger.debug("generating new servers from: " + nextPort.get());
-        ServerSetup smtp =
-                new ServerSetup(nextPort.getAndAdd(PORT_INCREMENT), null, ServerSetup.PROTOCOL_SMTP);
-        ServerSetup smtps =
-                new ServerSetup(nextPort.getAndAdd(PORT_INCREMENT), null, ServerSetup.PROTOCOL_SMTPS);
-        ServerSetup pop3 =
-                new ServerSetup(nextPort.getAndAdd(PORT_INCREMENT), null, ServerSetup.PROTOCOL_POP3);
-        ServerSetup pop3s =
-                new ServerSetup(nextPort.getAndAdd(PORT_INCREMENT), null, ServerSetup.PROTOCOL_POP3S);
-        ServerSetup imap =
-                new ServerSetup(nextPort.getAndAdd(PORT_INCREMENT), null, ServerSetup.PROTOCOL_IMAP);
-        ServerSetup imaps =
-                new ServerSetup(nextPort.getAndAdd(PORT_INCREMENT), null, ServerSetup.PROTOCOL_IMAPS);
-        return new ServerSetup[]{smtp, smtps, pop3, pop3s, imap, imaps};
+        return new ServerSetup[]{new ServerSetup(port, null, protocol)};
     }
 
     private void stopServers() throws Exception
@@ -140,42 +115,12 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         return message;
     }
     
-    protected String getPop3TestEndpointURI()
-    {
-        return buildEndpoint("pop3", servers.getPop3().getPort());
-    }
-
-    protected String getPop3sTestEndpointURI()
-    {
-        return buildEndpoint("pop3s", servers.getPop3s().getPort());
-    }
-
-    protected String getImapTestEndpointURI()
-    {
-        return buildEndpoint("imap", servers.getImap().getPort());
-    }
-    
-    protected String getImapsTestEndpointURI()
-    {
-        return buildEndpoint("imaps", servers.getImaps().getPort());
-    }
-    
-    protected String getSmtpTestEndpointURI()
-    {
-        return buildEndpoint("smtp", servers.getSmtp().getPort());
-    }
-    
-    protected String getSmtpsTestEndpointURI()
-    {
-        return buildEndpoint("smtps", servers.getSmtps().getPort());
-    }
-    
-   private String buildEndpoint(String protocol, int port) 
+    public String getTestEndpointURI()
     {
         return protocol + "://" + USER + ":" + PASSWORD + "@" + LOCALHOST + ":" + port +
-        "?connector=" + connectorName;
+                "?connector=" + connectorName;
     }
-    
+
     protected void assertMessageOk(Object message) throws Exception
     {
         assertTrue("Did not receive a MimeMessage", message instanceof MimeMessage);

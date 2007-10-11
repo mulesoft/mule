@@ -13,11 +13,19 @@ package org.mule.providers.email.connectors;
 import org.mule.providers.email.Pop3sConnector;
 import org.mule.umo.provider.UMOConnector;
 
+import com.icegreen.greenmail.util.ServerSetup;
+
 /**
  * Simple tests for pulling from an IMAP server.
  */
 public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
+
+    public Pop3sConnectorTestCase()
+    {
+        super(ServerSetup.PROTOCOL_POP3S, 50009);
+    }
+
     public UMOConnector createConnector() throws Exception
     {
         Pop3sConnector connector = new Pop3sConnector();
@@ -28,11 +36,6 @@ public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCa
         connector.setTrustStore("greenmail-truststore");
         connector.setManagementContext(managementContext);
         return connector;
-    }
-
-    public String getTestEndpointURI()
-    {
-        return getPop3sTestEndpointURI();
     }
 
 }

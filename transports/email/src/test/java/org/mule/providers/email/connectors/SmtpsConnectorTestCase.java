@@ -13,8 +13,16 @@ package org.mule.providers.email.connectors;
 import org.mule.providers.email.SmtpsConnector;
 import org.mule.umo.provider.UMOConnector;
 
+import com.icegreen.greenmail.util.ServerSetup;
+
 public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
 {
+
+    public SmtpsConnectorTestCase()
+    {
+        super(ServerSetup.PROTOCOL_SMTPS, 50008);
+    }
+
     // @Override
     public UMOConnector createConnector() throws Exception
     {
@@ -23,11 +31,6 @@ public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
         connector.setTrustStorePassword("password");
         connector.setTrustStore("greenmail-truststore");
         return connector;
-    }
-
-    public String getTestEndpointURI()
-    {
-        return getSmtpsTestEndpointURI();
     }
 
 }

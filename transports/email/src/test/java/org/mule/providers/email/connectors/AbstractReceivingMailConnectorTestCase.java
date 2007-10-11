@@ -38,9 +38,9 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
     public static final int POLL_PERIOD_MS = 1000;
     public static final int WAIT_PERIOD_MS = 3 * POLL_PERIOD_MS;
 
-    protected AbstractReceivingMailConnectorTestCase()
+    protected AbstractReceivingMailConnectorTestCase(String protocol, int port)
     {
-        super(SEND_INITIAL_EMAIL);
+        super(SEND_INITIAL_EMAIL, protocol, port);
     }
 
     public void testReceiver() throws Exception
@@ -78,7 +78,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         component.setInboundRouter(inboundRouter);
         managementContext.getRegistry().registerComponent(component, managementContext);
         managementContext.applyLifecycle(component);
-        if (managementContext.isStarted() == false)
+        if (!managementContext.isStarted())
         {
             managementContext.start();
         }
