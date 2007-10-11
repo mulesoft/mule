@@ -12,6 +12,7 @@ package org.mule.config.builders;
 
 import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
 import java.io.File;
@@ -54,7 +55,7 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
 
     /**
      * TODO TC MERGE THIS DOES NOT OVERRIDE SUPER NOW! Recheck.
-     * Attempt to load any resource from the Servlet Context first, then from the classpath.
+     * Attempt to load any resource from the Servlet Context first, then from FS and the classpath.
      */
     protected InputStream loadResource(String resource) throws ConfigurationException
     {
@@ -69,11 +70,29 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
         {
             is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
         }
-        if (logger.isDebugEnabled() && is != null)
+        if (logger.isDebugEnabled())
         {
-            logger.debug("Resource " + resource + " is found in Servlet Context.");
+            if (is != null)
+            {
+                logger.debug("Resource " + resource + " is found in Servlet Context.");
+            }
+            else
+            {
+                logger.debug("Resource " + resourcePath + " is not found in Servlet Context, loading from classpath or as external file");
+            }
         }
-
+        if (is == null && webappClasspath != null)
+        {
+            resourcePath = FileUtils.newFile(webappClasspath, resource).getPath();
+            try
+            {
+                is = IOUtils.getResourceAsStream(resourcePath,getClass());
+            }
+            catch (IOException ex)
+            {
+                logger.debug("Resource " + resourcePath + " is not found in filesystem "+ex);
+            }
+        }
         if (is == null)
         {
             try
