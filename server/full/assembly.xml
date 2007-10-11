@@ -211,6 +211,16 @@ Assembly descriptor for the full Mule distribution.
         <directory>../../../examples/loanbroker/bpm/dist</directory>
         <outputDirectory>examples/loanbroker/bpm</outputDirectory>
     </fileSet>
+    <!-- MULE-2535 The LoanBroker BPM unit tests need a file from the mule-transport-jdbc-tests.jar but 
+         trying to get the test-jar into the lib/user directory of the distro is more complicated than 
+         it seems.  It's easier to just copy over the missing source file so that the example tests compile.  -->
+    <fileSet>
+        <directory>../../../transports/jdbc/src/test/java/org/mule/util</directory>
+        <outputDirectory>examples/loanbroker/bpm/src/test/java/org/mule/util</outputDirectory>
+        <includes>
+            <include>MuleDerbyTestUtils.java</include>
+        </includes>
+    </fileSet>
 
     <!--
     =============================
