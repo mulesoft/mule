@@ -36,7 +36,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
      */
     protected int getDelay()
     {
-        return 5000;
+        return 10000;
     }
     
     public void testSingleLoanRequest() throws Exception

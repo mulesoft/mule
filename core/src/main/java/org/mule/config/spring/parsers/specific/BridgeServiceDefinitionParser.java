@@ -15,12 +15,14 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyChildDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.impl.MuleDescriptor;
+import org.mule.impl.model.seda.SedaComponent;
 import org.mule.impl.endpoint.InboundEndpoint;
 import org.mule.routing.inbound.ForwardingConsumer;
 import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.routing.UMORouter;
 
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +41,7 @@ public class BridgeServiceDefinitionParser extends AbstractSingleParentFamilyDef
     public BridgeServiceDefinitionParser()
     {
         addDelegate(new ComponentDefinitionParser(BridgeDescriptor.class));
-        addChildDelegate(new SimpleComponentDefinitionParser("serviceFactory", NullComponent.class)).addIgnored(NAME);
+        addChildDelegate(new SimplePojoServiceDefinitionParser(NullComponent.class)).addIgnored(NAME);
         addChildDelegate(new InboundForwardRouterDefinitionParser()).addIgnored(NAME);
     }
 
@@ -55,7 +57,7 @@ public class BridgeServiceDefinitionParser extends AbstractSingleParentFamilyDef
 
     }
 
-    private static class BridgeDescriptor extends MuleDescriptor
+    private static class BridgeDescriptor extends SedaComponent
     {
 
         public void setEndpoints(List list)
@@ -75,10 +77,30 @@ public class BridgeServiceDefinitionParser extends AbstractSingleParentFamilyDef
             }
             else
             {
-                OutboundPassThroughRouter router = new OutboundPassThroughRouter();
-                getOutboundRouter().addRouter(router);
-                router.addEndpoint(endpoint);
+                getOutboundPassThroughRouter().addEndpoint(endpoint);
             }
+        }
+
+        private OutboundPassThroughRouter getOutboundPassThroughRouter()
+        {
+            if (null == getOutboundRouter())
+            {
+                setOutboundRouter(new OutboundRouterCollection());
+            }
+            else
+            {
+                for (Iterator routers = getOutboundRouter().getRouters().iterator(); routers.hasNext();)
+                {
+                    UMORouter router = (UMORouter) routers.next();
+                    if (router instanceof OutboundPassThroughRouter)
+                    {
+                        return (OutboundPassThroughRouter) router;
+                    }
+                }
+            }
+            OutboundPassThroughRouter router = new OutboundPassThroughRouter();
+            getOutboundRouter().addRouter(router);
+            return router;
         }
 
     }

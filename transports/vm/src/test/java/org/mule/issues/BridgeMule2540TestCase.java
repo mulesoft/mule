@@ -21,7 +21,7 @@ public class BridgeMule2540TestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "vm/persistent-vmqueue-test.xml";
+        return "issues/bridge-mule-2540-test.xml";
     }
 
     public void testBridge() throws Exception

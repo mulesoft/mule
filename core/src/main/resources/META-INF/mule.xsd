@@ -285,12 +285,12 @@
                             <xsd:documentation>Factory to create the user's POJO service</xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
+                    <xsd:element name="properties" type="mapType" minOccurs="0"/>
                     <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
                     <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0"/>
                     <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
                     <xsd:element name="response-router" type="responseRouterCollectionType" minOccurs="0"/>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-                    <xsd:element name="meta-info" type="mapType" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="initialState" default="started">
@@ -330,7 +330,10 @@
             <xsd:extension base="abstractServiceType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-inbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
+                    <!-- extra sugar - this is inserted in the first outbound pass through router
+                         (one is added if necessary) -->
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>

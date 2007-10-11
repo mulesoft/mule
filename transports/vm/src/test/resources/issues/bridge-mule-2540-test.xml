@@ -15,7 +15,7 @@
     </vm:connector>
 
     <custom-transformer name="testTransformer"
-                     class="org.mule.transformers.simple.StringToObjectArray"/>
+                        class="org.mule.transformers.simple.StringToObjectArray"/>
 
     <model name="test">
 
