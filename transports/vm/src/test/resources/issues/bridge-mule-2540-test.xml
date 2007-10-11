@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <!-- similar to persistent-vmqueue-test.xml, but using bridge service -->
+
+    <vm:connector name="VMQueue" queueEvents="true">
+        <vm:queueProfile persistent="true" maxOutstandingMessages="10"/>
+    </vm:connector>
+
+    <custom-transformer name="testTransformer"
+                     class="org.mule.transformers.simple.StringToObjectArray"/>
+
+    <model name="test">
+
+        <bridge-service name="ReceiverUMO">
+            <vm:inbound-endpoint path="receiver"/>
+            <vm:outbound-endpoint path="echo">
+                <transformer ref="testTransformer"/>
+            </vm:outbound-endpoint>
+        </bridge-service>
+
+        <bridge-service name="EchoUMO">
+            <vm:inbound-endpoint path="echo"/>
+            <vm:outbound-endpoint path="out"/>
+        </bridge-service>
+
+    </model>
+
+</mule>

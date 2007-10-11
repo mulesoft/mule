@@ -27,7 +27,7 @@
 
     <xsd:complexType name="simpleServiceType">
         <xsd:complexContent>
-            <xsd:extension base="mule:defaultComponentType"/>
+            <xsd:extension base="mule:defaultServiceType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

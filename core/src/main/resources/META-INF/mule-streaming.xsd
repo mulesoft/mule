@@ -19,7 +19,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractModelType">
                 <xsd:sequence>
-                    <xsd:element name="service" type="streamingComponentType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="service" type="streamingServiceType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -27,11 +27,11 @@
 
     <!-- this is a minimal, incomplete implementation to match the existing examples -->
 
-    <xsd:complexType name="streamingComponentType">
+    <xsd:complexType name="streamingServiceType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractComponentType">
+            <xsd:extension base="mule:baseServiceType">
                 <xsd:annotation>
-                    <xsd:documentation>Override of the generic component schema to support streaming</xsd:documentation>
+                    <xsd:documentation>Override of the generic service schema to support streaming</xsd:documentation>
                 </xsd:annotation>
                 <xsd:sequence>
                     <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>

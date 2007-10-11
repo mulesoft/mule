@@ -264,52 +264,57 @@
 
 
     <!--==============================================================-->
-    <!--  Components                                                  -->
+    <!--  Services                                                    -->
     <!--==============================================================-->
 
-    <xsd:element name="service" type="defaultComponentType" substitutionGroup="abstract-component"/>
-    
-    <xsd:element name="abstract-component" abstract="true" type="abstractComponentType"/>
-    <xsd:complexType name="abstractComponentType">
-        <xsd:annotation>
-            <xsd:documentation>The model-based wrapper around the POJO service (SEDA, Streaming, etc.)</xsd:documentation>
-        </xsd:annotation>
-        <xsd:sequence>
-            <!-- minOccurs="0" to allow for <forwarding-router> which doesn't need a service. -->
-            <xsd:element ref="abstract-object-factory" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>Factory to create the user's POJO service</xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
-            <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0"/>
-            <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
-            <xsd:element name="response-router" type="responseRouterCollectionType" minOccurs="0"/>
-            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-            <xsd:element name="meta-info" type="mapType" minOccurs="0"/>
-        </xsd:sequence>
+    <xsd:element name="abstract-service" abstract="true" type="abstractServiceType"/>
+    <xsd:complexType name="abstractServiceType">
         <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="class" type="xsd:NMTOKEN"/>
-        <xsd:attribute name="initialState" default="started">
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="started"/>
-                    <xsd:enumeration value="stopped"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:complexType name="defaultComponentType">
+    <xsd:complexType name="baseServiceType">
+        <xsd:annotation>
+            <xsd:documentation>Base support for a model-based wrapper around the POJO service (SEDA, Streaming, etc.)</xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
-            <xsd:extension base="sedaComponentType"/>
+            <xsd:extension base="abstractServiceType">
+                <xsd:sequence>
+                    <!-- minOccurs="0" to allow for <forwarding-router> which doesn't need a service. -->
+                    <xsd:element ref="abstract-object-factory" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>Factory to create the user's POJO service</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
+                    <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0"/>
+                    <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
+                    <xsd:element name="response-router" type="responseRouterCollectionType" minOccurs="0"/>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element name="meta-info" type="mapType" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="initialState" default="started">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="started"/>
+                            <xsd:enumeration value="stopped"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="defaultServiceType">
+        <xsd:complexContent>
+            <xsd:extension base="sedaServiceType"/>
         </xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:element name="seda-component" type="sedaComponentType" substitutionGroup="abstract-component"/>
-    <xsd:complexType name="sedaComponentType">
+    <xsd:element name="service" type="sedaServiceType" substitutionGroup="abstract-service"/>
+    <xsd:complexType name="sedaServiceType">
         <xsd:complexContent>
-            <xsd:extension base="abstractComponentType">
+            <xsd:extension base="baseServiceType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-threading-profile" minOccurs="0"/>
                     <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
@@ -319,23 +324,30 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="bridge-service" type="bridgeServiceType" substitutionGroup="abstract-service"/>
+    <xsd:complexType name="bridgeServiceType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractServiceType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <!--==============================================================-->
-    <!-- POJO services                                                -->
+    <!-- POJO components                                              -->
     <!--==============================================================-->
 
-    <!-- This element should be called "service" but in order to not break everything at once, 
-         let's continue to call it "component" for now.  
-    <xsd:element name="service" type="defaultServiceType" substitutionGroup="abstract-object-factory"/>
-    -->
-    <xsd:element name="component" type="defaultServiceType" substitutionGroup="abstract-object-factory"/>
-    <xsd:complexType name="defaultServiceType">
+    <xsd:element name="component" type="defaultComponentType" substitutionGroup="abstract-object-factory"/>
+    <xsd:complexType name="defaultComponentType">
         <xsd:complexContent>
             <xsd:extension base="pooledObjectFactoryType"/>
         </xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:element name="pass-through-component" type="defaultServiceType" substitutionGroup="abstract-object-factory">
+    <xsd:element name="pass-through-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in PassThroughComponent that enables a bridge between an inbound and outbound endpoints.
@@ -345,7 +357,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="echo-component" type="defaultServiceType" substitutionGroup="abstract-object-factory">
+    <xsd:element name="echo-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in EchoComponent that logs the message and returns the payload back as the result.
@@ -353,7 +365,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="log-component" type="defaultServiceType" substitutionGroup="abstract-object-factory">
+    <xsd:element name="log-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in LogComponent that simply logs the message content (or content length if it is a
@@ -362,7 +374,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="null-component" type="defaultServiceType" substitutionGroup="abstract-object-factory">
+    <xsd:element name="null-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in NullComponent that will throw an exception if it receives a message.
@@ -381,7 +393,7 @@
 
     <xsd:complexType name="noArgsCallWrapperType">
         <xsd:complexContent>
-            <xsd:extension base="defaultServiceType">
+            <xsd:extension base="defaultComponentType">
                 <xsd:choice minOccurs="1" maxOccurs="1">
                         <xsd:element name="delegateClass" type="noArgsCallDelegateClassType"/>
                         <xsd:element name="delegateInstance" type="noArgsCallDelegateInstanceType"/>
@@ -1003,7 +1015,7 @@
         <xsd:sequence>
             <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
             <xsd:element ref="abstract-entrypoint-resolver" minOccurs="0"/>
-            <xsd:element ref="abstract-component" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-service" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <xsd:attribute name="class" type="xsd:NMTOKEN"/>

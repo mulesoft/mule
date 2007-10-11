@@ -92,7 +92,7 @@
     </xsd:element>
     <xsd:complexType name="restServiceWrapperType">
         <xsd:complexContent>
-            <xsd:extension base="mule:defaultServiceType">
+            <xsd:extension base="mule:defaultComponentType">
                 <xsd:sequence>
                     <xsd:element ref="mule:abstract-filter" minOccurs="0" maxOccurs="1"/>
                     <xsd:element name="payloadParameterNames" type="mule:listOrSetType" minOccurs="0" maxOccurs="unbounded"/>
