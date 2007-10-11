@@ -64,12 +64,14 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
                                         UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
             c.getInboundRouter().addEndpoint(ep);
             managementContext.getRegistry().registerComponent(c, managementContext);
-            fail();
+            c.start();
+            fail("Expected exception");
         }
         catch (UMOException e)
         {
             e = ExceptionHelper.getRootMuleException(e);
             assertTrue(e instanceof InitialisationException);
+            assertTrue(e.getMessage(), e.getMessage().indexOf("must implement at least one interface") > -1);
         }
     }
 }
