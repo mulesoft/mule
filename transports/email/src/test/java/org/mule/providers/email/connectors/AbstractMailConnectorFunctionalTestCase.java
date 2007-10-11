@@ -33,6 +33,9 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     public static final String EMAIL = USER + "@" + PROVIDER;
     public static final String PASSWORD = "secret";
     public static final String MESSAGE = "Test Email Message";
+
+    public static final int START_ATTEMPTS = 3;
+    public static final int TEST_ATTEMPTS = 5;
     public static final long STARTUP_PERIOD_MS = 1000;
 
     // for constructor
@@ -79,11 +82,10 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     private void startServers() throws Exception
     {
         servers = new Servers(getSetups());
-        servers.start();
+        GreenMailUtilities.robustStartup(servers, LOCALHOST, port, START_ATTEMPTS, TEST_ATTEMPTS, STARTUP_PERIOD_MS);
         if (initialEmail)
         {
             storeEmail();
-            GreenMailUtilities.waitForStartup(LOCALHOST, port, 10, STARTUP_PERIOD_MS);
         }
     }
 
