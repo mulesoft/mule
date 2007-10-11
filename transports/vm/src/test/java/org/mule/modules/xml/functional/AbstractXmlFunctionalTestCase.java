@@ -20,7 +20,7 @@ import org.apache.commons.io.IOUtils;
 public abstract class AbstractXmlFunctionalTestCase extends FunctionalTestCase
 {
 
-    public static final long TIMEOUT = 1000L;
+    public static final long TIMEOUT = 3000L;
 
     protected String getConfigAsString() throws IOException
     {
