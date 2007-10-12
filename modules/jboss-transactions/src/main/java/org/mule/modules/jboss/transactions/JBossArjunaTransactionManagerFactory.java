@@ -16,17 +16,23 @@ import org.mule.umo.manager.UMOTransactionManagerFactory;
 import com.arjuna.ats.arjuna.common.Environment;
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import javax.transaction.TransactionManager;
 
 public class JBossArjunaTransactionManagerFactory implements UMOTransactionManagerFactory
 {
+    private Map properties = new HashMap();
+
     //static
     //{
-        //arjPropertyManager.propertyManager.setProperty(LogFactory.LOGGER_PROPERTY, "log4j_releveler");
-        //arjPropertyManager.propertyManager.setProperty(LogFactory.LOGGER_PROPERTY, "jakarta");
-        //arjPropertyManager.propertyManager.setProperty(LogFactory.DEBUG_LEVEL, String.valueOf(DebugLevel.FULL_DEBUGGING));
-        //commonPropertyManager.propertyManager.setProperty(LogFactory.LOGGER_PROPERTY, "jakarta");
-        //commonPropertyManager.propertyManager.setProperty(LogFactory.DEBUG_LEVEL, String.valueOf(DebugLevel.FULL_DEBUGGING));
+    //arjPropertyManager.propertyManager.setProperty(LogFactory.LOGGER_PROPERTY, "log4j_releveler");
+    //arjPropertyManager.propertyManager.setProperty(LogFactory.LOGGER_PROPERTY, "jakarta");
+    //arjPropertyManager.propertyManager.setProperty(LogFactory.DEBUG_LEVEL, String.valueOf(DebugLevel.FULL_DEBUGGING));
+    //commonPropertyManager.propertyManager.setProperty(LogFactory.LOGGER_PROPERTY, "jakarta");
+    //commonPropertyManager.propertyManager.setProperty(LogFactory.DEBUG_LEVEL, String.valueOf(DebugLevel.FULL_DEBUGGING));
     //}
 
     private TransactionManager tm;
@@ -35,17 +41,38 @@ public class JBossArjunaTransactionManagerFactory implements UMOTransactionManag
     {
         //arjPropertyManager.propertyManager.setProperty("com.arjuna.ats.arjuna.objectstore.objectStoreType", "ShadowNoFileLockStore");
         //arjPropertyManager.propertyManager.setProperty(Environment.OBJECTSTORE_TYPE, ArjunaNames.Implementation_ObjectStore_JDBCStore().stringForm());
-        final String muleInternalDir = RegistryContext.getRegistry().getConfiguration().getWorkingDirectory();
-        arjPropertyManager.propertyManager.setProperty(Environment.OBJECTSTORE_DIR, muleInternalDir + "/transaction-log");
+
+
     }
 
     public synchronized TransactionManager create() throws Exception
     {
         if (tm == null)
         {
+            if (!properties.containsKey(Environment.OBJECTSTORE_DIR))
+            {
+                final String muleInternalDir = RegistryContext.getRegistry().getConfiguration().getWorkingDirectory();
+                arjPropertyManager.propertyManager.setProperty(Environment.OBJECTSTORE_DIR, muleInternalDir + "/transaction-log");
+            }
+
+            for (Iterator i = properties.entrySet().iterator(); i.hasNext();)
+            {
+                Map.Entry entry = (Map.Entry) i.next();
+                arjPropertyManager.propertyManager.setProperty((String) entry.getKey(), (String) entry.getValue());
+            }
             tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+
         }
         return tm;
     }
 
+    public Map getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(Map properties)
+    {
+        this.properties = properties;
+    }
 }
