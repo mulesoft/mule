@@ -23,7 +23,12 @@ public class ImapConnectorTestCase extends AbstractReceivingMailConnectorTestCas
 
     public ImapConnectorTestCase()
     {
-        super(ServerSetup.PROTOCOL_IMAP, 50012);
+        this(50012);
+    }
+
+    public ImapConnectorTestCase(int port)
+    {
+        super(ServerSetup.PROTOCOL_IMAP, port);
     }
 
     // @Override

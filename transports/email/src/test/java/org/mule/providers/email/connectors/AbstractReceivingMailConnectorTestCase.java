@@ -35,7 +35,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMailConnectorFunctionalTestCase
 {
     
-    public static final int POLL_PERIOD_MS = 1000;
+    public static final int POLL_PERIOD_MS = 2000;
     public static final int WAIT_PERIOD_MS = 3 * POLL_PERIOD_MS;
 
     protected AbstractReceivingMailConnectorTestCase(String protocol, int port)

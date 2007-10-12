@@ -15,7 +15,7 @@ public class NoBackupMule2050TestCase extends AbstractBaseBackupMule2050TestCase
 
     public NoBackupMule2050TestCase()
     {
-        super(false);
+        super(50021, false);
     }
 
 }
