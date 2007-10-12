@@ -63,6 +63,7 @@ public class GreenMailUtilities
             try {
                 Socket socket = new Socket(host, port);
                 socket.close();
+                logger.info("Successful connection made to port " + port);
                 return;
             }
             catch (Exception e)
