@@ -29,8 +29,7 @@ public class HttpNamespaceHandler extends NamespaceHandlerSupport
     {
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(HttpConnector.class, true));
         
-        registerBeanDefinitionParser("rest-service-component",
-                new ComplexComponentDefinitionParser(new SimplePojoServiceDefinitionParser(RestServiceWrapper.class)));
+        registerBeanDefinitionParser("rest-service-component", new ComplexComponentDefinitionParser(RestServiceWrapper.class));
         registerBeanDefinitionParser("payloadParameterNames", new ChildListDefinitionParser("payloadParameterNames"));
         registerBeanDefinitionParser("requiredParams", new ChildMapEntryDefinitionParser("requiredParams","key","value"));
         registerBeanDefinitionParser("optionalParams", new ChildMapEntryDefinitionParser("optionalParams","key","value"));
