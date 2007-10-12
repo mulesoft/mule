@@ -36,7 +36,10 @@ public class ComponentStatsTestCase extends AbstractMuleJmxTestCase
 
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);
 
-        // TODO Why 3?  Document the magic number!
+        // Expecting following mbeans to be registered:
+        // 1) org.mule.management.mbeans.ComponentStats@TEST_DOMAIN_1:type=TEST_NAME
+        // 2) org.mule.management.mbeans.RouterStats@TEST_DOMAIN_1:type=org.mule.Statistics,component=TEST_IN,router=inbound
+        // 3) org.mule.management.mbeans.RouterStats@TEST_DOMAIN_1:type=org.mule.Statistics,component=TEST_IN,router=outbound
         assertEquals("Unexpected components registered in the domain.", 3, mbeans.size());
 
         mBeanServer.unregisterMBean(name);

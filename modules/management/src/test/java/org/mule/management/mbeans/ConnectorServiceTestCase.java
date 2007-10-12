@@ -13,7 +13,6 @@ package org.mule.management.mbeans;
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.management.agents.JmxAgent;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.RegistryContext;
 
 import java.util.Set;
 
@@ -21,8 +20,6 @@ import javax.management.ObjectName;
 
 public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
-    // TODO Why 5?  Document the magic number!
-    private static final int NUMBER_OF_COMPONENTS = 5;
 
     public void testUndeploy() throws Exception
     {
@@ -31,14 +28,25 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
         final UMOConnector connector = getTestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();
-        RegistryContext.getRegistry().registerConnector(connector, managementContext);
-        RegistryContext.getRegistry().registerAgent(jmxAgent, managementContext);
+        managementContext.getRegistry().registerConnector(connector, managementContext);
+        managementContext.getRegistry().registerAgent(jmxAgent, managementContext);
+
+
+        managementContext.applyLifecycle(jmxAgent);
+
         managementContext.start();
 
         final String query = jmxSupport.getDomainName(managementContext) + ":*";
         final ObjectName objectName = jmxSupport.getObjectName(query);
         Set mbeans = mBeanServer.queryMBeans(objectName, null);
-        assertEquals("Unexpected number of components registered in the domain.", NUMBER_OF_COMPONENTS, mbeans.size());
+
+        // Expecting following mbeans to be registered:
+        // 1) org.mule.management.mbeans.StatisticsService@Mule.ConnectorServiceTest:type=org.mule.Statistics,name=AllStatistics
+        // 2) org.mule.management.mbeans.MuleConfigurationService@Mule.ConnectorServiceTest:type=org.mule.Configuration,name=GlobalConfiguration
+        // 3) org.mule.management.mbeans.ModelService@Mule.ConnectorServiceTest:type=org.mule.Model,name="_muleSystemModel(seda)"
+        // 4) org.mule.management.mbeans.MuleService@Mule.ConnectorServiceTest:type=org.mule.ManagementContext,name=MuleServerInfo
+        // 5) org.mule.management.mbeans.ConnectorService@Mule.ConnectorServiceTest:type=org.mule.Connector,name="TEST.CONNECTOR"
+        assertEquals("Unexpected number of components registered in the domain.", 5, mbeans.size());
 
         managementContext.dispose();
         //TODO: remove next line when MULE-2275 will be fixed.

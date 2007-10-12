@@ -11,7 +11,6 @@
 package org.mule.extras.spring.transaction;
 
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOTransaction;
 
 import com.mockobjects.dynamic.C;
@@ -34,7 +33,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
         factory.setManager((PlatformTransactionManager)mockPTM.proxy());
 
         UMOTransaction tx = factory.beginTransaction(managementContext);
-        TransactionCoordination.getInstance().bindTransaction(tx);
+//        TransactionCoordination.getInstance().bindTransaction(tx);
         tx.commit();
     }
 
@@ -50,7 +49,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
         factory.setManager((PlatformTransactionManager)mockPTM.proxy());
 
         UMOTransaction tx = factory.beginTransaction(managementContext);
-        TransactionCoordination.getInstance().bindTransaction(tx);
+//        TransactionCoordination.getInstance().bindTransaction(tx);
         tx.rollback();
     }
 

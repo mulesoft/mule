@@ -37,7 +37,9 @@ public class SpringTransactionFactory implements UMOTransactionFactory
 
     public UMOTransaction beginTransaction(UMOManagementContext managementContext) throws TransactionException
     {
-        return new SpringTransaction();
+        UMOTransaction tx = new SpringTransaction();
+        tx.begin();
+        return tx;
     }
 
     public boolean isTransacted()

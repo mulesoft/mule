@@ -1,6 +1,0 @@
-# These tests fail after TC's lifecycle changes, but since they are 
-# based on undocumented magic numbers (amount of mbeans) it's hard 
-# for me to understand or fix them.
-org.mule.management.mbeans.ComponentServiceTestCase
-org.mule.management.mbeans.ConnectorServiceTestCase
-org.mule.management.mbeans.ComponentStatsTestCase
