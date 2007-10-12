@@ -194,7 +194,6 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         if (! testFlag(bd, MULE_NO_REGISTRATION))
         {
             String name =  generateChildBeanName(ele);
-            logger.debug("register " + name + ": " + bd.getBeanClassName());
             registerBeanDefinitionHolder(new BeanDefinitionHolder(bd, name));
         }
     }

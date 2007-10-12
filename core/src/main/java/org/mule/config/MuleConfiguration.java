@@ -94,17 +94,19 @@ public class MuleConfiguration
     private String osEncoding = DEFAULT_OS_ENCODING;
 
     /**
-     * Names of threading profiles in the registry
+     * configuration for the threadpool used by message dispatchers
      */
-    public static final String DEFAULT_THREADING_PROFILE = "defaultThreadingProfile";
-    public static final String DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE = "defaultMessageDispatcherThreadingProfile";
-    public static final String DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "defaultMessageReceiverThreadingProfile";
-    public static final String DEFAULT_COMPONENT_THREADING_PROFILE = "defaultComponentThreadingProfile";
+    private ThreadingProfile messageDispatcherThreadingProfile = null;
 
     /**
-     * Used only when no threading profile in registry (typically tests without Spring)
+     * configuration for the threadpool used by message receivers
      */
-    private static ThreadingProfile FALLBACK_THREADING_PROFILE = new ThreadingProfile();
+    private ThreadingProfile messageReceiverThreadingProfile = null;
+
+    /**
+     * configuration for the threadpool used by component pooling in mule
+     */
+    private ThreadingProfile componentPoolThreadingProfile = null;
 
     /**
      * When running sychonously, return events can be received over transports that
@@ -124,6 +126,12 @@ public class MuleConfiguration
      * automatically
      */
     private boolean remoteSync = false;
+
+    /**
+     * A helper thread pool configuration that is used for all other thread pool
+     * configurations
+     */
+    private ThreadingProfile defaultThreadingProfile = new ThreadingProfile();
 
     /**
      * Where mule will store any runtime files to disk
@@ -187,35 +195,55 @@ public class MuleConfiguration
 
     public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
     {
-        return getThreadingProfile(DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
+        return getThreadingProfile(messageDispatcherThreadingProfile);
+    }
+
+    public void setDefaultMessageDispatcherThreadingProfile(ThreadingProfile messageDispatcherThreadingProfile)
+    {
+        this.messageDispatcherThreadingProfile = messageDispatcherThreadingProfile;
     }
 
     public ThreadingProfile getDefaultMessageReceiverThreadingProfile()
     {
-        return getThreadingProfile(DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
+        return getThreadingProfile(messageReceiverThreadingProfile);
+    }
+
+    public void setDefaultMessageReceiverThreadingProfile(ThreadingProfile messageReceiverThreadingProfile)
+    {
+        this.messageReceiverThreadingProfile = messageReceiverThreadingProfile;
     }
 
     public ThreadingProfile getDefaultComponentThreadingProfile()
     {
-        return getThreadingProfile(DEFAULT_COMPONENT_THREADING_PROFILE);
+        return getThreadingProfile(componentPoolThreadingProfile);
+    }
+
+    public void setDefaultComponentThreadingProfile(ThreadingProfile componentPoolThreadingProfile)
+    {
+        this.componentPoolThreadingProfile = componentPoolThreadingProfile;
     }
 
     public ThreadingProfile getDefaultThreadingProfile()
     {
-        return getThreadingProfile(DEFAULT_THREADING_PROFILE);
+        return getThreadingProfile(defaultThreadingProfile);
     }
 
-    private ThreadingProfile getThreadingProfile(String name)
+    public void setDefaultThreadingProfile(ThreadingProfile defaultThreadingProfile)
     {
-        ThreadingProfile tp = (ThreadingProfile) RegistryContext.getRegistry().lookupObject(name);
-        if (null != tp)
+        if (defaultThreadingProfile == null)
         {
-            return tp;
+            return;
         }
-        else
+        this.defaultThreadingProfile = defaultThreadingProfile;
+    }
+
+    private ThreadingProfile getThreadingProfile(ThreadingProfile profile)
+    {
+        if (profile != null)
         {
-            return FALLBACK_THREADING_PROFILE;
+            return new ThreadingProfile(profile);
         }
+        return new ThreadingProfile(defaultThreadingProfile);
     }
 
     public int getDefaultSynchronousEventTimeout()
@@ -401,6 +429,7 @@ public class MuleConfiguration
             }
         }
     }
+
 
     public String getSystemModelType()
     {

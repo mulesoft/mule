@@ -908,7 +908,7 @@
                 <xsd:attribute name="maxThreadsActive" type="xsd:string"/>
                 <xsd:attribute name="maxThreadsIdle" type="xsd:string"/>
                 <xsd:attribute name="threadTTL" type="xsd:string"/>
-                <xsd:attribute name="poolExhaustedAction">
+                <xsd:attribute name="poolExhaustedAction" default="RUN">
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:NMTOKEN">
                             <xsd:enumeration value="WAIT"/>

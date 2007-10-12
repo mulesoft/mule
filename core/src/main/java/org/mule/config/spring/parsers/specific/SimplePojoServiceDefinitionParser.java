@@ -38,12 +38,6 @@ public class SimplePojoServiceDefinitionParser extends PojoServiceDefinitionPars
         this.clazz = clazz;
     }
 
-    public SimplePojoServiceDefinitionParser(Class clazz, String setterMethod)
-    {
-        super(SingletonObjectFactory.class, setterMethod);
-        this.clazz = clazz;
-    }
-
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         getBeanAssembler(element, builder).extendBean("objectClass", clazz, false);

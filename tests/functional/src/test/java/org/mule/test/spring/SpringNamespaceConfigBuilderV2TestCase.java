@@ -192,52 +192,51 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 //        assertEquals("default", managementContext.getRegistry().lookupObject("system-prop2"));
     }
 
-// no longer overrride - made both configs same (and agree with 1.x)
-//    /**
-//     * The MuleXmlConfiguration builder provides special support for overloading
-//     * config elements for threadingProfiles, queueProfiles and poolingProfiles, so
-//     * that defaults can be declared in the main configuration but overiding elements
-//     * can just replace certain values
-//     *
-//     * @throws MuleException
-//     */
-//    // @Override
-//    public void testThreadingConfig() throws MuleException
-//    {
-//        // test config
-//        ThreadingProfile tp = RegistryContext.getConfiguration().getDefaultThreadingProfile();
-//        assertEquals(0, tp.getMaxBufferSize());
-//        assertEquals(8, tp.getMaxThreadsActive());
-//        assertEquals(4, tp.getMaxThreadsIdle());
-//        assertEquals(0, tp.getPoolExhaustedAction());
-//        assertEquals(60001, tp.getThreadTTL());
-//
-//        // test defaults
-//        tp = RegistryContext.getConfiguration().getDefaultComponentThreadingProfile();
-//        assertEquals(0, tp.getMaxBufferSize());
-//        assertEquals(8, tp.getMaxThreadsActive());
-//        assertEquals(4, tp.getMaxThreadsIdle());
-//        assertEquals(0, tp.getPoolExhaustedAction());
-//        assertEquals(60001, tp.getThreadTTL());
-//
-//        // test thatvalues not set retain a default value
-//        AbstractConnector c = (AbstractConnector)managementContext.getRegistry().lookupConnector("dummyConnector");
-//        tp = c.getDispatcherThreadingProfile();
-//        assertEquals(2, tp.getMaxBufferSize());
-//        assertEquals(8, tp.getMaxThreadsActive());
-//        assertEquals(4, tp.getMaxThreadsIdle());
-//        assertEquals(0, tp.getPoolExhaustedAction());
-//        assertEquals(60001, tp.getThreadTTL());
-//
-//        UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent2");
-//        assertTrue("component must be SedaComponent to get threading profile", component instanceof SedaComponent);
-//        tp = ((SedaComponent) component).getThreadingProfile();
-//        assertEquals(6, tp.getMaxBufferSize());
-//        assertEquals(12, tp.getMaxThreadsActive());
-//        assertEquals(6, tp.getMaxThreadsIdle());
-//        assertEquals(0, tp.getPoolExhaustedAction());
-//        assertEquals(60001, tp.getThreadTTL());
-//    }
+    /**
+     * The MuleXmlConfiguration builder provides special support for overloading
+     * config elements for threadingProfiles, queueProfiles and poolingProfiles, so
+     * that defaults can be declared in the main configuration but overiding elements
+     * can just replace certain values
+     *
+     * @throws MuleException
+     */
+    // @Override
+    public void testThreadingConfig() throws MuleException
+    {
+        // test config
+        ThreadingProfile tp = RegistryContext.getConfiguration().getDefaultThreadingProfile();
+        assertEquals(0, tp.getMaxBufferSize());
+        assertEquals(8, tp.getMaxThreadsActive());
+        assertEquals(4, tp.getMaxThreadsIdle());
+        assertEquals(0, tp.getPoolExhaustedAction());
+        assertEquals(60001, tp.getThreadTTL());
+
+        // test defaults
+        tp = RegistryContext.getConfiguration().getDefaultComponentThreadingProfile();
+        assertEquals(0, tp.getMaxBufferSize());
+        assertEquals(8, tp.getMaxThreadsActive());
+        assertEquals(4, tp.getMaxThreadsIdle());
+        assertEquals(0, tp.getPoolExhaustedAction());
+        assertEquals(60001, tp.getThreadTTL());
+
+        // test thatvalues not set retain a default value
+        AbstractConnector c = (AbstractConnector)managementContext.getRegistry().lookupConnector("dummyConnector");
+        tp = c.getDispatcherThreadingProfile();
+        assertEquals(2, tp.getMaxBufferSize());
+        assertEquals(8, tp.getMaxThreadsActive());
+        assertEquals(4, tp.getMaxThreadsIdle());
+        assertEquals(0, tp.getPoolExhaustedAction());
+        assertEquals(60001, tp.getThreadTTL());
+
+        UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent2");
+        assertTrue("component must be SedaComponent to get threading profile", component instanceof SedaComponent);
+        tp = ((SedaComponent) component).getThreadingProfile();
+        assertEquals(6, tp.getMaxBufferSize());
+        assertEquals(12, tp.getMaxThreadsActive());
+        assertEquals(6, tp.getMaxThreadsIdle());
+        assertEquals(0, tp.getPoolExhaustedAction());
+        assertEquals(60001, tp.getThreadTTL());
+    }
 
     // MULE-2458 (now has separate test)
 //    public void testGlobalEndpointOverrides()

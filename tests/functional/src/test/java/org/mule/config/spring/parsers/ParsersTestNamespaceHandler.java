@@ -33,7 +33,6 @@ import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDef
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComplexComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimpleComponentDefinitionParser;
-import org.mule.config.spring.parsers.specific.SimplePojoServiceDefinitionParser;
 import org.mule.config.spring.parsers.beans.ChildBean;
 import org.mule.config.spring.parsers.beans.OrphanBean;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
@@ -81,7 +80,7 @@ public class ParsersTestNamespaceHandler extends AbstractIgnorableNamespaceHandl
 
         registerBeanDefinitionParser("factory",
                 new ComplexComponentDefinitionParser(
-                        new SimplePojoServiceDefinitionParser(ChildBean.class, "object"),
+                        new SimpleComponentDefinitionParser("object", ChildBean.class),
                         (ChildDefinitionParser) new ChildDefinitionParser("child", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring")));
 
         registerDelegateDefinitionParser("complex-endpoint",

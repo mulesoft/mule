@@ -21,17 +21,11 @@ import org.w3c.dom.Element;
 
 public class PojoServiceDefinitionParser extends ObjectFactoryDefinitionParser
 {
-
     public PojoServiceDefinitionParser(Class beanClass)
     {
-        this(beanClass, "serviceFactory");
+        super(beanClass, "serviceFactory");
     }                                                             
     
-    public PojoServiceDefinitionParser(Class beanClass, String setterMethod)
-    {
-        super(beanClass, setterMethod);
-    }
-
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         super.parseChild(element, parserContext, builder);

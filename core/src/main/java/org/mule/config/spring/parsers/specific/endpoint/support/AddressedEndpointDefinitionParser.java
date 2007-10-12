@@ -15,7 +15,7 @@ import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
-import org.mule.config.spring.parsers.processors.DisableByAttribute;
+import org.mule.config.spring.parsers.preprocessors.DisableByAttribute;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 
 import org.apache.commons.logging.Log;

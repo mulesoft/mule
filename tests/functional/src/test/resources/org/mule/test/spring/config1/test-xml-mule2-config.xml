@@ -11,8 +11,10 @@
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
     <configuration serverId="test_Spring" defaultSynchronousEndpoints="false" domainId="org.mule">
-        <default-threading-profile maxBufferSize="42" maxThreadsActive="16"
-                                   maxThreadsIdle="3" poolExhaustedAction="WAIT" threadTTL="60001"/>
+        <default-threading-profile maxBufferSize="42" maxThreadsActive="16" maxThreadsIdle="3" poolExhaustedAction="WAIT"
+                                   threadTTL="60001"/>
+        <default-dispatcher-threading-profile maxBufferSize="42" maxThreadsActive="16" maxThreadsIdle="3"
+                                              poolExhaustedAction="WAIT" threadTTL="60001"/>
     </configuration>
 
     <environment-property name="doCompression" value="true"/>
@@ -39,7 +41,7 @@
     <!--</mgmt:chainsaw-notifications>-->
 
     <custom-connector name="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector">
-        <dispatcher-threading-profile maxBufferSize="2"/>
+        <dispatcher-threading-profile maxBufferSize="2" maxThreadsIdle="3"/>
         <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
     </custom-connector>
 
