@@ -18,8 +18,8 @@
         <mule:environment-property name="system-prop2" value="${system-prop2-cannot-loop}"/> <!-- defaultValue="default" -->
 
         <mule:configuration serverId="ijio" defaultSynchronousEndpoints="false">
-            <mule:default-threading-profile maxBufferSize="0" maxThreadsActive="8" maxThreadsIdle="4"
-                                            poolExhaustedAction="WAIT" threadTTL="60001"/>
+            <mule:default-threading-profile maxBufferSize="42" maxThreadsActive="16"
+                maxThreadsIdle="3" poolExhaustedAction="WAIT" threadTTL="60001"/>
         </mule:configuration>
 
         <mule:custom-transaction-manager class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
@@ -31,8 +31,7 @@
         </agents -->
 
         <test:connector name="dummyConnector">
-            <mule:dispatcher-threading-profile maxBufferSize="2" maxThreadsActive="8" maxThreadsIdle="4"
-                                               poolExhaustedAction="WAIT" threadTTL="60001"/>
+            <mule:dispatcher-threading-profile maxBufferSize="2"/>
             <mule:custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
             <!-- TODO -->
             <!-- no way to specify connection strategy on a connector? -->

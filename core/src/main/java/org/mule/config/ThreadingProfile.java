@@ -12,7 +12,6 @@ package org.mule.config;
 
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.util.MapUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitPolicy;
 
@@ -81,7 +80,7 @@ public class ThreadingProfile
     public static final int DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
 
     // map pool exhaustion strings to their respective values
-    private static final Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
+    public static final Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
     {
         private static final long serialVersionUID = 1L;
 
@@ -109,77 +108,87 @@ public class ThreadingProfile
         }
     };
 
-    private int maxThreadsActive = DEFAULT_MAX_THREADS_ACTIVE;
-    private int maxThreadsIdle = DEFAULT_MAX_THREADS_IDLE;
-    private int maxBufferSize = DEFAULT_MAX_BUFFER_SIZE;
-    private long threadTTL = DEFAULT_MAX_THREAD_TTL;
-    private long threadWaitTimeout = DEFAULT_THREAD_WAIT_TIMEOUT;
-    private int poolExhaustPolicy = DEFAULT_POOL_EXHAUST_ACTION;
-    private boolean doThreading = DEFAULT_DO_THREADING;
+    private static ThreadingProfile DEFAULT_THREADING_PROFILE =
+            new ThreadingProfile(
+                    DEFAULT_MAX_THREADS_ACTIVE,
+                    DEFAULT_MAX_THREADS_IDLE,
+                    DEFAULT_MAX_BUFFER_SIZE,
+                    DEFAULT_MAX_THREAD_TTL,
+                    DEFAULT_THREAD_WAIT_TIMEOUT,
+                    DEFAULT_POOL_EXHAUST_ACTION,
+                    DEFAULT_DO_THREADING,
+                    null,
+                    null
+                    );
+
+    private Integer maxThreadsActive;
+    private Integer maxThreadsIdle;
+    private Integer maxBufferSize;
+    private Long threadTTL;
+    private Long threadWaitTimeout;
+    private Integer poolExhaustedAction;
+    private Boolean doThreading;
+
+    private ThreadingProfile delegate = DEFAULT_THREADING_PROFILE;
 
     private WorkManagerFactory workManagerFactory = new DefaultWorkManagerFactory();
-
     private RejectedExecutionHandler rejectedExecutionHandler;
-
     private ThreadFactory threadFactory;
 
     public ThreadingProfile()
     {
-        super();
+        // use defaults
     }
 
     public ThreadingProfile(int maxThreadsActive,
                             int maxThreadsIdle,
+                            int maxBufferSize,
                             long threadTTL,
-                            int poolExhaustPolicy,
+                            long threadWaitTimeout,
+                            int poolExhaustedAction,
+                            boolean doThreading,
                             RejectedExecutionHandler rejectedExecutionHandler,
                             ThreadFactory threadFactory)
     {
-        this.maxThreadsActive = maxThreadsActive;
-        this.maxThreadsIdle = maxThreadsIdle;
-        this.threadTTL = threadTTL;
-        this.poolExhaustPolicy = poolExhaustPolicy;
-        this.rejectedExecutionHandler = rejectedExecutionHandler;
-        this.threadFactory = threadFactory;
+        setMaxThreadsActive(maxThreadsActive);
+        setMaxThreadsIdle(maxThreadsIdle);
+        setMaxBufferSize(maxBufferSize);
+        setThreadTTL(threadTTL);
+        setThreadWaitTimeout(threadWaitTimeout);
+        setPoolExhaustedAction(poolExhaustedAction);
+        setDoThreading(doThreading);
+        setRejectedExecutionHandler(rejectedExecutionHandler);
+        setThreadFactory(threadFactory);
     }
 
     public ThreadingProfile(ThreadingProfile tp)
     {
-        this.maxThreadsActive = tp.getMaxThreadsActive();
-        this.maxThreadsIdle = tp.getMaxThreadsIdle();
-        this.maxBufferSize = tp.getMaxBufferSize();
-        this.threadTTL = tp.getThreadTTL();
-        this.threadWaitTimeout = tp.getThreadWaitTimeout();
-        this.poolExhaustPolicy = tp.getPoolExhaustedAction();
-        this.doThreading = tp.isDoThreading();
-        this.rejectedExecutionHandler = tp.getRejectedExecutionHandler();
-        this.threadFactory = tp.getThreadFactory();
-        this.workManagerFactory = tp.getWorkManagerFactory();
+        delegate = tp;
     }
 
     public int getMaxThreadsActive()
     {
-        return maxThreadsActive;
+        return null != maxThreadsActive ? maxThreadsActive.intValue() : delegate.getMaxThreadsActive();
     }
 
     public int getMaxThreadsIdle()
     {
-        return maxThreadsIdle;
+        return null != maxThreadsIdle ? maxThreadsIdle.intValue() :  delegate.getMaxThreadsIdle();
     }
 
     public long getThreadTTL()
     {
-        return threadTTL;
+        return null != threadTTL ? threadTTL.longValue() : delegate.getThreadTTL();
     }
 
     public long getThreadWaitTimeout()
     {
-        return threadWaitTimeout;
+        return null != threadWaitTimeout ? threadWaitTimeout.longValue() : delegate.getThreadWaitTimeout();
     }
 
     public int getPoolExhaustedAction()
     {
-        return poolExhaustPolicy;
+        return null != poolExhaustedAction ? poolExhaustedAction.intValue() : delegate.getPoolExhaustedAction();
     }
 
     public RejectedExecutionHandler getRejectedExecutionHandler()
@@ -194,33 +203,27 @@ public class ThreadingProfile
 
     public void setMaxThreadsActive(int maxThreadsActive)
     {
-        this.maxThreadsActive = maxThreadsActive;
+        this.maxThreadsActive = new Integer(maxThreadsActive);
     }
 
     public void setMaxThreadsIdle(int maxThreadsIdle)
     {
-        this.maxThreadsIdle = maxThreadsIdle;
+        this.maxThreadsIdle = new Integer(maxThreadsIdle);
     }
 
     public void setThreadTTL(long threadTTL)
     {
-        this.threadTTL = threadTTL;
+        this.threadTTL = new Long(threadTTL);
     }
 
     public void setThreadWaitTimeout(long threadWaitTimeout)
     {
-        this.threadWaitTimeout = threadWaitTimeout;
+        this.threadWaitTimeout = new Long(threadWaitTimeout);
     }
 
     public void setPoolExhaustedAction(int poolExhaustPolicy)
     {
-        this.poolExhaustPolicy = poolExhaustPolicy;
-    }
-
-    public void setPoolExhaustedActionString(String poolExhaustPolicy)
-    {
-        this.poolExhaustPolicy = MapUtils.getIntValue(POOL_EXHAUSTED_ACTIONS, poolExhaustPolicy,
-            DEFAULT_POOL_EXHAUST_ACTION);
+        this.poolExhaustedAction = new Integer(poolExhaustPolicy);
     }
 
     public void setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler)
@@ -235,12 +238,12 @@ public class ThreadingProfile
 
     public int getMaxBufferSize()
     {
-        return maxBufferSize;
+        return null != maxBufferSize ? maxBufferSize.intValue() : delegate.getMaxBufferSize();
     }
 
     public void setMaxBufferSize(int maxBufferSize)
     {
-        this.maxBufferSize = maxBufferSize;
+        this.maxBufferSize = new Integer(maxBufferSize);
     }
 
     public WorkManagerFactory getWorkManagerFactory()
@@ -267,22 +270,19 @@ public class ThreadingProfile
     {
         BlockingQueue buffer;
 
-        if (maxBufferSize > 0 && maxThreadsActive > 1)
+        if (getMaxBufferSize() > 0 && getMaxThreadsActive() > 1)
         {
-            buffer = new LinkedBlockingDeque(maxBufferSize);
+            buffer = new LinkedBlockingDeque(getMaxBufferSize());
         }
         else
         {
             buffer = new SynchronousQueue();
         }
 
-        if (maxThreadsIdle > maxThreadsActive)
-        {
-            maxThreadsIdle = maxThreadsActive;
-        }
-
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(maxThreadsIdle, maxThreadsActive, threadTTL,
-            TimeUnit.MILLISECONDS, buffer);
+        ThreadPoolExecutor pool =
+                new ThreadPoolExecutor(Math.max(getMaxThreadsIdle(), getMaxThreadsActive()),
+                        getMaxThreadsActive(), getThreadTTL(),
+                        TimeUnit.MILLISECONDS, buffer);
 
         ThreadFactory tf = threadFactory;
         if (name != null)
@@ -301,7 +301,7 @@ public class ThreadingProfile
         }
         else
         {
-            switch (poolExhaustPolicy)
+            switch (getPoolExhaustedAction())
             {
                 case WHEN_EXHAUSTED_DISCARD_OLDEST :
                     pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
@@ -317,7 +317,7 @@ public class ThreadingProfile
                     break;
                 default :
                     // WHEN_EXHAUSTED_WAIT
-                    pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
+                    pool.setRejectedExecutionHandler(new WaitPolicy(getThreadWaitTimeout(), TimeUnit.MILLISECONDS));
                     break;
             }
         }
@@ -327,19 +327,19 @@ public class ThreadingProfile
 
     public boolean isDoThreading()
     {
-        return doThreading;
+        return null != doThreading ? doThreading.booleanValue() : delegate.isDoThreading();
     }
 
     public void setDoThreading(boolean doThreading)
     {
-        this.doThreading = doThreading;
+        this.doThreading = Boolean.valueOf(doThreading);
     }
 
     public String toString()
     {
         return "ThreadingProfile{" + "maxThreadsActive=" + maxThreadsActive + ", maxThreadsIdle="
                         + maxThreadsIdle + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL
-                        + ", poolExhaustPolicy=" + poolExhaustPolicy + ", threadWaitTimeout="
+                        + ", poolExhaustedAction=" + poolExhaustedAction + ", threadWaitTimeout="
                         + threadWaitTimeout + ", doThreading=" + doThreading + ", workManagerFactory="
                         + workManagerFactory + ", rejectedExecutionHandler=" + rejectedExecutionHandler
                         + ", threadFactory=" + threadFactory + "}";
@@ -350,7 +350,7 @@ public class ThreadingProfile
         UMOWorkManager createWorkManager(ThreadingProfile profile, String name);
     }
 
-    private class DefaultWorkManagerFactory implements WorkManagerFactory
+    private static class DefaultWorkManagerFactory implements WorkManagerFactory
     {
         public UMOWorkManager createWorkManager(ThreadingProfile profile, String name)
         {
