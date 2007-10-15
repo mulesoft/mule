@@ -22,7 +22,8 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-support</artifactId>
-            <version>2.0.6</version>
+            <!-- the springVersion property is defined in the toplevel pom -->
+            <version>${springVersion}</version>
             <exclusions>
                 <exclusion>
                     <!-- No, thank you. -->
@@ -34,7 +35,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <version>2.0.6</version>
+            <version>${springVersion}</version>
         </dependency>
         <!-- need to explicitly mark javax.activation as provided -->
         <dependency>
