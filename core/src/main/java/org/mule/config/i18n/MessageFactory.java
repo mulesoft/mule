@@ -58,9 +58,7 @@ public abstract class MessageFactory extends Object
      */
     protected static Message createMessage(String bundlePath, int code, Object arg)
     {
-        Object[] arguments = new Object[] {arg};
-        String messageString = getString(bundlePath, code, arguments);
-        return new Message(messageString, code, arguments);
+        return createMessage(bundlePath, code, new Object[] {arg});
     }
     
     /**
@@ -75,9 +73,7 @@ public abstract class MessageFactory extends Object
      */
     protected static Message createMessage(String bundlePath, int code, Object arg1, Object arg2)
     {
-        Object[] arguments = new Object[] {arg1, arg2};
-        String messageString = getString(bundlePath, code, arguments);
-        return new Message(messageString, code, arguments);
+        return createMessage(bundlePath, code, new Object[] {arg1, arg2});
     }
     
     /**
@@ -94,7 +90,23 @@ public abstract class MessageFactory extends Object
     protected static Message createMessage(String bundlePath, int code, Object arg1, Object arg2, 
         Object arg3)
     {
-        Object[] arguments = new Object[] {arg1, arg2, arg3};
+        return createMessage(bundlePath, code, new Object[] {arg1, arg2, arg3});
+    }
+    
+    /**
+     * Factory method to create a new {@link Message} instance that is filled with the formatted
+     * message with id <code>code</code> from the resource bundle <code>bundlePath</code>.
+     * 
+     * <b>Attention:</b> do not confuse this method with 
+     * <code>createMessage(String, int, Object)</code>.
+     * 
+     * @param bundlePath complete path to the resource bundle for lookup
+     * @param code numeric code of the message
+     * @param arguments
+     * @see getBundlePath()
+     */
+    protected static Message createMessage(String bundlePath, int code, Object[] arguments)
+    {
         String messageString = getString(bundlePath, code, arguments);
         return new Message(messageString, code, arguments);
     }
