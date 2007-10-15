@@ -36,6 +36,9 @@ public class XABridgeJmsJdbcTestCase extends FunctionalTestCase
 
         MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
         connectionString = "jdbc:derby:" + dbName;
+     
+        super.suitePreSetUp();
+    }
 
     // @Override
     protected void doSetUp() throws Exception
