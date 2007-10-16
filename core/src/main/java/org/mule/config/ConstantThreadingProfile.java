@@ -80,7 +80,7 @@ public class ConstantThreadingProfile implements ThreadingProfile
 
     public int getMaxThreadsIdle()
     {
-        throw new UnsupportedOperationException(getClass().getName());
+        return maxThreadsIdle;
     }
 
     public long getThreadTTL()

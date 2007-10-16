@@ -95,7 +95,7 @@ public class ChainedThreadingProfile implements ThreadingProfile
 
     public int getMaxThreadsIdle()
     {
-        return null != maxThreadsIdle ? maxThreadsIdle.intValue() :  delegate.getMaxThreadsIdle();
+        return null != maxThreadsIdle ? maxThreadsIdle.intValue() : delegate.getMaxThreadsIdle();
     }
 
     public long getThreadTTL()
