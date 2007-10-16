@@ -60,8 +60,7 @@
                 </router>
             </outbound-router -->
 
-                <mule:threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6"
-                                        poolExhaustedAction="WAIT" threadTTL="60001"/>
+                <mule:threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
                 <mule:queue-profile maxOutstandingMessages="102"/>
 
             </mule:service>

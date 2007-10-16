@@ -10,21 +10,13 @@
 
 package org.mule.config;
 
-import org.mule.impl.work.MuleWorkManager;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.util.MapUtils;
-import org.mule.util.concurrent.NamedThreadFactory;
-import org.mule.util.concurrent.WaitPolicy;
 
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
-import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 /**
@@ -32,8 +24,7 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
  * few different pools i.e. for component threads and message dispatchers. This object
  * makes it easier to configure the pool.
  */
-
-public class ThreadingProfile
+public interface ThreadingProfile
 {
 
     /**
@@ -78,10 +69,10 @@ public class ThreadingProfile
     /**
      * Default action to perform on pool exhaustion
      */
-    public static final int DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
+    static final int DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
 
     // map pool exhaustion strings to their respective values
-    private static final Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
+    static final Map POOL_EXHAUSTED_ACTIONS = new CaseInsensitiveMap()
     {
         private static final long serialVersionUID = 1L;
 
@@ -109,253 +100,68 @@ public class ThreadingProfile
         }
     };
 
-    private int maxThreadsActive = DEFAULT_MAX_THREADS_ACTIVE;
-    private int maxThreadsIdle = DEFAULT_MAX_THREADS_IDLE;
-    private int maxBufferSize = DEFAULT_MAX_BUFFER_SIZE;
-    private long threadTTL = DEFAULT_MAX_THREAD_TTL;
-    private long threadWaitTimeout = DEFAULT_THREAD_WAIT_TIMEOUT;
-    private int poolExhaustPolicy = DEFAULT_POOL_EXHAUST_ACTION;
-    private boolean doThreading = DEFAULT_DO_THREADING;
+    static final ThreadingProfile DEFAULT_THREADING_PROFILE =
+            new ConstantThreadingProfile(
+                    DEFAULT_MAX_THREADS_ACTIVE,
+                    DEFAULT_MAX_THREADS_IDLE,
+                    DEFAULT_MAX_BUFFER_SIZE,
+                    DEFAULT_MAX_THREAD_TTL,
+                    DEFAULT_THREAD_WAIT_TIMEOUT,
+                    DEFAULT_POOL_EXHAUST_ACTION,
+                    DEFAULT_DO_THREADING,
+                    null,
+                    null
+                    );
 
-    private WorkManagerFactory workManagerFactory = new DefaultWorkManagerFactory();
+    int getMaxThreadsActive();
 
-    private RejectedExecutionHandler rejectedExecutionHandler;
+    int getMaxThreadsIdle();
 
-    private ThreadFactory threadFactory;
+    long getThreadTTL();
 
-    public ThreadingProfile()
-    {
-        super();
-    }
+    long getThreadWaitTimeout();
 
-    public ThreadingProfile(int maxThreadsActive,
-                            int maxThreadsIdle,
-                            long threadTTL,
-                            int poolExhaustPolicy,
-                            RejectedExecutionHandler rejectedExecutionHandler,
-                            ThreadFactory threadFactory)
-    {
-        this.maxThreadsActive = maxThreadsActive;
-        this.maxThreadsIdle = maxThreadsIdle;
-        this.threadTTL = threadTTL;
-        this.poolExhaustPolicy = poolExhaustPolicy;
-        this.rejectedExecutionHandler = rejectedExecutionHandler;
-        this.threadFactory = threadFactory;
-    }
+    int getPoolExhaustedAction();
 
-    public ThreadingProfile(ThreadingProfile tp)
-    {
-        this.maxThreadsActive = tp.getMaxThreadsActive();
-        this.maxThreadsIdle = tp.getMaxThreadsIdle();
-        this.maxBufferSize = tp.getMaxBufferSize();
-        this.threadTTL = tp.getThreadTTL();
-        this.threadWaitTimeout = tp.getThreadWaitTimeout();
-        this.poolExhaustPolicy = tp.getPoolExhaustedAction();
-        this.doThreading = tp.isDoThreading();
-        this.rejectedExecutionHandler = tp.getRejectedExecutionHandler();
-        this.threadFactory = tp.getThreadFactory();
-        this.workManagerFactory = tp.getWorkManagerFactory();
-    }
+    RejectedExecutionHandler getRejectedExecutionHandler();
 
-    public int getMaxThreadsActive()
-    {
-        return maxThreadsActive;
-    }
+    ThreadFactory getThreadFactory();
 
-    public int getMaxThreadsIdle()
-    {
-        return maxThreadsIdle;
-    }
+    void setMaxThreadsActive(int maxThreadsActive);
 
-    public long getThreadTTL()
-    {
-        return threadTTL;
-    }
+    void setMaxThreadsIdle(int maxThreadsIdle);
 
-    public long getThreadWaitTimeout()
-    {
-        return threadWaitTimeout;
-    }
+    void setThreadTTL(long threadTTL);
 
-    public int getPoolExhaustedAction()
-    {
-        return poolExhaustPolicy;
-    }
+    void setThreadWaitTimeout(long threadWaitTimeout);
 
-    public RejectedExecutionHandler getRejectedExecutionHandler()
-    {
-        return rejectedExecutionHandler;
-    }
+    void setPoolExhaustedAction(int poolExhaustPolicy);
 
-    public ThreadFactory getThreadFactory()
-    {
-        return threadFactory;
-    }
+    void setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler);
 
-    public void setMaxThreadsActive(int maxThreadsActive)
-    {
-        this.maxThreadsActive = maxThreadsActive;
-    }
+    void setThreadFactory(ThreadFactory threadFactory);
 
-    public void setMaxThreadsIdle(int maxThreadsIdle)
-    {
-        this.maxThreadsIdle = maxThreadsIdle;
-    }
+    int getMaxBufferSize();
 
-    public void setThreadTTL(long threadTTL)
-    {
-        this.threadTTL = threadTTL;
-    }
+    void setMaxBufferSize(int maxBufferSize);
 
-    public void setThreadWaitTimeout(long threadWaitTimeout)
-    {
-        this.threadWaitTimeout = threadWaitTimeout;
-    }
+    WorkManagerFactory getWorkManagerFactory();
 
-    public void setPoolExhaustedAction(int poolExhaustPolicy)
-    {
-        this.poolExhaustPolicy = poolExhaustPolicy;
-    }
+    void setWorkManagerFactory(WorkManagerFactory workManagerFactory);
 
-    public void setPoolExhaustedActionString(String poolExhaustPolicy)
-    {
-        this.poolExhaustPolicy = MapUtils.getIntValue(POOL_EXHAUSTED_ACTIONS, poolExhaustPolicy,
-            DEFAULT_POOL_EXHAUST_ACTION);
-    }
+    UMOWorkManager createWorkManager(String name);
 
-    public void setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler)
-    {
-        this.rejectedExecutionHandler = rejectedExecutionHandler;
-    }
+    ThreadPoolExecutor createPool();
 
-    public void setThreadFactory(ThreadFactory threadFactory)
-    {
-        this.threadFactory = threadFactory;
-    }
+    ThreadPoolExecutor createPool(String name);
 
-    public int getMaxBufferSize()
-    {
-        return maxBufferSize;
-    }
+    boolean isDoThreading();
 
-    public void setMaxBufferSize(int maxBufferSize)
-    {
-        this.maxBufferSize = maxBufferSize;
-    }
+    void setDoThreading(boolean doThreading);
 
-    public WorkManagerFactory getWorkManagerFactory()
-    {
-        return workManagerFactory;
-    }
-
-    public void setWorkManagerFactory(WorkManagerFactory workManagerFactory)
-    {
-        this.workManagerFactory = workManagerFactory;
-    }
-
-    public UMOWorkManager createWorkManager(String name)
-    {
-        return workManagerFactory.createWorkManager(this, name);
-    }
-
-    public ThreadPoolExecutor createPool()
-    {
-        return createPool(null);
-    }
-
-    public ThreadPoolExecutor createPool(String name)
-    {
-        BlockingQueue buffer;
-
-        if (maxBufferSize > 0 && maxThreadsActive > 1)
-        {
-            buffer = new LinkedBlockingDeque(maxBufferSize);
-        }
-        else
-        {
-            buffer = new SynchronousQueue();
-        }
-
-        if (maxThreadsIdle > maxThreadsActive)
-        {
-            maxThreadsIdle = maxThreadsActive;
-        }
-
-        ThreadPoolExecutor pool = new ThreadPoolExecutor(maxThreadsIdle, maxThreadsActive, threadTTL,
-            TimeUnit.MILLISECONDS, buffer);
-
-        ThreadFactory tf = threadFactory;
-        if (name != null)
-        {
-            tf = new NamedThreadFactory(name); 
-        }
-
-        if (tf != null)
-        {
-            pool.setThreadFactory(tf);
-        }
-
-        if (rejectedExecutionHandler != null)
-        {
-            pool.setRejectedExecutionHandler(rejectedExecutionHandler);
-        }
-        else
-        {
-            switch (poolExhaustPolicy)
-            {
-                case WHEN_EXHAUSTED_DISCARD_OLDEST :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
-                    break;
-                case WHEN_EXHAUSTED_RUN :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-                    break;
-                case WHEN_EXHAUSTED_ABORT :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
-                    break;
-                case WHEN_EXHAUSTED_DISCARD :
-                    pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
-                    break;
-                default :
-                    // WHEN_EXHAUSTED_WAIT
-                    pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
-                    break;
-            }
-        }
-
-        return pool;
-    }
-
-    public boolean isDoThreading()
-    {
-        return doThreading;
-    }
-
-    public void setDoThreading(boolean doThreading)
-    {
-        this.doThreading = doThreading;
-    }
-
-    public String toString()
-    {
-        return "ThreadingProfile{" + "maxThreadsActive=" + maxThreadsActive + ", maxThreadsIdle="
-                        + maxThreadsIdle + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL
-                        + ", poolExhaustPolicy=" + poolExhaustPolicy + ", threadWaitTimeout="
-                        + threadWaitTimeout + ", doThreading=" + doThreading + ", workManagerFactory="
-                        + workManagerFactory + ", rejectedExecutionHandler=" + rejectedExecutionHandler
-                        + ", threadFactory=" + threadFactory + "}";
-    }
-
-    public static interface WorkManagerFactory
+    static interface WorkManagerFactory
     {
         UMOWorkManager createWorkManager(ThreadingProfile profile, String name);
-    }
-
-    private class DefaultWorkManagerFactory implements WorkManagerFactory
-    {
-        public UMOWorkManager createWorkManager(ThreadingProfile profile, String name)
-        {
-            return new MuleWorkManager(profile, name);
-        }
     }
 
 }

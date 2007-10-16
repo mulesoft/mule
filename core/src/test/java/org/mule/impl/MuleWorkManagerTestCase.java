@@ -37,7 +37,7 @@ public class MuleWorkManagerTestCase extends AbstractMuleTestCase
     {
         final Thread callerThread = Thread.currentThread();
 
-        MuleWorkManager wm = new MuleWorkManager(new ThreadingProfile(), null);
+        MuleWorkManager wm = new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, null);
         
         try
         {
@@ -77,7 +77,7 @@ public class MuleWorkManagerTestCase extends AbstractMuleTestCase
     {
         final Thread callerThread = Thread.currentThread();
 
-        MuleWorkManager wm = new MuleWorkManager(new ThreadingProfile(), null);
+        MuleWorkManager wm = new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, null);
 
         try
         {
@@ -117,7 +117,7 @@ public class MuleWorkManagerTestCase extends AbstractMuleTestCase
     {
         final Thread callerThread = Thread.currentThread();
 
-        MuleWorkManager wm = new MuleWorkManager(new ThreadingProfile(), null);
+        MuleWorkManager wm = new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, null);
 
         try
         {

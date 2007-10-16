@@ -57,12 +57,7 @@
                 defaultSynchronousEventTimeout="3000"
                 defaultEncoding="UTF-8"
                 defaultTransactionTimeout="5000"
-                workingDirectory=".mule">
-            <mule:default-threading-profile
-                    name="defaultThreadingProfile"
-                    threadWaitTimeout="30" maxThreadsActive="10" maxThreadsIdle="10"
-                    maxBufferSize="0" threadTTL="60000" poolExhaustedAction="RUN" />
-        </mule:configuration>
+                workingDirectory=".mule"/>
 
         <mule:model name="_muleSystemModel" />
 
@@ -138,7 +133,6 @@
     </bean>
 
     <bean name="_muleWorkManager" class="org.mule.impl.work.MuleWorkManager">
-        <!-- this is the name for the default-threading-profile element above -->
         <constructor-arg ref="defaultThreadingProfile"/>
         <constructor-arg value="MuleServer"/>
     </bean>
@@ -149,6 +143,27 @@
     
     <bean name="_muleEndpointFactory" class="org.mule.impl.endpoint.EndpointFactory" depends-on="_muleRegistry">
 <!--        <property name="defaultEndpointBuilder" ref="_muleDefaultEndpointBuilder"/>-->
+    </bean>
+
+    <bean name="defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <property name="threadWaitTimeout" value="30"/>
+        <property name="maxThreadsActive" value="10"/>
+        <property name="maxThreadsIdle" value="10"/>
+        <property name="maxBufferSize" value="0"/>
+        <property name="threadTTL" value="60000"/>
+        <property name="poolExhaustedAction" value="4"/>
+    </bean>
+
+    <bean name="defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="defaultMessageReceiverThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="defaultComponentThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="defaultThreadingProfile"/>
     </bean>
 
 <!--    <bean name="_muleDefaultEndpointBuilder" class="org.mule.impl.endpoint.EndpointBuilder"/>-->

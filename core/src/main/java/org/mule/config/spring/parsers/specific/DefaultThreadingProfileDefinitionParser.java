@@ -11,20 +11,22 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.ThreadingProfile;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.processors.ConstructorReference;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.processors.IdAttribute;
+import org.mule.config.spring.parsers.processors.NameAttribute;
 
 /**
  * This parser is responsible for processing the <code><threading-profile><code> configuration elements.
  */
-public class ThreadingProfileDefinitionParser extends ChildDefinitionParser
+public class DefaultThreadingProfileDefinitionParser extends OrphanDefinitionParser
 {
 
-    public ThreadingProfileDefinitionParser(String propertyName, String defaults)
+    public DefaultThreadingProfileDefinitionParser(String propertyName)
     {
-        super(propertyName, ChainedThreadingProfile.class);
+        super(ChainedThreadingProfile.class, true);
         addMapping("poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS);
-        registerPostProcessor(new ConstructorReference(defaults));
+        registerPostProcessor(new IdAttribute(propertyName));
+        registerPostProcessor(new NameAttribute(propertyName));
     }
 
 }

@@ -29,7 +29,7 @@ public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
         final SedaComponent component = new SedaComponent();
         component.setName("TEST_SERVICE");
         component.setServiceFactory(new SingletonObjectFactory(new Object()));
-        component.setThreadingProfile(new ThreadingProfile());
+        component.setThreadingProfile(ThreadingProfile.DEFAULT_THREADING_PROFILE);
         SedaModel model = new SedaModel();
         component.setModel(model);
         managementContext.getRegistry().registerModel(model, managementContext);
