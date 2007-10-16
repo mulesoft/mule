@@ -28,7 +28,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
  * dynamic one that rebuilds the instances) dyanmic and static behaviour should be identical.</p>
  *
  * <p>Also, the "lazy" chaining is an optimisation - all hierarchies should be grounded in a final
- * default which is {@link org.mule.config.ConstantThreadingProfile} and, as such, return reliable
+ * default which is {@link ImmutableThreadingProfile} and, as such, return reliable
  * values (lazy would be necessary if this is not the case, since we must avoid evaluating
  * incomplete delegates).</p>
  */
@@ -43,7 +43,7 @@ public class ChainedThreadingProfile implements ThreadingProfile
     private Integer poolExhaustedAction;
     private Boolean doThreading;
 
-    private WorkManagerFactory workManagerFactory = new ConstantThreadingProfile.DefaultWorkManagerFactory();
+    private WorkManagerFactory workManagerFactory = new ImmutableThreadingProfile.DefaultWorkManagerFactory();
     private RejectedExecutionHandler rejectedExecutionHandler;
     private ThreadFactory threadFactory;
 
@@ -83,7 +83,7 @@ public class ChainedThreadingProfile implements ThreadingProfile
         if (!dynamic)
         {
             // for static dependencies, we delegate to a fixed copy
-            delegate = new ConstantThreadingProfile(delegate);
+            delegate = new ImmutableThreadingProfile(delegate);
         }
         this.delegate = delegate;
     }
@@ -190,7 +190,7 @@ public class ChainedThreadingProfile implements ThreadingProfile
 
     public ThreadPoolExecutor createPool(String name)
     {
-        return ConstantThreadingProfile.createPool(name, this);
+        return ImmutableThreadingProfile.createPool(name, this);
     }
 
     public boolean isDoThreading()

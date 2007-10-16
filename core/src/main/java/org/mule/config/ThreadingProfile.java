@@ -20,9 +20,18 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 /**
- * <code>ThreadingProfile</code> is used to configure a thread pool. Mule uses a
- * few different pools i.e. for component threads and message dispatchers. This object
- * makes it easier to configure the pool.
+ * Mule uses a few different pools i.e. for component threads and message dispatchers. This interface
+ * makes it easier to configure the pool.  Pools are created via
+ * {@link ImmutableThreadingProfile#createPool(String, ThreadingProfile)} (which
+ * should really be a separate factory).
+ *
+ * <p>{@link ImmutableThreadingProfile} is a simple read-only implementation that
+ * makes a local copy of any {@link org.mule.config.ThreadingProfile} passed to a consructor.</p>
+ *
+ * <p>{@link org.mule.config.ChainedThreadingProfile} is a mutable implementation that can take
+ * default values from an existing {@link org.mule.config.ThreadingProfile}.  The default values
+ * can be either dynamic (read whenever the value is queried) or static (a local copy of the
+ * default is made when the profile is first constructed).</p>
  */
 public interface ThreadingProfile
 {
@@ -101,7 +110,7 @@ public interface ThreadingProfile
     };
 
     static final ThreadingProfile DEFAULT_THREADING_PROFILE =
-            new ConstantThreadingProfile(
+            new ImmutableThreadingProfile(
                     DEFAULT_MAX_THREADS_ACTIVE,
                     DEFAULT_MAX_THREADS_IDLE,
                     DEFAULT_MAX_BUFFER_SIZE,
