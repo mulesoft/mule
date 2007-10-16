@@ -17,7 +17,6 @@ import org.mule.providers.ConnectException;
 import org.mule.providers.file.i18n.FileMessages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
@@ -35,7 +34,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.util.Comparator;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -125,6 +126,15 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         try
         {
             File[] files = this.listFiles();
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Files: " + files);
+            }
+            Comparator comparator = getComparator();
+            if (comparator != null)
+            {
+                Arrays.sort(files, comparator);
+            }
             for (int i = 0; i < files.length; i++)
             {
                 this.processFile(files[i]);
@@ -430,6 +440,18 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             throw new MuleException(FileMessages.errorWhileListingFiles(), e);
         }
+    }
+
+    protected Comparator getComparator() throws Exception
+    {
+        Object o = this.getEndpoint().getProperty("comparator");
+        if (o != null)
+        {
+            Class clazz = Class.forName(o.toString());
+            o = clazz.newInstance();
+            return (Comparator) o;
+        }
+        return null;
     }
 
 }
