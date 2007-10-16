@@ -57,8 +57,6 @@
         </spring:property>
     </spring:bean>
 
-    <smtp:connector name="EmailConnector"/>
-
     <jms:activemq-connector name="JMSConnector"/>
     <!-- TODO DO: how to specify this? Fortunately it's the default of AMQ connector but it
          would be good to show an example to specify this anyway
@@ -149,7 +147,7 @@
                 </filtering-router>
                 
                 <filtering-router transformer-ref="ErrorMessageToException">
-                    <outbound-endpoint address="smtp://?address=${email.toAddress}"
+                    <outbound-endpoint address="smtp://${smtp.username}:${smtp.password}@${smtp.host}:${smtp.port}?address=${email.toAddress}"
                                    transformer-ref="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
                         <properties>
                             <spring:entry key="fromAddress" value="${email.fromAddress}"/>

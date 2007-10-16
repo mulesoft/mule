@@ -1,4 +1,9 @@
 +-----------------------+
+| Important notes       |
++-----------------------+
+- TODO - MULE-1969 - The above (email properties) may not work.
+
++-----------------------+
 | Error Handler Example |
 +-----------------------+
 The Error handler example demonstrates using Spring as the external container to provide
@@ -36,36 +41,13 @@ INSTALL.txt, you can run the example from the command line as follows:
 
     Linux / Unix
     ------------
-    mule -config file:conf/error-config.xml
-     or
-    export MULE_LIB=./conf
-    mule -config error-config.xml
+    ./errorhandler
 
     Windows
     -------
-    mule.bat -config .\conf\error-config.xml
-     or
-    SET MULE_LIB=.\conf
-    mule.bat -config error-config.xml
+    ./errorhandler.bat
 
 In the second window, copy the files (one by one so you can see the results) from the
 ./test-data/out directory to the ./test-data/in directory.  Note that for the
 FatalException.xml file, Mule will attempt to construct and send an alert email using the
-SMTP configuration you should specify as explained below.
-
-+-----------------+
-| E-mail settings |
-+-----------------+
-The FatalException.xml part of this example sends an alert e-mail to the Mule administrator.
-For this to work, you will need to configure your e-mail address and SMTP settings in the
-file ./conf/email.properties  Then you can run the example as follows:
-
-    Linux / Unix
-    ------------
-    mule -config file:conf/error-config.xml -props ./conf/email.properties
-
-    Windows
-    -------
-    mule.bat -config file:conf\error-config.xml -props .\conf\email.properties
-
-TODO - MULE-1969 - The above (email properties) may not work.
+SMTP configuration as specified in ./conf/email.properties.

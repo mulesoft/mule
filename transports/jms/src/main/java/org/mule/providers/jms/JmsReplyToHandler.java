@@ -65,7 +65,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             Object payload =
                     TransformerUtils.applyAllTransformers(
                             getTransformers(), returnMessage,
-                            getEndpoint(event, "jms://temporary")).getPayload();
+                            getEndpoint(event, "jms://temporary?connector=" + connector.getName())).getPayload();
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue
                     && connector.getJmsSupport() instanceof Jms102bSupport)
