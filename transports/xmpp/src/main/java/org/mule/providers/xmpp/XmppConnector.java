@@ -71,21 +71,13 @@ public class XmppConnector extends AbstractConnector
     public XMPPConnection createXmppConnection(UMOEndpointURI endpointURI) throws XMPPException
     {
         logger.info("Trying to find XMPP connection for uri: " + endpointURI);
-        XMPPConnection xmppConnection = null;
 
         String username = endpointURI.getUsername();
         String hostname = endpointURI.getHost();
         String password = endpointURI.getPassword();
         String resource = (String)endpointURI.getParams().get("resource");
 
-        if (endpointURI.getPort() != -1)
-        {
-            xmppConnection = new XMPPConnection(endpointURI.getHost(), endpointURI.getPort());
-        }
-        else
-        {
-            xmppConnection = new XMPPConnection(endpointURI.getHost());
-        }
+        XMPPConnection xmppConnection = this.doCreateXmppConnection(endpointURI);
 
         if (!xmppConnection.isAuthenticated())
         {
@@ -121,8 +113,36 @@ public class XmppConnector extends AbstractConnector
         else
         {
             if (logger.isDebugEnabled())
+            {
                 logger.debug("Already authenticated on this connection, no need to log in again.");
+            }
         }
+        return xmppConnection;
+    }
+
+    /**
+     * This method creates and returns the {@link XMPPConnection} object that's uses to talk to
+     * the Jabber server.
+     * <p/>
+     * Subclasses can override this method to create a more specialized {@link XMPPConnection}.
+     * 
+     * @param endpointURI
+     * @return
+     * @throws XMPPException
+     */
+    protected XMPPConnection doCreateXmppConnection(UMOEndpointURI endpointURI) throws XMPPException
+    {
+        XMPPConnection xmppConnection = null;
+        
+        if (endpointURI.getPort() != -1)
+        {
+            xmppConnection = new XMPPConnection(endpointURI.getHost(), endpointURI.getPort());
+        }
+        else
+        {
+            xmppConnection = new XMPPConnection(endpointURI.getHost());
+        }
+        
         return xmppConnection;
     }
 

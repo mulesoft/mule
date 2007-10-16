@@ -17,7 +17,6 @@ import org.jivesoftware.smack.packet.Message;
 
 public class XmppConnectorTestCase extends AbstractConnectorTestCase
 {
-
     // @Override
     public UMOConnector createConnector() throws Exception
     {
@@ -31,9 +30,14 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
         return new Message("Hello");
     }
 
+    protected String getProtocol()
+    {
+        return "xmpp";
+    }
+    
     public String getTestEndpointURI()
     {
-        return "xmpp://mule1:mule@jabber.org.au/ross@jabber.org";
+        return this.getProtocol() + "://mule1:mule@jabber.org.au/ross@jabber.org";
     }
 
 }
