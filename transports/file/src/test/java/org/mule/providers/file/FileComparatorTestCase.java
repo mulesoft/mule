@@ -32,10 +32,10 @@ public class FileComparatorTestCase extends FunctionalTestCase
         managementContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).stop();
         File f1 = FileUtils.newFile(PATH + FILE1_NAME);
         f1.createNewFile();
-        Thread.sleep(1);
+        Thread.sleep(1000);
         File f2 = FileUtils.newFile(PATH + FILE2_NAME);
         f2.createNewFile();
-        Thread.sleep(10);
+        Thread.sleep(1000);
         managementContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).start();
 
         MuleClient client = new MuleClient();
