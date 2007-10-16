@@ -10,15 +10,15 @@
 
 package org.mule.providers.ssl;
 
+import org.mule.extras.client.MuleClient;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.net.URI;
@@ -28,6 +28,8 @@ import javax.net.ssl.SSLSocketFactory;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Note that this test doesn't test the socket from the connector itself (and so ran
@@ -41,7 +43,7 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "/ssl-connector-functional-test.xml";
+        return "ssl-connector-functional-test.xml";
     }
 
     protected URI getUri()
@@ -109,39 +111,45 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
     {
 
         final CountDownLatch callbackCount = new CountDownLatch(1);
+        // these don't need to be atomic, they are just used as references
+        // so that wecan move the assertions out of the callback (failing
+        // in the callback hangs the test - it's not the right thread)
+        final AtomicBoolean nonNullOutputStream = new AtomicBoolean(false);
+        final AtomicReference certificates = new AtomicReference();
 
         FunctionalTestComponent ftc = lookupTestComponent("main", "testComponent");
         ftc.setEventCallback(new EventCallback()
         {
             public void eventReceived(UMOEventContext context, Object component) throws Exception
             {
-                callbackCount.countDown();
-                String result = FunctionalTestComponent.received(context.getMessageAsString());
-
-                assertNotNull(context.getOutputStream());
-                assertNotNull(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
-
-                if (!((ResponseOutputStream) context.getOutputStream()).getSocket().isClosed())
+                try
                 {
-                    context.getOutputStream().write(result.getBytes());
-                    context.getOutputStream().flush();
+                    String result = FunctionalTestComponent.received(context.getMessageAsString());
+                    nonNullOutputStream.set(null != context.getOutputStream());
+                    if (nonNullOutputStream.get())
+                    {
+                        certificates.set(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
+                        if (!((ResponseOutputStream) context.getOutputStream()).getSocket().isClosed())
+                        {
+                            context.getOutputStream().write(result.getBytes());
+                            context.getOutputStream().flush();
+                        }
+                    }
                 }
-
+                finally
+                {
+                    callbackCount.countDown();
+                }
             }
         });
 
-        URI uri = getUri();
-        socket = createSocket(uri);
-        DataOutputStream dos = new DataOutputStream((socket.getOutputStream()));
-        dos.write(TEST_MESSAGE.getBytes());
-        dos.flush();
-
-        DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-        byte[] buf = new byte[32];
-        int x = dis.read(buf);
-        assertTrue(x > -1);
-        assertEquals(new String(buf, 0, x), TEST_MESSAGE_RESPONSE);
+        MuleClient client = new MuleClient();
+        UMOMessage response = client.send(getUri().toString(), TEST_MESSAGE, null);
+        callbackCount.await(3000, TimeUnit.MILLISECONDS);
         assertEquals(0, callbackCount.getCount());
-
+        assertEquals(TEST_MESSAGE_RESPONSE, response.getPayloadAsString());
+        assertTrue("no output stream", nonNullOutputStream.get());
+        assertNull("no certificates", certificates.get());
     }
+
 }

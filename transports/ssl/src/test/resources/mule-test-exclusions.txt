@@ -1,1 +1,8 @@
+#
+# Test cases listed in this file are not run.
+#
+
 org.mule.providers.ssl.issues.AsynchronousSslMule1854TestCase
+
+# MULE-2564
+org.mule.providers.ssl.SslConnectorFunctionalTestCase
