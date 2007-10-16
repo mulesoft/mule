@@ -12,8 +12,10 @@ package org.mule.providers.xmpp;
 
 public class XmppsConnectorTestCase extends XmppConnectorTestCase
 {
+
     protected String getProtocol()
     {
         return "xmpps";
     }
+    
 }

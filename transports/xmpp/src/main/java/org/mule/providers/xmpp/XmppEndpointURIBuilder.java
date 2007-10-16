@@ -18,7 +18,7 @@ import java.net.URI;
 import java.util.Properties;
 
 /**
- * Does the same as the UserINfoEndpointBuilder but also ensures that a path is set
+ * Does the same as the UserInfoEndpointBuilder but also ensures that a path is set
  * on the uri. The path is used as either the groupChat name or the recipient name of
  * a one on one chat.
  */
