@@ -2,5 +2,5 @@
 # Test cases listed in this file are not run.
 #
 
-# MULE-2510
-org.mule.examples.loanbroker.bpm.JBpmFunctionalTestCase
+# MULE-2510 (intermittent?)
+#org.mule.examples.loanbroker.bpm.JBpmFunctionalTestCase

@@ -1,16 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-# TC - Only testReceiver (1 of 8 tests) is failing sporadically for these.
-#      Might be solved by adding a delay to the test
-# AC - Added delay (and resolved some other issues).
-#      Cannot duplicate now, so trying enabled...
-#org.mule.providers.email.connectors.ImapConnectorTestCase
-#org.mule.providers.email.connectors.ImapsConnectorTestCase
-#org.mule.providers.email.connectors.Pop3ConnectorTestCase
-#org.mule.providers.email.connectors.Pop3sConnectorTestCase
-#org.mule.providers.email.connectors.SmtpConnectorTestCase
-#org.mule.providers.email.connectors.SmtpsConnectorTestCase
-#org.mule.providers.email.issues.MakeBackupMule2050TestCase
-#org.mule.providers.email.issues.NoBackupMule2050TestCase
-

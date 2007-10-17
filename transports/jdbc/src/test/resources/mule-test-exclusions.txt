@@ -1,2 +1,4 @@
-# MULE-2415
-#org.mule.providers.jdbc.JdbcSelectOnOutboundFunctionalTestCase
+#
+# Test cases listed in this file are not run.
+#
+

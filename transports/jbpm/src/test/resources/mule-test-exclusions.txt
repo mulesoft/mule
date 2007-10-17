@@ -1,6 +1,6 @@
-# MULE-2418
-#org.mule.providers.bpm.jbpm.SimpleJbpmTestCase
-#org.mule.providers.bpm.jbpm.MessagingJbpmTestCase
+#
+# Test cases listed in this file are not run.
+#
 
 # Cannot run legacy tests without 1to2migration module
 org.mule.providers.bpm.jbpm.SimpleJbpmLegacyTestCase
