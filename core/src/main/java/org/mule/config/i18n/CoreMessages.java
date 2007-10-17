@@ -12,6 +12,7 @@ package org.mule.config.i18n;
 
 import org.mule.config.MuleManifest;
 import org.mule.impl.AbstractExceptionListener;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -964,6 +965,11 @@ public class CoreMessages extends MessageFactory
     public static Message notMuleXaTransaction(Object tx)
     {
         return createMessage(BUNDLE_PATH, 248, tx.getClass());
+    }
+    
+    public static Message noComponentQueueTimeoutSet(UMOComponent component)
+    {
+        return createMessage(BUNDLE_PATH, 249, component);
     }
 
 }

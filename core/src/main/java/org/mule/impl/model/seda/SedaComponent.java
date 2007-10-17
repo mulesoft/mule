@@ -108,7 +108,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         if (queueTimeout == null)
         {
             // TODO MULE-2102 This should be configured in the default template.
-            setQueueTimeout(((SedaModel) model).getQueueTimeout());
+            setQueueTimeout(new Integer(((SedaModel) model).getQueueTimeout()));
         }
         
         try
@@ -401,7 +401,14 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         {
             //logger.debug("Component " + name + " polling queue " + name + ", timeout = " + queueTimeout);
         }
-        return (UMOEvent) queue.poll(getQueueTimeout());
+        if (getQueueTimeout() == null)
+        {
+            throw new InitialisationException(CoreMessages.noComponentQueueTimeoutSet(this), this);
+        }
+        else
+        {
+            return (UMOEvent) queue.poll(getQueueTimeout().intValue());
+        }
     }
 
     public void workAccepted(WorkEvent event)
@@ -476,19 +483,14 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         this.queueProfile = queueProfile;
     }
 
-    public int getQueueTimeout()
+    public Integer getQueueTimeout()
     {
-        if(queueTimeout == null){
-            return 0;
-        }
-        else{
-            return queueTimeout.intValue();
-        }
+        return queueTimeout;
     }
 
-    public void setQueueTimeout(int queueTimeout)
+    public void setQueueTimeout(Integer queueTimeout)
     {
-        this.queueTimeout = new Integer(queueTimeout);
+        this.queueTimeout = queueTimeout;
     }
 
     public ThreadingProfile getThreadingProfile()
