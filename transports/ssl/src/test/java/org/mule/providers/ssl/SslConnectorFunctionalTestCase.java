@@ -128,6 +128,7 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
                     nonNullOutputStream.set(null != context.getOutputStream());
                     if (nonNullOutputStream.get())
                     {
+                        logger.debug("reading certificate");
                         certificates.set(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
                         if (!((ResponseOutputStream) context.getOutputStream()).getSocket().isClosed())
                         {
@@ -145,11 +146,11 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
 
         MuleClient client = new MuleClient();
         UMOMessage response = client.send(getUri().toString(), TEST_MESSAGE, null);
-        callbackCount.await(3000, TimeUnit.MILLISECONDS);
+        callbackCount.await(3000999, TimeUnit.MILLISECONDS);
         assertEquals(0, callbackCount.getCount());
         assertEquals(TEST_MESSAGE_RESPONSE, response.getPayloadAsString());
         assertTrue("no output stream", nonNullOutputStream.get());
-        assertNull("no certificates", certificates.get());
+        assertNotNull("no certificates", certificates.get());
     }
 
 }
