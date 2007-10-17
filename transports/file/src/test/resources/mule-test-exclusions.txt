@@ -1,1 +1,9 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# MULE-2562
+org.mule.providers.file.FileComparatorTestCase
+
+# MULE-1842
 org.mule.providers.file.issues.IndirectReceiveMule1842TestCase
