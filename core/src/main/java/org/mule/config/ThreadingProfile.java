@@ -85,7 +85,7 @@ public interface ThreadingProfile
     {
         private static final long serialVersionUID = 1L;
 
-        // static initializer
+        // initializer
         {
             Integer value = new Integer(WHEN_EXHAUSTED_WAIT);
             this.put("WHEN_EXHAUSTED_WAIT", value);
