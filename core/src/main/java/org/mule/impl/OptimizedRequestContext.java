@@ -13,24 +13,31 @@ package org.mule.impl;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
- * NOT FOR POUBLIC USE - please use the interface provided by RequestContext.
+ * NOT FOR PUBLIC USE - please use the interface provided by RequestContext.
  * This is a temporary interface that helps provide an (optimized) fix for message
  * scribbling.
  *
- * <p>Mutating methods have three versions: default (RequestContext; makes and returns a new copy);
- * unsafe (doesn't make a copy, use only where certain no threading); critical (as safe, but
+ * <p>Mutating methods have three versions: default (RequestContext; safe, makes and returns a new
+ * copy - although this can be changed via {@link RequestContext#DEFAULT_ACTION});
+ * unsafe (doesn't make a copy, use only where certain no threading); critical (safe,
  * documents that threading a known issue).</p>
  */
 public final class OptimizedRequestContext
 {
 
+    private static final boolean DOCUMENT_UNSAFE_CALLS = false;
+    private static final Log logger = LogFactory.getLog(OptimizedRequestContext.class);
+
     /**
-     * Do not instanciate.
+     * Do not instantiate.
      */
     private OptimizedRequestContext()
     {
-        super();
+        // unused
     }
 
     /**
@@ -41,6 +48,7 @@ public final class OptimizedRequestContext
      */
     public static UMOEvent unsafeSetEvent(UMOEvent event)
     {
+        documentUnsafeCall("unsafeSetEvent");
         return RequestContext.internalSetEvent(event);
     }
 
@@ -52,7 +60,7 @@ public final class OptimizedRequestContext
      */
     public static UMOEvent criticalSetEvent(UMOEvent event)
     {
-        return RequestContext.internalSetEvent(RequestContext.newEvent(event, true, true));
+        return RequestContext.internalSetEvent(RequestContext.newEvent(event, RequestContext.SAFE));
     }
 
     /**
@@ -65,7 +73,8 @@ public final class OptimizedRequestContext
      */
     public static UMOMessage unsafeRewriteEvent(UMOMessage message)
     {
-        return RequestContext.internalRewriteEvent(message, false, false);
+        documentUnsafeCall("unsafeRewriteEvent");
+        return RequestContext.internalRewriteEvent(message, RequestContext.UNSAFE);
     }
 
     /**
@@ -78,17 +87,26 @@ public final class OptimizedRequestContext
      */
     public static UMOMessage criticalRewriteEvent(UMOMessage message)
     {
-        return RequestContext.internalRewriteEvent(message, true, true);
+        return RequestContext.internalRewriteEvent(message, RequestContext.SAFE);
     }
 
     public static UMOMessage unsafeWriteResponse(UMOMessage message)
     {
-        return RequestContext.internalWriteResponse(message, false, false);
+        documentUnsafeCall("unsafeWriteResponse");
+        return RequestContext.internalWriteResponse(message, RequestContext.UNSAFE);
     }
 
     public static UMOMessage criticalWriteResponse(UMOMessage message)
     {
-        return RequestContext.internalWriteResponse(message, true, true);
+        return RequestContext.internalWriteResponse(message, RequestContext.SAFE);
+    }
+
+    private static void documentUnsafeCall(String message)
+    {
+        if (DOCUMENT_UNSAFE_CALLS)
+        {
+            logger.debug(message, new Exception(message));
+        }
     }
 
 }
