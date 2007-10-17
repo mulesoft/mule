@@ -565,6 +565,15 @@
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>1.1</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <!-- 
+                         see http://jira.codehaus.org/browse/MJAVADOC-145 which is
+                         fixed with v2.4 of the javadoc plugin which is not yet released.
+                    -->
+                    <version>2.2</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -828,7 +837,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <minmemory>128m</minmemory>
-                    <maxmemory>512</maxmemory>
+                    <maxmemory>512m</maxmemory>
                     <charset>ISO-8859-1</charset>
                     <encoding>ISO-8859-1</encoding>
                     <!-- aggregate all when built from the top-level directory -->
