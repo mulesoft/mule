@@ -334,7 +334,8 @@ public class MuleUniversalChannel extends AbstractChannel
     protected UMOStreamMessageAdapter sendStream(String uri, UMOStreamMessageAdapter sa) throws UMOException
     {
         // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        UMOEndpoint ep = (UMOEndpoint) RegistryContext.getRegistry().lookupOutboundEndpoint(uri, MuleServer.getManagementContext());
+        UMOEndpoint ep = (UMOEndpoint) RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri,
+            MuleServer.getManagementContext());
         ep.setStreaming(true);
         UMOMessage message = new MuleMessage(sa);
         UMOEvent event = new MuleEvent(message, ep, RequestContext.getEventContext().getSession(), true);
