@@ -18,7 +18,12 @@
         <!--  <module>visualizer</module> -->
         <module>bobberplus</module>
         <module>mule-transport-archetype</module>
+        <!--
+            Do not build this plugin as part of the normal build as it does not
+            belong here and it has no dependencies on Mule either. Worse, when
+            this plugin is part of the normal build generating the site fails.
         <module>mule-assembly-verifier</module>
+        -->
     </modules>
 
     <build>
