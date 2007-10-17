@@ -43,7 +43,7 @@ public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
 
     protected void sendTestData(int iterations) throws Exception
     {
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "axis:http://localhost:60198/mule/services/testComponent?method=receiveMessageWithAttachments",
             managementContext);
 

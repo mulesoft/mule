@@ -37,7 +37,7 @@ public interface UMOEndpointFactory
      * @return
      * @throws UMOException
      */
-    UMOImmutableEndpoint createInboundEndpoint(String uri, UMOManagementContext managementContext) throws UMOException;
+    UMOImmutableEndpoint getInboundEndpoint(String uri, UMOManagementContext managementContext) throws UMOException;
 
     /**
      * Creates an endpoint with the "OUTBOUND" role. <br/><br/> The uri parameter can either be a uri, or a
@@ -50,7 +50,7 @@ public interface UMOEndpointFactory
      * @return
      * @throws UMOException
      */
-    UMOImmutableEndpoint createOutboundEndpoint(String uri, UMOManagementContext managementContext) throws UMOException;
+    UMOImmutableEndpoint getOutboundEndpoint(String uri, UMOManagementContext managementContext) throws UMOException;
 
     /**
      * Creates an endpoint with the "RESPONSE" role. <br/><br/> The uri parameter can either be a uri, or a
@@ -63,7 +63,7 @@ public interface UMOEndpointFactory
      * @return
      * @throws UMOException
      */
-    UMOImmutableEndpoint createResponseEndpoint(String uri, UMOManagementContext managementContext) throws UMOException;
+    UMOImmutableEndpoint getResponseEndpoint(String uri, UMOManagementContext managementContext) throws UMOException;
 
     /**
      * Creates an endpoint with the "INBOUND" role using the builder provided.
@@ -73,7 +73,7 @@ public interface UMOEndpointFactory
      * @return
      * @throws UMOException
      */
-    UMOImmutableEndpoint createInboundEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
+    UMOImmutableEndpoint getInboundEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
 
     /**
      * Creates an endpoint with the "OUTBOUND" role using the builder provided.
@@ -83,7 +83,7 @@ public interface UMOEndpointFactory
      * @return
      * @throws UMOException
      */
-    UMOImmutableEndpoint createOutboundEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
+    UMOImmutableEndpoint getOutboundEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
 
     /**
      * Creates an endpoint with the "RESPONSE" role using the builder provided.
@@ -93,7 +93,7 @@ public interface UMOEndpointFactory
      * @return
      * @throws UMOException
      */
-    UMOImmutableEndpoint createResponseEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
+    UMOImmutableEndpoint getResponseEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
 
     /**
      * @param endpointUri
@@ -103,7 +103,7 @@ public interface UMOEndpointFactory
      * @throws EndpointException
      * @throws UMOException
      */
-    UMOImmutableEndpoint createEndpoint(UMOEndpointURI endpointUri,
+    UMOImmutableEndpoint getEndpoint(UMOEndpointURI endpointUri,
                                         String endpointType,
                                         UMOManagementContext managementContext) throws EndpointException, UMOException;
 

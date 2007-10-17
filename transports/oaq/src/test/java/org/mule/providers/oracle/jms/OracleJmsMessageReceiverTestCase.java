@@ -53,7 +53,7 @@ public class OracleJmsMessageReceiverTestCase extends AbstractMessageReceiverTes
     {
         UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("jms://TEST_QUEUE", managementContext);
         builder.setConnector(getConnector());
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
             managementContext);
         return endpoint;
     }

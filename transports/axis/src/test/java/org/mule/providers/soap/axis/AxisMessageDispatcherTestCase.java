@@ -25,7 +25,7 @@ public class AxisMessageDispatcherTestCase extends AbstractMuleTestCase
 {
     public void testNullParametersInCallAllowed() throws Exception
     {
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "axis:http://www.muleumo.org/services/myService?method=myTestMethod", managementContext);
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         dispatcher.service = new Service();

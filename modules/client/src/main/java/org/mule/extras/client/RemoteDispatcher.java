@@ -83,7 +83,8 @@ public class RemoteDispatcher implements Disposable
 
     protected RemoteDispatcher(String endpoint) throws UMOException
     {
-        serverEndpoint = RegistryContext.getRegistry().lookupInboundEndpoint(endpoint, MuleServer.getManagementContext());
+        serverEndpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpoint,
+            MuleServer.getManagementContext());
         wireFormat = new SerializationWireFormat();
     }
 

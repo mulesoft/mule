@@ -37,7 +37,7 @@ public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint("vm://test",
+        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vm://test",
             managementContext);
     }
 }

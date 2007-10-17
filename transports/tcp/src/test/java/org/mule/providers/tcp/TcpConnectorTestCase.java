@@ -44,7 +44,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         
         UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry()
             .lookupEndpointFactory()
-            .createInboundEndpoint(getTestEndpointURI(), managementContext);
+            .getInboundEndpoint(getTestEndpointURI(), managementContext);
 
         UMOConnector connector = getConnector();
 

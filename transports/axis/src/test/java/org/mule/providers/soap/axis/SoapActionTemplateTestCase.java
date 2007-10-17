@@ -23,7 +23,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 {
     public void testHostInfoReplace() throws Exception
     {
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "axis:http://mycompany.com:8080/services/myService?method=foo", managementContext);
         
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
@@ -35,7 +35,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 
     public void testHostReplace() throws Exception
     {
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "axis:http://mycompany.com:8080/services/myService?method=foo", managementContext);
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         UMOEvent event = getTestEvent("test,", ep);

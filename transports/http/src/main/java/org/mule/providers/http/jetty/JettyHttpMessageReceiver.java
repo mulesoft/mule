@@ -77,8 +77,10 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                     path = "/";
                 }
 
-                UMOImmutableEndpoint ep = connector.getManagementContext().getRegistry().lookupInboundEndpoint(
-                        "servlet://" + path.substring(1), connector.getManagementContext());
+                UMOImmutableEndpoint ep = connector.getManagementContext()
+                    .getRegistry()
+                    .lookupEndpointFactory()
+                    .getInboundEndpoint("servlet://" + path.substring(1), connector.getManagementContext());
                 // TODO DF: Endpoint mutability
                 ((UMOEndpoint) ep).setTransformers(endpoint.getTransformers());
                 scon.registerListener(component, ep);

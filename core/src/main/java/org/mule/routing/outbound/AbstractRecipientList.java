@@ -160,7 +160,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         UMOImmutableEndpoint endpoint = null;
         if (null != getManagementContext() && null != getManagementContext().getRegistry())
         {
-            endpoint = getManagementContext().getRegistry().createEndpoint(uri,
+            endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(uri,
                 UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
         }
         if (null != endpoint)
@@ -176,7 +176,8 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         UMOImmutableEndpoint endpoint = (UMOEndpoint) recipientCache.get(recipient);
         if (null == endpoint && null != getManagementContext() && null != getManagementContext().getRegistry())
         {
-            endpoint = getManagementContext().getRegistry().lookupOutboundEndpoint(recipient, getManagementContext());
+            endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(recipient,
+                getManagementContext());
         }
         return endpoint;
     }

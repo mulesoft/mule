@@ -853,12 +853,12 @@ public class MuleClient implements Disposable
 
     protected UMOImmutableEndpoint getInboundEndpoint(String uri) throws UMOException
     {
-        return managementContext.getRegistry().lookupInboundEndpoint(uri, managementContext);
+        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(uri, managementContext);
     }
     
     protected UMOImmutableEndpoint getOutboundEndpoint(String uri) throws UMOException
     {
-        return managementContext.getRegistry().lookupOutboundEndpoint(uri, managementContext);
+        return managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri, managementContext);
     }
 
     protected UMOImmutableEndpoint getDefaultClientEndpoint(UMOComponent component, Object payload)
@@ -880,7 +880,7 @@ public class MuleClient implements Disposable
                 {
                     UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
                     builder.setTransformers(new LinkedList());
-                    return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+                    return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
                         managementContext);
                 }
             }
@@ -893,7 +893,7 @@ public class MuleClient implements Disposable
         {
             UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("vm://mule.client", managementContext);
             builder.setName("muleClientProvider");
-            endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
                 managementContext);
         }
         return endpoint;

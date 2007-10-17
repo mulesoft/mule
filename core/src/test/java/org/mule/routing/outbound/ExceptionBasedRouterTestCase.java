@@ -46,15 +46,15 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
  
         UMOImmutableEndpoint endpoint1 = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .createOutboundEndpoint("test://Dummy1", managementContext);
+            .getOutboundEndpoint("test://Dummy1", managementContext);
 
         UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .createOutboundEndpoint("test://Dummy2", managementContext);
+            .getOutboundEndpoint("test://Dummy2", managementContext);
 
         UMOImmutableEndpoint endpoint3 = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .createOutboundEndpoint("test://Dummy3", managementContext);
+            .getOutboundEndpoint("test://Dummy3", managementContext);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         RegExFilter filter = new RegExFilter("(.*) event");
@@ -99,11 +99,11 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         UMOImmutableEndpoint endpoint1 = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .createOutboundEndpoint("test://AlwaysFail", managementContext);
+            .getOutboundEndpoint("test://AlwaysFail", managementContext);
 
         UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .createOutboundEndpoint("test://AlwaysFail", managementContext);
+            .getOutboundEndpoint("test://AlwaysFail", managementContext);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         RegExFilter filter = new RegExFilter("(.*) event");

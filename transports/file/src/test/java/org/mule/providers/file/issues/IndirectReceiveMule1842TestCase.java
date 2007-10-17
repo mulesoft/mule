@@ -35,7 +35,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         logger.debug(url);
         
         UMOImmutableEndpoint endpoint = 
-            managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(url, managementContext);
+            managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url, managementContext);
         relay.getInboundRouter().addEndpoint(endpoint);
 
         // then read from the queue that the polling receiver will write to

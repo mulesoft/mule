@@ -64,7 +64,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1590,8 +1589,8 @@ public abstract class AbstractConnector
 
     public UMOMessage receive(String uri, long timeout) throws Exception
     {
-        return this.receive(getManagementContext().getRegistry()
-            .lookupInboundEndpoint(uri, getManagementContext()), timeout);
+        return this.receive(getManagementContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(uri,
+            getManagementContext()), timeout);
     }
 
     public UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception

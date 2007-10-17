@@ -16,7 +16,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -98,8 +97,9 @@ public interface Registry extends Initialisable, Disposable
      * will be replaces by and more specific interface. SEE MULE-2292
      * 
      */
-    UMOImmutableEndpoint lookupInboundEndpoint(String uri, UMOManagementContext managementContext)
-        throws UMOException;
+    //TODO MULE-2494
+    //UMOImmutableEndpoint lookupInboundEndpoint(String uri, UMOManagementContext managementContext)
+    //    throws UMOException;
 
     /**
      * Returns immutable endpoint instance with the "OUTBOUND" role. <br/><br/> The uri paramater can be one
@@ -112,8 +112,9 @@ public interface Registry extends Initialisable, Disposable
      * will be replaces by and more specific interface. SEE MULE-2292
      * 
      */
-    UMOImmutableEndpoint lookupOutboundEndpoint(String uri, UMOManagementContext managementContext)
-        throws UMOException;
+    //TODO MULE-2494
+    //UMOImmutableEndpoint lookupOutboundEndpoint(String uri, UMOManagementContext managementContext)
+    //    throws UMOException;
 
     /**
      * Returns immutable endpoint instance with the "RESPONSE" role. <br/><br/> The uri paramater can be one
@@ -126,15 +127,9 @@ public interface Registry extends Initialisable, Disposable
      * will be replaces by and more specific interface. SEE MULE-2292
      * 
      */
-    UMOImmutableEndpoint lookupResponseEndpoint(String uri, UMOManagementContext managementContext)
-        throws UMOException;
-
-    /**
-     */
-    UMOImmutableEndpoint createEndpoint(UMOEndpointURI endpointUri,
-                                        String endpointType,
-                                        UMOManagementContext managementContext)
-        throws UMOException;
+    //TODO MULE-2494
+    //UMOImmutableEndpoint lookupResponseEndpoint(String uri, UMOManagementContext managementContext)
+    //    throws UMOException;
 
     UMOTransformer lookupTransformer(String name);
 
@@ -203,15 +198,20 @@ public interface Registry extends Initialisable, Disposable
 
     UMOConnector unregisterConnector(String connectorName) throws UMOException;
 
-    void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
-        throws UMOException;
+    //TODO MULE-2494
+    //void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
+    //    throws UMOException;
 
-    /** @deprecated Use registerEndpoint(UMOEndpoint endpoint, UMOManagementContext managementContext) instead. */
-    void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException;
+    //TODO MULE-2494
+    ///** @deprecated Use registerEndpoint(UMOEndpoint endpoint, UMOManagementContext managementContext) instead. */
+    //void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException;
 
+    //TODO MULE-2494
+    //UMOImmutableEndpoint unregisterEndpoint(String endpointName);
+
+    
     public void registerEndpointBuilder(String name, UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
     
-    UMOImmutableEndpoint unregisterEndpoint(String endpointName);
 
     void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext)
         throws UMOException;

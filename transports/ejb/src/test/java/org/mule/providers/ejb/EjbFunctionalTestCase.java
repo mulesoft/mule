@@ -94,7 +94,7 @@ public class EjbFunctionalTestCase extends FunctionalTestCase
         props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
         builder.setProperties(props);
 
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             builder, managementContext);
         try
         {
@@ -116,7 +116,7 @@ public class EjbFunctionalTestCase extends FunctionalTestCase
         props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
         builder.setProperties(props);
         
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             builder, managementContext);
         
         try

@@ -103,7 +103,8 @@ public class DefaultReplyToHandler implements ReplyToHandler
         UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) endpointCache.get(endpointUri);
         if (endpoint == null)
         {
-            endpoint = RegistryContext.getRegistry().lookupOutboundEndpoint(endpointUri,event.getManagementContext());
+            endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointUri,
+                event.getManagementContext());
             endpointCache.put(endpointUri, endpoint);
         }
         return endpoint;

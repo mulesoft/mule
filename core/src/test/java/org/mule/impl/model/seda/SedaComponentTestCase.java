@@ -21,6 +21,22 @@ import javax.resource.spi.work.WorkException;
 public class SedaComponentTestCase extends AbstractMuleTestCase
 {
 
+    public void testSedaModelEventTimeoutDefault() throws Exception
+    {
+        SedaComponent component = new SedaComponent();
+        component.setName("test");
+        component.setServiceFactory(new SimpleObjectFactory(Object.class));
+        component.setModel(new SedaModel());
+        component.setManagementContext(managementContext);
+        component.getModel().setManagementContext(managementContext);
+
+        component.getModel().initialise();
+        component.initialise();
+
+        assertNotNull(component.getQueueTimeout());
+        assertTrue(component.getQueueTimeout().intValue() != 0);
+    }
+    
     public void testSpiWorkThrowableHandling() throws Exception
     {
         try

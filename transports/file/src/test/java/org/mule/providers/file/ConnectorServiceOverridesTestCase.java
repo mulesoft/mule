@@ -59,7 +59,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
     public void testServiceOverrides3() throws InterruptedException, UMOException
     {
         // UMOEndpointURI uri = new MuleEndpointURI("file:///temp?connector=fileConnector1");
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint(
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "file:///temp?connector=fileConnector1", managementContext);
 
         assertNotNull(endpoint);
@@ -73,21 +73,21 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector1",
             managementContext);
         builder.setConnector(c);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
             managementContext);
         assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
         UMOEndpointBuilder builder2 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector3",
             managementContext);
         builder.setConnector(c);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder2,
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder2,
             managementContext);
         assertNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
         UMOEndpointBuilder builder3 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector2",
             managementContext);
         builder.setConnector(c);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder3,
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder3,
             managementContext);
         assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 

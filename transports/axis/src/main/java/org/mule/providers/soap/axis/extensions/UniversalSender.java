@@ -214,7 +214,7 @@ public class UniversalSender extends BasicHandler
 //                UMOMessage result = session.sendEvent(dispatchEvent);
                 UMOManagementContext managementContext = MuleServer.getManagementContext();
                 UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
-                endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+                endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
                     managementContext);
                 UMOEvent dispatchEvent = new MuleEvent(message, endpoint, session, sync);
                 UMOMessage result = endpoint.send(dispatchEvent);
@@ -275,7 +275,7 @@ public class UniversalSender extends BasicHandler
                         logger.debug("Dispatch Endpoint uri: " + uri
                                      + " not found on the cache. Creating the endpoint instead.");
                         ep = managementContext.getRegistry().lookupEndpointFactory()
-                                .createOutboundEndpoint(uri, managementContext);
+                                .getOutboundEndpoint(uri, managementContext);
                     }
                     else
                     {
@@ -291,7 +291,7 @@ public class UniversalSender extends BasicHandler
         else
         {
             ep = managementContext.getRegistry().lookupEndpointFactory()
-                    .createOutboundEndpoint(uri, managementContext);
+                    .getOutboundEndpoint(uri, managementContext);
         }
         return ep;
     }

@@ -91,7 +91,7 @@ public final class MuleObjectHelper
             {
                 UMOManagementContext managementContext = MuleServer.getManagementContext();
                 UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(iprovider, managementContext);
-                return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+                return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
                     managementContext);
             }
         }
@@ -121,7 +121,7 @@ public final class MuleObjectHelper
             {
                 UMOManagementContext managementContext = MuleServer.getManagementContext();
                 UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(iprovider, managementContext);
-                return managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder,
+                return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
                     managementContext);
             }
         }

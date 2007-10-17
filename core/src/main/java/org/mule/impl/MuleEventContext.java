@@ -278,8 +278,8 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage sendEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().createEndpoint(endpointUri,
-            UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
+        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(
+            endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
 
         // If synchronous receive has not been explicitly set, default it to
         // true
@@ -448,8 +448,8 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry()
-            .lookupOutboundEndpoint(endpointName, getManagementContext());
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            endpointName, getManagementContext());
         setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }
@@ -493,8 +493,8 @@ public class MuleEventContext implements UMOEventContext
      */
     public void dispatchEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().createEndpoint(endpointUri,
-            UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
+        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(
+            endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
         session.dispatchEvent(message, endpoint);
     }
 
@@ -568,8 +568,8 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage receiveEvent(UMOEndpointURI endpointUri, long timeout) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().createEndpoint(endpointUri,
-            UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
+        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(
+            endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
         return session.receiveEvent(endpoint, timeout);
     }
 

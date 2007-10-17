@@ -238,7 +238,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         // check the global endpoint
         try
         {
-            endpoint = managementContext.getRegistry().lookupInboundEndpoint("appleInEndpoint", managementContext);
+            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("appleInEndpoint",
+                managementContext);
         }
         catch (UMOException e)
         {
@@ -267,7 +268,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         // check the global endpoint
         try
         {
-            endpoint = managementContext.getRegistry().lookupInboundEndpoint("orangeEndpoint", managementContext);
+            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("orangeEndpoint",
+                managementContext);
         }
         catch (UMOException e)
         {

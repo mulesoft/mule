@@ -473,7 +473,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         UMOImmutableEndpoint endpoint;
         try
         {
-            endpoint = managementContext.getRegistry().lookupOutboundEndpoint(
+            endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
                 applicationEvent.getEndpoint(), managementContext);
         }
         catch (UMOException e)
@@ -562,7 +562,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             {
                 RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(!asynchronous);
                 // register any endpointUri mappings
-                registerEndpointMappings();
+                // TODO MULE-2494
+                //registerEndpointMappings();
             }
             // tell mule to load component definitions from spring
             //SpringContainerContext containerContext = new SpringContainerContext();
@@ -574,7 +575,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             // Next see if there are any UMOTransformers to register
             registerTransformers();
 
-            registerGlobalEndpoints();
+            // TODO MULE-2494
+            //registerGlobalEndpoints();
 
             // Register the multicaster descriptor
             registerMulticasterComponent();
@@ -641,7 +643,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
                 UMOImmutableEndpoint ep = managementContext.getRegistry()
                     .lookupEndpointFactory()
-                    .createInboundEndpoint(builder, managementContext);
+                    .getInboundEndpoint(builder, managementContext);
 
                 // check whether the endpoint has already been set on the MuleEventMulticastor
                 if (component.getInboundRouter().getEndpoint(ep.getName()) == null)
@@ -692,22 +694,23 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
 //        }
     }
 
-    protected void registerEndpointMappings() throws UMOException
-    {
-        // register any endpointUri mappings
-        if (endpointMappings != null)
-        {
-            Map.Entry entry;
-            for (Iterator iterator = endpointMappings.entrySet().iterator(); iterator.hasNext();)
-            {
-                entry = (Map.Entry) iterator.next();
-                UMOImmutableEndpoint endpoint = managementContext.getRegistry()
-                    .lookupEndpointFactory()
-                    .createInboundEndpoint((String) entry.getKey(), managementContext);
-                managementContext.getRegistry().registerEndpoint(endpoint);
-            }
-        }
-    }
+// TODO MULE-2494
+//    protected void registerEndpointMappings() throws UMOException
+//    {
+//        // register any endpointUri mappings
+//        if (endpointMappings != null)
+//        {
+//            Map.Entry entry;
+//            for (Iterator iterator = endpointMappings.entrySet().iterator(); iterator.hasNext();)
+//            {
+//                entry = (Map.Entry) iterator.next();
+//                UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+//                    .lookupEndpointFactory()
+//                    .getInboundEndpoint((String) entry.getKey(), managementContext);
+//                managementContext.getRegistry().registerEndpoint(endpoint);
+//            }
+//        }
+//    }
 
     protected void registerConnectors() throws UMOException
     {
@@ -733,29 +736,30 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
     }
 
-    protected void registerGlobalEndpoints() throws UMOException
-    {
-        if (!managementContext.isInitialised())
-        {
-            // Next see if there are any UMOConnectors to register
-            Map endpoints = applicationContext.getBeansOfType(UMOEndpoint.class, true, true);
-            if (endpoints.size() > 0)
-            {
-                Map.Entry entry;
-                UMOEndpoint endpoint;
-                for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();)
-                {
-                    entry = (Map.Entry)iterator.next();
-                    endpoint = (UMOEndpoint)entry.getValue();
-                    if (endpoint.getName() == null)
-                    {
-                        endpoint.setName(entry.getKey().toString());
-                    }
-                    managementContext.getRegistry().registerEndpoint(endpoint);
-                }
-            }
-        }
-    }
+// TODO MULE-2494
+//    protected void registerGlobalEndpoints() throws UMOException
+//    {
+//        if (!managementContext.isInitialised())
+//        {
+//            // Next see if there are any UMOConnectors to register
+//            Map endpoints = applicationContext.getBeansOfType(UMOEndpoint.class, true, true);
+//            if (endpoints.size() > 0)
+//            {
+//                Map.Entry entry;
+//                UMOEndpoint endpoint;
+//                for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();)
+//                {
+//                    entry = (Map.Entry)iterator.next();
+//                    endpoint = (UMOEndpoint)entry.getValue();
+//                    if (endpoint.getName() == null)
+//                    {
+//                        endpoint.setName(entry.getKey().toString());
+//                    }
+//                    managementContext.getRegistry().registerEndpoint(endpoint);
+//                }
+//            }
+//        }
+//    }
 
     protected void registerTransformers() throws UMOException
     {
@@ -803,7 +807,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         {
             logger.info("No receive endpoints have been set, using default '*'");
             component.getInboundRouter().addEndpoint(
-                managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint("vm://*", managementContext));
+                managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vm://*", managementContext));
         }
         else
         {
@@ -813,7 +817,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             for (int i = 0; i < subscriptions.length; i++)
             {
                 String subscription = subscriptions[i];
-                UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupInboundEndpoint(subscription,
+                UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+                    .lookupEndpointFactory()
+                    .getInboundEndpoint(subscription,
                     managementContext);
                 if (!asynchronous)
                 {

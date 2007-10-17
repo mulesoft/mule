@@ -253,7 +253,7 @@ public abstract class AbstractRegistry implements Registry
         {
             try
             {
-                o = lookupEndpointFactory().createInboundEndpoint((UMOEndpointBuilder) o, managementContext);
+                o = lookupEndpointFactory().getInboundEndpoint((UMOEndpointBuilder) o, managementContext);
             }
             catch (UMOException e)
             {
@@ -300,28 +300,22 @@ public abstract class AbstractRegistry implements Registry
         return (UMOEndpointFactory) lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
-    public UMOImmutableEndpoint lookupInboundEndpoint(String uri, UMOManagementContext managementContext)
+    public UMOImmutableEndpoint lookupInboundEndpoint(String name, UMOManagementContext managementContext)
         throws UMOException
     {
-        // For now create new instance with factory, existing instances in registry don't serve us as
-        // endpoints are not yet truely immutable
-        return lookupEndpointFactory().createInboundEndpoint(uri, managementContext);
+        return (UMOImmutableEndpoint) lookupObject(name);
     }
 
-    public UMOImmutableEndpoint lookupOutboundEndpoint(String uri, UMOManagementContext managementContext)
+    public UMOImmutableEndpoint lookupOutboundEndpoint(String name, UMOManagementContext managementContext)
         throws UMOException
     {
-        // For now create new instance with factory, existing instances in registry don't serve us as
-        // endpoints are not yet truely immutable
-        return lookupEndpointFactory().createOutboundEndpoint(uri, managementContext);
+        return (UMOImmutableEndpoint) lookupObject(name);
     }
 
-    public UMOImmutableEndpoint lookupResponseEndpoint(String uri, UMOManagementContext managementContext)
+    public UMOImmutableEndpoint lookupResponseEndpoint(String name, UMOManagementContext managementContext)
         throws UMOException
     {
-        // For now create new instance with factory, existing instances in registry don't serve us as
-        // endpoints are not yet truely immutable
-        return lookupEndpointFactory().createResponseEndpoint(uri, managementContext);
+        return (UMOImmutableEndpoint) lookupObject(name);
     }
 
     /**
@@ -332,7 +326,7 @@ public abstract class AbstractRegistry implements Registry
                                                UMOManagementContext managementContext)
         throws EndpointException, UMOException
     {
-        return lookupEndpointFactory().createEndpoint(endpointUri, endpointType, managementContext);
+        return lookupEndpointFactory().getEndpoint(endpointUri, endpointType, managementContext);
     }
 
     public UMOTransformer lookupTransformer(String name)

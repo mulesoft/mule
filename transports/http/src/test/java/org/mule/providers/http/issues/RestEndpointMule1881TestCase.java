@@ -19,7 +19,7 @@ public class RestEndpointMule1881TestCase extends AbstractMuleTestCase
     
     public void testJettyRestEndpointCreation() throws Exception
     {
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "jetty:rest://localhost:8080/loanbroker", managementContext);
         assertNotNull(ep);
         assertTrue(ep.getConnector() instanceof JettyConnector);
@@ -27,7 +27,7 @@ public class RestEndpointMule1881TestCase extends AbstractMuleTestCase
 
     public void testJettyHttpEndpointCreation() throws Exception
     {
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "jetty:rest://localhost:8080/loanbroker", managementContext);
         assertNotNull(ep);
         assertTrue(ep.getConnector() instanceof JettyConnector);

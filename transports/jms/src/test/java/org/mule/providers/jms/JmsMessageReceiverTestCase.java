@@ -85,7 +85,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             throw new InitialisationException(MessageFactory.createStaticMessage("Connector has not been initialized."), null);
         }
         builder.setConnector(connector);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(builder, managementContext);
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder, managementContext);
         return endpoint;
     }
 

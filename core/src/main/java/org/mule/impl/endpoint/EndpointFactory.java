@@ -32,7 +32,7 @@ public class EndpointFactory implements UMOEndpointFactory
     public static final int NEVER_CREATE_CONNECTOR = 2;
     public static final int USE_CONNECTOR = 3;
 
-    public UMOImmutableEndpoint createInboundEndpoint(String uri, UMOManagementContext managementContext)
+    public UMOImmutableEndpoint getInboundEndpoint(String uri, UMOManagementContext managementContext)
         throws UMOException
     {
         logger.debug("EndpointFactory request for inbound endpoint for uri: " + uri);
@@ -42,10 +42,10 @@ public class EndpointFactory implements UMOEndpointFactory
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
             endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         }
-        return createNewInboundEndpoint(endpointBuilder, managementContext);
+        return createInboundEndpoint(endpointBuilder, managementContext);
     }
 
-    public UMOImmutableEndpoint createOutboundEndpoint(String uri, UMOManagementContext managementContext)
+    public UMOImmutableEndpoint getOutboundEndpoint(String uri, UMOManagementContext managementContext)
         throws UMOException
     {
         logger.debug("EndpointFactory request for outbound endpoint for uri: " + uri);
@@ -55,10 +55,10 @@ public class EndpointFactory implements UMOEndpointFactory
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
             endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         }
-        return createNewOutboundEndpoint(endpointBuilder, managementContext);
+        return createOutboundEndpoint(endpointBuilder, managementContext);
     }
 
-    public UMOImmutableEndpoint createResponseEndpoint(String uri, UMOManagementContext managementContext)
+    public UMOImmutableEndpoint getResponseEndpoint(String uri, UMOManagementContext managementContext)
         throws UMOException
     {
         logger.debug("EndpointFactory request for response endpoint for uri: " + uri);
@@ -68,11 +68,11 @@ public class EndpointFactory implements UMOEndpointFactory
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
             endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         }
-        return createNewResponseEndpoint(endpointBuilder, managementContext);
+        return createResponseEndpoint(endpointBuilder, managementContext);
     }
 
     /** @deprecated */
-    public UMOImmutableEndpoint createEndpoint(UMOEndpointURI uri, String type, UMOManagementContext managementContext)
+    public UMOImmutableEndpoint getEndpoint(UMOEndpointURI uri, String type, UMOManagementContext managementContext)
         throws UMOException
     {
         logger.debug("EndpointFactory request for endpoint of type: " + type + ", for uri: " + uri);
@@ -94,15 +94,15 @@ public class EndpointFactory implements UMOEndpointFactory
         }
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
-            return endpointBuilder.buildInboundEndpoint();
+            return createInboundEndpoint(endpointBuilder, managementContext);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
-            return endpointBuilder.buildOutboundEndpoint();
+            return createOutboundEndpoint(endpointBuilder, managementContext);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
         {
-            return endpointBuilder.buildResponseEndpoint();
+            return createResponseEndpoint(endpointBuilder, managementContext);
         }
         else
         {
@@ -124,32 +124,32 @@ public class EndpointFactory implements UMOEndpointFactory
         return endpointBuilder;
     }
 
-    public UMOImmutableEndpoint createInboundEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext)
+    public UMOImmutableEndpoint getInboundEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext)
         throws UMOException
     {
-        return createNewInboundEndpoint(builder, managementContext);
+        return createInboundEndpoint(builder, managementContext);
     }
 
-    public UMOImmutableEndpoint createOutboundEndpoint(UMOEndpointBuilder builder,
+    public UMOImmutableEndpoint getOutboundEndpoint(UMOEndpointBuilder builder,
                                                        UMOManagementContext managementContext) throws UMOException
     {
-        return createNewOutboundEndpoint(builder, managementContext);
+        return createOutboundEndpoint(builder, managementContext);
     }
 
-    public UMOImmutableEndpoint createResponseEndpoint(UMOEndpointBuilder builder,
+    public UMOImmutableEndpoint getResponseEndpoint(UMOEndpointBuilder builder,
                                                        UMOManagementContext managementContext) throws UMOException
     {
-        return createNewResponseEndpoint(builder, managementContext);
+        return createResponseEndpoint(builder, managementContext);
     }
 
-    protected UMOImmutableEndpoint createNewInboundEndpoint(UMOEndpointBuilder builder,
+    protected UMOImmutableEndpoint createInboundEndpoint(UMOEndpointBuilder builder,
                                                             UMOManagementContext managementContext) throws UMOException
     {
         // TODO 1) Store in repo, 2) Register in registry, 3) Lifecycle ?
         return builder.buildInboundEndpoint();
     }
 
-    protected UMOImmutableEndpoint createNewOutboundEndpoint(UMOEndpointBuilder builder,
+    protected UMOImmutableEndpoint createOutboundEndpoint(UMOEndpointBuilder builder,
                                                              UMOManagementContext managementContext)
         throws UMOException
     {
@@ -157,7 +157,7 @@ public class EndpointFactory implements UMOEndpointFactory
         return builder.buildOutboundEndpoint();
     }
 
-    protected UMOImmutableEndpoint createNewResponseEndpoint(UMOEndpointBuilder builder,
+    protected UMOImmutableEndpoint createResponseEndpoint(UMOEndpointBuilder builder,
                                                              UMOManagementContext managementContext)
         throws UMOException
     {

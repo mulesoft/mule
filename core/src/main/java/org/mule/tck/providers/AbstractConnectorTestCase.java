@@ -150,8 +150,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         UMOComponent component = getTestComponent("anApple", Apple.class);
         managementContext.getRegistry().registerComponent(component, managementContext);
 
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
-            .lookupOutboundEndpoint(getTestEndpointURI(), managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            getTestEndpointURI(), managementContext);
 
         try
         {

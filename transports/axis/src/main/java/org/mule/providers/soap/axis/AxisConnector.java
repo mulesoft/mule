@@ -465,7 +465,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         
         UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .createInboundEndpoint(builder, managementContext);
+            .getInboundEndpoint(builder, managementContext);
         
         axisComponent.getInboundRouter().addEndpoint(serviceEndpoint);
 

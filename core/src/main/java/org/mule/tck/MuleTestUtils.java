@@ -77,15 +77,15 @@ public final class MuleTestUtils
         endpointBuilder.setName(name);
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createInboundEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder, context);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createOutboundEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder, context);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createResponseEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getResponseEndpoint(endpointBuilder, context);
         }
         else
         {
@@ -112,15 +112,15 @@ public final class MuleTestUtils
         endpointBuilder.setName(name);
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createInboundEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder, context);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createOutboundEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder, context);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().createResponseEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getResponseEndpoint(endpointBuilder, context);
         }
         else
         {

@@ -12,17 +12,16 @@ package org.mule.impl;
 
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
-import org.mule.transformers.TransformerUtils;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractConnector;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.EndpointNotFoundException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
@@ -142,8 +141,8 @@ public final class MuleSession implements UMOSession
 
     public void dispatchEvent(UMOMessage message, String endpointName) throws UMOException
     {
-        dispatchEvent(message, RegistryContext.getRegistry().lookupOutboundEndpoint(
-            endpointName, MuleServer.getManagementContext()));
+        dispatchEvent(message, RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName,
+            MuleServer.getManagementContext()));
     }
 
     public void dispatchEvent(UMOMessage message, UMOImmutableEndpoint endpoint) throws UMOException
@@ -170,8 +169,8 @@ public final class MuleSession implements UMOSession
 
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
     {
-        return sendEvent(message, RegistryContext.getRegistry()
-            .lookupOutboundEndpoint(endpointName, MuleServer.getManagementContext()));
+        return sendEvent(message, RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            endpointName, MuleServer.getManagementContext()));
     }
 
     public UMOMessage sendEvent(UMOMessage message) throws UMOException
@@ -402,8 +401,8 @@ public final class MuleSession implements UMOSession
      */
     public UMOMessage receiveEvent(String endpointName, long timeout) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry()
-            .lookupOutboundEndpoint(endpointName, MuleServer.getManagementContext());
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            endpointName, MuleServer.getManagementContext());
         return receiveEvent(endpoint, timeout);
     }
 
@@ -441,16 +440,6 @@ public final class MuleSession implements UMOSession
                          + ", for endpoint: " + endpoint);
         }
 
-        // Use default transformer if none is set
-        if (TransformerUtils.isUndefined(endpoint.getTransformers()) && endpoint instanceof UMOEndpoint)
-        {
-            if (endpoint.getConnector() instanceof AbstractConnector)
-            {
-                //TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-                ((UMOEndpoint)endpoint).setTransformers(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformers());
-                logger.debug("Using default connector outbound transformer: " + endpoint.getTransformers());
-            }
-        }
         try
         {
             UMOEvent event;

@@ -41,7 +41,7 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
 
     public final void testRoutingExceptionNullUMOMessageValidUMOImmutableEndpoint() throws UMOException
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "test://outbound", managementContext);
         assertNotNull(endpoint);
 

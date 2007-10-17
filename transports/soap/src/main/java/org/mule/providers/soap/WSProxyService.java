@@ -130,7 +130,7 @@ public class WSProxyService implements Callable, UMOComponentAware, Initialisabl
             UMOManagementContext managementContext = MuleServer.getManagementContext();
             UMOImmutableEndpoint webServiceEndpoint = managementContext.getRegistry()
                 .lookupEndpointFactory()
-                .createOutboundEndpoint(this.wsdlEndpoint, managementContext);
+                .getOutboundEndpoint(this.wsdlEndpoint, managementContext);
 
             UMOMessage replyWSDL = eventContext.sendEvent(new MuleMessage(NullPayload.getInstance()), webServiceEndpoint);
 

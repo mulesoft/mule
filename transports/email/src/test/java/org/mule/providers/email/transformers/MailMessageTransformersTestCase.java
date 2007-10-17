@@ -36,7 +36,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     public UMOTransformer getRoundTripTransformer() throws Exception
     {
         StringToEmailMessage trans = new StringToEmailMessage();
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "smtp://a:a@a.com", managementContext);
 
         // We need to init the connector without actually connecting for this test

@@ -104,7 +104,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
                             // TODO - is this correct? it stops other transformers from being used
                             builder.setTransformers(new LinkedList());
                             builder.setName(this.getClass().getName());
-                            endpoint = managementContext.getRegistry().lookupEndpointFactory().createInboundEndpoint(
+                            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
                                 builder, managementContext);
                         }
                         catch (UMOException e)

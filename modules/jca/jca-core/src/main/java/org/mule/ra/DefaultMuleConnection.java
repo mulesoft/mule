@@ -132,7 +132,7 @@ public class DefaultMuleConnection implements MuleConnection
      */
     public UMOMessage receive(String url, long timeout) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = manager.getRegistry().lookupOutboundEndpoint(url,
+        UMOImmutableEndpoint endpoint = manager.getRegistry().lookupEndpointFactory().getOutboundEndpoint(url,
             MuleServer.getManagementContext());
 
         try
@@ -157,7 +157,8 @@ public class DefaultMuleConnection implements MuleConnection
     protected UMOEvent getEvent(UMOMessage message, String uri, boolean synchronous)
         throws UMOException
     {
-        UMOImmutableEndpoint endpoint = manager.getRegistry().lookupOutboundEndpoint(uri, MuleServer.getManagementContext());
+        UMOImmutableEndpoint endpoint = manager.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri,
+            MuleServer.getManagementContext());
         //UMOConnector connector = endpoint.getConnector();
 
 //        if (!connector.isStarted() && manager.isStarted())

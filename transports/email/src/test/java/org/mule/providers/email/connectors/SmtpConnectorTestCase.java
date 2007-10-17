@@ -69,7 +69,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         managementContext.getRegistry().registerComponent(component, managementContext);
         UMOEndpointBuilder builder=new EndpointURIEndpointBuilder(getTestEndpointURI(), managementContext);
         builder.setName("test");
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             builder, managementContext);
         try
         {
@@ -85,7 +85,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     public void testSend() throws Exception
     {
         //managementContext.getRegistry().registerConnector(createConnector(false), managementContext);
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().createOutboundEndpoint(
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             getTestEndpointURI(), managementContext);
         
         UMOComponent component = getTestComponent(uniqueName("testComponent"), FunctionalTestComponent.class);

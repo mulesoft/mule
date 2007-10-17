@@ -83,7 +83,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         UMOImmutableEndpoint endpoint = null;
         try
         {
-            endpoint = managementContext.getRegistry().lookupInboundEndpoint("fruitBowlEndpoint", managementContext);
+            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("fruitBowlEndpoint",
+                managementContext);
         }
         catch (UMOException e)
         {
@@ -109,7 +110,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         UMOImmutableEndpoint endpoint = null;
         try
         {
-            endpoint = managementContext.getRegistry().lookupInboundEndpoint("waterMelonEndpoint", managementContext);
+            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("waterMelonEndpoint",
+                managementContext);
         }
         catch (UMOException e)
         {
