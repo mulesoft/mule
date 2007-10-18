@@ -520,7 +520,6 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         // @GuardedBy(this)
         private Set registeredTestMethod = new HashSet();
 
-        // TODO HH: MULE-2414
         // this is a shorter version of the snippet from:
         // http://www.davidflanagan.com/blog/2005_06.html#000060
         // (see comments; DF's "manual" version works fine too)
@@ -537,16 +536,9 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             // load test exclusions
             try
             {
-                // TODO HH: MULE-2414
-                // This may fail with jar files (such as in maven) since
-                // IOUtils/ClassUtils uses delegation-first to locate resources in
-                // jar files, which may then not be accessible to the actual test class.
-                // URL fileUrl = IOUtils.getResourceAsUrl("mule-test-exclusions.txt", test.getClass());
-
-                // TODO HH: MULE-2414
                 // We find the physical classpath root URL of the test class and
                 // use that to find the correct resource. Works fine everywhere,
-                // regardless of classloaders.
+                // regardless of classloaders. See MULE-2414
                 URL[] urls = new URL[]{getClassPathRoot(test.getClass())};
                 URL fileUrl = new URLClassLoader(urls).getResource("mule-test-exclusions.txt");
 

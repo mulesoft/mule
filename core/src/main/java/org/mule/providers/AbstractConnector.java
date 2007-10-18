@@ -1561,7 +1561,7 @@ public abstract class AbstractConnector
         }
     }
 
-    // TODO HH: the following methods should probably be lifecycle-enabled;
+    // TODO the following methods should probably be lifecycle-enabled;
     // for now they are only stubs to get the refactoring going.
 
     public void dispatch(UMOImmutableEndpoint endpoint, UMOEvent event) throws DispatchException

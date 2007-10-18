@@ -52,7 +52,7 @@ public class WaitPolicy implements RejectedExecutionHandler
         {
             if (e.isShutdown() || !e.getQueue().offer(r, time, timeUnit))
             {
-                // TODO HH: better message
+                // TODO better message
                 throw new RejectedExecutionException();
             }
         }
