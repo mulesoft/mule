@@ -1,0 +1,6 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# MULE-2585
+org.mule.management.config.ManagementNamespaceHandlerTestCase
