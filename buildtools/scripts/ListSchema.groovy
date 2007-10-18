@@ -49,7 +49,9 @@ def root = "../.."
 def base = "http://www.mulesource.org/schema/mule/"
 
 // the structure of xsd locations
-def corexsd = /.*(\/|\\)core(\/|\\).*(\/|\\)mule.xsd/
+def corexsd = /.*(\/|\\)core(\/|\\).*(\/|\\)mule\.xsd/
+def servicexsd = /.*(\/|\\)core(\/|\\).*(\/|\\)mule-(.*)\.xsd/
+def testxsd = /.*(\/|\\)tests(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-test\.xsd/
 def otherxsd = /.*(\/|\\)(transports|modules)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 
 def checkCurrentDirectory = {
@@ -77,9 +79,21 @@ def scanForSchemaAndInferDestinations = {
       schemaSources.put("core", f)
       schemaDestinations.put("core", "${base}core/${version}/mule.xsd")
       schemaDestinationPaths.put("core", "${base}core/${version}")
+    } else if (f.absolutePath ==~ testxsd) {
+      schemaNames << "test"
+      schemaSources.put("test", f)
+      schemaDestinations.put("test", "${base}test/${version}/mule-test.xsd")
+      schemaDestinationPaths.put("test", "${base}test/${version}")
     } else if (f.absolutePath ==~ otherxsd) {
       match = (f.absolutePath =~ otherxsd)
       name = match[0][7]
+      schemaNames << name
+      schemaSources.put(name, f)
+      schemaDestinations.put(name, "${base}${name}/${version}/mule-${name}.xsd")
+      schemaDestinationPaths.put(name, "${base}${name}/${version}")
+    } else if (f.absolutePath ==~ servicexsd) {
+      match = (f.absolutePath =~ servicexsd)
+      name = match[0][4]
       schemaNames << name
       schemaSources.put(name, f)
       schemaDestinations.put(name, "${base}${name}/${version}/mule-${name}.xsd")
@@ -133,8 +147,8 @@ def scanAndCheckConfigs = {
             if (match.matches()) {
               name = match[0][1]
               // we should really scan for test schema too, 
-              // but there's only one...
-              if (name != "parsers-test") {
+              // but there's only one^H^H^H a few
+              if (name != "parsers-test" && ! name.startsWith("nest-example")) {
                 if (! schemaNames.contains(name)) {
                   println "WARNING: missing schema for $name - see file $f"
                 } else if (uri != schemaDestinations[name]) {
