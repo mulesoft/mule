@@ -1,1 +1,2 @@
 http\://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd=META-INF/mule-jms.xsd
+http\://www.mulesource.org/schema/mule/jms/2.0/mule-activemq.xsd=META-INF/mule-activemq.xsd

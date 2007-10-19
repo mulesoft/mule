@@ -96,6 +96,33 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }
     
+    public void testTestConnectorConfig() throws Exception
+    {
+        JmsConnector c = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector3");
+        assertNotNull(c);
+
+        assertNotNull(c.getConnectionFactory());
+
+        assertTrue(c.getConnectionFactory().getOrCreate() instanceof TestConnectionFactory);
+        assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
+
+        assertNotNull(c.getRedeliveryHandler());
+        assertTrue(c.getRedeliveryHandler().getOrCreate() instanceof TestRedeliveryHandler);
+
+        assertEquals("myClient", c.getClientId());
+        assertTrue(c.isDurable());
+        assertTrue(c.isNoLocal());
+        assertTrue(c.isPersistentDelivery());
+        assertEquals(5, c.getMaxRedelivery());
+        assertTrue(c.isCacheJmsSessions());
+        assertFalse(c.isRecoverJmsConnections());
+        assertFalse(c.isEagerConsumer());
+        assertTrue(c.isJndiDestinations());
+        assertTrue(c.isForceJndiDestinations());
+
+        assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
+    }
+
 //    public void testJndi() throws Exception
 //    {
 //        JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector2");

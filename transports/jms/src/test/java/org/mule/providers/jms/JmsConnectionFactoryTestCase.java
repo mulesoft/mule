@@ -25,9 +25,6 @@ public class JmsConnectionFactoryTestCase extends FunctionalTestCase
     /**
      * Test providerProperties set on JmsConnector are not passed to the underlying
      * ConnectionFactory.
-     * 
-     * TODO This test passes because it doesn't actually do anything, see TODO in jms-connection-factory.xml
-     * and mule-jms.xsd
      */
     public void testProviderPropertiesNotPassed() throws Exception
     {

@@ -16,6 +16,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/jms/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd" />
 
+    <xsd:element name="connector" substitutionGroup="mule:abstract-connector" type="jms:vendorJmsConnectorType"/>
     <xsd:element name="connection-factory" substitutionGroup="jms:abstract-connection-factory" type="jms:genericConnectionFactoryType"/>
 
 </xsd:schema>

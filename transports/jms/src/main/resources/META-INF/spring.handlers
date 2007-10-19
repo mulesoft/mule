@@ -1,1 +1,2 @@
 http\://www.mulesource.org/schema/mule/jms/2.0=org.mule.providers.jms.config.JmsNamespaceHandler
+http\://www.mulesource.org/schema/mule/activemq/2.0=org.mule.providers.jms.config.ActiveMqNamespaceHandler

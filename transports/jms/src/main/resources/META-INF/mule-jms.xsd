@@ -14,20 +14,19 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
     <!-- Generic JMS Connector -->    
-    <xsd:element name="connector" substitutionGroup="mule:abstract-connector">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="mule:connectorType">
-                    <xsd:sequence>
-                        <!-- The ConnectionFactory is required for non-vendor JMS configs -->
-                        <xsd:element ref="abstract-connection-factory" minOccurs="1" maxOccurs="1"/>
-                        <xsd:group ref="jmsConnectorElements"/>
-                    </xsd:sequence>
-                    <xsd:attributeGroup ref="jmsConnectorAttributes"/>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
+    <xsd:element name="connector" type="genericConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <xsd:complexType name="genericConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:sequence>
+                    <!-- The ConnectionFactory is required for non-vendor JMS configs -->
+                    <xsd:element ref="abstract-connection-factory" minOccurs="1" maxOccurs="1"/>
+                    <xsd:group ref="jmsConnectorElements"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="jmsConnectorAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="abstract-connection-factory" abstract="true" type="abstractConnectionFactoryType"/>
     <xsd:complexType name="abstractConnectionFactoryType">
@@ -104,10 +103,6 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
-
-    <!-- Vendor-specific Connection Factories -->
-
-    <!-- xsd:element name="activemq-connection-factory" type="connectionFactoryType" substitutionGroup="" -->
 
     <!-- Vendor-specific JMS Connectors -->
          

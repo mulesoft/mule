@@ -8,15 +8,15 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <jms:custom-connector name="jmsConnector1" class="org.mule.providers.jms.test.TestJmsConnector">
+    <jms:custom-connector name="jmsConnector1" class="org.mule.providers.jms.test.GenericTestJmsConnector">
         <spring:property name="providerProperty" value="TEST_VALUE" />
-        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory" />
+        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
     </jms:custom-connector>
 
     <jms:connector name="jmsConnector2">
         <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory">
             <properties>
-                <spring:entry key="connectionFactoryProperty" value="TEST_VALUE" />
+                <spring:entry key="connectionFactoryProperty" value="TEST_VALUE"/>
             </properties>
         </jms:connection-factory>            
     </jms:connector>
