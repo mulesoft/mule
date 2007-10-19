@@ -537,13 +537,22 @@
             <name>Mule Dependencies</name>
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
         </pluginRepository>
+        <!-- this is needed to download dependencies of plugins from our custom repo -->
+        <pluginRepository>
+            <id>mule-plugins-deps</id>
+            <name>Mule Plugin Dependencies</name>
+            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
     </pluginRepositories>
 
     <build>
         <defaultGoal>install</defaultGoal>
 
-        <!-- WebDAV for remote deployment -->
         <extensions>
+            <!-- WebDAV for remote deployment -->
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-webdav</artifactId>
@@ -567,6 +576,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>2.0-beta-5</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <!-- 
                          see http://jira.codehaus.org/browse/MJAVADOC-145 which is
@@ -578,69 +592,10 @@
         </pluginManagement>
 
         <plugins>
-            <!-- Enforce minimum maven version.
-                 This must be done through the maven-enforcer-plugin as per
-                 http://jira.codehaus.org/browse/MNG-2423 the prerequisites are not inherited.
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <!-- MULE-2070: 1.0-alpha-3 is broke so enforce previous version  -->
-                <version>1.0-alpha-2</version>
-                <executions>
-                    <execution>
-                        <id>enforce-maven-version</id>
-                        <goals>
-                            <goal>enforce-once</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <!-- minimum version is 2.0.6, higher versions allowed -->
-                                    <version>[2.0.6,)</version>
-                                </requireMavenVersion>
-                                <requireJavaVersion>
-                                    <!-- minimum version is 1.4.2, Java 5 and higher not allowed -->
-                                    <version>[1.4.2,1.5.0)</version>
-                                </requireJavaVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Compile to JDK 1.4 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <!--
-                        we should really, really use the eclipse compiler but cannot:
-                        http://jira.codehaus.org/browse/MCOMPILER-43
-                        http://jira.codehaus.org/browse/PLXCOMP-59
-                    -->
-                    <!-- <compilerId>eclipse</compilerId> -->
-                    <source>1.4</source>
-                    <target>1.4</target>
-                    <encoding>ISO-8859-1</encoding>
-                </configuration>
-                <!--
-                <dependencies>
-                  <dependency>
-                    <groupId>org.codehaus.plexus</groupId>
-                    <artifactId>plexus-compiler-eclipse</artifactId>
-                    <version>1.5.1</version>
-                  </dependency>
-                </dependencies>
-                -->
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-
                 <configuration>
-
                     <archive>
                         <!--
                             Disabled for http://mule.mulesource.org/jira/browse/MULE-1153
@@ -695,36 +650,11 @@
                 </configuration>
             </plugin>
 
-            <!-- Checkstyle plug-in -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.mule</groupId>
-                        <artifactId>mule-buildtools</artifactId>
-                        <version>${version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <headerLocation>codecheck/LicenseHeader.txt</headerLocation>
-                </configuration>
-            </plugin>
-
-
             <!-- Delete code coverage database when 'mvn clean' is executed -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>${coberturaVersion}</version>
-                <!--<configuration>-->
-                <!--<instrumentation>-->
-                <!--<ignore>com.example.boringcode.*</ignore>-->
-                <!--<excludes>-->
-                <!--<exclude implementation="java.lang.String">**/*TestCase.class</exclude>-->
-                <!--</excludes>-->
-                <!--</instrumentation>-->
-                <!--</configuration>-->
                 <executions>
                     <execution>
                         <id>clean</id>
@@ -735,14 +665,26 @@
                 </executions>
             </plugin>
 
+            <!-- 
+                 Needed for checkstyle to find the license header file from the classpath.
+                 CAVEAT: you cannot build the site without mule-buildtools present in 
+                 your local repository.
+
+                 For plugin config see below in reporting section
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>2.0-beta-5</version>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.mule</groupId>
+                        <artifactId>mule-buildtools</artifactId>
+                        <version>${version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <!-- by default download all sources when generating project files -->
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
@@ -750,7 +692,6 @@
                     <downloadSources>true</downloadSources>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-idea-plugin</artifactId>
@@ -817,14 +758,6 @@
                 </reportSets>
             </plugin>
 
-            <!-- Test results
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>surefire-report-maven-plugin</artifactId>
-                <version>2.0-beta-1</version>
-            </plugin>
-            -->
-
             <!-- test exclusions report -->
             <plugin>
                 <groupId>org.mule.tools</groupId>
@@ -832,7 +765,7 @@
             </plugin>
 
             <!-- Javadoc settings -->
-            <plugin>
+<!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
@@ -840,11 +773,11 @@
                     <maxmemory>512m</maxmemory>
                     <charset>ISO-8859-1</charset>
                     <encoding>ISO-8859-1</encoding>
+                    <source>1.4</source>-->
                     <!-- aggregate all when built from the top-level directory -->
-                    <aggregate>true</aggregate>
+<!--                     <aggregate>true</aggregate> -->
                     <!-- Link to the external online JavaDoc -->
-                    <!-- TODO add more refs -->
-                    <links>
+<!--                    <links>
                         <link>http://java.sun.com/j2se/1.4.2/docs/api/</link>
                         <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
                         <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/docs/api/</link>
@@ -856,8 +789,7 @@
                         <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                         <link>http://www.slf4j.org/api/</link>
                         <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
-                        <!-- site is dead? -->
-                        <!-- link>http://www.junit.org/junit/javadoc/3.8.1/</link -->
+                        <!-- link>http://www.junit.org/junit/javadoc/3.8.1/</link
                         <link>http://junit.sourceforge.net/javadoc/</link>
                     </links>
                     <groups>
@@ -887,7 +819,7 @@
                         </group>
                     </groups>
                 </configuration>
-            </plugin>
+            </plugin>-->
 
 
             <!-- Source code cross-reference -->
@@ -895,6 +827,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
                 <configuration>
+                    <aggregate>true</aggregate>
                 </configuration>
             </plugin>
 
@@ -905,7 +838,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <configuration>
+                <configuration>-->
                     <!-- Display failed tests only -->
                     <showSuccess>false</showSuccess>
                 </configuration>
@@ -917,7 +850,11 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <configuration>
                     <configLocation>codecheck/checkstyle.xml</configLocation>
-                    <headerLocation>codecheck/LICENSE.txt</headerLocation>
+                    <headerLocation>codecheck/LicenseHeader.txt</headerLocation>
+                    <!-- do not link to JXR output as that is aggregated and the checkstyle
+                         plugin does not recognize that.
+                    -->
+                    <linkXRef>false</linkXRef>
                 </configuration>
             </plugin>
 
@@ -954,7 +891,6 @@
         http://maven.apache.org/guides/introduction/introduction-to-profiles.html)
     -->
     <profiles>
-
         <profile>
             <id>java14</id>
             <activation>
@@ -1092,6 +1028,62 @@
                             -->
                         </configuration>
                      </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--
+            The maven-enforcer-plugin has an option to skip all checks (-Denforcer.skip=true)
+            but this runs the enforcer plugin anyway with each and every module, sometimes 
+            even multiple times.
+
+            So we put it in a profile here to completely disable the enforcer plugin
+            e.g. on the CI server etc.
+        -->
+        <profile>
+            <id>enforcer-plugin</id>
+            <activation>
+                <property>
+                    <!--
+                        This profile is activated if NO system property
+                        'skipEnforcer' is found. Disable this profile
+                        by specifying -DskipEnforcer=true on the commandline
+                        -->
+                    <name>!skipEnforcer</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Enforce minimum maven version.
+                         This must be done through the maven-enforcer-plugin as per 
+                         http://jira.codehaus.org/browse/MNG-2423 the prerequisites are not inherited.
+                         -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <!-- MULE-2070: 1.0-alpha-3 is broke so enforce previous version  -->
+                        <version>1.0-alpha-2</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-maven-version</id>
+                                <goals>
+                                    <goal>enforce-once</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireMavenVersion>
+                                            <!-- minimum version is 2.0.6, higher versions allowed -->
+                                            <version>[2.0.6,)</version>
+                                        </requireMavenVersion>
+                                        <requireJavaVersion>
+                                            <!-- minimum version is 1.4.2, Java 5 and higher not allowed -->
+                                            <version>[1.4.2,1.5.0)</version>
+                                        </requireJavaVersion>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>

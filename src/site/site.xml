@@ -10,6 +10,7 @@
         <src>http://maven.apache.org/images/maven-small.gif</src>
     </bannerRight>
     -->
+    <publishDate position="left" format="MMM-dd-yyyy HH:mm"/>
     <body>
         <links>
             <item name="Mule" href="http://mule.codehaus.org/"/>
