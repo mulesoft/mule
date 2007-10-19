@@ -24,10 +24,8 @@ import org.w3c.dom.Element;
  * <p>Note that this make a lot of assumptions about what type of parser is used.
  */
 public abstract class AbstractSingleParentFamilyDefinitionParser
-        extends AbstractSerialDelegatingDefinitionParser
+        extends AbstractFirstResultSerialDefinitionParser
 {
-
-    private AbstractBeanDefinition parent;
 
     protected MuleChildDefinitionParser addChildDelegate(MuleChildDefinitionParser delegate)
     {
@@ -63,32 +61,12 @@ public abstract class AbstractSingleParentFamilyDefinitionParser
     {
         if (0 != index)
         {
-            ((MuleChildDefinitionParser) parser).forceParent(parent);
+            ((MuleChildDefinitionParser) parser).forceParent(firstDefinition);
             // we need this because we often block "everything but" which would mean
             // being unable to set ourselves on the parent
             ((MuleChildDefinitionParser) parser).getTargetPropertyConfiguration().setIgnoredDefault(false);
         }
-        try
-        {
-            AbstractBeanDefinition result = super.doSingleBean(index, parser, element, parserContext);
-            if (0 == index)
-            {
-                parent = result;
-            }
-            if (size() == index + 1)
-            {
-                return parent;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        catch (RuntimeException e)
-        {
-            parent = null;
-            throw e;
-        }
+        return super.doSingleBean(index, parser, element, parserContext);
     }
 
 }
