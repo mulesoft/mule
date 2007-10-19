@@ -20,12 +20,10 @@ import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
-import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,9 +63,6 @@ public class Mx4jAgent extends AbstractAgent
     public static final String DEFAULT_HOSTNAME = "localhost";
     public static final int DEFAULT_PORT = 9999;
     public static final String DEFAULT_JMX_ADAPTOR_URL = PROTOCOL_PREFIX + DEFAULT_HOSTNAME + ":" + DEFAULT_PORT;
-    private static final String MANAGEMENT_JAR = "mule-module-management-" + MuleManifest.getProductVersion() + ".jar";
-// to fully test, make sure jar is on classpath (null also works... can we do better?)
-//    private static final String MANAGEMENT_JAR = "mule-module-management-" + "2.0.0-M3-SNAPSHOT" + ".jar";
 
     private String jmxAdaptorUrl;
     private String host;
@@ -84,7 +79,9 @@ public class Mx4jAgent extends AbstractAgent
 
     private String authenticationMethod = "basic";
 
-    private String xslFilePath = null;
+    // TODO AH check how an embedded scenario can be handled (no mule home) 
+    private String xslFilePath = System.getProperty("mule.home") + "/lib/mule/mule-module-management-" +
+            MuleManifest.getProductVersion() + ".jar";
 
     private String pathInJar = DEFAULT_PATH_IN_JAR;
 
@@ -112,9 +109,9 @@ public class Mx4jAgent extends AbstractAgent
         // Set the XSLT Processor with any local overrides
         XSLTProcessor processor = new XSLTProcessor();
 
-        if (StringUtils.isNotBlank(getXslFilePath()))
+        if (StringUtils.isNotBlank(xslFilePath))
         {
-            processor.setFile(getXslFilePath().trim());
+            processor.setFile(xslFilePath.trim());
         }
 
         if (StringUtils.isNotBlank(pathInJar))
@@ -347,14 +344,6 @@ public class Mx4jAgent extends AbstractAgent
 
     public String getXslFilePath()
     {
-        if (null == xslFilePath)
-        {
-            URL url = IOUtils.getResourceAsUrl(MANAGEMENT_JAR, getClass());
-            if (null != url)
-            {
-                xslFilePath = url.getFile();
-            }
-        }
         return xslFilePath;
     }
 
