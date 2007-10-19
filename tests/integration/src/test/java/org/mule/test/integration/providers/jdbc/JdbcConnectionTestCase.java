@@ -12,6 +12,7 @@ package org.mule.test.integration.providers.jdbc;
 
 
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.SimpleRetryConnectionStrategy;
@@ -19,6 +20,8 @@ import org.mule.providers.jdbc.JdbcConnector;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.HashMap;
@@ -57,9 +60,11 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
         d.setModelName(model.getName());
         managementContext.getRegistry().registerService(d);
         UMOComponent component = model.getComponent(d.getName());
-        UMOEndpoint endpoint = new MuleEndpoint("test", new MuleEndpointURI(
-            "jdbc://test?sql=SELECT * FROM TABLE"), connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0,
-            null, new HashMap());
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jdbc://test?sql=SELECT * FROM TABLE", managementContext);
+        endpointBuilder.setName("test");
+        endpointBuilder.setConnector(connector);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            endpointBuilder, managementContext);
         managementContext.start();
         connector.registerListener(component, endpoint);
 

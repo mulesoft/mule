@@ -18,7 +18,7 @@ import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.ComponentRoutingException;
 import org.mule.umo.routing.RoutingException;
 
@@ -27,7 +27,7 @@ public class InboundTransformingForwardingCatchAllStrategy extends AbstractCatch
     public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
-        UMOEndpoint endpoint = this.getEndpoint();
+        UMOImmutableEndpoint endpoint = this.getEndpoint();
 
         if (endpoint == null)
         {

@@ -10,13 +10,12 @@
 
 package org.mule.test.integration.config;
 
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.container.ContainerKeyPair;
+import org.mule.registry.Registry;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.registry.RegistryFacade;
 
 /**
  * Tests Deploying and referencing components from two different spring container
@@ -31,19 +30,19 @@ public class MultiContainerTestCase extends FunctionalTestCase
 
     public void testContainer() throws Exception
     {
-        RegistryFacade registryFacade = managementContext.getRegistry();
-        assertNotNull(registryFacade);
-        assertNotNull(registryFacade.lookupObject("spring2-Apple"));
-        assertNotNull(registryFacade.lookupObject("spring-Apple"));
-        assertNotNull(registryFacade.lookupObject("spring2-Banana"));
-        assertNotNull(registryFacade.lookupObject("spring-Banana"));
+        Registry registry = managementContext.getRegistry();
+        assertNotNull(registry);
+        assertNotNull(registry.lookupObject("spring2-Apple"));
+        assertNotNull(registry.lookupObject("spring-Apple"));
+        assertNotNull(registry.lookupObject("spring2-Banana"));
+        assertNotNull(registry.lookupObject("spring-Banana"));
 
-        assertNull(registryFacade.lookupObject("WaterMelon"));
+        assertNull(registry.lookupObject("WaterMelon"));
     }
 
     public void testSpecificContainerAddressing() throws Exception
     {
-        RegistryFacade registry = managementContext.getRegistry();
+        Registry registry = managementContext.getRegistry();
         assertNotNull(registry);
         Orange o = (Orange)registry.lookupObject(new ContainerKeyPair("spring1", "Orange"));
         assertNotNull(o);

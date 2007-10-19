@@ -10,15 +10,16 @@
 
 package org.mule.test.integration.message;
 
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.providers.email.transformers.PlainTextDataSource;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import javax.activation.DataHandler;
 
@@ -34,9 +35,18 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
 
         builder = new QuickConfigurationBuilder();
 
-        UMOEndpoint vmSingle = builder.createEndpoint("vm://Single", "SingleEndpoint", true);
-        UMOEndpoint vmChained = builder.createEndpoint("vm://Chained", "ChainedEndpoint", true);
-
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("vm://Single", managementContext);
+        endpointBuilder.setName("SingleEndpoint");
+        UMOImmutableEndpoint vmSingle = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getOutboundEndpoint(endpointBuilder, managementContext);
+        
+        UMOEndpointBuilder endpointBuilder2 = new EndpointURIEndpointBuilder("vm://Single", managementContext);
+        endpointBuilder2.setName("ChainedEndpoint");
+        UMOImmutableEndpoint vmChained = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getOutboundEndpoint(endpointBuilder2, managementContext);
+        
         FunctionalTestComponent single = new FunctionalTestComponent();
         single.setEventCallback(this);
         FunctionalTestComponent chained = new FunctionalTestComponent();

@@ -17,6 +17,7 @@ import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
+import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,8 @@ public interface UMOEndpointBuilder
     UMOImmutableEndpoint buildResponseEndpoint() throws EndpointException, InitialisationException;
 
     void setConnector(UMOConnector connector);
+
+    void addTransformer(UMOTransformer transformer);
 
     void setTransformers(List transformers);
 

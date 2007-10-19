@@ -22,6 +22,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +58,8 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         // Start the server
         managementContext.start();
 
-        MuleEndpoint muleEndpoint = new MuleEndpoint("jdbc://?sql=SELECT * FROM TEST", true);
+        UMOImmutableEndpoint muleEndpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            "jdbc://?sql=SELECT * FROM TEST", managementContext);
         UMOMessage message = muleEndpoint.receive(1000);
         assertResultSetEmpty(message);
         
@@ -72,9 +74,9 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         // Start the server
         managementContext.start();
 
-        UMOEndpointURI muleEndpoint = new MuleEndpointURI(DEFAULT_OUT_URI);
-        UMOEndpoint endpoint = RegistryContext.getRegistry().getOrCreateEndpointForUri(muleEndpoint,
-            UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            DEFAULT_OUT_URI, managementContext);
+        
         UMOMessage message = new MuleMessage(DEFAULT_MESSAGE);
         UMOSession session = MuleTestUtils.getTestSession();
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
@@ -91,7 +93,9 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         // Start the server
         managementContext.start();
 
-        MuleEndpoint muleEndpoint = new MuleEndpoint(DEFAULT_IN_URI, true);
+        UMOImmutableEndpoint muleEndpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            DEFAULT_IN_URI, managementContext);
+        
         UMOMessage message = muleEndpoint.receive(1000);
 
         assertResultSetEmpty(message);

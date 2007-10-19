@@ -23,9 +23,7 @@ import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.MuleDerbyTestUtils;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
@@ -183,30 +181,14 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
         return connector;
     }
 
-    protected UMOEndpointURI getInDest()
+    protected String getInDest()
     {
-        try
-        {
-            return new MuleEndpointURI(DEFAULT_IN_URI);
-        }
-        catch (EndpointException e)
-        {
-            fail(e.getMessage());
-            return null;
-        }
+        return DEFAULT_IN_URI;
     }
 
-    protected UMOEndpointURI getOutDest()
+    protected String getOutDest()
     {
-        try
-        {
-            return new MuleEndpointURI(DEFAULT_OUT_URI);
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-            return null;
-        }
+        return DEFAULT_OUT_URI;
     }
     
     //by default use the embedded datasource

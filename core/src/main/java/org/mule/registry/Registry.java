@@ -199,15 +199,15 @@ public interface Registry extends Initialisable, Disposable
     UMOConnector unregisterConnector(String connectorName) throws UMOException;
 
     //TODO MULE-2494
-    //void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
-    //    throws UMOException;
+    void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
+        throws UMOException;
 
     //TODO MULE-2494
-    ///** @deprecated Use registerEndpoint(UMOEndpoint endpoint, UMOManagementContext managementContext) instead. */
-    //void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException;
+    /** @deprecated Use registerEndpoint(UMOEndpoint endpoint, UMOManagementContext managementContext) instead. */
+    void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException;
 
     //TODO MULE-2494
-    //UMOImmutableEndpoint unregisterEndpoint(String endpointName);
+    UMOImmutableEndpoint unregisterEndpoint(String endpointName);
 
     
     public void registerEndpointBuilder(String name, UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;

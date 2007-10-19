@@ -15,14 +15,20 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.service.TestReceiver;
 import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.util.object.SingletonObjectFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MuleClientListenerTestCase extends FunctionalTestCase
@@ -66,9 +72,10 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
         descriptor.setName(name);
         descriptor.setServiceFactory(new SingletonObjectFactory(receiver));
 
-        MuleEndpoint endpoint = new MuleEndpoint(urlString, true);
-        // We get a byte[] from a tcp endpoint so we need to convert it
-        endpoint.setTransformer(new ByteArrayToString());
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(urlString, managementContext);
+        endpointBuilder.addTransformer(new ByteArrayToString())
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            endpointBuilder, managementContext);
         descriptor.setInboundRouter(new InboundRouterCollection());
         descriptor.getInboundRouter().addEndpoint(endpoint);
         client.registerComponent(descriptor);

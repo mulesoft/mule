@@ -13,17 +13,23 @@ package org.mule.test.integration.client;
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleTransactionConfig;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.jms.JmsTransactionFactory;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
+import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MuleClientTransactionTestCase extends FunctionalTestCase
@@ -54,10 +60,14 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
-        MuleEndpoint inboundEndpoint = (new MuleEndpoint("jms://test.queue", false));
-        inboundEndpoint.setTransactionConfig(tc);
-        inboundEndpoint.setName("TransactedTest.Queue");
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", managementContext);
+        endpointBuilder.setTransactionConfig(tc);
+        endpointBuilder.setName("TransactedTest.Queue");
+        UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getOutboundEndpoint(endpointBuilder, managementContext);
         client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
+
 
         TransactionTemplate tt = new TransactionTemplate(tc, null, managementContext);
         tt.execute(new TransactionCallback()
@@ -99,9 +109,12 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
-        MuleEndpoint inboundEndpoint = (new MuleEndpoint("jms://test.queue", false));
-        inboundEndpoint.setTransactionConfig(tc);
-        inboundEndpoint.setName("TransactedTest.Queue");
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", managementContext);
+        endpointBuilder.setTransactionConfig(tc);
+        endpointBuilder.setName("TransactedTest.Queue");
+        UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getOutboundEndpoint(endpointBuilder, managementContext);
         client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
 
         TransactionTemplate tt = new TransactionTemplate(tc, null, managementContext);
@@ -150,10 +163,14 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
-        MuleEndpoint inboundEndpoint = (new MuleEndpoint("jms://test.queue", false));
-        inboundEndpoint.setTransactionConfig(tc);
-        inboundEndpoint.setName("TransactedTest.Queue");
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", managementContext);
+        endpointBuilder.setTransactionConfig(tc);
+        endpointBuilder.setName("TransactedTest.Queue");
+        UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getOutboundEndpoint(endpointBuilder, managementContext);
         client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
+
 
         TransactionTemplate tt = new TransactionTemplate(tc, null, managementContext);
         tt.execute(new TransactionCallback()

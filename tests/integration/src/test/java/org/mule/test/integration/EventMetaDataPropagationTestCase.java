@@ -11,10 +11,10 @@
 package org.mule.test.integration;
 
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.FunctionalTestCase;
@@ -27,6 +27,7 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.transformer.TransformerException;
@@ -34,7 +35,9 @@ import org.mule.umo.transformer.TransformerException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -53,10 +56,14 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         builder.registerModel("seda", "main");
-        MuleEndpoint out = new MuleEndpoint("vm://component2", false);
-        out.setTransformer(new DummyTransformer());
-        UMODescriptor c1 = builder.registerComponentInstance(this, "component1", new MuleEndpoint(
-            "vm://component1", true), out);
+        UMOEndpointBuilder endpointbuilder = new EndpointURIEndpointBuilder("vm://component2", managementContext);
+        List transformers=new ArrayList();
+        transformers.add(new DummyTransformer());
+        endpointbuilder.setTransformers(transformers)
+        UMOImmutableEndpoint out = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder, managementContext);
+        UMOImmutableEndpoint in = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vm://component2", managementContext);
+
+        UMODescriptor c1 = builder.registerComponentInstance(this, "component1", in, out);
 
         builder.registerComponentInstance(this, "component2", new MuleEndpointURI("vm://component2"));
         return builder;

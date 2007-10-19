@@ -12,13 +12,14 @@ package org.mule.test.integration;
 
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.transformers.TransformerUtils;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 
@@ -51,7 +52,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         UMOEndpoint endpoint = (UMOEndpoint)router1.getEndpoints().get(0);
         assertEquals("file", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("/C:/temp", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
+        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         // assertTrue(provider.getTransformer() instanceof ObjectToFileMessage);
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
@@ -61,13 +62,13 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         endpoint = (UMOEndpoint)router2.getEndpoints().get(0);
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
-        assertNull(endpoint.getTransformer());
+        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
         endpoint = (UMOEndpoint)router2.getEndpoints().get(1);
         assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("test.queue2", endpoint.getEndpointURI().getAddress());
-        assertNull(endpoint.getTransformer());
+        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
     }
@@ -84,8 +85,8 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals("vm", endpoint.getConnector().getProtocol().toLowerCase());
         assertTrue(endpoint.getName().equals("testEndpoint"));
         assertEquals("queue4", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof ObjectToXml);
+        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
+        assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
     }
 
@@ -103,14 +104,14 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         UMOEndpoint endpoint = (UMOEndpoint)router.getEndpoints().get(0);
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
-        assertNull(endpoint.getTransformer());
+        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers())); 
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
         endpoint = (UMOEndpoint)router.getEndpoints().get(1);
         assertEquals("vm", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("yet.another.queue", endpoint.getEndpointURI().getAddress());
-        assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof ObjectToXml);
+        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
+        assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
     }
 
@@ -128,21 +129,20 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         UMOEndpoint endpoint = (UMOEndpoint)router.getEndpoints().get(0);
         assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("tcp://localhost:45431", endpoint.getEndpointURI().getAddress());
-        assertNull(endpoint.getTransformer());
+        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers())); 
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
         endpoint = (UMOEndpoint)router.getEndpoints().get(1);
         assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("tcp://localhost:45432", endpoint.getEndpointURI().getAddress());
-        assertNull(endpoint.getTransformer());
+        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers())); 
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
     }
 
     public void testEndpointFromURI() throws Exception
     {
-        MuleEndpoint ep = new MuleEndpoint("test://hello?remoteSync=true&remoteSyncTimeout=2002", true);
-        ep.setManagementContext(managementContext);
-        ep.initialise();
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            "test://hello?remoteSync=true&remoteSyncTimeout=2002", managementContext);
         assertTrue(ep.isRemoteSync());
         assertEquals(2002, ep.getRemoteSyncTimeout());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
@@ -151,8 +151,10 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         UMOEvent event = new MuleEvent(new MuleMessage("hello"), ep, MuleTestUtils.getTestSession(), false);
         assertEquals(2002, event.getTimeout());
 
-        event = new MuleEvent(new MuleMessage("hello"), new MuleEndpoint("test://hello", true),
-            MuleTestUtils.getTestSession(), true);
+        UMOImmutableEndpoint ep2 = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            "test://hello", managementContext);
+
+        event = new MuleEvent(new MuleMessage("hello"), ep2, MuleTestUtils.getTestSession(), true);
         // default event timeout set in the test config file
         assertEquals(1001, event.getTimeout());
     }

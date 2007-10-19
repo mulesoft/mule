@@ -13,7 +13,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
 
 public class CustomConfigTestCase extends FunctionalTestCase
@@ -30,7 +30,8 @@ public class CustomConfigTestCase extends FunctionalTestCase
 
     public void testCustomEndpointConfig() throws Exception
     {
-        UMOEndpoint ep = managementContext.getRegistry().lookupEndpoint("fooEndpoint");
+        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            "fooEndpoint", managementContext);
         assertNotNull("fooEndpoint should not be null", ep);
         TestFilter tf = (TestFilter)ep.getFilter();
         assertNotNull("the filter on the endpoint should not be null", tf);
