@@ -285,7 +285,7 @@
                             <xsd:documentation>Factory to create the user's POJO service</xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element name="properties" type="mapType" minOccurs="0"/>
+                    <xsd:element ref="properties" minOccurs="0"/>
                     <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
                     <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0"/>
                     <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
@@ -521,7 +521,7 @@
                 <xsd:element ref="abstract-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-security-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-connection-strategy" minOccurs="0"/>
-                <xsd:element name="properties" type="mapType" minOccurs="0"/>
+                <xsd:element ref="properties" minOccurs="0"/>
             </xsd:sequence>
         </xsd:sequence>
     </xsd:group>
@@ -1429,7 +1429,7 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
-            <xsd:element name="properties" type="mapType" minOccurs="0">
+            <xsd:element ref="properties" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>Properties to be set on the created object</xsd:documentation>
                 </xsd:annotation>
@@ -1831,6 +1831,7 @@
          spring elements like <entry...> are handled by
          MuleHierarchicalBeanDefinitionParserDelegate which punts them to
          the spring handler -->
+    <xsd:element name="properties" type="mapType"/>
     <xsd:complexType name="mapType">
         <xsd:complexContent>
             <xsd:extension base="spring:mapType" />

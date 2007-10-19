@@ -3,10 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xmlns:test="http://www.mulesource.org/schema/mule/jms-test/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/jms-test/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms-test.xsd">
 
     <!-- Default config -->
     <jms:connector name="jmsConnectorDefaults">
@@ -26,14 +28,13 @@
                    jndiDestinations="true"
                    forceJndiDestinations="true"
                    specification="1.1">
-        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"
-                               username="myuser" password="mypass" />
+        <test:connection-factory username="myuser" password="mypass"/>
         <jms:redelivery-handler class="org.mule.providers.jms.test.TestRedeliveryHandler" />
     </jms:connector>
 
     <jms:custom-connector name="jmsConnector2" class="org.mule.providers.jms.JmsConnector"
                           specification="1.1">
-        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        <test:connection-factory/>
     </jms:custom-connector>
 
 </mule>

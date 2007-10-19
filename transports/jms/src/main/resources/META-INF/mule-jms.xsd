@@ -20,7 +20,7 @@
                 <xsd:extension base="mule:connectorType">
                     <xsd:sequence>
                         <!-- The ConnectionFactory is required for non-vendor JMS configs -->
-                        <xsd:element name="connection-factory" type="connectionFactoryType" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element ref="abstract-connection-factory" minOccurs="1" maxOccurs="1"/>
                         <xsd:group ref="jmsConnectorElements"/>
                     </xsd:sequence>
                     <xsd:attributeGroup ref="jmsConnectorAttributes"/>
@@ -29,6 +29,28 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="abstract-connection-factory" abstract="true" type="abstractConnectionFactoryType"/>
+    <xsd:complexType name="abstractConnectionFactoryType">
+        <xsd:attribute name="username" type="xsd:string"/>
+        <xsd:attribute name="password" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:element name="connection-factory" type="genericConnectionFactoryType" substitutionGroup="abstract-connection-factory"/>
+    <xsd:complexType name="genericConnectionFactoryType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractConnectionFactoryType">
+                <xsd:sequence>
+                    <xsd:element ref="mule:properties" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>Properties to be set on the connection factory</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <!-- Custom JMS Connector -->    
     <xsd:element name="custom-connector" substitutionGroup="mule:abstract-connector">
         <xsd:complexType>
@@ -36,7 +58,7 @@
                 <xsd:extension base="mule:customConnectorType">
                     <xsd:sequence>
                         <!-- The ConnectionFactory is required for non-vendor JMS configs -->
-                        <xsd:element name="connection-factory" type="connectionFactoryType" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element ref="abstract-connection-factory" minOccurs="1" maxOccurs="1"/>
                         <xsd:group ref="jmsConnectorElements"/>
                     </xsd:sequence>
                     <xsd:attributeGroup ref="jmsConnectorAttributes"/>
@@ -82,25 +104,19 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:complexType name="connectionFactoryType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:genericObjectFactoryType">
-                <xsd:attribute name="username" type="xsd:string"/>
-                <xsd:attribute name="password" type="xsd:string"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    
-    <!-- ******************************************************************* 
-         Vendor-specific JMS Connectors 
-         ******************************************************************* -->    
+
+    <!-- Vendor-specific Connection Factories -->
+
+    <!-- xsd:element name="activemq-connection-factory" type="connectionFactoryType" substitutionGroup="" -->
+
+    <!-- Vendor-specific JMS Connectors -->
          
     <xsd:complexType name="vendorJmsConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
                     <!-- Optional, a default ConnectionFactory is provided for vendor JMS configs -->
-                    <xsd:element name="connection-factory" type="connectionFactoryType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="connection-factory" type="genericConnectionFactoryType" minOccurs="0" maxOccurs="1"/>
                     <xsd:group ref="jmsConnectorElements"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="jmsConnectorAttributes"/>

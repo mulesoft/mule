@@ -11,8 +11,9 @@
 package org.mule.providers.jms.config;
 
 import org.mule.config.spring.parsers.delegate.AbstractFirstResultSerialDefinitionParser;
-import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.processors.AddAttribute;
+import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 
 /**
  * We want to set the connection factory as a pojo factory and then add attributes (username and
@@ -28,6 +29,12 @@ public class ConnectionFactoryDefinitionParser extends AbstractFirstResultSerial
     {
         addDelegate(new ObjectFactoryDefinitionParser("connectionFactory").addIgnored(USERNAME).addIgnored(PASSWORD));
         addDelegate(new ParentDefinitionParser().setIgnoredDefault(true).removeIgnored(USERNAME).removeIgnored(PASSWORD));
+    }
+
+    public ConnectionFactoryDefinitionParser(Class clazz)
+    {
+        this();
+        registerPreProcessor(new AddAttribute("class", clazz.getName()));
     }
 
 }

@@ -10,25 +10,14 @@
 
 package org.mule.config.spring.parsers.processors;
 
-import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
 
-import org.w3c.dom.Element;
-
-public class NameAttribute implements PostProcessor
+public class NameAttribute extends AddAttribute
 {
-
-    private String name;
 
     public NameAttribute(String name)
     {
-        this.name = name;
-    }
-
-    public void postProcess(BeanAssembler assembler, Element element)
-    {
-        element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, name);
+        super(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME, name);
     }
 
 }

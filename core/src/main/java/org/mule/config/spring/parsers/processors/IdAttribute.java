@@ -10,25 +10,14 @@
 
 package org.mule.config.spring.parsers.processors;
 
-import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
 
-import org.w3c.dom.Element;
-
-public class IdAttribute implements PostProcessor
+public class IdAttribute extends AddAttribute
 {
-
-    private String id;
 
     public IdAttribute(String id)
     {
-        this.id = id;
-    }
-
-    public void postProcess(BeanAssembler assembler, Element element)
-    {
-        element.setAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, id);
+        super(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID, id);
     }
 
 }
