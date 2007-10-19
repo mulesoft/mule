@@ -592,6 +592,32 @@
         </pluginManagement>
 
         <plugins>
+            <!-- Compile to JDK 1.4 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!--
+                        we should really, really use the eclipse compiler but cannot:
+                        http://jira.codehaus.org/browse/MCOMPILER-43
+                        http://jira.codehaus.org/browse/PLXCOMP-59
+                        -->
+                    <!-- <compilerId>eclipse</compilerId> -->
+                    <source>1.4</source>
+                    <target>1.4</target>
+                    <encoding>ISO-8859-1</encoding>
+                </configuration>
+                <!--
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-compiler-eclipse</artifactId>
+                        <version>1.5.1</version>
+                    </dependency>
+                </dependencies>
+                -->
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
