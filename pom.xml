@@ -789,7 +789,7 @@
                         <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                         <link>http://www.slf4j.org/api/</link>
                         <link>http://dcl.mathcs.emory.edu/util/backport-util-concurrent/doc/api/</link>
-                        <!-- link>http://www.junit.org/junit/javadoc/3.8.1/</link
+                        <link>http://www.junit.org/junit/javadoc/3.8.1/</link>
                         <link>http://junit.sourceforge.net/javadoc/</link>
                     </links>
                     <groups>
