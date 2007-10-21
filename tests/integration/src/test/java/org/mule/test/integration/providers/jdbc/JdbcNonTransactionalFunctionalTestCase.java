@@ -11,19 +11,23 @@
 package org.mule.test.integration.providers.jdbc;
 
 
-import org.mule.RegistryContext;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.seda.SedaComponent;
+import org.mule.routing.inbound.InboundRouterCollection;
+import org.mule.routing.outbound.FilteringOutboundRouter;
+import org.mule.routing.outbound.OutboundRouterCollection;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.functional.EventCallback;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.routing.UMOInboundRouterCollection;
+import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.umo.routing.UMOOutboundRouterCollection;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -137,11 +141,32 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
 
     public void initialiseComponent(EventCallback callback) throws Exception
     {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+        UMOComponent component = new SedaComponent();
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
-        builder.registerComponent(JdbcFunctionalTestComponent.class.getName(), "testComponent", getInDest(),
-            getOutDest(), props);
+        component.setProperties(props);
+        component.setName("testComponent");
+        
+        UMOImmutableEndpoint in = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            getInDest(), managementContext);
+        UMOImmutableEndpoint out = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            getOutDest(), managementContext);
+
+        UMOInboundRouterCollection inboundRouterCollection = new InboundRouterCollection();
+        inboundRouterCollection.addEndpoint(in);
+        component.setInboundRouter(inboundRouterCollection);
+
+        UMOOutboundRouterCollection outboundRouterCollection = new OutboundRouterCollection();
+        UMOOutboundRouter outboundRouter = new FilteringOutboundRouter();
+        List endpoints = new ArrayList();
+        endpoints.add(out);
+        outboundRouter.setEndpoints(endpoints);
+        outboundRouterCollection.addRouter(outboundRouter);
+
+        component.setInboundRouter(inboundRouterCollection);
+        component.setOutboundRouter(outboundRouterCollection);
+
+        managementContext.getRegistry().registerComponent(component, managementContext);
     }
 
 }

@@ -1,114 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
+    xmlns:file="http://www.mulesource.org/schema/mule/xml/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <configuration serverId="server" defaultSynchronousEventTimeout="1001" />
 
-<mule-configuration id="endpoint_test" version="1.0">
+    <vm:connector name="vmConnector1" />
+    <vm:connector name="vmConnector2" />
+    <test:connector name="testConnector1" />
 
-    <mule-environment-properties synchronousEventTimeout="1001"/>
+    <file:file-to-string-transformer name="ObjectToFileMessage" />
+    <xml:transformer-object-to-xml name="ObjectToXml" />
+    <xml:transformer-xml-to-object name="XmlToObject" />
 
-    <connector name="vmConnector1" className="org.mule.providers.vm.VMConnector"/>
-    <connector name="vmConnector2" className="org.mule.providers.vm.VMConnector"/>
-    <connector name="testConnector1" className="org.mule.tck.testmodels.mule.TestConnector"/>
-
-    <endpoint-identifiers>
-        <endpoint-identifier name="server1" value="tcp://localhost:45431"/>
-        <endpoint-identifier name="server2" value="tcp://localhost:45432"/>
-        <endpoint-identifier name="server3" value="tcp://localhost:45433"/>
-    </endpoint-identifiers>
-
-    <transformers>
-        <transformer name="ObjectToFileMessage" className="org.mule.providers.file.transformers.FileToString"/>
-        <transformer name="ObjectToXml" className="org.mule.transformers.xml.ObjectToXml" returnClass="java.lang.String"/>
-        <transformer name="XmlToObject" className="org.mule.transformers.xml.XmlToObject" returnClass="java.lang.Object"/>
-    </transformers>
-
-    <global-endpoints>
-        <endpoint name="testEndpoint" address="vm://another.queue" connector="vmConnector1" transformers="ObjectToXml"/>
-        <endpoint name="testEndpoint2" type="sender" address="vm://yet.another.queue" connector="vmConnector1" transformers="ObjectToXml"/>
-    </global-endpoints>
+    <endpoint name="server1" address="tcp://localhost:45431" />
+    <endpoint name="server2" address="tcp://localhost:45432" />
+    <endpoint name="server3" address="tcp://localhost:45433" />
+    <endpoint name="testEndpoint" address="vm://another.queue" connector="vmConnector1" transformer-ref="ObjectToXml" />
+    <endpoint name="testEndpoint2" address="vm://yet.another.queue" connector="vmConnector1"
+        transformer-ref="ObjectToXml" />
 
     <model name="main">
         <!-- Test sendEndpoint and receive endpoint as URIs where the test connector will be
-        used from the above config and the stream connector will be create dymanically
+            used from the above config and the stream connector will be create dymanically
         -->
-        <mule-descriptor name="TestComponent1"
-            implementation="org.mule.test.integration.service.TestComponent">
+        <service name="TestComponent1" implementation="org.mule.test.integration.service.TestComponent">
             <inbound-router>
-                <endpoint address="test://localhost/test.queue" connector="testConnector1"/>
+                <inbound-endpoint address="test://localhost/test.queue" connector="testConnector1" />
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="stream://System.out"/>
+                    <endpoint address="stream://System.out" />
                 </router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
         <!-- Will fore create of a new VM connector i.e. create=ALWAYS and uses the
-        transformer defined in in the inboundTransformer. Note that the URI
-        test://localhost/new.queue?create=ALWAYS&transformers=XmlToObject  achieves the same
-        result -->
-        <mule-descriptor name="TestComponent2"
-            implementation="org.mule.test.integration.service.TestComponent">
-             <inbound-router>
-                <endpoint address="test://localhost/test.queue" createConnector="ALWAYS_CREATE" transformers="XmlToObject"/>
+            transformer defined in in the inboundTransformer. Note that the URI
+            test://localhost/new.queue?create=ALWAYS&transformers=XmlToObject  achieves the same
+            result -->
+        <service name="TestComponent2" implementation="org.mule.test.integration.service.TestComponent">
+            <inbound-router>
+                <inbound-endpoint address="test://localhost/test.queue" createConnector="ALWAYS_CREATE"
+                    transformers="XmlToObject" />
             </inbound-router>
-        </mule-descriptor>
+        </service>
 
         <!-- Test uri endpoints for send and receive and Uri endpoints on the outbound router -->
-        <mule-descriptor name="TestComponent3"
-            implementation="org.mule.test.integration.service.TestComponent">
+        <service name="TestComponent3" implementation="org.mule.test.integration.service.TestComponent">
             <inbound-router>
-                <global-endpoint name="testEndpoint"/>
+                <inbound--endpoint name="testEndpoint" />
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint name="tcp1" address="tcp://localhost:60201"/>
-                </router>
-                <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <endpoint address="udp://localhost:56731"/>
-                    <endpoint address="test:/test.queue2" connector="testConnector1"/>
-                </router>
+                <filtering-router>
+                    <endpoint name="tcp1" address="tcp://localhost:60201" />
+                </filtering-router>
+                <multicasting-router>
+                    <outbound-endpoint address="udp://localhost:56731" />
+                    <outbound-endpoint address="test:/test.queue2" connector="testConnector1" />
+                </multicasting-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
         <!-- test Uri receiver endpoint specifying a provider with endpoint overrriden and
-        test outbound router config combining endpoints -->
-        <mule-descriptor name="TestComponent4"
-            implementation="org.mule.test.integration.service.TestComponent">
+            test outbound router config combining endpoints -->
+        <service name="TestComponent4" implementation="org.mule.test.integration.service.TestComponent">
             <inbound-router>
-                <global-endpoint name="testEndpoint" address="vm://queue4"/>
+                <inbound-endpoint name="testEndpoint" address="vm://queue4" />
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="udp://localhost:56731"/>
-                    <global-endpoint name="testEndpoint2"/>
-                </router>
+                <filtering-router>
+                    <outbound-endpoint address="udp://localhost:56731" />
+                    <outbound-endpoint ref="testEndpoint2" />
+                </filtering-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="TestComponent5"
-            implementation="org.mule.test.integration.service.TestComponent">
+        <service name="TestComponent5" implementation="org.mule.test.integration.service.TestComponent">
 
             <inbound-router>
-                <endpoint address="vm://some.queue" connector="vmConnector2"/>
+                <inbound-endpoint address="vm://some.queue" connector="vmConnector2" />
             </inbound-router>
 
             <outbound-router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="server1"/>
-                    <endpoint address="server2"/>
-                </router>
+                <filtering-router>
+                    <outbound-endpoint ref="server1" />
+                    <outbound-endpoint ref="server2" />
+                </filtering-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="TestComponent6"
-            implementation="org.mule.test.integration.service.TestComponent">
+        <service name="TestComponent6" implementation="org.mule.test.integration.service.TestComponent">
             <outbound-router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="server3"/>
-                </router>
+                <filtering-router>
+                    <outbound-endpoint ref="server3" />
+                </filtering-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-</mule-configuration>
+    </mule>

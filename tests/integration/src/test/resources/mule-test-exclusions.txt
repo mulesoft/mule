@@ -16,12 +16,12 @@ org.mule.test.usecases.sync.TcpJmsResponseTestCase
 
 # More testing on these: not recorded in Jira yet
 org.mule.test.usecases.axis.AxisClientWithComplexTypesTestCase
-org.mule.test.integration.EventMetaDataPropagationTestCase
+#org.mule.test.integration.EventMetaDataPropagationTestCase
 org.mule.test.integration.VisualizerServiceTestCase
 
 org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
 
-org.mule.test.integration.client.RemoteExceptionTestCase
+#org.mule.test.integration.client.RemoteExceptionTestCase
 org.mule.test.integration.client.MuleClientRemotingHttpTestCase
 org.mule.test.integration.client.MuleClientRemotingJmsTestCase
 org.mule.test.integration.transaction.OutboundTransactionsTestCase

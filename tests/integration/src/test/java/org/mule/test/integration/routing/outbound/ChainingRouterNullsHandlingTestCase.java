@@ -44,7 +44,7 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         Throwable exception = result.getExceptionPayload().getException();
         assertNotNull("Exception required", exception);
         assertTrue("Wrong exception", exception instanceof ComponentException);
-        String compName = ((ComponentException) exception).getComponent().getDescriptor().getName();
+        String compName = ((ComponentException) exception).getComponent().getName();
         assertEquals("Exception raised in wrong component", "component2Fail", compName);
     }
 
@@ -58,7 +58,7 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         Throwable exception = result.getExceptionPayload().getException();
         assertNotNull("Exception required", exception);
         assertTrue("Wrong exception", exception instanceof ComponentException);
-        String compName = ((ComponentException) exception).getComponent().getDescriptor().getName();
+        String compName = ((ComponentException) exception).getComponent().getName();
         assertEquals("Exception raised in wrong component", "component1Fail", compName);
     }
 }

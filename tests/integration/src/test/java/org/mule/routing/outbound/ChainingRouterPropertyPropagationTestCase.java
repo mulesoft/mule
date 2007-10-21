@@ -26,14 +26,13 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
 
     protected String getConfigResources()
     {
-        return "chaining-router-properties-propagation-config.xml";
+        return "org/mule/test/integration/routing/outbound/chaining-router-properties-propagation-config.xml";
     }
 
     public void testPropertiesPropagation() throws Exception
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
-        FunctionalTestComponent hop1 = (FunctionalTestComponent) model.getComponent("hop1").getInstance();
-        FunctionalTestComponent hop2 = (FunctionalTestComponent) model.getComponent("hop2").getInstance();
+        FunctionalTestComponent hop1 = (FunctionalTestComponent) managementContext.getRegistry().lookupComponent("hop1Service").getServiceFactory().getOrCreate();
+        FunctionalTestComponent hop2 = (FunctionalTestComponent) managementContext.getRegistry().lookupComponent("hop2Service").getServiceFactory().getOrCreate();
         assertNotNull(hop1);
 
         final AtomicBoolean hop1made = new AtomicBoolean(false);

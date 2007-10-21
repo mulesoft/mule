@@ -10,26 +10,22 @@
 
 package org.mule.test.integration;
 
-import org.mule.config.ConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
-import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.IOException;
@@ -49,39 +45,28 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
 
     protected String getConfigResources()
     {
-        return "";
-    }
-
-    protected ConfigurationBuilder getBuilder() throws Exception
-    {
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-        builder.registerModel("seda", "main");
-        UMOEndpointBuilder endpointbuilder = new EndpointURIEndpointBuilder("vm://component2", managementContext);
-        List transformers=new ArrayList();
-        transformers.add(new DummyTransformer());
-        endpointbuilder.setTransformers(transformers)
-        UMOImmutableEndpoint out = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder, managementContext);
-        UMOImmutableEndpoint in = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vm://component2", managementContext);
-
-        UMODescriptor c1 = builder.registerComponentInstance(this, "component1", in, out);
-
-        builder.registerComponentInstance(this, "component2", new MuleEndpointURI("vm://component2"));
-        return builder;
+        return "org/mule/test/integration/event-metadata-propagation-config.xml";
     }
 
     public void testEventMetaDataPropagation() throws UMOException
     {
-        UMOComponent component = managementContext.getRegistry().lookupModel("main").getComponent("component1");
+        UMOComponent component = managementContext.getRegistry().lookupComponent("component1");
+        UMOOutboundRouter outboundRouter = (UMOOutboundRouter) component.getOutboundRouter().getRouters().get(0);
+        UMOEndpoint endpoint = (UMOEndpoint) outboundRouter.getEndpoints().get(0);
+        List transformers = new ArrayList();
+        transformers.add(DummyTransformer.class);
+        endpoint.setTransformers(transformers);
+        
         UMOSession session = new MuleSession(component);
 
-        UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), (UMOImmutableEndpoint)component.getDescriptor()
+        UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), (UMOImmutableEndpoint)component
                 .getInboundRouter().getEndpoints().get(0), session, true);
         session.sendEvent(event);
     }
 
     public Object onCall(UMOEventContext context) throws Exception
     {
-        if ("component1".equals(context.getComponentDescriptor().getName()))
+        if ("component1".equals(context.getComponent().getName()))
         {
             Map props = new HashMap();
             props.put("stringParam", "param1");

@@ -32,22 +32,22 @@ public class PropsComponent implements Callable
     {
         logger.debug("org.mule.test.usecases.props.PropsComponent");
 
-        if ("component1".equals(context.getComponentDescriptor().getName()))
+        if ("component1".equals(context.getComponent().getName()))
         {
-            logger.debug("Adding: " + context.getComponentDescriptor().getName());
+            logger.debug("Adding: " + context.getComponent().getName());
             Map props = new HashMap();
             props.put("stringParam", "param1");
             props.put("objectParam", testObjectProperty);
             UMOMessage msg = new MuleMessage(context.getMessageAsString(), props);
-            logger.debug("Adding done: " + context.getComponentDescriptor().getName());
+            logger.debug("Adding done: " + context.getComponent().getName());
             return msg;
         }
         else
         {
-            logger.debug("Verifying: " + context.getComponentDescriptor().getName());
+            logger.debug("Verifying: " + context.getComponent().getName());
             assertEquals("param1", context.getMessage().getProperty("stringParam"));
             assertEquals(testObjectProperty, context.getMessage().getProperty("objectParam"));
-            logger.debug("Verifying done: " + context.getComponentDescriptor().getName());
+            logger.debug("Verifying done: " + context.getComponent().getName());
         }
 
         return context;

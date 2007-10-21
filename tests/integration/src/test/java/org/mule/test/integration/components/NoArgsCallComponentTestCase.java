@@ -13,7 +13,7 @@ import org.mule.components.simple.NoArgsCallWrapper;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 
 public class NoArgsCallComponentTestCase extends FunctionalTestCase
@@ -41,8 +41,8 @@ public class NoArgsCallComponentTestCase extends FunctionalTestCase
     }
 
     public void testDelegateClassNamespaceHandler() throws Exception{
-        UMODescriptor descriptor=managementContext.getRegistry().lookupService(SERVICE_DC_NAME);
-        Object object=descriptor.getServiceFactory().create();
+        UMOComponent component=managementContext.getRegistry().lookupComponent(SERVICE_DC_NAME);
+        Object object=component.getServiceFactory().getOrCreate();
         assertEquals(object.getClass().getName(), NoArgsCallWrapper.class.getName());
         NoArgsCallWrapper noArgsCallWrapper = (NoArgsCallWrapper)object;
         assertEquals(noArgsCallWrapper.getDelegateClass(), Apple.class.getName());
@@ -50,8 +50,8 @@ public class NoArgsCallComponentTestCase extends FunctionalTestCase
     }
 
     public void testDelegateInstanceNamespaceHandler() throws Exception{
-        UMODescriptor descriptor=managementContext.getRegistry().lookupService(SERVICE_DI_NAME);
-        Object object=descriptor.getServiceFactory().create();
+        UMOComponent component=managementContext.getRegistry().lookupComponent(SERVICE_DI_NAME);
+        Object object=component.getServiceFactory().getOrCreate();
         assertEquals(object.getClass().getName(), NoArgsCallWrapper.class.getName());
         NoArgsCallWrapper noArgsCallWrapper = (NoArgsCallWrapper)object;
         assertEquals(noArgsCallWrapper.getDelegateInstance().getClass().getName(), Apple.class.getName());

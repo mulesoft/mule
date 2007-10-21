@@ -41,7 +41,7 @@ public class FilePersistenceTestCase extends FunctionalTestCase
         assertNotNull(files);
         assertEquals(1, files.length);
 
-        managementContext.getRegistry().lookupModel("main").startComponent("TestComponent");
+        managementContext.getRegistry().lookupComponent("TestComponent").start();
         // give the component some time to initialise
         Thread.sleep(2000);
         files = store.listFiles();
