@@ -880,8 +880,8 @@
                         hackish but works even on the bamboo machine where 
                         other approaches fail for unknown reasons.
                     -->
-                    <configLocation>http://svn.codehaus.org/mule/trunk/mule/buildtools/src/main/resources/codecheck/checkstyle.xml</configLocation>
-                    <headerLocation>http://svn.codehaus.org/mule/trunk/mule/buildtools/src/main/resources/codecheck/LicenseHeader.txt</headerLocation>
+                    <configLocation>http://svn.codehaus.org/mule/branches/mule-2.x/buildtools/src/main/resources/codecheck/checkstyle.xml</configLocation>
+                    <headerLocation>http://svn.codehaus.org/mule/branches/mule-2.x/buildtools/src/main/resources/codecheck/LicenseHeader.txt</headerLocation>
                     <!-- do not link to JXR output as that is aggregated and the checkstyle
                          plugin does not recognize that.
                     -->
