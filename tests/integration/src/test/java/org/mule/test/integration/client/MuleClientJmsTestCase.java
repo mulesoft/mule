@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.client;
 
-
 import org.mule.RegistryContext;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.jms.JmsConstants;
@@ -34,70 +33,66 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
         return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
     }
 
-    // public void testClientSendDirect() throws Exception
-    // {
-    // MuleClient client = new MuleClient();
-    // RegistryContext.getConfiguration().setSynchronous(true);
-    //
-    // UMOMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client
-    // Send message", null);
-    // assertNotNull(message);
-    // assertEquals("Received: Test Client Send message", message.getPayload());
-    // }
-    //
-    // public void testClientDispatchDirect() throws Exception
-    // {
-    // MuleClient client = new MuleClient();
-    // RegistryContext.getConfiguration().setSynchronous(true);
-    //
-    // client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message",
-    // null);
-    // }
-    //
-    // public void testClientSend() throws Exception
-    // {
-    // MuleClient client = new MuleClient();
-    // RegistryContext.getConfiguration().setSynchronous(true);
-    // RegistryContext.getConfiguration().setRemoteSync(true);
-    //
-    // UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message",
-    // null);
-    // assertNotNull(message);
-    // assertEquals("Received: Test Client Send message", message.getPayload());
-    // }
-    //
-    // public void testClientMultiSend() throws Exception
-    // {
-    // MuleClient client = new MuleClient();
-    // RegistryContext.getConfiguration().setSynchronous(true);
-    // RegistryContext.getConfiguration().setRemoteSync(true);
-    //
-    // for (int i = 0; i < INTERATIONS; i++)
-    // {
-    // UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message "
-    // + i, null);
-    // assertNotNull(message);
-    // assertEquals("Received: Test Client Send message " + i, message.getPayload());
-    // }
-    // }
-    //
-    // public void testClientMultiDispatch() throws Exception
-    // {
-    // MuleClient client = new MuleClient();
-    // RegistryContext.getConfiguration().setSynchronous(false);
-    //
-    // int i = 0;
-    // // to init
-    // client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
-    // long start = System.currentTimeMillis();
-    // for (i = 0; i < INTERATIONS; i++)
-    // {
-    // client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
-    // }
-    // long time = System.currentTimeMillis() - start;
-    // logger.debug(i + " took " + time + "ms to process");
-    // Thread.sleep(1000);
-    // }
+    public void testClientSendDirect() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        // RegistryContext.getConfiguration().setSynchronous(true);
+
+        UMOMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
+        assertNotNull(message);
+        assertEquals("Received: Test Client Send message", message.getPayload());
+    }
+
+    public void testClientDispatchDirect() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        // RegistryContext.getConfiguration().setSynchronous(true);
+
+        client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message", null);
+    }
+
+    public void testClientSend() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        // RegistryContext.getConfiguration().setSynchronous(true);
+        // RegistryContext.getConfiguration().setRemoteSync(true);
+
+        UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
+        assertNotNull(message);
+        assertEquals("Received: Test Client Send message", message.getPayload());
+    }
+
+    public void testClientMultiSend() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        // RegistryContext.getConfiguration().setSynchronous(true);
+        // RegistryContext.getConfiguration().setRemoteSync(true);
+
+        for (int i = 0; i < INTERATIONS; i++)
+        {
+            UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
+            assertNotNull(message);
+            assertEquals("Received: Test Client Send message " + i, message.getPayload());
+        }
+    }
+
+    public void testClientMultiDispatch() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        // RegistryContext.getConfiguration().setSynchronous(false);
+
+        int i = 0;
+        // to init
+        client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
+        long start = System.currentTimeMillis();
+        for (i = 0; i < INTERATIONS; i++)
+        {
+            client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
+        }
+        long time = System.currentTimeMillis() - start;
+        logger.debug(i + " took " + time + "ms to process");
+        Thread.sleep(1000);
+    }
 
     public void testClientDispatchAndReceiveOnReplyTo() throws Exception
     {
@@ -135,5 +130,4 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
     {
         return "jms://test.queue";
     }
-
 }

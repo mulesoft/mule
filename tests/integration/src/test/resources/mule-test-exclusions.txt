@@ -47,6 +47,15 @@ org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
 # Hangs for a long, long time
 org.mule.test.integration.transaction.XAJdbcMule1479TestCase
 
+# These need <model-direct>, <model-pipeline>, etc. (or <direct:model>, <pipeline:model>?) elements configured.  
+# BTW, Is anyone actually using these?
+org.mule.test.integration.models.ConfigureModelTestCase
+org.mule.test.integration.models.DirectPipelineTestCase
+org.mule.test.integration.models.OptimisedSedaPipelineTestCase
+org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
+org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
+org.mule.test.integration.models.SedaPipelineTestCase
+
 # TODO MULE-1789
 org.mule.test.integration.config.MultiContainerTestCase
 
@@ -54,7 +63,6 @@ org.mule.test.integration.config.MultiContainerTestCase
 org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
 org.mule.test.integration.client.MuleAxisSoapClientTestCase
 org.mule.test.integration.client.MuleClientAxisTestCase
-org.mule.test.integration.client.MuleClientJmsTestCase
 org.mule.test.integration.client.MuleClientListenerTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 org.mule.test.integration.client.MuleClientRemotingTestCase
@@ -66,12 +74,6 @@ org.mule.test.integration.client.RemoteExceptionTestCase
 org.mule.test.integration.config.GlobalEndpointAndTransformerTestCase
 org.mule.test.integration.EventMetaDataPropagationTestCase
 org.mule.test.integration.exceptions.ExceptionListenerTestCase
-org.mule.test.integration.models.ConfigureModelTestCase
-org.mule.test.integration.models.DirectPipelineTestCase
-org.mule.test.integration.models.OptimisedSedaPipelineTestCase
-org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
-org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
-org.mule.test.integration.models.SedaPipelineTestCase
 org.mule.test.integration.MuleEndpointConfigurationTestCase
 org.mule.test.integration.persistence.FilePersistenceTestCase
 org.mule.test.integration.providers.axis.AxisOverJMSWithTransactionsTestCase
