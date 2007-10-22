@@ -25,7 +25,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <!--<endpoint address="stream://System.out" streaming="true"/>-->
+                    <!--<endpoint address="stdio://System.out" streaming="true"/>-->
                     <endpoint address="file://${mule.working.dir}/test-data/out" encoding="UTF8" streaming="true">
                         <properties>
                             <property name="outputPattern" value="foo.txt.processed"/>

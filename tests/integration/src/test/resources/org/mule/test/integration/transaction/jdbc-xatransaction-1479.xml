@@ -81,7 +81,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <endpoint address="stream://System.out" synchronous="true"/>
+                    <endpoint address="stdio://System.out" synchronous="true"/>
                 </router>
             </outbound-router>
             <exception-strategy className="org.mule.test.integration.transaction.RollbackRoutingExceptionStrategy"/>

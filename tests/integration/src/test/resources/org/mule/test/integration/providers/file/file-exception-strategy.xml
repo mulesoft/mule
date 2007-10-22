@@ -29,7 +29,7 @@
 
             <outbound-router>
                 <router className="org.mule.routing.outbound.ChainingRouter">
-                    <!--<endpoint address="stream://System.out"/>-->
+                    <!--<endpoint address="stdio://System.out"/>-->
                     <endpoint address="file://./.mule/out"/>
                 </router>
             </outbound-router>

@@ -29,7 +29,7 @@
 
     <model name="main">
         <!-- Test sendEndpoint and receive endpoint as URIs where the test connector will be
-            used from the above config and the stream connector will be create dymanically
+            used from the above config and the stdio connector will be create dymanically
         -->
         <service name="TestComponent1" implementation="org.mule.test.integration.service.TestComponent">
             <inbound-router>
@@ -37,7 +37,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="stream://System.out" />
+                    <endpoint address="stdio://System.out" />
                 </router>
             </outbound-router>
         </service>
