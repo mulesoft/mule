@@ -40,6 +40,11 @@ org.mule.test.usecases.sync.TcpToFileTestCase
 # Mule 2.x-specific failures
 ##########################################################################
 
+# Only testClientSendDirect() (1 of 6) is failing.
+# I'm not sure that RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true)
+# actually has any effect.
+org.mule.test.integration.client.MuleClientTestCase
+
 # Convert to XML config-based test
 org.mule.test.integration.message.AttachmentsPropagationTestCase
 org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
@@ -66,7 +71,6 @@ org.mule.test.integration.client.MuleClientAxisTestCase
 org.mule.test.integration.client.MuleClientListenerTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 org.mule.test.integration.client.MuleClientRemotingTestCase
-org.mule.test.integration.client.MuleClientTestCase
 org.mule.test.integration.client.MuleClientTransactionTestCase
 org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 org.mule.test.integration.client.MuleXFireSoapClientTestCase

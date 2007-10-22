@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="client_test" version="1.0">
-
-    <mule-environment-properties synchronous="true"/>
-
-    <global-endpoints>
-        <endpoint name="vmEndpoint" address="vm://test.queue"/>
-    </global-endpoints>
+    <endpoint name="vmEndpoint" address="vm://test.queue"/>
 
     <model name="model">
-        <mule-descriptor name="TestReceiverUMO" implementation="org.mule.tck.functional.FunctionalTestComponent">
+        <service name="TestReceiverUMO">
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <global-endpoint name="vmEndpoint"/>
+                <inbound-endpoint ref="vmEndpoint"/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="stdio://System.out"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="stdio://System.out"/>
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-</mule-configuration>
+</mule>
