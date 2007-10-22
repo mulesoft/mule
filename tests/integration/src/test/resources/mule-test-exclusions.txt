@@ -48,6 +48,10 @@ org.mule.test.integration.client.MuleClientTestCase
 # Tests the transport "wsdl:http://"  Is that working yet for 2.x?
 org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 
+# This one can't find its config file: mule-client-listener-config.xml
+# Where, oh where has this little file gone?
+org.mule.test.integration.client.MuleClientListenerTestCase
+
 # Convert to XML config-based test
 org.mule.test.integration.message.AttachmentsPropagationTestCase
 org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
@@ -69,12 +73,10 @@ org.mule.test.integration.config.MultiContainerTestCase
 
 # Not yet reviewed
 org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
-org.mule.test.integration.client.MuleClientListenerTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 org.mule.test.integration.client.MuleClientRemotingTestCase
 org.mule.test.integration.client.MuleClientTransactionTestCase
 org.mule.test.integration.client.RemoteExceptionTestCase
-org.mule.test.integration.config.GlobalEndpointAndTransformerTestCase
 org.mule.test.integration.EventMetaDataPropagationTestCase
 org.mule.test.integration.exceptions.ExceptionListenerTestCase
 org.mule.test.integration.MuleEndpointConfigurationTestCase

@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="GlobalEndpointandTransformerTest" version="1.0">
-
-    <transformers>
-        <transformer name="StringtoByteArray" className="org.mule.transformers.simple.StringToByteArray"/>
-    </transformers>
-
-    <global-endpoints>
-        <endpoint name="in" address="vm://in" transformers="StringtoByteArray"/>
-    </global-endpoints>
+    <transformer-string-to-byte-array name="StringtoByteArray"/>
+    
+    <endpoint name="in" address="vm://in"/>
 
     <model name="test">
-        <mule-descriptor name="Bridge" implementation="org.mule.components.simple.BridgeComponent">
+        <service name="Bridge">
             <inbound-router>
-                <global-endpoint name="in"/>
+                <inbound-endpoint ref="in" transformer-ref="StringtoByteArray"/>
+                <forwarding-router/>
             </inbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-</mule-configuration>
+</mule>
