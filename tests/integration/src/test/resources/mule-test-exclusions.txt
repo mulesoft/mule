@@ -67,7 +67,6 @@ org.mule.test.integration.config.MultiContainerTestCase
 # Not yet reviewed
 org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
 org.mule.test.integration.client.MuleAxisSoapClientTestCase
-org.mule.test.integration.client.MuleClientAxisTestCase
 org.mule.test.integration.client.MuleClientListenerTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 org.mule.test.integration.client.MuleClientRemotingTestCase
