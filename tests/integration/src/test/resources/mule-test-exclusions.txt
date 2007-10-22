@@ -45,6 +45,9 @@ org.mule.test.usecases.sync.TcpToFileTestCase
 # actually has any effect.
 org.mule.test.integration.client.MuleClientTestCase
 
+# Tests the transport "wsdl:http://"  Is that working yet for 2.x?
+org.mule.test.integration.client.MuleClientWSDLExternalTestCase
+
 # Convert to XML config-based test
 org.mule.test.integration.message.AttachmentsPropagationTestCase
 org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
@@ -70,8 +73,6 @@ org.mule.test.integration.client.MuleClientListenerTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 org.mule.test.integration.client.MuleClientRemotingTestCase
 org.mule.test.integration.client.MuleClientTransactionTestCase
-org.mule.test.integration.client.MuleClientWSDLExternalTestCase
-org.mule.test.integration.client.MuleXFireSoapClientTestCase
 org.mule.test.integration.client.RemoteExceptionTestCase
 org.mule.test.integration.config.GlobalEndpointAndTransformerTestCase
 org.mule.test.integration.EventMetaDataPropagationTestCase
