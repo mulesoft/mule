@@ -48,7 +48,7 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
 //
 //    public JmsConnector createConnector() throws Exception
 //    {
-//        ActiveMqJmsConnector connector = new ActiveMqJmsConnector();
+//        ActiveMQJmsConnector connector = new ActiveMQJmsConnector();
 //        connector.setName(CONNECTOR_NAME);
 //        Map overrides = new HashMap();
 //        overrides.put("transacted.message.receiver", TransactedJmsMessageReceiver.class.getName());

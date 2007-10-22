@@ -22,7 +22,7 @@ import javax.jms.Connection;
 
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 
-public class ActiveMqXaJmsConnectorTestCase extends FunctionalTestCase
+public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {

@@ -26,7 +26,7 @@ public class JmsNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("custom-connector", new JmsConnectorDefinitionParser());
         registerBeanDefinitionParser("activemq-connector", new JmsConnectorDefinitionParser(ActiveMQJmsConnector.class));
         // TODO XA
-        //registerBeanDefinitionParser("activemq-xa-connector", new JmsConnectorDefinitionParser(ActiveMqJmsConnector.class));
+        //registerBeanDefinitionParser("activemq-xa-connector", new JmsConnectorDefinitionParser(ActiveMQJmsConnector.class));
         registerBeanDefinitionParser("weblogic-connector", new JmsConnectorDefinitionParser(WeblogicJmsConnector.class));
         registerBeanDefinitionParser("websphere-connector", new JmsConnectorDefinitionParser(WebsphereJmsConnector.class));
         

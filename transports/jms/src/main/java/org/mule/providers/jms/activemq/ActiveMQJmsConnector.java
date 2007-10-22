@@ -33,7 +33,7 @@ public class ActiveMQJmsConnector extends JmsConnector
     public static final String BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
 
     /**
-     * Constructs a new ActiveMqJmsConnector.
+     * Constructs a new ActiveMQJmsConnector.
      */
     public ActiveMQJmsConnector()
     {

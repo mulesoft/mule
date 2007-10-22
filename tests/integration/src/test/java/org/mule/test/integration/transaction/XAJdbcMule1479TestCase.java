@@ -13,7 +13,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.providers.jdbc.JdbcUtils;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsConstants;
-import org.mule.providers.jms.activemq.ActiveMqJmsConnector;
+import org.mule.providers.jms.activemq.ActiveMQJmsConnector;
 import org.mule.tck.FunctionalTestCase;
 
 import java.sql.Connection;
@@ -114,7 +114,7 @@ public class XAJdbcMule1479TestCase extends FunctionalTestCase
 
     public JmsConnector createConnector() throws Exception
     {
-        ActiveMqJmsConnector connector = new ActiveMqJmsConnector();
+        ActiveMQJmsConnector connector = new ActiveMQJmsConnector();
         connector.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
         connector.setName("myConnector");
         connector.getDispatcherThreadingProfile().setDoThreading(false);
