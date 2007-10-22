@@ -24,7 +24,7 @@ import org.mule.util.object.ObjectFactory;
  */
 public class DummyInitialContextFactory implements ObjectFactory
 {
-    public Object create() throws Exception
+    public Object getOrCreate() throws Exception
     {
         SimpleContext c = new SimpleContext();
         c.bind("vmConnector", new VMConnector());
@@ -45,6 +45,16 @@ public class DummyInitialContextFactory implements ObjectFactory
     }
 
     public void dispose()
+    {
+        // do nothing
+    }
+
+    public Object lookup(String arg0) throws Exception
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void release(Object arg0) throws Exception
     {
         // do nothing
     }

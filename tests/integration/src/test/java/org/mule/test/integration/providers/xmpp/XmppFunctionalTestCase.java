@@ -12,16 +12,29 @@ package org.mule.test.integration.providers.xmpp;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.xmpp.XmppConnector;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
 import org.jivesoftware.smack.XMPPConnection;
 
-public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
+// TODO Convert this test to an XML-based configuration.
+public class XmppFunctionalTestCase extends FunctionalTestCase
 {
     private XMPPConnection cnn;
     private XmppConnector connector;
+
+    public void testSanity()
+    {
+        fail("Convert this test to an XML-based configuration");
+    }
+    
+    protected String getConfigResources()
+    {
+        // TODO
+        return null;
+    }
 
     protected void sendTestData(int iterations) throws Exception
     {
@@ -37,7 +50,8 @@ public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
         Thread.sleep(7000);
         // seem to be getting messages after the test messages??
-        assertTrue(callbackCount > 100);
+        // TODO Enable this assert
+        //assertTrue(callbackCount > 100);
     }
 
     protected UMOEndpointURI getInDest()
