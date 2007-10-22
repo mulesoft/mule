@@ -12,17 +12,15 @@ package org.mule.test.integration.providers.jdbc;
 
 import org.mule.RegistryContext;
 import org.mule.config.PoolingProfile;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.jdbc.JdbcConnector;
 import org.mule.providers.jdbc.JdbcUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.MuleDerbyTestUtils;
 
 import java.sql.Connection;
 import java.util.HashMap;
