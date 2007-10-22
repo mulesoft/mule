@@ -21,4 +21,4 @@ org.mule.providers.jms.transactions.JmsClientAcknowledgeSingleResourceTransactio
 org.mule.providers.jms.transactions.JmsClientAcknowledgeTransactionFunctionalTestCase
 
 # Active MQ XA Support Missing
-org.mule.providers.jms.vendors.ActiveMqXaJmsConnectorTestCase
+org.mule.providers.jms.vendors.ActiveMQXaJmsConnectorTestCase
