@@ -36,3 +36,76 @@ org.mule.test.integration.providers.jms.NestedRouterTestCase
 # MULE-2258: fails on the build server
 org.mule.test.usecases.sync.TcpToFileTestCase
 
+##########################################################################
+# Mule 2.x-specific failures
+##########################################################################
+
+# Convert to XML config-based test
+org.mule.test.integration.message.AttachmentsPropagationTestCase
+org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
+
+# Hangs for a long, long time
+org.mule.test.integration.transaction.XAJdbcMule1479TestCase
+
+# TODO MULE-1789
+org.mule.test.integration.config.MultiContainerTestCase
+
+# Not yet reviewed
+org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
+org.mule.test.integration.client.MuleAxisSoapClientTestCase
+org.mule.test.integration.client.MuleClientAxisTestCase
+org.mule.test.integration.client.MuleClientJmsTestCase
+org.mule.test.integration.client.MuleClientListenerTestCase
+org.mule.test.integration.client.MuleClientRemotingAxisTestCase
+org.mule.test.integration.client.MuleClientRemotingTestCase
+org.mule.test.integration.client.MuleClientTestCase
+org.mule.test.integration.client.MuleClientTransactionTestCase
+org.mule.test.integration.client.MuleClientWSDLExternalTestCase
+org.mule.test.integration.client.MuleXFireSoapClientTestCase
+org.mule.test.integration.client.RemoteExceptionTestCase
+org.mule.test.integration.config.GlobalEndpointAndTransformerTestCase
+org.mule.test.integration.EventMetaDataPropagationTestCase
+org.mule.test.integration.exceptions.ExceptionListenerTestCase
+org.mule.test.integration.models.ConfigureModelTestCase
+org.mule.test.integration.models.DirectPipelineTestCase
+org.mule.test.integration.models.OptimisedSedaPipelineTestCase
+org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
+org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
+org.mule.test.integration.models.SedaPipelineTestCase
+org.mule.test.integration.MuleEndpointConfigurationTestCase
+org.mule.test.integration.persistence.FilePersistenceTestCase
+org.mule.test.integration.providers.axis.AxisOverJMSWithTransactionsTestCase
+org.mule.test.integration.providers.file.FileAppendConnectorTestCase
+org.mule.test.integration.providers.file.FileAppendEndpointTestCase
+org.mule.test.integration.providers.file.FileExceptionStrategyFunctionalTestCase
+org.mule.test.integration.providers.file.FileFunctionalTestCase
+org.mule.test.integration.providers.file.FileRuntimeExceptionStrategyFunctionalTestCase
+org.mule.test.integration.providers.file.OutputPatternFromEndpointTestCase
+org.mule.test.integration.providers.jdbc.JdbcConnectionTestCase
+org.mule.test.integration.providers.jdbc.JdbcNonTransactionalFunctionalTestCase
+org.mule.test.integration.providers.jdbc.JdbcNullParamsTestCase
+org.mule.test.integration.providers.jdbc.JdbcTransactionalJdbcFunctionalTestCase
+org.mule.test.integration.providers.jdbc.JdbcTransactionalXaFunctionalTestCase
+org.mule.test.integration.providers.jms.QosHeadersTestCase
+org.mule.test.integration.providers.quartz.QuartzFunctionalTestCase
+org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
+org.mule.test.integration.routing.AggregatorIntegrationTestCase
+org.mule.test.integration.routing.EndpointBridgingTestCase
+org.mule.test.integration.routing.MessageChunkingTestCase
+org.mule.test.integration.routing.outbound.ChainingRouterNullsHandlingTestCase
+org.mule.test.integration.routing.replyto.ReplytoChainIntegrationTestCase
+org.mule.test.integration.routing.WireTapTestCase
+org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
+org.mule.test.integration.spring.MuleAdminTestCase
+org.mule.test.integration.streaming.FileToTcpStreamingTestCase
+org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
+org.mule.test.integration.util.ObjectNameHelperTestCase
+org.mule.test.NoArgsCallWrapperFunctionalTestCase
+org.mule.test.usecases.axis.clientbridge.ClientBridgeTestCase
+org.mule.test.usecases.http.HttpPostTestCase
+org.mule.test.usecases.http.HttpResponseTestCase
+org.mule.test.usecases.routing.ForwardingMessageSplitterTestCase
+org.mule.test.usecases.routing.InboundTransformingCatchAllTestCase
+org.mule.test.usecases.routing.response.ResponseAggregatorTestCase
+org.mule.test.usecases.sync.HttpTransformTestCase
+org.mule.test.usecases.sync.TcpJmsResponseBridgeTestCase
