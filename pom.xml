@@ -698,7 +698,7 @@
 
                  For plugin config see below in reporting section
             -->
-            <plugin>
+<!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <dependencies>
@@ -708,7 +708,7 @@
                         <version>${version}</version>
                     </dependency>
                 </dependencies>
-            </plugin>
+            </plugin>-->
 
             <!-- by default download all sources when generating project files -->
             <plugin>
@@ -875,8 +875,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <configuration>
-                    <configLocation>codecheck/checkstyle.xml</configLocation>
-                    <headerLocation>codecheck/LicenseHeader.txt</headerLocation>
+                    <!--
+                        Downloading the checkstyle files from SVN is kind of
+                        hackish but works even on the bamboo machine where 
+                        other approaches fail for unknown reasons.
+                    -->
+                    <configLocation>http://svn.codehaus.org/mule/trunk/mule/buildtools/src/main/resources/codecheck/checkstyle.xml</configLocation>
+                    <headerLocation>http://svn.codehaus.org/mule/trunk/mule/buildtools/src/main/resources/codecheck/LicenseHeader.txt</headerLocation>
                     <!-- do not link to JXR output as that is aggregated and the checkstyle
                          plugin does not recognize that.
                     -->
@@ -1004,6 +1009,15 @@
             <distributionManagement>
                 <site>
                     <url>file:///home/luntbuild/publish/mule/docs/${version}</url>
+                </site>
+            </distributionManagement>
+        </profile>
+
+        <profile>
+            <id>bamboo</id>
+            <distributionManagement>
+                <site>
+                    <url>file:///var/www/html/docs/site/${version}</url>
                 </site>
             </distributionManagement>
         </profile>
