@@ -55,7 +55,7 @@ public class MuleManifest
 
     public static String getProductName()
     {
-        return getManifestProperty("Implmentation-Title");
+        return getManifestProperty("Implementation-Title");
     }
 
     public static String getProductMoreInfo()
