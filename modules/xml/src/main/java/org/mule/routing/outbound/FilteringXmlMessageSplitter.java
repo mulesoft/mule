@@ -58,8 +58,8 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
     public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
     public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
 
-    protected static final ThreadLocal propertiesContext = new ThreadLocal();
-    protected static final ThreadLocal nodesContext = new ThreadLocal();
+    protected final ThreadLocal propertiesContext = new ThreadLocal();
+    protected final ThreadLocal nodesContext = new ThreadLocal();
 
     protected volatile String splitExpression = "";
     protected volatile Map namespaces = null;
