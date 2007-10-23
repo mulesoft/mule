@@ -61,8 +61,6 @@
                         <xsd:group ref="jmsConnectorElements"/>
                     </xsd:sequence>
                     <xsd:attributeGroup ref="jmsConnectorAttributes"/>
-                    <!-- Defaults to org.mule.providers.jms.JmsConstants.JMS_SPECIFICATION_102B  -->
-                    <xsd:attribute name="specification" type="jmsSpecificationSimpleType" default="1.0.2b"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -94,12 +92,21 @@
         <xsd:attribute name="eagerConsumer" type="mule:substitutableBoolean"/>
         <xsd:attribute name="jndiDestinations" type="mule:substitutableBoolean"/>
         <xsd:attribute name="forceJndiDestinations" type="mule:substitutableBoolean"/>
+        <!-- Defaults to org.mule.providers.jms.JmsConstants.JMS_SPECIFICATION_102B  -->
+        <xsd:attribute name="specification" default="1.0.2b">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="1.0.2b"/>
+                    <xsd:enumeration value="1.1"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
 
     <!-- Vendor-specific JMS Connectors -->
-
-    <xsd:complexType name="vendorJms102bDefaultConnectorType">
+         
+    <xsd:complexType name="vendorJmsConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
@@ -108,59 +115,32 @@
                     <xsd:group ref="jmsConnectorElements"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="jmsConnectorAttributes"/>
-                <!-- Defaults to org.mule.providers.jms.JmsConstants.JMS_SPECIFICATION_102B  -->
-                <xsd:attribute name="specification" type="jmsSpecificationSimpleType" default="1.0.2b"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:complexType name="vendorJms11DefaultConnectorType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:connectorType">
-                <xsd:sequence>
-                    <!-- Optional, a default ConnectionFactory is provided for vendor JMS configs -->
-                    <xsd:element name="connection-factory" type="genericConnectionFactoryType" minOccurs="0"
-                        maxOccurs="1" />
-                    <xsd:group ref="jmsConnectorElements" />
-                </xsd:sequence>
-                <xsd:attributeGroup ref="jmsConnectorAttributes" />
-                <!-- Defaults to org.mule.providers.jms.JmsConstants.JMS_SPECIFICATION_11  -->
-                <xsd:attribute name="specification" type="jmsSpecificationSimpleType" default="1.1"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
 
     <xsd:element name="activemq-connector" type="activeMqConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:element name="activemq-xa-connector" type="activeMqConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="activeMqConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="vendorJms11DefaultConnectorType">
+            <xsd:extension base="vendorJmsConnectorType">
                 <xsd:attribute name="brokerURL" type="xsd:string"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
+    
     <!-- TODO MULE-1726 -->
     <xsd:element name="oracleaq-connector" substitutionGroup="mule:abstract-connector">
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="vendorJms102bDefaultConnectorType">
+                <xsd:extension base="vendorJmsConnectorType">
                     <!-- JDBC Data Source -->
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:element name="weblogic-connector" type="vendorJms102bDefaultConnectorType" substitutionGroup="mule:abstract-connector" />
-    <xsd:element name="websphere-connector" type="vendorJms102bDefaultConnectorType" substitutionGroup="mule:abstract-connector" />
-
-    <xsd:simpleType name="jmsSpecificationSimpleType">
-        <xsd:restriction base="xsd:NMTOKEN">
-            <xsd:enumeration value="1.0.2b" />
-            <xsd:enumeration value="1.1" />
-        </xsd:restriction>
-    </xsd:simpleType>
-
-
+    <xsd:element name="weblogic-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <xsd:element name="websphere-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
+ 
 </xsd:schema>
