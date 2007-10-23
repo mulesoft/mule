@@ -26,19 +26,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleManifest
 {
-    public static final String IMPLEMENTATION_VERSION_PROPERTY = "Implementation-Version";
-    public static final String SPECIFICATION_VENDOR_PROPERTY = "Specification-Vendor";
-    public static final String VENDOR_URL_PROPERTY = "Vendor-Url";
-    public static final String PRODUCT_URL_PROPERTY = "Product-Url";
-    public static final String IMPLEMENTATION_TITLE_PROPERTY = "Implmentation-Title";
-    public static final String MORE_INFO_PROPERTY = "More-Info";
-    public static final String SUPPORT_PROPERTY = "Support";
-    public static final String LICENSE_PROPERTY = "License";
-    public static final String DESCRIPTION_PROPERTY = "Description";
-    public static final String BUILD_REVISION_PROPERTY = "Build-Revision";
-    public static final String DEV_LIST_EMAIL_PROPERTY = "Dev-List-Email";
-    public static final String DTD_PUBLIC_ID_PROPERTY = "Dtd-Public-Id";
-    public static final String DTD_SYSTEM_ID_PROPERTY = "Dtd-System-Id";
     /**
      * logger used by this class
      */
@@ -48,67 +35,67 @@ public class MuleManifest
 
     public static String getProductVersion()
     {
-        return getManifestProperty(IMPLEMENTATION_VERSION_PROPERTY);
+        return getManifestProperty("Implementation-Version");
     }
 
     public static String getVendorName()
     {
-        return getManifestProperty(SPECIFICATION_VENDOR_PROPERTY);
+        return getManifestProperty("Specification-Vendor");
     }
 
     public static String getVendorUrl()
     {
-        return getManifestProperty(VENDOR_URL_PROPERTY);
+        return getManifestProperty("Vendor-Url");
     }
 
     public static String getProductUrl()
     {
-        return getManifestProperty(PRODUCT_URL_PROPERTY);
+        return getManifestProperty("Product-Url");
     }
 
     public static String getProductName()
     {
-        return getManifestProperty(IMPLEMENTATION_TITLE_PROPERTY);
+        return getManifestProperty("Implmentation-Title");
     }
 
     public static String getProductMoreInfo()
     {
-        return getManifestProperty(MORE_INFO_PROPERTY);
+        return getManifestProperty("More-Info");
     }
 
     public static String getProductSupport()
     {
-        return getManifestProperty(SUPPORT_PROPERTY);
+        return getManifestProperty("Support");
     }
 
     public static String getProductLicenseInfo()
     {
-        return getManifestProperty(LICENSE_PROPERTY);
+        return getManifestProperty("License");
     }
 
     public static String getProductDescription()
     {
-        return getManifestProperty(DESCRIPTION_PROPERTY);
+        return getManifestProperty("Description");
     }
 
     public static String getBuildNumber()
     {
-        return getManifestProperty(BUILD_REVISION_PROPERTY);
+        return getManifestProperty("Build-Revision");
     }
 
     public static String getDevListEmail()
     {
-        return getManifestProperty(DEV_LIST_EMAIL_PROPERTY);
+        return getManifestProperty("Dev-List-Email");
     }
 
     public static String getDTDSystemId()
     {
-        return getManifestProperty(DTD_SYSTEM_ID_PROPERTY);
+        return getManifestProperty("Dtd-System-Id");
     }
 
     public static String getDTDPublicId()
     {
-        return getManifestProperty(DTD_PUBLIC_ID_PROPERTY);
+        return getManifestProperty("Dtd-Public-Id");
     }
 
     public static Manifest getManifest()
@@ -121,8 +108,7 @@ public class MuleManifest
             try
             {
                 // We want to load the MANIFEST.MF from the mule-core jar. Sine we
-                // don't the version we're using
-                // we have to search for the jar on the classpath
+                // don't know the version we're using we have to search for the jar on the classpath
                 URL url = (URL) AccessController.doPrivileged(new PrivilegedAction()
                 {
                     public Object run()
@@ -142,8 +128,7 @@ public class MuleManifest
                         }
                         catch (IOException e1)
                         {
-                            // TODO MULE-863: Is this sufficient (was printStackTrace) and correct?
-                            logger.debug("Failure reading manifest: " + e1.getMessage(), e1);
+                            logger.warn("Failure reading manifest: " + e1.getMessage(), e1);
                         }
                         return null;
                     }
@@ -158,11 +143,9 @@ public class MuleManifest
                 {
                     manifest.read(is);
                 }
-
             }
             catch (IOException e)
             {
-                // TODO MULE-863
                 logger.warn("Failed to read manifest Info, Manifest information will not display correctly: "
                         + e.getMessage());
             }
