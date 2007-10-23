@@ -14,38 +14,6 @@
     <description>Tests which ensure that Mule sub projects work well together.</description>
     <packaging>jar</packaging>
 
-    <profiles>
-        <profile>
-            <id>java14</id>
-            <activation>
-                <jdk>1.4</jdk>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <!--
-                Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
-                Unfortunately it is very buggy and does not support validation
-                against an XML Schema, so we have to unconditionally include
-                both xml-apis and xerces (in matching versions!) for JDK 1.4.
-                -->
-                <dependency>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>java5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -223,12 +191,6 @@
             <version>1.7.3.0</version>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derbyclient</artifactId>
-            <version>10.3.1.4</version>
-            <scope>test</scope>
-        </dependency>-->
 
         <!-- mule-module-spring does not pull in Hibernate, therefore we
             have to include it for the tests. The list of exclusions is
@@ -399,4 +361,69 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- 
+                         Do not run the integration tests per default. They have to be
+                         explicitly enabled via -Ptests
+                    -->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>java14</id>
+            <activation>
+                <jdk>1.4</jdk>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <!--
+                    Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
+                    Unfortunately it is very buggy and does not support validation
+                    against an XML Schema, so we have to unconditionally include
+                    both xml-apis and xerces (in matching versions!) for JDK 1.4.
+                    -->
+                <dependency>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>java5</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+        </profile>
+
+        <profile>
+            <id>tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <!-- here, we do want to run the tests -->
+                            <skip>false</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

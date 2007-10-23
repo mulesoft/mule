@@ -15,13 +15,13 @@
 
     <modules>
         <module>functional</module>
+        <module>integration</module>
     </modules>
 
     <profiles>
         <profile>
             <id>tests</id>
             <modules>
-                <module>integration</module>
                 <module>vendor</module>
             </modules>
         </profile>
