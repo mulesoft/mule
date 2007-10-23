@@ -20,10 +20,11 @@ File wrapperAdditionalConfFile = new File(wrapperConfDir + 'wrapper-additional.c
 boolean debugEnabled = args.findIndexOf { '-debug'.equalsIgnoreCase(it)} < args.size()
 int profileArgIndex = args.findIndexOf { '-profile'.equalsIgnoreCase(it)}
 boolean profileEnabled = profileArgIndex < args.size()
+boolean adHocOptionsAvailable = args.findIndexOf { it.startsWith('-M') } < args.size()
 
 paramIndex = 0
 
-if (debugEnabled || profileEnabled) {
+if (debugEnabled || profileEnabled || adHocOptionsAvailable) {
     // looking for maximum number of wrapper.java.additional property
     wrapperConfigFile.eachLine {
         String line ->
@@ -47,26 +48,38 @@ if (debugEnabled || profileEnabled) {
         }
 
         if (profileEnabled) {
-            String profileArg = null
+            String profileArg
             if (args.size() - 1 > profileArgIndex ) {
-                if(args[profileArgIndex + 1][0] != '-') {
+                if (args[profileArgIndex + 1][0] != '-') {
                     profileArg = args[profileArgIndex + 1]
                 }
             }
             writeProfilerOpts(w, profileArg)
         }
+
+        if (adHocOptionsAvailable) {
+            writeAdHocProps(w)
+        }
     }
 
 } else {
     // remove file if none of the options are specified
-    if (wrapperAdditionalConfFile.exists())
-    {
+    if (wrapperAdditionalConfFile.exists()) {
         wrapperAdditionalConfFile.delete()
     }
 }
 
 
 //=== next goes procedures definitions
+
+/**
+    Ad-hoc options
+*/
+def void writeAdHocProps(Writer w) {
+    args.findAll { it.startsWith('-M') }.each { arg ->
+        w << "wrapper.java.additional.${paramIndex++}=${arg.replaceFirst("^-M", "")}\n"
+    }
+}
 
 def void writeJpdaOpts(Writer w) {
     def jvmArgs = []
@@ -78,7 +91,7 @@ def void writeJpdaOpts(Writer w) {
 }
 
 def void writeProfilerOpts(Writer w, String optionValue) {
-    if(optionValue == null || optionValue.length() == 0) {
+    if (optionValue == null || optionValue.length() == 0) {
         optionValue = "sessionname=Mule"
     }
 
@@ -89,7 +102,7 @@ def void writeProfilerOpts(Writer w, String optionValue) {
     } else {
         additional = "-Xrun${getLibraryName()}:$optionValue"
     }
-    w << "wrapper.java.additional.${paramIndex++}=$additional"
+    w << "wrapper.java.additional.${paramIndex++}=$additional\n"
 }
 
 def String getLibraryName() {
