@@ -10,33 +10,29 @@
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <file:connector name="fileConnector" autoDelete="true" pollingFrequency="100"/>
-
-    <vm:connector name="vmQueue" queueEvents="true"/>
+    <file:connector name="fileConnector" autoDelete="true" fileAge="1000">
+        <receiver-threading-profile doThreading="false"/>
+        <dispatcher-threading-profile doThreading="false"/>
+    </file:connector>
 
     <endpoint address="file://./.mule/in" name="get" connector-ref="fileConnector"/>
-    <endpoint address="vm://out" name="out" connector-ref="vmQueue"/>
 
     <custom-transformer class="org.mule.providers.file.transformers.FileToByteArray" name="FileToByteArray"/>
 
-    <model name="receiveModel">
+    <model name="ESTest">
 
-        <service name="relay">
-            <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
+        <service name="FolderTO">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="get" transformer-ref="FileToByteArray">
                     <properties>
-                        <spring:entry key="comparator" value="org.mule.providers.file.comparator.TestComparator"/>
+                        <spring:entry key="comparator" value="org.mule.providers.file.comparator.OlderComparator"/>
+                        <spring:entry key="reverseOrder" value="true"/>
                     </properties>
                 </inbound-endpoint>
             </inbound-router>
-            <outbound-router>
-                <outbound-pass-through-router>
-                    <outbound-endpoint ref="out"/>
-                </outbound-pass-through-router>
-            </outbound-router>
+            <threading-profile doThreading="false"/>
         </service>
-
     </model>
 
 </mule>

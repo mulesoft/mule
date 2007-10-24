@@ -11,10 +11,14 @@ package org.mule.providers.file.comparator;
 
 import org.mule.util.FileUtils;
 
-import java.io.File;
 import java.util.Comparator;
+import java.io.File;
 
-public class TestComparator implements Comparator
+/**
+ * <p><code>OlderComparatorComparator</code> is a {@link Comparator} of File
+ * which is capable of comparing files for equality based on their modification dates.</p>
+ */
+public class OlderComparator implements Comparator
 {
     public int compare(Object o1, Object o2)
     {
@@ -22,15 +26,22 @@ public class TestComparator implements Comparator
         {
             File f = (File) o1;
             File f1 = (File) o2;
-            if (FileUtils.isFileNewer(f, f1))
+            boolean fileNewer = FileUtils.isFileNewer(f, f1);
+            boolean fileOlder = FileUtils.isFileOlder(f, f1);
+            if (!fileNewer && !fileOlder)
             {
-                return -1;
+                return 0;
             }
-            else
+            else if (fileNewer)
             {
                 return 1;
             }
+            else
+            {
+                return -1;
+            }
+
         }
-        throw new IllegalArgumentException("Compare not file instance");
+        throw new IllegalArgumentException("Impossible to compare not file instance");
     }
 }

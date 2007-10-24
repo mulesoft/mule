@@ -9,45 +9,56 @@
  */
 package org.mule.providers.file;
 
-import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.umo.UMOEventContext;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class FileComparatorTestCase extends FunctionalTestCase
 {
 
     public static final String PATH = "./.mule/in/";
-    public static final String FILE1_NAME = "first";
-    public static final String FILE2_NAME = "second";
-    public static final String OUT_QUEUE = "vm://out";
     public static final String FILE_CONNECTOR_NAME = "fileConnector";
-    public static final int TIMEOUT = 5000;
+    public static final int TIMEOUT = 50000;
+    public static final String FILE_NAMES[] = {"first", "second"};
+    public static final String MODEL_NAME = "ESTest";
+    public static final String COMPONENT_NAME = "FolderTO";
 
 
     public void testComparator() throws Exception
     {
+
+        final CountDownLatch countDown = new CountDownLatch(2);
+        EventCallback callback = new EventCallback()
+        {
+            public void eventReceived(UMOEventContext context, Object component) throws Exception
+            {
+                int index = (int) countDown.getCount() - 1;
+                assertEquals(context.getMessage().getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME), FILE_NAMES[index]);
+                countDown.countDown();
+            }
+        };
+
+        ((FunctionalTestComponent) managementContext.getRegistry().lookupComponent(COMPONENT_NAME).getServiceFactory().getOrCreate()).
+                setEventCallback(callback);
+
         managementContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).stop();
-        File f1 = FileUtils.newFile(PATH + FILE1_NAME);
+        File f1 = FileUtils.newFile(PATH + FILE_NAMES[0]);
         f1.createNewFile();
         Thread.sleep(1000);
-        File f2 = FileUtils.newFile(PATH + FILE2_NAME);
+        File f2 = FileUtils.newFile(PATH + FILE_NAMES[1]);
         f2.createNewFile();
         Thread.sleep(1000);
         managementContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).start();
-
-        MuleClient client = new MuleClient();
-        UMOMessage message = client.receive(OUT_QUEUE, TIMEOUT);
-        assertNotNull(message);
-        assertEquals(message.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME), FILE2_NAME);
-        message = client.receive(OUT_QUEUE, TIMEOUT);
-        assertNotNull(message);
-        assertEquals(message.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME), FILE1_NAME);
-        client.dispose();
-
+        assertTrue(countDown.await(TIMEOUT, TimeUnit.MILLISECONDS));
     }
+
 
     protected String getConfigResources()
     {
