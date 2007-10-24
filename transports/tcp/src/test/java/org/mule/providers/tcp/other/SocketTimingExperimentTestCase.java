@@ -71,6 +71,8 @@ public class SocketTimingExperimentTestCase extends FunctionalTestCase
 
     protected void badSend(Socket socket) throws IOException
     {
+        // just in case this reduces close time
+        socket.setReuseAddress(true);
         // turn off linger
         socket.setSoLinger(false, 0);
         // set buffer larger than the size we will send
