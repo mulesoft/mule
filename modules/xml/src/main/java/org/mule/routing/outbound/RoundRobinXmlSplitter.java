@@ -119,8 +119,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
         }
         finally
         {
-            nodesContext.set(null);
-            propertiesContext.set(null);
+            this.cleanup();
         }
     }
 

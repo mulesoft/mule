@@ -30,7 +30,8 @@ import java.util.List;
 
 public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCase
 {
-    public void testMessageSpltterRouter() throws Exception
+
+    public void testMessageSplitterRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
 
@@ -61,7 +62,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Orange.class), C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)));
-        router.route(message, (UMOSession)session.proxy(), false);
+        router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
         message = new MuleMessage(payload);
@@ -74,7 +75,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
             message);
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)),
             message);
-        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
+        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
@@ -91,7 +92,8 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
 
         public boolean eval(Object o)
         {
-            return ((UMOMessage)o).getPayload().getClass().equals(type);
+            return ((UMOMessage) o).getPayload().getClass().equals(type);
         }
     }
+
 }

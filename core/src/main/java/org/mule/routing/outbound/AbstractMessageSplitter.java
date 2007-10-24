@@ -22,11 +22,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <code>AbstractMessageSplitter</code> is an outbound Message Splitter used to
- * split the contents of a received message into sub parts that can be processed by
- * other components. Each Part is fired as a separate event to each endpoint on the
- * router. The endpoints can have filters on them to receive only certain message
- * parts.
+ * <code>AbstractMessageSplitter</code> is an outbound Message Splitter used to split
+ * the contents of a received message into sub parts that can be processed by other
+ * components. Each Part is fired as a separate event to each endpoint on the router. The
+ * endpoints can have filters on them to receive only certain message parts.
  */
 public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 {
@@ -87,11 +86,13 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                         message.setCorrelationGroupSize(groupSize);
                         message.setCorrelationSequence(correlationSequence++);
                     }
+
                     if (honorSynchronicity)
                     {
                         message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY,
                             endpoint.isRemoteSync());
                     }
+
                     if (synchronous)
                     {
                         result = send(session, message, endpoint);
@@ -105,25 +106,20 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                 {
                     throw new CouldNotRouteOutboundMessageException(message, endpoint, e);
                 }
+
                 if (!multimatch)
                 {
                     break;
                 }
-                message = getMessagePart(message, endpoint);
+
+                message = this.getMessagePart(message, endpoint);
             }
         }
-        return result;
-    }
 
-    /**
-     * Template method that can be used to split the message up before the
-     * getMessagePart method is called .
-     * 
-     * @param message the message being routed
-     */
-    protected void initialise(UMOMessage message)
-    {
-        // nothing to do
+        // we are done with splitting & routing
+        this.cleanup();
+
+        return result;
     }
 
     public boolean isHonorSynchronicity()
@@ -142,15 +138,29 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
     }
 
     /**
-     * Retrieves a specific message part for the given endpoint. the message will
-     * then be routed via the provider. <p/> <strong>NOTE:</strong>Implementations
-     * must provide proper synchronization for shared state (payload, properties,
-     * etc.)
+     * This method can be implemented to split the message up before
+     * {@link #getMessagePart(UMOMessage, UMOEndpoint)} method is called.
+     * 
+     * @param message the message being routed
+     */
+    protected abstract void initialise(UMOMessage message);
+
+    /**
+     * Retrieves a specific message part for the given endpoint. the message will then be
+     * routed via the provider. <p/> <strong>NOTE:</strong>Implementations must provide
+     * proper synchronization for shared state (payload, properties, etc.)
      * 
      * @param message the current message being processed
-     * @param endpoint the endpoint that will be used to route the resulting message
-     *            part
+     * @param endpoint the endpoint that will be used to route the resulting message part
      * @return the message part to dispatch
      */
     protected abstract UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint);
+
+    /**
+     * This method is called after all parts of the original message have been processed;
+     * typically this is the case after {@link #getMessagePart(UMOMessage, UMOEndpoint)}
+     * returned <code>null</code>.
+     */
+    protected abstract void cleanup();
+
 }

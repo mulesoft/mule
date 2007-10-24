@@ -70,6 +70,11 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
                     return null;
                 }
             }
+            
+            protected void cleanup()
+            {
+                parts = null;
+            }
         };
 
         List endpoints = new ArrayList();
