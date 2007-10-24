@@ -14,8 +14,8 @@
     </jms:connector>
 
     <endpoint name="ep1" address="jms://queue.NotATopic"/>
-    <endpoint name="ep2" address="jms://topic:context.ThisIsATopic"/>
-    <endpoint name="ep3" address="jms://context.aTopic?topic=true"/>
+    <endpoint name="ep2" address="jms://context.aTopic?topic=true"/>
+    <endpoint name="ep3" address="jms://topic:context.ThisIsATopic"/>
     <endpoint name="ep4" address="jms://topic:context.ThisIsATopic?topic=false"/>
 
 </mule>

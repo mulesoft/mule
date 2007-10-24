@@ -62,7 +62,7 @@ public class DefaultJmsTopicResolver implements JmsTopicResolver
      * Will use endpoint's resource info to detect a topic,
      * as in {@code jms://topic:trade.PriceUpdatesTopic}. This
      * method will call {@link #isTopic(org.mule.umo.endpoint.UMOImmutableEndpoint, boolean)}
-     * with fallback flag set to <strong>false</false>.
+     * with fallback flag set to <strong>true</false>.
      * <p/>
      * <strong>NOTE:</strong> When using topics, use the '.' (dot) symbol for subcontext separation,
      * as opposed to '/'. Otherwise the resource info may not get properly translated for the
@@ -73,7 +73,7 @@ public class DefaultJmsTopicResolver implements JmsTopicResolver
      */
     public boolean isTopic (UMOImmutableEndpoint endpoint)
     {
-        return isTopic(endpoint, false);
+        return isTopic(endpoint, true);
     }
 
     /** {@inheritDoc} */

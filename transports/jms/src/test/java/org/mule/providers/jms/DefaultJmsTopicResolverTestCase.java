@@ -10,20 +10,20 @@
 
 package org.mule.providers.jms;
 
+import javax.jms.Queue;
+import javax.jms.Topic;
+
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import com.mockobjects.dynamic.Mock;
-
-import javax.jms.Queue;
-import javax.jms.Topic;
 
 public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 {
     private JmsConnector connector;
     private DefaultJmsTopicResolver resolver;
 
-    protected void doSetUp () throws Exception
+    protected void doSetUp() throws Exception
     {
         super.doSetUp();
         connector = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector");
@@ -34,34 +34,106 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         return "jms-topic-resolver.xml";
     }
-    
+
     public void testSameConnector()
     {
         assertSame(connector, resolver.getConnector());
     }
 
-    public void testEndpointNotTopicNoFallback() throws Exception
+    public void testEndpointNotTopicWithFallback() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep1");
-        assertFalse(resolver.isTopic(endpoint));        
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep1", managementContext);
+        assertFalse(resolver.isTopic(endpoint));
     }
 
-    public void testEndpointTopicNoFallback() throws Exception
+    public void testEndpointNotTopicWithFallback2() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep2");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep1", managementContext);
+        assertFalse(resolver.isTopic(endpoint, true));
+    }
+
+    public void testEndpointNotTopicNoFallback() throws Exception
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep1", managementContext);
+        assertFalse(resolver.isTopic(endpoint, false));
+    }
+
+    public void testEndpointTopicPropertyWithFallback() throws Exception
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep2", managementContext);
         assertTrue(resolver.isTopic(endpoint));
     }
 
-    public void testEndpointNotTopicWithFallback() throws Exception
+    public void testEndpointTopicPropertyWithFallback2() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep3");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep2", managementContext);
         assertTrue(resolver.isTopic(endpoint, true));
     }
 
-    public void testEndpointTopicFallbackNotUsed() throws Exception
+    public void testEndpointTopicPropertyNoFallback() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("ep4");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep2", managementContext);
+        assertFalse(resolver.isTopic(endpoint, false));
+    }
+
+    public void testEndpointTopicPrefixWithFallback() throws Exception
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep3", managementContext);
+        assertTrue(resolver.isTopic(endpoint));
+    }
+
+    public void testEndpointTopicPrefixWithFallback2() throws Exception
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep3", managementContext);
         assertTrue(resolver.isTopic(endpoint, true));
+    }
+
+    public void testEndpointTopicPrefixNoFallback() throws Exception
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep3", managementContext);
+        assertTrue(resolver.isTopic(endpoint, false));
+    }
+
+    public void testEndpointTopicPrefixAndPropertyWithFallback() throws Exception
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep4", managementContext);
+        assertTrue(resolver.isTopic(endpoint));
+    }
+
+    public void testEndpointTopicPrefixAndPropertyWithFallback2() throws Exception
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep4", managementContext);
+        assertTrue(resolver.isTopic(endpoint, true));
+    }
+
+    public void testEndpointTopicPrefixAndPropertyNoFallback() throws Exception
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep4", managementContext);
+        assertTrue(resolver.isTopic(endpoint, false));
     }
 
     public void testDestinationNotTopic() throws Exception

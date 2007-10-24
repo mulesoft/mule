@@ -96,6 +96,13 @@
             <groupId>groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>1.0</version>
+            <exclusions>
+                <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
+                <exclusion>
+                    <groupId>openejb</groupId>
+                    <artifactId>openejb-loader</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Annoying: we need to override retrotranslated dependencies -->
         <dependency>
