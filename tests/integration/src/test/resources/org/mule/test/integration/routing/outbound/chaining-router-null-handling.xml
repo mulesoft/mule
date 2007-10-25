@@ -1,103 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="ChainingRouterNulls" version="1.0">
-
-    <mule-environment-properties synchronous="true"/>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <model name="ChainingRouterNullsModel">
-
         <!--
             Both first and last link elements succeed
         -->
-        <mule-descriptor name="bridge1"
-                         implementation="org.mule.components.simple.BridgeComponent">
+        <service name="bridge1">
             <inbound-router>
-                <endpoint address="vm://incomingPass"/>
+                <inbound-endpoint address="vm://incomingPass"/>
+                <forwarding-router/>
             </inbound-router>
 
             <outbound-router>
-                <router className="org.mule.routing.outbound.ChainingRouter">
-                    <endpoint address="vm://component1"/>
-                    <endpoint address="vm://component2Pass"/>
-                </router>
+                <chaining-router>
+                    <outbound-endpoint address="vm://component1"/>
+                    <outbound-endpoint address="vm://component2Pass"/>
+                </chaining-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
         <!--
             First passes and tags the message, but the last one fails
         -->
-        <mule-descriptor name="bridge2"
-                         implementation="org.mule.components.simple.BridgeComponent">
+        <service name="bridge2">
             <inbound-router>
-                <endpoint address="vm://incomingLastFail"/>
+                <inbound-endpoint address="vm://incomingLastFail"/>
+                <forwarding-router/>
             </inbound-router>
 
             <outbound-router>
-                <router className="org.mule.routing.outbound.ChainingRouter">
-                    <endpoint address="vm://component1"/>
-                    <endpoint address="vm://component2Fail"/>
-                </router>
+                <chaining-router>
+                    <outbound-endpoint address="vm://component1"/>
+                    <outbound-endpoint address="vm://component2Fail"/>
+                </chaining-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
         <!--
             First chain component fails, second never fires
         -->
-        <mule-descriptor name="bridge3"
-                         implementation="org.mule.components.simple.BridgeComponent">
+        <service name="bridge3">
             <inbound-router>
-                <endpoint address="vm://incomingFirstFail"/>
+                <inbound-endpoint address="vm://incomingFirstFail"/>
+                <forwarding-router/>
             </inbound-router>
 
             <outbound-router>
-                <router className="org.mule.routing.outbound.ChainingRouter">
-                    <endpoint address="vm://component1Fail"/>
-                    <endpoint address="vm://component2Pass"/>
-                </router>
+                <chaining-router>
+                    <outbound-endpoint address="vm://component1Fail"/>
+                    <outbound-endpoint address="vm://component2Pass"/>
+                </chaining-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="component1" implementation="org.mule.tck.functional.FunctionalTestComponent">
+        <service name="component1">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="appendComponentName" value="true"/>
+                </properties>
+            </component>
             <inbound-router>
-                <endpoint address="vm://component1"/>
+                <inbound-endpoint address="vm://component1"/>
             </inbound-router>
-            <properties>
-                <property name="appendComponentName" value="true"/>
-            </properties>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="component1Fail" implementation="org.mule.tck.functional.FunctionalTestComponent">
+        <service name="component1Fail">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="throwException" value="true"/>
+                    <spring:entry key="appendComponentName" value="true"/>
+                </properties>
+            </component>
             <inbound-router>
-                <endpoint address="vm://component1Fail"/>
+                <inbound-endpoint address="vm://component1Fail"/>
             </inbound-router>
-            <properties>
-                <property name="throwException" value="true"/>
-                <property name="appendComponentName" value="true"/>
-            </properties>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="component2Pass" implementation="org.mule.tck.functional.FunctionalTestComponent">
+        <service name="component2Pass">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="appendComponentName" value="true"/>
+                </properties>
+            </component>
             <inbound-router>
-                <endpoint address="vm://component2Pass"/>
+                <inbound-endpoint address="vm://component2Pass"/>
             </inbound-router>
-            <properties>
-                <property name="appendComponentName" value="true"/>
-            </properties>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="component2Fail" implementation="org.mule.tck.functional.FunctionalTestComponent">
+        <service name="component2Fail">
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="throwException" value="true"/>
+                    <spring:entry key="appendComponentName" value="true"/>
+                </properties>
+            </component>
             <inbound-router>
-                <endpoint address="vm://component2Fail"/>
+                <inbound-endpoint address="vm://component2Fail"/>
             </inbound-router>
-            <properties>
-                <property name="throwException" value="true"/>
-                <property name="appendComponentName" value="true"/>
-            </properties>
-        </mule-descriptor>
-
+        </service>
     </model>
-
-</mule-configuration>
+</mule>

@@ -107,7 +107,6 @@ org.mule.test.integration.providers.jms.QosHeadersTestCase
 org.mule.test.integration.providers.quartz.QuartzFunctionalTestCase
 org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
 org.mule.test.integration.routing.EndpointBridgingTestCase
-org.mule.test.integration.routing.outbound.ChainingRouterNullsHandlingTestCase
 org.mule.test.integration.routing.replyto.ReplytoChainIntegrationTestCase
 org.mule.test.integration.routing.WireTapTestCase
 org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
