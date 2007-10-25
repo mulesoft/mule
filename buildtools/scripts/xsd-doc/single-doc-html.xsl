@@ -267,8 +267,7 @@
                 <!-- this should always be true when using the normalized schema -->
                 <xsl:when test="/xsd:schema/xsd:element[@substitutionGroup=$name]">
                     This is an abstract element; another element with a compatible
-                    type must be used in its place.  The following is a list of
-                    suitable replacements.
+                    type must be used in its place:
                     <ul>
                         <xsl:apply-templates
                                 select="/xsd:schema/xsd:element[@substitutionGroup=$name]"
