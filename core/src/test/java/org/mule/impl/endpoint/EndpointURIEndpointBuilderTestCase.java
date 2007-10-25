@@ -69,8 +69,8 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
             fail("Unexpected exception: " + e.getStackTrace());
         }
     }
-    
-    //TODO DF: Test more than defaults with tests using builder to set non-default values
+
+    // TODO DF: Test more than defaults with tests using builder to set non-default values
 
     public void testBuildResponseEndpoint() throws UMOException
     {
@@ -92,11 +92,14 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
             fail("Unexpected exception: " + e.getStackTrace());
         }
     }
-    
-    protected void testDefaultCommonEndpointAttributes(UMOImmutableEndpoint ep){
+
+    protected void testDefaultCommonEndpointAttributes(UMOImmutableEndpoint ep)
+    {
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-        assertEquals(managementContext.getRegistry().getConfiguration().getDefaultSynchronousEventTimeout(), ep.getRemoteSyncTimeout());
-        assertEquals(managementContext.getRegistry().getConfiguration().isDefaultSynchronousEndpoints(), ep.isSynchronous());
+        assertEquals(managementContext.getRegistry().getConfiguration().getDefaultSynchronousEventTimeout(),
+            ep.getRemoteSyncTimeout());
+        assertEquals(managementContext.getRegistry().getConfiguration().isDefaultSynchronousEndpoints(),
+            ep.isSynchronous());
         assertEquals(false, ep.isRemoteSync());
         assertEquals(false, ep.isStreaming());
         assertTrue(ep.getConnectionStrategy() instanceof SingleAttemptConnectionStrategy);
