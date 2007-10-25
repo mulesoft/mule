@@ -1,76 +1,56 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="InjectionProblem" version="1.0">
-
-    <!-- embed Spring configuration to create a Jms Connection factory -->
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
-        <properties>
-            <text-property name="configuration">
-                <![CDATA[
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-                <beans>
-                <bean id="jmsConnectionFactory"
-                    class="org.apache.activemq.ActiveMQConnectionFactory">
-                    <property name="brokerURL"><value>vm://localhost?broker.persistent=false</value></property>
-                </bean>
-                </beans>
-                ]]>
-            </text-property>
-        </properties>
-    </container-context>
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
     <!-- Testing with ActiveMq -->
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
-        <properties>
-            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
-            <property name="specification" value="1.1"/>
-        </properties>
-    </connector>
-
-    <!--
-        The Mule model initialises and manages your UMO components
-    -->
+    <jms:activemq-connector name="jmsConnector"/>
+    
     <model name="InjectionProblem">
-        <mule-descriptor name="pojo1"
-            implementation="org.mule.components.simple.EchoComponent">
+        <service name="pojo1">
+            <echo-component/>
+
             <inbound-router>
-                <endpoint address="vm://pojo1" remoteSync="true" remoteSyncTimeout="10000"/>
+                <inbound-endpoint address="vm://pojo1" remoteSync="true" remoteSyncTimeout="10000"/>
             </inbound-router>
 
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://pojo2"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="jms://pojo2"/>
+                </outbound-pass-through-router>
             </outbound-router>
 
             <response-router timeout="7000">
-                <endpoint address="jms://response"/>
-                <router className="org.mule.routing.response.SingleResponseRouter"/>
+                <response-endpoint address="jms://response"/>
+                <single-response-router/>
             </response-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="pojo2"
-            implementation="org.mule.components.simple.EchoComponent">
+        <service name="pojo2">
+            <echo-component/>
+
             <inbound-router>
-                <endpoint address="jms://pojo2"/>
+                <inbound-endpoint address="jms://pojo2"/>
             </inbound-router>
 
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://pojo3"/>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="jms://pojo3"/>
                     <reply-to address="jms://response"/>
-                </router>
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="pojo3"
-            implementation="org.mule.test.integration.service.TestReceiver">
+        <service name="pojo3">
+            <component class="org.mule.test.integration.service.TestReceiver"/>
             <inbound-router>
-                <endpoint address="jms://pojo3"/>
+                <inbound-endpoint address="jms://pojo3"/>
             </inbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-
-</mule-configuration>
+</mule>

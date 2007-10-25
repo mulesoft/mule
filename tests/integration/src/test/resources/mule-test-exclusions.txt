@@ -58,6 +58,10 @@ org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 # Message chunking router not working?
 org.mule.test.integration.routing.MessageChunkingTestCase
 
+# JmsMessageAdapter [main]: Message access violation
+# java.lang.IllegalStateException: Only owner thread can write to message: Thread[jmsConnector.receiver
+org.mule.test.integration.routing.replyto.ReplytoChainIntegrationTestCase
+
 # These tests can't find their config file: Where, oh where has this little file gone?
 org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
 org.mule.test.integration.client.MuleClientListenerTestCase
@@ -107,7 +111,6 @@ org.mule.test.integration.providers.jms.QosHeadersTestCase
 org.mule.test.integration.providers.quartz.QuartzFunctionalTestCase
 org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
 org.mule.test.integration.routing.EndpointBridgingTestCase
-org.mule.test.integration.routing.replyto.ReplytoChainIntegrationTestCase
 org.mule.test.integration.routing.WireTapTestCase
 org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 org.mule.test.integration.spring.MuleAdminTestCase
