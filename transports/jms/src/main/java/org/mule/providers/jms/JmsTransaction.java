@@ -11,6 +11,7 @@
 package org.mule.providers.jms;
 
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.providers.jms.i18n.JmsMessages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
@@ -71,13 +72,20 @@ public class JmsTransaction extends AbstractSingleResourceTransaction
 
     protected void doRollback() throws TransactionException
     {
-        try
+        if (resource != null)
         {
-            ((Session)resource).rollback();
+            try
+            {
+                ((Session)resource).rollback();
+            }
+            catch (JMSException e)
+            {
+                throw new TransactionException(CoreMessages.transactionRollbackFailed(), e);
+            }
         }
-        catch (JMSException e)
+        else 
         {
-            throw new TransactionException(CoreMessages.transactionRollbackFailed(), e);
+            throw new TransactionException(MessageFactory.createStaticMessage("No resource has been bound to this transaction"));
         }
     }
 }
