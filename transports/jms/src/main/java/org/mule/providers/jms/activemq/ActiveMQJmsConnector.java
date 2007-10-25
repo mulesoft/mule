@@ -12,7 +12,6 @@ package org.mule.providers.jms.activemq;
 
 import org.mule.providers.ConnectException;
 import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.xa.ConnectionInvocationHandler;
 import org.mule.util.object.ObjectFactory;
 import org.mule.util.object.SimpleObjectFactory;
@@ -37,7 +36,6 @@ public class ActiveMQJmsConnector extends JmsConnector
      */
     public ActiveMQJmsConnector()
     {
-        setSpecification(JmsConstants.JMS_SPECIFICATION_11);
         setEagerConsumer(false);
         // TODO MULE-1409 better support for ActiveMQ 4.x temp destinations
     }

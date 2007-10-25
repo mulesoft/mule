@@ -14,4 +14,22 @@
         <dispatcher-threading-profile doThreading="false"/>
     </jms:activemq-connector>
     
+    <jms:activemq-connector name="activeMqJmsConnector"/>
+
+    <jms:activemq-connector name="customActiveMqJmsConnector"
+                            acknowledgementMode="DUPS_OK_ACKNOWLEDGE"
+                            clientId="myClient"
+                            durable="true"
+                            noLocal="true"
+                            persistentDelivery="true"
+                            maxRedelivery="5"
+                            cacheJmsSessions="true"
+                            recoverJmsConnections="false"
+                            eagerConsumer="false"
+                            jndiDestinations="true"
+                            forceJndiDestinations="true"
+                            specification="1.1">
+        <jms:redelivery-handler class="org.mule.providers.jms.test.TestRedeliveryHandler" />
+    </jms:activemq-connector>
+    
 </mule>
