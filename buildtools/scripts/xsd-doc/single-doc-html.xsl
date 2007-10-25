@@ -15,7 +15,8 @@
 
          a lot of things could be improved.  obvious targets include:
          - cross-linking
-         - using multiple schema
+         - using multiple schema 
+           (current work-around is to use normalized schema - see notmalize.sh)
 
          some features commented-out to give a "friendlier" interface.
     -->
