@@ -10,6 +10,7 @@
 
 package org.mule.modules.boot;
 
+import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringUtils;
@@ -34,6 +35,11 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 
 public class LibraryDownloader
 {
+    private static final String[][] EXTERNAL_LIBRARIES = { 
+        { "javax.activation.DataSource", "/javax/activation/activation/1.1/activation-1.1.jar", "activation-1.1.jar" },
+        { "javax.mail.Message", "/javax/mail/mail/1.4/mail-1.4.jar", "mail-1.4.jar" }
+    };
+    
     static final int STARTUP_TIMEOUT = 120000;
     static final String REPO_CENTRAL = "http://repo1.maven.org/maven2";
 
@@ -121,28 +127,41 @@ public class LibraryDownloader
     public List downloadLibraries() throws IOException
     {
         List libraries = new ArrayList();
+        Exception proxyException = null;
         try
         {
-            libraries.add(getLibrary(REPO_CENTRAL, "/javax/activation/activation/1.1/activation-1.1.jar",
-                "activation-1.1.jar"));
-            libraries.add(getLibrary(REPO_CENTRAL, "/javax/mail/mail/1.4/mail-1.4.jar", "mail-1.4.jar"));
-            return libraries;
+            for (int externalLibraryPos = 0; externalLibraryPos < EXTERNAL_LIBRARIES.length; externalLibraryPos++)
+            {
+                downloadLibrary(libraries, externalLibraryPos);
+            }
         }
         catch (UnknownHostException uhe)
         {
-            System.err.println();
-            IOException ex = new IOException(
-                "Unable to reach a remote repository, this is most likely because you are behind a firewall and have not configured your HTTP proxy settings in $MULE_HOME/conf/wrapper.conf.");
-            ex.initCause(uhe);
-            throw ex;
+            proxyException = uhe;
         }
-        catch (ConnectTimeoutException e)
+        catch (ConnectTimeoutException cte)
         {
-            System.err.println();
-            IOException ex = new IOException(
-                "Unable to reach a remote repository, this is most likely because you are behind a firewall and have not configured your HTTP proxy settings in $MULE_HOME/conf/wrapper.conf.");
-            ex.initCause(e);
-            throw ex;
+            proxyException = cte;
+        }
+        finally
+        {
+            if (proxyException != null)
+            {
+                System.err.println();
+                IOException ex = new IOException(
+                    "Unable to reach a remote repository, this is most likely because you are behind a firewall and have not configured your HTTP proxy settings in $MULE_HOME/conf/wrapper.conf.");
+                ex.initCause(proxyException);
+                throw ex;
+            }
+        }
+        return libraries;        
+    }
+    
+    public void downloadLibrary(List libraries, int externalLibraryPos) throws IOException
+    {
+        if (! ClassUtils.isClassOnPath(EXTERNAL_LIBRARIES[externalLibraryPos][0], MuleBootstrapUtils.class))
+        {
+            libraries.add(getLibrary(REPO_CENTRAL, EXTERNAL_LIBRARIES[externalLibraryPos][1], EXTERNAL_LIBRARIES[externalLibraryPos][2]));
         }
     }
 
