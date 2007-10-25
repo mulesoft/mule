@@ -10,6 +10,10 @@
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
+    <configuration serverId="MULE">
+        <default-threading-profile doThreading="false"/>
+    </configuration>
+
     <file:connector name="fileConnector" autoDelete="true" fileAge="1000">
         <receiver-threading-profile doThreading="false"/>
         <dispatcher-threading-profile doThreading="false"/>
@@ -26,12 +30,12 @@
             <inbound-router>
                 <inbound-endpoint ref="get" transformer-ref="FileToByteArray">
                     <properties>
-                        <spring:entry key="comparator" value="org.mule.providers.file.comparator.OlderComparator"/>
+                        <spring:entry key="comparator" value="org.mule.providers.file.comparator.OlderFirstComparator"/>
                         <spring:entry key="reverseOrder" value="true"/>
                     </properties>
                 </inbound-endpoint>
             </inbound-router>
-            <threading-profile doThreading="false"/>
+            <threading-profile maxThreadsActive="1"/>
         </service>
     </model>
 
