@@ -16,7 +16,7 @@
          a lot of things could be improved.  obvious targets include:
          - cross-linking
          - using multiple schema 
-           (current work-around is to use normalized schema - see notmalize.sh)
+           (current work-around is to use normalized schema - see normalize.sh)
 
          some features commented-out to give a "friendlier" interface.
     -->
@@ -264,11 +264,11 @@
         <xsl:variable name="name" select="@name"/>
         <p>
             <xsl:choose>
+                <!-- this should always be true when using the normalized schema -->
                 <xsl:when test="/xsd:schema/xsd:element[@substitutionGroup=$name]">
                     This is an abstract element; another element with a compatible
                     type must be used in its place.  The following is a list of
-                    suitable replacements from this schema.  Other schema may
-                    contain further possible elements.
+                    suitable replacements.
                     <ul>
                         <xsl:apply-templates
                                 select="/xsd:schema/xsd:element[@substitutionGroup=$name]"
@@ -277,9 +277,8 @@
                 </xsl:when>
                 <xsl:otherwise>
                     This is an abstract element; another element with a compatible
-                    type must be used in its place.  No such types are defined in
-                    this schema.  You will need to check other schema for suitable
-                    elements.
+                    type must be used in its place.  However, no replacements were
+                    found when generating this documentation.
                 </xsl:otherwise>
             </xsl:choose>
         </p>
