@@ -276,7 +276,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected boolean getDefaultDeleteUnacceptedMessages(UMOConnector connector)
     {
-        return connector.isRemoteSyncEnabled();
+        return false;
     }
 
     protected String getEndpointEncoding(UMOConnector connector)
@@ -326,7 +326,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected int getDefaultRemoteSyncTimeout(UMOConnector connector)
     {
-        return 0;
+        return managementContext.getRegistry().getConfiguration().getDefaultSynchronousEventTimeout();
     }
 
     protected List getInboundTransformers(UMOConnector connector, UMOEndpointURI endpointURI)
