@@ -1,69 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="no-args-call-wrapper" version="1.0">
-
-    <container-context className="org.mule.extras.spring.SpringContainerContext" name="spring">
-        <properties>
-            <text-property name="configuration">
-                <![CDATA[
-                <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-                <beans>
-                    <bean name="containerDelegate" class="org.mule.tck.testmodels.fruit.Apple"/>
-                </beans>
-                ]]>
-            </text-property>
-        </properties>
-    </container-context>
-
-
-    <connector name="VMConnector" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <property value="true" name="queueEvents"/>
-        </properties>
-    </connector>
-
+    <vm:connector name="VMConnector" queueEvents="true"/>
 
     <model name="NoArgsWrapperModel">
-
-        <mule-descriptor name="WrapperUMO"
-                         implementation="org.mule.components.simple.NoArgsCallWrapper">
+        <service name="WrapperUMO">
+            <component class="org.mule.components.simple.NoArgsCallWrapper">
+                <properties>
+                    <spring:entry key="delegateClass" value="org.mule.tck.testmodels.fruit.Apple"/>
+                    <spring:entry key="delegateMethod" value="toString"/>
+                </properties>
+            </component>
             <inbound-router>
-                <endpoint address="vm://invoke"/>
+                <inbound-endpoint address="vm://invoke"/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://out"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://out"/>
+                </outbound-pass-through-router>
             </outbound-router>
-            <properties>
-                <property name="delegateClass" value="org.mule.tck.testmodels.fruit.Apple"/>
-                <property name="delegateMethod" value="toString"/>
-            </properties>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="WrapperUMOInjected"
-                         implementation="org.mule.components.simple.NoArgsCallWrapper">
+        <service name="WrapperUMOInjected">
+            <component class="org.mule.components.simple.NoArgsCallWrapper">
+                <properties>
+                    <spring:entry key="delegateInstance">
+                        <spring:bean name="containerDelegate" class="org.mule.tck.testmodels.fruit.Apple"/>
+                    </spring:entry>
+                    <spring:entry key="delegateMethod" value="wash"/>
+                </properties>
+            </component>
             <inbound-router>
-                <endpoint address="vm://invokeWithInjected"/>
+                <inbound-endpoint address="vm://invokeWithInjected"/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                <outbound-pass-through-router>
                     <!--
                         don't reuse the output queue, ensure we're the only sender
                         for this one by providing a unique name
                     -->
-                    <endpoint address="vm://outWithInjected"/>
-                </router>
+                    <outbound-endpoint address="vm://outWithInjected"/>
+                </outbound-pass-through-router>
             </outbound-router>
-            <properties>
-                <container-property name="delegateInstance" reference="containerDelegate" required="true" container="spring"/>
-                <property name="delegateMethod" value="wash"/>
-            </properties>
-        </mule-descriptor>
-
+        </service>
     </model>
-
-</mule-configuration>
+</mule>
