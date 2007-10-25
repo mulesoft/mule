@@ -409,6 +409,7 @@
             <xsl:when test="$type='mule:substitutableLong'">long</xsl:when>
             <xsl:when test="$type='mule:substitutablePortNumber'">port number</xsl:when>
             <xsl:when test="$type='mule:substitutableClass'">class name</xsl:when>
+            <xsl:when test="starts-with($type, 'xsd:')"><xsl:value-of select="substring($type, 5)"/></xsl:when>
             <xsl:otherwise><xsl:value-of select="$type"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
