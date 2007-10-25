@@ -4,6 +4,8 @@
    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
    >
 
+    <!-- $Id$ -->
+
     <!-- an initial experiment at generating a "complete" doc
          outpu way too complex, problems with loops etc -->
 
