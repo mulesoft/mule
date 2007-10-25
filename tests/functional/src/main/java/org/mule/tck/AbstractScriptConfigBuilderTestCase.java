@@ -20,6 +20,7 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestEntryPointResolverSet;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
+import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
@@ -247,7 +248,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
             fail(e.getMessage());
         }
         assertNotNull(endpoint);
-        assertTrue(TransformerUtils.isUndefined(endpoint.getTransformers()));
+        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
+        assertTrue(endpoint.getTransformers().get(0) instanceof TestInboundTransformer);
 
         assertEquals(2, component.getInboundRouter().getEndpoints().size());
         assertNotNull(component.getInboundRouter().getCatchAllStrategy());
@@ -277,7 +279,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
             fail(e.getMessage());
         }
         assertNotNull(endpoint);
-        assertTrue(TransformerUtils.isUndefined(endpoint.getTransformers()));
+        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
+        assertTrue(endpoint.getTransformers().get(0) instanceof TestInboundTransformer);
     }
 
     public void testInboundRouterConfig()
