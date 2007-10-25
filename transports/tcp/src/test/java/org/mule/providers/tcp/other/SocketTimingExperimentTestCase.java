@@ -24,19 +24,33 @@ import java.net.Socket;
 public class SocketTimingExperimentTestCase extends FunctionalTestCase
 {
 
-    private static int MAX_COUNT = 1000;
+    private static int MAX_COUNT = 3;
     private static int SERVER_PORT = 60323;
     private static String LOCALHOST = "localhost";
 
-    public void testSocketTiming() throws IOException
+    public void testSocketTiming() throws IOException, InterruptedException
     {
-        boolean expectBadClient = expectBadClient();
-        logger.info("Expected bad client: " + expectBadClient);
-        boolean expectBadServer = expectBadServer();
-        logger.info("Expected bad server: " + expectBadServer);
+        try
+        {
+            boolean expectBadClient = expectBadClient();
+            logger.info("Expected bad client: " + expectBadClient);
+        }
+        catch (Exception e)
+        {
+            logger.info(e);
+        }
+        try
+        {
+            boolean expectBadServer = expectBadServer();
+            logger.info("Expected bad server: " + expectBadServer);
+        }
+        catch (Exception e)
+        {
+            logger.info(e);
+        }
     }
 
-    protected boolean expectBadClient() throws IOException
+    protected boolean expectBadClient() throws IOException, InterruptedException
     {
         for (int i = 0; i < MAX_COUNT; ++i)
         {
@@ -48,44 +62,81 @@ public class SocketTimingExperimentTestCase extends FunctionalTestCase
         return true;
     }
 
-    protected boolean expectBadClientSingle() throws IOException
+    protected boolean expectBadClientSingle() throws IOException, InterruptedException
     {
         ServerSocket server = new ServerSocket();
-        Socket in = null;
         try {
             server.bind(new InetSocketAddress(LOCALHOST, SERVER_PORT));
-            Socket client = new Socket(LOCALHOST, SERVER_PORT);
-            in = server.accept();
-            badSend(client);
-            return in.getInputStream().read() > -1;
+            return badSend(new Socket(LOCALHOST, SERVER_PORT), server.accept(), null);
         }
         finally
         {
-            if (null != in)
-            {
-                in.close();
-            }
             server.close();
         }
     }
 
-    protected void badSend(Socket socket) throws IOException
+    protected boolean badSend(Socket from, Socket to, ServerSocket server) throws IOException, InterruptedException
     {
-        // just in case this reduces close time
-        socket.setReuseAddress(true);
-        // turn off linger
-        socket.setSoLinger(false, 0);
-        // set buffer larger than the size we will send
-        socket.setSendBufferSize(10);
-        // don't sent until buffer full
-        socket.setTcpNoDelay(false);
-        // write a single byte to the buffer
-        socket.getOutputStream().write(0);
-        // close (before buffer sent)
-        socket.close();
+        try
+        {
+            // reduce target buffer so that it is easy to fill
+            to.setReceiveBufferSize(1);
+            from.setSendBufferSize(1);
+            // just in case this reduces close time
+//            from.setReuseAddress(true);
+            // make linger very small (same result if false or omitted)
+//            from.setSoLinger(true, 1);
+//            to.setSoLinger(true, 1);
+            // don't send until buffer full (should be default)
+//            to.setTcpNoDelay(false);
+//            from.setTcpNoDelay(false);
+            // write two bytes to the buffer - this is more than the target can receive
+            // so we end up with one byte in receiver and one in sender
+            from.getOutputStream().write(1);
+            from.getOutputStream().write(2);
+            // this blocks, confirming buffers are correct
+//            from.getOutputStream().write(3);
+            // close (before buffer sent)
+            // close everything we can think of...
+            from.shutdownInput();
+            from.shutdownOutput();
+            from.close();
+            to.shutdownOutput();
+            if (null != server)
+            {
+                server.close();
+            }
+            // make sure tcp has time to fail
+            Thread.sleep(100);
+            // this works when server is closed (bad server case)
+            if (null != server)
+            {
+                ServerSocket another = new ServerSocket();
+                another.bind(new InetSocketAddress(LOCALHOST, SERVER_PORT));
+                another.setReuseAddress(true);
+                Socket another2 = new Socket(LOCALHOST, SERVER_PORT);
+                Socket another3 = another.accept();
+                another2.getOutputStream().write(9);
+                assertEquals(9, another3.getInputStream().read());
+                another3.close();
+                another2.close();
+                another.close();
+            }
+            // now try reading - this should fail on second value?
+            return 1 == to.getInputStream().read()
+                    && 2 == to.getInputStream().read();
+        }
+        finally
+        {
+            to.close();
+            if (!from.isClosed())
+            {
+                 from.close();
+            }
+        }
     }
 
-    protected boolean expectBadServer() throws IOException
+    protected boolean expectBadServer() throws IOException, InterruptedException
     {
         for (int i = 0; i < MAX_COUNT; ++i)
         {
@@ -97,23 +148,16 @@ public class SocketTimingExperimentTestCase extends FunctionalTestCase
         return true;
     }
 
-    protected boolean expectBadServerSingle() throws IOException
+    protected boolean expectBadServerSingle() throws IOException, InterruptedException
     {
         ServerSocket server = new ServerSocket();
-        Socket client = null;
         try {
             server.bind(new InetSocketAddress(LOCALHOST, SERVER_PORT));
-            client = new Socket(LOCALHOST, SERVER_PORT);
-            Socket out = server.accept();
-            badSend(out);
-            return client.getInputStream().read() > -1;
+            Socket client = new Socket(LOCALHOST, SERVER_PORT);
+            return badSend(server.accept(), client, server);
         }
         finally
         {
-            if (null != client)
-            {
-                client.close();
-            }
             server.close();
         }
     }
