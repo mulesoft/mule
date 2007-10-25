@@ -10,19 +10,13 @@
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <spring:bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <spring:property name="brokerURL" value="vm://localhost?broker.persistence=true"/>
-    </spring:bean>
-
     <!--
-    JmsConnector is used to send and receive information via the Jms channel
+        JmsConnector is used to send and receive information via the Jms channel
     -->
-    
-    <!-- Testing with ActiveMq -->
-    <jms:connector name="jmsConnector" >
-        <jms:connection-factory instance-ref="jmsConnectionFactory"/>
-        <!-- property name="specification" value="1.1"/ -->
-    </jms:connector>
+    <jms:activemq-connector name="jmsConnector" />
+    <!-- this is needed also, but does not work now -->
+    <!--                            brokerUrl="vm://localhost?broker.persistence=true"/> -->
+
 
     <model name="test">
 
@@ -50,7 +44,7 @@
         </service>
 
         <service name="mycomponent3">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://mycomponent3"/>
             </inbound-router>
@@ -59,7 +53,7 @@
         <service name="mycomponent4">
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
-                <inbound-endpoint address="axis:jms://mycomponent3" synchronous="false"/>
+                <inbound-endpoint address="axis:jms://mycomponent4" synchronous="false"/>
             </inbound-router>
         </service>
 

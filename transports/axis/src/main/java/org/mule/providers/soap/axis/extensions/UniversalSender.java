@@ -204,19 +204,13 @@ public class UniversalSender extends BasicHandler
 
             if (sync)
             {
-
-                // We need to rewrite the endpoint on the event to set the
-                // reomoteSync property
-//                MuleEndpoint syncEndpoint = new MuleEndpoint(dispatchEvent.getEndpoint());
-//                syncEndpoint.setRemoteSync(true);
-//                dispatchEvent = new MuleEvent(dispatchEvent.getMessage(), syncEndpoint,
-//                    dispatchEvent.getSession(), dispatchEvent.isSynchronous());
-//                UMOMessage result = session.sendEvent(dispatchEvent);
                 UMOManagementContext managementContext = MuleServer.getManagementContext();
                 UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
-                endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
-                    managementContext);
-                UMOEvent dispatchEvent = new MuleEvent(message, endpoint, session, sync);
+                builder.setRemoteSync(true);
+                UMOImmutableEndpoint syncEndpoint = managementContext.getRegistry()
+                    .lookupEndpointFactory()
+                    .getOutboundEndpoint(builder, managementContext);
+                UMOEvent dispatchEvent = new MuleEvent(message, syncEndpoint, session, sync);
                 UMOMessage result = endpoint.send(dispatchEvent);
 
                 if (result != null)

@@ -91,6 +91,11 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
         logger.info(msg);
 
+        if (eventCallback != null)
+        {
+            eventCallback.eventReceived(context, this);
+        }
+        
         Object replyMessage;
         if (returnMessage != null)
         {
@@ -116,10 +121,6 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
             throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));
         }
 
-        if (eventCallback != null)
-        {
-            eventCallback.eventReceived(context, this);
-        }
         return replyMessage;
     }
 
