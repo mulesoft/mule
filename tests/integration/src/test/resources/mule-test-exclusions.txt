@@ -65,6 +65,9 @@ org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
 # Convert transacted endpoint to XML config
 org.mule.test.integration.client.MuleClientTransactionTestCase
 
+# Not sure what to do about the "test:" namespace in 2.x
+org.mule.test.integration.MuleEndpointConfigurationTestCase
+
 # Hangs for a long, long time
 org.mule.test.integration.transaction.XAJdbcMule1479TestCase
 
@@ -81,7 +84,6 @@ org.mule.test.integration.models.SedaPipelineTestCase
 org.mule.test.integration.config.MultiContainerTestCase
 
 # Not yet reviewed
-org.mule.test.integration.MuleEndpointConfigurationTestCase
 org.mule.test.integration.persistence.FilePersistenceTestCase
 org.mule.test.integration.providers.axis.AxisOverJMSWithTransactionsTestCase
 org.mule.test.integration.providers.file.FileAppendConnectorTestCase

@@ -83,7 +83,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         UMOEndpoint endpoint = (UMOEndpoint)component.getInboundRouter().getEndpoints().get(0);
         assertNotNull(endpoint);
         assertEquals("vm", endpoint.getConnector().getProtocol().toLowerCase());
-        assertTrue(endpoint.getName().equals("testEndpoint"));
+        assertEquals("testEndpoint", endpoint.getName());
         assertEquals("queue4", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
