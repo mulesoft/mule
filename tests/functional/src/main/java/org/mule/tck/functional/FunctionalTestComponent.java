@@ -11,9 +11,11 @@
 package org.mule.tck.functional;
 
 import org.mule.MuleException;
+import org.mule.MuleServer;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -100,8 +102,14 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
                     + (appendComponentName ? " " + context.getComponent().getName() : "");
         }
 
-        context.getManagementContext().fireNotification(
-                new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
+        UMOManagementContext managementContext = context.getManagementContext();
+        if (managementContext == null)
+        {
+            logger.warn("No ManagementContext available from EventContext");
+            managementContext = MuleServer.getManagementContext();
+        }
+        managementContext.fireNotification(
+            new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)
         {

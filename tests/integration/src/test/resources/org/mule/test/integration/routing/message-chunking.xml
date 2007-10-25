@@ -1,34 +1,34 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <!-- 
+        <mule-environment-properties enableMessageEvents="true" synchronous="true"/>
+    -->
 
-<mule-configuration id="Message_Chunking_Test" version="1.0">
-
-    <mule-environment-properties enableMessageEvents="true" synchronous="true"/>
-    
     <model name="main">
+        <service name="Receiver">
+            <inbound-router>
+                <inbound-endpoint address="vm://inbound.channel" />
+                <forwarding-router />
+            </inbound-router>
+            <outbound-router>
+                <message-chunking-router messageSize="2">
+                    <outbound-endpoint address="vm://chunking.channel" />
+                </message-chunking-router>
+            </outbound-router>
+        </service>
 
-       <mule-descriptor name="Receiver" implementation="org.mule.components.simple.BridgeComponent">
-           <inbound-router>
-               <endpoint address="vm://inbound.channel"/>
-           </inbound-router>
-           <outbound-router>
-               <router className="org.mule.routing.outbound.MessageChunkingRouter">
-                   <endpoint address="vm://chunking.channel"/>
-                   <properties>
-                       <property name="chunkSize" value="2"/>
-                   </properties>
-               </router>
-           </outbound-router>
-        </mule-descriptor>
-
-       <mule-descriptor name="ChunkingReceiver"
-            implementation="org.mule.tck.functional.FunctionalTestComponent">
-           <inbound-router>
-               <endpoint address="vm://chunking.channel"/>
-               <router className="org.mule.routing.inbound.MessageChunkingAggregator"/>
-           </inbound-router>
-        </mule-descriptor>
+        <service name="ChunkingReceiver">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent" />
+            <inbound-router>
+                <inbound-endpoint address="vm://chunking.channel" />
+                <message-chunking-aggregator-router/>
+            </inbound-router>
+        </service>
     </model>
-</mule-configuration>
+</mule>
