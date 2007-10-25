@@ -1,33 +1,30 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="exception-listener_test" version="1.0">
-
-    <mule-environment-properties/>
-
-    <connector name="vm" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <property name="queueEvents" value="true"/>
-        </properties>
-    </connector>
+    <vm:connector name="vm" queueEvents="true"/>
 
     <model name="test">
-        <mule-descriptor name="mycomponent"
-            implementation="org.mule.components.simple.NullComponent">
+        <service name="mycomponent">
+            <component class="org.mule.components.simple.NullComponent"/>
             <inbound-router>
-                <endpoint address="vm://component.in"/>
+                <inbound-endpoint address="vm://component.in"/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://component.out"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://component.out"/>
+                </outbound-pass-through-router>
             </outbound-router>
 
-            <exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
-                <endpoint address="vm://error.queue"/>
-            </exception-strategy>
-        </mule-descriptor>
+            <default-component-exception-strategy>
+                <outbound-endpoint address="vm://error.queue"/>
+            </default-component-exception-strategy>
+        </service>
     </model>
-</mule-configuration>
+</mule>
