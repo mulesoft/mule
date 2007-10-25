@@ -1,27 +1,29 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="Test_Briding" version="1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <model name="test">
-
-       <mule-descriptor name="bridge" implementation="org.mule.components.simple.BridgeComponent">
+       <service name="bridge">
            <inbound-router>
-               <endpoint address="vm://bridge.inbound"/>
+               <inbound-endpoint address="vm://bridge.inbound"/>
+               <forwarding-router/>
            </inbound-router>
            <outbound-router>
-               <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                   <endpoint address="vm://bridge.outbound"/>
-               </router>
+               <outbound-pass-through-router>
+                   <outbound-endpoint address="vm://bridge.outbound"/>
+               </outbound-pass-through-router>
            </outbound-router>
-        </mule-descriptor>
+        </service>
 
-       <mule-descriptor name="Receiver" implementation="org.mule.test.integration.service.TestReceiver">
+       <service name="Receiver">
+           <component class="org.mule.test.integration.service.TestReceiver"/>
            <inbound-router>
-               <endpoint address="vm://bridge.outbound"/>
+               <inbound-endpoint address="vm://bridge.outbound"/>
            </inbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-</mule-configuration>
+</mule>

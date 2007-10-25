@@ -48,6 +48,9 @@ org.mule.test.integration.client.MuleClientTestCase
 # Need to finish implementation of <static-recipient-list-router>
 org.mule.test.integration.routing.AggregatorIntegrationTestCase
 
+# Need to finish implementation of <wire-tap-router>
+org.mule.test.integration.routing.WireTapTestCase
+
 # Tests the transport "wsdl:http://"  Is that working yet for 2.x?
 org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 
@@ -110,8 +113,6 @@ org.mule.test.integration.providers.jdbc.JdbcTransactionalXaFunctionalTestCase
 org.mule.test.integration.providers.jms.QosHeadersTestCase
 org.mule.test.integration.providers.quartz.QuartzFunctionalTestCase
 org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
-org.mule.test.integration.routing.EndpointBridgingTestCase
-org.mule.test.integration.routing.WireTapTestCase
 org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 org.mule.test.integration.spring.MuleAdminTestCase
 org.mule.test.integration.streaming.FileToTcpStreamingTestCase

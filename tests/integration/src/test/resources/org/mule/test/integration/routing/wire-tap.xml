@@ -1,28 +1,27 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="Wire_Tap_Test" version="1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <model name="main">
-
-       <mule-descriptor name="Receiver" implementation="org.mule.tck.functional.FunctionalTestComponent">
+       <service name="Receiver">
+           <component class="org.mule.tck.functional.FunctionalTestComponent"/>
            <inbound-router>
-               <endpoint address="vm://inbound.channel"/>
-               <router className="org.mule.routing.inbound.WireTap">
-                   <properties>
-                       <property name="endpoint" value="vm://tapped.channel"/>
-                   </properties>
-               </router>
+               <inbound-endpoint address="vm://inbound.channel"/>
+               <wire-tap-router>
+                   <inbound-endpoint address="vm://tapped.channel"/>
+               </wire-tap-router>
            </inbound-router>
-        </mule-descriptor>
+        </service>
 
-       <mule-descriptor name="TappedReceiver"
-            implementation="org.mule.tck.functional.FunctionalTestComponent">
+       <service name="TappedReceiver">
+           <component class="org.mule.tck.functional.FunctionalTestComponent"/>
            <inbound-router>
-               <endpoint address="vm://tapped.channel"/>
+               <inbound-endpoint address="vm://tapped.channel"/>
            </inbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-</mule-configuration>
+</mule>
