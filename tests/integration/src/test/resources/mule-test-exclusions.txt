@@ -51,6 +51,9 @@ org.mule.test.integration.routing.AggregatorIntegrationTestCase
 # Need to finish implementation of <wire-tap-router>
 org.mule.test.integration.routing.WireTapTestCase
 
+# How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
+org.mule.test.integration.persistence.FilePersistenceTestCase
+
 # Tests the transport "wsdl:http://"  Is that working yet for 2.x?
 org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 
@@ -97,7 +100,6 @@ org.mule.test.integration.models.SedaPipelineTestCase
 org.mule.test.integration.config.MultiContainerTestCase
 
 # Not yet reviewed
-org.mule.test.integration.persistence.FilePersistenceTestCase
 org.mule.test.integration.providers.axis.AxisOverJMSWithTransactionsTestCase
 org.mule.test.integration.providers.file.FileAppendConnectorTestCase
 org.mule.test.integration.providers.file.FileAppendEndpointTestCase
@@ -121,7 +123,6 @@ org.mule.test.integration.util.ObjectNameHelperTestCase
 org.mule.test.usecases.axis.clientbridge.ClientBridgeTestCase
 org.mule.test.usecases.http.HttpPostTestCase
 org.mule.test.usecases.http.HttpResponseTestCase
-org.mule.test.usecases.routing.ForwardingMessageSplitterTestCase
 org.mule.test.usecases.routing.InboundTransformingCatchAllTestCase
 org.mule.test.usecases.routing.response.ResponseAggregatorTestCase
 org.mule.test.usecases.sync.HttpTransformTestCase

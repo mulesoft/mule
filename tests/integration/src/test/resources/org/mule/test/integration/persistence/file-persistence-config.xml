@@ -1,31 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="TestConfiguration" version="1.0">
-
+    <!-- 
     <mule-environment-properties>
         <queue-profile persistent="true" maxOutstandingMessages="1000"/>
         <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/>
     </mule-environment-properties>
+     -->
 
-    <connector name="vmQueue" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <property name="queueEvents" value="true"/>
-        </properties>
-    </connector>
+    <vm:connector name="vmQueue" queueEvents="true"/>
 
     <model name="main">
-        <mule-descriptor name="TestComponent" implementation="org.mule.components.simple.PassThroughComponent" initialState="stopped" >
+        <service name="TestComponent" initialState="stopped">
+            <pass-through-component/>
             <inbound-router>
-                <endpoint address="vm://test.queue" connector="vmQueue"/>
+                <inbound-endpoint address="vm://test.queue" connector-ref="vmQueue"/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="stdio://System.out"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="stdio://System.out"/>
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+            <queue-profile persistent="true" maxOutstandingMessages="1000"/>
+        </service>
     </model>
-</mule-configuration>
+</mule>
