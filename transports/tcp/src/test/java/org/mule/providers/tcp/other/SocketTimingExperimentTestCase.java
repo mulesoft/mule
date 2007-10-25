@@ -79,29 +79,32 @@ public class SocketTimingExperimentTestCase extends FunctionalTestCase
     {
         try
         {
-            // reduce target buffer so that it is easy to fill
+            // reduce buffers so that they are easy to fill
             to.setReceiveBufferSize(1);
             from.setSendBufferSize(1);
             // just in case this reduces close time
 //            from.setReuseAddress(true);
-            // make linger very small (same result if false or omitted)
-//            from.setSoLinger(true, 1);
-//            to.setSoLinger(true, 1);
+            // make linger very small (same result if false or zero, or omitted)
+            from.setSoLinger(false, 0);
+            to.setSoLinger(false, 0);
             // don't send until buffer full (should be default)
-//            to.setTcpNoDelay(false);
-//            from.setTcpNoDelay(false);
+            to.setTcpNoDelay(false);
+            from.setTcpNoDelay(false);
             // write two bytes to the buffer - this is more than the target can receive
-            // so we end up with one byte in receiver and one in sender
+            // so we should end up with one byte in receiver and one in sender
             from.getOutputStream().write(1);
             from.getOutputStream().write(2);
             // this blocks, confirming buffers are correct
-//            from.getOutputStream().write(3);
+            // OH NO IT DOESN'T
+            from.getOutputStream().write(3);
+            // this appears to block (no timeout)
+//            from.getOutputStream().write(new byte[100000]);
             // close (before buffer sent)
             // close everything we can think of...
-            from.shutdownInput();
-            from.shutdownOutput();
+//            from.shutdownInput();
+//            from.shutdownOutput();
             from.close();
-            to.shutdownOutput();
+//            to.shutdownOutput();
             if (null != server)
             {
                 server.close();
@@ -124,7 +127,8 @@ public class SocketTimingExperimentTestCase extends FunctionalTestCase
             }
             // now try reading - this should fail on second value?
             return 1 == to.getInputStream().read()
-                    && 2 == to.getInputStream().read();
+                    && 2 == to.getInputStream().read()
+                    && 3 == to.getInputStream().read();
         }
         finally
         {
