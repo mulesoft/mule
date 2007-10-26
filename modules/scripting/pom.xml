@@ -62,32 +62,11 @@
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
         </dependency>
-        <!-- These are engines for JSR-223 compliance, not actual implementations -->
+        <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
         <dependency>
             <groupId>javax.script</groupId>
             <artifactId>groovy-engine</artifactId>
-            <version>1.0</version>
-            <!-- we use our own retrotranslated version -->
-            <classifier>jdk14</classifier>
-        </dependency>
-        <dependency>
-            <groupId>javax.script</groupId>
-            <artifactId>js-engine</artifactId>
-            <version>1.0</version>
-            <!-- we use our own retrotranslated version -->
-            <classifier>jdk14</classifier>
-        </dependency>
-        <dependency>
-            <groupId>javax.script</groupId>
-            <artifactId>jython-engine</artifactId>
-            <version>1.0</version>
-            <!-- we use our own retrotranslated version -->
-            <classifier>jdk14</classifier>
-        </dependency>
-        <dependency>
-            <groupId>javax.script</groupId>
-            <artifactId>jruby-engine</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
         </dependency>
@@ -125,6 +104,10 @@
                 <exclusion>
                     <groupId>com.tonicsystems</groupId>
                     <artifactId>jarjar</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>commons-logging</groupId>
