@@ -12,6 +12,4 @@ org.mule.providers.soap.axis.AxisServletBindingTestCase
 # MULE-2164
 org.mule.providers.soap.axis.AxisEndpointMule2164TestCase
 
-# MULE-2573
-org.mule.providers.soap.axis.functional.SoapAttachmentsFunctionalTestCase
 	
