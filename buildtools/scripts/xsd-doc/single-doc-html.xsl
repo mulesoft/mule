@@ -1,5 +1,5 @@
 <xsl:stylesheet 
-        version="1.0"
+        version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
         >
@@ -15,6 +15,7 @@
 
          a lot of things could be improved.  obvious targets include:
          - cross-linking
+           (now supported via explicit pages in links.xml)
          - using multiple schema 
            (current work-around is to use normalized schema - see normalize.sh)
 
@@ -23,6 +24,8 @@
 
     <xsl:output method="html"/>
     <xsl:param name="elementName"/>
+    <xsl:key name="item-to-page" match="link" use="item"/>
+    <xsl:variable name="items-to-pages" select="document('links.xml')/links"/>
 
     <xsl:template match="/">
         <html>
@@ -34,7 +37,11 @@
     </xsl:template>
   
     <xsl:template match="xsd:element" mode="start">
-        <h2>&lt;<xsl:value-of select="@name"/> ...&gt;</h2>
+        <a>
+            <!-- define a tag we can link to -->
+            <xsl:attribute name="id">#<xsl:value-of select="@name"/></xsl:attribute>
+            <h2>&lt;<xsl:value-of select="@name"/> ...&gt;</h2>
+        </a>
         <xsl:apply-templates select="." mode="documentation"/>
         <!--
         <xsl:if test="@type">
@@ -234,7 +241,13 @@
     <xsl:template match="xsd:element[@ref]" mode="elements">
         <xsl:variable name="ref" select="@ref"/>
         <tr>
-            <td rowspan="2" style="border-bottom: 1px solid black; border-right: 1px solid black"><xsl:value-of select="@ref"/></td>
+            <td rowspan="2" style="border-bottom: 1px solid black; border-right: 1px solid black">
+                <xsl:call-template name="link">
+                    <xsl:with-param name="item">
+                        <xsl:value-of select="@ref"/>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </td>
             <xsl:apply-templates
                     select="/xsd:schema/xsd:element[@name=$ref]" mode="elements-type"/>
         </tr>
@@ -250,7 +263,13 @@
 
     <xsl:template match="xsd:element[@name]" mode="elements">
         <tr>
-            <td rowspan="2" style="border-bottom: 1px solid black; border-right: 1px solid black"><xsl:value-of select="@name"/></td>
+            <td rowspan="2" style="border-bottom: 1px solid black; border-right: 1px solid black">
+                <xsl:call-template name="link">
+                    <xsl:with-param name="item">
+                        <xsl:value-of select="@name"/>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </td>
             <xsl:apply-templates select="." mode="elements-type"/>
         </tr>
         <tr><td style="border-bottom: 1px solid black">
@@ -413,10 +432,43 @@
             <xsl:otherwise><xsl:value-of select="$type"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
+
+    <!-- add attribution -->
   
     <xsl:template name="attribution">
         <xsl:param name="text"/>
         <!-- <br/><small><em><xsl:value-of select="$text"/></em></small> -->
+    </xsl:template>
+
+
+    <!-- links via a separate index - see links.xml -->
+
+    <xsl:template name="link">
+        <xsl:param name="item"/>
+        <xsl:variable name="page">
+            <xsl:apply-templates select="$items-to-pages">
+                <xsl:with-param name="item" select="$item"/>
+            </xsl:apply-templates>
+        </xsl:variable>
+        <xsl:choose>
+            <xsl:when test="string-length($page) > 0">
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="$page"/>#<xsl:value-of select="$item"/>
+                    </xsl:attribute>
+                    <xsl:value-of select="$item"/>
+                </a>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$item"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="links">
+        <xsl:param name="item"/>
+        <xsl:value-of select="key('item-to-page', $item)/page"/>
     </xsl:template>
 
 </xsl:stylesheet>
