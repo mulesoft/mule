@@ -40,7 +40,7 @@ geronimo-qname_1.1_spec-1.0.1
 geronimo-saaj_1.1_spec-1.0.1
 geronimo-servlet_2.4_spec-1.0.1
 groovy-all-1.0
-groovy-engine-1.0-jdk14
+groovy-engine-1.1-jdk14
 hibernate-3.2.2.ga
 howl-logger-0.1.11
 jaxen-1.1.1
@@ -52,11 +52,8 @@ jcl104-over-slf4j-1.4.3
 jdom-1.0
 jotm_jrmp_stubs-2.0.10
 jotm-2.0.10
-jruby-engine-1.0-jdk14
-js-engine-1.0-jdk14
 jug-2.0.0-asl
 junit-3.8.2
-jython-engine-1.0-jdk14
 log4j-1.2.14
 mockobjects-core-0.09
 mule-core
