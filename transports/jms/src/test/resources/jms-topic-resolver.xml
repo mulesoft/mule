@@ -17,5 +17,10 @@
     <endpoint name="ep2" address="jms://context.aTopic?topic=true"/>
     <endpoint name="ep3" address="jms://topic:context.ThisIsATopic"/>
     <endpoint name="ep4" address="jms://topic:context.ThisIsATopic?topic=false"/>
+    <endpoint name="ep5" address="jms://context.aTopic.Properties">
+        <properties>
+            <spring:entry key="topic" value="true"/>
+        </properties>
+    </endpoint>
 
 </mule>

@@ -10,13 +10,13 @@
 
 package org.mule.providers.jms;
 
-import javax.jms.Queue;
-import javax.jms.Topic;
-
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import com.mockobjects.dynamic.Mock;
+
+import javax.jms.Queue;
+import javax.jms.Topic;
 
 public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 {
@@ -135,6 +135,15 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
             .getInboundEndpoint("ep4", managementContext);
         assertTrue(resolver.isTopic(endpoint, false));
     }
+
+    public void testEndpointTopicUsesEndpointProperties() throws Exception
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("ep5", managementContext);
+        assertTrue(resolver.isTopic(endpoint));
+    }
+
 
     public void testDestinationNotTopic() throws Exception
     {
