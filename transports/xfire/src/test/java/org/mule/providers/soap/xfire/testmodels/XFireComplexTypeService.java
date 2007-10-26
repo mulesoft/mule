@@ -11,12 +11,13 @@
 package org.mule.providers.soap.xfire.testmodels;
 
 import org.mule.tck.testmodels.services.Person;
+import org.mule.tck.testmodels.services.PersonResponse;
 
 public class XFireComplexTypeService
 {
 
-    public boolean addPersonWithConfirmation(Person person)
+    public PersonResponse addPersonWithConfirmation(Person person)
     {
-        return true;
+        return new PersonResponse(person);
     }
 }

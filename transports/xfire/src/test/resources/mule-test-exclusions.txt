@@ -6,7 +6,7 @@
 # Don't execute it as it's not a unit test.
 org.mule.providers.soap.xfire.testmodels.TestXFireComponent
 
-# MULE-1134
+# MULE-1134 VM transport needs a stream.message.adapter property to work with XFire
 org.mule.providers.soap.xfire.XFireConnectorVMFunctionalTestCase
 
 # tests with external dependencies
@@ -14,4 +14,6 @@ org.mule.providers.soap.xfire.XFireWsdlTestCase
 
 # Cyclic dependency with axis ... hold for now
 org.mule.providers.soap.xfire.XFireServiceUsingAxisEndpointTestCase
+
+# MULE-2044 Can't send complex types to WS using Xfire
 org.mule.providers.soap.xfire.ComplexTypeMethodTestCase
