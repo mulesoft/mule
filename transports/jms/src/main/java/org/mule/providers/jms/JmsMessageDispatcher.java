@@ -38,7 +38,6 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.BooleanUtils;
 
 /**
@@ -88,13 +87,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         {
             logger.debug("dispatching on endpoint: " + event.getEndpoint().getEndpointURI()
                          + ". Event id is: " + event.getId()
-                         + ". outbound transformer is: " + event.getEndpoint().getTransformers());
+                         + ". Outbound transformers are: " + event.getEndpoint().getTransformers());
         }
 
         try
         {
-            // Retrieve the session from the current transaction.
-            // TODO AP: clean up to use getDelegateSession()
             session = connector.getSessionFromTransaction();
             if (session != null)
             {
@@ -120,16 +117,12 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 else
                 {
-                    // Retrieve a session from the connector
-                    // TODO AP: clean up to use getDelegateSession()
                     session = connector.getSession(event.getEndpoint());
                     cachedSession = session;
                 }
             }
             else
             {
-                // Retrieve a session from the connector
-                // TODO AP: clean up to use getDelegateSession()
                 session = connector.getSession(event.getEndpoint());
                 if (event.getEndpoint().getTransactionConfig().isTransacted())
                 {
@@ -139,15 +132,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
-            boolean topic = false;
-            String resourceInfo = endpointUri.getResourceInfo();
-            topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(resourceInfo));
-            // TODO MULE20 remove resource info support
-            if (!topic)
-            {
-                topic = MapUtils.getBooleanValue(event.getEndpoint().getProperties(),
-                    JmsConstants.TOPIC_PROPERTY, false);
-            }
+            boolean topic = connector.getTopicResolver().isTopic(event.getEndpoint(), true);
 
             Destination dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(),
                 topic);
@@ -181,6 +166,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     }
                     else
                     {
+                        // TODO AP should this drill-down be moved into the resolver as well?
                         boolean replyToTopic = false;
                         String reply = tempReplyTo.toString();
                         int i = reply.indexOf(":");
@@ -191,7 +177,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                             // Extract to a custom resolver for ActiveMQ4.x
                             // The code path can be exercised, e.g. by a LoanBrokerESBTestCase
                             String qtype = reply.substring(0, i);
-                            replyToTopic = "topic".equalsIgnoreCase(qtype);
+                            replyToTopic = JmsConstants.TOPIC_PROPERTY.equalsIgnoreCase(qtype);
                             reply = reply.substring(i + 1);
                         }
                         replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
@@ -363,9 +349,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
         try
         {
-            String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-            boolean topic = (resourceInfo != null && JmsConstants.TOPIC_PROPERTY
-                .equalsIgnoreCase(resourceInfo));
+            final boolean topic = connector.getTopicResolver().isTopic(endpoint);
 
             JmsSupport support = connector.getJmsSupport();
             session = connector.getSession(false, topic);
@@ -375,7 +359,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             try
             {
-                Message message = null;
+                Message message;
 
                 if (timeout == RECEIVE_NO_WAIT)
                 {

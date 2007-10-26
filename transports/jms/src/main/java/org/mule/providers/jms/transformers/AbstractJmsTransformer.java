@@ -72,6 +72,11 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
 
             return result;
         }
+        catch (TransformerException tex)
+        {
+            // rethrow
+            throw tex;
+        }
         catch (Exception e)
         {
             throw new TransformerException(this, e);
@@ -152,12 +157,10 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         }
     }
 
-    protected Session getSession() throws Exception
+    protected Session getSession() throws TransformerException, JMSException
     {
         if (endpoint != null)
         {
-            // TODO AP: use the right JMS session creation method, throw when
-            // the endpoint's connector is not a JmsConnector
             return ((JmsConnector)endpoint.getConnector()).getSession(endpoint);
         }
         else

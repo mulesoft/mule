@@ -125,14 +125,18 @@ public class JmsPropertyFilter implements UMOFilter
             }
             catch (Exception e)
             {
+                logger.warn("Error filtering on property " + propertyName
+                            + ": " + e.toString());
+            }
+        }
+        else
+        {
                 logger.warn("Expected a payload of javax.jms.Message but instead received " +
                         ClassUtils.getSimpleName(message.getPayload().getClass()));
             }
 
             return false;
         }
-        return true;
-    }
 
     /**
      * Sets the match expression
@@ -145,8 +149,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Returns the match expression
      */
-    public String getExpression
-            ()
+    public String getExpression()
     {
         return expression;
     }
@@ -154,9 +157,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Sets the name of the property
      */
-    public void setPropertyName
-            (String
-                    propertyName)
+    public void setPropertyName(String propertyName)
     {
         this.propertyName = propertyName;
     }
@@ -164,8 +165,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Returns the name of the property
      */
-    public String getPropertyName
-            ()
+    public String getPropertyName()
     {
         return propertyName;
     }
@@ -173,9 +173,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Sets the class type of the property
      */
-    public void setPropertyClass
-            (String
-                    propertyClass)
+    public void setPropertyClass(String propertyClass)
     {
         this.propertyClass = propertyClass;
     }
@@ -183,8 +181,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Returns the class type of the property
      */
-    public String getPropertyClass
-            ()
+    public String getPropertyClass()
     {
         return propertyClass;
     }
@@ -192,8 +189,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Sets the regex pattern to match on
      */
-    public String getPattern
-            ()
+    public String getPattern()
     {
         return (pattern == null ? null : pattern.pattern());
     }
@@ -201,9 +197,7 @@ public class JmsPropertyFilter implements UMOFilter
     /**
      * Return the regex pattern to match on
      */
-    public void setPattern
-            (String
-                    pattern)
+    public void setPattern(String pattern)
     {
         this.pattern = Pattern.compile(pattern);
     }

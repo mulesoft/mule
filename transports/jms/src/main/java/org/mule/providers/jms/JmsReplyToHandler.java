@@ -13,12 +13,12 @@ package org.mule.providers.jms;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.providers.DefaultReplyToHandler;
 import org.mule.providers.jms.i18n.JmsMessages;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.DispatchException;
 import org.mule.util.StringMessageUtils;
-import org.mule.transformers.TransformerUtils;
 
 import java.util.List;
 
@@ -75,8 +75,8 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                                                                + "Please report your application server or JMS vendor name and version "
                                                                + "to dev<_at_>mule.codehaus.org or http://mule.mulesource.org/jira"));
             }
-            // TODO MULE-1304 and friends
-            boolean topic = replyToDestination instanceof Topic;
+            
+            final boolean topic = connector.getTopicResolver().isTopic(replyToDestination);
             session = connector.getSession(false, topic);
             Message replyToMessage = JmsMessageUtils.toMessage(payload, session);
 

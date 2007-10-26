@@ -74,7 +74,7 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Message with id: " + id + " has been redelivered for the fist time");
+                logger.debug("Message with id: " + id + " has been redelivered for the first time");
             }
             messages.put(id, new Integer(1));
             return;
