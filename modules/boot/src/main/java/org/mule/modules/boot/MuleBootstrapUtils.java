@@ -10,8 +10,6 @@
 
 package org.mule.modules.boot;
 
-import org.mule.util.ClassUtils;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -115,5 +113,18 @@ public final class MuleBootstrapUtils
         String port;
         String username;
         String password;
+        
+        public ProxyInfo(String host, String port)
+        {
+            this(host, port, null, null);
+        }
+        
+        public ProxyInfo(String host, String port, String username, String password)
+        {
+            this.host = host;
+            this.port = port;
+            this.username = username;
+            this.password = password;
+        }
     }
 }
