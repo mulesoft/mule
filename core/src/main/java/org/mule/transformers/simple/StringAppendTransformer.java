@@ -12,20 +12,24 @@ package org.mule.transformers.simple;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.StringUtils;
 
 public class StringAppendTransformer extends AbstractTransformer
 {
 
-    String message = "";
+    private String message = StringUtils.EMPTY;
 
     public StringAppendTransformer()
     {
-        this("");
+        this(StringUtils.EMPTY);
     }
 
     public StringAppendTransformer(String message)
     {
         this.message = message;
+        setReturnClass(String.class);
+        registerSourceType(String.class);
+        registerSourceType(byte[].class);
     }
 
     protected Object doTransform(Object src, String encoding) throws TransformerException
@@ -35,14 +39,11 @@ public class StringAppendTransformer extends AbstractTransformer
         {
             string = new String((byte[]) src);
         }
-        else if (src instanceof String)
+        else
         {
             string = (String) src;
         }
-        else
-        {
-            throw new IllegalArgumentException("Require String or byte[] payload");
-        }
+
         return append(message, string);
     }
 

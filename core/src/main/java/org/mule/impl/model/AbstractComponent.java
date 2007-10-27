@@ -123,13 +123,13 @@ public abstract class AbstractComponent implements UMOComponent
      */
     protected String name;
 
-    protected UMOInboundRouterCollection inboundRouter;
+    protected UMOInboundRouterCollection inboundRouter = new InboundRouterCollection();
 
-    protected UMOOutboundRouterCollection outboundRouter;
+    protected UMOOutboundRouterCollection outboundRouter = new OutboundRouterCollection();
 
-    protected UMONestedRouterCollection nestedRouter;
+    protected UMONestedRouterCollection nestedRouter = new NestedRouterCollection();
 
-    protected UMOResponseRouterCollection responseRouter;
+    protected UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
 
     /**
      * Determines the initial state of this component when the model starts. Can be

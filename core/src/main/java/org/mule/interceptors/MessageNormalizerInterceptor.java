@@ -10,12 +10,14 @@
 
 package org.mule.interceptors;
 
-import org.mule.config.MuleProperties;
-import org.mule.impl.RequestContext;
+import org.mule.transformers.TransformerTemplate;
 import org.mule.umo.Invocation;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.transformer.UMOTransformer;
+
+import java.util.Arrays;
 
 /**
  * <code>MessageNormalizerInterceptor</code> can be used as a simple pre/post message
@@ -55,14 +57,11 @@ public abstract class MessageNormalizerInterceptor implements UMOInterceptor
         UMOMessage bMessage = before(invocation);
         if (bMessage != null)
         {
-            // update the current event
-            RequestContext.rewriteEvent(bMessage);
             // update the message in the invocation
-            invocation.setMessage(bMessage);
-            // remove any method override as it will not apply to the new
-            // message payload
-            invocation.getMessage().removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
+            UMOTransformer trans = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(bMessage));
+            invocation.getMessage().applyTransformers(Arrays.asList(new Object[]{trans}));
         }
+        
         // invoke
         UMOMessage message = invocation.execute();
         // Update the message

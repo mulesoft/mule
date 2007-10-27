@@ -14,6 +14,7 @@ import org.mule.providers.email.MailMessageAdapter;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.registry.ServiceDescriptorFactory;
 
 import java.util.Properties;
 
@@ -24,6 +25,12 @@ import javax.mail.internet.MimeMessage;
 public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
     private Message message;
+
+    protected void doSetUp() throws Exception
+    {
+        //wee need to load the transport descriptor in order to tes tthe message Adapter
+        managementContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, "pop3", null);
+    }
 
     /*
      * (non-Javadoc)

@@ -21,6 +21,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.Resource;
 
@@ -42,6 +43,14 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         this(configResources, true);
     }
 
+    public MuleApplicationContext(Resource[] configResources, ApplicationContext parent)
+    {
+        super(parent);
+        this.configResources = configResources;
+        this.configLocations = null;
+        refresh();
+    }
+
     public MuleApplicationContext(Resource[] configResources, boolean refresh) throws BeansException
     {
         this.configResources = configResources;
@@ -56,6 +65,15 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
     {
         this(configLocations, true);
     }
+
+    public MuleApplicationContext(String[] configLocations, ApplicationContext parent)
+    {
+        super(parent);
+        this.configLocations = configLocations;
+        this.configResources = null;
+        refresh();
+    }
+
 
     public MuleApplicationContext(String[] configLocations, boolean refresh) throws BeansException
     {

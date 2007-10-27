@@ -13,8 +13,7 @@ package org.mule.examples.loanbroker.transformers;
 import org.mule.examples.loanbroker.bank.Bank;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.routing.outbound.StaticRecipientList;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
+import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
@@ -22,7 +21,7 @@ import org.mule.umo.transformer.TransformerException;
  * Set the Recipient List property on the LoanBrokerQuoteRequest message based on the
  * list of banks in LoanBrokerQuoteRequest.getLenders()
  */
-public class SetLendersAsRecipients extends AbstractEventAwareTransformer
+public class SetLendersAsRecipients extends AbstractMessageAwareTransformer
 {
 
     public SetLendersAsRecipients()
@@ -32,8 +31,9 @@ public class SetLendersAsRecipients extends AbstractEventAwareTransformer
         //setReturnClass(CustomerQuoteRequest.class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
     {
+        Object src = message.getPayload();
         Bank[] lenders = ((LoanBrokerQuoteRequest) src).getLenders();
 
         String recipients = "";
@@ -43,9 +43,8 @@ public class SetLendersAsRecipients extends AbstractEventAwareTransformer
             recipients += lenders[i].getEndpoint();
         }
 
-        UMOMessage msg = context.getMessage();
-        context.getMessage().setProperty(StaticRecipientList.RECIPIENTS_PROPERTY, recipients);
-        return msg;
+        message.setProperty(StaticRecipientList.RECIPIENTS_PROPERTY, recipients);
+        return message;
     }
 
 }

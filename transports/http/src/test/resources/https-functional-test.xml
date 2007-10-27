@@ -2,12 +2,10 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:custom="http://www.mulesource.org/schema/mule/custom/2.0"
        xmlns:https="http://www.mulesource.org/schema/mule/https/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/custom/2.0 http://www.mulesource.org/schema/mule/custom/2.0/mule-custom.xsd
        http://www.mulesource.org/schema/mule/https/2.0 http://www.mulesource.org/schema/mule/https/2.0/mule-https.xsd">
 
     <https:connector name="httpConnector">
@@ -18,12 +16,12 @@
 
     <endpoint name="clientEndpoint" address="https://localhost:60202" synchronous="true" connector-ref="httpConnector"/>
 
-    <custom:model name="main">
-        <custom:service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+    <model name="main">
+        <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
             <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="clientEndpoint"/>
             </inbound-router>
-        </custom:service>
-    </custom:model>
+        </service>
+    </model>
 </mule>

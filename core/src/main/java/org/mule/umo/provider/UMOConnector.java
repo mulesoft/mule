@@ -12,24 +12,23 @@ package org.mule.umo.provider;
 
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.MessagingException;
+import org.mule.umo.NamedObject;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
 
 import java.beans.ExceptionListener;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
  * <code>UMOConnector</code> is the mechanism used to connect to external systems
  * and protocols in order to send and receive data.
  */
-public interface UMOConnector extends Lifecycle, Initialisable, ManagementContextAware
+public interface UMOConnector extends Lifecycle, ManagementContextAware, NamedObject
 {
     int INT_VALUE_NOT_SET = -1;
 
@@ -81,30 +80,6 @@ public interface UMOConnector extends Lifecycle, Initialisable, ManagementContex
      * @see UMOMessageAdapter
      */
     UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException;
-
-    /**
-     * Gets a {@link UMOStreamMessageAdapter} from the connector for the given
-     * message. This Adapter will correctly handle data streaming for this type of
-     * connector
-     * 
-     * @param in the input stream to read the data from
-     * @param out the outputStream to write data to. This can be null.
-     * @return the {@link UMOStreamMessageAdapter} for the endpoint
-     * @throws MessagingException if the message parameter is not supported
-     * @see UMOStreamMessageAdapter
-     */
-    UMOStreamMessageAdapter getStreamMessageAdapter(InputStream in, OutputStream out)
-        throws MessagingException;
-
-    /**
-     * @return the name associated with the connector
-     */
-    String getName();
-
-    /**
-     * @param newName the name to associate with the connector
-     */
-    void setName(String newName);
 
     /**
      * @return the primary protocol name for endpoints of this connector

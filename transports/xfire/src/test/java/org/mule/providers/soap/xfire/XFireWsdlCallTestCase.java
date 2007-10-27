@@ -104,7 +104,6 @@ public class XFireWsdlCallTestCase extends FunctionalTestCase
 
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-
         Document document = DocumentHelper.parseText(reply.getPayloadAsString());
         List nodes;
         nodes = document.selectNodes("//wsdl:definitions/wsdl:service");

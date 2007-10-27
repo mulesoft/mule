@@ -251,6 +251,7 @@ public class HttpServerConnection
             {
                 ((ChunkedOutputStream) outstream).finish();
             }
+            content.close();
         }
 
         outstream.flush();

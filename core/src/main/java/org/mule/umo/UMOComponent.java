@@ -12,7 +12,6 @@ package org.mule.umo;
 
 import org.mule.impl.InitialisationCallback;
 import org.mule.impl.ManagementContextAware;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.model.UMOModel;
@@ -32,7 +31,7 @@ import java.util.Map;
  * the component as well as managing pooled resources.
  */
 
-public interface UMOComponent extends Serializable, Lifecycle, Initialisable, ManagementContextAware
+public interface UMOComponent extends Serializable, Lifecycle, ManagementContextAware, NamedObject
 {
     /**
      * Makes an asynhronous event call to the component.
@@ -86,13 +85,6 @@ public interface UMOComponent extends Serializable, Lifecycle, Initialisable, Ma
      *         used.
      */
     ExceptionListener getExceptionListener();
-
-    /**
-     * Gets the identifier for the Mule UMO created from the descriptor
-     *
-     * @return the identifier for the Mule UMO created from the descriptor
-     */
-    String getName();
 
     /**
      * @return Factory which creates an instance of the actual service object.
@@ -160,13 +152,6 @@ public interface UMOComponent extends Serializable, Lifecycle, Initialisable, Ma
      *            argument is null a default
      */
     void setExceptionListener(ExceptionListener listener);
-
-    /**
-     * sets the identifier for the Mule UMO created from the descriptor
-     *
-     * @param newName the identifier for the Mule UMO created from the descriptor
-     */
-    void setName(String newName);
 
     /**
      * @param Factory which creates an instance of the actual service object.

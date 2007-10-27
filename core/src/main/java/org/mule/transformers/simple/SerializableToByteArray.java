@@ -10,8 +10,7 @@
 
 package org.mule.transformers.simple;
 
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
@@ -26,13 +25,12 @@ import org.apache.commons.lang.SerializationUtils;
  * will be serialised. This is useful for transports such as TCP where the message
  * headers would normally be lost.
  */
-public class SerializableToByteArray extends AbstractEventAwareTransformer
+public class SerializableToByteArray extends AbstractTransformer
 {
 
     public SerializableToByteArray()
     {
         this.registerSourceType(Serializable.class);
-        this.registerSourceType(byte[].class);
         this.setReturnClass(byte[].class);
     }
 
@@ -53,7 +51,7 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
         }
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         /*
          * If the UMOMessage source type has been registered then we can assume that
@@ -61,14 +59,6 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
          * useful for protocols such as tcp where the protocol does not support
          * headers and the whole message needs to be serialized.
          */
-        if (this.isAcceptUMOMessage())
-        {
-            src = context.getMessage();
-        }
-        else if (src instanceof byte[])
-        {
-            return src;
-        }
 
         try
         {

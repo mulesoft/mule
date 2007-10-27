@@ -21,11 +21,11 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Given an endpoint ({@link #getTestEndpointURI()}) this waits for up to 10 seconds,
@@ -34,9 +34,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMailConnectorFunctionalTestCase
 {
-    
     public static final int POLL_PERIOD_MS = 2000;
-    public static final int WAIT_PERIOD_MS = 3 * POLL_PERIOD_MS;
+    public static final int WAIT_PERIOD_MS = 4 * POLL_PERIOD_MS;
 
     protected AbstractReceivingMailConnectorTestCase(String protocol, int port)
     {
@@ -57,7 +56,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
                     logger.debug("woot - event received");
                     logger.debug("context: " + context);
                     logger.debug("component: " + component);
-                    assertMessageOk(context.getMessage().getPayload());
+                    assertMessageOk(context.getMessage().getOrginalPayload());
                     countDown.countDown();
                 } 
                 catch (Exception e) 
@@ -77,12 +76,12 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         inboundRouter.addEndpoint(ep);
         component.setInboundRouter(inboundRouter);
         managementContext.getRegistry().registerComponent(component, managementContext);
-        managementContext.applyLifecycle(component);
+        //managementContext.applyLifecycle(component);
         if (!managementContext.isStarted())
         {
             managementContext.start();
         }
-            
+
         logger.debug("waiting for count down");
         assertTrue(countDown.await(WAIT_PERIOD_MS, TimeUnit.MILLISECONDS));
     }

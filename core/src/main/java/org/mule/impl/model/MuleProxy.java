@@ -13,7 +13,9 @@ package org.mule.impl.model;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Lifecycle;
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Startable;
+import org.mule.umo.lifecycle.Stoppable;
 import org.mule.util.queue.QueueSession;
 
 import javax.resource.spi.work.Work;
@@ -23,7 +25,7 @@ import javax.resource.spi.work.Work;
  * can be executed in it's own thread.
  */
 
-public interface MuleProxy extends Work, Lifecycle
+public interface MuleProxy extends Work, Startable, Stoppable, Disposable
 {
 
     /**

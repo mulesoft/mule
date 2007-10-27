@@ -10,18 +10,17 @@
 
 package org.mule.providers.file;
 
-import org.mule.MuleException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.Message;
 import org.mule.impl.ThreadSafeAccess;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.file.i18n.FileMessages;
-import org.mule.providers.file.transformers.FileToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.ObjectUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * <code>FileMessageAdapter</code> provides a wrapper for a file reference. Users
@@ -31,15 +30,11 @@ import java.io.File;
  */
 public class FileMessageAdapter extends AbstractMessageAdapter
 {
-    /**
-     * Serial version
-     */
+    /** Serial version */
     private static final long serialVersionUID = 4127485947547548996L;
 
-    private static final FileToByteArray transformer = new FileToByteArray();
-
-    private File file = null;
-    private byte[] contents = null;
+    protected File file = null;
+    protected InputStream payload;
 
     public FileMessageAdapter(Object message) throws MessagingException
     {
@@ -47,7 +42,11 @@ public class FileMessageAdapter extends AbstractMessageAdapter
 
         if (message instanceof File)
         {
-            this.setMessage((File)message);
+            this.setFileMessage((File) message);
+        }
+        else if(message instanceof FileMessageReceiver.ReceiverFileInputStream)
+        {
+            this.setStreamMessage((FileMessageReceiver.ReceiverFileInputStream)message);
         }
         else
         {
@@ -59,7 +58,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
     {
         super(template);
         file = template.file;
-        contents = template.contents;
+        payload = template.payload;
     }
 
     public Object getPayload()
@@ -67,84 +66,29 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         return file;
     }
 
-    public byte[] getPayloadAsBytes() throws Exception
+    protected void setFileMessage(File message) throws MessagingException
     {
-        synchronized (this)
-        {
-            if (contents == null)
-            {
-                try
-                {
-                    // TODO unfortunately reading the file here is required,
-                    // since otherwise the FileMessageReceiver might delete the
-                    // file
-                    this.contents = (byte[])transformer.transform(file);
-                }
-                catch (Exception noPayloadException)
-                {
-                    throw new MuleException(CoreMessages.failedToReadPayload(), noPayloadException);
-                }
-            }
-            return contents;
-        }
-    }
-
-    /**
-     * Converts the message implementation into a String representation
-     * 
-     * @param encoding The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte array
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     */
-    public String getPayloadAsString(String encoding) throws Exception
-    {
-        synchronized (this)
-        {
-            return new String(this.getPayloadAsBytes(), encoding);
-        }
-    }
-
-    protected void setMessage(File message) throws MessagingException
-    {
-        boolean fileIsValid;
-        Exception fileInvalidException;
-
         try
         {
-            fileIsValid = (message != null && message.isFile());
-            fileInvalidException = null;
+            this.file = message;
+            this.payload = new FileInputStream(message);
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
-            // save any file access exceptions
-            fileInvalidException = ex;
-            fileIsValid = false;
+            throw new MessagingException(FileMessages.fileDoesNotExist(ObjectUtils.toString(message, "null")), ex);
         }
-
-        if (!fileIsValid)
-        {
-            Object exceptionArg;
-
-            if (fileInvalidException != null)
-            {
-                exceptionArg = fileInvalidException;
-            }
-            else
-            {
-                exceptionArg = ObjectUtils.toString(message, "null");
-            }
-
-            Message msg = FileMessages.fileDoesNotExist(ObjectUtils.toString(message, "null"));
-
-            throw new MessagingException(msg, exceptionArg);
-        }
-
-        this.file = message;
-        this.contents = null;
-        this.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
-        this.setProperty(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
+        setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
+        setProperty(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
     }
+
+    protected void setStreamMessage(FileMessageReceiver.ReceiverFileInputStream message) throws MessagingException
+    {
+        this.file = message.getCurrentFile();
+        this.payload = message;
+        setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
+        setProperty(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
+    }
+
 
     public String getUniqueId()
     {

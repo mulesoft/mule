@@ -122,7 +122,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
             }
         }
 
-        return result;
+        return result; 
     }
 
     /**

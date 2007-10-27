@@ -16,6 +16,12 @@ package org.mule.samples.echo;
 public class XFireEchoTestCase extends AxisEchoTestCase
 {
 
+    public void testPostEcho() throws Exception
+    {
+        // TODO Auto-generated method stub
+        super.testPostEcho();
+    }
+
     protected String getConfigResources()
     {
         return "echo-xfire-config.xml";

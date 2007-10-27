@@ -14,7 +14,7 @@ import org.mule.transformers.wire.TransformerPairWireFormat;
 
 public class MuleAdminAgentConfigTestCase extends AbstractMuleTestCase
 {
-    protected String getConfigResources()
+    protected String getConfigurationResources()
     {
         return "mule-admin-agent.xml";
     }

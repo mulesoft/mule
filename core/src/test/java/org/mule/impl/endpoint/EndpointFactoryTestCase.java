@@ -11,6 +11,7 @@
 package org.mule.impl.endpoint;
 
 import org.mule.impl.registry.TransientRegistry;
+import org.mule.registry.Registry;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
@@ -253,7 +254,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateEndpointFromGlobalEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
+        Registry r = managementContext.getRegistry();        
         r.registerObject("myGlobalEndpoint", new EndpointURIEndpointBuilder("test://address", managementContext),
             managementContext);
         String uri = "myGlobalEndpoint";
@@ -271,7 +272,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateEndpointFromNamedConcreteEndpoint() throws UMOException
     {
-        TransientRegistry r = TransientRegistry.createNew();
+        Registry r = managementContext.getRegistry();
         r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder("test://address",
             managementContext), managementContext);
         String uri = "&myNamedConcreateEndpoint";

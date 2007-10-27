@@ -60,6 +60,7 @@ public final class OptimizedRequestContext
      */
     public static UMOEvent criticalSetEvent(UMOEvent event)
     {
+        //return RequestContext.internalSetEvent(event);
         return RequestContext.internalSetEvent(RequestContext.newEvent(event, RequestContext.SAFE));
     }
 
@@ -77,30 +78,6 @@ public final class OptimizedRequestContext
         return RequestContext.internalRewriteEvent(message, RequestContext.UNSAFE);
     }
 
-    /**
-     * Sets a new message payload in the RequestContext but maintains all other
-     * properties (session, endpoint, synchronous, etc.) from the previous event.
-     * Critical: thread safety known to be required
-     *
-     * @param message - the new message payload
-     * @return A new copy of the message set
-     */
-    public static UMOMessage criticalRewriteEvent(UMOMessage message)
-    {
-        return RequestContext.internalRewriteEvent(message, RequestContext.SAFE);
-    }
-
-    public static UMOMessage unsafeWriteResponse(UMOMessage message)
-    {
-        documentUnsafeCall("unsafeWriteResponse");
-        return RequestContext.internalWriteResponse(message, RequestContext.UNSAFE);
-    }
-
-    public static UMOMessage criticalWriteResponse(UMOMessage message)
-    {
-        return RequestContext.internalWriteResponse(message, RequestContext.SAFE);
-    }
-
     private static void documentUnsafeCall(String message)
     {
         if (DOCUMENT_UNSAFE_CALLS)
@@ -108,5 +85,4 @@ public final class OptimizedRequestContext
             logger.debug(message, new Exception(message));
         }
     }
-
 }

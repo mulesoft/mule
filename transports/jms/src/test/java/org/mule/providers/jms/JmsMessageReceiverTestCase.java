@@ -46,7 +46,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         connector.setConnectionFactory(new SingletonObjectFactory(connectionFactory.proxy()));
         
         connector.setManagementContext(managementContext);
-        managementContext.applyLifecycle(connector);
+        //managementContext.applyLifecycle(connector);
         managementContext.getRegistry().registerConnector(connector, managementContext);
         
         super.doSetUp();

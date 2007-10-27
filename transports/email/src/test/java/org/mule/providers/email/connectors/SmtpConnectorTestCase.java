@@ -40,7 +40,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     public SmtpConnectorTestCase()
     {
         this(ServerSetup.PROTOCOL_SMTP, 50007);
-    }
+    } 
     
     public SmtpConnectorTestCase(String protocol, int port)
     {
@@ -66,7 +66,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         assertNotNull(connector);
 
         UMOComponent component = getTestComponent("anApple", Apple.class);
-        managementContext.getRegistry().registerComponent(component, managementContext);
+        //managementContext.getRegistry().registerComponent(component, managementContext);
         UMOEndpointBuilder builder=new EndpointURIEndpointBuilder(getTestEndpointURI(), managementContext);
         builder.setName("test");
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
@@ -91,7 +91,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         UMOComponent component = getTestComponent(uniqueName("testComponent"), FunctionalTestComponent.class);
         // TODO Simplify this API for adding an outbound endpoint.
         ((OutboundPassThroughRouter) component.getOutboundRouter().getRouters().get(0)).addEndpoint(endpoint);
-        managementContext.getRegistry().registerComponent(component, managementContext);
+        //managementContext.getRegistry().registerComponent(component, managementContext);
 
         UMOMessage message = new MuleMessage(MESSAGE);
         message.setStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);

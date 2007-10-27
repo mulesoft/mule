@@ -48,7 +48,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     }
 
     protected FunctionalTestComponent lookupTestComponent(String modelName, String componentName) throws UMOException
-    {    
+    {
         UMOComponent c = managementContext.getRegistry().lookupComponent(componentName);
         assertNotNull("Component " + c + " not found", c);
         assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
@@ -58,4 +58,22 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         return (FunctionalTestComponent) pojoService;
     }
 
+    protected Object lookupComponent(String modelName, String componentName) throws Exception
+    {
+       UMOComponent c = managementContext.getRegistry().lookupComponent(componentName);
+        assertNotNull("Component " + c + " not found", c);
+        //TODO: What happened to TestSedaModel? assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
+        Object pojoService = c.getServiceFactory().getOrCreate();
+        assertNotNull(pojoService);
+        //assertTrue("Service should be a FunctionalTestComponent", pojoService instanceof FunctionalTestComponent);
+        return pojoService;
+    }
+
+    //Delegate to an abstract method to ensure that FunctionalTestCases know they need to pass in config resources
+    protected String getConfigurationResources()
+    {
+        return getConfigResources();
+    }
+
+    protected abstract String getConfigResources();
 }

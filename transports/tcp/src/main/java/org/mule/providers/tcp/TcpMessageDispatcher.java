@@ -24,12 +24,17 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>TcpMessageDispatcher</code> will send transformed Mule events over TCP.
  */
 
 public class TcpMessageDispatcher extends AbstractMessageDispatcher
 {
+    protected transient Log logger = LogFactory.getLog(getClass());
+
     private final TcpConnector connector;
 
     public TcpMessageDispatcher(UMOImmutableEndpoint endpoint)
@@ -54,10 +59,10 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     protected synchronized UMOMessage doSend(UMOEvent event) throws Exception
     {
         Socket socket = connector.getSocket(event.getEndpoint());
-        try
-        {
-            dispatchToSocket(socket, event);
+        dispatchToSocket(socket, event);
 
+        try 
+        {
             if (useRemoteSync(event))
             {
                 try
@@ -67,6 +72,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     {
                         return null;
                     }
+                    
+                    if (result instanceof UMOMessage)
+                    {
+                    	return (UMOMessage) result;
+                    }
+                    
                     return new MuleMessage(connector.getMessageAdapter(result));
                 }
                 catch (SocketTimeoutException e)
@@ -84,8 +95,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         }
         finally
         {
-            connector.releaseSocket(socket, event.getEndpoint());
+            if (!useRemoteSync(event))
+            {
+                connector.releaseSocket(socket, endpoint);
+            }
         }
+        
     }
 
     // Socket management (get and release) is handled outside this method
@@ -102,14 +117,48 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         bos.flush();
     }
 
-    private Object receiveFromSocket(Socket socket, int timeout) throws IOException
+    private Object receiveFromSocket(final Socket socket, int timeout) throws IOException
     {
-        DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+        final UMOImmutableEndpoint endpoint = getEndpoint();
+        DataInputStream underlyingIs = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+        TcpInputStream tis = new TcpInputStream(underlyingIs)
+        {
+            public void close() throws IOException
+            {
+                try
+                {
+                    connector.releaseSocket(socket, endpoint);
+                }
+                catch (IOException e)
+                {
+                   throw ((IOException) e);
+                }
+                catch (Exception e)
+                {
+                    IOException e2 = new IOException();
+                    e2.initCause(e);
+                    throw e2;
+                }
+            }
+            
+        };
+        
         if (timeout >= 0)
         {
             socket.setSoTimeout(timeout);
         }
-        return connector.getTcpProtocol().read(dis);
+        
+        try
+        {
+            return connector.getTcpProtocol().read(tis);
+        }
+        finally 
+        {
+            if (!tis.isStreaming())
+            {
+                tis.close();
+            }
+        }
     }
 
     /**
@@ -145,10 +194,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
             }
             return null;
         }
-        finally
-        {
-            connector.releaseSocket(socket, endpoint);
-        }
+        
     }
 
     protected synchronized void doDispose()

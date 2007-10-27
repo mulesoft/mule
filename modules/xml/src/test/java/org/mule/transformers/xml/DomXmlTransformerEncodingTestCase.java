@@ -52,7 +52,9 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
 
     public UMOTransformer getRoundTripTransformer() throws Exception
     {
-        return new XmlToDomDocument(); // encoding is not interesting
+        XmlToDomDocument trans =  new XmlToDomDocument(); // encoding is not interesting
+        trans.setReturnClass( org.w3c.dom.Document.class);
+        return trans;
     }
 
     public Object getTestData()

@@ -11,8 +11,8 @@
 package org.mule.transformers.script;
 
 import org.mule.components.script.jsr223.Scriptable;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
+import org.mule.transformers.AbstractMessageAwareTransformer;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 
@@ -24,7 +24,7 @@ import javax.script.ScriptException;
 /**
  * Runs a script to perform transformation on an object.
  */
-public class ScriptTransformer extends AbstractEventAwareTransformer
+public class ScriptTransformer extends AbstractMessageAwareTransformer
 {
     protected final Scriptable scriptable = new Scriptable();
 
@@ -33,10 +33,10 @@ public class ScriptTransformer extends AbstractEventAwareTransformer
         super();
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
     {
         Bindings bindings = this.getScriptEngine().createBindings();
-        this.populateBindings(bindings, context, src);
+        this.populateBindings(bindings, message);
 
         try
         {
@@ -48,11 +48,10 @@ public class ScriptTransformer extends AbstractEventAwareTransformer
         }
     }
 
-    protected void populateBindings(Bindings namespace, UMOEventContext context, Object src)
+    protected void populateBindings(Bindings namespace, UMOMessage message)
     {
-        namespace.put("eventContext", context);
-        namespace.put("message", context.getMessage());
-        namespace.put("src", src);
+        namespace.put("message", message);
+        namespace.put("src", message.getPayload());
         namespace.put("transformerNamespace", namespace);
         namespace.put("log", logger);
     }

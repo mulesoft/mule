@@ -13,6 +13,7 @@ package org.mule.providers.email.transformers;
 import org.mule.providers.email.MailMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringUtils;
 
@@ -43,21 +44,21 @@ public class ObjectToMimeMessage extends StringToEmailMessage
     private Log logger = LogFactory.getLog(getClass());
     
     // @Override
-    protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context)
+    protected void setContent(Object payload, Message msg, String contentType, UMOMessage message)
         throws Exception
     {
 
-        if (context.getMessage().getAttachmentNames().size() > 0)
+        if (message.getAttachmentNames().size() > 0)
         {
             // The content type must be multipart/mixed
             MimeMultipart multipart = new MimeMultipart("mixed");
-            multipart.addBodyPart(getPayloadBodyPart(payload, contentType));
-            for (Iterator it = context.getMessage().getAttachmentNames().iterator(); it.hasNext();)
+            multipart.addBodyPart(getPayloadBodyPart(message.getPayload(), contentType));
+            for (Iterator it = message.getAttachmentNames().iterator(); it.hasNext();)
             {
                 String name = (String)it.next();
-                BodyPart part = getBodyPartForAttachment(context.getMessage().getAttachment(name), name);
+                BodyPart part = getBodyPartForAttachment(message.getAttachment(name), name);
                 // Check message props for extra headers
-                addBodyPartHeaders(part, name, context);
+                addBodyPartHeaders(part, name, message);
                 multipart.addBodyPart(part);
             }
             // the payload must be set to the constructed MimeMultipart message
@@ -68,12 +69,12 @@ public class ObjectToMimeMessage extends StringToEmailMessage
         }
         // now the message will contain the multipart payload, and the multipart
         // contentType
-        super.setContent(payload, msg, contentType, context);
+        super.setContent(payload, msg, contentType, message);
     }
 
-    protected void addBodyPartHeaders(BodyPart part, String name, UMOEventContext context)
+    protected void addBodyPartHeaders(BodyPart part, String name, UMOMessage message)
     {
-        Map headers = (Map)context.getMessage().getProperty(
+        Map headers = (Map)message.getProperty(
             name + MailMessageAdapter.ATTACHMENT_HEADERS_PROPERTY_POSTFIX);
 
         if (null != headers)

@@ -113,8 +113,9 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             }
         }, "component1");
 
-        managementContext.getRegistry().registerComponent(getTestComponent("component2", Apple.class), managementContext);
-        managementContext.getRegistry().registerComponent(getTestComponent("component1", Apple.class), managementContext);
+        getTestComponent("component2", Apple.class);
+        getTestComponent("component1", Apple.class);
+
 
         // Wait for the notifcation event to be fired as they are queued
         latch.await(20000, TimeUnit.MILLISECONDS);
@@ -138,9 +139,10 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             }
         }, "component*");
 
-        managementContext.getRegistry().registerComponent(getTestComponent("component2", Apple.class), managementContext);
-        managementContext.getRegistry().registerComponent(getTestComponent("component1", Apple.class), managementContext);
-        managementContext.getRegistry().registerComponent(getTestComponent("noMatchComponent", Apple.class), managementContext);
+        //Components automatically get registered
+        getTestComponent("component2", Apple.class);
+        getTestComponent("component1", Apple.class);
+        getTestComponent("noMatchComponent", Apple.class);
 
         // Wait for the notifcation event to be fired as they are queued
         latch.await(2000, TimeUnit.MILLISECONDS);

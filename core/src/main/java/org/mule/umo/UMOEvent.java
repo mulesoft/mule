@@ -61,6 +61,18 @@ public interface UMOEvent
     Object getTransformedMessage() throws TransformerException;
 
     /**
+     * Returns the message transformed into the reuqest format. The
+     * transformer used is the one configured on the endpoint through which this
+     * event was received.
+     * 
+     * @param outputType The requested output type.
+     * @return the message transformed into it's recognised or expected format.
+     * @throws TransformerException if a failure occurs in the transformer
+     * @see org.mule.umo.transformer.UMOTransformer
+     */
+    Object getTransformedMessage(Class outputType) throws TransformerException;
+
+    /**
      * Returns the message transformed into it's recognised or expected format and
      * then into an array of bytes. The transformer used is the one configured on the
      * endpoint through which this event was received.
@@ -240,13 +252,6 @@ public interface UMOEvent
      *         that received the message
      */
     OutputStream getOutputStream();
-
-    /**
-     * Determines whether the event flow is being streamed
-     * 
-     * @return true if the request should be streamed
-     */
-    boolean isStreaming();
 
     /**
      * Gets the encoding for this message.

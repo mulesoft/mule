@@ -10,6 +10,7 @@
 
 package org.mule.providers.udp;
 
+import org.mule.impl.MuleMessage;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -33,12 +34,12 @@ public class UdpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     {
         Object message = getValidMessage();
         UMOMessageAdapter adapter = createAdapter(message);
-
-        assertEquals(new String(((DatagramPacket)message).getData()), adapter.getPayloadAsString());
-        byte[] bytes = adapter.getPayloadAsBytes();
+        MuleMessage muleMessage = new MuleMessage(adapter);
+        assertEquals(new String(((DatagramPacket)message).getData()), muleMessage.getPayloadAsString());
+        byte[] bytes = muleMessage.getPayloadAsBytes();
         assertNotNull(bytes);
 
-        String stringMessage = adapter.getPayloadAsString();
+        String stringMessage = muleMessage.getPayloadAsString();
         assertNotNull(stringMessage);
 
         assertNotNull(adapter.getPayload());

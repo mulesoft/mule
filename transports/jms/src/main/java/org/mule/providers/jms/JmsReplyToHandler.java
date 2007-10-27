@@ -18,8 +18,10 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.DispatchException;
+import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.StringMessageUtils;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.jms.DeliveryMode;
@@ -62,10 +64,23 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 return;
             }
 
-            Object payload =
-                    TransformerUtils.applyAllTransformers(
-                            getTransformers(), returnMessage,
-                            getEndpoint(event, "jms://temporary?connector=" + connector.getName())).getPayload();
+            //This is a work around for JmsTransformers where the current endpoint needs
+            //to be set on the transformer so that a JMSMEssage can be created correctly
+            Class srcType = returnMessage.getPayload().getClass();
+            for (Iterator iterator = getTransformers().iterator(); iterator.hasNext();)
+            {
+                UMOTransformer t = (UMOTransformer)iterator.next();
+                if(t.isSourceTypeSupported(srcType))
+                {
+                    if(t.getEndpoint()==null)
+                    {
+                        t.setEndpoint(getEndpoint(event, "jms://temporary"));
+                        break;
+                    }
+                }
+            }
+            returnMessage.applyTransformers(getTransformers());
+            Object payload = returnMessage.getPayload();
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue
                     && connector.getJmsSupport() instanceof Jms102bSupport)

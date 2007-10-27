@@ -2,13 +2,11 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:stream="http://www.mulesource.org/schema/mule/streaming/2.0"
        xmlns:ftp="http://www.mulesource.org/schema/mule/ftp/2.0"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-               http://www.mulesource.org/schema/mule/streaming/2.0 http://www.mulesource.org/schema/mule/streaming/2.0/mule-streaming.xsd
                http://www.mulesource.org/schema/mule/ftp/2.0 http://www.mulesource.org/schema/mule/ftp/2.0/mule-ftp.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
@@ -20,33 +18,33 @@
         <tcp:direct-protocol payloadOnly="true"/>
     </tcp:connector>
 
-    <stream:model name="main">
+    <model name="main">
 
-        <stream:service name="bridge">
-            <component class="org.mule.components.simple.StreamingBridgeComponent"/>
-            <stream:inbound-router>
-                <stream:inbound-endpoint address="tcp://localhost:60196">
+        <service name="bridge">
+            <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="tcp://localhost:60196">
                     <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
-                </stream:inbound-endpoint>
-            </stream:inbound-router>
-            <stream:outbound-router>
-                <stream:outbound-pass-through-router>
-                    <stream:outbound-endpoint address="ftp://anonymous:email@localhost:60197">
+                </inbound-endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="ftp://anonymous:email@localhost:60197">
                         <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
-                    </stream:outbound-endpoint>
-                </stream:outbound-pass-through-router>
-            </stream:outbound-router>
-        </stream:service>
+                    </outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <stream:service name="testComponent" class="org.mule.tck.testmodels.mule.TestStreamingComponent">
+        <service name="testComponent">
             <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
-            <stream:inbound-router>
-                <stream:inbound-endpoint address="ftp://anonymous:email@localhost:60197">
+            <inbound-router>
+                <inbound-endpoint address="ftp://anonymous:email@localhost:60197">
                     <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
-                </stream:inbound-endpoint>
-            </stream:inbound-router>
-        </stream:service>
+                </inbound-endpoint>
+            </inbound-router>
+        </service>
 
-    </stream:model>
+    </model>
 
 </mule>

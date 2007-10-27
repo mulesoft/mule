@@ -15,8 +15,6 @@ import org.mule.extras.pgp.PGPAuthentication;
 import org.mule.extras.pgp.PGPCryptInfo;
 import org.mule.extras.pgp.PGPKeyRing;
 import org.mule.extras.pgp.i18n.PGPMessages;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 import org.mule.impl.security.AbstractEndpointSecurityFilter;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOEvent;
@@ -30,13 +28,14 @@ import org.mule.umo.security.UnknownAuthenticationTypeException;
 import java.io.ByteArrayInputStream;
 import java.util.Collection;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import cryptix.message.LiteralMessage;
 import cryptix.message.Message;
 import cryptix.message.MessageFactory;
 import cryptix.message.SignedMessage;
 import cryptix.pki.KeyBundle;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 {
@@ -78,7 +77,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
                 CoreMessages.failedToReadPayload(), event.getMessage(), e1);
         }
 
-        UMOAuthentication authResult;
+        final UMOAuthentication authResult;
         UMOAuthentication umoAuthentication;
 
         try
@@ -117,8 +116,9 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
         try
         {
-            RequestContext.rewriteEvent(new MuleMessage(
-                getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult)));
+            updatePayload(event.getMessage(), getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult));
+//            TODO RequestContext.rewriteEvent(new MuleMessage(
+//                getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult)));
         }
         catch (Exception e2)
         {
@@ -175,30 +175,15 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         KeyBundle userKeyBundle = keyManager.getKeyBundle((String)getCredentialsAccessor().getCredentials(
             event));
 
-        PGPCryptInfo cryptInfo = new PGPCryptInfo(userKeyBundle, signRequired);
-
-        byte[] msg = null;
+        final PGPCryptInfo cryptInfo = new PGPCryptInfo(userKeyBundle, signRequired);
 
         try
         {
-            msg = message.getPayloadAsBytes();
-            msg = strategy.encrypt(msg, cryptInfo);
+            updatePayload(event.getMessage(), strategy.encrypt(message.getPayloadAsBytes(), cryptInfo));
         }
         catch (Exception e1)
         {
             throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event.getMessage(), e1);
-        }
-
-        try
-        {
-            String mesg = new String(msg);
-            RequestContext.rewriteEvent(new MuleMessage(mesg));
-            logger.debug("Message:" + mesg);
-        }
-        catch (Exception e2)
-        {
-            throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(),
-                event.getEndpoint(), this);
         }
     }
 

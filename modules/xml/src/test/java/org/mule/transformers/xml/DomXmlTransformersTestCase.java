@@ -33,12 +33,16 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
 
     public UMOTransformer getTransformer() throws Exception
     {
-        return new XmlToDomDocument();
+        XmlToDomDocument trans = new XmlToDomDocument();
+        trans.setReturnClass(org.w3c.dom.Document.class);
+        return trans;
     }
 
     public UMOTransformer getRoundTripTransformer() throws Exception
     {
-        return new DomDocumentToXml();
+        DomDocumentToXml trans = new DomDocumentToXml();
+        trans.setReturnClass(String.class);
+        return trans;
     }
 
     public Object getTestData()

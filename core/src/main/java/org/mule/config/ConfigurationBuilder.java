@@ -33,6 +33,16 @@ public interface ConfigurationBuilder
 
     /**
      * Will configure a UMOManager based on the configuration file(s) provided.
+     *
+     * @param configResources an array of configuration files to load,
+     *            this should be accessible on the classpath or filesystem
+     * @return A configured UMOManager
+     * @throws ConfigurationException
+     */
+    UMOManagementContext configure(String[] configResources) throws ConfigurationException;
+
+    /**
+     * Will configure a UMOManager based on the configuration file(s) provided.
      * 
      * @param configResources - A comma-separated list of configuration files to
      *            load, these should be accessible on the classpath or filesystem
@@ -45,19 +55,45 @@ public interface ConfigurationBuilder
     UMOManagementContext configure(String configResources, String startupPropertiesFile) throws ConfigurationException;
 
     /**
-     * Will configure a UMOManager based on the configurations made available through
-     * Readers
-     * 
-     * @param configResources - An array of Readers, each Reader contains a portion
-     *            of the Mule server configuration.
+     * Will configure a UMOManager based on the configuration file(s) provided.
+     *
+     * @param configResources - An array list of configuration files to
+     *            load, these should be accessible on the classpath or filesystem
+     * @param startupPropertiesFile - An optional file containing startup properties.
+     *            This is useful for managing different environments (dev, test,
+     *            production)
+     * @return A configured UMOManager
+     * @throws ConfigurationException
+     */
+    UMOManagementContext configure(String[] configResources, String startupPropertiesFile) throws ConfigurationException;
+
+    /**
+     * Will configure a UMOManager based on the configuration file(s) provided.
+     *
+     * @param configResources - A comma-separated list of configuration files to
+     *            load, these should be accessible on the classpath or filesystem
      * @param startupProperties - Optional properties to be set before configuring
      *            the Mule server. This is useful for managing different environments
      *            (dev, test, production)
      * @return A configured UMOManager
      * @throws ConfigurationException
      */
-    UMOManagementContext configure(ReaderResource[] configResources, Properties startupProperties)
-        throws ConfigurationException;
+    UMOManagementContext configure(String configResources, Properties startupProperties) throws ConfigurationException;
+
+    /**
+     * Will configure a UMOManager based on the configuration file(s) provided.
+     *
+     * @param configResources - An array list of configuration files to
+     *            load, these should be accessible on the classpath or filesystem
+     * @param startupProperties - Optional properties to be set before configuring
+     *            the Mule server. This is useful for managing different environments
+     *            (dev, test, production)
+     * @return A configured UMOManager
+     * @throws ConfigurationException
+     */
+    UMOManagementContext configure(String[] configResources, Properties startupProperties) throws ConfigurationException;
+
+
 
     boolean isConfigured();
 }

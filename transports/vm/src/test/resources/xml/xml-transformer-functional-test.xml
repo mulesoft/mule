@@ -19,14 +19,27 @@
     </vm:connector>
 
     <mxml:dom-to-xml name="domToXml"/>
-    <mxml:xml-to-dom name="xmlToDom"/>
+    <mxml:xml-to-dom name="xmlToDom" returnClass="org.w3c.dom.Document"/>
 
     <mxml:jxpath-extractor name="jxpath" expression="count(//parent)"/>
 
     <mxml:object-to-xml name="objectToXml"/>
     <mxml:xml-to-object name="xmlToObject"/>
 
-    <mxml:xslt-transformer name="xslt">
+    <mxml:xslt-transformer name="xslt" returnClass="org.dom4j.Document">
+        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+            <!-- test for this string in test -->
+            <!-- Whenever you match any node or any attribute -->
+            <xsl:template match="node()|@*">
+                <!-- Copy the current node -->
+                <xsl:copy>
+                    <!-- don't copy inner contents -->
+                </xsl:copy>
+            </xsl:template>
+        </xsl:stylesheet>
+    </mxml:xslt-transformer>
+
+    <mxml:xslt-transformer name="xslt-string" returnClass="java.lang.String">
         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
             <!-- test for this string in test -->
             <!-- Whenever you match any node or any attribute -->
@@ -56,6 +69,8 @@
                     <outbound-endpoint name="xml-out" address="vm://xml-out" connector-ref="queue"/>
                     <outbound-endpoint name="xml-xslt-out" address="vm://xml-xslt-out" connector-ref="queue"
                                        transformer-ref="xslt"/>
+                    <outbound-endpoint name="xml-xslt-out-string" address="vm://xml-xslt-out" connector-ref="queue"
+                                       transformer-ref="xslt-string"/>
                     <outbound-endpoint name="xml-jxpath-out" address="vm://xml-jxpath-out" connector-ref="queue"
                                        transformer-ref="jxpath"/>
                     <outbound-endpoint name="xml-dom-out" address="vm://xml-dom-out" connector-ref="queue"

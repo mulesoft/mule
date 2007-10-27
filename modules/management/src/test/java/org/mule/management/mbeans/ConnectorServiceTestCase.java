@@ -12,6 +12,7 @@ package org.mule.management.mbeans;
 
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.management.agents.JmxAgent;
+import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.Set;
@@ -25,15 +26,11 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
     {
         final String configId = "ConnectorServiceTest";
         managementContext.setId(configId);
-        final UMOConnector connector = getTestConnector();
+        final UMOConnector connector = new TestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();
         managementContext.getRegistry().registerConnector(connector, managementContext);
         managementContext.getRegistry().registerAgent(jmxAgent, managementContext);
-
-
-        managementContext.applyLifecycle(jmxAgent);
-
         managementContext.start();
 
         final String query = jmxSupport.getDomainName(managementContext) + ":*";

@@ -54,6 +54,15 @@ public interface UMOMessageAdapter extends Serializable
     void setProperty(String key, Object value);
 
     /**
+     * Set a property on the message
+     *
+     * @param key the key on which to associate the value
+     * @param value the property value
+     * @param scope The scope at which to set the property at
+     * @see PropertyScope
+     */
+    void setProperty(String key, Object value, PropertyScope scope);
+    /**
      * Removes a property on this message
      * 
      * @param key the property key to remove
@@ -62,36 +71,9 @@ public interface UMOMessageAdapter extends Serializable
     Object removeProperty(String key);
 
     /**
-     * Converts the message implementation into a String representation
-     * 
-     * @param encoding The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte array
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     */
-    String getPayloadAsString(String encoding) throws Exception;
-
-    /**
-     * Converts the message implementation into a String representation. If encoding
-     * is required it will use the encoding set on the message
-     * 
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     */
-    String getPayloadAsString() throws Exception;
-
-    /**
      * @return all property keys on this message
      */
     Set getPropertyNames();
-
-    /**
-     * Converts the message implementation into a byte array representation
-     * 
-     * @return byte array of the message
-     * @throws Exception Implemetation may throw an endpoint specific exception
-     */
-    byte[] getPayloadAsBytes() throws Exception;
 
     /**
      * @return the current message
@@ -109,7 +91,7 @@ public interface UMOMessageAdapter extends Serializable
     String getUniqueId();
 
     /**
-     * Gets a property from the event
+     * Gets a property from the message
      * 
      * @param name the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the event
@@ -118,7 +100,7 @@ public interface UMOMessageAdapter extends Serializable
     Object getProperty(String name, Object defaultValue);
 
     /**
-     * Gets an integer property from the event
+     * Gets an integer property from the message
      * 
      * @param name the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the event
@@ -127,7 +109,7 @@ public interface UMOMessageAdapter extends Serializable
     int getIntProperty(String name, int defaultValue);
 
     /**
-     * Gets a long property from the event
+     * Gets a long property from the message
      * 
      * @param name the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the event
@@ -136,7 +118,7 @@ public interface UMOMessageAdapter extends Serializable
     long getLongProperty(String name, long defaultValue);
 
     /**
-     * Gets a double property from the event
+     * Gets a double property from the message
      * 
      * @param name the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the event
@@ -145,7 +127,7 @@ public interface UMOMessageAdapter extends Serializable
     double getDoubleProperty(String name, double defaultValue);
 
     /**
-     * Gets a boolean property from the event
+     * Gets a boolean property from the message
      * 
      * @param name the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the event
@@ -154,7 +136,7 @@ public interface UMOMessageAdapter extends Serializable
     boolean getBooleanProperty(String name, boolean defaultValue);
 
     /**
-     * Sets a boolean property on the event
+     * Sets a boolean property on the message
      * 
      * @param name the property name or key
      * @param value the property value
@@ -162,7 +144,7 @@ public interface UMOMessageAdapter extends Serializable
     void setBooleanProperty(String name, boolean value);
 
     /**
-     * Sets a integerproperty on the event
+     * Sets a integerproperty on the message
      * 
      * @param name the property name or key
      * @param value the property value
@@ -170,7 +152,7 @@ public interface UMOMessageAdapter extends Serializable
     void setIntProperty(String name, int value);
 
     /**
-     * Sets a long property on the event
+     * Sets a long property on the message
      * 
      * @param name the property name or key
      * @param value the property value
@@ -178,7 +160,7 @@ public interface UMOMessageAdapter extends Serializable
     void setLongProperty(String name, long value);
 
     /**
-     * Sets a double property on the event
+     * Sets a double property on the message
      * 
      * @param name the property name or key
      * @param value the property value
@@ -186,7 +168,7 @@ public interface UMOMessageAdapter extends Serializable
     void setDoubleProperty(String name, double value);
 
     /**
-     * Gets a String property from the event
+     * Gets a String property from the message
      * 
      * @param name the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the event
@@ -195,7 +177,7 @@ public interface UMOMessageAdapter extends Serializable
     String getStringProperty(String name, String defaultValue);
 
     /**
-     * Sets a String property on the event
+     * Sets a String property on the message
      * 
      * @param name the property name or key
      * @param value the property value
@@ -283,7 +265,7 @@ public interface UMOMessageAdapter extends Serializable
      * If an error occurred during the processing of this message this will return a
      * ErrorPayload that contains the root exception and Mule error code, plus any
      * other releated info
-     * 
+     *
      * @return The exception payload (if any) attached to this message
      */
     UMOExceptionPayload getExceptionPayload();
@@ -292,17 +274,43 @@ public interface UMOMessageAdapter extends Serializable
      * If an error occurs while processing this message, a ErrorPayload is attached
      * which contains the root exception and Mule error code, plus any other releated
      * info
-     * 
+     *
      * @param payload The exception payloaad to attach to this message
      */
     void setExceptionPayload(UMOExceptionPayload payload);
 
+    /**
+     * Allows for arbitary data attachments to be associated with the Message. These attachements work in the
+     * same way that email attachments work. Attachments can be binary or text
+     * @param name the name to associate with the attachment
+     * @param dataHandler The attachment datahandler to use. This will be used to interract with the attachment data
+     * @throws Exception
+     * @see javax.activation.DataHandler
+     */
     void addAttachment(String name, DataHandler dataHandler) throws Exception;
 
+    /**
+     * Remove an attahcment form this message with the specifed name
+     * @param name the name of the attachment to remove. If the attachment does not exist, the request may be ignorred
+     * @throws Exception different messaging systems handle attachments differnetly, as such some will throw an exception
+     * if an attahcment does dot exist.
+     */
     void removeAttachment(String name) throws Exception;
 
+    /**
+     * Retrieve an attachment with the given name. If the attachment does not exist, null will be returned
+     * @param name the name of the attachment to retrieve
+     * @return the attachment with the given name or null if the attachment does not exist
+     * @see javax.activation.DataHandler
+     */
     DataHandler getAttachment(String name);
 
+    /**
+     * Returns a set of the names of the attachments on this message. If there are no attachments an empty set will be
+     * returned.
+     * @return a set of the names of the attachments on this message. If there are no attachments an empty set will be
+     * returned.
+     */
     Set getAttachmentNames();
 
     /**
@@ -322,4 +330,9 @@ public interface UMOMessageAdapter extends Serializable
      */
     void setEncoding(String encoding);
 
+    /**
+     * Perform any clean up operations on the message resource.
+     * Typically this is used to esure that a message stream is closed
+     */
+    void release();
 }

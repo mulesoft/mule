@@ -35,7 +35,20 @@ public class SpringRegistryFactoryBean extends AbstractFactoryBean implements Ap
 
     protected Object createInstance() throws Exception
     {
-        registry = new TransientRegistry(new SpringRegistry(context));
+        Registry current = RegistryContext.getRegistry();
+        if(current==null || current.isDisposed())
+        {
+            registry = new TransientRegistry(new SpringRegistry(context));
+        }
+        else if(current instanceof TransientRegistry)
+        {
+            registry = current;
+            registry.setParent(new SpringRegistry(context));
+        }
+        else
+        {
+            throw new IllegalStateException("There is currently a registry available: " + current.getRegistryId());
+        }
         RegistryContext.setRegistry(registry);
         return registry;
     }

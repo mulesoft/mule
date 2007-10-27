@@ -48,6 +48,8 @@ import javax.resource.spi.work.Work;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.cookie.MalformedCookieException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used to
@@ -55,6 +57,7 @@ import org.apache.commons.httpclient.cookie.MalformedCookieException;
  */
 public class HttpMessageReceiver extends TcpMessageReceiver
 {
+    protected final Log logger = LogFactory.getLog(getClass());
 
     public HttpMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
@@ -158,6 +161,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
             finally
             {
+                logger.info("Closing HTTP connection.");
+
                 conn.close();
                 conn = null;
             }
@@ -198,22 +203,16 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             return transformResponse(response);
         }
 
-        protected HttpResponse doRequest(HttpRequest request, RequestLine requestLine) throws IOException, UMOException
+        protected HttpResponse doRequest(HttpRequest request,
+                                         RequestLine requestLine) throws IOException, UMOException
         {
             Map headers = parseHeaders(request);
 
             // TODO Mule 2.0 generic way to set stream message adapter
-            UMOMessageAdapter adapter;
-            if (endpoint.isStreaming() && request.getBody() != null)
-            {
-                adapter = buildStreamingAdapter(request, headers);
-            }
-            else
-            {
-                adapter = buildStandardAdapter(request, headers);
-            }
+            UMOMessageAdapter adapter = buildStandardAdapter(request, headers);
+            
             UMOMessage message = new MuleMessage(adapter);
-
+            
             if (logger.isDebugEnabled())
             {
                 logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
@@ -247,7 +246,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 }
                 else
                 {
-                    response = transformResponse(tempResponse);
+                    response = transformResponse(returnMessage);
                 }
                 response.disableKeepAlive(!((HttpConnector)connector).isKeepAlive());
             }
@@ -280,20 +279,25 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             return transformResponse(response);
         }
 
-        protected UMOMessageAdapter buildStreamingAdapter(HttpRequest request, Map headers) throws MessagingException
+        protected UMOMessageAdapter buildStandardAdapter(final HttpRequest request, 
+                                                         final Map headers) throws MessagingException, TransformerException, IOException
         {
-            UMOMessageAdapter adapter = connector.getStreamMessageAdapter(request.getBody(), conn.getOutputStream());
-            for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();)
+            final RequestLine requestLine = request.getRequestLine();
+            
+            sendExpect100(headers, requestLine);
+            
+            Object body = request.getBody();
+            if (body == null)
             {
-                Map.Entry entry = (Map.Entry)iterator.next();
-                adapter.setProperty((String)entry.getKey(), entry.getValue());
+                body = requestLine.getUri();
             }
-            return adapter;
+            
+            return connector.getMessageAdapter(new Object[]{body, headers});
         }
 
-        protected UMOMessageAdapter buildStandardAdapter(HttpRequest request, Map headers) throws MessagingException, TransformerException, IOException
+        private void sendExpect100(Map headers, RequestLine requestLine)
+            throws TransformerException, IOException
         {
-            RequestLine requestLine = request.getRequestLine();
             // respond with status code 100, for Expect handshake
             // according to rfc 2616 and http 1.1
             // the processing will continue and the request will be fully
@@ -314,13 +318,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     conn.writeResponse(transformResponse(expected));
                 }
             }
-
-            Object body = request.getBodyBytes();
-            if (body == null)
-            {
-                body = requestLine.getUri();
-            }
-            return connector.getMessageAdapter(new Object[]{body, headers});
         }
 
         protected HttpResponse buildFailureResponse(RequestLine requestLine, UMOMessage message) throws TransformerException
@@ -409,7 +406,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             conn.close();
             conn = null;
         }
-
     }
 
     protected String getRequestPath(UMOMessage message)
@@ -473,11 +469,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // try again
             String uriStr = requestUri.toString();
             receiver = connector.lookupReceiver(uriStr);
-
-            if (receiver == null)
+            
+            if (receiver == null) 
             {
-                receiver = findReceiverByStem(connector.getReceivers(), uriStr);
-            }
+				receiver = findReceiverByStem(connector.getReceivers(), uriStr);
+			}
 
             if (receiver == null && logger.isWarnEnabled())
             {
@@ -490,11 +486,22 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         return receiver;
     }
-
+    
     protected HttpResponse transformResponse(Object response) throws TransformerException
     {
-        return (HttpResponse) TransformerUtils.applyAllTransformersToObject(
-                connector.getDefaultResponseTransformers(), response);
+        UMOMessage message = null;
+        if(response instanceof UMOMessage)
+        {
+            message = (UMOMessage)response;
+        }
+        else
+        {
+            message = new MuleMessage(response);
+        }
+        //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using MuleMessage (or another static utility 
+        //class
+        message.applyTransformers(connector.getDefaultResponseTransformers(), HttpResponse.class);
+        return (HttpResponse) message.getPayload();
     }
 
     public static UMOMessageReceiver findReceiverByStem(Map receivers, String uriStr)

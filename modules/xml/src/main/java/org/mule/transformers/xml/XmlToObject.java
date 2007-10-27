@@ -10,7 +10,7 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.ByteArrayInputStream;
@@ -38,8 +38,9 @@ public class XmlToObject extends AbstractXStreamTransformer
         registerSourceType(org.dom4j.Document.class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
     {
+        Object src = message.getPayload();
         if (src instanceof byte[])
         {
             return getXStream().fromXML(new ByteArrayInputStream((byte[]) src));

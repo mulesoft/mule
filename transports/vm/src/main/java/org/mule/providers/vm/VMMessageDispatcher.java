@@ -11,7 +11,6 @@
 package org.mule.providers.vm;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.vm.i18n.VMMessages;
 import org.mule.transformers.simple.ObjectToByteArray;
@@ -21,14 +20,8 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
-import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 
 /**
  * <code>VMMessageDispatcher</code> is used for providing in memory interaction
@@ -37,13 +30,11 @@ import java.io.PipedOutputStream;
 public class VMMessageDispatcher extends AbstractMessageDispatcher
 {
     private final VMConnector connector;
-    private final ObjectToByteArray objectToByteArray;
 
     public VMMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (VMConnector)endpoint.getConnector();
-        objectToByteArray = new ObjectToByteArray();
     }
 
     /**
@@ -145,14 +136,6 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
                 logger.warn("No receiver for endpointUri: " + event.getEndpoint().getEndpointURI());
                 return;
             }
-
-            if (event.isStreaming())
-            {
-                PipedInputStream in = new PipedInputStream();
-                PipedOutputStream out = new PipedOutputStream(in);
-                UMOStreamMessageAdapter sma = connector.getStreamMessageAdapter(in, out);
-                sma.write(event);
-            }
             receiver.onEvent(event);
         }
         if (logger.isDebugEnabled())
@@ -166,6 +149,8 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         UMOMessage retMessage;
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         VMMessageReceiver receiver = connector.getReceiver(endpointUri);
+        //Apply any outbound transformers on this event before we dispatch
+        event.getTransformedMessage();
         if (receiver == null)
         {
             if (connector.isQueueEvents())
@@ -186,36 +171,13 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
                         event.getEndpoint().getEndpointURI()));
             }
         }
-        if (event.isStreaming())
-        {
-            PipedInputStream in = new PipedInputStream();
-            PipedOutputStream out = new PipedOutputStream(in);
-            UMOStreamMessageAdapter sma = connector.getStreamMessageAdapter(in, out);
-            sma.write(event);
-        }
 
         retMessage = (UMOMessage)receiver.onCall(event);
-
-        if (event.isStreaming() && retMessage != null)
-        {
-            InputStream in;
-            if (retMessage.getPayload() instanceof InputStream)
-            {
-                in = (InputStream)retMessage.getPayload();
-            }
-            else
-            {
-                in = new ByteArrayInputStream((byte[])objectToByteArray.transform(retMessage.getPayload()));
-            }
-            UMOStreamMessageAdapter sma = connector.getStreamMessageAdapter(in, null);
-            retMessage = new MuleMessage(sma, retMessage);
-        }
 
         if (logger.isDebugEnabled())
         {
             logger.debug("sent event on endpointUri: " + event.getEndpoint().getEndpointURI());
         }
-
         return retMessage;
     }
 

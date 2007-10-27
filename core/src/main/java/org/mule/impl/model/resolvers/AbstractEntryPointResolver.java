@@ -69,9 +69,7 @@ public abstract class AbstractEntryPointResolver implements UMOEntryPointResolve
     {
         StringBuffer key = new StringBuffer(24).append(context.getComponent().getName())
                 .append(".").append(methodName);
-        //logger.debug("Looking up: " + key.toString());
         Method method = (Method) methodCache.get(key);
-        //logger.debug("got: " + method + " with key: " + key.toString());
         return method;
     }
 

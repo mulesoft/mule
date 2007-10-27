@@ -12,7 +12,7 @@ package org.mule.routing;
 
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOMessage;
-import org.mule.util.properties.MessagePropertyExtractor;
+import org.mule.util.properties.MessageHeaderPropertyExtractor;
 
 /**
  * <code>CorrelationPropertiesExtractor</code> is a default implementation used for
@@ -22,7 +22,7 @@ import org.mule.util.properties.MessagePropertyExtractor;
  * message.getCorrelationId() or
  * message.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY)
  */
-public class CorrelationPropertiesExtractor extends MessagePropertyExtractor
+public class CorrelationPropertiesExtractor extends MessageHeaderPropertyExtractor
 {
     public final Object getProperty(String name, Object message)
     {

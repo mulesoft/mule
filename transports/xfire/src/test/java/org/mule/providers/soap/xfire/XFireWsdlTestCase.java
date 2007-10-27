@@ -20,8 +20,11 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-import org.jdom.Document;
+import org.custommonkey.xmlunit.XMLAssert;
 
+/**
+ * This test requires an external Xfire instance to call out to 
+ */
 public class XFireWsdlTestCase extends AbstractMuleTestCase
 {
     public static final String TEST_URL = "wsdl-xfire:http://localhost:63080/mule-tests-external-xfire/services/TestService?WSDL&method=getTest";
@@ -36,10 +39,10 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
         UMOMessage reply = client.send(TEST_URL, message);
         assertNotNull(reply);
 
-        Document response = (Document)reply.getPayload();
+        String response = reply.getPayloadAsString();
         assertNotNull(response);
 
-        //TODO RM* URGENT XMLAssert.assertXpathEvaluatesTo("test1", "//*[namespace-uri()='http://applications.external.tck.mule.org' and local-name()='key']", response);
+        XMLAssert.assertXpathEvaluatesTo("test1", "//*[namespace-uri()='http://applications.external.tck.mule.org' and local-name()='key']", response);
     }
 
     /**
@@ -65,9 +68,10 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
 
         assertNotNull(reply);
 
-        Document response = (Document)reply.getPayload();
+        String response = reply.getPayloadAsString();
         assertNotNull(response);
-        //TODO RM* URGENT XMLAssert.assertXpathEvaluatesTo("test1", "//*[namespace-uri()='http://applications.external.tck.mule.org' and local-name()='key']", response);
+        XMLAssert.assertXpathEvaluatesTo("test1", "//*[namespace-uri()='http://applications.external.tck.mule.org' and local-name()='key']", response);
+        
         
         // bye-bye
         // MuleManager.getInstance().dispose();

@@ -24,6 +24,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.PropertyScope;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
@@ -35,7 +36,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
 import java.util.Iterator;
@@ -43,7 +43,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -237,7 +236,7 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
                 // don't overwrite property on the message
                 if (!ignoreProperty(prop))
                 {
-                    message.setProperty(prop, value);
+                    message.setProperty(prop, value, PropertyScope.INVOCATION);
                 }
 
                 if (logger.isDebugEnabled())
@@ -327,25 +326,21 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
 
     public Object getTransformedMessage() throws TransformerException
     {
-        if (isStreaming())
-        {
-            return message.getAdapter();
-        }
-        if (transformedMessage == null)
-        {
-            List transformers = endpoint.getTransformers();
-            if (null != transformers)
-            {
-                transformedMessage = TransformerUtils.applyAllTransformers(transformers, message).getPayload();
-            }
-            else
-            {
-                transformedMessage = message.getPayload();
-            }
-        }
-        return transformedMessage;
+        return getTransformedMessage(null);
     }
 
+    public Object getTransformedMessage(Class outputType) throws TransformerException
+    {
+        message.applyTransformers(endpoint.getTransformers());
+        if(outputType==null)
+        {
+            return message.getPayload();
+        }
+        else
+        {
+            return message.getPayload(outputType);
+        }
+    }
     /**
      * This method will attempt to convert the transformed message into an array of
      * bytes It will first check if the result of the transformation is a byte array
@@ -359,41 +354,8 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
      */
     public byte[] getTransformedMessageAsBytes() throws TransformerException
     {
-        Object msg = getTransformedMessage();
-        if (msg instanceof byte[])
-        {
-            return (byte[]) msg;
-        }
-        else if (msg instanceof String)
-        {
-            try
-            {
-                return msg.toString().getBytes(getEncoding());
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new TransformerException(
-                    CoreMessages.transformFailedFrom(msg.getClass()), e);
-            }
-        }
-        else if (msg instanceof Serializable)
-        {
-            try
-            {
-                return SerializationUtils.serialize((Serializable) msg);
-            }
-            catch (Exception e)
-            {
-                throw new TransformerException(
-                    CoreMessages.transformFailed(msg.getClass().getName(), "byte[]"), e);
-            }
-        }
-        else
-        {
-            throw new TransformerException(
-                CoreMessages.transformOnObjectNotOfSpecifiedType(msg.getClass().getName(),
-                    "byte[] or " + Serializable.class.getName()));
-        }
+        Object obj =  getTransformedMessage(byte[].class);
+        return (byte[])obj;
     }
 
     /**
@@ -712,16 +674,6 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         {
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
-    }
-
-    /**
-     * Determines whether the event flow is being streamed
-     *
-     * @return true if the request should be streamed
-     */
-    public boolean isStreaming()
-    {
-        return endpoint.isStreaming();
     }
 
     /**

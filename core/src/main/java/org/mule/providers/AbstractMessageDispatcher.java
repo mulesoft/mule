@@ -97,7 +97,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             }
             catch (UMOException e)
             {
-                dispose();
+                disposeAndLogException();
                 throw new MuleRuntimeException(CoreMessages.failedToStart("WorkManager"), e);
             }
         }
@@ -134,13 +134,10 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             }
             catch (UMOException e)
             {
-                dispose();
+                disposeAndLogException();
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
         }
-        // the security filter may update the payload so we need to get the
-        // latest event again
-        event = RequestContext.getEvent();
 
         try
         {
@@ -168,13 +165,25 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         }
         catch (DispatchException e)
         {
-            dispose();
+            disposeAndLogException();
             throw e;
         }
         catch (Exception e)
         {
-            dispose();
+            disposeAndLogException();
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
+        }
+    }
+
+    private void disposeAndLogException()
+    {
+        try
+        {
+            dispose();
+        }
+        catch (Throwable t)
+        {
+            logger.error("Could not dispose of the message dispatcher!", t);
         }
     }
 
@@ -209,13 +218,10 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             }
             catch (UMOException e)
             {
-                dispose();
+                disposeAndLogException();
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
         }
-        // the security filter may update the payload so we need to get the
-        // latest event again
-        event = RequestContext.getEvent();
 
         try
         {
@@ -244,12 +250,12 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         }
         catch (DispatchException e)
         {
-            dispose();
+            disposeAndLogException();
             throw e;
         }
         catch (Exception e)
         {
-            dispose();
+            disposeAndLogException();
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
     }
@@ -281,12 +287,12 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         }
         catch (DispatchException e)
         {
-            dispose();
+            disposeAndLogException();
             throw e;
         }
         catch (Exception e)
         {
-            dispose();
+            disposeAndLogException();
             throw new ReceiveException(endpoint, timeout, e);
         }
     }
@@ -567,7 +573,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         {
             try
             {
-                event = OptimizedRequestContext.criticalSetEvent(event);
+                RequestContext.setEvent(event);
                 // Make sure we are connected
                 connectionStrategy.connect(AbstractMessageDispatcher.this);
                 AbstractMessageDispatcher.this.doDispatch(event);

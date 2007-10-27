@@ -11,6 +11,7 @@
 package org.mule.tck.providers.soap;
 
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.tck.FunctionalTestCase;
@@ -55,7 +56,6 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient();
-
         List results = new ArrayList();
         int number = 1;
         Map props = new HashMap();
@@ -104,7 +104,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         UMOMessage result = client.send(getSendReceiveComplexEndpoint1(), new Person("Dino", "Flintstone"),
             null);
-        assertNull(result);
+        assertEquals(NullPayload.getInstance(), result.getPayload());
 
         result = client.receive(getSendReceiveComplexEndpoint2(), 0);
         assertNotNull(result);

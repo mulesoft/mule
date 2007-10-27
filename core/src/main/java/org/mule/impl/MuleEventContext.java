@@ -29,9 +29,9 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
-import java.io.OutputStream;
-
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+
+import java.io.OutputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,7 +51,7 @@ public class MuleEventContext implements UMOEventContext
     private final UMOEvent event;
     private final UMOSession session;
 
-    MuleEventContext(UMOEvent event)
+    public MuleEventContext(UMOEvent event)
     {
         this.event = event;
         this.session = event.getSession();
@@ -615,7 +615,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
     {
-        RequestContext.getEvent().setStopFurtherProcessing(stopFurtherProcessing);
+        event.setStopFurtherProcessing(stopFurtherProcessing);
     }
 
     /**

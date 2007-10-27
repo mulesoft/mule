@@ -10,28 +10,37 @@
 
 package org.mule.modules.xml.functional;
 
+import java.util.Properties;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 
 public class Dom4jPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    protected String getConfigResources()
+    public Dom4jPropertyExtractorTestCase()
     {
-        return "xml/dom4j-property-extractor-test.xml";
+        super(true);
+    }
+
+    protected Properties getStartUpProperties()
+    {
+        Properties p = new Properties();
+        p.setProperty("selector.property", "${xpath:/endpoint}");
+        return p;
     }
 
     protected Object getMatchMessage()
     {
         Document document = DocumentHelper.createDocument();
-        document.addElement("endpoint").addText("name");
+        document.addElement("endpoint").addText("matchingEndpoint1");
         return document;
     }
 
     protected Object getErrorMessage()
     {
         Document document = DocumentHelper.createDocument();
-        document.addElement("endpoint").addText("missing");
+        document.addElement("endpoint").addText("missingEndpoint");
         return document;
     }
 

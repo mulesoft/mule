@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionPayload;
@@ -92,8 +93,8 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
                     }
                     catch (UMOException e)
                     {
-                        logger.info("Failed to send to endpoint: " + endpoint.getEndpointURI().toString()
-                                    + ". Error was: " + e.getMessage() + ". Trying next endpoint");
+                        logger.warn("Failed to send to endpoint: " + endpoint.getEndpointURI().toString()
+                                    + ". Error was: " + ExceptionHelper.getRootException(e) + ". Trying next endpoint");
                     }
                 }
                 else

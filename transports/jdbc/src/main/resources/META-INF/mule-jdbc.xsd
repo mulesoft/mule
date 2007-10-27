@@ -21,7 +21,6 @@
                 <xsd:sequence>
                     <xsd:element name="dataSource" type="mule:genericObjectFactoryType" />
                     <xsd:element name="queries" type="mule:mapType" minOccurs="0"/>
-                    <xsd:element name="extractors" type="extractorsType" minOccurs="0"/>
                     <xsd:element name="resultSetHandler" type="mule:genericObjectFactoryType" minOccurs="0" />
                     <xsd:element name="queryRunner" type="mule:genericObjectFactoryType" minOccurs="0" />
                 </xsd:sequence>
@@ -30,14 +29,14 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="extractorsType">
-        <xsd:choice minOccurs="0" maxOccurs="unbounded">
-            <xsd:element ref="mule:abstract-property-extractor"/>
-        </xsd:choice>
-    </xsd:complexType>
+    <!--<xsd:complexType name="extractorsType">-->
+        <!--<xsd:choice minOccurs="0" maxOccurs="unbounded">-->
+            <!--<xsd:element ref="mule:abstract-property-extractor"/>-->
+        <!--</xsd:choice>-->
+    <!--</xsd:complexType>-->
 
-    <xsd:element name="now-property-extractor"
-                 type="mule:abstractPropertyExtractorType"
-                 substitutionGroup="mule:abstract-property-extractor"/>
+    <!--<xsd:element name="now-property-extractor"-->
+                 <!--type="mule:abstractPropertyExtractorType"-->
+                 <!--substitutionGroup="mule:abstract-property-extractor"/>-->
 
 </xsd:schema>

@@ -42,11 +42,6 @@ public class RmiMessageAdapter extends AbstractMessageAdapter
         message = template.message;
     }
 
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-        return convertToBytes(getPayload());
-    }
-
     /**
      * Converts the message implementation into a String representation
      * 

@@ -11,7 +11,7 @@
 package org.mule.umo.model;
 
 import org.mule.impl.ManagementContextAware;
-import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.NamedObject;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 
@@ -22,26 +22,8 @@ import java.beans.ExceptionListener;
  * Mule Server instance. It is responsible for maintaining the UMOs instances and
  * their configuration.
  */
-public interface UMOModel extends Lifecycle, Initialisable, ManagementContextAware
+public interface UMOModel extends Lifecycle, ManagementContextAware, NamedObject
 {
-    /**
-     * Sets the model's name. It is poosible to configure more than one model in a
-     * config file. The name can then be used to reference the Model use when
-     * starting the server
-     *
-     * @param name the model's name
-     */
-    void setName(String name);
-
-    /**
-     * The model's name. It is poosible to configure more than one model in a config
-     * file. The name can then be used to reference the Model use when starting the
-     * server
-     *
-     * @return the model's name
-     */
-    String getName();
-
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model

@@ -14,6 +14,7 @@ import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ThreadSafeAccess;
 import org.mule.umo.MessagingException;
+import org.mule.util.IOUtils;
 
 import java.io.File;
 
@@ -30,36 +31,38 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
      */
     private static final long serialVersionUID = 7368719494535568721L;
 
+    private byte[] contents = null;
+
     public FileContentsMessageAdapter(Object message) throws MessagingException
     {
         super(message);
+        this.getPayload();
     }
 
     public FileContentsMessageAdapter(FileContentsMessageAdapter template)
     {
         super(template);
-    }
-    
-    protected void setMessage(File message) throws MessagingException
-    {
-        super.setMessage(message);
-        // force reading of file (lazy loading would be really, really complicated)
+        contents = template.contents;
         this.getPayload();
     }
 
     public Object getPayload()
     {
-        synchronized (this)
+        if(contents==null)
         {
-            try
+            synchronized (this)
             {
-                return this.getPayloadAsBytes();
-            }
-            catch (Exception noPayloadException)
-            {
-                throw new MuleRuntimeException(CoreMessages.failedToReadPayload(), noPayloadException);
+                try
+                {
+                    contents = IOUtils.toByteArray(payload);
+                }
+                catch (Exception noPayloadException)
+                {
+                    throw new MuleRuntimeException(CoreMessages.failedToReadPayload(), noPayloadException);
+                }
             }
         }
+        return contents;
     }
     
     public ThreadSafeAccess newThreadCopy()

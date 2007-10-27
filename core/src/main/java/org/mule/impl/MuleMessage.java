@@ -11,14 +11,29 @@
 package org.mule.impl;
 
 import org.mule.MuleRuntimeException;
+import org.mule.RegistryContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.DefaultMessageAdapter;
+import org.mule.providers.NullPayload;
+import org.mule.transformers.TransformerUtils;
+import org.mule.transformers.simple.ObjectToByteArray;
+import org.mule.transformers.simple.ObjectToString;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.PropertyScope;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.provider.UMOMutableMessageAdapter;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.DebugOptions;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
+import java.io.InputStream;
+import java.lang.reflect.Proxy;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,16 +49,21 @@ import org.apache.commons.logging.LogFactory;
 
 public class MuleMessage implements UMOMessage, ThreadSafeAccess
 {
-    /**
-     * Serial version
-     */
+    /** Serial version */
     private static final long serialVersionUID = 1541720810851984842L;
 
     private static Log logger = LogFactory.getLog(MuleMessage.class);
 
     private UMOMessageAdapter adapter;
 
-    protected UMOExceptionPayload exceptionPayload;
+    private UMOMessageAdapter originalAdapter = null;
+
+    private transient List previousTransformHashCode = new CopyOnWriteArrayList();
+
+    private transient ObjectToString objectToString = new ObjectToString();
+    private transient ObjectToByteArray objectToByteArray = new ObjectToByteArray();
+
+    private byte[] cache;
 
     public MuleMessage(Object message)
     {
@@ -64,11 +84,13 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
         resetAccessControl();
     }
 
+
     public MuleMessage(Object message, UMOMessageAdapter previous)
     {
         if (message instanceof UMOMessageAdapter)
         {
             adapter = (UMOMessageAdapter) message;
+            ((ThreadSafeAccess)adapter).resetAccessControl();
         }
         else
         {
@@ -101,351 +123,582 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
         resetAccessControl();
     }
 
+    /** {@inheritDoc} */
+    public Object getPayload(Class outputType) throws TransformerException
+    {
+        return getPayload(outputType, getEncoding());
+    }
+
+    /**
+     * Will attempt to obtain the payload of this message with the desired Class type. This will
+     * try and resolve a trnsformr that can do this transformation. If a transformer cannot be found
+     * an exception is thrown.  Any transfromers added to the reqgistry will be checked for compatability
+     *
+     * @param outputType the desired return type
+     * @param encoding   the encoding to use if required
+     * @return The converted payload of this message. Note that this method will not alter the payload of this
+     *         message *unless* the payload is an inputstream in which case the stream will be read and the payload will become
+     *         the fully read stream.
+     * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the
+     *                              payload
+     */
+    protected Object getPayload(Class outputType, String encoding) throws TransformerException
+    {
+        //Handle null by ignoring the request
+        if (outputType == null)
+        {
+            return getPayload();
+        }
+
+        Class inputCls = getPayload().getClass();
+
+        //Special case where proxies are used for testing
+        if (Proxy.isProxyClass(inputCls))
+        {
+            inputCls = inputCls.getInterfaces()[0];
+        }
+
+        //If no conversion is necessary, just return the payload as-is
+        if (outputType.isAssignableFrom(inputCls))
+        {
+            return getPayload();
+        }
+        //Grab a list of transformers that batch out input/output requirements
+        List transformers = RegistryContext.getRegistry().lookupTransformers(inputCls, outputType);
+
+        //The transformer to execute on this message
+        UMOTransformer transformer = null;
+
+        //If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
+        //byte[]
+        UMOTransformer secondPass = null;
+
+        if (transformers.size() == 0)
+        {
+            //If no transformers were found but the output type is String or byte[] we can perform a more general search
+            // using Object.class and then convert to String or byte[] using the second pass transformer
+            if (outputType.equals(String.class))
+            {
+                //TODO encoding
+                secondPass = objectToString;
+            }
+            else if (outputType.equals(byte[].class))
+            {
+                //TODO encoding
+                secondPass = objectToByteArray;
+            }
+            else
+            {
+                throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputCls, outputType));
+            }
+            //Perform a more general search
+            transformers = RegistryContext.getRegistry().lookupTransformers(inputCls, Object.class);
+        }
+
+        //Still no transformers found
+        if (transformers.size() == 0)
+        {
+            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputCls, outputType));
+
+        }
+        //Exact match
+        else if (transformers.size() == 1)
+        {
+            transformer = (UMOTransformer) transformers.get(0);
+        }
+        else
+        {
+            //We have more than one match. Next we go through the list and perform additionl checks
+            for (Iterator iterator = transformers.iterator(); iterator.hasNext();)
+            {
+                //fallack to the first in the list
+                transformer = (UMOTransformer) transformers.get(0);
+                UMOTransformer umoTransformer = (UMOTransformer) iterator.next();
+                //Does the transformer live in the same module as the Message adapter wrapped by this message?
+                //If so, that transformer should be used
+                if (umoTransformer.getClass().getPackage().getName().startsWith(adapter.getClass().getPackage().getName()))
+                {
+                    transformer = umoTransformer;
+                    //Do we have an exact type match? If so, we can stop going through the list
+                    //TODO not sure this check is required
+                    if (outputType.equals(umoTransformer.getReturnClass()))
+                    {
+                        //If this is an exact match then break
+                        break;
+                    }
+                }
+            }
+            //Default to the first transformer if there is no specific match. This might cause problems
+            if (transformer == null)
+            {
+                transformer = (UMOTransformer) transformers.get(0);
+                logger.warn("No exact match transformer was found to convert from: " + inputCls + " to " + outputType + ". Defaulting to: " + transformer);
+            }
+        }
+
+        // Pass in the adapter itself, so we respect the encoding
+        Object result = transformer.transform(this);
+
+        //If a second pass is required, run it straight after
+        if (secondPass != null)
+        {
+            result = secondPass.transform(result);
+        }
+        //TODO Unless we disallow Object.class as a valid return type we need to do this extra check
+        if (!outputType.isAssignableFrom(result.getClass()))
+        {
+            throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(outputType.getName(), result.getClass()));
+        }
+        //If the payload is a stream and we've consumed it, then we should
+        //set the payload on the message
+        //This is the only time this method will alter the payload on the message
+        if (isPayloadConsumed(inputCls))
+        {
+            setPayload(result);
+        }
+
+        return result;
+    }
+
+    /**
+     * Checks if the payload has been consumed for this message. This only applies to Streaming payload types
+     * since once the stream has been read, the payload of the message should be updated to represent the data read
+     * from the stream
+     *
+     * @param inputCls the input type of the message payload
+     * @return true if the payload message type was stream-based, false otherwise
+     */
+    protected boolean isPayloadConsumed(Class inputCls)
+    {
+        return InputStream.class.isAssignableFrom(inputCls);
+    }
+
+    /** {@inheritDoc} */
     public UMOMessageAdapter getAdapter()
     {
         return adapter;
     }
 
-    /**
-     * Gets a property of the payload implementation
-     * 
-     * @param key the key on which to lookup the property value
-     * @return the property value or null if the property does not exist
-     */
+    /** {@inheritDoc} */
+    public Object getOrginalPayload()
+    {
+        return (originalAdapter == null ? adapter.getPayload() : originalAdapter.getPayload());
+    }
+
+    /** {@inheritDoc} */
+    public UMOMessageAdapter getOriginalAdapter()
+    {
+        return (originalAdapter == null ? adapter : originalAdapter);
+    }
+
+    /** {@inheritDoc} */
+    public void setProperty(String key, Object value, PropertyScope scope)
+    {
+        adapter.setProperty(key, value, scope);
+    }
+   
+
+    /** {@inheritDoc} */
     public Object getProperty(String key)
     {
         return adapter.getProperty(key);
     }
 
+    /** {@inheritDoc} */
     public Object removeProperty(String key)
     {
         return adapter.removeProperty(key);
     }
 
-    /**
-     * Gets a property of the payload implementation
-     * 
-     * @param key the key on which to associate the value
-     * @param value the property value
-     */
+    /** {@inheritDoc} */
     public void setProperty(String key, Object value)
     {
         adapter.setProperty(key, value);
     }
-
-    /**
-     * Converts the payload implementation into a String representation
-     * 
-     * @return String representation of the payload
-     * @throws Exception Implemetation may throw an endpoint specific exception
-     */
-    public String getPayloadAsString() throws Exception
+    
+    /** {@inheritDoc} */
+    public final String getPayloadAsString() throws Exception
     {
-        return adapter.getPayloadAsString();
+        assertAccess(READ);
+        return getPayloadAsString(getEncoding());
     }
 
-    /**
-     * Converts the message implementation into a String representation
-     * 
-     * @param encoding The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte array
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     */
+    /** {@inheritDoc} */
+    public byte[] getPayloadAsBytes() throws Exception
+    {
+        assertAccess(READ);
+        if(cache!=null)
+        {
+            return cache;
+        }
+        byte[] result = (byte[]) getPayload(byte[].class);
+        if(DebugOptions.isCacheMessageAsBytes())
+        {
+            cache = result;
+        }
+        return result;
+    }
+
+    /** {@inheritDoc} */
     public String getPayloadAsString(String encoding) throws Exception
     {
-        if (encoding == null)
+        assertAccess(READ);
+        if(cache!=null)
         {
-            return adapter.getPayloadAsString();
+            return new String(cache, encoding);
         }
-        else
+        String result = (String) getPayload(String.class);
+        if(DebugOptions.isCacheMessageAsBytes())
         {
-            return adapter.getPayloadAsString(encoding);
+            cache = result.getBytes(encoding);
         }
+        return result;
     }
 
-    /**
-     * @return all properties on this payload
-     */
+    /** {@inheritDoc} */
     public Set getPropertyNames()
     {
         return adapter.getPropertyNames();
     }
 
-    /**
-     * Converts the payload implementation into a String representation
-     * 
-     * @return String representation of the payload
-     * @throws Exception Implemetation may throw an endpoint specific exception
-     */
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-        return adapter.getPayloadAsBytes();
-    }
-
-    /**
-     * @return the current payload
-     */
-    public Object getPayload()
-    {
-        return adapter.getPayload();
-    }
-
-    public void addProperties(Map properties)
-    {
-        adapter.addProperties(properties);
-    }
-
-    public void clearProperties()
-    {
-        adapter.clearProperties();
-    }
-
-    /**
-     * Gets a double property from the event
-     * 
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     */
+    //** {@inheritDoc} */
     public double getDoubleProperty(String name, double defaultValue)
     {
         return adapter.getDoubleProperty(name, defaultValue);
     }
 
-    /**
-     * Sets a double property on the event
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
+    /** {@inheritDoc} */
     public void setDoubleProperty(String name, double value)
     {
         adapter.setDoubleProperty(name, value);
     }
 
+    /** {@inheritDoc} */
     public String getUniqueId()
     {
         return adapter.getUniqueId();
     }
 
+    /** {@inheritDoc} */
     public Object getProperty(String name, Object defaultValue)
     {
         return adapter.getProperty(name, defaultValue);
     }
 
+    /** {@inheritDoc} */
     public int getIntProperty(String name, int defaultValue)
     {
         return adapter.getIntProperty(name, defaultValue);
     }
 
+    /** {@inheritDoc} */
     public long getLongProperty(String name, long defaultValue)
     {
         return adapter.getLongProperty(name, defaultValue);
     }
 
+    /** {@inheritDoc} */
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
         return adapter.getBooleanProperty(name, defaultValue);
     }
 
+    /** {@inheritDoc} */
     public void setBooleanProperty(String name, boolean value)
     {
         adapter.setBooleanProperty(name, value);
     }
 
+    /** {@inheritDoc} */
     public void setIntProperty(String name, int value)
     {
         adapter.setIntProperty(name, value);
     }
 
+    /** {@inheritDoc} */
     public void setLongProperty(String name, long value)
     {
         adapter.setLongProperty(name, value);
     }
 
-    /**
-     * Sets a correlationId for this message. The correlation Id can be used by
-     * components in the system to manage message relations <p/> transport protocol.
-     * As such not all messages will support the notion of a correlationId i.e. tcp
-     * or file. In this situation the correlation Id is set as a property of the
-     * message where it's up to developer to keep the association with the message.
-     * For example if the message is serialised to xml the correlationId will be
-     * available in the message.
-     * 
-     * @param id the Id reference for this relationship
-     */
+    /** {@inheritDoc} */
     public void setCorrelationId(String id)
     {
         adapter.setCorrelationId(id);
     }
 
-    /**
-     * Sets a correlationId for this message. The correlation Id can be used by
-     * components in the system to manage message relations. <p/> The correlationId
-     * is associated with the message using the underlying transport protocol. As
-     * such not all messages will support the notion of a correlationId i.e. tcp or
-     * file. In this situation the correlation Id is set as a property of the message
-     * where it's up to developer to keep the association with the message. For
-     * example if the message is serialised to xml the correlationId will be
-     * available in the message.
-     * 
-     * @return the correlationId for this message or null if one hasn't been set
-     */
+    /** {@inheritDoc} */
     public String getCorrelationId()
     {
         return adapter.getCorrelationId();
     }
 
-    /**
-     * Sets a replyTo address for this message. This is useful in an asynchronous
-     * environment where the caller doesn't wait for a response and the response
-     * needs to be routed somewhere for further processing. The value of this field
-     * can be any valid endpointUri url.
-     * 
-     * @param replyTo the endpointUri url to reply to
-     */
+    /** {@inheritDoc} */
     public void setReplyTo(Object replyTo)
     {
         adapter.setReplyTo(replyTo);
     }
 
-    /**
-     * Sets a replyTo address for this message. This is useful in an asynchronous
-     * environment where the caller doesn't wait for a response and the response
-     * needs to be routed somewhere for further processing. The value of this field
-     * can be any valid endpointUri url.
-     * 
-     * @return the endpointUri url to reply to or null if one has not been set
-     */
+    /** {@inheritDoc} */
     public Object getReplyTo()
     {
         return adapter.getReplyTo();
     }
 
-    /**
-     * Gets the sequence or ordering number for this message in the the correlation
-     * group (as defined by the correlationId)
-     * 
-     * @return the sequence number or -1 if the sequence is not important
-     */
+    /** {@inheritDoc} */
     public int getCorrelationSequence()
     {
         return adapter.getCorrelationSequence();
     }
 
-    /**
-     * Gets the sequence or ordering number for this message in the the correlation
-     * group (as defined by the correlationId)
-     * 
-     * @param sequence the sequence number or -1 if the sequence is not important
-     */
+    /** {@inheritDoc} */
     public void setCorrelationSequence(int sequence)
     {
         adapter.setCorrelationSequence(sequence);
     }
 
-    /**
-     * Determines how many messages are in the correlation group
-     * 
-     * @return total messages in this group or -1 if the size is not known
-     */
+    /** {@inheritDoc} */
     public int getCorrelationGroupSize()
     {
         return adapter.getCorrelationGroupSize();
     }
 
-    /**
-     * Determines how many messages are in the correlation group
-     * 
-     * @param size the total messages in this group or -1 if the size is not known
-     */
+    //** {@inheritDoc} */
     public void setCorrelationGroupSize(int size)
     {
         adapter.setCorrelationGroupSize(size);
     }
 
+    /** {@inheritDoc} */
     public UMOExceptionPayload getExceptionPayload()
     {
-        return exceptionPayload;
+        return adapter.getExceptionPayload();
     }
 
+    /** {@inheritDoc} */
     public void setExceptionPayload(UMOExceptionPayload exceptionPayload)
     {
-        this.exceptionPayload = exceptionPayload;
+        adapter.setExceptionPayload(exceptionPayload);
     }
 
+    /** {@inheritDoc} */
     public String toString()
     {
         return adapter.toString();
     }
 
+    /** {@inheritDoc} */
     public void addAttachment(String name, DataHandler dataHandler) throws Exception
     {
         adapter.addAttachment(name, dataHandler);
     }
 
+    /** {@inheritDoc} */
     public void removeAttachment(String name) throws Exception
     {
         adapter.removeAttachment(name);
     }
 
+    /** {@inheritDoc} */
     public DataHandler getAttachment(String name)
     {
         return adapter.getAttachment(name);
     }
 
+    /** {@inheritDoc} */
     public Set getAttachmentNames()
     {
         return adapter.getAttachmentNames();
     }
 
-    /**
-     * Gets the encoding for the current message. For potocols that send encoding
-     * Information with the message, this method should be overriden to expose the
-     * transport encoding, otherwise the default encoding in the Mule configuration
-     * will be used
-     * 
-     * @return the encoding for this message. This method must never return null
-     */
+    /** {@inheritDoc} */
     public String getEncoding()
     {
         return adapter.getEncoding();
     }
 
-    /**
-     * Sets the encoding for this message
-     * 
-     * @param encoding the encoding to use
-     */
+    /** {@inheritDoc} */
     public void setEncoding(String encoding)
     {
         adapter.setEncoding(encoding);
     }
 
-    /**
-     * Gets a String property from the event
-     * 
-     * @param name the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
-     * @return the property value or the defaultValue if the property does not exist
-     */
+    /** {@inheritDoc} */
     public String getStringProperty(String name, String defaultValue)
     {
         return adapter.getStringProperty(name, defaultValue);
     }
 
-    /**
-     * Sets a String property on the event
-     * 
-     * @param name the property name or key
-     * @param value the property value
-     */
+    /** {@inheritDoc} */
     public void setStringProperty(String name, String value)
     {
         adapter.setStringProperty(name, value);
     }
 
+
+    /** {@inheritDoc} */
+    public void addProperties(Map properties)
+    {
+        adapter.addProperties(properties);
+    }
+
+    /** {@inheritDoc} */
+    public void clearProperties()
+    {
+        adapter.clearProperties();
+    }
+
+    /** {@inheritDoc} */
+    public Object getPayload()
+    {
+        return adapter.getPayload();
+    }
+
+    /** {@inheritDoc} */
+    public synchronized void setPayload(Object payload)
+    {
+        //TODO we may want to enforce stricter rules here, rather than silently wrapping the existing adapter
+        if(!(adapter instanceof UMOMutableMessageAdapter))
+        {
+            adapter = new DefaultMessageAdapter(payload, adapter);
+        }
+        else
+        {
+            ((UMOMutableMessageAdapter)adapter).setPayload(payload);
+        }
+        cache = null;
+    }
+
+    /** {@inheritDoc} */
+    public void release()
+    {
+        adapter.release();
+        if(originalAdapter!=null)
+        {
+            originalAdapter.release();
+        }
+        cache = null;
+    }
+
+    public void applyTransformer(UMOTransformer transformer) throws TransformerException
+    {
+        if(transformer!=null &&! (transformer instanceof VoidTransformer))
+        {
+            setPayload(transformer.transform(this));
+        }
+
+    }
+
+    /** {@inheritDoc} */
+    public void applyTransformers(List transformers) throws TransformerException
+    {
+        applyTransformers(transformers, null);
+    }
+
+    /** {@inheritDoc} */
+    //TODO RM*: I don't like having to treat transformers differently if there is a collection of them
+    public void applyTransformers(List transformers, Class outputType) throws TransformerException
+    {
+        if (TransformerUtils.isUndefined(transformers) || transformers.size() == 0)
+        {
+            if (outputType != null)
+            {
+                Object object = getPayload(outputType);
+                setPayload(object);
+                return;
+            }
+            return;
+        }
+
+        Object transformedMessage = null;
+        //If we have already performed the same transform do not do it again.  Trigger this by setting the
+        //transformers to null and the transformedPAyload to the current payload.
+        //This will still allow use to perform any further transformation based on the required
+        //outputType (if it is set)
+        if (previousTransformHashCode.contains(new Integer(transformers.hashCode())))
+        {
+            transformers = null;
+            transformedMessage = getPayload();
+        }
+
+
+        if (null != transformers)
+        {
+            applyAllTransformers(transformers);
+            transformedMessage = getPayload(outputType);
+            previousTransformHashCode.add(new Integer(transformers.hashCode()));
+        }
+        else if (outputType != null && !transformedMessage.getClass().isAssignableFrom(outputType))
+        {
+            transformedMessage = getPayload(outputType);
+        }
+        if (transformedMessage != null)
+        {
+            setPayload(transformedMessage);
+        }
+
+    }
+
+    protected void applyAllTransformers(List transformers) throws TransformerException
+    {
+        // no transformer, so do nothing.
+        if (TransformerUtils.isUndefined(transformers) || 0 == transformers.size())
+        {
+            return;
+        }
+
+        Iterator iterator = transformers.iterator();
+        while (iterator.hasNext())
+        {
+            UMOTransformer transformer = (UMOTransformer) iterator.next();
+
+            if (getPayload() == null)
+            {
+                if (transformer.isAcceptNull())
+                {
+                    setPayload(NullPayload.getInstance());
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            Class srcCls = getPayload().getClass();
+            if (transformer.isSourceTypeSupported(srcCls))
+            {
+                Object result = transformer.transform(this);
+
+                if (originalAdapter == null && DebugOptions.isCacheMessageOriginalPayload())
+                {
+                    originalAdapter = adapter;
+                }
+                //TODO RM*: Must make sure this works for all scenarios
+                if (result instanceof UMOMessage)
+                {
+                    synchronized (adapter)
+                    {
+                        this.adapter = ((UMOMessage) result).getAdapter();
+                    }
+                    return;
+                }
+                setPayload(result);
+            }
+            else if (!transformer.isIgnoreBadInput())
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Transformer: " + iterator + " doesn't support the result payload: "
+                            + getPayload().getClass());
+                }
+                break;
+            }
+        }
+    }
+
+
+    //////////////////////////////// ThreadSafeAccess Impl ///////////////////////////////
+    /** {@inheritDoc} */
     public ThreadSafeAccess newThreadCopy()
     {
         if (adapter instanceof ThreadSafeAccess)
@@ -460,6 +713,7 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
         }
     }
 
+    /** {@inheritDoc} */
     public void resetAccessControl()
     {
         if (adapter instanceof AbstractMessageAdapter)
@@ -468,6 +722,7 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
         }
     }
 
+    /** {@inheritDoc} */
     public void assertAccess(boolean write)
     {
         if (adapter instanceof AbstractMessageAdapter)
@@ -476,4 +731,8 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
         }
     }
 
+    protected void finalize() throws Throwable
+    {
+        release();
+    }
 }

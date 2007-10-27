@@ -10,13 +10,13 @@
 
 package org.mule.providers.email.transformers;
 
+import org.mule.RegistryContext;
 import org.mule.providers.email.MailProperties;
 import org.mule.providers.email.MailUtils;
 import org.mule.providers.email.SmtpConnector;
 import org.mule.registry.RegistrationException;
-import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.MapUtils;
@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  * using the String as the contents. This implementation uses properties on the
  * transformer to determine the To: and Subject: fields.
  */
-public class StringToEmailMessage extends AbstractEventAwareTransformer
+public class StringToEmailMessage extends AbstractMessageAwareTransformer
 {
     /**
      * logger used by this class
@@ -54,27 +54,22 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         this.setReturnClass(Message.class);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
-     */
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+
+    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
     {
         String endpointAddress = endpoint.getEndpointURI().getAddress();
         SmtpConnector connector = (SmtpConnector) endpoint.getConnector();
-        UMOMessage eventMsg = context.getMessage();
-        String to = eventMsg.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
-        String cc = eventMsg.getStringProperty(MailProperties.CC_ADDRESSES_PROPERTY,
+        String to = message.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
+        String cc = message.getStringProperty(MailProperties.CC_ADDRESSES_PROPERTY,
             connector.getCcAddresses());
-        String bcc = eventMsg.getStringProperty(MailProperties.BCC_ADDRESSES_PROPERTY,
+        String bcc = message.getStringProperty(MailProperties.BCC_ADDRESSES_PROPERTY,
             connector.getBccAddresses());
-        String from = eventMsg.getStringProperty(MailProperties.FROM_ADDRESS_PROPERTY,
+        String from = message.getStringProperty(MailProperties.FROM_ADDRESS_PROPERTY,
             connector.getFromAddress());
-        String replyTo = eventMsg.getStringProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY,
+        String replyTo = message.getStringProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY,
             connector.getReplyToAddresses());
-        String subject = eventMsg.getStringProperty(MailProperties.SUBJECT_PROPERTY, connector.getSubject());
-        String contentType = eventMsg.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY,
+        String subject = message.getStringProperty(MailProperties.SUBJECT_PROPERTY, connector.getSubject());
+        String contentType = message.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY,
             connector.getContentType());
 
         Properties headers = new Properties();
@@ -85,29 +80,24 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             headers.putAll(customHeaders);
         }
 
-        Properties otherHeaders = (Properties) eventMsg.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
+        Properties otherHeaders = (Properties) message.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
         if (otherHeaders != null && !otherHeaders.isEmpty())
         {
-            try
-            {
-                final UMOManagementContext mc = context.getManagementContext();
-                for (Iterator iterator = eventMsg.getPropertyNames().iterator(); iterator.hasNext();)
-                {
-                    String propertyKey = (String) iterator.next();
-                    mc.getRegistry().registerObject(propertyKey, eventMsg.getProperty(propertyKey), mc);
-                }
+                //TODO Whats going on here?
+//                final UMOManagementContext mc = context.getManagementContext();
+//                for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
+//                {
+//                    String propertyKey = (String) iterator.next();
+//                    mc.getRegistry().registerObject(propertyKey, message.getProperty(propertyKey), mc);
+//                }
                 headers.putAll(templateParser.parse(new TemplateParser.TemplateCallback()
                 {
                     public Object match(String token)
                     {
-                        return mc.getRegistry().lookupObject(token);
+                        return RegistryContext.getRegistry().lookupObject(token);
                     }
                 }, otherHeaders));
-            }
-            catch (RegistrationException e)
-            {
-                throw new TransformerException(this, e);
-            }
+
         }
 
         if (logger.isDebugEnabled())
@@ -121,7 +111,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             buf.append("Subject: ").append(subject);
             buf.append("ReplyTo: ").append(replyTo);
             buf.append("Content type: ").append(contentType);
-            buf.append("Payload type: ").append(src.getClass().getName());
+            buf.append("Payload type: ").append(message.getPayload().getClass().getName());
             buf.append("Custom Headers: ").append(MapUtils.toString(headers, false));
             logger.debug(buf.toString());
         }
@@ -163,7 +153,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
                 email.setHeader(entry.getKey().toString(), entry.getValue().toString());
             }
 
-            setContent(src, email, contentType, context);
+            setContent(message.getPayload(), email, contentType, message);
 
             return email;
         }
@@ -173,7 +163,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         }
     }
 
-    protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context)
+    protected void setContent(Object payload, Message msg, String contentType, UMOMessage message)
         throws Exception
     {
         msg.setContent(payload, contentType);

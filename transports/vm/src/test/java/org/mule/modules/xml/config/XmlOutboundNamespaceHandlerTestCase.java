@@ -15,7 +15,6 @@ import org.mule.routing.outbound.FilteringXmlMessageSplitter;
 import org.mule.routing.outbound.RoundRobinXmlSplitter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOComponent;
-import org.mule.util.properties.Dom4jPropertyExtractor;
 
 import java.util.List;
 import java.util.Map;
@@ -56,7 +55,6 @@ public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
     {
         assertEquals(correln, splitter.getEnableCorrelation());
         assertEquals("external", splitter.getExternalSchemaLocation());
-        assertTrue(splitter.getPropertyExtractor().getClass().getName(), splitter.getPropertyExtractor() instanceof Dom4jPropertyExtractor);
         assertEquals("/expression", splitter.getSplitExpression());
         assertTrue(splitter.isHonorSynchronicity());
         assertTrue(splitter.isValidateSchema());

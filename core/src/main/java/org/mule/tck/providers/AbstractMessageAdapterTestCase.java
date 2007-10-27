@@ -10,10 +10,11 @@
 
 package org.mule.tck.providers;
 
+import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.MessagingException;
-import org.mule.umo.provider.MessageTypeNotSupportedException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCase
@@ -37,26 +38,17 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
     {
         Object message = getValidMessage();
         UMOMessageAdapter adapter = createAdapter(message);
+        UMOMessage muleMessage = new MuleMessage(adapter);
 
         doTestMessageEqualsPayload(message, adapter.getPayload());
 
-        byte[] bytes = adapter.getPayloadAsBytes();
+        byte[] bytes = muleMessage.getPayloadAsBytes();
         assertNotNull(bytes);
 
-        String stringMessage = adapter.getPayloadAsString();
+        String stringMessage = muleMessage.getPayloadAsString();
         assertNotNull(stringMessage);
 
         assertNotNull(adapter.getPayload());
-
-        try
-        {
-            adapter = createAdapter(getInvalidMessage());
-            fail("Message adapter should throw MessageTypeNotSupportedException if an invalid message is set");
-        }
-        catch (MessageTypeNotSupportedException e)
-        {
-            // expected
-        }
     }
 
     public void testMessageProps() throws Exception

@@ -10,7 +10,7 @@
 
 package org.mule.umo.manager;
 
-import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.NamedObject;
 import org.mule.umo.lifecycle.Lifecycle;
 
 /**
@@ -18,22 +18,8 @@ import org.mule.umo.lifecycle.Lifecycle;
  * destroyed along with the UMOManager itself. Agents can initialise or bind to
  * external services such as a Jmx server.
  */
-public interface UMOAgent extends Lifecycle, Initialisable
+public interface UMOAgent extends Lifecycle, NamedObject
 {
-    /**
-     * Gets the name of this agent
-     * 
-     * @return the agent name
-     */
-    String getName();
-
-    /**
-     * Sets the name of this agent
-     * 
-     * @param name the name of the agent
-     */
-    void setName(String name);
-
     /**
      * Should be a 1 line description of the agent
      * 

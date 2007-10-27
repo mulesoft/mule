@@ -10,13 +10,8 @@
 
 package org.mule.test.spring;
 
-import org.mule.MuleException;
-import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.impl.model.seda.SedaComponent;
-import org.mule.providers.AbstractConnector;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
@@ -28,8 +23,8 @@ import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.properties.JXPathPropertyExtractor;
 import org.mule.util.properties.PropertyExtractor;
+import org.mule.xml.util.properties.JXPathPropertyExtractor;
 
 import java.util.List;
 
@@ -106,43 +101,6 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertTrue(((Apple) obj).isBitten()); 
         assertTrue(((Apple) obj).isWashed()); 
     }
-
-    // no equivalent in 2.x for these
-//    public void testMapPropertyTypesConfig() throws Exception
-//    {
-//        UMODescriptor d = managementContext.getRegistry().lookupService("testPropertiesComponent");
-//        assertNotNull(d);
-//        Map props = (Map)d.getProperties().get("propertiesMap");
-//        assertNotNull(props);
-//        assertNotNull(props.get("factoryObject"));
-//        assertTrue(props.get("factoryObject") instanceof Orange);
-//        assertNotNull(props.get("containerObject"));
-//        assertTrue(props.get("containerObject") instanceof Apple);
-//        assertNull(props.get("doesNotExist"));
-//        assertEquals(System.getProperty("os.version"), props.get("osVersion"));
-//        assertEquals("defaultValue", props.get("notASystemProperty"));
-//        assertEquals("test1", props.get("test1"));
-//        assertEquals("test2", props.get("test2"));
-//    }
-//
-//    public void testListPropertyTypesConfig() throws Exception
-//    {
-//        UMODescriptor d = managementContext.getRegistry().lookupService("testPropertiesComponent");
-//        assertNotNull(d);
-//        List props = (List)d.getProperties().get("propertiesList");
-//        assertNotNull(props);
-//        assertEquals(6, props.size());
-//        assertNotNull(props.get(0));
-//        assertTrue(props.get(0) instanceof Orange);
-//        assertEquals(System.getProperty("os.version"), props.get(1));
-//        assertEquals("defaultValue", props.get(2));
-//        assertEquals("test1", props.get(3));
-//        assertEquals("test2", props.get(4));
-//
-//        // Container properties are added last
-//        assertNotNull(props.get(5));
-//        assertTrue(props.get(5) instanceof Apple);
-//    }
 
     public void testEndpointURIParamsConfig()
     {

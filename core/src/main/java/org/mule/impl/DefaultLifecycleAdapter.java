@@ -14,6 +14,7 @@ import org.mule.MuleException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.nested.NestedInvocationHandler;
+import org.mule.transformers.TransformerTemplate;
 import org.mule.umo.ComponentException;
 import org.mule.umo.Invocation;
 import org.mule.umo.UMOComponent;
@@ -172,7 +173,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
     {
         // Invoke method
         Object result;
-        UMOEvent event = RequestContext.getEvent();   // new copy here?
+        UMOEvent event = RequestContext.getEvent();
 
         try
         {
@@ -197,8 +198,9 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         UMOMessage resultMessage = null;
         if (result instanceof VoidResult)
         {
-            resultMessage = new MuleMessage(event.getTransformedMessage(),
-                    RequestContext.getEventContext().getMessage());
+            //This will rewire the current message
+            event.getTransformedMessage();
+            resultMessage = event.getMessage();
         }
         else if (result != null)
         {
@@ -208,7 +210,10 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             }
             else
             {
-                resultMessage = new MuleMessage(result, event.getMessage());
+                event.getMessage().applyTransformer(
+                        new TransformerTemplate(
+                                new TransformerTemplate.OverwitePayloadCallback(result)));
+                resultMessage = event.getMessage();
             }
         }
         return resultMessage;

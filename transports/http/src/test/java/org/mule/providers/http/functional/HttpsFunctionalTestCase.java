@@ -19,10 +19,10 @@ import org.mule.tck.testmodels.mule.TestSedaComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 {

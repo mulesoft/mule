@@ -14,6 +14,10 @@
     each component communicates messaging according to its configuration in this file.
     </description>
 
+    <!--<configuration serverId="loanbroker">-->
+        <!--<default-threading-profile maxThreadsActive="1" maxThreadsIdle="1" maxBufferSize="0"/>-->
+    <!--</configuration>-->
+
     <!-- Synchronous VM connector (messages are processed in the same execution thread) -->
     <vm:connector name="syncVm"/>
 

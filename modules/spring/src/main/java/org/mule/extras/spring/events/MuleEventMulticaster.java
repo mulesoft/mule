@@ -46,15 +46,15 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.SimpleObjectFactory;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -507,11 +507,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     // transform if necessary
                     if (endpoint.getTransformers() != null)
                     {
-                        message = new MuleMessage(
-                                TransformerUtils.applyAllTransformersToObject(
-                                        endpoint.getTransformers(),
-                                        applicationEvent.getSource()),
-                                applicationEvent.getProperties());
+                        message = new MuleMessage(applicationEvent.getSource(), applicationEvent.getProperties());
+                        message.applyTransformers(endpoint.getTransformers());
                     }
                     endpoint.dispatch(new MuleEvent(message, endpoint, session, false));
                 }

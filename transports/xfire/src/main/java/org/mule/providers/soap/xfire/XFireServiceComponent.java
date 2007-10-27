@@ -16,24 +16,16 @@ import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.xfire.transport.MuleLocalChannel;
-import org.mule.providers.streaming.OutStreamMessageAdapter;
-import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.provider.UMOStreamMessageAdapter;
 import org.mule.util.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
-
-import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
@@ -50,7 +42,7 @@ import org.codehaus.xfire.transport.http.HtmlServiceWriter;
  * marshalls requests and responses
  * 
  */
-public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
+public class XFireServiceComponent implements Callable, Lifecycle
 {
 
     /**
@@ -80,13 +72,18 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         }
 
         boolean wsdlRequested = false;
-        
+        boolean servicesRequested = false;
+
         //if http request
         String request = eventContext.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY,
             StringUtils.EMPTY);
         if (request.toLowerCase().endsWith(org.mule.providers.soap.SoapConstants.WSDL_PROPERTY))
         {
             wsdlRequested = true;
+        }
+        else if (request.toLowerCase().endsWith(org.mule.providers.soap.SoapConstants.LIST_PROPERTY))
+        {
+            servicesRequested = true;
         }
         else //if servlet request
         {
@@ -103,6 +100,17 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             getXfire().generateWSDL(getServiceName(eventContext), out);
+            UMOMessage result = new MuleMessage(out.toString(eventContext.getEncoding()));
+            result.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+            return result;
+        }
+        else if(servicesRequested)
+        {
+            // In order to list all services we need to pass in a HttpServletRequest to the write, which we don't have
+            //So we can just list the current service
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            HtmlServiceWriter writer = new HtmlServiceWriter();
+            writer.write(out, getServiceRegistry().getService(getServiceName(eventContext)));
             UMOMessage result = new MuleMessage(out.toString(eventContext.getEncoding()));
             result.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
             return result;
@@ -149,26 +157,6 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
         return getXfire().getTransportManager();
     }
 
-    protected void generateServiceX(OutStreamMessageAdapter response, String serviceName)
-        throws IOException, XMLStreamException
-    {
-        response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
-        Service endpoint = getServiceRegistry().getService(serviceName);
-        HtmlServiceWriter writer = new HtmlServiceWriter();
-        writer.write(response.getStream(), endpoint);
-    }
-
-    /**
-     * @param response
-     */
-    protected void generateServicesX(OutStreamMessageAdapter response) throws IOException, XMLStreamException
-    {
-        response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
-
-        HtmlServiceWriter writer = new HtmlServiceWriter();
-        writer.write(response.getStream(), getServiceRegistry().getServices());
-    }
-
     /**
      * Gets the stream representation of the current message. If the message is set
      * for streaming the input stream on the UMOStreamMEssageAdapter will be used,
@@ -179,27 +167,9 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
      * @return The inputstream for the current message
      * @throws UMOException
      */
-
     protected InputStream getMessageStream(UMOEventContext context) throws UMOException
     {
-        InputStream is;
-        UMOMessage eventMsg = context.getMessage();
-        Object eventMsgPayload = eventMsg.getPayload();
-
-        if (eventMsgPayload instanceof InputStream)
-        {
-            is = (InputStream)eventMsgPayload;
-        }
-        else if (eventMsg.getAdapter() instanceof UMOStreamMessageAdapter)
-        {
-            StreamMessageAdapter sma = (StreamMessageAdapter)eventMsg.getAdapter();
-            is = sma.getInputStream();
-        }
-        else
-        {
-            is = new ByteArrayInputStream(context.getTransformedMessageAsBytes());
-        }
-        return is;
+        return (InputStream) context.getMessage().getPayload(InputStream.class);
     }
 
     /**

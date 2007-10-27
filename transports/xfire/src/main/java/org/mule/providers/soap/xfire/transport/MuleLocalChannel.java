@@ -30,10 +30,12 @@ import java.io.UnsupportedEncodingException;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -357,7 +359,7 @@ public class MuleLocalChannel extends AbstractChannel
             XMLStreamReader reader;
 
             // TODO isStreaming()?
-            Object payload = ctx.getMessage().getPayload();
+            Object payload = ctx.getTransformedMessage();
             if (payload instanceof InputStream)
             {
                 reader = STAXUtils.createXMLStreamReader((InputStream)payload, ctx.getEncoding(), context);
@@ -377,13 +379,13 @@ public class MuleLocalChannel extends AbstractChannel
             String soapAction = getSoapAction(ctx.getMessage());
             in.setProperty(SoapConstants.SOAP_ACTION, soapAction);
 
-            receive(context, in);
-
-            Object result = null;
-
             try
             {
                 // We need to check if there is a fault message. If that's the case,
+                receive(context, in);
+
+                Object result = null;
+
                 // we need to send back the fault to the client.
                 // TODO: see MULE-1113 for background about this workaround; I'm not
                 // even sure the fault reading is done correctly? (XFire API is a bit
@@ -399,13 +401,27 @@ public class MuleLocalChannel extends AbstractChannel
                 {
                     result = resultStream.toString(context.getExchange().getOutMessage().getEncoding());
                 }
+                
+                return result;
             }
             catch (UnsupportedEncodingException e1)
             {
                 throw new MuleException(e1);
             }
-
-            return result;
+            finally
+            {
+                if (reader != null)
+                {
+                    try
+                    {
+                        reader.close();
+                    }
+                    catch (XMLStreamException e)
+                    {
+                        logger.warn("Could not close XMLStreamReader.", e);
+                    }
+                }
+            }
 
         }
         catch (UMOException e)

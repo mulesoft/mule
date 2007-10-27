@@ -13,6 +13,8 @@ package org.mule.providers.jms.transformers;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassUtils;
 
+import javax.jms.Message;
+
 /**
  * <code>ObjectToJMSMessage</code> will convert any object to a
  * <code>javax.jms.Message</code> or sub-type into an object. One of the 5 types of
@@ -30,6 +32,11 @@ import org.mule.util.ClassUtils;
 
 public class ObjectToJMSMessage extends AbstractJmsTransformer
 {
+
+    public ObjectToJMSMessage()
+    {
+        setReturnClass(Message.class);
+    }
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {

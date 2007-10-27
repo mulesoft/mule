@@ -1,0 +1,5 @@
+#
+# Test cases listed in this file are not run.
+#
+#MULE-2557
+org.mule.transformers.xml.XmlUMOMessageTransformersTestCase

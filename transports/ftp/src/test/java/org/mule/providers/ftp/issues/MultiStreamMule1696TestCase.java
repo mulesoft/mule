@@ -15,15 +15,13 @@ import org.mule.providers.ftp.AbstractFtpServerTestCase;
 import org.mule.providers.ftp.server.NamedPayload;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
-import org.mule.tck.testmodels.mule.TestStreamingComponent;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
-
-import java.util.HashMap;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
+import java.util.HashMap;
 
 public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
 {
@@ -66,10 +64,9 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOComponent component = managementContext.getRegistry().lookupComponent("testComponent");
-        assertTrue(component instanceof TestStreamingComponent);
-        FunctionalStreamingTestComponent ftc = 
-            (FunctionalStreamingTestComponent) ((TestStreamingComponent) component).getOrCreateService();
+        FunctionalStreamingTestComponent ftc =
+                (FunctionalStreamingTestComponent) lookupComponent("main", "testComponent");
+
         assertNotNull(ftc);
 //        assertEquals(1, ftc.getNumber());
 

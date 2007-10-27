@@ -10,10 +10,10 @@
 
 package org.mule.transformers.simple;
 
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
+import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOHeaderOnlyTransformer;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.Set;
  * The transformer then acts as a more gentle 'enricher'. The default setting is
  * <code>true</code>.
  */
-public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
+public class MessagePropertiesTransformer extends AbstractMessageAwareTransformer implements UMOHeaderOnlyTransformer
 {
     private List deleteProperties = null;
     private Map addProperties = null;
@@ -65,10 +65,8 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
         return clone;
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
     {
-        final UMOMessage message = context.getMessage();
-
         if (deleteProperties != null && deleteProperties.size() > 0)
         {
             for (Iterator iterator = deleteProperties.iterator(); iterator.hasNext();)
@@ -119,7 +117,7 @@ public class MessagePropertiesTransformer extends AbstractEventAwareTransformer
             }
         }
 
-        return src;
+        return message;
     }
 
     public List getDeleteProperties()

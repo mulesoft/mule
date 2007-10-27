@@ -14,24 +14,45 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.NullPayload;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTestCase
 {
-    public static long WAIT_PERIOD = 3000L;
+    public static long WAIT_PERIOD = 5000L;
+
+    private boolean matchSingle = true;
+
+    protected AbstractXmlPropertyExtractorTestCase(boolean matchSingle)
+    {
+        this.matchSingle = matchSingle;
+    }
 
     protected abstract Object getMatchMessage() throws Exception;
 
     protected abstract Object getErrorMessage() throws Exception;
 
-    public void testMatch() throws Exception
+    protected String getConfigResources()
     {
-        MuleClient client = new MuleClient();
-        client.dispatch("in", getMatchMessage(), null);
-        UMOMessage message = client.receive("vm://match?connector=queue", WAIT_PERIOD);
-        assertNotNull(message);
+        return "xml/property-extractor-test.xml";
     }
+
+    public void testMatch() throws Exception
+        {
+            MuleClient client = new MuleClient();
+            client.dispatch("in", getMatchMessage(), null);
+            UMOMessage message = client.receive("vm://match1?connector=queue", WAIT_PERIOD);
+            assertNotNull(message);
+            assertFalse(message.getPayload() instanceof NullPayload);
+            if(!matchSingle)
+            {
+                message = client.receive("vm://match2?connector=queue", WAIT_PERIOD);
+                assertNotNull(message);
+                assertFalse(message.getPayload() instanceof NullPayload);
+            }
+        }
+
 
     public void testError() throws Exception
     {
@@ -39,6 +60,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
         client.dispatch("in", getErrorMessage(), null);
         UMOMessage message = client.receive("vm://error?connector=queue", WAIT_PERIOD);
         assertNotNull(message);
+        assertFalse(message.getPayload() instanceof NullPayload);
     }
     
 }

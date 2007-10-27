@@ -33,6 +33,7 @@ public class TransformerChainMule2063TestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         client.send("vm://" + name + "-in", IN, null);
         UMOMessage message = client.receive("vm://" + name + "-out", WAIT_MS);
+        
         assertNotNull(message);
         assertNotNull(message.getPayloadAsString());
         assertEquals(result, message.getPayloadAsString());

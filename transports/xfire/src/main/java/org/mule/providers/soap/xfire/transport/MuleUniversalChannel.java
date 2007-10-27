@@ -17,22 +17,21 @@ import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
+import org.mule.providers.DefaultMessageAdapter;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.OutputHandler;
-import org.mule.umo.provider.UMOStreamMessageAdapter;
+import org.mule.umo.provider.UMOMessageAdapter;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.mail.MessagingException;
@@ -64,21 +63,22 @@ import org.codehaus.xfire.util.STAXUtils;
  * The MuleUniversalChannel is an XFire Channel implementation that uses
  * a Mule Transport under the covers. It theoretically can use any Mule transport
  * but only transports that support streaming can be used with XFire.
- *
+ * <p/>
  * This channel is used for making Soap requests using XFire, not receiving them.
- *
  */
 public class MuleUniversalChannel extends AbstractChannel
 {
-    /**
-     * logger used by this class
-     */
+    /** logger used by this class */
     protected final transient Log logger = LogFactory.getLog(getClass());
+
+    private UMOManagementContext managementContext;
 
     public MuleUniversalChannel(String uri, Transport transport)
     {
         setTransport(transport);
         setUri(uri);
+        //TODO not keen on this static Access
+        this.managementContext = MuleServer.getManagementContext();
     }
 
     public void open()
@@ -90,11 +90,11 @@ public class MuleUniversalChannel extends AbstractChannel
     {
         if (message.getUri().equals(Channel.BACKCHANNEL_URI))
         {
-            final OutputStream out = (OutputStream)context.getProperty(Channel.BACKCHANNEL_URI);
+            final OutputStream out = (OutputStream) context.getProperty(Channel.BACKCHANNEL_URI);
             if (out != null)
             {
                 final XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message.getEncoding(),
-                    context);
+                        context);
 
                 message.getSerializer().writeMessage(message, writer, context);
             }
@@ -137,7 +137,7 @@ public class MuleUniversalChannel extends AbstractChannel
     }
 
     void writeWithoutAttachments(MessageContext context, OutMessage message, OutputStream out)
-        throws XFireException
+            throws XFireException
     {
         XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message.getEncoding(), context);
 
@@ -219,11 +219,12 @@ public class MuleUniversalChannel extends AbstractChannel
                     else
                     {
                         XMLStreamWriter writer = STAXUtils.createXMLStreamWriter(out, message.getEncoding(),
-                            context);
+                                context);
                         message.getSerializer().writeMessage(message, writer, context);
                         try
                         {
                             writer.flush();
+                            writer.close();
                         }
                         catch (XMLStreamException e)
                         {
@@ -239,55 +240,30 @@ public class MuleUniversalChannel extends AbstractChannel
                 }
             }
 
-            public Map getHeaders(UMOEvent event)
-            {
-                Map headers = new HashMap();
-                headers.put(HttpConstants.HEADER_CONTENT_TYPE, getSoapMimeType(message));
-                headers.put(SoapConstants.SOAP_ACTION, message.getProperty(SoapConstants.SOAP_ACTION));
-                UMOMessage msg = event.getMessage();
-                for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
-                {
-                    String headerName = (String)iterator.next();
-                    Object headerValue = msg.getStringProperty(headerName, null);
-
-                    // let us filter only MULE properties except MULE_USER,
-                    // Content-Type and Content-Lenght; all other properties are
-                    // allowed through including custom headers
-                    if ((!headerName.startsWith(MuleProperties.PROPERTY_PREFIX) || (MuleProperties.MULE_USER_PROPERTY.compareTo(headerName) == 0))
-                        && (!HttpConstants.HEADER_CONTENT_TYPE.equalsIgnoreCase(headerName))
-                        && (!HttpConstants.HEADER_CONTENT_LENGTH.equalsIgnoreCase(headerName)))
-                    {
-                        headers.put(headerName, headerValue);
-                    }
-                }
-
-                return headers;
-            }
         };
 
         // We can create a generic StreamMessageAdapter here as the underlying
         // transport will create one specific to the transport
-        UMOStreamMessageAdapter sp = new StreamMessageAdapter(handler);
+        DefaultMessageAdapter sp = new DefaultMessageAdapter(handler);
         sp.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
+        writeHeaders(message, sp);
 
         // set all properties on the message adapter
         UMOMessage msg = RequestContext.getEvent().getMessage();
         for (Iterator i = msg.getPropertyNames().iterator(); i.hasNext();)
         {
-            String propertyName = (String)i.next();
+            String propertyName = (String) i.next();
             sp.setProperty(propertyName, msg.getProperty(propertyName));
         }
 
-        UMOStreamMessageAdapter result = null;
-
-        try
+        UMOMessage result = send(getUri(), sp);
+        if (result != null)
         {
-            result = sendStream(getUri(), sp);
-            if (result != null)
+            InMessage inMessage;
+            String contentType = sp.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+            InputStream in = (InputStream) result.getPayload(InputStream.class);
+            try
             {
-                InMessage inMessage;
-                String contentType = sp.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
-                InputStream in = result.getInputStream();
                 if (contentType.toLowerCase().indexOf("multipart/related") != -1)
                 {
                     try
@@ -310,13 +286,40 @@ public class MuleUniversalChannel extends AbstractChannel
                 }
                 getEndpoint().onReceive(context, inMessage);
             }
-        }
-        finally
-        {
-            sp.release();
-            if (result != null)
+            finally
             {
-                result.release();
+                try
+                {
+                    in.close();
+                }
+                catch (IOException e)
+                {
+                    logger.warn("Could not close stream.", e);
+                }
+            }
+
+        }
+
+    }
+
+    public void writeHeaders(OutMessage message, UMOMessageAdapter msg)
+    {
+        msg.setProperty(HttpConstants.HEADER_CONTENT_TYPE, getSoapMimeType(message));
+        msg.setProperty(SoapConstants.SOAP_ACTION, message.getProperty(SoapConstants.SOAP_ACTION));
+
+        for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
+        {
+            String headerName = (String) iterator.next();
+            Object headerValue = msg.getStringProperty(headerName, null);
+
+            // let us filter only MULE properties except MULE_USER,
+            // Content-Type and Content-Lenght; all other properties are
+            // allowed through including custom headers
+            if ((!headerName.startsWith(MuleProperties.PROPERTY_PREFIX) || (MuleProperties.MULE_USER_PROPERTY.compareTo(headerName) == 0))
+                    && (!HttpConstants.HEADER_CONTENT_TYPE.equalsIgnoreCase(headerName))
+                    && (!HttpConstants.HEADER_CONTENT_LENGTH.equalsIgnoreCase(headerName)))
+            {
+                msg.setProperty(headerName, headerValue);
             }
         }
     }
@@ -331,29 +334,12 @@ public class MuleUniversalChannel extends AbstractChannel
         return false;
     }
 
-    protected UMOStreamMessageAdapter sendStream(String uri, UMOStreamMessageAdapter sa) throws UMOException
+    protected UMOMessage send(String uri, UMOMessageAdapter adapter) throws UMOException
     {
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        UMOEndpoint ep = (UMOEndpoint) RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri,
-            MuleServer.getManagementContext());
-        ep.setStreaming(true);
-        UMOMessage message = new MuleMessage(sa);
+        UMOImmutableEndpoint ep = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri, managementContext);
+        UMOMessage message = new MuleMessage(adapter);
         UMOEvent event = new MuleEvent(message, ep, RequestContext.getEventContext().getSession(), true);
-        UMOMessage result = ep.send(event);
-        if (result != null)
-        {
-            if (result.getAdapter() instanceof UMOStreamMessageAdapter)
-            {
-                return (UMOStreamMessageAdapter) result.getAdapter();
-            }
-            else
-            {
-                // TODO i18n (though this case should never happen...)
-                throw new IllegalStateException(
-                        "Mismatch of stream states. A stream was used for outbound channel, but a stream was not used for the response");
-            }
-        }
-        return null;
+        return ep.send(event);
     }
 
 }

@@ -3,4 +3,4 @@
 #
 
 # MULE-2510 (intermittent?)
-#org.mule.examples.loanbroker.bpm.JBpmFunctionalTestCase
+org.mule.examples.loanbroker.bpm.JBpmFunctionalTestCase

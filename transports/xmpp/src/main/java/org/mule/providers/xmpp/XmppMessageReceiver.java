@@ -12,7 +12,6 @@ package org.mule.providers.xmpp;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
@@ -22,7 +21,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.transformers.TransformerUtils;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -144,9 +142,8 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
 
                 if (returnMessage != null && packet instanceof Message)
                 {
-                    RequestContext.rewriteEvent(returnMessage);
-                    Packet result = (Packet) TransformerUtils.applyAllTransformers(
-                            connector.getDefaultResponseTransformers(), returnMessage);
+                    returnMessage.applyTransformers(connector.getDefaultResponseTransformers());
+                    Packet result = (Packet) returnMessage.getPayload();
                     xmppConnection.sendPacket(result);
                 }
             }

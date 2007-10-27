@@ -34,11 +34,7 @@ public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
         component.setModel(model);
         managementContext.getRegistry().registerModel(model, managementContext);
         managementContext.getRegistry().registerComponent(component, managementContext);
-
-        managementContext.getRegistry().initialise();
-        component.initialise();
         managementContext.start();
-
 
         final ComponentService service = new ComponentService("TEST_SERVICE");
         final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_SERVICE");

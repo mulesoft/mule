@@ -220,7 +220,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                 List transformers = ((AbstractConnector) endpoint.getConnector()).getDefaultInboundTransformers();
                 if (transformers != null)
                 {
-                    result = TransformerUtils.applyAllTransformers(transformers, result);
+                    result.applyTransformers(transformers);
                 }
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 wireFormat.write(out, result, getEncoding());
@@ -242,12 +242,11 @@ public class MuleManagerComponent implements Callable, Initialisable
     public static final UMOComponent getComponent(UMOEndpointBuilder endpointBuilder,
                                                     WireFormat wireFormat,
                                                     String encoding,
-                                                    int eventTimeout) throws UMOException
+                                                    int eventTimeout,
+                                                    UMOManagementContext managementContext) throws UMOException
     {
         try
         {
-            UMOManagementContext managementContext = MuleServer.getManagementContext();
-
             UMOComponent component = new SedaComponent();
             component.setName(MANAGER_COMPONENT_NAME);
             component.setModel(managementContext.getRegistry().lookupSystemModel());
@@ -259,7 +258,7 @@ public class MuleManagerComponent implements Callable, Initialisable
             component.setServiceFactory(new SimpleObjectFactory(MuleManagerComponent.class, props));
 
             component.setManagementContext(managementContext);
-            component.initialise();
+            //component.initialise();
     
             endpointBuilder.setName(MANAGER_ENDPOINT_NAME);
             UMOImmutableEndpoint endpoint = managementContext.getRegistry()

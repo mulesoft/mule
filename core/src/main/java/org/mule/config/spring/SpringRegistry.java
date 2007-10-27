@@ -9,6 +9,8 @@
  */
 package org.mule.config.spring;
 
+import org.mule.config.MuleConfiguration;
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.container.MultiContainerContext;
@@ -18,14 +20,22 @@ import org.mule.impl.registry.AbstractRegistry;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
+import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.model.UMOModel;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Properties;
+
+import javax.transaction.TransactionManager;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -83,6 +93,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
                         new Throwable().fillInStackTrace());
             return null;
         }
+        
         try
         {
             return applicationContext.getBean(key);
@@ -90,11 +101,6 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         catch (NoSuchBeanDefinitionException e)
         {
             logger.debug(e);
-            return null;
-        }
-        catch (Exception e)
-        {
-            logger.error(e);
             return null;
         }
     }
@@ -137,8 +143,58 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         {
             throw new ServiceException(CoreMessages.failedToLoad(type + " " + name));
         }
-        return ServiceDescriptorFactory.create(type, name, props, overrides, applicationContext);
+        return ServiceDescriptorFactory.create(type, name, props, overrides, this);
     }
+
+    /**
+     * @return the MuleConfiguration for this MuleManager. This object is immutable
+     *         once the manager has initialised.
+     */
+    protected synchronized MuleConfiguration getLocalConfiguration()
+    {
+        return (MuleConfiguration)applicationContext.getBean(MuleProperties.OBJECT_MULE_CONFIGURATION);        
+    }
+
+
+    /** {@inheritDoc} */
+    public TransactionManager getTransactionManager()
+    {
+        Map m = applicationContext.getBeansOfType(TransactionManager.class);
+        if (m.size() > 0)
+        {
+            return (TransactionManager) m.values().iterator().next();
+        }
+        return null;
+    }
+
+    public Collection getModels()
+    {
+        return applicationContext.getBeansOfType(UMOModel.class).values();
+    }
+
+    /** {@inheritDoc} */
+    public Collection getConnectors()
+    {
+        return applicationContext.getBeansOfType(UMOConnector.class).values();
+    }
+
+    public Collection getAgents()
+    {
+        return applicationContext.getBeansOfType(UMOAgent.class).values();
+    }
+
+    /** {@inheritDoc} */
+    public Collection getEndpoints()
+    {
+        return applicationContext.getBeansOfType(UMOImmutableEndpoint.class).values();
+    }
+
+    /** {@inheritDoc} */
+    public Collection getTransformers()
+    {
+        return applicationContext.getBeansOfType(UMOTransformer.class).values();
+    }
+
 
     public boolean isReadOnly()
     {

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule</artifactId>
-        <version>2.0.0-M3-SNAPSHOT</version>
+ <version>2.0.0-M3-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.transports</groupId>
     <artifactId>mule-transports</artifactId>
@@ -38,6 +38,32 @@
         <module>xfire</module>
         <module>xmpp</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <!-- Now that m2 dependency resolution works, activation
+             should ONLY come via core or (in the future) core-api, but there is
+             OF COURSE a bug with m2's handling of provided dependencies:
+             http://jira.codehaus.org/browse/MNG-2205
+        -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 
     <profiles>
         <profile>

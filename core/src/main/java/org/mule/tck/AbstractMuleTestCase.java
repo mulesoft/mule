@@ -30,6 +30,8 @@ import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 import org.mule.util.concurrent.Latch;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -39,17 +41,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
-
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import junit.framework.TestCase;
+import junit.framework.TestResult;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
@@ -204,7 +205,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     /**
      * Shamelessly copy from Spring's ConditionalTestCase so in MULE-2.0 we can extend
      * this class from ConditionalTestCase.
-     * <p/>
+     * 
      * Subclasses can override <code>isDisabledInThisEnvironment</code> to skip a single test.
      */
     public void runBare() throws Throwable
@@ -294,8 +295,6 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         {
             System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + toString(), '=', 80));
         }
-        //MuleManager.getConfiguration().getDefaultThreadingProfile().setDoThreading(false);
-        //MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
 
         try
         {
@@ -316,6 +315,10 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
             managementContext = createManagementContext();
             MuleServer.setManagementContext(managementContext);
+//            if(!managementContext.getRegistry().isInitialised())
+//            {
+//                managementContext.getRegistry().initialise();
+//            }
             if (isStartContext() && managementContext.isStarted() == false)
             {
                 // TODO MULE-1988
@@ -342,7 +345,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         else
         {
             ConfigurationBuilder builder = getBuilder();
-            context = builder.configure(getConfigResources());
+            context = builder.configure(getConfigurationResources(), getStartUpProperties());
         }
         return context;
     }
@@ -355,9 +358,14 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return builder;
     }
 
-    protected String getConfigResources()
+    protected String getConfigurationResources()
     {
-        return "";
+        return StringUtils.EMPTY;
+    }
+
+    protected Properties getStartUpProperties()
+    {
+        return null;
     }
 
     /**
@@ -419,19 +427,23 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         {
             if (managementContext != null && !(managementContext.isDisposed() || managementContext.isDisposing()))
             {
+                managementContext.dispose();
+
                 if (RegistryContext.getRegistry() != null)
                 {
                     final String workingDir = RegistryContext.getConfiguration().getWorkingDirectory();
                     // do not delete TM recovery object store, everything else is good to go
                     FileUtils.deleteTree(FileUtils.newFile(workingDir), IGNORED_DOT_MULE_DIRS);
+
+                    RegistryContext.getRegistry().dispose();
                 }
-                managementContext.dispose();
             }
             FileUtils.deleteTree(FileUtils.newFile("./ActiveMQ"));
         }
         finally
         {
             managementContext = null;
+            RegistryContext.setRegistry(null);
         }
     }
 

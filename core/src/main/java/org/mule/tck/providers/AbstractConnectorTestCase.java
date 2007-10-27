@@ -53,7 +53,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
             fail("You need to set the connector name on the connector before returning it");
         }
         connector.setManagementContext(managementContext);
-        managementContext.applyLifecycle(connector);
         managementContext.getRegistry().registerConnector(connector, managementContext);
     }
 
@@ -148,7 +147,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         assertNotNull(connector);
 
         UMOComponent component = getTestComponent("anApple", Apple.class);
-        managementContext.getRegistry().registerComponent(component, managementContext);
 
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             getTestEndpointURI(), managementContext);

@@ -10,7 +10,7 @@
 
     <model name="main">
         <service name="testComponent">
-            <component class="org.mule.providers.tcp.issues.InputStreamSource"/>
+            <singleton-object class="org.mule.providers.tcp.issues.InputStreamSource"/>
             <inbound-router>
                 <inbound-endpoint address="tcp://localhost:65432"/>
             </inbound-router>

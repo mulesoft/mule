@@ -69,7 +69,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 
     public void testXmlXsltOut() throws Exception
     {
-        String xml = (String) receive(sendXml(), "xml-xslt-out", String.class);
+        String xml = (String) receive(sendXml(), "xml-xslt-out-string", String.class);
         XMLAssert.assertXMLEqual(CHILDLESS_XML, xml);
     }
 

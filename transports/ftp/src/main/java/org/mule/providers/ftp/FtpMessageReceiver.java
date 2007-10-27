@@ -22,6 +22,7 @@ import org.mule.umo.provider.UMOConnector;
 
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +32,6 @@ import java.util.Set;
 
 import javax.resource.spi.work.Work;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -142,21 +142,14 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             final String fileName = file.getName();
 
             UMOMessage message;
-            if (endpoint.isStreaming())
+            InputStream stream = client.retrieveFileStream(fileName);
+            if (stream == null)
             {
-                message = new MuleMessage(
-                        connector.getStreamMessageAdapter(client.retrieveFileStream(fileName), null));
+                throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
+                        new Object[]{fileName, new Integer(client.getReplyCode())}));
             }
-            else
-            {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                if (!client.retrieveFile(fileName, baos))
-                {
-                    throw new IOException(MessageFormat.format("Failed to retrieve file {0}. Ftp error: {1}",
-                            new Object[]{fileName, new Integer(client.getReplyCode())}));
-                }
-                message = new MuleMessage(connector.getMessageAdapter(baos.toByteArray()));
-            }
+            message = new MuleMessage(connector.getMessageAdapter(stream));
+            
 
             message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, fileName);
             routeMessage(message);

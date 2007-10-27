@@ -13,8 +13,8 @@ package org.mule.providers.oracle.jms.transformers;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.oracle.jms.OracleJmsConnector;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
+import org.mule.transformers.AbstractMessageAwareTransformer;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringMessageUtils;
 
@@ -38,7 +38,7 @@ import oracle.xdb.XMLType;
  * @see OracleJmsConnector
  * @see <a href="http://otn.oracle.com/pls/db102/">XML DB Developer's Guide</a>
  */
-public class StringToXMLMessage extends AbstractEventAwareTransformer
+public class StringToXMLMessage extends AbstractMessageAwareTransformer
 {
     public StringToXMLMessage()
     {
@@ -52,7 +52,7 @@ public class StringToXMLMessage extends AbstractEventAwareTransformer
      * @param src - String or byte[] containing properly-formed XML.
      * @return JMS message whose payload is Oracle's native XML data type
      */
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage msg, String outputEncoding) throws TransformerException
     {
         Session session;
         AdtMessage message;
@@ -80,9 +80,10 @@ public class StringToXMLMessage extends AbstractEventAwareTransformer
 
             // Prepare the XML string.
             String xml;
+            Object src = msg.getPayload();
             if (src instanceof byte[])
             {
-                xml = new String((byte[]) src, encoding);
+                xml = new String((byte[]) src, outputEncoding);
             }
             else if (src instanceof String)
             {

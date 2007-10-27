@@ -11,18 +11,20 @@
 package org.mule.providers.http.transformers;
 
 import org.mule.impl.MuleMessage;
+import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.ReleasingInputStream;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.io.IOUtils;
 
 /**
  * <code>HttpClientMethodResponseToObject</code> transforms a http client response
@@ -42,26 +44,29 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
     {
         Object msg;
         HttpMethod httpMethod = (HttpMethod)src;
-        Header contentType = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
+        
+        InputStream is;
         try
         {
-            if (contentType != null && !contentType.getValue().startsWith("text/"))
-            {
-                // TODO properly do streaming
-                msg = IOUtils.toByteArray(httpMethod.getResponseBodyAsStream());
-            }
-            else
-            {
-                msg = httpMethod.getResponseBodyAsString();
-            }
+            is = httpMethod.getResponseBodyAsStream();
         }
         catch (IOException e)
         {
             throw new TransformerException(this, e);
         }
+        
+        if (is == null) 
+        {
+            msg = NullPayload.getInstance();
+        }
+        else
+        {
+            msg = new ReleasingInputStream(is, httpMethod);
+        }
+        
         // Standard headers
         Map headerProps = new HashMap();
-        Header[] headers = httpMethod.getRequestHeaders();
+        Header[] headers = httpMethod.getResponseHeaders();
         String name;
         for (int i = 0; i < headers.length; i++)
         {

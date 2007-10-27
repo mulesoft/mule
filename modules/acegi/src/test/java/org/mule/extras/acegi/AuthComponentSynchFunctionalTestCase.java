@@ -13,6 +13,7 @@ package org.mule.extras.acegi;
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.security.MuleCredentials;
+import org.mule.providers.NullPayload;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOMessage;
@@ -64,7 +65,7 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
         UMOMessage m = client.send("vm://test", "Marie", props);
-        assertFalse(m.getPayload().equals("Marie"));
+        assertEquals(NullPayload.getInstance(), m.getPayload());
     }
 
     public void testCaseBadAuthentication() throws Exception

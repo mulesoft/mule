@@ -32,7 +32,7 @@ import javax.resource.spi.work.Work;
 public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeCompletedListener
 {
     private Certificate[] peerCertificateChain;
-    private Certificate[] localCertificateChain;
+    private Certificate[] localCertificateChain; 
 
     public SslMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
@@ -42,14 +42,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
 
     protected Work createWork(Socket socket) throws IOException
     {
-        if (endpoint.isStreaming())
-        {
-            return new SslStreamWorker(socket, this);
-        }
-        else
-        {
-            return new SslWorker(socket, this);
-        }
+        return new SslWorker(socket, this);
     }
 
     private void preRoute(MuleMessage message) throws Exception
@@ -84,19 +77,4 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
             preRoute(message);
         }
     }
-
-    protected class SslStreamWorker extends TcpStreamWorker
-    {
-        public SslStreamWorker(Socket socket, AbstractMessageReceiver receiver) throws IOException
-        {
-            super(socket, receiver);
-            ((SSLSocket) socket).addHandshakeCompletedListener(SslMessageReceiver.this);
-        }
-
-        protected void preRouteMuleMessage(MuleMessage message) throws Exception
-        {
-            preRoute(message);
-        }
-    }
-
 }

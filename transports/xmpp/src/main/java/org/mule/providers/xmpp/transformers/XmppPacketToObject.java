@@ -10,8 +10,7 @@
 
 package org.mule.providers.xmpp.transformers;
 
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
+import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
@@ -19,7 +18,7 @@ import java.util.Iterator;
 
 import org.jivesoftware.smack.packet.Message;
 
-public class XmppPacketToObject extends AbstractEventAwareTransformer
+public class XmppPacketToObject extends AbstractMessageAwareTransformer
 {
 
     public XmppPacketToObject()
@@ -28,18 +27,17 @@ public class XmppPacketToObject extends AbstractEventAwareTransformer
         setReturnClass(String.class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
     {
-        Message message = (Message) src;
-        UMOMessage msg = context.getMessage();
+        Message xmppMessage = (Message) message.getPayload();
 
-        for (Iterator iterator = message.getPropertyNames(); iterator.hasNext();)
+        for (Iterator iterator = xmppMessage.getPropertyNames(); iterator.hasNext();)
         {
             String name = (String) iterator.next();
-            msg.setProperty(name, message.getProperty(name));
+            message.setProperty(name, xmppMessage.getProperty(name));
         }
 
-        return message.getBody();
+        return xmppMessage.getBody();
     }
 
 }

@@ -26,6 +26,9 @@ import org.mule.umo.transformer.TransformerException;
  * 
  * @see org.mule.umo.UMOMessage
  * @see org.mule.impl.MuleMessage
+ * @see org.mule.transformers.AbstractMessageAwareTransformer
+ * @deprecated use AbstractMessageAwareTransformer
+ *
  */
 
 public abstract class AbstractEventAwareTransformer extends AbstractTransformer

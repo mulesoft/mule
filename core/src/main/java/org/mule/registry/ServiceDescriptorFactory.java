@@ -22,7 +22,6 @@ import org.mule.util.SpiUtils;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Factory used to create a new service descriptor.
@@ -38,7 +37,7 @@ public class ServiceDescriptorFactory
     /**
      * Factory method to create a new service descriptor.
      */
-    public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides, ApplicationContext context) throws ServiceException
+    public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides, Registry registry) throws ServiceException
     {       
         String serviceFinderClass = null;
         if(overrides!=null)
@@ -52,9 +51,9 @@ public class ServiceDescriptorFactory
         {
             try
             {
-                sd = new DefaultTransportServiceDescriptor(name, props, context);
+                sd = new DefaultTransportServiceDescriptor(name, props, registry);
             }
-            catch (ClassNotFoundException e)
+            catch (Exception e)
             {
                 throw (IllegalStateException) new IllegalStateException("Cannot create transport " + name).initCause(e);
             }

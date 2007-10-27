@@ -21,7 +21,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.properties.MessagePropertyExtractor;
+import org.mule.util.properties.MessageHeaderPropertyExtractor;
 import org.mule.util.properties.PropertyExtractor;
 
 import java.net.MalformedURLException;
@@ -62,7 +62,7 @@ public class RestServiceWrapper implements Callable, Initialisable
     private UMOFilter errorFilter;
     private String errorExpression;
 
-    private PropertyExtractor propertyExtractor = new MessagePropertyExtractor();
+    private PropertyExtractor propertyExtractor = new MessageHeaderPropertyExtractor();
 
     public String getServiceUrl()
     {

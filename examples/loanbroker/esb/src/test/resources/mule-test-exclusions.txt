@@ -1,6 +1,6 @@
 #
 # Test cases listed in this file are not run.
 #
-
+# Currently fail due to OpenEjb configuration
 org.mule.examples.loanbroker.esb.LoanBrokerEsbContainerTestCase
 org.mule.examples.loanbroker.esb.LoanBrokerEsbTestCase

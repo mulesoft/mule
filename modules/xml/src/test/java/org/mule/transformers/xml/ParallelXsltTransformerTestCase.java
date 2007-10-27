@@ -39,6 +39,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     public UMOTransformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
+        transformer.setReturnClass(String.class);
         transformer.setXslFile("cdcatalog.xsl");
         transformer.initialise();
         return transformer;

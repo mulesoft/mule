@@ -16,15 +16,20 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ThreadSafeAccess;
 import org.mule.umo.UMOExceptionPayload;
+import org.mule.umo.provider.PropertyScope;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.util.DebugOptions;
 import org.mule.util.FileUtils;
-import org.mule.util.MapUtils;
+import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,11 +37,6 @@ import java.util.Set;
 
 import javax.activation.DataHandler;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,39 +47,49 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractMessageAdapter implements UMOMessageAdapter, ThreadSafeAccess
 {
-
-    /**
-     * logger used by this class
-     */
-    protected transient Log logger = LogFactory.getLog(getClass());
-
-    protected ConcurrentMap properties = new ConcurrentHashMap();
-    protected ConcurrentMap attachments = new ConcurrentHashMap();
-    protected String encoding = FileUtils.DEFAULT_ENCODING;
-
     /**
      * Should we fail when we detect scribbling?  This can be overridden by setting the
      * property {@link org.mule.config.MuleProperties#MULE_THREAD_UNSAFE_MESSAGES_PROPERTY}
      */
     public static final boolean DEFAULT_FAILFAST = true;
 
+    /** logger used by this class */
+    protected static transient Log logger;
+
+    /** Scoped properties for this message */
+    protected MessagePropertiesContext properties = new MessagePropertiesContext();
+
+    /** Collection of attachments associatated with this message */
+    protected ConcurrentMap attachments = new ConcurrentHashMap();
+
+    /** The encoding used by this message. This is usually used when working with String representations of the message payload */
+    protected String encoding = FileUtils.DEFAULT_ENCODING;
+
+    /** If an excpetion occurs while processing this message an exception payload will be attached here */
     protected UMOExceptionPayload exceptionPayload;
+
+    /** the default UUID for the message. If the underlying transport has the notion of a message id, this uuid will be ignorred */
     protected String id = UUID.getUUID();
 
     // these are transient because serisalisation generates a new instance
     // so we allow mutation again (and we can't serialize threads anyway)
     private transient AtomicReference ownerThread = null;
+
     private transient AtomicBoolean mutable = null;
-    public static final boolean WRITE = true;
-    public static final boolean READ = false;
 
     protected AbstractMessageAdapter()
     {
         // usual access for subclasses
+        logger = LogFactory.getLog(getClass());
     }
 
+    /**
+     * Creates a message adapter copying values from an existing one
+     * @param template
+     */
     protected AbstractMessageAdapter(UMOMessageAdapter template)
     {
+        logger = LogFactory.getLog(getClass());
         if (null != template)
         {
             Iterator propertyNames = template.getPropertyNames().iterator();
@@ -88,7 +98,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
                 String key = (String) propertyNames.next();
                 try
                 {
-                   setProperty(key, template.getProperty(key));
+                    setProperty(key, template.getProperty(key));
                 }
                 catch (Exception e)
                 {
@@ -128,11 +138,15 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
         buf.append(", correlationSeq=").append(getCorrelationSequence());
         buf.append(", encoding=").append(getEncoding());
         buf.append(", exceptionPayload=").append(exceptionPayload);
-        buf.append(", properties=").append(MapUtils.toString(properties, true));
+        if (logger.isDebugEnabled())
+        {
+            buf.append(", properties=").append(properties);
+        }
         buf.append('}');
         return buf.toString();
     }
 
+    /** {@inheritDoc} */
     public void addProperties(Map props)
     {
         assertAccess(WRITE);
@@ -149,51 +163,47 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
         }
     }
 
+    /**
+     * A convenience method for extending classes to Set inbound scoped properties on the message
+     * properties that arrive on the inbound message should be set as inbound-scoped properties. These are
+     * read-only
+     * @param props the properties to set
+     * @see org.mule.umo.provider.PropertyScope
+     */
+    protected void addInboundProperties(Map props)
+    {
+        properties.addInboundProperties(props);
+    }
+
+    /** {@inheritDoc} */
     public void clearProperties()
     {
         assertAccess(WRITE);
-        properties.clear();
+        properties.clearProperties();
     }
 
-    /**
-     * Removes an associated property from the message
-     * 
-     * @param key the key of the property to remove
-     */
+    /** {@inheritDoc} */
     public Object removeProperty(String key)
     {
         assertAccess(WRITE);
-        return properties.remove(key);
+        return properties.removeProperty(key);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOMessageAdapter#getProperty(java.lang.Object)
-     */
+    /** {@inheritDoc} */
     public Object getProperty(String key)
     {
         assertAccess(READ);
-        return properties.get(key);
+        return properties.getProperty(key);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOMessageAdapter#getPropertyNames()
-     */
+    /** {@inheritDoc} */
     public Set getPropertyNames()
     {
         assertAccess(READ);
-        return Collections.unmodifiableSet(properties.keySet());
+        return properties.getPropertyNames();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOMessageAdapter#setProperty(java.lang.Object,
-     *      java.lang.Object)
-     */
+    /** {@inheritDoc} */
     public void setProperty(String key, Object value)
     {
         assertAccess(WRITE);
@@ -201,72 +211,107 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
         {
             if (value != null)
             {
-                properties.put(key, value);
+                properties.setProperty(key, value);
             }
             else
             {
                 logger.warn("setProperty(key, value) called with null value; removing key: " + key
-                            + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
-                    new Throwable());
-                properties.remove(key);
+                        + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
+                        new Throwable());
+                properties.removeProperty(key);
             }
         }
         else
         {
             logger.warn("setProperty(key, value) ignored because of null key for object: " + value
-                        + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
-                new Throwable());
+                    + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
+                    new Throwable());
         }
     }
 
+    /** {@inheritDoc} */
+    public void setProperty(String key, Object value, PropertyScope scope)
+    {
+        assertAccess(WRITE);
+        if (key != null)
+        {
+            if (value != null)
+            {
+                properties.setProperty(key, value, scope);
+            }
+            else
+            {
+                logger.warn("setProperty(key, value) called with null value; removing key: " + key
+                        + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
+                        new Throwable());
+                properties.removeProperty(key);
+            }
+        }
+        else
+        {
+            logger.warn("setProperty(key, value) ignored because of null key for object: " + value
+                    + "; please report the following stack trace to " + MuleManifest.getDevListEmail(),
+                    new Throwable());
+        }
+    }
+
+    /** {@inheritDoc} */
     public String getUniqueId()
     {
         assertAccess(READ);
         return id;
     }
 
+    /** {@inheritDoc} */
     public Object getProperty(String name, Object defaultValue)
     {
         assertAccess(READ);
-        return MapUtils.getObject(properties, name, defaultValue);
+        return properties.getProperty(name, defaultValue);
     }
 
+    /** {@inheritDoc} */
     public int getIntProperty(String name, int defaultValue)
     {
         assertAccess(READ);
-        return MapUtils.getIntValue(properties, name, defaultValue);
+        return properties.getIntProperty(name, defaultValue);
     }
 
+    /** {@inheritDoc} */
     public long getLongProperty(String name, long defaultValue)
     {
         assertAccess(READ);
-        return MapUtils.getLongValue(properties, name, defaultValue);
+        return properties.getLongProperty(name, defaultValue);
     }
 
+    /** {@inheritDoc} */
     public double getDoubleProperty(String name, double defaultValue)
     {
         assertAccess(READ);
-        return MapUtils.getDoubleValue(properties, name, defaultValue);
+        return properties.getDoubleProperty(name, defaultValue);
     }
 
+    /** {@inheritDoc} */
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
         assertAccess(READ);
-        return MapUtils.getBooleanValue(properties, name, defaultValue);
+        return properties.getBooleanProperty(name, defaultValue);
     }
 
+    /** {@inheritDoc} */
     public String getStringProperty(String name, String defaultValue)
     {
         assertAccess(READ);
-        return MapUtils.getString(properties, name, defaultValue);
+        return properties.getStringProperty(name, defaultValue);
     }
 
+    /** {@inheritDoc} */
     public void setBooleanProperty(String name, boolean value)
     {
         assertAccess(WRITE);
         setProperty(name, Boolean.valueOf(value));
     }
 
+    /** {@inheritDoc} */
     public void setIntProperty(String name, int value)
     {
         assertAccess(WRITE);
@@ -285,18 +330,21 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
         setProperty(name, new Double(value));
     }
 
+    /** {@inheritDoc} */
     public void setStringProperty(String name, String value)
     {
         assertAccess(WRITE);
         setProperty(name, value);
     }
 
+    /** {@inheritDoc} */
     public Object getReplyTo()
     {
         assertAccess(READ);
         return getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
     }
 
+    /** {@inheritDoc} */
     public void setReplyTo(Object replyTo)
     {
         assertAccess(WRITE);
@@ -310,12 +358,15 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
         }
     }
 
+    /** {@inheritDoc} */
     public String getCorrelationId()
     {
         assertAccess(READ);
         return (String) getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
     }
 
+
+    /** {@inheritDoc} */
     public void setCorrelationId(String correlationId)
     {
         assertAccess(WRITE);
@@ -329,46 +380,28 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
         }
     }
 
-    /**
-     * Gets the sequence or ordering number for this message in the the correlation
-     * group (as defined by the correlationId)
-     * 
-     * @return the sequence number or -1 if the sequence is not important
-     */
+    /** {@inheritDoc} */
     public int getCorrelationSequence()
     {
         assertAccess(READ);
         return getIntProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, -1);
     }
 
-    /**
-     * Gets the sequence or ordering number for this message in the the correlation
-     * group (as defined by the correlationId)
-     * 
-     * @param sequence the sequence number or -1 if the sequence is not important
-     */
+    /** {@inheritDoc} */
     public void setCorrelationSequence(int sequence)
     {
         assertAccess(WRITE);
         setIntProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
     }
 
-    /**
-     * Determines how many messages are in the correlation group
-     * 
-     * @return total messages in this group or -1 if the size is not known
-     */
+    /** {@inheritDoc} */
     public int getCorrelationGroupSize()
     {
         assertAccess(READ);
         return getIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, -1);
     }
 
-    /**
-     * Determines how many messages are in the correlation group
-     * 
-     * @param size the total messages in this group or -1 if the size is not known
-     */
+    /** {@inheritDoc} */
     public void setCorrelationGroupSize(int size)
     {
         assertAccess(WRITE);
@@ -381,110 +414,78 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
         return exceptionPayload;
     }
 
+    /** {@inheritDoc} */
     public void setExceptionPayload(UMOExceptionPayload payload)
     {
         assertAccess(WRITE);
         exceptionPayload = payload;
     }
 
+    /** {@inheritDoc} */
     public void addAttachment(String name, DataHandler dataHandler) throws Exception
     {
         assertAccess(WRITE);
         attachments.put(name, dataHandler);
     }
 
+    /** {@inheritDoc} */
     public void removeAttachment(String name) throws Exception
     {
         assertAccess(WRITE);
         attachments.remove(name);
     }
 
+    /** {@inheritDoc} */
     public DataHandler getAttachment(String name)
     {
         assertAccess(READ);
         return (DataHandler) attachments.get(name);
     }
 
+    /** {@inheritDoc} */
     public Set getAttachmentNames()
     {
         assertAccess(READ);
         return Collections.unmodifiableSet(attachments.keySet());
     }
 
+    /** {@inheritDoc} */
     public String getEncoding()
     {
         assertAccess(READ);
         return encoding;
     }
 
-    /**
-     * Sets the encoding for this message
-     * 
-     * @param encoding the encoding to use
-     */
+    /** {@inheritDoc} */
     public void setEncoding(String encoding)
     {
         assertAccess(WRITE);
         this.encoding = encoding;
     }
 
-    /**
-     * Converts the message implementation into a String representation. If encoding
-     * is required it will use the encoding set on the message
-     * 
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     */
-    public final String getPayloadAsString() throws Exception
+    /** {@inheritDoc} */
+    public void release()
     {
-        assertAccess(READ);
-        return getPayloadAsString(getEncoding());
+        //TODO handle other stream types
+        if(getPayload() instanceof InputStream)
+        {
+            IOUtils.closeQuietly((InputStream)getPayload());
+        }
+        properties.clearProperties();
+        attachments.clear();
     }
 
-    protected byte[] convertToBytes(Object object) throws TransformerException, UnsupportedEncodingException
-    {
-        assertAccess(READ);
-        if (object instanceof String)
-        {
-            return object.toString().getBytes(getEncoding());
-        }
+    ///////////////////////// ThreadSafeAccess impl /////////////////////////////////////
 
-        if (object instanceof byte[])
-        {
-            return (byte[]) object;
-        }
-        else if (object instanceof Serializable)
-        {
-            try
-            {
-                return SerializationUtils.serialize((Serializable) object);
-            }
-            catch (Exception e)
-            {
-                throw new TransformerException(
-                    CoreMessages.transformFailed(object.getClass().getName(), "byte[]"), e);
-            }
-        }
-        else
-        {
-            throw new TransformerException(
-                CoreMessages.transformOnObjectNotOfSpecifiedType(object.getClass().getName(), 
-                    "byte[] or " + Serializable.class.getName()));
-        }
-    }
-
-    /**
-     * Restrict mutation to private use within a single thread.
-     * Allow reading and writing by initial thread only.
-     * Once accessed by another thread, no writing allowed at all.
-     *
-     * @param write
-     */
+    /** {@inheritDoc} */
     public void assertAccess(boolean write)
     {
-        initAccessControl();
-        setOwner();
-        checkMutable(write);
+        if(DebugOptions.isAssertMessageAccess())
+        {
+            initAccessControl();
+            setOwner();
+            checkMutable(write);
+        }
     }
 
     private void setOwner()
@@ -579,20 +580,18 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter, Threa
         }
     }
 
+    /** {@inheritDoc} */
     public synchronized void resetAccessControl()
     {
-        assertAccess(WRITE);
-        ownerThread.set(null);
-        mutable.set(true);
+        if(DebugOptions.isAssertMessageAccess())
+        {
+            assertAccess(WRITE);
+            ownerThread.set(null);
+            mutable.set(true);
+        }
     }
 
-    /**
-     * By default we return "this".  This allows older code to inter-operate but doesn't,
-     * of course, give the required safety.  Subclasses should override this method.
-     * Re-writing the threading handling should remove this requirement....
-     *
-     * @return A new copy of this
-     */
+    /** {@inheritDoc} */
     public ThreadSafeAccess newThreadCopy()
     {
         if (logger.isInfoEnabled())

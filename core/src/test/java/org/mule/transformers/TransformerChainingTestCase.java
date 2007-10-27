@@ -10,6 +10,7 @@
 
 package org.mule.transformers;
 
+import org.mule.impl.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
@@ -17,6 +18,8 @@ import org.mule.umo.transformer.UMOTransformer;
 import java.util.Arrays;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.util.Arrays;
 
 public class TransformerChainingTestCase extends AbstractMuleTestCase
 {
@@ -54,10 +57,10 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
                 return marker;
             }
         };
-        Object result =
-                TransformerUtils.applyAllTransformersToObject(
-                        Arrays.asList(new UMOTransformer[]{transformer, transformer2}),
-                        this);
+        MuleMessage message = new MuleMessage(this);
+        message.applyTransformers(Arrays.asList(new UMOTransformer[]{transformer, transformer2}));
+
+        Object result = message.getPayload();
         assertNotNull(result);
         assertSame(marker, result);
         assertTrue("Next transformer not called.", nextCalled.get());

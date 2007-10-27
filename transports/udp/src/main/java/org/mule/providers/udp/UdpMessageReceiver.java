@@ -263,7 +263,8 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                     byte[] data;
                     if (responseTransformers != null)
                     {
-                        Object response = TransformerUtils.applyAllTransformers(responseTransformers, returnMessage);
+                        returnMessage.applyTransformers(responseTransformers);
+                        Object response = returnMessage.getPayload();
                         if (response instanceof byte[])
                         {
                             data = (byte[]) response;

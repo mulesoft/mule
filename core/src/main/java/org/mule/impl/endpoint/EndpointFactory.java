@@ -42,7 +42,7 @@ public class EndpointFactory implements UMOEndpointFactory
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
             endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         }
-        return createInboundEndpoint(endpointBuilder, managementContext);
+        return getInboundEndpoint(endpointBuilder, managementContext);
     }
 
     public UMOImmutableEndpoint getOutboundEndpoint(String uri, UMOManagementContext managementContext)
@@ -55,7 +55,7 @@ public class EndpointFactory implements UMOEndpointFactory
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
             endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         }
-        return createOutboundEndpoint(endpointBuilder, managementContext);
+        return getOutboundEndpoint(endpointBuilder, managementContext);
     }
 
     public UMOImmutableEndpoint getResponseEndpoint(String uri, UMOManagementContext managementContext)
@@ -68,7 +68,7 @@ public class EndpointFactory implements UMOEndpointFactory
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
             endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         }
-        return createResponseEndpoint(endpointBuilder, managementContext);
+        return getResponseEndpoint(endpointBuilder, managementContext);
     }
 
     /** @deprecated */
@@ -94,15 +94,15 @@ public class EndpointFactory implements UMOEndpointFactory
         }
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
-            return createInboundEndpoint(endpointBuilder, managementContext);
+            return getInboundEndpoint(endpointBuilder, managementContext);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
-            return createOutboundEndpoint(endpointBuilder, managementContext);
+            return getOutboundEndpoint(endpointBuilder, managementContext);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
         {
-            return createResponseEndpoint(endpointBuilder, managementContext);
+            return getResponseEndpoint(endpointBuilder, managementContext);
         }
         else
         {
@@ -124,32 +124,14 @@ public class EndpointFactory implements UMOEndpointFactory
         return endpointBuilder;
     }
 
-    public UMOImmutableEndpoint getInboundEndpoint(UMOEndpointBuilder builder, UMOManagementContext managementContext)
-        throws UMOException
-    {
-        return createInboundEndpoint(builder, managementContext);
-    }
-
-    public UMOImmutableEndpoint getOutboundEndpoint(UMOEndpointBuilder builder,
-                                                       UMOManagementContext managementContext) throws UMOException
-    {
-        return createOutboundEndpoint(builder, managementContext);
-    }
-
-    public UMOImmutableEndpoint getResponseEndpoint(UMOEndpointBuilder builder,
-                                                       UMOManagementContext managementContext) throws UMOException
-    {
-        return createResponseEndpoint(builder, managementContext);
-    }
-
-    protected UMOImmutableEndpoint createInboundEndpoint(UMOEndpointBuilder builder,
+    public UMOImmutableEndpoint getInboundEndpoint(UMOEndpointBuilder builder,
                                                             UMOManagementContext managementContext) throws UMOException
     {
         // TODO 1) Store in repo, 2) Register in registry, 3) Lifecycle ?
         return builder.buildInboundEndpoint();
     }
 
-    protected UMOImmutableEndpoint createOutboundEndpoint(UMOEndpointBuilder builder,
+    public UMOImmutableEndpoint getOutboundEndpoint(UMOEndpointBuilder builder,
                                                              UMOManagementContext managementContext)
         throws UMOException
     {
@@ -157,12 +139,11 @@ public class EndpointFactory implements UMOEndpointFactory
         return builder.buildOutboundEndpoint();
     }
 
-    protected UMOImmutableEndpoint createResponseEndpoint(UMOEndpointBuilder builder,
+    public UMOImmutableEndpoint getResponseEndpoint(UMOEndpointBuilder builder,
                                                              UMOManagementContext managementContext)
         throws UMOException
     {
         // TODO 1) Store in repo, 2) Register in registry, 3) Lifecycle ?
         return builder.buildResponseEndpoint();
     }
-
 }

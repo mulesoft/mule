@@ -30,13 +30,10 @@
                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE =
                          ${type} AND ACK IS NULL" />
             <spring:entry key="getTest.ack"
-                   value="UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE =
+                   value="UPDATE TEST SET ACK = ${function:NOW} WHERE ID = ${id} AND TYPE =
                          ${type} AND DATA = ${data}" />
         </jdbc:queries>
-        <jdbc:extractors>
-            <bean-property-extractor/>
-            <jdbc:now-property-extractor/>
-        </jdbc:extractors>
+        
     </jdbc:connector>
 
     <endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">

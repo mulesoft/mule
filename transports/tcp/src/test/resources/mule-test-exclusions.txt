@@ -5,9 +5,6 @@
 # MULE-1389
 org.mule.providers.tcp.issues.StreamingDownloadMule1389TestCase
 
-# MULE-1687
-org.mule.providers.tcp.issues.SynchStreamingMule1687TestCase
-
 # MULE-2067
 org.mule.providers.tcp.issues.LingerExperimentMule2067TestCase
 org.mule.providers.tcp.issues.ReuseExperimentMule2067TestCase

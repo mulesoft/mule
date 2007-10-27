@@ -10,24 +10,20 @@
 
 package org.mule.transformers;
 
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 import org.mule.impl.VoidTransformer;
-import org.mule.providers.NullPayload;
 import org.mule.providers.service.TransportFactoryException;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.CollectionUtils;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 import java.util.Iterator;
 import java.util.List;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,96 +47,6 @@ public class TransformerUtils
                     CollectionUtils.singletonList(VoidTransformer.getInstance()));
     
     private static Log logger = LogFactory.getLog(AbstractTransformer.class);
-
-    public static UMOMessage applyAllTransformers(List transformers, UMOMessage message) throws TransformerException
-    {
-        return applyAllTransformers(transformers, message, null);
-    }
-
-    /**
-     * Please use the simpler method unless you're mad or using JMS
-     * @deprecated
-     */
-    public static UMOMessage applyAllTransformers(List transformers, UMOMessage message, UMOImmutableEndpoint endpoint) throws TransformerException
-    {
-        // no transformer, so do nothing.
-        if (isUndefined(transformers) || 0 == transformers.size())
-        {
-            return message;
-        }
-
-        UMOMessage iteratedMessage = message;
-
-        Iterator iterator = transformers.iterator();
-        while (iterator.hasNext())
-        {
-            UMOTransformer transformer = (UMOTransformer) iterator.next();
-
-            if (iteratedMessage == null)
-            {
-                if (transformer.isAcceptNull())
-                {
-                    iteratedMessage =
-                            new MuleMessage(NullPayload.getInstance(), RequestContext.getEventContext().getMessage());
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            Object payload = iteratedMessage.getPayload();
-            if (transformer.isSourceTypeSupported(payload.getClass()))
-            {
-                if (null != endpoint)
-                {
-                    transformer.setEndpoint(endpoint);
-                }
-
-                Object result = transformer.transform(payload);
-
-                if (result instanceof UMOMessage)
-                {
-                    iteratedMessage = (UMOMessage) result;
-                }
-                else
-                {
-                    if (null != RequestContext.getEvent())
-                    {
-                        iteratedMessage = new MuleMessage(result, RequestContext.getEvent().getMessage());
-                    }
-                    else
-                    {
-                        iteratedMessage = new MuleMessage(result);
-                    }
-                }
-                RequestContext.writeResponse(iteratedMessage);
-            }
-            else if (!transformer.isIgnoreBadInput())
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Transformer: " + iterator + " doesn't support the result payload: "
-                            + payload.getClass());
-                }
-                break;
-            }
-        }
-        return iteratedMessage;
-    }
-
-    public static Object applyAllTransformersToObject(List transformers, Object object) throws TransformerException
-    {
-        UMOMessage message = applyAllTransformers(transformers, new MuleMessage(object));
-        if (null != message)
-        {
-            return message.getPayload();
-        }
-        else
-        {
-            return null;
-        }
-    }
 
     public static void initialiseAllTransformers(List transformers) throws InitialisationException
     {

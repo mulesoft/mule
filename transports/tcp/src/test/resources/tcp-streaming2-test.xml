@@ -2,12 +2,10 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:stream="http://www.mulesource.org/schema/mule/streaming/2.0"
        xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-               http://www.mulesource.org/schema/mule/streaming/2.0 http://www.mulesource.org/schema/mule/streaming/2.0/mule-streaming.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
     <!-- as tcp-streaming-test.xml but with synchronous set to true in
@@ -16,30 +14,29 @@
     <configuration serverId="" defaultSynchronousEndpoints="true"/>
 
     <tcp:connector name="default" validateConnections="false">
-        <tcp:direct-protocol payloadOnly="true"/>
+        <tcp:streaming-protocol/>
     </tcp:connector>
 
-    <stream:model name="echoModel">
+    <model name="echoModel">
 
-        <stream:service name="echo">
-            <component class="org.mule.components.simple.StreamingBridgeComponent"/>
-            <stream:inbound-router>
-                <stream:inbound-endpoint address="tcp://localhost:65432" synchronous="false"/>
-            </stream:inbound-router>
-            <stream:outbound-router>
-                <stream:outbound-pass-through-router>
-                    <stream:outbound-endpoint address="tcp://localhost:65433" synchronous="false"/>
-                </stream:outbound-pass-through-router>
-            </stream:outbound-router>
-        </stream:service>
+        <service name="echo">
+            <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="tcp://localhost:65432" synchronous="false"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="tcp://localhost:65433" synchronous="false"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <stream:service name="testComponent" class="org.mule.tck.testmodels.mule.TestStreamingComponent">
-            <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
-            <stream:inbound-router>
-                <stream:inbound-endpoint address="tcp://localhost:65433" synchronous="false"/>
-            </stream:inbound-router>
-        </stream:service>
-
-    </stream:model>
-
+        <service name="testComponent">
+            <!-- This component knows how to look for EOF -->
+            <singleton-object class="org.mule.providers.tcp.integration.EOFStreamingTestComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="tcp://localhost:65433" synchronous="false"/>
+            </inbound-router>
+        </service>
+    </model>
 </mule>

@@ -137,7 +137,7 @@ public class MuleAdminAgent extends AbstractAgent
                     if (managementContext.getRegistry().lookupConnector(connector.getName()) == null)
                     {
                         connector.setName(DEFAULT_MANAGER_ENDPOINT);
-                        connector.initialise();
+                        //connector.initialise();
                         managementContext.getRegistry().registerConnector(connector, managementContext);
                     }
                     endpointBuilder.setConnector(connector);
@@ -145,7 +145,7 @@ public class MuleAdminAgent extends AbstractAgent
                 logger.info("Registering Admin listener on: " + serverUri);
                 UMOComponent component = MuleManagerComponent.getComponent(endpointBuilder, wireFormat,
                     RegistryContext.getConfiguration().getDefaultEncoding(), RegistryContext.getConfiguration()
-                        .getDefaultSynchronousEventTimeout());
+                        .getDefaultSynchronousEventTimeout(), managementContext);
                 managementContext.getRegistry().registerComponent(component, managementContext);
             }
         }

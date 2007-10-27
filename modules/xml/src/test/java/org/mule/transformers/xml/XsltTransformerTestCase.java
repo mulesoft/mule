@@ -37,6 +37,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     public UMOTransformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
+        transformer.setReturnClass(String.class);
         transformer.setXslFile("cdcatalog.xsl");
         transformer.setMaxActiveTransformers(42);
         transformer.initialise();
@@ -84,6 +85,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         t.setXslTransformerFactory(null);
         t.initialise();
     }
+
     public void testTransformWithStaticParam() throws TransformerException, InitialisationException
     {
 
@@ -121,6 +123,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
         XsltTransformer transformer = new XsltTransformer();
 
+        transformer.setReturnClass(String.class);
         // set stylesheet
         transformer.setXslt(xsl);
 
@@ -179,6 +182,8 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
         XsltTransformer transformer = new XsltTransformer();
 
+        transformer.setReturnClass(String.class);
+        
         // set stylesheet
         transformer.setXslt(xsl);
 

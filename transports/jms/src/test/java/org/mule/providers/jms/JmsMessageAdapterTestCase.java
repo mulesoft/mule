@@ -15,8 +15,7 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
-{
-
+{  
     /*
      * (non-Javadoc)
      * 

@@ -9,7 +9,7 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans"/>
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
     <xsd:element name="connector" type="tcpConnectorType" substitutionGroup="mule:abstract-connector">
@@ -152,6 +152,7 @@
     </xsd:complexType>
 
     <xsd:element name="abstract-protocol" abstract="true" type="abstractProtocolType"/>
+    <xsd:element name="streaming-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol"/>
     <xsd:element name="xml-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol"/>
     <xsd:element name="xml-eof-protocol" type="abstractProtocolType" substitutionGroup="abstract-protocol"/>
     <xsd:complexType name="abstractProtocolType"/>
@@ -165,7 +166,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="safe-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol"/>
     <xsd:element name="length-protocol" type="lengthProtocolType" substitutionGroup="abstract-protocol"/>
     <xsd:complexType name="lengthProtocolType">

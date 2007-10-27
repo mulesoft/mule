@@ -12,14 +12,14 @@ package org.mule.examples.loanbroker.transformers;
 
 import org.mule.examples.loanbroker.messages.Customer;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
+import org.mule.transformers.AbstractMessageAwareTransformer;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
 /**
  * Converts parameters on the message into a CustomerQuoteRequest object
  */
-public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
+public class RestRequestToCustomerRequest extends AbstractMessageAwareTransformer
 {
 
     public RestRequestToCustomerRequest()
@@ -27,7 +27,7 @@ public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
         setReturnClass(CustomerQuoteRequest.class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
     {
         String name;
         int ssn;
@@ -36,10 +36,10 @@ public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
 
         try
         {
-            name = getParam(context, "customerName");
-            ssn = Integer.parseInt(getParam(context, "ssn"));
-            amount = Double.parseDouble(getParam(context, "loanAmount"));
-            duration = Integer.parseInt(getParam(context, "loanDuration"));
+            name = getParam(message, "customerName");
+            ssn = Integer.parseInt(getParam(message, "ssn"));
+            amount = Double.parseDouble(getParam(message, "loanAmount"));
+            duration = Integer.parseInt(getParam(message, "loanDuration"));
         }
         catch (Exception e)
         {
@@ -51,9 +51,9 @@ public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer
         return request;
     }
 
-    protected String getParam(UMOEventContext context, String name) throws NullPointerException
+    protected String getParam(UMOMessage message, String name) throws NullPointerException
     {
-        String value = context.getMessage().getStringProperty(name, null);
+        String value = message.getStringProperty(name, null);
         if (value == null)
         {
             throw new IllegalArgumentException("Parameter '" + name + "' must be set on the request");

@@ -10,7 +10,7 @@
 
 package org.mule.providers.tcp.other;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -21,7 +21,7 @@ import java.net.Socket;
  * This was an attempt to understand the issue we saw with HTTP closing early.
  * Unfortunately, it doesn't shed any light on the problem.
  */
-public class SocketTimingExperimentTestCase extends FunctionalTestCase
+public class SocketTimingExperimentTestCase extends AbstractMuleTestCase
 {
 
     private static int MAX_COUNT = 3;

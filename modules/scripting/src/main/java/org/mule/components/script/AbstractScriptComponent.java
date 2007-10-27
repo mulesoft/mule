@@ -14,7 +14,6 @@ import org.mule.impl.UMOComponentAware;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.util.ClassUtils;
@@ -36,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  */
 public abstract class AbstractScriptComponent
-    implements Initialisable, Lifecycle, UMOComponentAware, FileListener, Callable
+    implements Lifecycle, UMOComponentAware, FileListener, Callable
 {
     public static final int DEFAULT_RELOAD_INTERVAL_MS = 60000;
 

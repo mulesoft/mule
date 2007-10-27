@@ -12,7 +12,6 @@ package org.mule.routing.outbound;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
@@ -97,7 +96,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         }
         try
         {
-            message = TransformerUtils.applyAllTransformers(transformers, message);
+            message.applyTransformers(transformers);
         }
         catch (TransformerException e)
         {

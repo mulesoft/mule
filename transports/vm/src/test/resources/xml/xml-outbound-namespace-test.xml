@@ -20,7 +20,6 @@
                 <mxml:message-splitter splitExpression="/expression" enableCorrelation="ALWAYS"
                                        externalSchemaLocation="external" honorSynchronicity="true"
                                        validateSchema="true">
-                    <mxml:dom4j-property-extractor/>
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:message-splitter>
             </outbound-router>
@@ -34,7 +33,6 @@
                 <mxml:round-robin-splitter splitExpression="/expression" enableCorrelation="IF_NOT_SET"
                                            externalSchemaLocation="external" honorSynchronicity="true"
                                            validateSchema="true" endpointFiltering="true">
-                    <mxml:dom4j-property-extractor/>
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:round-robin-splitter>
             </outbound-router>

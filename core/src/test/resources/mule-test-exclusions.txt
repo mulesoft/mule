@@ -20,3 +20,5 @@ org.mule.mule.MuleDescriptorTestCase
 
 # MULE-2536
 org.mule.util.queue.FilePersistenceTestCase
+
+org.mule.routing.inbound.IdempotentInMemoryMessageIdStoreTestCase

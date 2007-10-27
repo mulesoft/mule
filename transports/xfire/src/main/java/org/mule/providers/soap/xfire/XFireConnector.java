@@ -24,6 +24,7 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.xfire.i18n.XFireMessages;
 import org.mule.providers.soap.xfire.transport.MuleLocalTransport;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
@@ -360,8 +361,8 @@ public class XFireConnector extends AbstractConnector
     	SedaComponent c = new SedaComponent();
         c.setName(XFIRE_SERVICE_COMPONENT_NAME + receiver.getComponent().getName());            
         c.setModel(managementContext.getRegistry().lookupSystemModel());
-        c.setManagementContext(managementContext);
-        c.initialise();
+        //c.setManagementContext(managementContext);
+        //c.initialise();
         
         XFireServiceComponent svcComponent = new XFireServiceComponent(((XFireMessageReceiver)receiver));
         svcComponent.setXfire(xfire);
@@ -447,7 +448,8 @@ public class XFireConnector extends AbstractConnector
         UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(builder, managementContext);
-        
+
+        c.setInboundRouter(new InboundRouterCollection());
         c.getInboundRouter().addEndpoint(serviceEndpoint);
         
         components.add(c);
@@ -584,7 +586,6 @@ public class XFireConnector extends AbstractConnector
                 try
                 {
                     managementContext.getRegistry().registerComponent(c, managementContext);
-                    c.start();
                 }
                 catch (UMOException e)
                 {

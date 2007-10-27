@@ -57,30 +57,6 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
     }
 
     /**
-     * Converts the message implementation into a String representation
-     * 
-     * @param encoding The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte array
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     */
-    public String getPayloadAsString(String encoding) throws Exception
-    {
-        return new String(getPayloadAsBytes(), encoding);
-    }
-
-    /**
-     * Converts the payload implementation into a String representation
-     * 
-     * @return String representation of the payload
-     * @throws Exception Implemetation may throw an endpoint specific exception
-     */
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-        return (byte[]) trans.transform(payload);
-    }
-
-    /**
      * @return the current payload
      */
     public Object getPayload()
@@ -105,7 +81,7 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
         return messageContext;
     }
 
-    public void setMessageContext(MessageContext messageContext)
+    void setMessageContext(MessageContext messageContext)
     {
         this.messageContext = messageContext;
         initHeaders();

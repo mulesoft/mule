@@ -10,4 +10,3 @@ org.mule.providers.http.issues.StreamingDownloadMule1389TestCase
 
 # MULE-2208
 org.mule.providers.http.functional.HttpsFunctionalTestCase
-

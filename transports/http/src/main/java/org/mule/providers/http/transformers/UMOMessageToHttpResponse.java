@@ -16,9 +16,8 @@ import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpResponse;
-import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
@@ -42,19 +41,18 @@ import org.apache.commons.httpclient.HttpVersion;
  * response.
  */
 
-public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
+public class UMOMessageToHttpResponse extends AbstractMessageAwareTransformer
 {
     public static final String CUSTOM_HEADER_PREFIX = "";
 
     // @GuardedBy("itself")
     private SimpleDateFormat format;
     private String server;
-    private SerializableToByteArray serializableToByteArray;
 
     public UMOMessageToHttpResponse()
     {
         registerSourceType(Object.class);
-        setReturnClass(Object.class);
+        setReturnClass(HttpResponse.class);
     }
 
 
@@ -74,14 +72,13 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
             server = MuleManifest.getProductName() + "/"
                      + MuleManifest.getProductVersion();
         }
-
-        serializableToByteArray = new SerializableToByteArray();
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage msg, String outputEncoding) throws TransformerException
     {
+        Object src = msg.getPayload();
         // Send back the exception payload if one has been set
-        if (context.getMessage().getExceptionPayload() != null)
+        if (msg.getExceptionPayload() != null)
         {
             // src = context.getMessage().getExceptionPayload();
         }
@@ -103,7 +100,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
             }
             else
             {
-                response = createResponse(src, encoding, context);
+                response = createResponse(src, outputEncoding, msg);
             }
 
             // Ensure there's a content type header
@@ -143,8 +140,6 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
                     response.addHeader(header);
                 }
             }
-
-            UMOMessage msg = context.getMessage();
 
             if (!response.containsHeader(HttpConstants.HEADER_CONNECTION))
             {
@@ -192,11 +187,10 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 
     }
 
-    protected HttpResponse createResponse(Object src, String encoding, UMOEventContext context)
+    protected HttpResponse createResponse(Object src, String encoding, UMOMessage msg)
         throws IOException, TransformerException
     {
         HttpResponse response = new HttpResponse();
-        UMOMessage msg = context.getMessage();
 
         int status = msg.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
         String version = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
@@ -279,8 +273,14 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         }
         else
         {
-            response.setBody(new ByteArrayInputStream((byte[])serializableToByteArray.doTransform(src,
-                encoding)));
+            try
+            {
+                response.setBody(new ByteArrayInputStream((byte[])msg.getPayloadAsBytes()));
+            }
+            catch (Exception e)
+            {
+                throw new TransformerException(this, e);
+            }
         }
         return response;
     }

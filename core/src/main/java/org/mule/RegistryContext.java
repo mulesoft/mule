@@ -10,6 +10,7 @@
 package org.mule;
 
 import org.mule.config.MuleConfiguration;
+import org.mule.impl.registry.TransientRegistry;
 import org.mule.registry.Registry;
 
 /** 
@@ -26,7 +27,7 @@ public class RegistryContext
         return registry;
     }
 
-    public static void setRegistry(Registry registry)
+    public static synchronized void setRegistry(Registry registry)
     {
         RegistryContext.registry = registry;
     }
@@ -35,5 +36,14 @@ public class RegistryContext
     public static MuleConfiguration getConfiguration()
     {
         return registry != null ? registry.getConfiguration() : null;
+    }
+
+    public static Registry getOrCreateRegistry()
+    {
+        if(registry==null || registry.isDisposed())
+        {
+            registry = new TransientRegistry();
+        }
+        return registry;
     }
 }

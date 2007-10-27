@@ -10,20 +10,25 @@
 
 package org.mule.util.properties;
 
+import org.mule.umo.NamedObject;
+
 /**
  * <code>PropertyExtractor</code> extracts a property from the message in a generic
  * way. i.e. composite properties can be pulled and aggregated depending on this
  * strategy. This can be used to extract Correlation Ids, Message Ids etc.
+ *
+ * These objects are used to execute property expressions (usually on the
+ * current message) at runtime to extracta dynamic value.
  */
-public interface PropertyExtractor
+public interface PropertyExtractor extends NamedObject
 {
     /**
      * Extracts a single property from the message
      * 
-     * @param name the property name or expression
+     * @param expression the property expression or expression
      * @param message the message to extract from
      * @return the result of the extraction or null if the property was not found
      */
-    Object getProperty(String name, Object message);
+    Object getProperty(String expression, Object message);
 
 }

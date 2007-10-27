@@ -12,7 +12,6 @@ package org.mule.routing;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleEvent;
-import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -42,10 +41,9 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
         try
         {
             UMOImmutableEndpoint endpoint = getEndpoint();
-            
             if (sendTransformed && endpoint.getTransformers() != null)
             {
-                message = TransformerUtils.applyAllTransformers(endpoint.getTransformers(), message);
+                message.applyTransformers(endpoint.getTransformers());
             }
 
             UMOEvent newEvent = new MuleEvent(message, endpoint, session, synchronous);

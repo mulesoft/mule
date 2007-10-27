@@ -99,25 +99,30 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
         doTestMessageEqualsPayload(validMessage, adapter.getPayload());
     }
 
-    public void testMultipleSetMessageCalls() throws Exception
-    {
-        // get new message adapter to test
-        FileContentsMessageAdapter adapter = new FileContentsMessageAdapter(messageFile);
-
-        // access first payload
-        doTestMessageEqualsPayload(validMessage, adapter.getPayload());
-
-        // create another source file
-        String secondMessageContent = "Hooray";
-        byte[] secondMessage = secondMessageContent.getBytes();
-        File secondFile = File.createTempFile("simple2", ".mule", messageFile.getParentFile());
-        FileUtils.writeStringToFile(secondFile, secondMessageContent, null);
-
-        // replace the first message content
-        adapter.setMessage(secondFile);
-
-        // make sure the file was properly read
-        doTestMessageEqualsPayload(secondMessage, adapter.getPayload());
-    }
+    /**
+     * This is not a valid use case since Transport adapters are immutable, hence a new one should be created
+     * for each messages
+     */
+//    public void testMultipleSetMessageCalls() throws Exception
+//    {
+//        // get new message adapter to test
+//        FileContentsMessageAdapter adapter = new FileContentsMessageAdapter(messageFile);
+//
+//        // access first payload
+//        doTestMessageEqualsPayload(validMessage, adapter.getPayload());
+//
+//        // create another source file
+//        String secondMessageContent = "Hooray";
+//        byte[] secondMessage = secondMessageContent.getBytes();
+//        File secondFile = File.createTempFile("simple2", ".mule", messageFile.getParentFile());
+//        FileUtils.writeStringToFile(secondFile, secondMessageContent, null);
+//
+//        // replace the first message content
+        //This shouln't even be visible
+//        adapter.setFileMessage(secondFile);
+//
+//        // make sure the file was properly read
+//        doTestMessageEqualsPayload(secondMessage, adapter.getPayload());
+//    }
 
 }

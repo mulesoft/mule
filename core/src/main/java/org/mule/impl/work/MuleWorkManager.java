@@ -235,7 +235,11 @@ public class MuleWorkManager implements UMOWorkManager
      */
     public void execute(Runnable work)
     {
-        if (workExecutorService == null || workExecutorService.isShutdown())
+        if (workExecutorService == null)
+        {
+            throw new IllegalStateException("This MuleWorkManager '" + name + "' was never started");
+        }
+        else if (workExecutorService.isShutdown())
         {
             throw new IllegalStateException("This MuleWorkManager '" + name + "' is stopped");
         }

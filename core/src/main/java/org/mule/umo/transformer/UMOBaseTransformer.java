@@ -9,6 +9,7 @@
  */
 package org.mule.umo.transformer;
 
+import org.mule.umo.NamedObject;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 
@@ -17,7 +18,7 @@ import org.mule.umo.lifecycle.Initialisable;
  * object type to another.
 
  */
-public interface UMOBaseTransformer extends Initialisable
+public interface UMOBaseTransformer extends Initialisable, NamedObject
 {
     /**
      * The endpoint that this transformer is attached to
@@ -32,15 +33,5 @@ public interface UMOBaseTransformer extends Initialisable
      * @param endpoint sets the endpoint associated with the transfromer
      */
     void setEndpoint(UMOImmutableEndpoint endpoint);
-
-    /**
-     * @param newName the logical name for the transformer
-     */
-    void setName(String newName);
-
-    /**
-     * @return the logical name of the transformer
-     */
-    String getName();
 
 }

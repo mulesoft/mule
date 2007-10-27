@@ -10,6 +10,8 @@
 
 package org.mule.providers.http;
 
+import org.mule.providers.http.i18n.HttpMessages;
+
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
@@ -29,14 +31,14 @@ public class RequestLine
 
     public static RequestLine parseLine(final String l) throws HttpException
     {
-        String method = null;
-        String uri = null;
-        String protocol = null;
+        String method;
+        String uri;
+        String protocol;
         try
         {
             if(l==null)
             {
-                System.out.println("");
+                throw new ProtocolException(HttpMessages.requestLineIsMalformed(l).getMessage());
             }
             StringTokenizer st = new StringTokenizer(l, " ");
             method = st.nextToken();
@@ -45,7 +47,7 @@ public class RequestLine
         }
         catch (NoSuchElementException e)
         {
-            throw new ProtocolException("Invalid request line: " + l);
+            throw new ProtocolException(HttpMessages.requestLineIsMalformed(l).getMessage());
         }
         return new RequestLine(method, uri, protocol);
     }

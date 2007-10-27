@@ -21,10 +21,11 @@ public interface UMOTransformer extends UMOBaseTransformer
      * Determines if a particular source class can be handled by this transformer
      * 
      * @param aClass The class to check for compatability
-     * @return true if the transformer supports this types of class or false
+     * @return true if the transformer supports this type of class or false
      *         otherwise
      */
     boolean isSourceTypeSupported(Class aClass);
+
 
     /**
      * Does this transformer allow null input?

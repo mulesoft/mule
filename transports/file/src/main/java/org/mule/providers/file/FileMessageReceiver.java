@@ -47,7 +47,6 @@ import org.apache.commons.collections.comparators.ReverseComparator;
 
 public class FileMessageReceiver extends AbstractPollingMessageReceiver
 {
-
     public static final String COMPARATOR_CLASS_NAME_PROPERTY = "comparator";
     public static final String COMPARATOR_REVERSE_ORDER_PROPERTY = "reverseOrder";
 
@@ -182,24 +181,20 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         File destinationFile = null;
         String sourceFileOriginalName = sourceFile.getName();
         //Create a message adapter here to pass to the fileName parser
-        UMOMessageAdapter msgAdapter;
-        if (endpoint.isStreaming())
+        UMOMessageAdapter msgAdapter = null;
+        try 
         {
-            try
-            {
-                msgAdapter = connector.getStreamMessageAdapter(new FileInputStream(sourceFile), null);
-            }
-            catch (FileNotFoundException e)
-            {
-                //we can ignore since we did manage to acquire a lock, but just in case
-                logger.error("File being read disappeared!", e);
-                return;
-            }
+            Object payload = new ReceiverFileInputStream(sourceFile, moveDir != null);
+            
+            msgAdapter = connector.getMessageAdapter(payload);
         }
-        else
+        catch (FileNotFoundException e)
         {
-            msgAdapter = connector.getMessageAdapter(sourceFile);
+            //we can ignore since we did manage to acquire a lock, but just in case
+            logger.error("File being read disappeared!", e);
+            return;
         }
+        
         msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
         // set up destination file
@@ -243,14 +238,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                 }
 
                 // create new MessageAdapter for destinationFile
-                if (endpoint.isStreaming())
-                {
-                    msgAdapter = connector.getStreamMessageAdapter(new FileInputStream(destinationFile), null);
-                }
-                else
-                {
-                    msgAdapter = connector.getMessageAdapter(destinationFile);
-                }
+                Object payload = getPayload(destinationFile, true);
+                msgAdapter = connector.getMessageAdapter(payload);
+                
                 msgAdapter.setProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
                 msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
             }
@@ -258,25 +248,12 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // finally deliver the file message
             this.routeMessage(new MuleMessage(msgAdapter), endpoint.isSynchronous());
 
-            // at this point msgAdapter either points to the old sourceFile
-            // or the new destinationFile.
-            if (((FileConnector) connector).isAutoDelete())
+            // Delete the file if we didn't stream it
+            if (!((FileConnector) connector).isStreamFiles())
             {
-                // no moveTo directory
-                if (destinationFile == null)
-                {
-                    // delete source
-                    if (!sourceFile.delete())
-                    {
-                        throw new MuleException(
-                                FileMessages.failedToDeleteFile(sourceFile.getAbsolutePath()));
-                    }
-                }
-                else
-                {
-                    // nothing to do here since moveFile() should have deleted
-                    // the source file for us
-                }
+                boolean moveTo = destinationFile != null;
+                File current = moveTo ? destinationFile : sourceFile;
+                delete(current, moveTo);
             }
         }
         catch (Exception e)
@@ -295,6 +272,35 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                             (fileWasRolledBack ? "successful" : "unsuccessful")), new MuleMessage(msgAdapter), endpoint,
                     e);
             this.handleException(ex);
+        }
+    }
+
+    private Object getPayload(final File sourceFile, boolean moveTo) throws FileNotFoundException
+    {
+        Object payload = null;
+        if (((FileConnector) connector).isStreamFiles()) 
+        {
+            payload = new ReceiverFileInputStream(sourceFile, moveTo);
+        }
+        else
+        {
+            payload = sourceFile;
+        }
+        return payload;
+    }
+
+    private void delete(final File file, boolean moveTo) throws MuleException
+    {
+        // at this point msgAdapter either points to the old sourceFile
+        // or the new destinationFile.
+        if (((FileConnector) connector).isAutoDelete() || moveTo)
+        {
+            // delete source
+            if (!file.delete())
+            {
+                throw new MuleException(
+                        FileMessages.failedToDeleteFile(file.getAbsolutePath()));
+            }
         }
     }
 
@@ -447,6 +453,44 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    /**
+     * Deletes the file when close() is called.
+     */
+    final class ReceiverFileInputStream extends FileInputStream
+    {
+        private boolean movedTo;
+        private File currentFile;
+
+        public ReceiverFileInputStream(File currentFile, boolean movedTo)
+            throws FileNotFoundException
+        {
+            super(currentFile);
+            this.movedTo = movedTo;
+            this.currentFile = currentFile;
+        }
+
+        public void close() throws IOException
+        {
+            super.close();
+
+            try
+            {
+                delete(currentFile, movedTo);
+            }
+            catch (MuleException e)
+            {
+                IOException e2 = new IOException();
+                e2.initCause(e);
+                throw e2;
+            }
+        }
+
+        public File getCurrentFile()
+        {
+            return currentFile;
+        }
+    }
+
     protected Comparator getComparator() throws Exception
     {
 
@@ -465,5 +509,4 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         return null;
     }
-
 }

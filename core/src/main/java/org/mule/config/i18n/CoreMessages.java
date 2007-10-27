@@ -323,6 +323,11 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 76, object);
     }
 
+    public static Message objectNotFound(String type, String object)
+    {
+        return createMessage(BUNDLE_PATH, 76, type + ": " + object);
+    }
+
     public static Message transactionMarkedForRollback()
     {
         return createMessage(BUNDLE_PATH, 77);
@@ -612,6 +617,13 @@ public class CoreMessages extends MessageFactory
                 StringMessageUtils.toString(actual));
     }
 
+    public static Message propertyIsNotSupportedType(String property, Class[] expected,
+                                                     Class actual)
+    {
+        return createMessage(BUNDLE_PATH, 157, property, StringMessageUtils.toString(expected),
+                StringMessageUtils.toString(actual));
+    }
+
     public static Message containerAlreadyRegistered(String name)
     {
         return createMessage(BUNDLE_PATH, 155, name);
@@ -652,7 +664,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 167, name);
     }
 
-    public static Object propertyIsNotSetOnEvent(String property)
+    public static Message propertyIsNotSetOnEvent(String property)
     {
         return createMessage(BUNDLE_PATH, 168, property);
     }
@@ -874,7 +886,7 @@ public class CoreMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 231, descriptor.getName(), descriptor.getModelName(), modelName);
     }
-
+    
     //These endpoint errors should go away once we make setting endpoints on routers typesafe
 
     public static Message inboundRouterMustUseInboundEndpoints(UMOInboundRouterCollection router, UMOImmutableEndpoint endpoint)
@@ -910,7 +922,16 @@ public class CoreMessages extends MessageFactory
                              StringUtils.defaultString(MuleManifest.getVendorName(), notset) + " " +
                              StringUtils.defaultString(MuleManifest.getVendorUrl(), notset));
     }
+    
+    public static Message noTransformerFoundForMessage(Class input, Class output)
+    {
+        return createMessage(BUNDLE_PATH, 237, input.getName(), output.getName());
+    }
 
+    public static Message errorReadingStream()
+    {
+        return createMessage(BUNDLE_PATH, 238);
+    }
 
     public static Message noEntryPointFoundForNoArgsMethodUsingResolver(final Object component, final String methodName, UMOEntryPointResolver resolver)
     {
@@ -956,7 +977,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 246, StringMessageUtils.toString(object),
                 methodName, resolver);
     }
-
+    
     public static Message noJtaTransactionAvailable(final Thread callingThread)
     {
         return createMessage(BUNDLE_PATH, 247, StringUtils.defaultString(callingThread.toString()));
@@ -970,6 +991,21 @@ public class CoreMessages extends MessageFactory
     public static Message noComponentQueueTimeoutSet(UMOComponent component)
     {
         return createMessage(BUNDLE_PATH, 249, component);
+    }
+
+    public static Message failedToProcessExtractorFunction(String name)
+    {
+        return createMessage(BUNDLE_PATH, 250, name);
+    }
+
+    public static Message noExtractorRegisteredWithKey(String key)
+    {
+        return createMessage(BUNDLE_PATH, 251, key);
+    }
+
+    public static Message objectAlreadyExists(String key)
+    {
+        return createMessage(BUNDLE_PATH, 252, key);
     }
 
 }

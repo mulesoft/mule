@@ -15,7 +15,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.UMOComponentAware;
-import org.mule.providers.NullPayload;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOManagementContext;
@@ -132,7 +131,7 @@ public class WSProxyService implements Callable, UMOComponentAware, Initialisabl
                 .lookupEndpointFactory()
                 .getOutboundEndpoint(this.wsdlEndpoint, managementContext);
 
-            UMOMessage replyWSDL = eventContext.sendEvent(new MuleMessage(NullPayload.getInstance()), webServiceEndpoint);
+            UMOMessage replyWSDL = eventContext.receiveEvent(webServiceEndpoint, eventContext.getTimeout());
 
             wsdlString = replyWSDL.getPayloadAsString();
 

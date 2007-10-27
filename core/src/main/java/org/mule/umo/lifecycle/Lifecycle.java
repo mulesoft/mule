@@ -15,7 +15,7 @@ package org.mule.umo.lifecycle;
  * <code>stop</code> and <code>dispose</code>.
  * TODO MULE-2113
  */
-public interface Lifecycle extends Startable, Stoppable, Disposable
+public interface Lifecycle extends Initialisable, Startable, Stoppable, Disposable
 {
     // no additional methods - see super interfaces
 }

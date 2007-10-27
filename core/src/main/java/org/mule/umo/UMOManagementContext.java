@@ -14,7 +14,6 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.Registry;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
@@ -30,7 +29,7 @@ import javax.transaction.TransactionManager;
 /**
  * TODO document
  */
-public interface UMOManagementContext extends Initialisable, Lifecycle
+public interface UMOManagementContext extends Lifecycle
 {
     String getSystemName();
 

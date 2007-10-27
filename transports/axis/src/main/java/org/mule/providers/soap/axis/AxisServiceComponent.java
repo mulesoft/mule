@@ -156,7 +156,7 @@ public class AxisServiceComponent implements Initialisable, Callable
                 String uri = SoapConstants.SOAP_ENDPOINT_PREFIX + context.getEndpointURI().getScheme()
                                 + "://" + context.getEndpointURI().getHost() + ":"
                                 + context.getEndpointURI().getPort();
-                uri += context.getMessageAsString();
+                uri += context.getMessage().getStringProperty(HttpConnector.HTTP_REQUEST_PROPERTY, "");
                 endpointUri = new MuleEndpointURI(uri);
                 endpointUri.initialise();
             }

@@ -13,9 +13,10 @@ package org.mule.extras.spring.events;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
-import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.concurrent.Latch;
@@ -24,6 +25,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -336,7 +338,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
      * A simple UMOTransformer that counts down a Latch to indicate that it has been
      * called.
      */
-    public static class TestEventAwareTransformer extends AbstractEventAwareTransformer
+    public static class TestEventAwareTransformer extends AbstractMessageAwareTransformer
     {
         private CountDownLatch latch;
 
@@ -365,17 +367,16 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
             this.latch = latch;
         }
 
-        public Object transform(Object src, String encoding, UMOEventContext context)
-            throws TransformerException
+        public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
         {
-            assertNotNull(context);
+            assertNotNull(message);
 
             if (latch != null)
             {
                 latch.countDown();
             }
 
-            return src;
+            return message;
         }
     }
 

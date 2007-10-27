@@ -109,7 +109,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            UMOMessageReceiver receiver = getReceiverForURI(request);
+        	UMOMessageReceiver receiver = getReceiverForURI(request);
             UMOMessage responseMessage;
             UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
@@ -125,7 +125,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
     private void setupRequestMessage(HttpServletRequest request, UMOMessage requestMessage)
     {
-        requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request.getRequestURI());
+        requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request.getPathInfo());
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -133,7 +133,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-            UMOMessageReceiver receiver = getReceiverForURI(request);
+        	UMOMessageReceiver receiver = getReceiverForURI(request);
             UMOMessage responseMessage;
             UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
             requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
@@ -290,6 +290,14 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 receiver = HttpMessageReceiver.findReceiverByStem(connector.getReceivers(), uri);
             }
             
+            // This is some bizarre piece of code so the XFire Servlet code works.
+            // We should remove this at some point (see XFireWsdlCallTestCase for a failure
+            // if this code is removed).
+            if (receiver == null) 
+            {
+				receiver = HttpMessageReceiver.findReceiverByStem(connector.getReceivers(), uri);
+			}
+
             // This is some bizarre piece of code so the XFire Servlet code works.
             // We should remove this at some point (see XFireWsdlCallTestCase for a failure
             // if this code is removed).

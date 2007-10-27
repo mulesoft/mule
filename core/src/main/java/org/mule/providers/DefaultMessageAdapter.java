@@ -14,6 +14,7 @@ import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ThreadSafeAccess;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.provider.UMOMutableMessageAdapter;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -26,7 +27,7 @@ import javax.activation.DataHandler;
  * associated with an object.
  */
 
-public class DefaultMessageAdapter extends AbstractMessageAdapter
+public final class DefaultMessageAdapter extends AbstractMessageAdapter implements UMOMutableMessageAdapter
 {
     /**
      * Serial version
@@ -37,6 +38,12 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
      * The message object wrapped by this adapter
      */
     protected Object message;
+
+    
+    protected DefaultMessageAdapter()
+    {
+        super();
+    }
 
     /**
      * Creates a default message adapter with properties and attachments
@@ -139,7 +146,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
         this(message);
         if (properties != null)
         {
-            this.properties.putAll(properties);
+            this.properties.addInboundProperties(properties);
         }
         if (attachments != null)
         {
@@ -147,57 +154,30 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
         }
     }
 
-    /**
-     * Converts the message implementation into a String representation
-     *
-     * @param encoding The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte array
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     */
-    public String getPayloadAsString(String encoding) throws Exception
-    {
-        if (message instanceof byte[])
-        {
-            if (encoding != null)
-            {
-                return new String((byte[]) message, encoding);
-            }
-            else
-            {
-                return new String((byte[]) message);
-            }
-        }
-        else
-        {
-            return message.toString();
-        }
-    }
-
-    /**
-     * Converts the message implementation into a String representation
-     *
-     * @return String representation of the message
-     * @throws Exception Implemetation may throw an endpoint specific exception
-     */
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-        return convertToBytes(message);
-    }
-
-    /**
-     * @return the current message
-     */
+    /** {@inheritDoc} */
     public Object getPayload()
     {
         return message;
     }
 
+    /** {@inheritDoc} */
+    public void setPayload(Object payload)
+    {
+        synchronized(message)
+        {
+            message = payload;
+        }
+    }
+
+    /** {@inheritDoc} */
     public String getUniqueId()
     {
         return id;
     }
 
+    ////////////////////////// ThreadSafeAccess impl ////////////////////
+
+    /** {@inheritDoc} */
     public ThreadSafeAccess newThreadCopy()
     {
         return new DefaultMessageAdapter(getPayload(), this);

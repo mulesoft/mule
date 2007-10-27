@@ -25,7 +25,12 @@ public class ConnectorCreationTestCase extends FunctionalTestCase
     {
         setStartContext(false);
     }
-    
+
+    protected String getConfigResources()
+    {
+        return "";
+    }
+
     public void testAlwaysCreateUsingParamString() throws Exception
     {
         disposeManager();

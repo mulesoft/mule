@@ -35,7 +35,7 @@ public class XFireConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoin
     {
         return "xfire";
     }
-    
+
     public void testBinding() throws Exception
     {
         String url = "http://localhost:62108/";

@@ -44,7 +44,7 @@ import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.SimpleObjectFactory;
+import org.mule.util.object.SingletonObjectFactory;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -207,7 +207,7 @@ public final class MuleTestUtils
     {
         return getTestComponent(name, clazz, props, context, true);        
     }
-    
+
     public static UMOComponent getTestComponent(String name, Class clazz, Map props, UMOManagementContext context, boolean initialize) throws Exception
     {
         SedaModel model = new SedaModel();
@@ -216,19 +216,16 @@ public final class MuleTestUtils
         
         UMOComponent c = new SedaComponent();
         c.setName(name);
-        ObjectFactory of = new SimpleObjectFactory(clazz, props);
+        ObjectFactory of = new SingletonObjectFactory(clazz, props);
         of.initialise();
         c.setServiceFactory(of);
         c.setModel(model);
-
-        c.setManagementContext(context);
         if (initialize)
         {
-            context.applyLifecycle(c);
-
+            context.getRegistry().registerComponent(c, context);
+            //TODO Why is this necessary
             UMOOutboundRouter router = new OutboundPassThroughRouter();
-            router.addEndpoint(getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER, context));
-            c.getOutboundRouter().addRouter(router);        
+            c.getOutboundRouter().addRouter(router);
         }
 
         return c;

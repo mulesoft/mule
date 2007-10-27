@@ -41,7 +41,7 @@ public class XFireServiceUsingAxisEndpointTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         props.put("http.method", "GET");
-        UMOMessage reply = client.send("http://localhost:33382/services/XfireService?wsdl",
+        UMOMessage reply = client.send("http://localhost:63382/services/XfireService?wsdl",
             "/services/Hello_Xfire?wsdl", props);
 
         assertNotNull(reply);

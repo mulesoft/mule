@@ -42,7 +42,7 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
         connector.setDataSourceFactory(of);
         
         connector.setManagementContext(managementContext);
-        managementContext.applyLifecycle(connector);
+        //managementContext.applyLifecycle(connector);
         managementContext.getRegistry().registerConnector(connector, managementContext);
         
         

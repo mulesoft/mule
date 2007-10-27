@@ -10,27 +10,32 @@
 
 package org.mule.modules.xml.functional;
 
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
+import java.util.Properties;
+
 
 public class JXPathPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    protected String getConfigResources()
+    public JXPathPropertyExtractorTestCase()
     {
-        return "xml/jxpath-property-extractor-test.xml";
+        super(true);
+    }
+
+    protected Properties getStartUpProperties()
+    {
+        Properties p = new Properties();
+        p.setProperty("selector.property", "${jxpath:/endpoint}");
+        return p;
     }
 
     protected Object getMatchMessage()
     {
-        return "<endpoint>name</endpoint>";
+        return "<endpoint>matchingEndpoint1</endpoint>";
     }
 
     protected Object getErrorMessage()
     {
-        return "<endpoint>missing</endpoint>";
+        return "<endpoint>missingEndpoint</endpoint>";
     }
 
 }

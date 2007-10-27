@@ -25,6 +25,8 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public interface Registry extends Initialisable, Disposable
@@ -135,6 +137,8 @@ public interface Registry extends Initialisable, Disposable
 
     UMOComponent lookupComponent(String component);
 
+    List lookupTransformers(Class input, Class output);
+
     Collection/*<UMOComponent>*/ lookupComponents(String model);
 
     UMOModel lookupModel(String name);
@@ -177,6 +181,8 @@ public interface Registry extends Initialisable, Disposable
 
     void registerObject(String key, Object value, Object metadata, UMOManagementContext managementContext)
         throws RegistrationException;
+
+    void registerObjects(Map objects) throws RegistrationException;
 
     void unregisterObject(String key);
 
@@ -251,7 +257,7 @@ public interface Registry extends Initialisable, Disposable
     // TODO These methods are a mess (they blur lookup with creation, uris with names). Need to clean this up.
 
     ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
-        throws ServiceException;
+            throws ServiceException;
 
     // /////////////////////////////////////////////////////////////////////////
     // Registry Metadata

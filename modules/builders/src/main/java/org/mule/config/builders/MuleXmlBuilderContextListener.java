@@ -99,7 +99,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
         throws ConfigurationException
     {
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context, webappClasspath);
-        managementContext = builder.configure(configResource, null);
+        managementContext = builder.configure(configResource);
         return managementContext;
     }
 

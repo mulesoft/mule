@@ -17,6 +17,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.CreateException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.Map;
@@ -120,6 +121,11 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
 
         public void release()
         { /*nop*/ }
+    }
+
+    protected void doInitialise() throws InitialisationException
+    {
+        //nothing to do
     }
 
     protected void doConnect() throws Exception

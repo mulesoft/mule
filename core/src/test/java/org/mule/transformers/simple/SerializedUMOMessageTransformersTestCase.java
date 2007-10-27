@@ -64,14 +64,12 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
 
     public UMOTransformer getTransformer() throws Exception
     {
-        SerializableToByteArray t = new SerializableToByteArray();
-        t.setAcceptUMOMessage(true);
-        return t;
+        return new UMOMessageToByteArray();
     }
 
     public UMOTransformer getRoundTripTransformer() throws Exception
     {
-        return new ByteArrayToSerializable();
+        return new ByteArrayToUMOMessage();
     }
 
     public Object getTestData()

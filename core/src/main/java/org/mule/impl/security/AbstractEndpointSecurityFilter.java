@@ -14,6 +14,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOManagementContext;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -27,6 +29,9 @@ import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.util.StringUtils;
+import org.mule.transformers.TransformerTemplate;
+
+import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,9 +43,7 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecurityFilter, ManagementContextAware
 {
-    /**
-     * logger used by this class
-     */
+    /** logger used by this class */
     protected transient Log logger = LogFactory.getLog(getClass());
 
     protected UMOSecurityManager securityManager;
@@ -85,8 +88,8 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
                 else
                 {
                     throw new InitialisationException(
-                        CoreMessages.objectNotRegistered(
-                            "Security Provider", sp[i]), this);
+                            CoreMessages.objectNotRegistered(
+                                    "Security Provider", sp[i]), this);
                 }
             }
             securityManager = localManager;
@@ -97,7 +100,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
 
     protected final synchronized void lazyInit() throws InitialisationException
     {
-        if (! isInitialised)
+        if (!isInitialised)
         {
             initialiseEndpoint();
             isInitialised = true;
@@ -122,9 +125,9 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         else
         {
             throw new InitialisationException(
-                CoreMessages.authEndpointTypeForFilterMustBe(
-                    UMOEndpoint.ENDPOINT_TYPE_SENDER + " or " + UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
-                    endpoint.getType()), this);
+                    CoreMessages.authEndpointTypeForFilterMustBe(
+                            UMOEndpoint.ENDPOINT_TYPE_SENDER + " or " + UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
+                            endpoint.getType()), this);
         }
         doInitialise();
     }
@@ -139,9 +142,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         this.authenticate = authenticate;
     }
 
-    /**
-     * @param manager
-     */
+    /** @param manager  */
     public void setSecurityManager(UMOSecurityManager manager)
     {
         securityManager = manager;
@@ -199,12 +200,25 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         this.credentialsAccessor = credentialsAccessor;
     }
 
+    protected void updatePayload(UMOMessage message, final Object payload) throws TransformerException
+    {
+        TransformerTemplate trans = new TransformerTemplate(new TransformerTemplate.TransformerCallback()
+        {
+            public Object doTransform(UMOMessage message) throws Exception
+            {
+                return payload;
+            }
+        });
+
+        message.applyTransformers(Arrays.asList(new Object[]{trans}));
+    }
+
     protected abstract void authenticateInbound(UMOEvent event)
-        throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
-        EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
+            throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
+            EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
 
     protected abstract void authenticateOutbound(UMOEvent event)
-        throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException;
+            throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException;
 
     protected abstract void doInitialise() throws InitialisationException;
 

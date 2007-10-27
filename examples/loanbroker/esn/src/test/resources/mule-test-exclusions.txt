@@ -2,8 +2,6 @@
 # Test cases listed in this file are not run.
 #
 
-# these still fail quite often with an unexpected NullPayload :(
-org.mule.examples.loanbroker.esn.AxisLoanBrokerSynchronousFunctionalTestCase
+# Currently fail because we get the soapString returned from XFire not the Object binding??
 org.mule.examples.loanbroker.esn.XFireLoanBrokerAsynchronousFunctionalTestCase
 org.mule.examples.loanbroker.esn.XFireLoanBrokerSynchronousFunctionalTestCase
-

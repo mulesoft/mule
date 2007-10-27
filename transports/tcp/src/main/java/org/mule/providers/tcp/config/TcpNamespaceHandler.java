@@ -21,6 +21,7 @@ import org.mule.providers.tcp.protocols.MuleMessageEOFProtocol;
 import org.mule.providers.tcp.protocols.MuleMessageLengthProtocol;
 import org.mule.providers.tcp.protocols.MuleMessageSafeProtocol;
 import org.mule.providers.tcp.protocols.SafeProtocol;
+import org.mule.providers.tcp.protocols.StreamingProtocol;
 import org.mule.providers.tcp.protocols.XmlMessageEOFProtocol;
 import org.mule.providers.tcp.protocols.XmlMessageProtocol;
 
@@ -43,6 +44,7 @@ public class TcpNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("length-protocol", new ByteOrMessageProtocolDefinitionParser(LengthProtocol.class, MuleMessageLengthProtocol.class));
         registerBeanDefinitionParser("eof-protocol", new ByteOrMessageProtocolDefinitionParser(EOFProtocol.class, MuleMessageEOFProtocol.class));
         registerBeanDefinitionParser("direct-protocol", new ByteOrMessageProtocolDefinitionParser(DirectProtocol.class, MuleMessageDirectProtocol.class));
+        registerBeanDefinitionParser("streaming-protocol", new ByteOrMessageProtocolDefinitionParser(StreamingProtocol.class, MuleMessageDirectProtocol.class));
     }
 
 }

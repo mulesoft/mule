@@ -38,7 +38,16 @@ public class BankQuotesAggregationLogic
         for (Iterator iterator = events.iterator(); iterator.hasNext();)
         {
             event = (UMOEvent)iterator.next();
-            quote = (LoanQuote)event.getTransformedMessage();
+            Object o = event.getTransformedMessage();
+            if(o instanceof LoanQuote)
+            {
+                quote = (LoanQuote)o;
+            }
+            else
+            {
+                throw new IllegalArgumentException("Object received by Aggregator is not of expected type. Wanted: "
+                        + LoanQuote.class.getName() + " Got: " + o);
+            }
             logger.info(LocaleMessage.processingQuote(quote));
 
             if (lowestQuote == null)

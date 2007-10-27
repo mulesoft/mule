@@ -33,6 +33,11 @@ public class TcpMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 3);
     }
+
+    public static Message invalidStreamingOutputType(Class c)
+    {
+        return createMessage(BUNDLE_PATH, 4, c.getName());
+    }
 }
 
 

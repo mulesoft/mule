@@ -22,7 +22,7 @@
     <endpoint name="robin1" address="vm://robin1" connector-ref="queue"/>
     <endpoint name="robin2" address="vm://robin2" connector-ref="queue"/>
 
-    <spring:bean name="dom4jpe" class="org.mule.util.properties.Dom4jPropertyExtractor"/>
+    <spring:bean name="dom4jpe" class="org.mule.xml.util.properties.XPathPayloadPropertyExtractor"/>
 
     <model name="xml outbound tests">
 

@@ -4,11 +4,12 @@
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"
+       default-init-method="initialise">
 
-    <bean name="_muleManagementContext" class="org.mule.config.spring.ManagementContextFactoryBean"
-          depends-on="_muleRegistry">
+    <bean name="_muleManagementContext" class="org.mule.config.spring.ManagementContextFactoryBean">
         <constructor-arg ref="_muleLifecycleManager"/>
+        <property name="workManager" ref="_muleWorkManager"/>
     </bean>
 
     <bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
@@ -46,6 +47,9 @@
 
     <bean name="_muleRegistry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean">
     </bean>
+
+     <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"
+          depends-on="_muleRegistry"/>
 
     <mule:mule name="_muleSystemModel">
 
@@ -168,6 +172,8 @@
 
 <!--    <bean name="_muleDefaultEndpointBuilder" class="org.mule.impl.endpoint.EndpointBuilder"/>-->
 
-    <!--<mule:properties-container includeSystemProperties="true" name="_muleSystemModelProperties"/>-->
 
+    <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
+    the transformers will be available even when using the the TransientRegistry only -->
+    
 </beans>

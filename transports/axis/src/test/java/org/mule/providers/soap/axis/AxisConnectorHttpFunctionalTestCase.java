@@ -57,13 +57,12 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
         try
         {
             // TODO MULE-2228 Simplify this API
-            UMOComponent c = MuleTestUtils.getTestComponent("testComponentWithoutInterfaces", ComponentWithoutInterfaces.class, managementContext);
+            UMOComponent c = MuleTestUtils.getTestComponent("testComponentWithoutInterfaces", ComponentWithoutInterfaces.class, null, managementContext, false);
             UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getEndpoint(
                 new MuleEndpointURI(getComponentWithoutInterfacesEndpoint()), UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
                 managementContext);
             c.getInboundRouter().addEndpoint(ep);
             managementContext.getRegistry().registerComponent(c, managementContext);
-            c.start();
             fail("Expected exception");
         }
         catch (UMOException e)

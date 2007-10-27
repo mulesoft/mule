@@ -10,15 +10,21 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
+import org.mule.util.StringUtils;
+import org.mule.util.properties.PropertyExtractorManager;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>EndpointSelector</code> selects the outgoing endpoint based on a
@@ -39,70 +45,87 @@ import java.util.Iterator;
  *
  * </pre>
  */
-public class EndpointSelector extends FilteringOutboundRouter
+public class EndpointSelector extends FilteringOutboundRouter implements ManagementContextAware
 {
-    private String selectorProperty = "endpoint";
-    private boolean extractorEnabled = false;
+    public static final String DEFAULT_SELECTOR_PROPERTY = "endpoint";
+
+    private String selectorProperty = DEFAULT_SELECTOR_PROPERTY;
+
+
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
         throws RoutingException
     {
+        List endpoints;
         String endpointName;
-        if (extractorEnabled)
+        
+        Object property = PropertyExtractorManager.processExpression(getSelectorProperty(), message);
+        if(property ==null)
         {
-            if (null == getPropertyExtractor())
-            {
-                throw new IllegalArgumentException("No property extractor specified");
-            }
-            Object property = getPropertyExtractor().getProperty(getSelectorProperty(), message);
-            if (!(property instanceof String))
-            {
-                throw new IllegalArgumentException("No property for " + getSelectorProperty());
-            }
-            endpointName = (String) property;
+            throw new CouldNotRouteOutboundMessageException(
+                    CoreMessages.propertyIsNotSetOnEvent(getSelectorProperty()), message, null);
+        }
+
+        if (property instanceof String)
+        {
+            endpoints = new ArrayList(1);
+            endpoints.add(property);
+        }
+        else if(property instanceof List)
+        {
+            endpoints = (List)property;
         }
         else
         {
-            endpointName = message.getStringProperty(getSelectorProperty(), null);
-        }
-        if (endpointName == null)
-        {
-            throw new IllegalArgumentException("selectorProperty '" + getSelectorProperty()
-                                               + "' must be set on message in order to route it.");
+            throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSupportedType(
+                    getSelectorProperty(), new Class[]{String.class, List.class}, property.getClass()), message, null);
+
         }
 
-        UMOEndpoint ep = lookupEndpoint(endpointName);
-        if (ep == null)
+        UMOMessage result = null;
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            throw new CouldNotRouteOutboundMessageException(
-                MessageFactory.createStaticMessage("No endpoint found with the name " + endpointName), message, ep);
-        }
+            endpointName =  iterator.next().toString();
 
-        try
-        {
-            if (synchronous)
+            if(StringUtils.isEmpty(endpointName))
             {
-                return send(session, message, ep);
+                throw new CouldNotRouteOutboundMessageException(
+                        CoreMessages.objectIsNull("Endpoint Name: " + getSelectorProperty()), message, null);
             }
-            else
+            UMOImmutableEndpoint ep = lookupEndpoint(endpointName);
+            if (ep == null)
             {
-                dispatch(session, message, ep);
-                return null;
+                throw new CouldNotRouteOutboundMessageException(
+                    CoreMessages.objectNotFound("Endpoint", endpointName), message, ep);
+            }
+
+            try
+            {
+                if (synchronous)
+                {
+                    //TODO See MULE-2613, we only return the last message here
+                    result = send(session, message, ep);
+                }
+                else
+                {
+                    dispatch(session, message, ep);
+                }
+            }
+            catch (UMOException e)
+            {
+                throw new CouldNotRouteOutboundMessageException(message, ep, e);
             }
         }
-        catch (UMOException e)
-        {
-            throw new CouldNotRouteOutboundMessageException(message, ep, e);
-        }
+        return result;
     }
 
-    protected UMOEndpoint lookupEndpoint(String endpointName)
+    protected UMOImmutableEndpoint lookupEndpoint(String endpointName)
     {
-        UMOEndpoint ep;
+        UMOImmutableEndpoint ep;
         Iterator iterator = endpoints.iterator();
         while (iterator.hasNext())
         {
-            ep = (UMOEndpoint) iterator.next();
+            ep = (UMOImmutableEndpoint) iterator.next();
             // Endpoint identifier (deprecated)
             if (endpointName.equals(ep.getEndpointURI().getEndpointName()))
             {
@@ -118,7 +141,7 @@ public class EndpointSelector extends FilteringOutboundRouter
                 return ep;
             }
         }
-        return null;
+        return getManagementContext().getRegistry().lookupEndpoint(endpointName, getManagementContext());
     }
 
     public String getSelectorProperty()
@@ -130,15 +153,4 @@ public class EndpointSelector extends FilteringOutboundRouter
     {
         this.selectorProperty = selectorProperty;
     }
-
-    public boolean isExtractorEnabled()
-    {
-        return extractorEnabled;
-    }
-
-    public void setExtractorEnabled(boolean extractorEnabled)
-    {
-        this.extractorEnabled = extractorEnabled;
-    }
-
 }

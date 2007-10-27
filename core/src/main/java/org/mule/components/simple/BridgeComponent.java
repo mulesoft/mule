@@ -13,8 +13,10 @@ package org.mule.components.simple;
 import org.mule.config.ConfigurationException;
 import org.mule.impl.UMOComponentAware;
 import org.mule.routing.inbound.ForwardingConsumer;
-import org.mule.umo.UMOEventContext;
+import org.mule.routing.inbound.InboundPassThroughRouter;
+import org.mule.routing.inbound.InboundRouterCollection;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.routing.UMOInboundRouter;
 
@@ -45,9 +47,20 @@ public class BridgeComponent implements UMOComponentAware, Callable
     {
         // Add a ForwardingConsumer, which punts message to oubound router, unless already present
         boolean registered = false;
-        for (Iterator router = component.getInboundRouter().getRouters().iterator(); router.hasNext();)
+        if(component.getInboundRouter()==null)
         {
-            registered = registered || ((UMOInboundRouter) router.next()) instanceof ForwardingConsumer;
+            component.setInboundRouter(new InboundRouterCollection());
+        }
+        for (Iterator routers = component.getInboundRouter().getRouters().iterator(); routers.hasNext();)
+        {
+            UMOInboundRouter router = (UMOInboundRouter) routers.next();
+            //Remove if present
+            if(router instanceof InboundPassThroughRouter)
+            {
+                component.getInboundRouter().removeRouter(router);
+            }
+            registered = registered || router instanceof ForwardingConsumer;
+
         }
         if (! registered)
         {

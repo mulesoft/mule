@@ -34,6 +34,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -42,9 +43,10 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.WaitableBoolean;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import java.io.OutputStream;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -117,7 +119,24 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         setConnector(connector);
         setComponent(component);
         setEndpoint(endpoint);
+    }
 
+    /**
+     * Method used to perform any initialisation work. If a fatal error occurs during
+     * initialisation an <code>InitialisationException</code> should be thrown,
+     * causing the Mule instance to shutdown. If the error is recoverable, say by
+     * retrying to connect, a <code>RecoverableException</code> should be thrown.
+     * There is no guarantee that by throwing a Recoverable exception that the Mule
+     * instance will not shut down.
+     *
+     * @throws org.mule.umo.lifecycle.InitialisationException
+     *          if a fatal error occurs causing the Mule
+     *          instance to shutdown
+     * @throws org.mule.umo.lifecycle.RecoverableException
+     *          if an error occurs that can be recovered from
+     */
+    public void initialise() throws InitialisationException
+    {
         listener = new DefaultInternalMessageListener();
         endpointUri = endpoint.getEndpointURI();
 
@@ -127,12 +146,12 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         }
         catch (UMOException e)
         {
-            throw new CreateException(e, this);
+            throw new InitialisationException(e, this);
         }
 
         connectionStrategy = this.endpoint.getConnectionStrategy();
+        doInitialise();
     }
-
     /*
      * (non-Javadoc)
      * 
@@ -561,10 +580,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
             if (authorised)
             {
-                // the security filter may update the payload so we need to get the
-                // latest event again
-                muleEvent = RequestContext.getEvent();
-
                 // This is a replyTo event for a current request
                 if (UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
                 {
@@ -582,9 +597,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
                 {
                     setExceptionDetails(resultMessage, resultMessage.getExceptionPayload().getException());
                 }
-                OptimizedRequestContext.unsafeRewriteEvent(resultMessage);
+                resultMessage.applyTransformers(endpoint.getResponseTransformers());
             }
-            return TransformerUtils.applyAllTransformers(endpoint.getResponseTransformers(), resultMessage);
+            return resultMessage;
         }
     }
 
@@ -614,6 +629,14 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         return sb.toString();
     }
 
+    protected void doInitialise() throws InitialisationException
+    {
+        //nothing to do
+        //TODO this was addd to complete the lifecycle phases on the message receivers however, we ened to
+        //review each receiver to move logic from the contstructor to the init method. The Connector will
+        //call this method when the receiver is created. see MULE-2113 for more information about lifecycle clean up
+    }
+    
     protected abstract void doStart() throws UMOException;
 
     protected abstract void doStop() throws UMOException;

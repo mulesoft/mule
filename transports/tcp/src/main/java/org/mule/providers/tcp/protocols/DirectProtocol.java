@@ -31,11 +31,12 @@ import org.apache.commons.logging.LogFactory;
 public class DirectProtocol extends AbstractByteProtocol
 {
 
+    protected static final int UNLIMITED = -1;
+
     private static final Log logger = LogFactory.getLog(DirectProtocol.class);
     private static final int DEFAULT_BUFFER_SIZE = 8192;
-    private static final int UNLIMITED = -1;
-
-    private int bufferSize;
+    
+    protected int bufferSize;
 
     public DirectProtocol()
     {
@@ -88,7 +89,7 @@ public class DirectProtocol extends AbstractByteProtocol
         return nullEmptyArray(baos.toByteArray());
     }
 
-    private int remaining(int limit, int remain, int len)
+    protected int remaining(int limit, int remain, int len)
     {
         if (UNLIMITED == limit)
         {

@@ -54,7 +54,7 @@ public abstract class AbstractMessageBuilder implements UMOComponentAware, Calla
         UMOMessage requestMessage = new MuleMessage(eventContext.getTransformedMessage(),
             eventContext.getMessage());
 
-        UMOMessage responseMessage = requestMessage;
+        UMOMessage responseMessage = null;
         Object builtMessage;
 
         if (component.getOutboundRouter().hasEndpoints())
@@ -65,9 +65,12 @@ public abstract class AbstractMessageBuilder implements UMOComponentAware, Calla
                 UMOOutboundRouter router = (UMOOutboundRouter) iterator.next();
                 endpoints.addAll(router.getEndpoints());
             }
+
             for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
             {
                 UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
+                Object request = requestMessage.getPayload();
+
                 boolean rsync = eventContext.getMessage().getBooleanProperty(
                     MuleProperties.MULE_REMOTE_SYNC_PROPERTY, endpoint.isRemoteSync());
                 if (!rsync)
@@ -106,9 +109,9 @@ public abstract class AbstractMessageBuilder implements UMOComponentAware, Calla
                             // ignore
                         }
                     }
-                    builtMessage = buildMessage(requestMessage, responseMessage);
+                    builtMessage = buildMessage(new MuleMessage(request, requestMessage), responseMessage);
                     responseMessage = new MuleMessage(builtMessage, responseMessage);
-                    requestMessage = responseMessage;
+                    requestMessage = new MuleMessage(responseMessage.getPayload(), responseMessage);
                 }
             }
         }

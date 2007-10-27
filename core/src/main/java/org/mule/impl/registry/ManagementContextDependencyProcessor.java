@@ -9,7 +9,6 @@
  */
 package org.mule.impl.registry;
 
-import org.mule.MuleServer;
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOManagementContext;
 
@@ -36,11 +35,10 @@ public class ManagementContextDependencyProcessor implements ObjectProcessor
         {
             if(context==null)
             {
-                context= MuleServer.getManagementContext();
+               // context= MuleServer.getManagementContext();
                 if(context==null)
                 {
-                    //todo
-                    throw new NullPointerException("manContext is null");
+                    return object;
                 }
             }
             ((ManagementContextAware)object).setManagementContext(context);

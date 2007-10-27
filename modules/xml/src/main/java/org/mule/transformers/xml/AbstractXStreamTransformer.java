@@ -11,24 +11,24 @@
 package org.mule.transformers.xml;
 
 import org.mule.config.i18n.MessageFactory;
-import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import com.thoughtworks.xstream.XStream;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 /**
  * <code>AbstractXStreamTransformer</code> is a base class for all XStream based
  * transformers. It takes care of creating and configuring the XStream parser.
  */
 
-public abstract class AbstractXStreamTransformer extends AbstractEventAwareTransformer
+public abstract class AbstractXStreamTransformer extends AbstractMessageAwareTransformer
 {
     private final AtomicReference/* XStream */xstream = new AtomicReference();
     private volatile String driverClassName = XStreamFactory.XSTREAM_XPP_DRIVER;

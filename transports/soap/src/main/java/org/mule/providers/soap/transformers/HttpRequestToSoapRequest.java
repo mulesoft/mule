@@ -12,13 +12,16 @@ package org.mule.providers.soap.transformers;
 
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
+import org.mule.transformers.AbstractMessageAwareTransformer;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.IOUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringMessageUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,7 +32,7 @@ import java.util.Properties;
  * Usually, you would POST a SOAP document, but this Transformer can be useful for
  * making simple SOAP requests
  */
-public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
+public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
 {
     public static final String SOAP_HEADER = "<?xml version=\"1.0\" encoding=\"{0}\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><soap:Body>";
     public static final String SOAP_FOOTER = "</soap:Body></soap:Envelope>";
@@ -38,17 +41,43 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
     public HttpRequestToSoapRequest()
     {
         registerSourceType(String.class);
+        registerSourceType(InputStream.class);
         registerSourceType(byte[].class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
     {
+        Object src = message.getPayload();
+
         String data = src.toString();
+        if (src instanceof InputStream)
+        {
+            InputStream is = (InputStream)src;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            try
+            {
+                try
+                {
+                    IOUtils.copy(is, bos);
+                }
+                finally
+                {
+                    is.close();
+                }
+            }
+            catch (IOException e)
+            {
+                throw new TransformerException(this, e);
+            }
+            
+            src = bos.toByteArray();
+        }
+        
         if (src instanceof byte[])
         {
             try
             {
-                data = new String((byte[])src, encoding);
+                data = new String((byte[])src, outputEncoding);
             }
             catch (UnsupportedEncodingException e)
             {
@@ -60,8 +89,9 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
                 return data;
             }
         }
-        String httpMethod = context.getMessage().getStringProperty("http.method", "GET");
-        String request = context.getMessage().getStringProperty("http.request", null);
+        
+        String httpMethod = message.getStringProperty("http.method", "GET");
+        String request = message.getStringProperty("http.request", null);
 
         int i = request.indexOf('?');
         String query = request.substring(i + 1);
@@ -76,19 +106,11 @@ public class HttpRequestToSoapRequest extends AbstractEventAwareTransformer
 
         if (httpMethod.equals("POST"))
         {
-
-            try
-            {
-                p.setProperty(method, context.getMessageAsString());
-            }
-            catch (UMOException e)
-            {
-                throw new TransformerException(this, e);
-            }
+            p.setProperty(method, data);
         }
 
         StringBuffer result = new StringBuffer(8192);
-        String header = StringMessageUtils.getFormattedMessage(SOAP_HEADER, new Object[]{encoding});
+        String header = StringMessageUtils.getFormattedMessage(SOAP_HEADER, new Object[]{outputEncoding});
 
         result.append(header);
         result.append('<').append(method).append(" xmlns=\"");

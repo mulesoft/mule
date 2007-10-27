@@ -41,10 +41,9 @@
                  </nested-router>
 
                  <outbound-router>
-                     <!-- couldn't this be pass-through? -->
-                     <filtering-router>
+                     <outbound-pass-through-router>
                          <outbound-endpoint ref="LenderService"/>
-                     </filtering-router>
+                     </outbound-pass-through-router>
                  </outbound-router>
 
                  <response-router timeout="10000">
@@ -72,10 +71,9 @@
                      <inbound-endpoint ref="LenderService"/>
                  </inbound-router>
                  <outbound-router>
-                     <!-- again, could be pass-through? -->
-                     <filtering-router>
+                     <outbound-pass-through-router>
                          <outbound-endpoint ref="BankGateway" transformer-ref="SetLendersAsRecipients"/>
-                     </filtering-router>
+                     </outbound-pass-through-router>
                  </outbound-router>
              </service>
 

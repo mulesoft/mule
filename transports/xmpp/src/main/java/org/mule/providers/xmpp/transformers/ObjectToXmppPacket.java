@@ -11,8 +11,7 @@
 package org.mule.providers.xmpp.transformers;
 
 import org.mule.providers.xmpp.XmppConnector;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
+import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
@@ -24,7 +23,7 @@ import org.jivesoftware.smack.packet.XMPPError;
 /**
  * Creates an Xmpp message packet from a UMOMessage
  */
-public class ObjectToXmppPacket extends AbstractEventAwareTransformer
+public class ObjectToXmppPacket extends AbstractMessageAwareTransformer
 {
     public ObjectToXmppPacket()
     {
@@ -33,9 +32,11 @@ public class ObjectToXmppPacket extends AbstractEventAwareTransformer
         setReturnClass(Message.class);
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage msg, String outputEncoding) throws TransformerException
     {
-        // Make the transformer match its wiki documentation: we accept Messages and Strings. 
+        Object src = msg.getPayload();
+        
+        // Make the transformer match its wiki documentation: we accept Messages and Strings.
         // No special treatment for Messages is needed
         if (src instanceof Message)
         {
@@ -44,10 +45,9 @@ public class ObjectToXmppPacket extends AbstractEventAwareTransformer
         
         Message result = new Message();
 
-        UMOMessage msg = context.getMessage();
         if (msg.getExceptionPayload() != null)
         {
-            result.setError(new XMPPError(503, context.getMessage().getExceptionPayload().getMessage()));
+            result.setError(new XMPPError(503, msg.getExceptionPayload().getMessage()));
         }
 
         for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)

@@ -29,6 +29,12 @@ public class SchemaValidationMule2225TestCase extends AbstractMuleTestCase
     // not available in 1.4 constants?
     public static final String XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
 
+    /**
+     * If this fails for you, check if you are using JDK 1.5. if so make sure you build from maven with the
+     * -Pjava14 profile flag
+     * @throws SAXException
+     * @throws IOException
+     */
     public void testValidation() throws SAXException, IOException
     {
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XML_SCHEMA);

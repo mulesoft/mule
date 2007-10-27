@@ -3,11 +3,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
 
+    <http:connector name="default" socketSoLinger="1000" clientSoTimeout="1000"/>
+    
     <model name="test">
         <service name="mycomponent">
             <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>

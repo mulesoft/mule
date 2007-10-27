@@ -14,7 +14,6 @@ import org.mule.providers.jdbc.test.TestDataSource;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.object.ObjectFactory;
-import org.mule.util.properties.PropertyExtractor;
 
 
 /**
@@ -37,11 +36,6 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         Object ds=dsf.getOrCreate();
         assertNotNull(ds);
         assertEquals(TestDataSource.class, ds.getClass());
-        
-        assertTrue(c.getPropertyExtractors().size() >= 5);
-        assertTrue(c.getPropertyExtractors().size() <= 7);
-        assertTrue(ObjectFactory.class.isAssignableFrom((c.getPropertyExtractors().toArray()[0]).getClass()));
-        assertTrue(((ObjectFactory)c.getPropertyExtractors().toArray()[0]).getOrCreate() instanceof PropertyExtractor);
         assertNull(c.getQueries());
         
     }
@@ -56,13 +50,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         Object ds=dsf.getOrCreate();
         assertNotNull(ds);
         assertEquals(TestDataSource.class, ds.getClass());
-        
-        assertTrue(c.getPropertyExtractors().size()>=5);
-        assertTrue(c.getPropertyExtractors().size()<=7);
-        assertTrue(ObjectFactory.class.isAssignableFrom((c.getPropertyExtractors().toArray()[0]).getClass()));
-        assertTrue(((ObjectFactory)c.getPropertyExtractors().toArray()[0]).getOrCreate() instanceof PropertyExtractor);
         assertNull(c.getQueries());
-        
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
     }
@@ -78,8 +66,8 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(ds);
         assertEquals(TestDataSource.class, ds.getClass());
         
-        assertEquals(2,c.getPropertyExtractors().size());
-        assertTrue(c.getPropertyExtractors().iterator().next() instanceof PropertyExtractor);
+//        assertEquals(2,c.getPropertyExtractors().size());
+//        assertTrue(c.getPropertyExtractors().iterator().next() instanceof PropertyExtractor);
         assertNotNull(c.getQueries());
         assertEquals(3, c.getQueries().size());
         

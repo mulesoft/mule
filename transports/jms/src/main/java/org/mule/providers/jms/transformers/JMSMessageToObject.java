@@ -49,7 +49,21 @@ public class JMSMessageToObject extends AbstractJmsTransformer
                 logger.debug("Source object is " + ClassUtils.getSimpleName(src.getClass()));
             }
 
-            Object result = transformFromMessage((Message)src);
+            Object result = transformFromMessage((Message) src);
+
+            //We need to handle String / byte[] explicitly since this transformer does not nefine a single return type
+            //TODO I don't think we should allow a null return class
+            if (returnClass != null)
+            {
+                if (returnClass.equals(byte[].class) && result instanceof String)
+                {
+                    result = result.toString().getBytes(encoding);
+                }
+                else if (returnClass.equals(String.class) && result instanceof byte[])
+                {
+                    result = new String((byte[]) result, encoding);
+                }
+            }
 
             if (logger.isDebugEnabled())
             {

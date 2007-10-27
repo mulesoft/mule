@@ -12,19 +12,20 @@ package org.mule.config.builders;
 
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
-import org.mule.config.ConfigurationBuilder;
+import org.mule.config.AbstractConfigurationBuilder;
 import org.mule.config.ConfigurationException;
-import org.mule.config.ReaderResource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.MuleApplicationContext;
+import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.IOUtils;
-import org.mule.util.PropertiesUtils;
-import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
+import org.springframework.context.ApplicationContext;
 
 /**
  * <code>MuleXmlConfigurationBuilder</code> Enables Mule to be loaded from as Spring
@@ -35,82 +36,73 @@ import java.util.Properties;
  * sure that the DTD definitions for each of the document types are declared in the
  * documents.
  */
-public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
+public class MuleXmlConfigurationBuilder extends AbstractConfigurationBuilder
 {
     private String defaultConfigResource = "default-mule-config.xml";
 
     private boolean used = false;
+
+    private ApplicationContext parentContext;
 
     /**
      * Start the ManagementContext once it's configured (defaults to true).
      * TODO MULE-1988
      */
     private boolean startContext = true;
-    
-    /**
-     * Will configure a UMOManager based on the configurations made available through
-     * Readers.
-     *
-     * @param configResources an array of Readers
-     * @return A configured UMOManager
-     * @throws org.mule.config.ConfigurationException
-     */
-    public UMOManagementContext configure(ReaderResource[] configResources) throws ConfigurationException
+
+    public MuleXmlConfigurationBuilder()
     {
-        // just in case it's ever implemented
-        return configure(configResources, null);
+    }
+
+    public MuleXmlConfigurationBuilder(ApplicationContext parentContext)
+    {
+        this.parentContext = parentContext;
     }
 
     /**
-     * Will configure a UMOManager based on the configurations made available through
-     * Readers.
+     * Will configure a UMOManager based on the configuration file(s) provided.
      *
-     * @param configResources an array of Readers
+     * @param configResources   - An array list of configuration files to
+     *                          load, these should be accessible on the classpath or filesystem
+     * @param startupProperties - Optional properties to be set before configuring
+     *                          the Mule server. This is useful for managing different environments
+     *                          (dev, test, production)
      * @return A configured UMOManager
      * @throws org.mule.config.ConfigurationException
+     *
      */
-    public UMOManagementContext configure(ReaderResource[] configResources, Properties startupProperties)
-        throws ConfigurationException
+    public UMOManagementContext configure(String[] configResources, Properties startupProperties) throws ConfigurationException
     {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    public UMOManagementContext configure(String configResources) throws ConfigurationException
-    {
-        return configure(configResources, null);
-    }
-
-    public UMOManagementContext configure(String configResource, String startupPropertiesFile)
-        throws ConfigurationException
-    {
-        // Load startup properties if any.
-        if (StringUtils.isNotBlank(startupPropertiesFile))
-        {
-            try
-            {
-                startupPropertiesFile = StringUtils.trimToEmpty(startupPropertiesFile);
-                Properties startupProperties = PropertiesUtils.loadProperties(startupPropertiesFile,
-                    getClass());
-                //TODO RM* URGENT How do we handle this: ((MuleManager)managementContext).addProperties(startupProperties);
-            }
-            catch (IOException e)
-            {
-                throw new ConfigurationException(CoreMessages.failedToLoad(startupPropertiesFile), e);
-            }
-        }
-
-        if (configResource == null)
+        if (configResources == null)
         {
             throw new ConfigurationException(CoreMessages.objectIsNull("Configuration Resource"));
         }
-        String[] resources = org.springframework.util.StringUtils.tokenizeToStringArray(configResource, ",;",
-            true, true);
 
-        String[] all = new String[resources.length + 1];
+        // Load startup properties.
+        Registry registry = RegistryContext.getOrCreateRegistry();
+        try
+        {
+            registry.registerObjects(startupProperties);
+        }
+        catch (RegistrationException e)
+        {
+            throw new ConfigurationException(e);
+        }
+
+        String[] all = new String[configResources.length + 1];
         all[0] = defaultConfigResource;
-        System.arraycopy(resources, 0, all, 1, resources.length);
+        System.arraycopy(configResources, 0, all, 1, configResources.length);
 
-        MuleApplicationContext context = new MuleApplicationContext(all);
+
+        MuleApplicationContext context;
+        if (parentContext != null)
+        {
+            context = new MuleApplicationContext(all, parentContext);
+        }
+        else
+        {
+            context = new MuleApplicationContext(all);
+        }
 
         try
         {
@@ -123,9 +115,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 mc.start();
             }
 
-            // TODO Is this still needed?
-            RegistryContext.getConfiguration().setConfigResources(resources);
-            
+            registry.getConfiguration().setConfigResources(configResources);
+
             return mc;
         }
         catch (Exception e)
@@ -151,7 +142,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
      * @param configResource Mule configuration resources
      * @return an InputStream to the resource
      * @throws ConfigurationException if the resource could not be loaded by any
-     *             means
+     *                                means
      */
     protected InputStream loadConfig(String configResource) throws ConfigurationException
     {
@@ -194,5 +185,15 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public void setStartContext(boolean startContext)
     {
         this.startContext = startContext;
+    }
+
+    public ApplicationContext getParentContext()
+    {
+        return parentContext;
+    }
+
+    public void setParentContext(ApplicationContext parentContext)
+    {
+        this.parentContext = parentContext;
     }
 }

@@ -11,14 +11,17 @@
 package org.mule.providers.http.transformers;
 
 import org.mule.config.MuleProperties;
+import org.mule.impl.RequestContext;
 import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.StreamPayloadRequestEntity;
 import org.mule.providers.http.i18n.HttpMessages;
-import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.OutputHandler;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringUtils;
 import org.mule.RegistryContext;
@@ -27,6 +30,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
@@ -48,13 +52,17 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
  * HttpClient HttpMethod that represents an HttpRequest.
  */
 
-public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransformer
+public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransformer
 {
     private final SerializableToByteArray serializableToByteArray;
 
     public ObjectToHttpClientMethodRequest()
     {
         setReturnClass(HttpMethod.class);
+        registerSourceType(byte[].class);
+        registerSourceType(String.class);
+        registerSourceType(InputStream.class);
+        registerSourceType(OutputHandler.class);
         serializableToByteArray = new SerializableToByteArray();
     }
 
@@ -108,10 +116,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         return parameterIndex + 1;
     }
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(UMOMessage msg, String outputEncoding) throws TransformerException
     {
-        UMOMessage msg = context.getMessage();
-
+        Object src = msg.getPayload();
+        
         String endpoint = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
         if (endpoint == null)
         {
@@ -129,7 +137,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
             if (HttpConstants.METHOD_GET.equals(method))
             {
                 httpMethod = new GetMethod(uri.toString());
-
                 String paramName = msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
                     HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
                 String query = uri.getQuery();
@@ -150,28 +157,27 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
             else if (HttpConstants.METHOD_POST.equalsIgnoreCase(method))
             {
                 PostMethod postMethod = new PostMethod(uri.toString());
-
                 String paramName = msg.getStringProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, null);
 
                 if (paramName == null)
                 {
                     // Call method to manage the parameter array
                     addParameters(uri.getQuery(), postMethod);
-                    setupEntityMethod(src, encoding, context, msg, uri, postMethod);
+                    setupEntityMethod(src, outputEncoding, msg, uri, postMethod);
                 }
                 else
                 {
                     postMethod.addParameter(paramName, src.toString());
                 }
-
+                
                 httpMethod = postMethod;
             }
             else if (HttpConstants.METHOD_PUT.equalsIgnoreCase(method))
             {
                 PutMethod putMethod = new PutMethod(uri.toString());
 
-                setupEntityMethod(src, encoding, context, msg, uri, putMethod);
-
+                setupEntityMethod(src, outputEncoding, msg, uri, putMethod);
+                
                 httpMethod = putMethod;
             }
             else if (HttpConstants.METHOD_DELETE.equalsIgnoreCase(method))
@@ -195,6 +201,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                 throw new TransformerException(HttpMessages.unsupportedMethod(method));
             }
 
+            setHeaders(httpMethod, msg);
+            
             // Allow the user to set HttpMethodParams as an object on the message
             HttpMethodParams params = (HttpMethodParams)msg.removeProperty(HttpConnector.HTTP_PARAMS_PROPERTY);
             if (params != null)
@@ -215,7 +223,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     httpMethod.getParams().setVersion(HttpVersion.HTTP_1_1);
                 }
             }
-            setHeaders(httpMethod, context);
+            setHeaders(httpMethod, msg);
 
             return httpMethod;
         }
@@ -225,14 +233,17 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         }
     }
 
-    private void setupEntityMethod(Object src, String encoding,
-            UMOEventContext context, UMOMessage msg, URI uri,
-            EntityEnclosingMethod postMethod) throws UnsupportedEncodingException,
-            TransformerException {
+    private void setupEntityMethod(Object src,
+                                   String encoding,
+                                   UMOMessage msg,
+                                   URI uri,
+                                   EntityEnclosingMethod postMethod)
+        throws UnsupportedEncodingException, TransformerException
+    {
         // Dont set a POST payload if the body is a Null Payload.
         // This way client calls
         // can control if a POST body is posted explicitly
-        if (!(context.getMessage().getPayload() instanceof NullPayload))
+        if (!(msg.getPayload() instanceof NullPayload))
         {
             // See if we have a MIME type set
             String mimeType = msg.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
@@ -250,7 +261,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     }
                 }
                 if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                if (encoding == null) encoding = RegistryContext.getRegistry().getConfiguration().getDefaultEncoding();
+
                 postMethod.setRequestEntity(new StringRequestEntity(src.toString(), mimeType,
                     encoding));
             }
@@ -262,23 +273,37 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                 postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream)src,
                     mimeType));
             }
-            else
+            else if (src instanceof byte[])
             {
                 // TODO Danger here! We don't know if the content is
                 // really text or not
                 if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                byte[] buffer = (byte[])serializableToByteArray.doTransform(src, encoding);
-                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, mimeType));
+                postMethod.setRequestEntity(new ByteArrayRequestEntity((byte[])src,
+                    mimeType));
+            }
+            else if (src instanceof OutputHandler)
+            {
+                UMOEvent event = RequestContext.getEvent();
+                postMethod.setRequestEntity(new StreamPayloadRequestEntity((OutputHandler) src, event));
+            }
+            else
+            {
+//                // TODO Danger here! We don't know if the content is
+//                // really text or not
+//                if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+//                byte[] buffer = (byte[])serializableToByteArray.doTransform(src, encoding);
+//                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, mimeType));
+                throw new IllegalArgumentException("this should never happen");
             }
         }
+       
     }
 
-    protected void setHeaders(HttpMethod httpMethod, UMOEventContext context)
+    protected void setHeaders(HttpMethod httpMethod, UMOMessage msg)
     {
         // Standard requestHeaders
         String headerValue;
         String headerName;
-        UMOMessage msg = context.getMessage();
         for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
         {
             headerName = (String)iterator.next();
@@ -296,7 +321,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         }
 
 
-        if (context.getMessage().getPayload() instanceof InputStream)
+        Set attNams = msg.getAttachmentNames();
+        if (msg.getPayload() instanceof InputStream
+                        && attNams != null && attNams.size() > 0)
         {
             // must set this for receiver to properly parse attachments
             httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related");

@@ -47,6 +47,8 @@ public class XFireComponentExceptionStrategyTestCase extends FunctionalTestCase
         }
         catch (DispatchException ex)
         {
+            //TODO RM* REMOVE
+            ex.printStackTrace();
             final Throwable t = ex.getCause();
             assertNotNull("Cause should've been filled in.", t);
             assertTrue(t instanceof XFireEnabledFaultMessage);

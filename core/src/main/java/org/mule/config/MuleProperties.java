@@ -84,7 +84,7 @@ public interface MuleProperties
     String MULE_REMOTE_SYNC_PROPERTY = PROPERTY_PREFIX + "REMOTE_SYNC";
     String MULE_SOAP_METHOD = PROPERTY_PREFIX + "SOAP_METHOD";
     String MULE_JMS_SESSION = PROPERTY_PREFIX + "JMS_SESSION";
-    public final String MULE_MANAGEMENT_CONTEXT_PROPERTY = PROPERTY_PREFIX + "MANAGEMENT_CONTEXT";
+    String MULE_MANAGEMENT_CONTEXT_PROPERTY = PROPERTY_PREFIX + "MANAGEMENT_CONTEXT";
     // End Event Level properties
 
     /********************************************************************************
@@ -108,7 +108,6 @@ public interface MuleProperties
     String CONNECTOR_DISPATCHER_FACTORY = "dispatcher.factory";
     String CONNECTOR_TRANSACTION_FACTORY = "transaction.factory";
     String CONNECTOR_MESSAGE_ADAPTER = "message.adapter";
-    String CONNECTOR_STREAM_MESSAGE_ADAPTER = "stream.message.adapter";
     String CONNECTOR_INBOUND_TRANSFORMER = "inbound.transformer";
     String CONNECTOR_OUTBOUND_TRANSFORMER = "outbound.transformer";
     String CONNECTOR_RESPONSE_TRANSFORMER = "response.transformer";
@@ -138,4 +137,12 @@ public interface MuleProperties
     String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
     String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
     String OBJECT_MULE_ENDPOINT_FACTORY = "_muleEndpointFactory";
+    String OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP = "_muleSimpleRegistryBootstrap";
+
+    //Debug Options
+    String DEBUG_CACHE_MESSAGE_AS_BYTES = SYSTEM_PROPERTY_PREFIX + "message.cacheBytes";
+    String DEBUG_CACHE_ORIGINAL_MESSAGE = SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal";
+    String DEBUG_ENABLE_STREAMING = SYSTEM_PROPERTY_PREFIX + "streaming.enable";
+    String DEBUG_ASSERT_MESSAGE_ACCESS = SYSTEM_PROPERTY_PREFIX + "message.assertAccess";
+    String DEBUG_AUTO_WRAP_TRANSFORM = SYSTEM_PROPERTY_PREFIX + "trasnform.autoWrap";
 }

@@ -13,7 +13,6 @@ package org.mule.providers.tcp;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.model.streaming.CallbackOutputStream;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.tcp.i18n.TcpMessages;
 import org.mule.providers.tcp.protocols.SafeProtocol;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOException;
@@ -44,6 +43,7 @@ public class TcpConnector extends AbstractConnector
     /** Property can be set on the endpoint to configure how the socket is managed */
     public static final String KEEP_SEND_SOCKET_OPEN_PROPERTY = "keepSendSocketOpen";
     public static final int DEFAULT_SOCKET_TIMEOUT = INT_VALUE_NOT_SET;
+    public static final int DEFAULT_SO_LINGER = INT_VALUE_NOT_SET;
     public static final int DEFAULT_BUFFER_SIZE = INT_VALUE_NOT_SET;
     public static final int DEFAULT_BACKLOG = INT_VALUE_NOT_SET;
 
@@ -59,7 +59,7 @@ public class TcpConnector extends AbstractConnector
     private boolean sendTcpNoDelay;
     private boolean validateConnections = true;
     private Boolean reuseAddress = Boolean.TRUE; // this could be null for Java default
-    private int socketSoLinger = INT_VALUE_NOT_SET;
+    private int socketSoLinger = DEFAULT_SO_LINGER;
     private TcpProtocol tcpProtocol;
     private boolean keepSendSocketOpen = false;
     private boolean keepAlive = false;

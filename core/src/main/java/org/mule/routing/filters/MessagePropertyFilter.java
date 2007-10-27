@@ -13,6 +13,9 @@ package org.mule.routing.filters;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>MessagePropertyFilter</code> can be used to filter against properties on
  * an event. This can be very useful as the event properties represent all the meta
@@ -25,6 +28,10 @@ import org.mule.umo.UMOMessage;
  */
 public class MessagePropertyFilter implements UMOFilter
 {
+    /**
+     * logger used by this class
+     */
+    protected transient final Log logger = LogFactory.getLog(MessagePropertyFilter.class);
     private boolean caseSensitive = true;
     private boolean not = false;
 
@@ -49,15 +56,20 @@ public class MessagePropertyFilter implements UMOFilter
         }
 
         Object value = message.getProperty(propertyName);
-
+        boolean match;
         if (value == null)
         {
-            return compare(null, propertyValue);
+            match = compare(null, propertyValue);
         }
         else
         {
-            return compare(value.toString(), propertyValue);
+            match = compare(value.toString(), propertyValue);
         }
+        if(!match && logger.isDebugEnabled())
+        {
+            logger.debug("Property: " + propertyName + " not found on message with Id: " + message.getUniqueId());
+        }
+        return match;
     }
 
     protected boolean compare(String value1, String value2)
