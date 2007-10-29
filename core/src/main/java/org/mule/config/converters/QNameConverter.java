@@ -29,11 +29,11 @@ import org.apache.commons.beanutils.Converter;
 public class QNameConverter implements Converter
 {
 
-    boolean explicit = false;
+    protected final boolean explicit;
 
     public QNameConverter()
     {
-        super();
+        this(false);
     }
 
     public QNameConverter(boolean explicit)
