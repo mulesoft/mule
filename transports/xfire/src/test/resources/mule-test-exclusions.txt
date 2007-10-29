@@ -4,8 +4,6 @@
 
 # MULE-1134 VM transport needs a stream.message.adapter property to work with XFire
 org.mule.providers.soap.xfire.XFireConnectorVMFunctionalTestCase
-#org.mule.providers.soap.xfire.XFireConnectorHttpFunctionalTestCase
-#org.mule.providers.soap.xfire.XFireBasicTestCase
 
 # tests with external dependencies
 org.mule.providers.soap.xfire.XFireWsdlTestCase
