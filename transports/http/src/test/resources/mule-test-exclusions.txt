@@ -10,3 +10,6 @@ org.mule.providers.http.issues.StreamingDownloadMule1389TestCase
 
 # MULE-2208
 org.mule.providers.http.functional.HttpsFunctionalTestCase
+
+# MULE-2625
+org.mule.providers.http.functional.HttpContentLengthPropagationTestCase
