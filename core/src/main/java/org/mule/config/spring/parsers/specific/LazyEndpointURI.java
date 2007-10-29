@@ -31,14 +31,18 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 public class LazyEndpointURI implements UMOEndpointURI
 {
 
-    private static final String DOTS_SLASHES = "://";
+    private static final String DOTS = ":";
+    private static final String DOTS_SLASHES = DOTS + "//";
 
     public static final String ADDRESS = "address";
+    public static final String PROTOCOL = "protocol";
+    public static final String META = "meta";
     // TODO - pull out other strings as needed
     public static final String[] ATTRIBUTES =
-            new String[]{"protocol", "username", "password", "hostname", ADDRESS, "port", "path"};
+            new String[]{META, PROTOCOL, "username", "password", "hostname", ADDRESS, "port", "path"};
 
     private String address;
+    private String meta;
     private String protocol;
     private String username;
     private String password;
@@ -84,6 +88,12 @@ public class LazyEndpointURI implements UMOEndpointURI
         this.protocol = protocol;
     }
 
+    public void setMeta(String meta)
+    {
+        assertNotYetInjected();
+        this.meta = meta;
+    }
+
     public void setPath(String path)
     {
         assertNotYetInjected();
@@ -94,11 +104,23 @@ public class LazyEndpointURI implements UMOEndpointURI
     {
         if (null != address)
         {
-            return address;
+            if (null != meta)
+            {
+                return meta + DOTS + address;
+            }
+            else
+            {
+                return address;
+            }
         }
         else
         {
             StringBuffer buffer = new StringBuffer();
+            if (null != meta)
+            {
+                buffer.append(meta);
+                buffer.append(DOTS);
+            }
             buffer.append(protocol);
             buffer.append(DOTS_SLASHES);
             if (null != username)
@@ -143,7 +165,7 @@ public class LazyEndpointURI implements UMOEndpointURI
 
     protected UMOEndpointURI lazyDelegate()
     {
-        UMOEndpointURI exists =(UMOEndpointURI) delegate.get();
+        UMOEndpointURI exists = (UMOEndpointURI) delegate.get();
         if (null != exists)
         {
             return exists;

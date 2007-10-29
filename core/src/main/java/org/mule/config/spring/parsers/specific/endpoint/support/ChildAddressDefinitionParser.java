@@ -10,11 +10,9 @@
 
 package org.mule.config.spring.parsers.specific.endpoint.support;
 
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
-
-import org.w3c.dom.Element;
+import org.mule.config.spring.parsers.processors.AddAttribute;
 
 /**
  * Generate an Endpoint URI from simple address components.
@@ -22,19 +20,20 @@ import org.w3c.dom.Element;
 public class ChildAddressDefinitionParser extends ChildDefinitionParser
 {
 
-    private String protocol;
+    public static final boolean META = true;
+    public static final boolean PROTOCOL = false;
 
     public ChildAddressDefinitionParser(String protocol)
     {
-        super(EndpointUtils.ENDPOINT_URI_ATTRIBUTE, LazyEndpointURI.class);
-        this.protocol = protocol;
+        this(protocol, PROTOCOL);
     }
 
-    // @Override
-    protected void postProcess(BeanAssembler assembler, Element element)
+    public ChildAddressDefinitionParser(String metaOrProtocol, boolean isMeta)
     {
-        assembler.extendBean("protocol", protocol, false);
-        super.postProcess(assembler, element);
+        super(EndpointUtils.ENDPOINT_URI_ATTRIBUTE, LazyEndpointURI.class);
+        registerPreProcessor(new AddAttribute(
+                isMeta ? LazyEndpointURI.META : LazyEndpointURI.PROTOCOL,
+                metaOrProtocol));
     }
 
 }

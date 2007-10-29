@@ -19,17 +19,23 @@ public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDe
 
     public TransportGlobalEndpointDefinitionParser(String protocol)
     {
-        this(protocol, new String[]{});
+        this(protocol, PROTOCOL);
+    }
+
+    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta)
+    {
+        this(metaOrProtocol, isMeta, new String[]{});
     }
 
     /**
-     * @param protocol The transport protocol ("tcp" etc)
+     * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
+     * @param isMeta Whether transport is "meta" or not (eg cxf)
      * @param properties A list of attribute names which will be set as properties on the
      * endpointParser
      */
-    public TransportGlobalEndpointDefinitionParser(String protocol, String[] properties)
+    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, String[] properties)
     {
-        super(protocol, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class), properties);
+        super(metaOrProtocol, isMeta, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class), properties);
     }
 
 }

@@ -85,7 +85,9 @@ public class ParsersTestNamespaceHandler extends AbstractIgnorableNamespaceHandl
                         (ChildDefinitionParser) new ChildDefinitionParser("child", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring")));
 
         registerDelegateDefinitionParser("complex-endpoint",
-                new TransportGlobalEndpointDefinitionParser("test", new String[]{"string", "bar"})).addAlias("bar", "foo");
+                new TransportGlobalEndpointDefinitionParser(
+                        "test", TransportGlobalEndpointDefinitionParser.PROTOCOL,
+                        new String[]{"string", "bar"})).addAlias("bar", "foo");
     }
 
 }

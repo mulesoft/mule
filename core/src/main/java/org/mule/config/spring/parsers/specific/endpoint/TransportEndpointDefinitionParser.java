@@ -33,18 +33,24 @@ public class TransportEndpointDefinitionParser extends AddressedEndpointDefiniti
 
     public TransportEndpointDefinitionParser(String protocol, Class endpoint)
     {
-        this(protocol, endpoint, new String[]{});
+        this(protocol, PROTOCOL, endpoint);
+    }
+
+    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint)
+    {
+        this(metaOrProtocol, isMeta, endpoint, new String[]{});
     }
 
     /**
-     * @param protocol The transport protocol ("tcp" etc)
+     * @param metaOrProtocol The transport protocol ("tcp" etc)
+     * @param isMeta Whether transport is "meta" or not (eg cxf)
      * @param endpoint The endpoint class
      * @param properties A list of attribute names which will be set as properties on the
      * endpointParser
      */
-    public TransportEndpointDefinitionParser(String protocol, Class endpoint, String[] properties)
+    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint, String[] properties)
     {
-        super(protocol, new ChildEndpointDefinitionParser(endpoint), properties);
+        super(metaOrProtocol, isMeta, new ChildEndpointDefinitionParser(endpoint), properties);
         registerPreProcessor(
                 new CheckExclusiveAttributes(new String[][]{
                         new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},

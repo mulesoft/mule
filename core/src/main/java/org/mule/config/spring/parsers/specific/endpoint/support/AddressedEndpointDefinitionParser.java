@@ -34,6 +34,8 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 {
 
     protected Log logger = LogFactory.getLog(getClass());
+    public static final boolean META = ChildAddressDefinitionParser.META;
+    public static final boolean PROTOCOL = ChildAddressDefinitionParser.PROTOCOL;
     public static final String[] BAD_ADDRESS_ATTRIBUTES =
             new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF};
 
@@ -46,16 +48,23 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
     public AddressedEndpointDefinitionParser(String protocol, MuleDefinitionParser endpointParser)
     {
-        this(protocol, endpointParser, new String[]{});
+        this(protocol, PROTOCOL, endpointParser);
+    }
+
+    public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, MuleDefinitionParser endpointParser)
+    {
+        this(metaOrProtocol, isMeta, endpointParser, new String[]{});
     }
 
     /**
-     * @param protocol The transport protocol ("tcp" etc)
+     * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
+     * @param isMeta Whether transport is "meta" or not (eg cxf)
      * @param endpointParser The parser for the endpoint
      * @param propertyAttributes A list of attribute names which will be set as properties on the
      * endpointParser
      */
-    public AddressedEndpointDefinitionParser(String protocol, MuleDefinitionParser endpointParser,
+    public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
+                                             MuleDefinitionParser endpointParser,
                                              String[] propertyAttributes)
     {
         // the first delegate, the parent, is an endpoint; we block address and property
@@ -65,7 +74,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         addDelegate(endpointParser);
 
         // the next delegate parses the address.  it will see the endpoint as parent automatically.
-        MuleChildDefinitionParser addressParser = new ChildAddressDefinitionParser(protocol);
+        MuleChildDefinitionParser addressParser = new ChildAddressDefinitionParser(metaOrProtocol, isMeta);
         // it should see only the endpoint attributes
         enableAttributes(addressParser, LazyEndpointURI.ATTRIBUTES);
         addChildDelegate(addressParser);

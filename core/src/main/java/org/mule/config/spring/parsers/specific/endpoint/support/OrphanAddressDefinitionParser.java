@@ -10,11 +10,9 @@
 
 package org.mule.config.spring.parsers.specific.endpoint.support;
 
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
-
-import org.w3c.dom.Element;
+import org.mule.config.spring.parsers.processors.AddAttribute;
 
 /**
  * Generate an Endpoint URI from simple address components.
@@ -22,19 +20,15 @@ import org.w3c.dom.Element;
 public class OrphanAddressDefinitionParser extends OrphanDefinitionParser
 {
 
-    private String protocol;
+    public static final boolean META = true;
+    public static final boolean PROTOCOL = false;
 
-    public OrphanAddressDefinitionParser(String protocol)
+    public OrphanAddressDefinitionParser(String metaOrProtocol, boolean isMeta)
     {
         super(LazyEndpointURI.class, true);
-        this.protocol = protocol;
-    }
-
-    // @Override
-    protected void postProcess(BeanAssembler assembler, Element element)
-    {
-        assembler.extendBean("protocol", protocol, false);
-        super.postProcess(assembler, element);
+        registerPreProcessor(new AddAttribute(
+                isMeta ? LazyEndpointURI.META : LazyEndpointURI.PROTOCOL,
+                metaOrProtocol));
     }
 
 }
