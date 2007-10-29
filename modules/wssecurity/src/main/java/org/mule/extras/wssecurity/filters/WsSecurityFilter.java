@@ -21,6 +21,7 @@ import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.providers.soap.xfire.XFireConnector;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.security.EncryptionStrategyNotFoundException;
 import org.mule.umo.security.SecurityException;
@@ -108,17 +109,26 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
 
             // remove security in handlers if present
             XFireConnector connector = null;
-            Collection objs = RegistryContext.getRegistry().lookupObjects(XFireConnector.class);
+            Collection objs = RegistryContext.getRegistry().lookupObjects(UMOConnector.class);
             Iterator it = objs.iterator();
-            if (it.hasNext())
+            while (it.hasNext())
             {
-                connector = (XFireConnector) it.next();
-            }
-            if (it.hasNext())
-            {
-                logger.warn("More than one XFire connector found, only one expected");
-                // TODO Shouldn't we throw an exception here instead?
-                //throw new org.mule.config.ConfigurationException(MessageFactory.createStaticMessage("More than one XFire connector found."));
+                Object obj = it.next();
+                if (obj instanceof XFireConnector)
+                {
+                    if (connector == null)
+                    {
+                        connector = (XFireConnector) obj;
+                    }
+                    else
+                    {
+                        logger.warn("More than one XFire connector found, only one expected");
+                        // TODO Shouldn't we throw an exception here instead?
+                        // throw new
+                        // org.mule.config.ConfigurationException(MessageFactory.createStaticMessage("More
+                        // than one XFire connector found."));
+                    }
+                }
             }
 
              if (connector != null)

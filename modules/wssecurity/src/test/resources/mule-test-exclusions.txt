@@ -2,7 +2,3 @@
 # Test cases listed in this file are not run.
 #
 
-# MULE-2578 (was labelled as MULE-1176, incorrectly i think)
-org.mule.extras.wssecurity.testcases.XfireMultipleConnectorsWSSecurityTestCase
-org.mule.extras.wssecurity.testcases.XfireWsSecurityOnOutboundTestCase
-org.mule.extras.wssecurity.testcases.XfireWsSecurityOnOutboundUsingPropertiesTestCase
