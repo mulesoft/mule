@@ -154,23 +154,27 @@ public class VMConnector extends AbstractConnector
         {
             if (tx.hasResource(qm))
             {
-                if (logger.isTraceEnabled())
+                final QueueSession queueSession = (QueueSession) tx.getResource(qm);
+                if (logger.isDebugEnabled())
                 {
-                    logger.trace("Retrieving queue session from current transaction");
+                    logger.debug("Retrieved VM queue session " + queueSession + " from current transaction " + tx);
                 }
-                return (QueueSession)tx.getResource(qm);
+                return queueSession;
             }
         }
 
-        if (logger.isTraceEnabled())
+        if (logger.isDebugEnabled())
         {
-            logger.trace("Retrieving new queue session from queue manager");
+            logger.debug("Retrieving new VM queue session from queue manager");
         }
 
         QueueSession session = qm.getQueueSession();
         if (tx != null)
         {
-            logger.debug("Binding queue session to current transaction");
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Binding VM queue session " + session + " to current transaction " + tx);
+            }
             try
             {
                 tx.bindResource(qm, session);

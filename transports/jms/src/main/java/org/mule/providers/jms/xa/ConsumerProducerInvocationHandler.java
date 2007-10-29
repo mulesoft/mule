@@ -10,6 +10,7 @@
 package org.mule.providers.jms.xa;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class ConsumerProducerInvocationHandler implements InvocationHandler
@@ -40,6 +41,13 @@ public class ConsumerProducerInvocationHandler implements InvocationHandler
         {
             sessionInvocationHandler.enlist();
         }
-        return method.invoke(target, args);
+        try
+        {
+            return method.invoke(target, args);
+        }
+        catch (InvocationTargetException e)
+        {
+            throw e.getCause();
+        }
     }
 }

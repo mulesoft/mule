@@ -45,7 +45,7 @@ public class StatementInvocationHandler implements InvocationHandler
         }
         catch (InvocationTargetException ex)
         {
-            throw ex.getTargetException();
+            throw ex.getCause();
         }
     }
 
