@@ -107,10 +107,10 @@ def void writeProfilerOpts(Writer w, String optionValue) {
 
 def String getLibraryName() {
     // Decide whether this is a 32 or 64 bit version of Java.
-    String jvmBits = System.getProperty("sun.arch.data.model", "");
+    String jvmBits = System.getProperty("sun.arch.data.model", "")
 
     // Generate an os name.  Most names are used as is, but some are modified.
-    String os = System.getProperty("os.name", "").toLowerCase();
+    String os = System.getProperty("os.name", "").toLowerCase()
 
     switch (os) {
         case ~/^windows.*/:
@@ -129,7 +129,7 @@ def String getLibraryName() {
 
 def String getArchitecture() {
     // Generate architecture name.
-    String arch = System.getProperty("os.arch", "").toLowerCase();
+    String arch = System.getProperty("os.arch", "").toLowerCase()
 
     switch (arch) {
         case ["amd64", "athlon", "ia32", "ia64", "x86_64", "i686", "i586", "i486", "i386", "x86"]:
