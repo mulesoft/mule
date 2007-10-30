@@ -138,12 +138,12 @@
             </dependencies>
         </profile>
         <profile>
-            <id>java15</id>
+            <id>java5</id>
             <activation>
                 <jdk>1.5</jdk>
             </activation>
             <modules>
-                <!-- TODO Dan: insert the cxf transport here -->
+                <!-- <module>cxf</module> -->
             </modules>
         </profile>
     </profiles>
