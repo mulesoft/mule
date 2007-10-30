@@ -11,6 +11,7 @@
 package org.mule.providers.cxf;
 
 import org.mule.config.ConfigurationException;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.cxf.transport.MuleUniversalDestination;
@@ -23,6 +24,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointNotFoundException;
 import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -54,7 +57,7 @@ import org.apache.cxf.transports.http.QueryHandlerRegistry;
  * The CXF receives messages from Mule, converts them into CXF messages and dispatches
  * them into the receiving CXF destination.
  */
-public class CxfServiceComponent implements Callable
+public class CxfServiceComponent implements Callable, Lifecycle
 {
     /**
      * logger used by this class
@@ -296,5 +299,28 @@ public class CxfServiceComponent implements Callable
         {
             this.message = message;
         }
+    }
+
+    public void initialise() throws InitialisationException
+    {
+        if (bus == null)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("No Cxf bus instance, this component has not been initialized properly."), this);
+        }        
+    }
+
+    public void start() throws UMOException
+    {
+        // template method
+    }
+    
+    public void stop() throws UMOException
+    {
+        // template method
+    }
+
+    public void dispose()
+    {
+        // template method
     }
 }

@@ -14,6 +14,7 @@ import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
+import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.cxf.transport.MuleUniversalTransport;
@@ -81,6 +82,14 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
 
     protected void doInitialise() throws InitialisationException
     {
+        try
+        {
+            managementContext.registerListener(this);
+        }
+        catch (NotificationException e)
+        {
+            throw new InitialisationException(e, this);
+        }
         if (configurationLocation != null)
         {
             bus = new SpringBusFactory().createBus(configurationLocation);
