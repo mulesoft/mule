@@ -46,6 +46,7 @@
         <!-- <module>extras</module> -->
         <module>jca</module>
         <module>profiler</module>
+        <module>scripting</module>
         <module>server</module>
     </modules>
 
