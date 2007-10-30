@@ -51,26 +51,26 @@
         </xsl:if>
         -->
          <h3>Properties</h3>
-        <table style="border: 2px solid black; empty-cells: show; border-collapse: collapse">
+        <table>
             <tr>
-                <th rowspan="2" style="width:25%; border-bottom: 1px solid black; border-right: 1px solid black">Name</th>
+                <th rowspan="2" style="width:25%">Name</th>
                 <th style="width:25%">Type</th>
                 <th style="width:25%">Required</th>
                 <th style="width:25%">Default</th>
             </tr>
             <tr>
-                <th colspan="3" style="border-bottom: 1px solid black">Description</th>
+                <th colspan="3">Description</th>
             </tr>
             <xsl:apply-templates select="." mode="attributes"/>
         </table>
         <h3>Child Elements</h3>
-        <table style="border: 2px solid black; empty-cells: show; border-collapse: collapse">
+        <table>
             <tr>
-                <th rowspan="2" style="width:25%; border-bottom: 1px solid black; border-right: 1px solid black">Name</th>
+                <th rowspan="2" style="width:25%">Name</th>
                 <th>Type</th>
             </tr>
             <tr>
-                <th style="border-bottom: 1px solid black">Description</th>
+                <th>Description</th>
             </tr>
             <xsl:call-template name="element-children"/>
             <xsl:if test="@type">
@@ -157,7 +157,7 @@
 
     <xsl:template match="xsd:attribute[@name]" mode="attributes">
         <tr>
-            <td rowspan="2" style="border-bottom: 1px solid black; border-right: 1px solid black"><xsl:value-of select="@name"/></td>
+            <td rowspan="2"><xsl:value-of select="@name"/></td>
             <td style="text-align: center"><xsl:call-template name="rewrite-type"><xsl:with-param name="type" select="@type"/></xsl:call-template></td>
             <td style="text-align: center">
                 <xsl:choose>
@@ -169,7 +169,7 @@
                 <xsl:if test="@default"><xsl:value-of select="@default"/></xsl:if>
             </td>
         </tr>
-        <tr style="border-bottom: 1px solid black">
+        <tr>
             <td colspan="3">
                 <xsl:if test="xsd:annotation/xsd:documentation/text()">
                     <p>
@@ -243,7 +243,7 @@
     <xsl:template match="xsd:element[@ref]" mode="elements">
         <xsl:variable name="ref" select="@ref"/>
         <tr>
-            <td rowspan="2" style="border-bottom: 1px solid black; border-right: 1px solid black">
+            <td rowspan="2">
                 <xsl:call-template name="link">
                     <xsl:with-param name="item">
                         <xsl:value-of select="@ref"/>
@@ -253,7 +253,7 @@
             <xsl:apply-templates
                     select="/xsd:schema/xsd:element[@name=$ref]" mode="elements-type"/>
         </tr>
-        <tr><td style="border-bottom: 1px solid black">
+        <tr><td>
             <!-- include both ref and element doc -->
             <xsl:apply-templates select="." mode="elements-doc"/>
             <xsl:apply-templates
@@ -265,7 +265,7 @@
 
     <xsl:template match="xsd:element[@name]" mode="elements">
         <tr>
-            <td rowspan="2" style="border-bottom: 1px solid black; border-right: 1px solid black">
+            <td rowspan="2">
                 <xsl:call-template name="link">
                     <xsl:with-param name="item">
                         <xsl:value-of select="@name"/>
@@ -274,7 +274,7 @@
             </td>
             <xsl:apply-templates select="." mode="elements-type"/>
         </tr>
-        <tr><td style="border-bottom: 1px solid black">
+        <tr><td>
             <xsl:apply-templates select="." mode="elements-doc"/>
             <xsl:apply-templates select="." mode="elements-abstract"/>
         </td></tr>
