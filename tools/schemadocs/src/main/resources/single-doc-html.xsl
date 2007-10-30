@@ -52,24 +52,24 @@
         -->
          <h3>Properties</h3>
         <table class="confluenceTable">
-            <tr class="confluenceTr">
+            <tr>
                 <th class="confluenceTh" rowspan="2" style="width:25%">Name</th>
                 <th class="confluenceTh" style="width:25%">Type</th>
                 <th class="confluenceTh" style="width:25%">Required</th>
                 <th class="confluenceTh" style="width:25%">Default</th>
             </tr>
-            <tr class="confluenceTr">
+            <tr>
                 <th class="confluenceTh" colspan="3">Description</th>
             </tr>
             <xsl:apply-templates select="." mode="attributes"/>
         </table>
         <h3>Child Elements</h3>
         <table class="confluenceTable">
-            <tr class="confluenceTr">
+            <tr>
                 <th class="confluenceTh" rowspan="2" style="width:25%">Name</th>
                 <th class="confluenceTh">Type</th>
             </tr>
-            <tr class="confluenceTr">
+            <tr>
                 <th class="confluenceTh">Description</th>
             </tr>
             <xsl:call-template name="element-children"/>
@@ -156,7 +156,7 @@
     <!-- attributes -->
 
     <xsl:template match="xsd:attribute[@name]" mode="attributes">
-        <tr class="confluenceTr">
+        <tr>
             <td rowspan="2"><xsl:value-of select="@name"/></td>
             <td style="text-align: center"><xsl:call-template name="rewrite-type"><xsl:with-param name="type" select="@type"/></xsl:call-template></td>
             <td style="text-align: center">
@@ -169,7 +169,7 @@
                 <xsl:if test="@default"><xsl:value-of select="@default"/></xsl:if>
             </td>
         </tr>
-        <tr class="confluenceTr">
+        <tr>
             <td colspan="3">
                 <xsl:if test="xsd:annotation/xsd:documentation/text()">
                     <p>
@@ -242,7 +242,7 @@
 
     <xsl:template match="xsd:element[@ref]" mode="elements">
         <xsl:variable name="ref" select="@ref"/>
-        <tr class="confluenceTr">
+        <tr>
             <td rowspan="2">
                 <xsl:call-template name="link">
                     <xsl:with-param name="item">
@@ -253,7 +253,7 @@
             <xsl:apply-templates
                     select="/xsd:schema/xsd:element[@name=$ref]" mode="elements-type"/>
         </tr>
-        <tr class="confluenceTr"><td>
+        <tr><td>
             <!-- include both ref and element doc -->
             <xsl:apply-templates select="." mode="elements-doc"/>
             <xsl:apply-templates
@@ -264,7 +264,7 @@
     </xsl:template>
 
     <xsl:template match="xsd:element[@name]" mode="elements">
-        <tr class="confluenceTr">
+        <tr>
             <td rowspan="2">
                 <xsl:call-template name="link">
                     <xsl:with-param name="item">
@@ -274,7 +274,7 @@
             </td>
             <xsl:apply-templates select="." mode="elements-type"/>
         </tr>
-        <tr class="confluenceTr"><td>
+        <tr><td>
             <xsl:apply-templates select="." mode="elements-doc"/>
             <xsl:apply-templates select="." mode="elements-abstract"/>
         </td></tr>
