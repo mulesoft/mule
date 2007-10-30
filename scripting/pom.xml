@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.distributions</groupId>
+        <artifactId>mule-distributions</artifactId>
+        <version>2.0.0-M3-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-scripting-pack</artifactId>
+    <packaging>pom</packaging>
+    <name>JSR-223 Additional Scripting</name>
+    <description>Contains additional retrotranslated js-engine for Scripting Mule Services and embedding Mule inside
+        scripts
+    </description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <!--
+                    Don't upgrade because of http://jira.codehaus.org/browse/MASSEMBLY-194,
+                    Needs to be fixed and then assembly descriptors should be updated.
+                 -->
+                <version>2.1</version>
+                <configuration>
+                    <finalName>${pom.artifactId}</finalName>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <tarLongFileMode>gnu</tarLongFileMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <!--
+                                'attached' ensures there's only a single run bound to m2's lifecycle.
+                                The default 'assembly' goal would run every plugin in this pom twice.
+                            -->
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>mule-assembly-verifier</artifactId>
+                <!--version is managed in the pluginManagement of the toplevel pom -->
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <projectOutputFile>${pom.artifactId}.zip</projectOutputFile>
+                    <whitelist>assembly-whitelist.txt</whitelist>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!-- required for the script-api and retrotranslated JSR-223 engines -->
+        <!--<dependency>-->
+            <!--<groupId>net.sf.retrotranslator</groupId>-->
+            <!--<artifactId>retrotranslator-runtime</artifactId>-->
+            <!--<version>1.2.1</version>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>script-api</artifactId>
+            <version>1.0</version>
+            <classifier>jdk14</classifier>
+        </dependency>
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>jruby-engine</artifactId>
+            <version>1.1</version>
+            <classifier>jdk14</classifier>
+        </dependency>
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>jython-engine</artifactId>
+            <version>1.1</version>
+            <classifier>jdk14</classifier>
+        </dependency>
+        <dependency>
+            <groupId>javax.script</groupId>
+            <artifactId>js-engine</artifactId>
+            <version>1.1</version>
+            <classifier>jdk14</classifier>
+        </dependency>
+    </dependencies>
+</project>
