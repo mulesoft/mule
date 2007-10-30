@@ -13,18 +13,20 @@ package org.mule.tools.schemadocs;
 import org.mule.util.IOUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.jar.JarEntry;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
@@ -45,6 +47,8 @@ public class SchemaDocsMain
 {
 
     public static final String BACKUP = ".bak";
+    public static final String XSD = ".xsd";
+    public static final String MULE = "mule";
     public static final String TAG = "tag";
     public static final String XSL_FILE = "rename-tag.xsl";
 
@@ -92,27 +96,27 @@ public class SchemaDocsMain
         TransformerFactory factory = TransformerFactory.newInstance();
         Templates template = factory.newTemplates(new StreamSource(xslSource));
         Transformer xformer = template.newTransformer();
-        Iterator files = listSchema2().iterator();
-        while (files.hasNext())
+        Iterator urls = listSchema2().iterator();
+        while (urls.hasNext())
         {
-            File file = (File) files.next();
-            String tag = tagFromFileName(file);
-            logger.debug(tag + " : " + file);
+            URL url = (URL) urls.next();
+            String tag = tagFromFileName(url.getFile());
+            logger.info(tag + " : " + url);
             xformer.setParameter(TAG, tag);
-            Source source = new StreamSource(new FileInputStream(file));
+            Source source = new StreamSource(url.openStream());
             xformer.transform(source, new StreamResult(out));
 //            xformer.transform(source, new StreamResult(System.out));
             out.flush();
         }
     }
 
-    protected String tagFromFileName(File file)
+    protected String tagFromFileName(String name)
     {
-        String name = file.getName();
-        int index = name.indexOf(".");
+        int index = name.lastIndexOf(".");
         name = name.substring(0, index);
-        index = name.indexOf("-");
-        if (index > -1)
+        index = name.lastIndexOf("-");
+        // make sure "-" is in last file step
+        if (index > -1 && index > name.lastIndexOf("/"))
         {
             return name.substring(index+1);
         }
@@ -131,7 +135,7 @@ public class SchemaDocsMain
         List list = new LinkedList();
         for (int i = 0; i < resources.length; ++i)
         {
-            list.add(resources[i].getFile());
+            list.add(resources[i].getURL());
         }
         return list;
     }
@@ -146,27 +150,53 @@ public class SchemaDocsMain
                 new FilenameFilter() {
                     public boolean accept(File dir, String name)
                     {
-                        return name.endsWith(".xsd");
+                        return name.startsWith(MULE) && name.endsWith(XSD);
                     }
                 };
         while (resources.hasMoreElements())
         {
             URL url = (URL) resources.nextElement();
             logger.debug("url: " + url);
-            if ("file".equals(url.getProtocol()))
+            if (url.toString().startsWith("jar:"))
             {
-                File dir = new File(url.getFile());
-                String[] names = dir.list(filter);
-                for (int i = 0; i < names.length; ++i)
-                {
-                    String name = names[i];
-                    logger.debug("file: " + name);
-                    files.add(new File(dir, name));
-                }
+                readFromJar(url, files);
+            }
+            else if ("file".equals(url.getProtocol()))
+            {
+                readFromDirectory(new File(url.getFile()), files, filter);
             }
         }
         return files;
     }
+
+    // this is used from within idea
+    protected void readFromDirectory(File dir, List files, FilenameFilter filter) throws MalformedURLException
+    {
+        String[] names = dir.list(filter);
+        for (int i = 0; i < names.length; ++i)
+        {
+            String name = names[i];
+            logger.debug("file: " + name);
+            files.add(new File(dir, name).toURL());
+        }
+    }
+
+    // this is used from within maven
+    protected void readFromJar(URL jarUrl, List resources) throws IOException
+    {
+        JarURLConnection jarConnection = (JarURLConnection) jarUrl.openConnection();
+        Enumeration entries = jarConnection.getJarFile().entries();
+        while (entries.hasMoreElements())
+        {
+            JarEntry entry = (JarEntry) entries.nextElement();
+            String name = new File(entry.getName()).getName();
+            if (name.startsWith(MULE) && name.endsWith(XSD))
+            {
+                logger.debug("entry: " + entry);
+                resources.add(new URL(jarUrl, entry.getName()));
+            }
+        }
+  }
 
     protected void backup(File file) throws IOException
     {
