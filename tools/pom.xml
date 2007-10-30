@@ -18,6 +18,7 @@
         <!--  <module>visualizer</module> -->
         <module>bobberplus</module>
         <module>mule-transport-archetype</module>
+        <module>schemadocs</module>
     </modules>
 
 <!--    <pluginRepositories>
