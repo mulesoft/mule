@@ -26,7 +26,8 @@
     <xsl:output method="html"/>
     <xsl:param name="elementName"/>
     <xsl:key name="item-to-page" match="link" use="item"/>
-    <xsl:variable name="items-to-pages" select="document('links.xml')/links"/>
+    <xsl:variable name="items-to-pages" select="document('http://svn.codehaus.org/mule/branches/mule-2.x/tools/schemadocs/src/main/resources/links.xml')/links"/>
+    <!-- xsl:variable name="items-to-pages" select="document('links.xml')/links"/ -->
 
     <xsl:template match="/">
         <html>
