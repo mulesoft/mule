@@ -1,7 +1,7 @@
 @echo off
 setlocal
 REM There is no need to call this if you set the MULE_HOME in your environment properties
-if "%MULE_HOME%" == "" SET MULE_HOME=..\..
+if "%MULE_HOME%" == "" SET MULE_HOME=%~dp0..\..
 if "%MULE_BASE%" == "" SET MULE_BASE=%MULE_HOME%
 
 REM This extends the classpath to include the configuration directory
@@ -48,4 +48,3 @@ SET /P Choice=Select the one you wish to execute and press Enter...
 IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -main org.mule.examples.loanbroker.esb.LoanBrokerApp
 IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -main org.mule.examples.loanbroker.esn.LoanBrokerApp
 IF '%Choice%'=='3' call "%MULE_BASE%\bin\mule.bat" -main org.mule.examples.loanbroker.bpm.LoanBrokerApp
-
