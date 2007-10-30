@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<links>
-    <!-- this is a table of pages for linked items.
-         if an item appears here, a link is generated to the given page.
-         this allows us to match the documentation to the existing wiki structure. -->
-    <link><item>mule:receiver-threading-profile</item><page>page1</page></link>
-    <link><item>mule:dispatcher-threading-profile</item><page>page2</page></link>
-</links>

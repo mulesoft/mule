@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# this is now replaced by org.mule.buildtools.schemadoc.Main
+
 # this generates a single composite xsd
 # the resulting file is not valid as a schema, but allows easier cross-referencing of elements
 # (the underlying problem is that while xsl handles namespaces, when we select with xpath on,
@@ -18,19 +20,7 @@ then
   mv "$NORMALIZED" "$NORMALIZED$BACKUP"
 fi
 
-cat > "$NORMALIZED" << EOS
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xsd:schema xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:spring="http://www.springframework.org/schema/beans"
-            attributeFormDefault="unqualified"
-            elementFormDefault="qualified">
-
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.springframework.org/schema/beans"
-                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"/>
-EOS
+cat schemadoc-prefix.txt > "$NORMALIZED"
 
 for file in `find ../../.. \( -name "normalized.xsd" -prune \) -o \( -name "buildtools" -prune \) -o \( -name "*classes" -prune \) -o \( -name "test" -prune \) -o -name "*.xsd" -print `
 do
@@ -43,6 +33,4 @@ do
   saxon "$file" rename-tag.xsl tag="$tag" >> "$NORMALIZED"
 done
 
-cat >> "$NORMALIZED" << EOS
-</xsd:schema>
-EOS
+cat schemadoc-postfix.txt >> "$NORMALIZED"

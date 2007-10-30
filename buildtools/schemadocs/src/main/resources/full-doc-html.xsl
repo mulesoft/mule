@@ -4,10 +4,10 @@
    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
    >
 
-    <!-- $Id$ -->
+    <!-- $Id: full-doc-html.xsl 9354 2007-10-25 13:56:12Z acooke $ -->
 
     <!-- an initial experiment at generating a "complete" doc
-         outpu way too complex, problems with loops etc -->
+         output way too complex, problems with loops etc -->
 
   <xsl:output method="html"/>
 

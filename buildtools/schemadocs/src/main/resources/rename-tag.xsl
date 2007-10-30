@@ -4,7 +4,7 @@
    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
    >
 
-    <!-- $Id$ -->
+    <!-- $Id: rename-tag.xsl 9372 2007-10-25 19:43:54Z acooke $ -->
 
     <!-- this renames element, group and type names so that we can process several
          schema together.  see further comments in normalize.sh -->
