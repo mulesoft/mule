@@ -214,11 +214,11 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <mainClass>org.mule.buildtools.schemadoc.Main</mainClass>
+                            <mainClass>org.mule.tools.schemadocs.SchemaDocsMain</mainClass>
                             <arguments>
                                 <argument>schemadoc-prefix.txt</argument>
                                 <argument>schemadoc-postfix.txt</argument>
-                                <argument>/home/andrew/projects/mule/branches/mule-2.x/buildtools/schemadocs/target/normalized.xsd</argument>
+                                <argument>/home/andrew/projects/mule/branches/mule-2.x/tools/schemadocs/target/normalized.xsd</argument>
                             </arguments>
                             <!-- systemProperties>
                                 <systemProperty>
