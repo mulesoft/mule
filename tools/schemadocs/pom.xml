@@ -218,14 +218,8 @@
                             <arguments>
                                 <argument>schemadoc-prefix.txt</argument>
                                 <argument>schemadoc-postfix.txt</argument>
-                                <argument>/home/andrew/projects/mule/branches/mule-2.x/tools/schemadocs/target/normalized.xsd</argument>
+                                <argument>/opt/j2ee/domains/mulesource.org/mule/ROOT/webapps/atlassian-confluence/data/data-2.3.3/script/xsd-doc/normalized.xsd</argument>
                             </arguments>
-                            <!-- systemProperties>
-                                <systemProperty>
-                                    <key>myproperty</key>
-                                    <value>myvalue</value>
-                                </systemProperty>
-                            </systemProperties -->
                         </configuration>
                     </plugin>
                 </plugins>
