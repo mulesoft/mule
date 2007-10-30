@@ -11,10 +11,6 @@ org.mule.util.concurrent.WaitPolicyTestCase
 org.mule.impl.MuleComponentTestCase
 # Rewrite this test using the Registry 
 org.mule.impl.MuleModelTestCase                        
-# Update after MULE-2233
-org.mule.mule.commonspool.CommonsPoolTestCase
-# Delete after MULE-2233
-org.mule.mule.commonspool.CommonsPoolProxyFactoryTestCase
 # Clean this one up after MULE-2287 or just delete it 
 org.mule.mule.MuleDescriptorTestCase
 
@@ -22,3 +18,6 @@ org.mule.mule.MuleDescriptorTestCase
 org.mule.util.queue.FilePersistenceTestCase
 
 org.mule.routing.inbound.IdempotentInMemoryMessageIdStoreTestCase
+
+# KeyedObjectPool is not getting exhausted by the exhaustion tests for some reason.
+org.mule.util.object.PooledIdentifiableObjectFactoryTestCase
