@@ -1,4 +1,3 @@
 jruby-engine-1.1-jdk14
 js-engine-1.1-jdk14
 jython-engine-1.1-jdk14
-script-api-1.0-jdk14
