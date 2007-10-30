@@ -141,6 +141,7 @@ public class SchemaDocsMain
     }
 
     // this is a bit ad-hoc, but seems to work efficiently
+    // http://forum.java.sun.com/thread.jspa?threadID=286026&messageID=1119510
     protected List listSchema2() throws IOException
     {
         ClassLoader loader = getClass().getClassLoader();
