@@ -27,30 +27,10 @@ public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestC
 
     public void testNoneTx() throws Exception
     {
-        send(scenarioNonTx);
-        receive(scenarioNonTx);
+        send(scenarioNoTx);
+        receive(scenarioNoTx);
         receive(scenarioNotReceive);
     }
-
-    Scenario scenarioNonTx = new AbstractScenario()
-    {
-        public void send(Session session, MessageProducer producer) throws JMSException
-        {
-            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-        }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(TIMEOUT);
-            assertNotNull(message);
-            return message;
-        }
-
-        public boolean isTransacted()
-        {
-            return false;
-        }
-    };
 
 
 }

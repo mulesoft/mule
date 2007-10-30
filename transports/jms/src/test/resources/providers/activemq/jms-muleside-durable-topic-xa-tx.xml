@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+      xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.0"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/jbossts/2.0 http://www.mulesource.org/schema/mule/jbossts/2.0/mule-jbossts.xsd
+       ">
+
+    <jbossts:jboss-transaction-manager/>
+
+    <vm:connector name="vm" queueEvents="true"/>
+    <jms:activemq-connector name="jmsConnectorXA" specification="1.1"/>
+    <jms:activemq-xa-connector name="jmsConnectorC1" specification="1.1" durable="true" clientId="C1"/>
+    <jms:activemq-xa-connector name="jmsConnectorC2" specification="1.1" durable="true" clientId="C2"/>
+
+    <endpoint name="in" address="vm://in" connector-ref="vm"/>
+    <endpoint name="out" address="vm://out" connector-ref="vm"/>
+
+    <spring:bean name="txFactory" class="org.mule.transaction.XaTransactionFactory"/>
+
+    <custom-transformer name="ObjectToJMSMessage"
+                        class="org.mule.providers.jms.transformers.ObjectToJMSMessage"
+                        returnClass="javax.jms.TextMessage"/>
+
+    <model name="TEST">
+
+        <service name="InputPart">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
+                </properties>
+            </singleton-object>
+            <inbound-router>
+                <inbound-endpoint ref="in"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint transformer-ref="ObjectToJMSMessage" address="jms://topic:durable.broadcast"
+                                       connector-ref="jmsConnectorXA">
+                        <transaction action="BEGIN_OR_JOIN">
+                            <transaction-factory factory-ref="txFactory"/>
+                        </transaction>
+                    </outbound-endpoint>
+                    <transaction action="ALWAYS_BEGIN">
+                        <transaction-factory factory-ref="txFactory"/>
+                    </transaction>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+
+        <service name="Part1">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="returnMessage" value="OUTPUT MESSAGE-1"/>
+                </properties>
+            </singleton-object>
+            <inbound-router>
+                <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC1">
+                    <transaction action="ALWAYS_BEGIN">
+                        <transaction-factory factory-ref="txFactory"/>
+                    </transaction>
+                </inbound-endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="out" transformer-ref="ObjectToJMSMessage"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+        <service name="Part3">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="returnMessage" value="OUTPUT MESSAGE-2"/>
+                </properties>
+            </singleton-object>
+            <inbound-router>
+                <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC2">
+                    <transaction action="ALWAYS_BEGIN">
+                        <transaction-factory factory-ref="txFactory"/>
+                    </transaction>
+                </inbound-endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="out" transformer-ref="ObjectToJMSMessage"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+    </model>
+</mule>

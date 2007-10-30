@@ -316,7 +316,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
-            Message message = consumer.receive(TIMEOUT);
+            Message message = consumer.receive(SMALL_TIMEOUT);
             assertNull(message);
             return message;
         }
@@ -327,5 +327,23 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }
 
     };
+
+    Scenario scenarioNoTx = new AbstractScenario()
+    {
+        public void send(Session session, MessageProducer producer) throws JMSException
+        {
+            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
+        }
+
+        public Message receive(Session session, MessageConsumer consumer) throws JMSException
+        {
+            Message message = consumer.receive(TIMEOUT);
+            assertNotNull(message);
+            assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
+            assertEquals(((TextMessage) message).getText(), DEFAULT_OUTPUT_MESSAGE);
+            return message;
+        }
+    };
+    
 
 }
