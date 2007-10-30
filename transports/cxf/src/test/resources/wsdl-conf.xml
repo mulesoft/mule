@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:servlet="http://www.mulesource.org/schema/mule/servlet/2.0"
+       xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/servlet/2.0 http://www.mulesource.org/schema/mule/servlet/2.0/mule-servlet.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
+
+    <servlet:connector name="servlet" servletUrl="http://localhost:63088/services"/>
+
+    <cxf:connector name="cxf" defaultFrontend="simple"/>
+    
+    <model name="WsdlTest">
+
+        <service name="mycomponent">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="cxf:servlet://mycomponent" />
+            </inbound-router>
+        </service>
+        
+        <service name="cxfService">
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="cxf:http://localhost:63082/cxfService" />
+            </inbound-router>
+        </service>
+
+    </model>
+    
+</mule>

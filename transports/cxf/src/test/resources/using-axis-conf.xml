@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
+
+    <!-- mule-environment-properties serverUrl="tcp://localhost:63500"/ -->
+
+    <model name="Testing_a_cxf_service_using_axis">
+
+        <!--Hosting the Cxf service-->
+        <service name="CxfService">
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="cxf:http://localhost:63382/services/CxfService"/>
+            </inbound-router>
+        </service>
+
+        <!--Accessing a Cxf hosted web-service using Axis-->
+        <service name="BridgeToCxfHello">
+            <component class="org.mule.components.simple.BridgeComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="vm://cxf.in"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="axis:http://localhost:63382/services/CxfService?method=receive">
+                        <properties>
+                            <spring:entry key="soapAction" value="${methodNamespace}${method}"/>
+                            <spring:entry key="soapMethods">
+                                <spring:list>
+                                    <spring:bean class="org.mule.providers.soap.SoapMethod">
+                                        <!-- the strange qname syntax here will generate a QName instance via a property editor -->
+                                        <spring:constructor-arg value="qname{add:http://muleumo.org/Calc}"/>
+                                        <spring:constructor-arg>
+                                            <spring:list>
+                                                <spring:value>s;string;in</spring:value>
+                                                <spring:value>return;string</spring:value>
+                                            </spring:list>
+                                        </spring:constructor-arg>
+                                    </spring:bean>
+                                </spring:list>
+                            </spring:entry>
+                        </properties>
+                    </outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+        
+    </model>
+    
+</mule>
+

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Mule_Sample" version="1.0">
+    <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
+        <properties>
+            <property name="servletUrl" value="http://localhost:18088/services"/>
+        </properties>
+    </connector>
+
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.tck.testmodels.services.TestServiceComponent"
+            inboundEndpoint="cxf:servlet://mycomponent">
+        </mule-descriptor>
+
+        <mule-descriptor name="xfireService" implementation="org.mule.tck.testmodels.services.TestServiceComponent">
+            <inbound-router>
+                <endpoint address="cxf:http://localhost:18082/xfireService"/>
+            </inbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

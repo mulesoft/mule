@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
+
+  <cxf:connector name="cxf" defaultFrontend="simple"/>
+    
+  <configuration serverId="" defaultSynchronousEndpoints="true"/>
+
+  <model name="BasicCxfTest">
+    <service name="CxfWithExceptionStrategy">
+      <component
+        class="org.mule.providers.cxf.testmodels.TestXFireComponent" />
+      <inbound-router>
+        <inbound-endpoint
+          address="cxf:http://localhost:63181/services/CxfWithExceptionStrategy" />
+      </inbound-router>
+      <custom-exception-strategy class="org.mule.providers.soap.cxf.CxfComponentExceptionStrategy"/>
+    </service>
+
+    <service name="CxfDefault">
+      <component
+        class="org.mule.providers.cxf.testmodels.TestXFireComponent" />
+      <inbound-router>
+        <inbound-endpoint
+          address="cxf:http://localhost:63181/services/CxfDefault" />
+      </inbound-router>
+    </service>
+  </model>
+
+</mule>

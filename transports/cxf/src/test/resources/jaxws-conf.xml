@@ -1,0 +1,18 @@
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+  xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
+
+  <model name="TestCxfModel">
+    <service name="echoService">
+      <component class="org.mule.providers.soap.cxf.testmodels.Echo"/>
+      <inbound-router>
+          <cxf:inbound-endpoint address="http://localhost:63081/services/Echo" />
+      </inbound-router>
+    </service>
+  </model>
+</mule>

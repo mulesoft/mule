@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.transports</groupId>
+        <artifactId>mule-transports</artifactId>
+        <version>2.0-M2-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-transport-cxf</artifactId>
+    <!--<packaging>bundle</packaging>-->
+    <name>SOAP Transport: CXF</name>
+    <description>A Mule transport for web service connectivity using CXF.</description>
+    <build>
+        <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                <source>1.5</source>
+                <target>1.5</target>
+              </configuration>
+            </plugin>
+                <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>maven-buildnumber-plugin</artifactId>
+      <version>0.9.6</version>
+      <executions>
+        <execution>
+          <phase>validate</phase>        
+          <goals>
+            <goal>create</goal>
+          </goals>
+        </execution>
+      </executions>
+      <configuration>
+        <doCheck>false</doCheck>
+        <doUpdate>false</doUpdate>
+      </configuration>
+    </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>tests-external</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.mule.tests</groupId>
+                    <artifactId>mule-tests-external-cxf</artifactId>
+                    <version>${version}</version>
+                    <type>war</type>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <Export-Package>
+                                    org.mule.providers.soap.cxf.*
+                                </Export-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <repositories>
+        <repository>
+          <id>apache-incubating</id>
+          <name>Apache Incubating Repository</name>
+          <url>http://people.apache.org/repo/m2-incubating-repository/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+<dependency>
+      <groupId>org.mule.transports</groupId>
+      <artifactId>mule-transport-soap</artifactId>
+      <version>${version}</version>
+    </dependency>
+
+    <!-- Needed for common SOAP test classes -->
+    <dependency>
+      <groupId>org.mule.transports</groupId>
+      <artifactId>mule-transport-soap</artifactId>
+      <version>${version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mule.modules</groupId>
+      <artifactId>mule-module-client</artifactId>
+      <version>${version}</version>
+    </dependency>
+
+    <!-- CXF dependencies -->
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-core</artifactId>
+      <version>2.0.1-incubator</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-simple</artifactId>
+      <version>2.0.1-incubator</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxws</artifactId>
+      <version>2.0.1-incubator</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-databinding-aegis</artifactId>
+      <version>2.0.1-incubator</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-databinding-jaxb</artifactId>
+      <version>2.0.1-incubator</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-local</artifactId>
+      <version>2.0.1-incubator</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http</artifactId>
+      <version>2.0.1-incubator</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-testutils</artifactId>
+      <version>2.0.1-incubator</version>
+    </dependency>
+    
+    <!-- TODO can we get rid of this dependency? -->
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http-jetty</artifactId>
+      <version>2.0.1-incubator</version>
+    </dependency>
+        
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <version>1.4.3</version>
+    </dependency>
+      
+    <!-- For dynamic client, which compiles stuff on the fly -->
+    <dependency>
+      <groupId>ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.6.5</version>
+    </dependency>
+    
+    <!-- for integrtion tests -->
+    <dependency>
+      <groupId>org.mule.transports</groupId>
+      <artifactId>mule-transport-vm</artifactId>
+      <version>${version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mule.modules</groupId>
+      <artifactId>mule-module-client</artifactId>
+      <version>${version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Better testing of XML -->
+    <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    </dependencies>
+</project>

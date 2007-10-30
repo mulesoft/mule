@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+  xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+  xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
+  xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+  xsi:schemaLocation="
+               http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+  <http:connector name="default" clientSoTimeout="1000" socketSoLinger="1000"/>
+
+  <mule:model name="BasicCxfTest">
+
+    <mule:service name="echoService">
+      <mule:component class="org.mule.components.simple.EchoComponent" />
+      <mule:inbound-router>
+        <cxf:inbound-endpoint
+          address="http://localhost:63081/services/Echo" frontend="simple"/>
+      </mule:inbound-router>
+    </mule:service>
+    
+    <mule:service name="echoService2">
+      <mule:component class="org.mule.components.simple.EchoComponent" />
+      <mule:inbound-router>
+        <cxf:inbound-endpoint
+          address="http://localhost:63082/services/Echo2" frontend="simple"/>
+      </mule:inbound-router>
+    </mule:service>
+
+    <mule:service name="echoService3">
+      <mule:component class="org.mule.components.simple.EchoComponent" />
+      <mule:inbound-router>
+        <cxf:inbound-endpoint
+          address="http://localhost:63083/services/Echo3" frontend="simple"/>
+      </mule:inbound-router>
+    </mule:service>
+  </mule:model>
+
+</beans>
+
