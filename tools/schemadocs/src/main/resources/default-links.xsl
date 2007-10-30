@@ -29,9 +29,7 @@
             </item>
             <page>
                 <xsl:choose>
-                    <xsl:when test="starts-with(@name, 'mule:')">
-                        <xsl:value-of select="concat('SchemaBasics#', @name)"/>
-                    </xsl:when>
+                    <xsl:when test="starts-with(@name, 'mule:')">SchemaBasics</xsl:when>
                     <!-- more logic here? -->
                 </xsl:choose>
             </page>
