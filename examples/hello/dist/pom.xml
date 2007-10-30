@@ -27,7 +27,17 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-stdio</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
             <version>${muleVersion}</version>
         </dependency>
     </dependencies>

@@ -10,13 +10,10 @@
 package org.mule.config;
 
 import org.mule.umo.UMOManagementContext;
-import org.mule.util.ClassUtils;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.util.Properties;
 
 /**
@@ -114,8 +111,15 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
     {
         try
         {
-            Properties props = PropertiesUtils.loadProperties(startupPropertiesFile, getClass());
-            return configure(configResources, props);
+            if (startupPropertiesFile != null)
+            {
+                Properties props = PropertiesUtils.loadProperties(startupPropertiesFile, getClass());
+                return configure(configResources, props);
+            }
+            else
+            {
+                return configure(configResources);
+            }
         }
         catch (IOException e)
         {
