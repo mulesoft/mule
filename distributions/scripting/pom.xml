@@ -69,18 +69,6 @@
     </build>
 
     <dependencies>
-        <!-- required for the script-api and retrotranslated JSR-223 engines -->
-        <!--<dependency>-->
-            <!--<groupId>net.sf.retrotranslator</groupId>-->
-            <!--<artifactId>retrotranslator-runtime</artifactId>-->
-            <!--<version>1.2.1</version>-->
-        <!--</dependency>-->
-        <dependency>
-            <groupId>javax.script</groupId>
-            <artifactId>script-api</artifactId>
-            <version>1.0</version>
-            <classifier>jdk14</classifier>
-        </dependency>
         <dependency>
             <groupId>javax.script</groupId>
             <artifactId>jruby-engine</artifactId>
