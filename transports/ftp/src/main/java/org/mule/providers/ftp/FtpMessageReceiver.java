@@ -152,6 +152,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             
 
             message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, fileName);
+            message.setProperty(FileConnector.PROPERTY_FILE_SIZE, new Long(file.getSize()));
             routeMessage(message);
 
             if (!client.deleteFile(fileName))

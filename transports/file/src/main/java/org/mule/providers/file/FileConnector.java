@@ -64,8 +64,10 @@ public class FileConnector extends AbstractConnector
     public static final String PROPERTY_SERVICE_OVERRIDE = "serviceOverrides";
     public static final String PROPERTY_WRITE_TO_DIRECTORY = "writeToDirectoryName";
     public static final String PROPERTY_READ_FROM_DIRECTORY = "readFromDirectoryName";
+    public static final String PROPERTY_FILE_SIZE = "fileSize";
 
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
+
 
     /**
      * Time in milliseconds to poll. On each poll the poll() method is called
