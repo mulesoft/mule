@@ -58,7 +58,8 @@ public class CoreMessages extends MessageFactory
 
     public static Message version()
     {
-        return createMessage(BUNDLE_PATH, 6);
+        String version = StringUtils.defaultString(MuleManifest.getProductVersion(), notSet().getMessage());
+        return createMessage(BUNDLE_PATH, 6, version);
     }
 
     public static Message shutdownNormally(Date date)

@@ -21,7 +21,6 @@ import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Disposable;
@@ -684,9 +683,9 @@ public class ManagementContext implements UMOManagementContext
         Map att = mf.getMainAttributes();
         if (att.values().size() > 0)
         {
-            message.add(StringUtils.defaultString(MuleManifest.getProductDescription(), notset) + " "
-                    + CoreMessages.version().getMessage() + " "
-                    + StringUtils.defaultString(MuleManifest.getProductVersion(), notset));
+            message.add(StringUtils.defaultString(MuleManifest.getProductDescription(), notset));
+            message.add(CoreMessages.version().getMessage() + " Build: " 
+                + StringUtils.defaultString(MuleManifest.getBuildNumber(), notset));
 
             message.add(StringUtils.defaultString(MuleManifest.getVendorName(), notset));
             message.add(StringUtils.defaultString(MuleManifest.getProductMoreInfo(), notset));
