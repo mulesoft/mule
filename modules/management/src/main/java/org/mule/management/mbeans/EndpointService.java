@@ -59,14 +59,13 @@ public class EndpointService implements EndpointServiceMBean
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("Endpoint").getMessage());
         }
-        if (receiver == null && !UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
+        if (receiver == null && UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
         {
             throw new IllegalArgumentException(
                 "Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");
         }
 
         name = ObjectNameHelper.getEndpointName(endpoint);
-
     }
 
     public String getAddress()
