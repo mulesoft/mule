@@ -11,23 +11,22 @@
 package org.mule.test.firewall;
 
 import org.mule.config.factories.HostNameFactory;
+import org.mule.tck.AbstractMuleTestCase;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.DatagramPacket;
 import java.net.UnknownHostException;
 import java.security.SecureRandom;
 
-import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class FirewallTestCase extends TestCase
+public class FirewallTestCase extends AbstractMuleTestCase
 {
-
     public static final String LOCALHOST = "localhost";
     public static final String LOCALADDR = "127.0.0.1";
     public static final int TEST_COUNT = 1;
