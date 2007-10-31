@@ -16,7 +16,9 @@ import org.codehaus.xfire.fault.FaultInfoException;
 
 public class XFireEnabledFaultMessage extends FaultInfoException
 {
-    CustomFault faultInfo;
+    private static final long serialVersionUID = -6379864543048621063L;
+
+    protected CustomFault faultInfo;
 
     public XFireEnabledFaultMessage(String message, CustomFault fault)
     {

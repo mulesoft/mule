@@ -13,3 +13,6 @@ org.mule.providers.soap.xfire.XFireServiceUsingAxisEndpointTestCase
 
 # MULE-2044 Can't send complex types to WS using Xfire
 org.mule.providers.soap.xfire.ComplexTypeMethodTestCase
+
+# MULE-2608: ocnfig needs to be rewritten
+org.mule.providers.soap.xfire.XFireMessageReceiverFunctionalTestCase

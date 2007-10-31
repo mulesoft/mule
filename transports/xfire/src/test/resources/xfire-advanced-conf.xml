@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="myId" version="1.0">
+ <description>Basic XFire Tests</description>
+
+
+  <connector name="xfireConnector" className="org.mule.providers.soap.xfire.XFireConnector"/>
+
+ <model name="TestXfire">
+  <mule-descriptor name="echoServiceWsdlPortType" implementation="org.mule.components.simple.EchoComponent">
+   <inbound-router>
+    <endpoint address="xfire:http://localhost:63081/services" connector="xfireConnector"/>
+   </inbound-router>
+    <properties>
+      <property name="wsdlUrl" value="file://xfire-advanced-echo-service.wsdl"/>
+      <property name="portType" value="qname{http://www.muleumo.org:echoServiceCustomPortType}"/>
+    </properties>
+  </mule-descriptor>
+
+
+
+ </model>
+</mule-configuration>

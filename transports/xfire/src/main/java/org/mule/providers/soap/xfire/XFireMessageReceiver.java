@@ -10,6 +10,7 @@
 
 package org.mule.providers.soap.xfire;
 
+import org.mule.config.converters.QNameConverter;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOComponent;
@@ -42,6 +43,7 @@ import org.codehaus.xfire.service.Service;
  */
 public class XFireMessageReceiver extends AbstractMessageReceiver
 {
+    private static final String PORT_TYPE = "portType";
 
     protected XFireConnector connector;
     protected Service service;
@@ -63,6 +65,15 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
         {
             Map props = new HashMap(component.getProperties());
             props.putAll(endpoint.getProperties());
+
+            // convert port Type to QName if specified
+            if (props.containsKey(PORT_TYPE))
+            {
+                Object value = props.get(PORT_TYPE);
+                QNameConverter converter = new QNameConverter(true);
+                QName portTypeQName = (QName) converter.convert(QName.class, value);
+                props.put(PORT_TYPE, portTypeQName);
+            }
 
             // check if there is the namespace property on the component
             String namespace = (String) component.getProperties().get(SoapConstants.SOAP_NAMESPACE_PROPERTY);
@@ -99,7 +110,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             }
             else
             {
-                rewriteProperty(props, "portType");
+                rewriteProperty(props, PORT_TYPE);
                 rewriteProperty(props, "style");
                 rewriteProperty(props, "use");
                 rewriteProperty(props, "createDefaultBindings");

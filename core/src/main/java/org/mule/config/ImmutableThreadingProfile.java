@@ -228,15 +228,23 @@ public class ImmutableThreadingProfile implements ThreadingProfile
                         tp.getMaxThreadsActive(), tp.getThreadTTL(),
                         TimeUnit.MILLISECONDS, buffer);
 
-        ThreadFactory tf = tp.getThreadFactory();
-        if (name != null)
+        // use a custom ThreadFactory if one has been configured
+        if (tp.getThreadFactory() != null)
         {
-            tf = new NamedThreadFactory(name);
+            pool.setThreadFactory(tp.getThreadFactory());
         }
-
-        if (tf != null)
+        else
         {
-            pool.setThreadFactory(tf);
+            // ..else create a "NamedThreadFactory" if a proper name was passed in
+            if (name != null)
+            {
+                pool.setThreadFactory(new NamedThreadFactory(name)); 
+            }
+            else
+            {
+                // let ThreadPoolExecutor create a default ThreadFactory;
+                // see Executors.defaultThreadFactory()
+            }
         }
 
         if (tp.getRejectedExecutionHandler() != null)
