@@ -40,13 +40,13 @@ import org.mule.util.CollectionUtils;
 import org.mule.util.UUID;
 import org.mule.util.properties.PropertyExtractorManager;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -372,9 +372,14 @@ public abstract class AbstractRegistry implements Registry
         return (UMOComponent) lookupObject(name);
     }
 
+    public Collection/*<UMOComponent>*/ lookupComponents()
+    {
+        return lookupObjects(UMOComponent.class);
+    }
+
     public Collection/*<UMOComponent>*/ lookupComponents(String model)
     {
-        Collection/*<UMOComponent>*/ components = lookupObjects(UMOComponent.class);
+        Collection/*<UMOComponent>*/ components = lookupComponents();
         List modelComponents = new ArrayList();
         Iterator it = components.iterator();
         UMOComponent component;

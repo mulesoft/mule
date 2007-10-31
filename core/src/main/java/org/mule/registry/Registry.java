@@ -141,6 +141,8 @@ public interface Registry extends Initialisable, Disposable
 
     Collection/*<UMOComponent>*/ lookupComponents(String model);
 
+    Collection/*<UMOComponent>*/ lookupComponents();
+
     UMOModel lookupModel(String name);
 
     UMOModel lookupSystemModel();
