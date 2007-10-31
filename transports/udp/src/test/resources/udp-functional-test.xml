@@ -22,7 +22,7 @@
 
     <model name="main">
         <service name="testUDP1">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="serverEndpoint"/>
             </inbound-router>

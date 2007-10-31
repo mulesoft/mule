@@ -12,7 +12,7 @@
 
     <model name="WebService_Test">
         <service name="ServiceEntryPoint">
-            <singleton-object class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
+            <component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:8088">
                     <properties>

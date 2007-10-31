@@ -15,7 +15,7 @@
 
     <model name="TestXfireHeaders">
         <service name="TestComponent">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="xfire:http://localhost:63181/services"/>
             </inbound-router>

@@ -13,7 +13,6 @@ package org.mule.tck.testmodels.fruit;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
-import org.mule.util.object.Identifiable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +21,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class Orange implements Fruit, Callable, Identifiable
+public class Orange implements Fruit, Callable
 {
     /**
      * Serial version
@@ -34,8 +33,6 @@ public class Orange implements Fruit, Callable, Identifiable
      */
     private static final Log logger = LogFactory.getLog(Orange.class);
 
-    private String id;
-    
     private boolean bitten = false;
     private Integer segments = new Integer(10);
     private Double radius = new Double(4.34);
@@ -270,13 +267,4 @@ public class Orange implements Fruit, Callable, Identifiable
         return true;
     }
 
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
 }

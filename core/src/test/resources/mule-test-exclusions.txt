@@ -9,15 +9,17 @@ org.mule.util.concurrent.WaitPolicyTestCase
 
 # This test needs some work after MULE-2233 and MULE-2287 
 org.mule.impl.MuleComponentTestCase
+# Update after MULE-2233
+org.mule.mule.commonspool.CommonsPoolTestCase
+# Delete after MULE-2233
+org.mule.mule.commonspool.CommonsPoolProxyFactoryTestCase
 
 # MULE-2536
 org.mule.util.queue.FilePersistenceTestCase
 
 org.mule.routing.inbound.IdempotentInMemoryMessageIdStoreTestCase
 
-# KeyedObjectPool is not getting exhausted by the exhaustion tests for some reason.
-org.mule.util.object.PooledIdentifiableObjectFactoryTestCase
-
 # Duplicate registration doesn't currently produce an exception, should it?
 # See comment in TransientRegistry.doRegisterObject()
 org.mule.impl.registry.DuplicateRegistrationTestCase
+

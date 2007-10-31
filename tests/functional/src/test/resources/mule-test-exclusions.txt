@@ -3,3 +3,4 @@ org.mule.test.spring.GlobalPropertiesMule2458TestCase
 # Delete after MULE-2233
 org.mule.test.config.CommonsPoolProxyPoolTestCase
 
+org.mule.test.firewall.FirewallTestCase

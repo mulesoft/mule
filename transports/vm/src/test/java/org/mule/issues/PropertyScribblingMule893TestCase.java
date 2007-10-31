@@ -20,7 +20,6 @@ import java.util.Map;
 
 public class PropertyScribblingMule893TestCase extends FunctionalTestCase
 {
-    MuleClient client = null;
 
     protected String getConfigResources()
     {
@@ -29,10 +28,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
 
     public void testSingleMessage() throws Exception
     {
-        if (client == null)
-        {
-            client = new MuleClient();
-        }
+        MuleClient client = new MuleClient();
         Map properties = new HashMap();
         properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "receive");
         client.dispatch("dispatch", "Message", properties);
@@ -43,19 +39,9 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
 
     public void testManyMessage() throws Exception
     {
-        int NUM_MESSAGES = 1000;
-        int msg = 0;
-        try
+        for (int i = 0; i < 1000; i++)
         {
-            while (msg < NUM_MESSAGES)
-            {
-                testSingleMessage();
-                msg++;
-            }
-        }
-        finally 
-        {
-            logger.info(msg + " messages out of " + NUM_MESSAGES + " processed sucessfully.");
+            testSingleMessage();
         }
     }
 
