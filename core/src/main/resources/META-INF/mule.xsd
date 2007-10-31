@@ -1320,14 +1320,10 @@
 
     <!-- Catch all strategy implementations -->
 
-    <xsd:element name="forwarding-catch-all-strategy" type="forwardingCatchAllStrategyType" substitutionGroup="abstract-catch-all-strategy"/>
-    <xsd:complexType name="forwardingCatchAllStrategyType">
+    <xsd:element name="logging-catch-all-strategy" type="loggingCatchAllStrategyType" substitutionGroup="abstract-catch-all-strategy"/>
+    <xsd:complexType name="loggingCatchAllStrategyType">
         <xsd:complexContent>
-            <xsd:extension base="abstractCatchAllStrategyType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
+            <xsd:extension base="abstractCatchAllStrategyType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -1343,10 +1339,26 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="logging-catch-all-strategy" type="loggingCatchAllStrategyType" substitutionGroup="abstract-catch-all-strategy"/>
-    <xsd:complexType name="loggingCatchAllStrategyType">
+    <xsd:element name="forwarding-catch-all-strategy" type="forwardingCatchAllStrategyType" substitutionGroup="abstract-catch-all-strategy"/>
+    <xsd:complexType name="forwardingCatchAllStrategyType">
         <xsd:complexContent>
-            <xsd:extension base="abstractCatchAllStrategyType"/>
+            <xsd:extension base="abstractCatchAllStrategyType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-forwarding-catch-all-strategy" type="customForwardingCatchAllStrategyType" substitutionGroup="abstract-catch-all-strategy"/>
+    <xsd:complexType name="customForwardingCatchAllStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="forwardingCatchAllStrategyType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 

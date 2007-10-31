@@ -1,61 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="InboundRouterCatchAllTest" version="1.0">
-
-    <connector name="vmQueue" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <property name="queueEvents" value="true"/>
-        </properties>
-    </connector>
-
-    <transformers>
-        <transformer name="StringtoByteArray" className="org.mule.transformers.simple.StringToByteArray"/>
-    </transformers>
+    <vm:connector name="vmQueue" queueEvents="true"/>
 
     <model name="test" >
-
-        <mule-descriptor name="BridgeNoTransformer" implementation="org.mule.components.simple.PassThroughComponent">
+        <service name="BridgeNoTransformer">
+            <pass-through-component/>
             <inbound-router matchAll="true">
-                <catch-all-strategy className="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
-                    <endpoint address="vm://catchall" connector="vmQueue"/>
-                </catch-all-strategy>
+                <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
+                    <outbound-endpoint address="vm://catchall" connector-ref="vmQueue"/>
+                </custom-forwarding-catch-all-strategy>
 
-                <endpoint address="vm://in1" connector="vmQueue"/>
+                <inbound-endpoint address="vm://in1" connector-ref="vmQueue"/>
 
-                <router className="org.mule.routing.inbound.SelectiveConsumer">
-                    <filter expectedType="java.lang.Integer" className="org.mule.routing.filters.PayloadTypeFilter"/>
-                </router>
-
+                <selective-consumer-router>
+                    <payload-type-filter expectedType="java.lang.Integer"/>
+                </selective-consumer-router>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://out" connector="vmQueue"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="BridgeTransformed" implementation="org.mule.components.simple.PassThroughComponent">
+        <service name="BridgeTransformed">
+            <pass-through-component/>
             <inbound-router matchAll="true">
-                <catch-all-strategy className="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
-                    <endpoint address="vm://catchall" connector="vmQueue" transformers="StringtoByteArray"/>
-                </catch-all-strategy>
+                <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
+                    <outbound-endpoint address="vm://catchall" connector-ref="vmQueue">
+                        <transformer-string-to-byte-array/>
+                    </outbound-endpoint>
+                </custom-forwarding-catch-all-strategy>
 
-                <endpoint address="vm://in2" connector="vmQueue" transformers="StringtoByteArray"/>
+                <inbound-endpoint address="vm://in2" connector-ref="vmQueue">
+                    <transformer-string-to-byte-array/>
+                </inbound-endpoint>
 
-                <router className="org.mule.routing.inbound.SelectiveConsumer">
-                    <filter expectedType="java.lang.Integer" className="org.mule.routing.filters.PayloadTypeFilter"/>
-                </router>
-
+                <selective-consumer-router>
+                    <payload-type-filter expectedType="java.lang.Integer"/>
+                </selective-consumer-router>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="vm://out" connector="vmQueue"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
-
+        </service>
     </model>
-</mule-configuration>
+</mule>
