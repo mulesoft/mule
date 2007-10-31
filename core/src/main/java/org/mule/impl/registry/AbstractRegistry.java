@@ -764,7 +764,7 @@ public abstract class AbstractRegistry implements Registry
 
         if (collection.size() > 1)
         {
-            //logger.warn("More than one MuleConfiguration was found in registry");
+            logger.warn("More than one MuleConfiguration was found in registry");
         }
         return (MuleConfiguration) collection.iterator().next();
     }
