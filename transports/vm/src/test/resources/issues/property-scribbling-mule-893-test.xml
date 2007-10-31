@@ -30,7 +30,7 @@
         </service>
 
         <service name="responder">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <vm:inbound-endpoint path="responder" synchronous="false" connector-ref="default"/>
             </inbound-router>
