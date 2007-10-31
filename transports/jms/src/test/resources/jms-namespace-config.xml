@@ -28,6 +28,7 @@
                    jndiDestinations="true"
                    forceJndiDestinations="true"
                    specification="1.1">
+        <spring:property name="numberOfConcurrentTransactedReceivers" value="7"/>
         <test:connection-factory username="myuser" password="mypass"/>
         <jms:redelivery-handler class="org.mule.providers.jms.test.TestRedeliveryHandler" />
     </jms:connector>

@@ -96,7 +96,7 @@
     <!--==============================================================-->
     <!--   Abstract Types                                             -->
     <!--==============================================================-->
-    
+
     <xsd:element name="abstract-extension" abstract="true" type="abstractExtensionType">
         <xsd:annotation>
             <xsd:documentation>
@@ -310,7 +310,7 @@
             <xsd:extension base="sedaServiceType"/>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="service" type="sedaServiceType" substitutionGroup="abstract-service"/>
     <xsd:complexType name="sedaServiceType">
         <xsd:complexContent>
@@ -351,7 +351,7 @@
             <xsd:extension base="pooledObjectFactoryType"/>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="pass-through-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
             <xsd:documentation>
@@ -1032,7 +1032,7 @@
             <xsd:extension base="sedaModelType"/>
         </xsd:complexContent>
     </xsd:complexType>
-            
+
     <xsd:element name="seda-model" type="sedaModelType" substitutionGroup="abstract-model"/>
     <xsd:complexType name="sedaModelType">
         <xsd:complexContent>
@@ -1479,7 +1479,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-            
+
     <xsd:element name="singleton-object" type="singletonObjectFactoryType" substitutionGroup="abstract-object-factory"/>
     <xsd:complexType name="singletonObjectFactoryType">
         <xsd:complexContent>
@@ -1855,7 +1855,10 @@
     <xsd:complexType name="connectorType">
         <xsd:complexContent>
             <xsd:extension base="abstractConnectorType">
-                <xsd:group ref="connectorElements"/>
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:group ref="connectorElements"/>
+                </xsd:sequence>
                 <xsd:attributeGroup ref="connectorAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
