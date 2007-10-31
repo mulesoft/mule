@@ -22,6 +22,7 @@ import java.io.OutputStreamWriter;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -51,6 +52,7 @@ public class SchemaDocsMain
     public static final String MULE = "mule";
     public static final String TAG = "tag";
     public static final String XSL_FILE = "rename-tag.xsl";
+    public static final List TARGET_PATH = Arrays.asList(new String[]{"tools", "schemadocs", "target"});
 
     protected final Log logger = LogFactory.getLog(getClass());
 
@@ -70,7 +72,7 @@ public class SchemaDocsMain
         logger.info("Generating " + normalizedPath);
         logger.debug("prefix: " + prefix);
         logger.debug("postfix: " + postfix);
-        File normalized = new File(normalizedPath);
+        File normalized = inTargetDir(normalizedPath);
         backup(normalized);
         InputStream xslSource = IOUtils.getResourceAsStream(XSL_FILE, getClass());
         if (null == xslSource)
@@ -88,6 +90,40 @@ public class SchemaDocsMain
         out.flush();
         IOUtils.copy(IOUtils.getResourceAsStream(postfix, getClass()), outWriter);
         outWriter.close();
+    }
+
+    // if possible, and path not absolute, place in target directory
+    protected File inTargetDir(String path)
+    {
+        if (path.startsWith(File.pathSeparator))
+        {
+            return new File(path);
+        }
+        else
+        {
+            File dir = new File(".");
+            Iterator dirs = TARGET_PATH.iterator();
+            boolean foundPath = false;
+            while (dirs.hasNext())
+            {
+                File next = new File(dir, (String) dirs.next());
+                if (next.exists())
+                {
+                    foundPath = true;
+                    dir = next;
+                }
+                else if (foundPath)
+                {
+                    // in this case we started down the path, but failed
+                    // (this avoids us placing the file somewhere other than "target"
+                    // to workaround, specify absolute path)
+                    throw new IllegalArgumentException("Could not find " + next + " while placing in target directory");
+                }
+            }
+            File target = new File(dir, path);
+            logger.info("Target: " + target);
+            return target;
+        }
     }
 
     protected void processSchema(InputStream xslSource, OutputStream out)

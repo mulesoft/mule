@@ -222,9 +222,9 @@
                                 <!-- 
                                      The choice of phase is sensitive here. Since we use a class
                                      that's compiled in this module we must chose a phase 
-                                     later than 'compile'
+                                     later than (or including, since this runs after) 'compile'
                                 -->
-                                <phase>package</phase>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>java</goal>
                                 </goals>
@@ -235,7 +235,7 @@
                             <arguments>
                                 <argument>schemadoc-prefix.txt</argument>
                                 <argument>schemadoc-postfix.txt</argument>
-                                <argument>/opt/j2ee/domains/mulesource.org/mule/ROOT/webapps/atlassian-confluence/data/data-2.3.3/script/xsd-doc/normalized.xsd</argument>
+                                <argument>normalized.xsd</argument>
                             </arguments>
                         </configuration>
                     </plugin>
