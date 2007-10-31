@@ -17,10 +17,13 @@
     <jbossts:jboss-transaction-manager/>
 
     <vm:connector name="vm" queueEvents="true"/>
-    <jms:activemq-connector name="jmsConnectorXA" specification="1.1"/>
+
+    <jms:activemq-connector name="jmsConnectorSingle" specification="1.1"/>
+
     <jms:activemq-xa-connector name="jmsConnectorC1" specification="1.1" durable="true" clientId="C1">
         <spring:property name="numberOfConcurrentTransactedReceivers" value="1"/>
     </jms:activemq-xa-connector>
+
     <jms:activemq-xa-connector name="jmsConnectorC2" specification="1.1" durable="true" clientId="C2">
         <spring:property name="numberOfConcurrentTransactedReceivers" value="1"/>
     </jms:activemq-xa-connector>
@@ -48,14 +51,8 @@
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint transformer-ref="ObjectToJMSMessage" address="jms://topic:durable.broadcast"
-                                       connector-ref="jmsConnectorXA">
-                        <transaction action="BEGIN_OR_JOIN">
-                            <transaction-factory factory-ref="txFactory"/>
-                        </transaction>
+                                       connector-ref="jmsConnectorSingle">
                     </outbound-endpoint>
-                    <transaction action="ALWAYS_BEGIN">
-                        <transaction-factory factory-ref="txFactory"/>
-                    </transaction>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -69,14 +66,14 @@
             </singleton-object>
             <inbound-router>
                 <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC1">
-                    <transaction action="ALWAYS_BEGIN">
+                    <transaction action="BEGIN_OR_JOIN">
                         <transaction-factory factory-ref="txFactory"/>
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="out" transformer-ref="ObjectToJMSMessage"/>
+                    <outbound-endpoint ref="out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -89,14 +86,14 @@
             </singleton-object>
             <inbound-router>
                 <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC2">
-                    <transaction action="ALWAYS_BEGIN">
+                    <transaction action="BEGIN_OR_JOIN">
                         <transaction-factory factory-ref="txFactory"/>
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="out" transformer-ref="ObjectToJMSMessage"/>
+                    <outbound-endpoint ref="out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

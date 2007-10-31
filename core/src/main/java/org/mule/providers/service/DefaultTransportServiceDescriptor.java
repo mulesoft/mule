@@ -18,6 +18,7 @@ import org.mule.impl.endpoint.UrlEndpointURIBuilder;
 import org.mule.providers.NullPayload;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.registry.Registry;
+import org.mule.transaction.XaTransactionFactory;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -48,6 +49,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     private String messageAdapter;
     private String messageReceiver;
     private String transactedMessageReceiver;
+    private String xaTransactedMessageReceiver;
     private String endpointBuilder;
     private String sessionHandler;
     private String defaultInboundTransformer;
@@ -71,6 +73,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         transactionFactory = removeProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, props);
         messageReceiver = removeProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, props);
         transactedMessageReceiver = removeProperty(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, props);
+        xaTransactedMessageReceiver = removeProperty(MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS, props);
         messageAdapter = removeProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, props);
         defaultInboundTransformer = removeProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, props);
         defaultOutboundTransformer = removeProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, props);
@@ -126,6 +129,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, messageReceiver);
         transactedMessageReceiver = props.getProperty(
                 MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, transactedMessageReceiver);
+        xaTransactedMessageReceiver = props.getProperty(
+                MuleProperties.CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS, xaTransactedMessageReceiver);
         messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, messageAdapter);
 
         String temp = props.getProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
@@ -270,10 +275,16 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         if (endpoint.getTransactionConfig() != null
                 && endpoint.getTransactionConfig().getAction() != UMOTransactionConfig.ACTION_NONE)
         {
-            if (transactedMessageReceiver != null)
+            boolean xaTx = endpoint.getTransactionConfig().getFactory() instanceof XaTransactionFactory;
+            if (transactedMessageReceiver != null && !xaTx)
             {
                 receiverClass = transactedMessageReceiver;
             }
+            else if (xaTransactedMessageReceiver != null && xaTx)
+            {
+                receiverClass = xaTransactedMessageReceiver;
+            }
+
         }
 
         if (receiverClass != null)
