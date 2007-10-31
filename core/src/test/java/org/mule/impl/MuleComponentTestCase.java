@@ -31,8 +31,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     
     public void testSendToPausedComponent() throws Exception
     {
-        UMOComponent c = MuleTestUtils.getTestComponent("orangeComponent", Orange.class, managementContext);
-        c.setInitialState(ImmutableMuleDescriptor.INITIAL_STATE_STOPPED);
+        UMOComponent c = MuleTestUtils.getTestComponent("orangeComponent", Orange.class, null, managementContext, false);
         managementContext.getRegistry().registerComponent(c, managementContext);
 
         // TODO MULE-1995
@@ -71,7 +70,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
 
     public void testSendToStoppedComponent() throws Exception
     {
-        UMOComponent comp = getTestComponent("myComponent", EchoComponent.class);
+        UMOComponent comp = MuleTestUtils.getTestComponent("myComponent", EchoComponent.class, null, managementContext, false);
         // Component is stopped because it has not been registered.
         assertTrue(!comp.isStarted());
 
@@ -87,7 +86,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
 
         try
         {
-            comp.sendEvent(getTestEvent("hello"));
+            comp.sendEvent(getTestEvent("hello", comp));
             fail();
         }
         catch (ComponentException e)
@@ -100,9 +99,9 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     public void testInitialStateStopped() throws Exception
     {
         // Test connector
-        managementContext.getRegistry().registerConnector(getTestConnector(), managementContext);
+        getTestConnector();
         // Test component
-        UMOComponent c = MuleTestUtils.getTestComponent("orangeComponent", Orange.class, managementContext);
+        UMOComponent c = MuleTestUtils.getTestComponent("orangeComponent", Orange.class, null, managementContext, false);
         c.setInitialState(ImmutableMuleDescriptor.INITIAL_STATE_STOPPED);
         managementContext.getRegistry().registerComponent(c, managementContext);
 
@@ -113,6 +112,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
 
         // The connector should be started, but with no listeners registered.
         AbstractConnector connector = (AbstractConnector)managementContext.getRegistry().lookupConnector("testConnector");
+        assertNotNull(connector);
         assertTrue(connector.isStarted());
         assertTrue(connector.getReceivers().isEmpty());
 
@@ -135,9 +135,9 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     public void testStoppingComponentStopsEndpoints() throws Exception
     {
         // Test connector
-        managementContext.getRegistry().registerConnector(getTestConnector(), managementContext);
+        getTestConnector();
         // Test component
-        UMOComponent c = MuleTestUtils.getTestComponent("orangeComponent", Orange.class, managementContext);
+        UMOComponent c = MuleTestUtils.getTestComponent("orangeComponent", Orange.class, null, managementContext, false);
         managementContext.getRegistry().registerComponent(c, managementContext);
 
         // TODO MULE-1995
@@ -146,6 +146,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
 
         // The listeners should be registered and started.
         AbstractConnector connector = (AbstractConnector)managementContext.getRegistry().lookupConnector("testConnector");
+        assertNotNull(connector);
         assertTrue(connector.isStarted());
         assertFalse(connector.getReceivers().isEmpty());
 
