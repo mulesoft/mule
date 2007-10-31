@@ -354,8 +354,8 @@ public class TransientRegistry extends AbstractRegistry
             {
                 // objectMap.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
                 // Not sure whether to throw an exception or log a warning here.
-                throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
-                //logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
+                //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
+                logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
             }
             objectMap.put(key, value);
             if (managementContext != null) // need this check to call doRegisterObject(String, Object) successfully

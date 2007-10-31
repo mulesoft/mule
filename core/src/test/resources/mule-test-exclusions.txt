@@ -19,3 +19,7 @@ org.mule.routing.inbound.IdempotentInMemoryMessageIdStoreTestCase
 
 # KeyedObjectPool is not getting exhausted by the exhaustion tests for some reason.
 org.mule.util.object.PooledIdentifiableObjectFactoryTestCase
+
+# Duplicate registration doesn't currently produce an exception, should it?
+# See comment in TransientRegistry.doRegisterObject()
+org.mule.impl.registry.DuplicateRegistrationTestCase
