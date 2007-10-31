@@ -198,6 +198,17 @@
       </dependency>
     </dependencies>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>mojo.codehaus</id>
+            <name>Mojo plugins at Codehaus</name>
+            <url>http://repository.codehaus.org</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
     <profiles>
         <profile>
             <id>schemadocs</id>
@@ -208,6 +219,12 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <executions>
                             <execution>
+                                <!-- 
+                                     The choice of phase is sensitive here. Since we use a class
+                                     that's compiled in this module we must chose a phase 
+                                     later than 'compile'
+                                -->
+                                <phase>package</phase>
                                 <goals>
                                     <goal>java</goal>
                                 </goals>
@@ -226,5 +243,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>
