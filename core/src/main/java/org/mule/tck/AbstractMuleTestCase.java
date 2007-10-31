@@ -276,7 +276,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     protected TestCaseWatchdog createWatchdog()
     {
-        return new TestCaseWatchdog(30, TimeUnit.MINUTES, this);
+        return new TestCaseWatchdog(10, TimeUnit.MINUTES, this);
     }
 
     public void handleTimeout(long timeout, TimeUnit unit)
