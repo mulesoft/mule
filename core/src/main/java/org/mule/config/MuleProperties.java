@@ -144,5 +144,5 @@ public interface MuleProperties
     String DEBUG_CACHE_ORIGINAL_MESSAGE = SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal";
     String DEBUG_ENABLE_STREAMING = SYSTEM_PROPERTY_PREFIX + "streaming.enable";
     String DEBUG_ASSERT_MESSAGE_ACCESS = SYSTEM_PROPERTY_PREFIX + "message.assertAccess";
-    String DEBUG_AUTO_WRAP_TRANSFORM = SYSTEM_PROPERTY_PREFIX + "trasnform.autoWrap";
+    String DEBUG_AUTO_WRAP_TRANSFORM = SYSTEM_PROPERTY_PREFIX + "transform.autoWrap";
 }
