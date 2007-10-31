@@ -241,7 +241,7 @@
                                     <arguments>
                                         <argument>schemadoc-prefix.txt</argument>
                                         <argument>schemadoc-postfix.txt</argument>
-                                        <argument>normalized.xsd</argument>
+                                        <argument>normalized/normalized.xsd</argument>
                                     </arguments>
                                 </configuration>
                                 <goals>
@@ -251,8 +251,6 @@
                         </executions>
                     </plugin>
 
-                    <!-- this is going to copy everything in target, as far as i can tell,
-                         but the overhead is not huge -->
                     <plugin>
                         <groupId>org.apache.myfaces.maven</groupId>
                         <artifactId>wagon-maven-plugin</artifactId>
@@ -261,7 +259,7 @@
                                 <phase>process-classes</phase>
                                 <configuration>
                                     <id>mule-wiki</id>
-                                    <inputDirectory>target</inputDirectory>
+                                    <inputDirectory>target/normalized</inputDirectory>
                                     <url>scp://mule.mulesource.org/opt/j2ee/domains/mulesource.org/mule/ROOT/webapps/atlassian-confluence/data/data-2.3.3/script/xsd-doc/</url>
                                 </configuration>
                                 <goals>

@@ -79,8 +79,7 @@ public class SchemaDocsMain
         {
             throw new IllegalStateException("Cannot open " + XSL_FILE);
         }
-        logger.debug("creating output file for " + normalized);
-        normalized.createNewFile();
+        create(normalized, false);
         OutputStream out = new FileOutputStream(normalized);
         logger.debug("out: " + out);
         OutputStreamWriter outWriter = new OutputStreamWriter(out);
@@ -90,6 +89,23 @@ public class SchemaDocsMain
         out.flush();
         IOUtils.copy(IOUtils.getResourceAsStream(postfix, getClass()), outWriter);
         outWriter.close();
+    }
+
+    protected void create(File file, boolean dir) throws IOException
+    {
+        if (!file.getParentFile().exists())
+        {
+            create(file.getParentFile(), true);
+        }
+        logger.debug("creating " + file);
+        if (dir)
+        {
+            file.mkdir();
+        }
+        else
+        {
+            file.createNewFile();
+        }
     }
 
     // if possible, and path not absolute, place in target directory
