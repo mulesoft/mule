@@ -1,50 +1,31 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-<mule-configuration id="test" version="1.0">
-
-    <!-- Mule properties -->
-    <mule-environment-properties synchronous="false" remoteSync="false"  />
-
-    <transformers>
-        <transformer name="ByteArrayToString"
-            className="org.mule.transformers.simple.ByteArrayToString" />
-        <transformer name="ByteArrayToSerializable"
-            className="org.mule.transformers.simple.ByteArrayToSerializable" />
-        <transformer name="SerializableToByteArray"
-            className="org.mule.transformers.simple.SerializableToByteArray" />
-        <transformer name="ObjectToXml"
-            className="org.mule.transformers.xml.ObjectToXml"
-            returnClass="java.lang.String" />
-        <transformer name="Compress"
-            className="org.mule.transformers.compression.GZipCompressTransformer" />
-        <transformer name="ToHttpResponse"
-            className="org.mule.providers.http.transformers.UMOMessageToHttpResponse" />
-    </transformers>
-
-    <global-endpoints>
-        <endpoint name="httpRequest"
-                  address="http://localhost:18080/RemoteService"
-                  synchronous="true">
-            <properties>
-                <property name="method" value="post" />
-                <property name="http.post.body.param" value="IncidentData"/>
-            </properties>
-        </endpoint>
-        <endpoint name="httpService"
-                  address="http://localhost:18080/RemoteService"
-                  synchronous="true">
-        </endpoint>
-    </global-endpoints>
+    <endpoint name="httpRequest"
+              address="http://localhost:18080/RemoteService"
+              synchronous="true">
+        <properties>
+            <spring:entry key="method" value="post" />
+            <spring:entry key="http.post.body.param" value="IncidentData"/>
+        </properties>
+    </endpoint>
+    <endpoint name="httpService"
+              address="http://localhost:18080/RemoteService"
+              synchronous="true">
+    </endpoint>
 
     <model name="model">
-        <mule-descriptor name="HttpService"
-            implementation="org.mule.components.simple.EchoComponent">
+        <service name="HttpService">
+            <echo-component/>
             <inbound-router>
-                <endpoint address="httpService"/>
+                <inbound-endpoint ref="httpService"/>
             </inbound-router>
-        </mule-descriptor>
+        </service>
     </model>
 
-</mule-configuration>
+</mule>

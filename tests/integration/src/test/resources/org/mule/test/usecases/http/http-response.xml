@@ -1,31 +1,37 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="test" version="1.0">
-
-    <transformers>
-        <transformer name="ByteArrayToString"
-            className="org.mule.transformers.simple.ByteArrayToString" />
-    </transformers>
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <model name="model">
-        <mule-descriptor name="HttpAsync" implementation="org.mule.components.simple.EchoComponent">
+        <service name="HttpAsync">
+            <echo-component/>
             <inbound-router>
-                <endpoint address="http://localhost:8990" transformers="ByteArrayToString"/>
+                <inbound-endpoint address="http://localhost:8990">
+                    <transformer-byte-array-to-string/>
+                </inbound-endpoint>
             </inbound-router>
-        </mule-descriptor>
+        </service>
 
-         <mule-descriptor name="HttpWithoutRemoteSynch" implementation="org.mule.components.simple.EchoComponent">
+        <service name="HttpWithoutRemoteSynch">
+            <echo-component/>
             <inbound-router>
-                <endpoint address="http://localhost:8999" transformers="ByteArrayToString" synchronous="true"/>
+                <inbound-endpoint address="http://localhost:8999" synchronous="true">
+                    <transformer-byte-array-to-string/>
+                </inbound-endpoint>
             </inbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="HttpWithRemoteSynch" implementation="org.mule.components.simple.EchoComponent">
+        <service name="HttpWithRemoteSynch">
+            <echo-component/>
             <inbound-router>
-                <endpoint address="http://localhost:8989" transformers="ByteArrayToString" remoteSync="true"/>
+                <inbound-endpoint address="http://localhost:8989" remoteSync="true">
+                    <transformer-byte-array-to-string/>
+                </inbound-endpoint>
             </inbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-</mule-configuration>
+</mule>

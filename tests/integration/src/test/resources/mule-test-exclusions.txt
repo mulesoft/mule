@@ -121,8 +121,6 @@ org.mule.test.integration.streaming.FileToTcpStreamingTestCase
 org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
 org.mule.test.integration.util.ObjectNameHelperTestCase
 org.mule.test.usecases.axis.clientbridge.ClientBridgeTestCase
-org.mule.test.usecases.http.HttpPostTestCase
-org.mule.test.usecases.http.HttpResponseTestCase
 org.mule.test.usecases.routing.InboundTransformingCatchAllTestCase
 org.mule.test.usecases.routing.response.ResponseAggregatorTestCase
 org.mule.test.usecases.sync.HttpTransformTestCase
