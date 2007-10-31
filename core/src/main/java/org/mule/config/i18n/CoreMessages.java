@@ -887,7 +887,7 @@ public class CoreMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 231, descriptor.getName(), descriptor.getModelName(), modelName);
     }
-    
+
     //These endpoint errors should go away once we make setting endpoints on routers typesafe
 
     public static Message inboundRouterMustUseInboundEndpoints(UMOInboundRouterCollection router, UMOImmutableEndpoint endpoint)
@@ -923,7 +923,7 @@ public class CoreMessages extends MessageFactory
                              StringUtils.defaultString(MuleManifest.getVendorName(), notset) + " " +
                              StringUtils.defaultString(MuleManifest.getVendorUrl(), notset));
     }
-    
+
     public static Message noTransformerFoundForMessage(Class input, Class output)
     {
         return createMessage(BUNDLE_PATH, 237, input.getName(), output.getName());
@@ -978,7 +978,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 246, StringMessageUtils.toString(object),
                 methodName, resolver);
     }
-    
+
     public static Message noJtaTransactionAvailable(final Thread callingThread)
     {
         return createMessage(BUNDLE_PATH, 247, StringUtils.defaultString(callingThread.toString()));
@@ -988,7 +988,7 @@ public class CoreMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 248, tx.getClass());
     }
-    
+
     public static Message noComponentQueueTimeoutSet(UMOComponent component)
     {
         return createMessage(BUNDLE_PATH, 249, component);
@@ -1009,7 +1009,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 252, key);
     }
 
-    public static Message notMuleTransactionAvailable()
+    public static Message noMuleTransactionAvailable()
     {
         return createMessage(BUNDLE_PATH, 253);
     }

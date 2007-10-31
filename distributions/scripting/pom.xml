@@ -10,10 +10,8 @@
     </parent>
     <artifactId>mule-scripting-pack</artifactId>
     <packaging>pom</packaging>
-    <name>JSR-223 Additional Scripting</name>
-    <description>Contains additional retrotranslated js-engine for Scripting Mule Services and embedding Mule inside
-        scripts
-    </description>
+    <name>Mule Scripting Pack</name>
+    <description>Support for additional scripting languages in Mule</description>
 
     <build>
         <plugins>
