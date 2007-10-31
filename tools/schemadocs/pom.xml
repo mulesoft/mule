@@ -222,9 +222,10 @@
                                 <!-- 
                                      The choice of phase is sensitive here. Since we use a class
                                      that's compiled in this module we must chose a phase 
-                                     later than (or including, since this runs after) 'compile'
+                                     later than 'compile'.  We also need a phase earlier than
+                                     'package' since our results are in target.
                                 -->
-                                <phase>compile</phase>
+                                <phase>process-classes</phase>
                                 <goals>
                                     <goal>java</goal>
                                 </goals>
