@@ -11,7 +11,7 @@
 package org.mule.providers.bpm.jbpm;
 
 import org.mule.providers.bpm.tests.AbstractBpmTestCase;
-import org.mule.util.MuleDerbyTestUtils;
+import org.mule.providers.jdbc.util.MuleDerbyUtils;
 
 public abstract class AbstractJbpmTestCase extends AbstractBpmTestCase
 {
@@ -21,10 +21,10 @@ public abstract class AbstractJbpmTestCase extends AbstractBpmTestCase
     {
         if (!derbySetupDone)
         {
-            String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", "database.name");
+            String dbName = MuleDerbyUtils.loadDatabaseName("derby.properties", "database.name");
             System.getProperties().put("hibernate.dbURL", "jdbc:derby:" + dbName + ";sql.enforce_strict_size=true");
             
-            MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
+            MuleDerbyUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
             derbySetupDone = true;
         }
 

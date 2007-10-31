@@ -12,10 +12,10 @@ package org.mule.test.integration.transaction;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.jdbc.JdbcUtils;
+import org.mule.providers.jdbc.util.MuleDerbyUtils;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.transaction.extras.Book;
 import org.mule.umo.UMOMessage;
-import org.mule.util.MuleDerbyTestUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -37,9 +37,9 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
     
     protected void suitePreSetUp() throws Exception
     {
-        String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", "database.name");
+        String dbName = MuleDerbyUtils.loadDatabaseName("derby.properties", "database.name");
 
-        MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
+        MuleDerbyUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
         connectionString = "jdbc:derby:" + dbName;
 
         super.suitePreSetUp();

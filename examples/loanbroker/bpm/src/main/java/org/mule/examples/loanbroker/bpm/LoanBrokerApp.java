@@ -11,6 +11,8 @@
 package org.mule.examples.loanbroker.bpm;
 
 import org.mule.examples.loanbroker.AbstractLoanBrokerApp;
+import org.mule.providers.jdbc.util.MuleDerbyUtils;
+import org.mule.umo.UMOException;
 
 /**
  * Executes the LoanBroker BPM example.
@@ -31,7 +33,7 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
     protected void init() throws Exception
     {
         // before initialisation occurs, the database must be cleaned and a new one created
-        DbUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
+        MuleDerbyUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
         super.init();
     }
 }

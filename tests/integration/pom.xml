@@ -68,16 +68,6 @@
             <artifactId>mule-transport-jdbc</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- 
-             Also include the test-jar of the jdbc transport as it contains
-             the MuleDerbyTestUtils class.
-        -->
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jdbc</artifactId>
-            <version>${version}</version>
-            <type>test-jar</type>
-        </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jms</artifactId>

@@ -15,12 +15,12 @@ import org.mule.config.PoolingProfile;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.jdbc.JdbcConnector;
 import org.mule.providers.jdbc.JdbcUtils;
+import org.mule.providers.jdbc.util.MuleDerbyUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.MuleDerbyTestUtils;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -61,9 +61,9 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     {
         if (!derbySetupDone)
         {
-            String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", "database.name");
+            String dbName = MuleDerbyUtils.loadDatabaseName("derby.properties", "database.name");
 
-            MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
+            MuleDerbyUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
             EMBEDDED_CONNECTION_STRING = "jdbc:derby:" + dbName;
             CLIENT_CONNECTION_STRING = "jdbc:derby://localhost:1527/"+ dbName +";create=true";
             derbySetupDone = true;
