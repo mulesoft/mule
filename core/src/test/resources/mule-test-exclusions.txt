@@ -9,8 +9,6 @@ org.mule.util.concurrent.WaitPolicyTestCase
 
 # This test needs some work after MULE-2233 and MULE-2287 
 org.mule.impl.MuleComponentTestCase
-# Clean this one up after MULE-2287 or just delete it 
-org.mule.mule.MuleDescriptorTestCase
 
 # MULE-2536
 org.mule.util.queue.FilePersistenceTestCase
