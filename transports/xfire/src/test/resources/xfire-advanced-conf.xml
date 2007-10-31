@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
 
-<mule-configuration id="myId" version="1.0">
- <description>Basic XFire Tests</description>
+    <description>Basic XFire Tests</description>
 
+    <xfire:connector name="xfireConnector"/>
 
-  <connector name="xfireConnector" className="org.mule.providers.soap.xfire.XFireConnector"/>
+    <model name="TestXfire">
+        <service name="echoServiceWsdlPortType">
+            <echo-component/>
+            <inbound-router>
+                <inbound-endpoint address="xfire:http://localhost:63081/services">
+                    <properties>
+                        <spring:entry key="wsdlUrl" value="file://xfire-advanced-echo-service.wsdl"/>
+                        <spring:entry key="portType" value="qname{http://www.muleumo.org:echoServiceCustomPortType}"/>
+                    </properties>
+                </inbound-endpoint>
+            </inbound-router>
+        </service>
+    </model>
 
- <model name="TestXfire">
-  <mule-descriptor name="echoServiceWsdlPortType" implementation="org.mule.components.simple.EchoComponent">
-   <inbound-router>
-    <endpoint address="xfire:http://localhost:63081/services" connector="xfireConnector"/>
-   </inbound-router>
-    <properties>
-      <property name="wsdlUrl" value="file://xfire-advanced-echo-service.wsdl"/>
-      <property name="portType" value="qname{http://www.muleumo.org:echoServiceCustomPortType}"/>
-    </properties>
-  </mule-descriptor>
+</mule>
 
-
-
- </model>
-</mule-configuration>
