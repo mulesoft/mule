@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd">
 
-<mule-configuration version="1.0">
-    <mule-environment-properties synchronous="true"></mule-environment-properties>
-    <connector name="FileConnector" className="org.mule.providers.file.FileConnector">
-        <properties>
-            <property name="pollingFrequency" value="1000"/>
-            <property name="moveToDirectory" value="/tmp/test-data/out"/>
-            <property name="outputPattern" value="${DATE}.pdf"/>
-            <property name="binaryMode" value="false"/>
-        </properties>
-    </connector>
+    <file:connector name="FileConnector" 
+        pollingFrequency="1000" moveToDirectory="/tmp/test-data/out" outputPattern="${DATE}.pdf"/>
+
 <!--    <connector name="MidFileConnector" className="org.mule.providers.file.FileConnector">-->
 <!--        <properties>-->
 <!--            <property name="pollingFrequency" value="1000"/>-->
@@ -43,67 +42,60 @@
 <!--        <transformer name="DOMToXML" className="org.mule.transformers.xml.DomDocumentToXml"-->
 <!--            returnClass="java.lang.String"/>-->
 <!--    </transformers>-->
-    <transformers>
-        <transformer name="ByteArrayToString" className="org.mule.transformers.simple.ByteArrayToString"
-            returnClass="java.lang.String"/>
-    </transformers>
-
-    <interceptor-stack name="default">
-        <interceptor className="org.mule.interceptors.LoggingInterceptor"></interceptor>
-        <interceptor className="org.mule.interceptors.TimerInterceptor"></interceptor>
-    </interceptor-stack>
 
     <model name="fo">
-        <mule-descriptor implementation="org.mule.components.simple.EchoComponent" name="getLaszloW10">
+        <service name="getLaszloW10">
+            <echo-component/>
             <inbound-router>
-                <endpoint address="http://localhost:28081"></endpoint>
+                <inbound-endpoint address="http://localhost:28081"/>
             </inbound-router>
-
             <outbound-router matchAll="false">
-                <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <endpoint address="vm://getReportW10"></endpoint>
-                    <properties>
+                <multicasting-router>
+                    <outbound-endpoint address="vm://getReportW10"/>
+<!--                    <properties>-->
 <!--                        <property name="replyTo" value="vm://W10Response"/>-->
 <!--                        <property name="correlationId" value="true"/>-->
-                    </properties>
-                </router>
+<!--                    </properties>-->
+                </multicasting-router>
             </outbound-router>
             <response-router>
-                <endpoint address="vm://W10Response"></endpoint>
-                <router className="org.mule.test.usecases.service.DummyResponseAggregator">
-                </router>
+                <response-endpoint address="vm://W10Response"/>
+                <custom-response-router class="org.mule.test.usecases.service.DummyResponseAggregator"/>
             </response-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor implementation="org.mule.components.simple.EchoComponent" name="W10Report">
+        <service name="W10Report">
+            <echo-component/>
             <inbound-router>
-                <endpoint address="vm://getReportW10"></endpoint>
+                <inbound-endpoint address="vm://getReportW10"/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.MulticastingRouter">
+                <multicasting-router>
 <!--                    <endpoint address="file://home/bkalbfu/workspace31/test-data/out" connector="MidFileConnector"/>-->
-                    <endpoint address="vm://getFO"></endpoint>
+                    <outbound-endpoint address="vm://getFO"/>
 <!--                    <properties>-->
 <!--                        <property name="correlationId" value="false"/>-->
 <!--                    </properties>-->
-                </router>
+                </multicasting-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor implementation="org.mule.test.integration.service.TestReceiver" name="W10FO">
+        <service name="W10FO">
+            <component class="org.mule.test.integration.service.TestReceiver"/>
             <inbound-router>
-                <endpoint address="vm://getFO" transformers="ByteArrayToString"/>
+                <inbound-endpoint address="vm://getFO">
+                    <transformer-byte-array-to-string/>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <endpoint address="file://temp/test-data/out"/>
-                    <endpoint address="vm://W10Response"></endpoint>
+                <multicasting-router>
+                    <outbound-endpoint address="file://temp/test-data/out"/>
+                    <outbound-endpoint address="vm://W10Response"/>
 <!--                    <properties>-->
 <!--                        <property name="correlationId" value="false"/>-->
 <!--                    </properties>-->
-                </router>
+                </multicasting-router>
             </outbound-router>
-        </mule-descriptor>
-
+        </service>
     </model>
-</mule-configuration>
+</mule>
