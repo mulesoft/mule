@@ -10,6 +10,7 @@
 
 package org.mule.providers.jdbc.xa;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
 import org.mule.umo.UMOTransaction;
@@ -456,14 +457,13 @@ public class ConnectionWrapper implements Connection
         UMOTransaction transaction = TransactionCoordination.getInstance().getTransaction();
         if (transaction == null)
         {
-            // TODO AP: This could really be a foul, throw exception?
-            logger.warn("Mule transaction is null, but enlist method is called");
+            throw new IllegalStateException(CoreMessages.notMuleTransactionAvailable().toString());
         }
-        if (transaction != null && !(transaction instanceof XaTransaction))
+        if (!(transaction instanceof XaTransaction))
         {
-            throw new IllegalStateException("Can't enlist resource, Mule transaction is not instance of XaTransaction " + transaction);
+            throw new IllegalStateException(CoreMessages.notMuleXaTransaction(transaction).toString());
         }
-        if (transaction != null && !isEnlisted())
+        if (!isEnlisted())
         {
             enlisted = ((XaTransaction) transaction).enlistResource(xaConnection.getXAResource());
         }

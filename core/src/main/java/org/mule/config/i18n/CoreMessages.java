@@ -1009,4 +1009,9 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 252, key);
     }
 
+    public static Message notMuleTransactionAvailable()
+    {
+        return createMessage(BUNDLE_PATH, 253);
+    }
+
 }
