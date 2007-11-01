@@ -239,9 +239,15 @@
                                 <configuration>
                                     <mainClass>org.mule.tools.schemadocs.SchemaDocsMain</mainClass>
                                     <arguments>
+                                        <!-- first two args are the header/footer for the file -->
                                         <argument>schemadoc-prefix.txt</argument>
                                         <argument>schemadoc-postfix.txt</argument>
-                                        <argument>normalized/normalized.xsd</argument>
+                                        <!-- this is the destination of the final composite schema
+                                             relative paths are relative to maven's target directory
+                                             absolute paths are absolute.
+                                             in either case, directories are created as needed. -->
+                                        <!-- argument>normalized/normalized.xsd</argument -->
+                                        <argument>/www/html/docs/xsd-doc/normalized.xsd</argument>
                                     </arguments>
                                 </configuration>
                                 <goals>
@@ -251,7 +257,8 @@
                         </executions>
                     </plugin>
 
-                    <plugin>
+                    <!-- this is not needed if we write directly to an html directory -->
+                    <!-- plugin>
                         <groupId>org.apache.myfaces.maven</groupId>
                         <artifactId>wagon-maven-plugin</artifactId>
                         <executions>
@@ -267,7 +274,7 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
+                    </plugin -->
 
                 </plugins>
             </build>

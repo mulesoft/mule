@@ -31,6 +31,7 @@
     <!-- remove once layout ok -->
     <xsl:param name="doubleLineTable"/>
 
+    <!-- the table of pages for linking -->
     <xsl:key name="item-to-page" match="link" use="item"/>
     <xsl:variable name="items-to-pages" select="document('http://svn.codehaus.org/mule/branches/mule-2.x/tools/schemadocs/src/main/resources/links.xml')/links"/>
     <!-- xsl:variable name="items-to-pages" select="document('links.xml')/links"/ -->
@@ -48,8 +49,16 @@
         <a>
             <!-- define a tag we can link to -->
             <xsl:attribute name="id">#<xsl:value-of select="@name"/></xsl:attribute>
-            <h2>&lt;<xsl:value-of select="@name"/> ...&gt;</h2>
+            <h2>&lt;<xsl:value-of select="@name"/> ...&gt; in 2.x</h2>
         </a>
+        <p>
+            <em>This documentation is automatically generated from the XML schema.
+            We are still extending the documentation and improving the presentation;
+            please bear with us.
+            To add similar documentation to other pages, examine the source of this
+            page and copy the {cache ....} section that contains {xslt ...}.
+            Change the "elementName" parameter to select the element you want displayed.</em>
+        </p>
         <xsl:apply-templates select="." mode="documentation"/>
         <!--
         <xsl:if test="@type">
