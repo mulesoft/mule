@@ -111,7 +111,7 @@ public class SchemaDocsMain
     // if possible, and path not absolute, place in target directory
     protected File inTargetDir(String path)
     {
-        if (path.startsWith(File.pathSeparator))
+        if (path.startsWith(File.separator))
         {
             return new File(path);
         }
