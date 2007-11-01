@@ -320,6 +320,8 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                             logger.debug("Closing listener: " + socketAddress);
                         }
                     }
+                    
+                    shutdownSocket();
                     socket.close();
                 }
             }
@@ -327,6 +329,11 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             {
                 logger.warn("Socket close failed with: " + e);
             }
+        }
+
+        protected void shutdownSocket() throws IOException
+        {
+            socket.shutdownOutput();
         }
 
         protected void bindTransaction(UMOTransaction tx) throws TransactionException

@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PushbackInputStream;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.SystemUtils;
 
 /**
@@ -35,6 +36,8 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
     private int bufferSize = DEFAULT_BUFFER_SIZE;
     private InputStream inputStream;
     private StdioConnector connector;
+
+    private boolean sendStream;
 
     public StdioMessageReceiver(UMOConnector connector,
                                 UMOComponent component,
@@ -66,6 +69,8 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
                 ssc.setPromptMessage(promptMessage);
             }
         }
+        
+        this.sendStream = BooleanUtils.toBoolean((String) endpoint.getProperties().get("sendStream"));
     }
 
     protected void doDispose()
@@ -97,7 +102,7 @@ public class StdioMessageReceiver extends AbstractPollingMessageReceiver
     {
         try
         {
-            if (endpoint.isStreaming())
+            if (sendStream)
             {
                 PushbackInputStream in = new PushbackInputStream(inputStream);
 

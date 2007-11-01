@@ -13,9 +13,6 @@ package org.mule.providers.cxf;
 import org.mule.MuleException;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.cxf.i18n.CxfMessages;
-import org.mule.providers.soap.MuleSoapHeaders;
-import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,13 +37,7 @@ public class CxfMessageAdapter extends AbstractMessageAdapter
     private static final long serialVersionUID = -1L;
 
     private final Message payload;
-
-    private UMOTransformer trans = new SerializableToByteArray();
-
-    // Kill, kill, kill...
-    private static final String MULE_SOAP_HEADER_URI = MuleSoapHeaders.MULE_10_ACTOR;
-    private static final String MULE_SOAP_HEADER_LOCAL_NAME = MuleSoapHeaders.MULE_HEADER;
-
+    
     public CxfMessageAdapter(Message message) throws MuleException
     {
         if (message == null)
@@ -54,31 +45,6 @@ public class CxfMessageAdapter extends AbstractMessageAdapter
             throw new MuleException(CxfMessages.unableToConstructAdapterForNullMessage());
         }
         this.payload = message;
-    }
-
-    /**
-     * Converts the message implementation into a String representation
-     * 
-     * @param encoding The encoding to use when transforming the message (if
-     *            necessary). The parameter is used when converting from a byte array
-     * @return String representation of the message payload
-     * @throws Exception Implementation may throw an endpoint specific exception
-     */
-    public String getPayloadAsString(String encoding) throws Exception
-    {
-        return new String(getPayloadAsBytes(), encoding);
-    }
-
-    /**
-     * Converts the payload implementation into a String representation
-     * 
-     * @return String representation of the payload
-     * @throws Exception Implemetation may throw an endpoint specific exception
-     */
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-
-        return (byte[]) trans.transform(payload);
     }
 
     /**
@@ -130,7 +96,7 @@ public class CxfMessageAdapter extends AbstractMessageAdapter
         payload.setAttachments(newAttachments);
     }
 
-    private Collection<Attachment> getAttachments() throws MuleException
+    protected Collection<Attachment> getAttachments() throws MuleException
     {
         if (payload instanceof AbstractWrappedMessage)
         {

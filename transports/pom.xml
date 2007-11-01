@@ -18,7 +18,7 @@
         <module>axis</module>
         <module>bpm</module>
         <module>ejb</module>
-        <module>email</module>
+        <!-- module>email</module -->
         <module>file</module>
         <module>ftp</module>
         <module>http</module>
@@ -143,7 +143,7 @@
                 <jdk>1.5</jdk>
             </activation>
             <modules>
-                <!-- <module>cxf</module> -->
+                <module>cxf</module>
             </modules>
         </profile>
     </profiles>

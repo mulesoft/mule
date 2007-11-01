@@ -20,7 +20,7 @@
         <inbound-endpoint
           address="cxf:http://localhost:63181/services/CxfWithExceptionStrategy" />
       </inbound-router>
-      <custom-exception-strategy class="org.mule.providers.soap.cxf.CxfComponentExceptionStrategy"/>
+      <custom-exception-strategy class="org.mule.providers.cxf.CxfComponentExceptionStrategy"/>
     </service>
 
     <service name="CxfDefault">

@@ -215,7 +215,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
 
         UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
         builder.setSynchronous(sync);
-        builder.setName(ep.getScheme() + ":" + serviceName);
+        builder.setName(ep.getScheme() + ":" + serviceName.getLocalPart());
 
         // Set the transformers on the endpoint too
         builder.setTransformers(receiver.getEndpoint().getTransformers());

@@ -119,7 +119,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         ep.setFilter(getFilter(connector));
         ep.setInitialState(getInitialState(connector));
         ep.setRemoteSyncTimeout(getRemoteSyncTimeout(connector));
-        ep.setStreaming(getStreaming(connector));
 
         boolean remoteSync = getRemoteSync(connector);
         ep.setRemoteSync(remoteSync);

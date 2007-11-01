@@ -93,7 +93,7 @@ public class FileContentsMessageAdapterTestCase extends AbstractMessageAdapterTe
         UMOMessageAdapter adapter = new FileContentsMessageAdapter(messageFile);
 
         // delete the file before accessing the payload
-        assertTrue(messageFile.delete());
+         assertTrue(messageFile.delete());
 
         // slight detour for testing :)
         doTestMessageEqualsPayload(validMessage, adapter.getPayload());

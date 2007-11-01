@@ -12,7 +12,6 @@ package org.mule.impl;
 
 import org.mule.impl.endpoint.InboundEndpoint;
 import org.mule.impl.endpoint.OutboundEndpoint;
-import org.mule.impl.endpoint.OutboundStreamingEndpoint;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.outbound.TransformerRouter;
 import org.mule.tck.AbstractMuleTestCase;
@@ -60,7 +59,6 @@ public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
     {
         List list= new ArrayList();
         list.add(new OutboundEndpoint());
-        list.add(new OutboundStreamingEndpoint());
         list.add(new OutboundEndpoint());
         AbstractOutboundRouter router=new TransformerRouter();
         assertNotNull(router.getEndpoints());
@@ -69,7 +67,7 @@ public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
         assertEquals(1, router.getEndpoints().size());
         router.setEndpoints(list);
         assertNotNull(router.getEndpoints());
-        assertEquals(3, router.getEndpoints().size());
+        assertEquals(2, router.getEndpoints().size());
     }
 
     public void testSetBadEndpoints()
@@ -77,7 +75,6 @@ public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
         List list= new ArrayList();
         list.add(new InboundEndpoint());
         list.add(new OutboundEndpoint());
-        list.add(new OutboundStreamingEndpoint());
         AbstractOutboundRouter router=new TransformerRouter();
         try{
             router.setEndpoints(list);
@@ -91,7 +88,6 @@ public class AbstractExceptionListenerTestCase extends AbstractMuleTestCase
     public void testSetBad2Endpoints()
     {
         List list= new ArrayList();
-        list.add(new OutboundStreamingEndpoint());
         list.add(new InboundEndpoint());
         list.add(new OutboundEndpoint());
         AbstractOutboundRouter router=new TransformerRouter();

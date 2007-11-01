@@ -9,7 +9,7 @@
 
   <model name="TestCxfModel">
     <service name="echoService">
-      <component class="org.mule.providers.soap.cxf.testmodels.Echo"/>
+      <component class="org.mule.providers.cxf.testmodels.Echo"/>
       <inbound-router>
           <cxf:inbound-endpoint address="http://localhost:63081/services/Echo" />
       </inbound-router>

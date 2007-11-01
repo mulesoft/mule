@@ -50,10 +50,10 @@ public class FileComparatorTestCase extends FunctionalTestCase
 
         managementContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).stop();
         File f1 = FileUtils.newFile(PATH + FILE_NAMES[0]);
-        f1.createNewFile();
+        assertTrue(f1.createNewFile());
         Thread.sleep(1000);
         File f2 = FileUtils.newFile(PATH + FILE_NAMES[1]);
-        f2.createNewFile();
+        assertTrue(f2.createNewFile());
         Thread.sleep(1000);
         managementContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).start();
         assertTrue(countDown.await(TIMEOUT, TimeUnit.MILLISECONDS));

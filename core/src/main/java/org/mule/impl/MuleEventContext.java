@@ -110,17 +110,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public Object getTransformedMessage(Class expectedType) throws TransformerException
     {
-        Object message = getTransformedMessage();
-        if (expectedType != null && expectedType.isAssignableFrom(message.getClass()))
-        {
-            return message;
-        }
-        else
-        {
-            throw new TransformerException(
-                CoreMessages.transformOnObjectNotOfSpecifiedType(this.getComponent().getName(), expectedType),
-                    this.event.getEndpoint().getTransformers());
-        }
+        return event.getTransformedMessage(expectedType);
     }
 
     /**
@@ -681,16 +671,6 @@ public class MuleEventContext implements UMOEventContext
                     CoreMessages.cannotUseTxAndRemoteSync().getMessage());
             }
         }
-    }
-
-    /**
-     * Determines whether the event flow is being streamed
-     * 
-     * @return true if the request should be streamed
-     */
-    public boolean isStreaming()
-    {
-        return event.getEndpoint().isStreaming();
     }
 
     /**

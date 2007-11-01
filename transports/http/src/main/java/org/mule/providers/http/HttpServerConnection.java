@@ -66,6 +66,8 @@ public class HttpServerConnection
                 {
                     logger.debug("Closing: " + socket);
                 }
+                
+                socket.shutdownOutput();
                 socket.close();
             }
         }

@@ -10,6 +10,10 @@
 
 package org.mule.providers.cxf;
 
+import org.mule.extras.client.MuleClient;
+import org.mule.tck.providers.soap.AbstractSoapUrlEndpointFunctionalTestCase;
+import org.mule.umo.UMOMessage;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,10 +22,6 @@ import java.util.Map;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.providers.soap.AbstractSoapUrlEndpointFunctionalTestCase;
-import org.mule.tck.testmodels.services.Person;
-import org.mule.umo.UMOMessage;
 
 public class CxfConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointFunctionalTestCase
 {
@@ -35,22 +35,8 @@ public class CxfConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointF
     {
         return "cxf";
     }
-
-    @Override
-    public void testSendAndReceiveComplex() throws Throwable
-    {
-        MuleClient client = new MuleClient();
-        UMOMessage result = client.send(getSendReceiveComplexEndpoint1(), new Person("Dino", "Flintstone"),
-            null);
-        assertNull(result);
-
-        result = client.receive(getSendReceiveComplexEndpoint2(), 0);
-        assertNotNull(result);
-        assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Dino", ((Person) result.getPayload()).getFirstName());
-        assertEquals("Flintstone", ((Person) result.getPayload()).getLastName());
-    }
-
+    
+    @SuppressWarnings("unchecked")
     public void testBinding() throws Exception
     {
         String url = "http://localhost:62108/";
@@ -88,7 +74,6 @@ public class CxfConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointF
                 assertEquals(fullPath, mulePort);
             }
         }
-
     }
 
     public String getConfigResources()

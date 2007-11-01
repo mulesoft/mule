@@ -108,6 +108,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
         result = client.receive(getSendReceiveComplexEndpoint2(), 0);
         assertNotNull(result);
+        
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Dino", ((Person)result.getPayload()).getFirstName());
         assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());

@@ -14,7 +14,7 @@
         <service name="ServiceEntryPoint">
             <component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
             <inbound-router>
-                <inbound-endpoint address="axis:http://localhost:8088">
+                <inbound-endpoint address="axis:http://localhost:63080">
                     <properties>
                         <spring:entry key="style" value="Message"/>
                         <spring:entry key="serviceNamespace" value="http://muleumo.org"/>

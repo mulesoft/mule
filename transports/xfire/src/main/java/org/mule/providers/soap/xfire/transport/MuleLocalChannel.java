@@ -370,8 +370,8 @@ public class MuleLocalChannel extends AbstractChannel
             }
             else
             {
-                String text = ctx.getTransformedMessageAsString(ctx.getEncoding());
-                reader = STAXUtils.createXMLStreamReader(new StringReader(text), context);
+                InputStream i = (InputStream) ctx.getTransformedMessage(InputStream.class);
+                reader = STAXUtils.createXMLStreamReader(i, ctx.getEncoding(), context);
             }
 
             InMessage in = new InMessage(reader, getUri());

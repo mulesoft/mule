@@ -76,5 +76,10 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
         {
             preRoute(message);
         }
+        
+        protected void shutdownSocket() throws IOException
+        {
+            // SSL Sockets don't support shutdownSocket
+        }
     }
 }

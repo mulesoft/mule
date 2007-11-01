@@ -244,16 +244,6 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
     }
 
     /**
-     * Determines whether the endpoint should deal with requests as streams
-     * 
-     * @param stream true if the request should be streamed
-     */
-    public void setStreaming(boolean stream)
-    {
-        this.streaming = stream;
-    }
-
-    /**
      * Sets a property on the endpoint
      * 
      * @param key the property key

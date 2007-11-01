@@ -10,8 +10,6 @@
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-    <http:connector name="default" clientSoTimeout="1000" socketSoLinger="1000"/>
-
     <!--
         Basic XFire tests
      -->

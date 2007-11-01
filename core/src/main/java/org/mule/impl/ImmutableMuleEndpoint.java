@@ -139,12 +139,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      * and will be set to the default Synchonous Event time out value if not set
      */
     protected Integer remoteSyncTimeout = null;
-
-    /**
-     * Determines whether the endpoint should deal with requests as streams
-     */
-    protected boolean streaming = false;
-
+    
     /**
      * The state that the endpoint is initialised in such as started or stopped
      */
@@ -483,17 +478,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         return (List) responseTransformers.get();
     }
-
-    /**
-     * Determines whether the endpoint should deal with requests as streams
-     * 
-     * @return true if the request should be streamed
-     */
-    public boolean isStreaming()
-    {
-        return streaming;
-    }
-
+    
     public Object getProperty(Object key)
     {
         Object value = properties.get(key);

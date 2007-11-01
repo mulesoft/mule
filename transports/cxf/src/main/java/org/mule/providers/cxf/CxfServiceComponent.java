@@ -33,7 +33,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.Properties;
 
 import javax.xml.stream.XMLStreamReader;
@@ -116,7 +115,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         }
     }
 
-    private Object generateWSDLOrXSD(UMOEventContext eventContext, String req, Properties params)
+    protected Object generateWSDLOrXSD(UMOEventContext eventContext, String req, Properties params)
         throws EndpointNotFoundException, IOException
     {
         // TODO: we need to handle ?xsd too, but the request URL from Mule looks
@@ -162,13 +161,13 @@ public class CxfServiceComponent implements Callable, Lifecycle
         return result;
     }
 
-    Object sendToDestination(UMOEventContext ctx, String uri) throws UMOException, IOException
+    protected Object sendToDestination(UMOEventContext ctx, String uri) throws UMOException, IOException
     {
         try
         {
             MessageImpl m = new MessageImpl();
 
-            Object payload = ctx.getMessage().getPayload();
+            Object payload = ctx.getTransformedMessage();
 
             if (payload instanceof InputStream)
             {
@@ -185,9 +184,9 @@ public class CxfServiceComponent implements Callable, Lifecycle
             }
             else
             {
-                String text = ctx.getTransformedMessageAsString(ctx.getEncoding());
-                StringReader strReader = new StringReader(text);
-                m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(strReader));
+                InputStream is = (InputStream) ctx.getTransformedMessage(InputStream.class);
+                m.put(Message.ENCODING, ctx.getEncoding());
+                m.setContent(InputStream.class, is);
             }
 
             // TODO: Not sure if this is 100% correct - DBD
@@ -259,7 +258,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         return is;
     }
 
-    private String getSoapAction(UMOMessage message)
+    protected String getSoapAction(UMOMessage message)
     {
         String action = (String) message.getProperty(SoapConstants.SOAP_ACTION_PROPERTY);
 

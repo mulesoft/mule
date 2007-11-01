@@ -15,7 +15,6 @@ import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.List;
 import java.util.Map;
@@ -202,14 +201,7 @@ public interface UMOEndpoint extends UMOImmutableEndpoint
      * @param state
      */
     void setInitialState(String state);
-
-    /**
-     * Determines whether the endpoint should deal with requests as streams
-     * 
-     * @param stream true if the request should be streamed
-     */
-    void setStreaming(boolean stream);
-
+    
     /**
      * Sets the connection strategy this endpoint should use when connecting to the underlying resource
      * @param connectionStrategy the connection strategy this endpoint should use when connecting to the underlying resource

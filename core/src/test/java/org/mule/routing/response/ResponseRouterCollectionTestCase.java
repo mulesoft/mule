@@ -11,10 +11,8 @@
 package org.mule.routing.response;
 
 import org.mule.impl.endpoint.InboundEndpoint;
-import org.mule.impl.endpoint.InboundStreamingEndpoint;
 import org.mule.impl.endpoint.OutboundEndpoint;
 import org.mule.impl.endpoint.ResponseEndpoint;
-import org.mule.impl.endpoint.ResponseStreamingEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.InvalidEndpointTypeException;
 
@@ -49,7 +47,6 @@ public class ResponseRouterCollectionTestCase extends AbstractMuleTestCase
     {
         List list= new ArrayList();
         list.add(new ResponseEndpoint());
-        list.add(new ResponseStreamingEndpoint());
         list.add(new ResponseEndpoint());
         ResponseRouterCollection router=new ResponseRouterCollection();
         assertNotNull(router.getEndpoints());
@@ -58,7 +55,7 @@ public class ResponseRouterCollectionTestCase extends AbstractMuleTestCase
         assertEquals(1, router.getEndpoints().size());
         router.setEndpoints(list);
         assertNotNull(router.getEndpoints());
-        assertEquals(3, router.getEndpoints().size());
+        assertEquals(2, router.getEndpoints().size());
     }
 
     public void testSetBadEndpoints()
@@ -66,7 +63,6 @@ public class ResponseRouterCollectionTestCase extends AbstractMuleTestCase
         List list= new ArrayList();
         list.add(new InboundEndpoint());
         list.add(new OutboundEndpoint());
-        list.add(new InboundStreamingEndpoint());
         ResponseRouterCollection router=new ResponseRouterCollection();
         try{
             router.setEndpoints(list);
@@ -81,7 +77,6 @@ public class ResponseRouterCollectionTestCase extends AbstractMuleTestCase
     {
         List list= new ArrayList();
         list.add(new InboundEndpoint());
-        list.add(new InboundStreamingEndpoint());
         list.add(new OutboundEndpoint());
         ResponseRouterCollection router=new ResponseRouterCollection();
         try{

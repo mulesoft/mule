@@ -276,6 +276,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
+    @SuppressWarnings("unchecked")
     protected UMOMessage doReceive(long timeout) throws Exception
     {
         ((ClientImpl) client).setSynchronousTimeout((int) timeout);

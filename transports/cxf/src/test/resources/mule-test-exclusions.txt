@@ -4,16 +4,15 @@
 
 # This class matches surefire's include pattern by accident.
 # Don't execute it as it's not a unit test.
-org.mule.providers.soap.cxf.testmodels.TestXFireComponent
+org.mule.providers.cxf.testmodels.TestXFireComponent
 
-# MULE-1134
-org.mule.providers.soap.cxf.CxfConnectorVMFunctionalTestCase
+#org.mule.providers.cxf.bridge.BridgeTest
 
 # tests with external dependencies
-org.mule.providers.soap.cxf.CxfWsdlTestCase
+org.mule.providers.cxf.CxfWsdlTestCase
 
 # Cyclic dependency with axis ... hold for now
-org.mule.providers.soap.cxf.CxfServiceUsingAxisEndpointTestCase
+org.mule.providers.cxf.ServiceUsingAxisEndpointTestCase
 
 # Not working yet...
-org.mule.providers.soap.cxf.client.GeneratedClientTestCase
+org.mule.providers.cxf.client.GeneratedClientTestCase

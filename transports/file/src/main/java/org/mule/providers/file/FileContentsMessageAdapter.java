@@ -16,8 +16,6 @@ import org.mule.impl.ThreadSafeAccess;
 import org.mule.umo.MessagingException;
 import org.mule.util.IOUtils;
 
-import java.io.File;
-
 /**
  * <code>FileContentsMessageAdapter</code> provides a wrapper for file data. Users
  * can obtain the contents of the message through the payload property and can get
@@ -55,6 +53,7 @@ public class FileContentsMessageAdapter extends FileMessageAdapter
                 try
                 {
                     contents = IOUtils.toByteArray(payload);
+                    payload.close();
                 }
                 catch (Exception noPayloadException)
                 {

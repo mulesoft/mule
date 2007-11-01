@@ -43,7 +43,7 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
 
     protected static String getServiceEndpoint()
     {
-        return "http://localhost:8088/ServiceEntryPoint";
+        return "http://localhost:63080/ServiceEntryPoint";
     }
 
     public void testDocumentWithNamesapce() throws Exception

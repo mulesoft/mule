@@ -443,13 +443,6 @@ public interface UMOEventContext
     int getTimeout();
 
     /**
-     * Determines whether the event flow is being streamed
-     * 
-     * @return true if the request should be streamed
-     */
-    boolean isStreaming();
-
-    /**
      * Gets the encoding for the current message. For potocols that send encoding
      * Information with the message, this method should be overriden to expose the
      * transport encoding, otherwise the default encoding in the Mule configuration

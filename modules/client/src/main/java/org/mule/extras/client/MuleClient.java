@@ -752,8 +752,6 @@ public class MuleClient implements Disposable
         {
             endpoint.getConnector().start();
         }
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((UMOEndpoint) endpoint).setStreaming(streaming);
         try
         {
             MuleSession session = new MuleSession(message,

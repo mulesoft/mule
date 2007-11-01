@@ -10,8 +10,10 @@
 
 package org.mule.providers.cxf;
 
+import org.mule.components.simple.BridgeComponent;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.cxf.i18n.CxfMessages;
+import org.mule.providers.cxf.support.ProviderService;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -22,6 +24,7 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -57,7 +60,6 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         connector = (CxfConnector) umoConnector;
     }
 
-    
     @Override
     protected void doInitialise() throws InitialisationException
     {
@@ -71,14 +73,14 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             String bindingId = (String) endpointProps.get(CxfConstants.BINDING_ID);
             String frontend = (String) endpointProps.get(CxfConstants.FRONTEND);
 
-//            if (exposedInterface.equals(BridgeComponent.class))
-//            {
-//                bridge = true;
-//                exposedInterface = ProviderService.class;
-//                frontend = "jaxws";
-//            }
+            if (exposedInterface.equals(BridgeComponent.class))
+            {
+                bridge = true;
+                exposedInterface = ProviderService.class;
+                frontend = "jaxws";
+            }
 
-            if (frontend == null)
+            if (StringUtils.isEmpty(frontend))
             {
                 frontend = connector.getDefaultFrontend();
             }

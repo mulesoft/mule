@@ -198,6 +198,25 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         
         msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
+        FileConnector fc = ((FileConnector) connector);
+        // We can't move files if they're going to be deleted on the stream close
+        if (!fc.isStreamFiles() || (fc.isStreamFiles() && !fc.isAutoDelete())) 
+        {
+            moveAndDelete(sourceFile, destinationFile, sourceFileOriginalName, msgAdapter, fileIn);
+        }
+        else 
+        {
+            // finally deliver the file message
+            this.routeMessage(new MuleMessage(msgAdapter), endpoint.isSynchronous());
+        }
+    }
+
+    private void moveAndDelete(final File sourceFile,
+                               File destinationFile,
+                               String sourceFileOriginalName,
+                               UMOMessageAdapter msgAdapter,
+                               FileInputStream fileIn)
+    {
         // set up destination file
         if (moveDir != null)
         {

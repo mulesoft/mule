@@ -101,7 +101,6 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertEquals(managementContext.getRegistry().getConfiguration().isDefaultSynchronousEndpoints(),
             ep.isSynchronous());
         assertEquals(false, ep.isRemoteSync());
-        assertEquals(false, ep.isStreaming());
         assertTrue(ep.getConnectionStrategy() instanceof SingleAttemptConnectionStrategy);
         assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);
         assertTrue(ep.getTransactionConfig() instanceof MuleTransactionConfig);
