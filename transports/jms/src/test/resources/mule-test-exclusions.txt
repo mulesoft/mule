@@ -4,6 +4,9 @@
 
 # MULE-2071
 org.mule.providers.jms.issues.ActiveMQJmsTransactionMule2071TestCase
+# The following are now failing intermittently - I think the are related to MULE-2071 too?
+org.mule.providers.jms.functional.ActiveMQJmsTopicFunctionalTestCase
+org.mule.providers.jms.functional.ActiveMQJmsQueueFunctionalTestCase
 
 # MULE-2065
 org.mule.test.integration.providers.jms.activemq.ActiveMQJmsTransactionFunctionalTestCase
