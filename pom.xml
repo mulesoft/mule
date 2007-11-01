@@ -1046,7 +1046,7 @@
             <build>
                 <plugins>
                     <!-- add repository revision to manifests -->
-                    <plugin>
+                    <!--<plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>maven-buildnumber-plugin</artifactId>
                         <executions>
@@ -1057,18 +1057,19 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
+                        <configuration>-->
                             <!-- never touch svn -->
-                            <doCheck>false</doCheck>
-                            <doUpdate>false</doUpdate>
+                            <!--<doCheck>false</doCheck>-->
+                            <!--<doUpdate>false</doUpdate>-->
+                            <!-- Keep the format and items commented out -->
                             <!--
                                 <format>{0,date,yyyy-MMM-dd-HH:mm:ss}</format>
                                 <items>
                                     <item>timestamp</item>
                                 </items>
                             -->
-                        </configuration>
-                     </plugin>
+                        <!--</configuration>-->
+                     <!--</plugin>-->
                 </plugins>
             </build>
         </profile>
