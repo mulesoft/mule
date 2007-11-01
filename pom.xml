@@ -870,7 +870,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <configuration>-->
+                <configuration>
                     <!-- Display failed tests only -->
                     <showSuccess>false</showSuccess>
                 </configuration>
@@ -1037,11 +1037,11 @@
             </activation>
             <pluginRepositories>
                 <!-- for buildnumber plugin -->
-                <pluginRepository>
-                    <id>tlc</id>
-                    <name>TLC Repository</name>
-                    <url>http://commons.ucalgary.ca/pub/m2</url>
-                </pluginRepository>
+                <!--<pluginRepository>-->
+                    <!--<id>tlc</id>-->
+                    <!--<name>TLC Repository</name>-->
+                    <!--<url>http://commons.ucalgary.ca/pub/m2</url>-->
+                <!--</pluginRepository>-->
             </pluginRepositories>
             <build>
                 <plugins>
