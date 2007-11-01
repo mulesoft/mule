@@ -15,6 +15,6 @@ public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunction
 {
     protected String getConfigResources()
     {
-        return "activemq-config.xml," + super.getConfigResources();
+        return "activemq-config-no-threads.xml," + super.getConfigResources();
     }
 }

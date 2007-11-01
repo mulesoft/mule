@@ -12,11 +12,6 @@ org.mule.test.integration.providers.jms.activemq.ActiveMQJmsXaTransactionFunctio
 # MULE-2646
 org.mule.providers.jms.functional.MultipleJmsConnectorsTestCase
 
-# MULE-2651
-org.mule.providers.jms.functional.ActiveMQJmsQueueFunctionalTestCase
-# (may be similar to MULE-2651 above)
-org.mule.providers.jms.functional.ActiveMQJmsTopicFunctionalTestCase
-
 # MULE-2648
 org.mule.providers.jms.transactions.JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase
 # (may be similar to MULE-2648 above)
