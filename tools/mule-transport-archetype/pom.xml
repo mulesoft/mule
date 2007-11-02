@@ -9,6 +9,7 @@
     </parent>
     <packaging>maven-plugin</packaging>
     <name>Mule Transport Archetype</name>
+    <!-- Do not specify group here, otherwise deployment will break -->
     <artifactId>mule-transport-archetype</artifactId>
     <version>2.0.0-M3-SNAPSHOT</version>
     <description>Archetype for Mule 2.0 and above transport projects.</description>
