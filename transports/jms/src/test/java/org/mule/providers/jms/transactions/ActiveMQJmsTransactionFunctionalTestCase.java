@@ -15,6 +15,6 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
 {
     protected String getConfigResources()
     {
-        return "activemq-config.xml," + super.getConfigResources();
+        return "activemq-config-threads.xml," + super.getBaseConfigResources();
     }
 }

@@ -10,6 +10,7 @@
 
 package org.mule.providers.jms.functional;
 
+import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
@@ -19,14 +20,15 @@ public class MultipleJmsConnectorsTestCase extends FunctionalTestCase
     {
         return "jms-multiple-connectors.xml";
     }
-    
+
     public void testMultipleJmsClientConnections() throws Exception
     {
-        UMOImmutableEndpoint ep1 = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ep1",
-            managementContext);
-        ep1.dispatch(getTestEvent("testing"));
-        UMOImmutableEndpoint ep2 = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ep2",
-            managementContext);
+        MuleClient client = new MuleClient();
+        client.dispatch("ep1", "test", null);
+        UMOImmutableEndpoint ep1 = managementContext.getRegistry().lookupEndpoint("ep1", managementContext);
+        assertNotNull("cannot retrieve ep1", ep1);
+        UMOImmutableEndpoint ep2 = managementContext.getRegistry().lookupEndpoint("ep2");
+        assertNotNull("cannot retrieve ep2", ep2);
         ep2.dispatch(getTestEvent("testing"));
 
         // wait a bit to let the messages go on their way

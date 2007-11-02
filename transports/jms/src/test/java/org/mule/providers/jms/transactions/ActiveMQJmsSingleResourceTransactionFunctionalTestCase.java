@@ -15,6 +15,6 @@ public class ActiveMQJmsSingleResourceTransactionFunctionalTestCase extends Abst
 {
     protected String getConfigResources()
     {
-        return "activemq-single-resource.xml," + super.getConfigResources();
+        return "activemq-single-resource.xml," + super.getBaseConfigResources();
     }
 }

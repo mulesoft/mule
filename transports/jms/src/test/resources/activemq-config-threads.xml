@@ -10,8 +10,6 @@
 
     <spring:bean name="txFactory" class="org.mule.providers.jms.JmsTransactionFactory" />
     
-    <jms:activemq-connector name="jmsConnector" maxRedelivery="1">
-        <dispatcher-threading-profile doThreading="false"/>
-    </jms:activemq-connector>
+    <jms:activemq-connector name="jmsConnector"/>
 
 </mule>

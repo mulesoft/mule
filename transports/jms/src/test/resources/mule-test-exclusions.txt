@@ -3,26 +3,21 @@
 #
 
 # MULE-2071
+# These are intermittent, unfortunately - there may be more, but I've re-enabled many tests
+# as I seem to have fixed some issues.  So sorry, but we need to wait for failures again.
+# (and this particular test now seems to have an additional error!)
+# Note - all these have similar errors and all extend AbstractJmsTransactionFunctionalTest
 org.mule.providers.jms.issues.ActiveMQJmsTransactionMule2071TestCase
-# The following are now failing intermittently - I think the are related to MULE-2071 too?
+org.mule.providers.jms.transactions.ActiveMQJmsXaTransactionFunctionalTestCase
+org.mule.providers.jms.transactions.ActiveMQJmsSingleResourceTransactionFunctionalTestCase
+org.mule.providers.jms.transactions.ActiveMQJmsTransactionFunctionalTestCase
+
+# These fail intermittently too, but look different to the 2071 errors
 org.mule.providers.jms.functional.ActiveMQJmsTopicFunctionalTestCase
 org.mule.providers.jms.functional.ActiveMQJmsQueueFunctionalTestCase
 
-# MULE-2065
-org.mule.test.integration.providers.jms.activemq.ActiveMQJmsTransactionFunctionalTestCase
-org.mule.test.integration.providers.jms.activemq.ActiveMQJmsXaTransactionFunctionalTestCase
-
 # MULE-2646
 org.mule.providers.jms.functional.MultipleJmsConnectorsTestCase
-
-# May be similar to MULE-2646 above? - give "at least 2 connectors..." errors
-org.mule.providers.jms.transactions.ActiveMQJmsXaTransactionFunctionalTestCase
-org.mule.providers.jms.transactions.ActiveMQJmsTransactionFunctionalTestCase
-
-# No specific issue?
-org.mule.providers.jms.transactions.JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase
-org.mule.providers.jms.transactions.JmsClientAcknowledgeTransactionFunctionalTestCase
-org.mule.providers.jms.transactions.ActiveMQJmsSingleResourceTransactionFunctionalTestCase
 
 # Andrew P working on these?
 #org.mule.providers.jms.integration.JmsMuleSideDurableTopicXATxTestCase

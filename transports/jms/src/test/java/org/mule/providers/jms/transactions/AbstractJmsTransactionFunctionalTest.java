@@ -62,7 +62,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         return ! excluded;
     }
 
-    protected String getConfigResources()
+    protected String getBaseConfigResources()
     {
         return "jms-transaction.xml";
     }

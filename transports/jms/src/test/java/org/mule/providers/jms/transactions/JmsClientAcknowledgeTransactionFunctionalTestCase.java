@@ -17,7 +17,7 @@ public class JmsClientAcknowledgeTransactionFunctionalTestCase extends AbstractJ
 {
     protected String getConfigResources()
     {
-        return "activemq-client-ack.xml," + super.getConfigResources();
+        return "activemq-client-ack.xml," + super.getBaseConfigResources();
     }
 
     //@Override

@@ -15,6 +15,6 @@ public class JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase ext
 {
     protected String getConfigResources()
     {
-        return "activemq-client-ack-single-resource.xml," + super.getConfigResources();
+        return "activemq-client-ack-single-resource.xml," + super.getBaseConfigResources();
     }
 }

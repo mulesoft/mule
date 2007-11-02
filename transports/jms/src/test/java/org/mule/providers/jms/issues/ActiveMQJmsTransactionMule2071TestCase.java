@@ -33,6 +33,11 @@ public class ActiveMQJmsTransactionMule2071TestCase extends AbstractJmsTransacti
         exclude(ALL ^ TRANSACTED_REDELIVERY_TO_DL_DESTINATION);
     }
 
+    protected String getConfigResources()
+    {
+        return "activemq-config-threads.xml," + getBaseConfigResources();
+    }
+
     public ConnectionFactory getConnectionFactory() throws Exception
     {
         if (factory == null)
