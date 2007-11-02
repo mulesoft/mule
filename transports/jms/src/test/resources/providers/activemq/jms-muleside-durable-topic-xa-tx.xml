@@ -18,7 +18,7 @@
 
     <vm:connector name="vm" queueEvents="true"/>
 
-    <jms:activemq-connector name="jmsConnectorSingle" specification="1.1"/>
+    <jms:activemq-xa-connector name="jmsConnectorTestDriver" specification="1.1"/>
 
     <jms:activemq-xa-connector name="jmsConnectorC1" specification="1.1" durable="true" clientId="C1">
         <spring:property name="numberOfConcurrentTransactedReceivers" value="1"/>
@@ -33,9 +33,9 @@
 
     <spring:bean name="txFactory" class="org.mule.transaction.XaTransactionFactory"/>
 
-    <custom-transformer name="ObjectToJMSMessage"
-                        class="org.mule.providers.jms.transformers.ObjectToJMSMessage"
-                        returnClass="javax.jms.TextMessage"/>
+    <!--<custom-transformer name="ObjectToJMSMessage"-->
+                        <!--class="org.mule.providers.jms.transformers.ObjectToJMSMessage"-->
+                        <!--returnClass="javax.jms.TextMessage"/>-->
 
     <model name="TEST">
 
@@ -50,9 +50,15 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint transformer-ref="ObjectToJMSMessage" address="jms://topic:durable.broadcast"
-                                       connector-ref="jmsConnectorSingle">
+                    <outbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorTestDriver">
                     </outbound-endpoint>
+                    <!--
+                        There's no inbound TX, so make sure XA is happy by starting it via router
+                        on the outbound. Such problems are now nicely detected and reported via an error.
+                    -->
+                    <transaction action="BEGIN_OR_JOIN">
+                        <transaction-factory factory-ref="txFactory"/>
+                    </transaction>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

@@ -24,5 +24,3 @@ org.mule.providers.jms.transactions.ActiveMQJmsSingleResourceTransactionFunction
 
 org.mule.providers.jms.transactions.JmsClientAcknowledgeTransactionFunctionalTestCase
 
-# MULE-2630
-org.mule.providers.jms.integration.JmsMuleSideDurableTopicXATxTestCase
