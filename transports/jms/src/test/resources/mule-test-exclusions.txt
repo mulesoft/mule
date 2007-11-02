@@ -15,12 +15,15 @@ org.mule.test.integration.providers.jms.activemq.ActiveMQJmsXaTransactionFunctio
 # MULE-2646
 org.mule.providers.jms.functional.MultipleJmsConnectorsTestCase
 
-# MULE-2648
-org.mule.providers.jms.transactions.JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase
-# (may be similar to MULE-2648 above)
-org.mule.providers.jms.transactions.ActiveMQJmsTransactionFunctionalTestCase
+# May be similar to MULE-2646 above? - give "at least 2 connectors..." errors
 org.mule.providers.jms.transactions.ActiveMQJmsXaTransactionFunctionalTestCase
+org.mule.providers.jms.transactions.ActiveMQJmsTransactionFunctionalTestCase
+
+# No specific issue?
+org.mule.providers.jms.transactions.JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase
+org.mule.providers.jms.transactions.JmsClientAcknowledgeTransactionFunctionalTestCase
 org.mule.providers.jms.transactions.ActiveMQJmsSingleResourceTransactionFunctionalTestCase
 
-org.mule.providers.jms.transactions.JmsClientAcknowledgeTransactionFunctionalTestCase
-
+# Andrew P working on these?
+#org.mule.providers.jms.integration.JmsMuleSideDurableTopicXATxTestCase
+#org.mule.providers.jms.integration.JmsDurableTopicSingleTxTestCase

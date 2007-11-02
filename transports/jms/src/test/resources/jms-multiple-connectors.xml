@@ -8,9 +8,21 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <jms:activemq-connector name="jmsConnector"/>
+    <jms:activemq-connector name="jmsConnector">
+        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
+    </jms:activemq-connector>
 
     <endpoint name="ep1" address="jms://admin:admin@admin.queue?createConnector=ALWAYS"/>
     <endpoint name="ep2" address="jms://ross:ross@ross.queue?createConnector=ALWAYS"/>
+
+    <model name="model">
+        <service name="service">
+            <null-component/>
+            <inbound-router>
+                <inbound-endpoint ref="ep1"/>
+                <inbound-endpoint ref="ep2"/>
+            </inbound-router>
+        </service>
+    </model>
 
 </mule>

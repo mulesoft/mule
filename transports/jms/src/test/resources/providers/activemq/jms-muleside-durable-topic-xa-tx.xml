@@ -31,7 +31,7 @@
     <endpoint name="in" address="vm://in" connector-ref="vm"/>
     <endpoint name="out" address="vm://out" connector-ref="vm"/>
 
-    <spring:bean name="txFactory" class="org.mule.transaction.XaTransactionFactory"/>
+    <custom-transaction-factory name="txFactory" class="org.mule.transaction.XaTransactionFactory"/>
 
     <model name="TEST">
 
@@ -53,7 +53,7 @@
                         on the outbound. Such problems are now nicely detected and reported via an error.
                     -->
                     <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory factory-ref="txFactory"/>
+                        <transaction-factory ref="txFactory"/>
                     </transaction>
                 </outbound-pass-through-router>
             </outbound-router>
@@ -69,7 +69,7 @@
             <inbound-router>
                 <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC1">
                     <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory factory-ref="txFactory"/>
+                        <transaction-factory ref="txFactory"/>
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
@@ -89,7 +89,7 @@
             <inbound-router>
                 <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC2">
                     <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory factory-ref="txFactory"/>
+                        <transaction-factory ref="txFactory"/>
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>

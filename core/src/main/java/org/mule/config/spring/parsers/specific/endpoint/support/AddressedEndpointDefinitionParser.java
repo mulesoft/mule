@@ -15,7 +15,7 @@ import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
-import org.mule.config.spring.parsers.processors.DisableByAttribute;
+import org.mule.config.spring.parsers.processors.BlockAttribute;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 
 import org.apache.commons.logging.Log;
@@ -87,9 +87,9 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         // this handles the "ref problem" - we don't want these parsers to be used if a "ref"
         // defines the address so add a preprocessor to check for that and indicate that the
         // exception should be handled internally, rather than shown to the user
-        addressParser.registerPreProcessor(new DisableByAttribute(BAD_ADDRESS_ATTRIBUTES));
-        propertiesParser.registerPreProcessor(new DisableByAttribute(BAD_ADDRESS_ATTRIBUTES));
-        addHandledException(DisableByAttribute.DisableByAttributeException.class);
+        addressParser.registerPreProcessor(new BlockAttribute(BAD_ADDRESS_ATTRIBUTES));
+        propertiesParser.registerPreProcessor(new BlockAttribute(BAD_ADDRESS_ATTRIBUTES));
+        addHandledException(BlockAttribute.BlockAttributeException.class);
     }
 
 }

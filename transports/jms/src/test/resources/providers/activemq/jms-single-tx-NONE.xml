@@ -32,7 +32,7 @@
             <inbound-router>
                 <inbound-endpoint ref="in">
                     <transaction action="NONE">
-                        <transaction-factory factory-ref="txFactory"/>
+                        <transaction-factory ref="txFactory"/>
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>

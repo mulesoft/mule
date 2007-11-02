@@ -14,8 +14,6 @@
     <endpoint name="in" address="jms://in" connector-ref="jmsConnector"/>
     <endpoint name="topic" address="jms://topic:durable.broadcast" connector-ref="jmsConnector"/>
 
-    <spring:bean name="txFactory" class="org.mule.providers.jms.JmsTransactionFactory"/>
-
     <custom-transformer name="ObjectToJMSMessage"
                         class="org.mule.providers.jms.transformers.ObjectToJMSMessage"
                         returnClass="javax.jms.TextMessage"/>
@@ -30,7 +28,7 @@
             <inbound-router>
                 <inbound-endpoint ref="in">
                     <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory factory-ref="txFactory"/>
+                        <custom-transaction-factory class="org.mule.providers.jms.JmsTransactionFactory"/>
                     </transaction>
 
                 </inbound-endpoint>

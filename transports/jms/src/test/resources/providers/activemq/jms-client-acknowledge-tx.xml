@@ -34,7 +34,7 @@
             <inbound-router>
                 <inbound-endpoint ref="in">
                     <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory  factory-ref="txFactory"/>
+                        <transaction-factory ref="txFactory"/>
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
@@ -54,7 +54,7 @@
             <inbound-router>
                 <inbound-endpoint ref="middle">
                     <transaction action="ALWAYS_BEGIN">
-                        <transaction-factory factory-ref="txFactory"/>
+                        <transaction-factory ref="txFactory"/>
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>

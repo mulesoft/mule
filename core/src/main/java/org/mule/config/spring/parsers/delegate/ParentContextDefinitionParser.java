@@ -73,4 +73,9 @@ public class ParentContextDefinitionParser extends AbstractParallelDelegatingDef
         }
     }
 
+    protected MuleDefinitionParser getOtherwise()
+    {
+        return otherwise;
+    }
+
 }

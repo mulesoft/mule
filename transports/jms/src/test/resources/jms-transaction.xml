@@ -28,7 +28,7 @@
             <inbound-router>
                 <inbound-endpoint address="jms://component2In">
                     <transaction action="ALWAYS_BEGIN">
-                        <transaction-factory scope="singleton" instance-ref="txFactory"/>
+                        <transaction-factory ref="txFactory"/>
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
@@ -46,7 +46,7 @@
             <inbound-router>
                 <inbound-endpoint address="jms://component3In">
                     <transaction action="NONE">
-                        <transaction-factory scope="singleton" instance-ref="txFactory"/>
+                        <transaction-factory ref="txFactory"/>
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
