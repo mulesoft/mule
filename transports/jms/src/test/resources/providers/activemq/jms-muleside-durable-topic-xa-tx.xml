@@ -33,10 +33,6 @@
 
     <spring:bean name="txFactory" class="org.mule.transaction.XaTransactionFactory"/>
 
-    <!--<custom-transformer name="ObjectToJMSMessage"-->
-                        <!--class="org.mule.providers.jms.transformers.ObjectToJMSMessage"-->
-                        <!--returnClass="javax.jms.TextMessage"/>-->
-
     <model name="TEST">
 
         <service name="InputPart">
