@@ -5,13 +5,13 @@
     <parent>
         <groupId>org.mule.tools</groupId>
         <artifactId>mule-tools</artifactId>
-        <version>2.0.0-M3-SNAPSHOT</version>
+        <version>2.0.0-RC1-SNAPSHOT</version>
     </parent>
     <packaging>maven-plugin</packaging>
     <name>Mule Transport Archetype</name>
     <!-- Do not specify group here, otherwise deployment will break -->
     <artifactId>mule-transport-archetype</artifactId>
-    <version>2.0.0-M3-SNAPSHOT</version>
+    <version>2.0.0-RC1-SNAPSHOT</version>
     <description>Archetype for Mule 2.0 and above transport projects.</description>
 
     <dependencies>

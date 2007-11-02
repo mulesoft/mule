@@ -9,7 +9,7 @@
         <appname>Mule</appname>
         <!-- IMPORTANT - When changing the version also change the version further down
                          within this file where the classpath is set to point to mule core. -->
-        <appversion>2.0-M2-SNAPSHOT</appversion>
+        <appversion>2.0.0-RC1-SNAPSHOT</appversion>
         <authors>
             <author name="MuleSource" email="support@mulesource.com"/>
         </authors>
