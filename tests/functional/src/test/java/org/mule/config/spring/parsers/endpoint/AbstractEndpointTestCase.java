@@ -21,7 +21,8 @@ public abstract class AbstractEndpointTestCase extends FunctionalTestCase
 
     public UMOImmutableEndpoint doTest(String name) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(name, managementContext);
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name,
+            managementContext);
         assertNotNull(endpoint);
         UMOEndpointURI uri = endpoint.getEndpointURI();
         assertNotNull(uri);

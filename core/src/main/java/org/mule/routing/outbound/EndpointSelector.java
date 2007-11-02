@@ -11,7 +11,6 @@
 package org.mule.routing.outbound;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -92,18 +91,18 @@ public class EndpointSelector extends FilteringOutboundRouter implements Managem
                 throw new CouldNotRouteOutboundMessageException(
                         CoreMessages.objectIsNull("Endpoint Name: " + getSelectorProperty()), message, null);
             }
-            UMOImmutableEndpoint ep = lookupEndpoint(endpointName);
-            if (ep == null)
-            {
-                throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.objectNotFound("Endpoint", endpointName), message, ep);
-            }
-
+            UMOImmutableEndpoint ep = null;
             try
             {
+                ep = lookupEndpoint(endpointName);
+                if (ep == null)
+                {
+                    throw new CouldNotRouteOutboundMessageException(CoreMessages.objectNotFound("Endpoint",
+                        endpointName), message, ep);
+                }
                 if (synchronous)
                 {
-                    //TODO See MULE-2613, we only return the last message here
+                    // TODO See MULE-2613, we only return the last message here
                     result = send(session, message, ep);
                 }
                 else
@@ -119,7 +118,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements Managem
         return result;
     }
 
-    protected UMOImmutableEndpoint lookupEndpoint(String endpointName)
+    protected UMOImmutableEndpoint lookupEndpoint(String endpointName) throws UMOException
     {
         UMOImmutableEndpoint ep;
         Iterator iterator = endpoints.iterator();
@@ -141,7 +140,8 @@ public class EndpointSelector extends FilteringOutboundRouter implements Managem
                 return ep;
             }
         }
-        return getManagementContext().getRegistry().lookupEndpoint(endpointName, getManagementContext());
+        return getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName,
+            getManagementContext());
     }
 
     public String getSelectorProperty()

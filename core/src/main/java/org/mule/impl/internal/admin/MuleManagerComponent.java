@@ -24,7 +24,6 @@ import org.mule.impl.message.ExceptionPayload;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
-import org.mule.transformers.TransformerUtils;
 import org.mule.transformers.wire.WireFormat;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -33,8 +32,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -128,18 +127,19 @@ public class MuleManagerComponent implements Callable, Initialisable
 
         if (destComponent != null)
         {
-            UMOSession session = new MuleSession(MuleServer.getManagementContext().getRegistry().lookupComponent(destComponent));
+            UMOSession session = new MuleSession(MuleServer.getManagementContext().getRegistry().lookupComponent(
+                destComponent));
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type
             UMOManagementContext managementContext = MuleServer.getManagementContext();
-            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint(), managementContext);
-            // TODO - is this correct?  it stops any other transformer from being set
-            builder.setTransformers(new LinkedList());
-            UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
+            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint(),
                 managementContext);
-            UMOEvent event = new MuleEvent(action.getMessage(), ep, context.getSession(),
-                context.isSynchronous());
+            // TODO - is this correct? it stops any other transformer from being set
+            builder.setTransformers(new LinkedList());
+            UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+                builder, managementContext);
+            UMOEvent event = new MuleEvent(action.getMessage(), ep, context.getSession(), context.isSynchronous());
             event = RequestContext.setEvent(event);
 
             if (context.isSynchronous())
@@ -165,22 +165,25 @@ public class MuleManagerComponent implements Callable, Initialisable
     protected Object sendAction(AdminNotification action, UMOEventContext context) throws UMOException
     {
         UMOMessage result = null;
+        UMOImmutableEndpoint endpoint = null;
+        UMOManagementContext managementContext = context.getManagementContext();
         try
         {
-            UMOImmutableEndpoint endpoint = context.getManagementContext()
-                .getRegistry()
-                .lookupEndpointFactory()
-                .getOutboundEndpoint(action.getResourceIdentifier(), MuleServer.getManagementContext());
-
             if (AdminNotification.ACTION_DISPATCH == action.getAction())
             {
+                endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+                    action.getResourceIdentifier(), managementContext);
                 context.dispatchEvent(action.getMessage(), endpoint);
                 return null;
             }
             else
             {
-                //TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-                ((UMOEndpoint) endpoint).setRemoteSync(true);
+                UMOEndpointFactory endpointFactory = managementContext.getRegistry().lookupEndpointFactory();
+                UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(action.getResourceIdentifier(),
+                    managementContext);
+                endpointBuilder.setRemoteSync(true);
+                endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder,
+                    managementContext);
                 result = context.sendEvent(action.getMessage(), endpoint);
                 if (result == null)
                 {

@@ -69,30 +69,68 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
     public Object getResultData()
     {
         return "<org.mule.impl.MuleMessage>\n"
-                        + "  <adapter class=\"org.mule.providers.DefaultMessageAdapter\">\n"
-                        + "    <message class=\"string\">test</message>\n"
-                        + "    <properties class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\">\n"
-                        + "      <entry>\n"
-                        + "        <string>string</string>\n"
-                        + "        <string>hello</string>\n"
-                        + "      </entry>\n"
-                        + "      <entry>\n"
-                        + "        <string>object</string>\n"
-                        + "        <org.mule.tck.testmodels.fruit.Apple>\n"
-                        + "          <bitten>false</bitten>\n"
-                        + "          <washed>false</washed>\n"
-                        + "        </org.mule.tck.testmodels.fruit.Apple>\n"
-                        + "      </entry>\n"
-                        + "      <entry>\n"
-                        + "        <string>number</string>\n"
-                        + "        <int>1</int>\n"
-                        + "      </entry>\n"
-                        + "    </properties>\n"
-                        + "    <attachments class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n"
-                        + "    <encoding>UTF-8</encoding>\n"
-                        + "    <id>" + testObject.getUniqueId() + "</id>\n"
-                        + "  </adapter>\n"
-                        + "</org.mule.impl.MuleMessage>";
+               + " <adapter class=\"org.mule.providers.DefaultMessageAdapter\">\n"
+               + " <message class=\"string\">test</message>\n"
+               + "   <properties>\n"
+               + "     <scopedMap class=\"tree-map\">\n"
+               + "       <comparator class=\"org.mule.umo.provider.PropertyScope$ScopeComarator\"/>\n"
+               + "       <entry>\n"
+               + "         <org.mule.umo.provider.PropertyScope>\n"
+               + "           <scope>invocation</scope>\n"
+               + "           <order>0</order>\n"
+               + "         </org.mule.umo.provider.PropertyScope>\n"
+               + "         <map/>\n"
+               + "       </entry>\n"
+               + "       <entry>\n"
+               + "         <org.mule.umo.provider.PropertyScope>\n"
+               + "           <scope>inbound</scope>\n"
+               + "           <order>1</order>\n"
+               + "         </org.mule.umo.provider.PropertyScope>\n"
+               + "         <map/>\n"
+               + "       </entry>\n"
+               + "       <entry>\n"
+               + "         <org.mule.umo.provider.PropertyScope>\n"
+               + "           <scope>outbound</scope>\n"
+               + "           <order>2</order>\n"
+               + "         </org.mule.umo.provider.PropertyScope>\n"
+               + "         <map>\n"
+               + "           <entry>\n"
+               + "             <string>object</string>\n"
+               + "             <org.mule.tck.testmodels.fruit.Apple>\n"
+               + "               <bitten>false</bitten>\n"
+               + "               <washed>false</washed>\n"
+               + "             </org.mule.tck.testmodels.fruit.Apple>\n"
+               + "           </entry>\n"
+               + "           <entry>\n"
+               + "             <string>string</string>\n"
+               + "             <string>hello</string>\n"
+               + "           </entry>\n"
+               + "           <entry>\n"
+               + "             <string>number</string>\n"
+               + "             <int>1</int>\n"
+               + "           </entry>\n"
+               + "         </map>\n"
+               + "       </entry>\n"
+               + "       <entry>\n"
+               + "         <org.mule.umo.provider.PropertyScope>\n"
+               + "           <scope>session</scope>\n"
+               + "           <order>3</order>\n"
+               + "         </org.mule.umo.provider.PropertyScope>\n"
+               + "         <map/>\n"
+               + "       </entry>\n"
+               + "     </scopedMap>\n"
+               + "     <keySet class=\"tree-set\">\n"
+               + "       <no-comparator/>\n"
+               + "       <string>number</string>\n"
+               + "       <string>object</string>\n"
+               + "       <string>string</string>\n"
+               + "     </keySet>\n"
+               + "     <applicationProperties class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n"
+               + "     <defaultScope reference=\"../scopedMap/entry[3]/org.mule.umo.provider.PropertyScope\"/>\n"
+               + "     <fallbackToRegistry>false</fallbackToRegistry>\n" + "   </properties>\n"
+               + "   <attachments class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n"
+               + "   <encoding>UTF-8</encoding>\n" + "   <id>3be5fe5a-87f8-11dc-a153-0b6db396665f</id>\n"
+               + " </adapter>\n" + " </org.mule.impl.MuleMessage>\n";
     }
 
     /**
@@ -109,10 +147,10 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
             // this is currently the case when running on Mustang
             try
             {
-                XMLAssert.assertXpathEvaluatesTo("3", "count(//adapter/properties/entry)", (String)result);
+                XMLAssert.assertXpathEvaluatesTo("3", "count(//adapter/properties/scopedMap/entry/map/entry)", (String)result);
                 // depending on your VM and the phase of the moon this is either "number" or "object"
-                XMLAssert.assertXpathEvaluatesTo("number", "//adapter/properties/entry/string/text()", (String)result);
-                XMLAssert.assertXpathEvaluatesTo("false", "//adapter/properties/entry/org.mule.tck.testmodels.fruit.Apple/bitten", (String)result);
+                XMLAssert.assertXpathEvaluatesTo("number", "//adapter/properties/scopedMap/entry/map/entry/string/text()", (String)result);
+                XMLAssert.assertXpathEvaluatesTo("false", "//adapter/properties/scopedMap/entry/map/entry/org.mule.tck.testmodels.fruit.Apple/bitten", (String)result);
             }
             catch (Exception ex)
             {

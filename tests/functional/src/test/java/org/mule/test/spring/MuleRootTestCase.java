@@ -11,6 +11,7 @@
 package org.mule.test.spring;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class MuleRootTestCase extends FunctionalTestCase
@@ -21,10 +22,11 @@ public class MuleRootTestCase extends FunctionalTestCase
         return "org/mule/test/spring/mule-root-test.xml";
     }
 
-    public void testModel()
+    public void testModel() throws UMOException
     {
         assertNotNull("No model", managementContext.getRegistry().lookupModel("model"));
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("endpoint");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            "endpoint", managementContext);
         assertNotNull("No endpoint", endpoint);
         String address = endpoint.getEndpointURI().getAddress();
         assertNotNull("No address", address);

@@ -24,14 +24,13 @@ import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
 import java.io.OutputStream;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -269,7 +268,7 @@ public class MuleEventContext implements UMOEventContext
     public UMOMessage sendEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
         UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(
-            endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
+            endpointUri, UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
 
         // If synchronous receive has not been explicitly set, default it to
         // true
@@ -484,7 +483,7 @@ public class MuleEventContext implements UMOEventContext
     public void dispatchEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
         UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(
-            endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
+            endpointUri, UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
         session.dispatchEvent(message, endpoint);
     }
 
@@ -559,7 +558,7 @@ public class MuleEventContext implements UMOEventContext
     public UMOMessage receiveEvent(UMOEndpointURI endpointUri, long timeout) throws UMOException
     {
         UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(
-            endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
+            endpointUri, UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
         return session.receiveEvent(endpoint, timeout);
     }
 

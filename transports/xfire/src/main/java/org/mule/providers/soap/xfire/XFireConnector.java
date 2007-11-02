@@ -13,7 +13,6 @@ package org.mule.providers.soap.xfire;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
@@ -25,6 +24,7 @@ import org.mule.providers.soap.xfire.i18n.XFireMessages;
 import org.mule.providers.soap.xfire.transport.MuleLocalTransport;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.routing.inbound.InboundRouterCollection;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
@@ -42,7 +42,6 @@ import org.mule.util.object.SingletonObjectFactory;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.codehaus.xfire.DefaultXFire;
@@ -410,44 +409,41 @@ public class XFireConnector extends AbstractConnector
             receiver.getEndpoint().getProperties().put(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
             receiver.getEndpoint().getProperties().put(HttpConstants.HEADER_CONTENT_TYPE,
                 "text/xml");
-
-            // Default to using synchronous for socket based protocols unless the
-            // synchronous property has been set explicitly
-            if (!receiver.getEndpoint().isSynchronousSet())
-            {
-                sync = true;
-            }
         }
         
-        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
-        builder.setSynchronous(sync);
-        builder.setName(ep.getScheme() + ":" + serviceName);
-
+        UMOEndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint,
+            managementContext);
+        serviceEndpointbuilder.setSynchronous(sync);
+        serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName);
         // Set the transformers on the endpoint too
-        builder.setTransformers(receiver.getEndpoint().getTransformers());
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((MuleEndpoint) receiver.getEndpoint()).setTransformers(new LinkedList());
-
-        builder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers());
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((MuleEndpoint) receiver.getEndpoint()).setResponseTransformers(new LinkedList());
-
+        serviceEndpointbuilder.setTransformers(receiver.getEndpoint().getTransformers());
+        serviceEndpointbuilder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers());
         // set the filter on the axis endpoint on the real receiver endpoint
-        builder.setFilter(receiver.getEndpoint().getFilter());
-        // Remove the Axis filter now
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((MuleEndpoint) receiver.getEndpoint()).setFilter(null);
-
+        serviceEndpointbuilder.setFilter(receiver.getEndpoint().getFilter());
         // set the Security filter on the axis endpoint on the real receiver
         // endpoint
-        builder.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
+        serviceEndpointbuilder.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
+
+        // TODO Do we really need to modify the existing receiver endpoint? What happnes if we don't security,
+        // filters and transformers will get invoked twice?
+        UMOEndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint(),
+            managementContext);
+        receiverEndpointBuilder.setTransformers(TransformerUtils.UNDEFINED);
+        receiverEndpointBuilder.setResponseTransformers(TransformerUtils.UNDEFINED);
+        // Remove the Axis filter now
+        receiverEndpointBuilder.setFilter(null);
         // Remove the Axis Receiver Security filter now
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((MuleEndpoint) receiver.getEndpoint()).setSecurityFilter(null);
+        receiverEndpointBuilder.setSecurityFilter(null);
 
         UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint(builder, managementContext);
+            .getInboundEndpoint(serviceEndpointbuilder, managementContext);
+
+        UMOImmutableEndpoint receiverEndpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint(receiverEndpointBuilder, managementContext);
+
+        receiver.setEndpoint(receiverEndpoint);
 
         c.setInboundRouter(new InboundRouterCollection());
         c.getInboundRouter().addEndpoint(serviceEndpoint);
@@ -618,6 +614,20 @@ public class XFireConnector extends AbstractConnector
     public void setTransportClass(String clazz)
     {
         transportClass = clazz;
+    }
+    
+    public boolean isSyncEnabled(UMOImmutableEndpoint endpoint)
+    {
+        String scheme = endpoint.getEndpointURI().getScheme().toLowerCase();
+        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")
+            || scheme.equals("servlet"))
+        {
+            return true;
+        }
+        else
+        {
+            return super.isSyncEnabled(endpoint);
+        }
     }
 
 }

@@ -17,6 +17,7 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
 
 import com.mockobjects.dynamic.C;
@@ -51,7 +52,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
                 parts = Arrays.asList(StringUtils.splitAndTrim(message.getPayload().toString(), ","));
             }
 
-            protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
+            protected UMOMessage getMessagePart(UMOMessage message, UMOImmutableEndpoint endpoint)
             {
                 if (endpoint.getEndpointURI().getAddress().equals("endpointUri.1"))
                 {

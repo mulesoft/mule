@@ -13,6 +13,7 @@ package org.mule.providers.vm;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.endpoint.DynamicEndpointURIEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.filters.WildcardFilter;
@@ -23,7 +24,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -214,8 +214,9 @@ public class VMConnector extends AbstractConnector
             WildcardFilter filter = new WildcardFilter(filterAddress);
             if (filter.accept(endpointUri.getAddress()))
             {
-                // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-                ((UMOEndpoint) receiver.getEndpoint()).setEndpointURI(new MuleEndpointURI(endpointUri, filterAddress));
+                UMOImmutableEndpoint endpoint = receiver.getEndpoint();
+                UMOEndpointURI newEndpointURI = new MuleEndpointURI(endpointUri, filterAddress);
+                receiver.setEndpoint(new DynamicEndpointURIEndpoint(endpoint, newEndpointURI));
 
                 if (logger.isDebugEnabled())
                 {

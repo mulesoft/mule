@@ -16,7 +16,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutePathNotFoundException;
@@ -122,17 +121,17 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
         return result;
     }
 
-    public void addEndpoint(UMOEndpoint endpoint)
-    {
-        if (!endpoint.isRemoteSync())
-        {
-            logger.debug("Endpoint: "
-                         + endpoint.getEndpointURI()
-                         + " registered on ExceptionBasedRouter needs to be RemoteSync enabled. Setting this property now.");
-            endpoint.setRemoteSync(true);
-        }
-        super.addEndpoint(endpoint);
-    }
+//    public void addEndpoint(UMOEndpoint endpoint)
+//    {
+//        if (!endpoint.isRemoteSync())
+//        {
+//            logger.debug("Endpoint: "
+//                         + endpoint.getEndpointURI()
+//                         + " registered on ExceptionBasedRouter needs to be RemoteSync enabled. Setting this property now.");
+//            endpoint.setRemoteSync(true);
+//        }
+//        super.addEndpoint(endpoint);
+//    }
 
     /**
      * @param message message to check

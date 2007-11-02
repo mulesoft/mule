@@ -14,7 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutePathNotFoundException;
 import org.mule.umo.routing.RoutingException;
@@ -51,12 +51,12 @@ public class MulticastingRouter extends FilteringOutboundRouter
 
         try
         {
-            UMOEndpoint endpoint;
+            UMOImmutableEndpoint endpoint;
             synchronized (endpoints)
             {
                 for (int i = 0; i < endpoints.size(); i++)
                 {
-                    endpoint = (UMOEndpoint) endpoints.get(i);
+                    endpoint = (UMOImmutableEndpoint) endpoints.get(i);
                     if (synchronous)
                     {
                         // Were we have multiple outbound endpoints
@@ -86,7 +86,7 @@ public class MulticastingRouter extends FilteringOutboundRouter
         }
         catch (UMOException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint) endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, (UMOImmutableEndpoint) endpoints.get(0), e);
         }
         return result;
     }

@@ -25,7 +25,6 @@ import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.InvalidEndpointTypeException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -177,11 +176,6 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     protected void doInitialise(UMOManagementContext managementContext) throws InitialisationException
     {
         logger.info("Initialising exception listener: " + toString());
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
-        {
-            UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
-            umoEndpoint.initialise();
-        }
     }
 
     /**

@@ -16,6 +16,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
 import java.io.BufferedOutputStream;
@@ -46,9 +47,13 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
         return "ssl-connector-functional-test.xml";
     }
 
-    protected URI getUri()
+    protected URI getUri() throws UMOException
     {
-        return managementContext.getRegistry().lookupEndpoint("in").getEndpointURI().getUri();
+        return managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("in", managementContext)
+            .getEndpointURI()
+            .getUri();
     }
 
     protected Socket createSocket(URI uri) throws Exception

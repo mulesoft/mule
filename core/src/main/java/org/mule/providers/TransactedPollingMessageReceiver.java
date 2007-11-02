@@ -15,7 +15,6 @@ import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
@@ -51,7 +50,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     /**
      * @deprecated please use
-     *             {@link #TransactedPollingMessageReceiver(UMOConnector,UMOComponent,UMOEndpoint,long,TimeUnit)}
+     *             {@link #TransactedPollingMessageReceiver(UMOConnector,UMOComponent,UMOImmutableEndpoint,long,TimeUnit)}
      *             instead
      */
     public TransactedPollingMessageReceiver(UMOConnector connector,

@@ -68,7 +68,8 @@ public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testEndpoint() throws UMOException
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("global");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            "global", managementContext);
         assertNotNull(endpoint);
         String address = endpoint.getEndpointURI().getAddress();
         assertNotNull(address);

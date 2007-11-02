@@ -12,6 +12,7 @@ package org.mule.providers.http.servlet;
 
 import org.mule.RegistryContext;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.endpoint.DynamicEndpointURIEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.http.HttpConnector;
@@ -21,7 +22,6 @@ import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.service.TransportFactory;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.PropertiesUtils;
@@ -326,8 +326,8 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);
             }
         }
-        //TODO DF: Endpoint mutability
-        ((UMOEndpoint) receiver.getEndpoint()).setEndpointURI(new MuleEndpointURI(getRequestUrl(httpServletRequest)));
+        receiver.setEndpoint(new DynamicEndpointURIEndpoint(receiver.getEndpoint(), new MuleEndpointURI(
+            getRequestUrl(httpServletRequest))));
         return receiver;
     }
 

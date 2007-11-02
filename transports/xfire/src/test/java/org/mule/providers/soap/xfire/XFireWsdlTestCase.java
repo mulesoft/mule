@@ -14,11 +14,13 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 
 import org.custommonkey.xmlunit.XMLAssert;
 
@@ -54,11 +56,11 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
         // make sure the Mule is up when not using MuleClient
         // MuleManager.getInstance().start();
 
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URL_NOWSDL, managementContext);
+        endpointBuilder.setProperty("wsdlUrl", TEST_URL_WSDL);
         UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint(TEST_URL_NOWSDL, managementContext);
-        endpoint.setProperty("wsdlUrl", TEST_URL_WSDL);
+            .getOutboundEndpoint(endpointBuilder, managementContext);
 
         UMOMessage message = new MuleMessage("test1");
         UMOSession session = new MuleSession(message, ((AbstractConnector) endpoint.getConnector())

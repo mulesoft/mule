@@ -16,7 +16,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.ComponentRoutingException;
 import org.mule.umo.routing.RoutingException;
@@ -27,7 +26,7 @@ import org.mule.umo.routing.RoutingException;
  */
 public class ComponentCatchAllStrategy extends AbstractCatchAllStrategy
 {
-    public void setEndpoint(UMOEndpoint endpoint)
+    public void setEndpoint(UMOImmutableEndpoint endpoint)
     {
         throw new UnsupportedOperationException("The endpoint cannot be set on this catch all");
     }

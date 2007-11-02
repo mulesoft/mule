@@ -175,7 +175,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
      */
     public void setSynchronous(boolean synchronous)
     {
-        this.synchronous = Boolean.valueOf(synchronous);
+        this.synchronous = synchronous;
     }
 
     public void setCreateConnector(int action)
@@ -209,10 +209,10 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
      */
     public void setRemoteSync(boolean value)
     {
-        this.remoteSync = Boolean.valueOf(value);
+        this.remoteSync = value;
         if (value)
         {
-            this.synchronous = Boolean.TRUE;
+            this.synchronous = true;
         }
     }
 

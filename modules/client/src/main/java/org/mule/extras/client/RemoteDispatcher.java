@@ -27,7 +27,8 @@ import org.mule.umo.FutureMessageResult;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.DispatchException;
@@ -62,7 +63,8 @@ public class RemoteDispatcher implements Disposable
     /**
      * dispatch destination
      */
-    private UMOImmutableEndpoint serverEndpoint;
+    private UMOImmutableEndpoint asyncServerEndpoint;
+    private UMOImmutableEndpoint syncServerEndpoint;
     private UMOCredentials credentials = null;
 
     /**
@@ -83,8 +85,14 @@ public class RemoteDispatcher implements Disposable
 
     protected RemoteDispatcher(String endpoint) throws UMOException
     {
-        serverEndpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpoint,
-            MuleServer.getManagementContext());
+        UMOEndpointFactory endpointFactory = RegistryContext.getRegistry().lookupEndpointFactory();
+        asyncServerEndpoint = endpointFactory.getInboundEndpoint(endpoint, MuleServer.getManagementContext());
+        
+        UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpoint, MuleServer.getManagementContext());
+        endpointBuilder.setRemoteSync(true);
+        syncServerEndpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            endpointBuilder, MuleServer.getManagementContext());
+
         wireFormat = new SerializationWireFormat();
     }
 
@@ -281,8 +289,16 @@ public class RemoteDispatcher implements Disposable
     protected UMOMessage dispatchAction(AdminNotification action, boolean synchronous, int timeout)
         throws UMOException
     {
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((UMOEndpoint) serverEndpoint).setRemoteSync(synchronous);
+        UMOImmutableEndpoint serverEndpoint = null;
+        if (synchronous)
+        {
+            serverEndpoint = syncServerEndpoint;
+        }
+        else
+        {
+            serverEndpoint = asyncServerEndpoint;
+        }
+        
         updateContext(new MuleMessage(action), serverEndpoint, synchronous);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();

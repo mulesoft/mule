@@ -12,7 +12,7 @@ package org.mule.umo.routing;
 
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>ResponseTimeoutException</code> is thrown when a response is not received
@@ -27,14 +27,14 @@ public class ResponseTimeoutException extends RoutingException
      */
     private static final long serialVersionUID = 6882278747922113239L;
 
-    public ResponseTimeoutException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
+    public ResponseTimeoutException(Message message, UMOMessage umoMessage, UMOImmutableEndpoint endpoint)
     {
         super(message, umoMessage, endpoint);
     }
 
     public ResponseTimeoutException(Message message,
                                     UMOMessage umoMessage,
-                                    UMOEndpoint endpoint,
+                                    UMOImmutableEndpoint endpoint,
                                     Throwable cause)
     {
         super(message, umoMessage, endpoint, cause);

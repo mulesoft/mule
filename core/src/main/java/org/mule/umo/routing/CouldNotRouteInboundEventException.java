@@ -12,7 +12,7 @@ package org.mule.umo.routing;
 
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>CouldNotRouteInboundEventException</code> thrown if the current component
@@ -26,24 +26,24 @@ public class CouldNotRouteInboundEventException extends RoutingException
      */
     private static final long serialVersionUID = 2736231899561051615L;
 
-    public CouldNotRouteInboundEventException(UMOMessage message, UMOEndpoint endpoint)
+    public CouldNotRouteInboundEventException(UMOMessage message, UMOImmutableEndpoint endpoint)
     {
         super(message, endpoint);
     }
 
-    public CouldNotRouteInboundEventException(UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    public CouldNotRouteInboundEventException(UMOMessage umoMessage, UMOImmutableEndpoint endpoint, Throwable cause)
     {
         super(umoMessage, endpoint, cause);
     }
 
-    public CouldNotRouteInboundEventException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
+    public CouldNotRouteInboundEventException(Message message, UMOMessage umoMessage, UMOImmutableEndpoint endpoint)
     {
         super(message, umoMessage, endpoint);
     }
 
     public CouldNotRouteInboundEventException(Message message,
                                               UMOMessage umoMessage,
-                                              UMOEndpoint endpoint,
+                                              UMOImmutableEndpoint endpoint,
                                               Throwable cause)
     {
         super(message, umoMessage, endpoint, cause);

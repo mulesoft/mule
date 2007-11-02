@@ -14,7 +14,7 @@ import org.mule.config.MuleProperties;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
@@ -45,13 +45,13 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
         this.initialise(message);
 
-        UMOEndpoint endpoint;
+        UMOImmutableEndpoint endpoint;
         UMOMessage result = null;
         List list = getEndpoints();
         int correlationSequence = 1;
         for (Iterator iterator = list.iterator(); iterator.hasNext();)
         {
-            endpoint = (UMOEndpoint) iterator.next();
+            endpoint = (UMOImmutableEndpoint) iterator.next();
             message = getMessagePart(message, endpoint);
             // TODO MULE-1378
             if (message == null)
@@ -139,7 +139,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
     /**
      * This method can be implemented to split the message up before
-     * {@link #getMessagePart(UMOMessage, UMOEndpoint)} method is called.
+     * {@link #getMessagePart(UMOMessage, UMOImmutableEndpoint)} method is called.
      * 
      * @param message the message being routed
      */
@@ -154,11 +154,11 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
      * @param endpoint the endpoint that will be used to route the resulting message part
      * @return the message part to dispatch
      */
-    protected abstract UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint);
+    protected abstract UMOMessage getMessagePart(UMOMessage message, UMOImmutableEndpoint endpoint);
 
     /**
      * This method is called after all parts of the original message have been processed;
-     * typically this is the case after {@link #getMessagePart(UMOMessage, UMOEndpoint)}
+     * typically this is the case after {@link #getMessagePart(UMOMessage, UMOImmutableEndpoint)}
      * returned <code>null</code>.
      */
     protected abstract void cleanup();

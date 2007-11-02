@@ -11,7 +11,6 @@
 package org.mule.management.stats;
 
 import org.mule.management.stats.printers.SimplePrinter;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.io.PrintWriter;
@@ -110,7 +109,7 @@ public class RouterStatistics implements Statistics
         {
             for (int i = 0; i < list.size(); i++)
             {
-                incrementRoutedMessage((UMOEndpoint) list.get(i));
+                incrementRoutedMessage((UMOImmutableEndpoint) list.get(i));
             }
         }
     }

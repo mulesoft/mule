@@ -19,7 +19,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.InvalidEndpointTypeException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.RoutingException;
@@ -286,10 +285,10 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
      */
     public UMOImmutableEndpoint getEndpoint(String name)
     {
-        UMOEndpoint endpointDescriptor;
+        UMOImmutableEndpoint endpointDescriptor;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            endpointDescriptor = (UMOEndpoint) iterator.next();
+            endpointDescriptor = (UMOImmutableEndpoint) iterator.next();
             if (endpointDescriptor.getName().equals(name))
             {
                 return endpointDescriptor;

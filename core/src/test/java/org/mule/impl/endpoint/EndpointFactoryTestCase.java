@@ -10,9 +10,9 @@
 
 package org.mule.impl.endpoint;
 
-import org.mule.impl.registry.TransientRegistry;
 import org.mule.registry.Registry;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
@@ -287,5 +287,80 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             fail("Unexpected exception: " + e.getMessage());
         }
     }
+    
+    public void testCreateEndpointDontnowName() throws UMOException
+    {
+        Registry r = managementContext.getRegistry();
+        
+        // Create and register two connectors
+        TestConnector testConnector1 = new TestConnector();
+        testConnector1.setName("testConnector1");
+        TestConnector testConnector2 = new TestConnector();
+        testConnector2.setName("testConnector2");
+        r.registerConnector(testConnector1, managementContext);
+        r.registerConnector(testConnector2, managementContext);
+        
+        String globalEndpointName = "concreteEndpoint";
+        
+        // Create and register a endpoint builder (global endpoint) with connector1
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://address", managementContext);
+        endpointBuilder.setConnector(testConnector1);
+        r.registerObject(globalEndpointName, endpointBuilder, managementContext);
+        UMOEndpointFactory endpointFactory = new EndpointFactory();
+        try
+        {
+            // Test that EndpointFactory.getEndpointBuilder() returns a new EndpointBuilder instance equal to
+            // the one we registered earlier
+            UMOEndpointBuilder endpointBuilder1 = endpointFactory.getEndpointBuilder(globalEndpointName,
+                managementContext);
+            assertNotSame(endpointBuilder1, endpointBuilder);
+            assertTrue(endpointBuilder1.equals(endpointBuilder));
 
+            // Test that EndpointFactory.getEndpointBuilder() returns a new EndpointBuilder instance equal to
+            // the one we registered earlier
+            UMOEndpointBuilder endpointBuilder2 = endpointFactory.getEndpointBuilder(globalEndpointName,
+                managementContext);
+            assertNotSame(endpointBuilder2, endpointBuilder);
+            assertTrue(endpointBuilder2.equals(endpointBuilder));
+
+            // Check that all EndpointBuilder's returned are unique but equal
+            assertNotSame(endpointBuilder1, endpointBuilder2);
+            assertTrue(endpointBuilder1.equals(endpointBuilder2));
+            assertEquals(endpointBuilder1.hashCode(), endpointBuilder2.hashCode());
+
+            // Test creating an endpoint from endpointBuilder1
+            endpointBuilder1.setSynchronous(true);
+            endpointBuilder1.setRemoteSyncTimeout(99);
+            UMOImmutableEndpoint ep = endpointFactory.getInboundEndpoint(endpointBuilder1, managementContext);
+            assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            assertTrue(ep.isSynchronous());
+            assertEquals(99, ep.getRemoteSyncTimeout());
+            assertNotNull(ep.getConnector());
+            assertEquals(testConnector1, ep.getConnector());
+
+            // Test creating an endpoint from endpointBuilder2
+            endpointBuilder2.setSynchronous(false);
+            endpointBuilder2.setRemoteSyncTimeout(0);
+            endpointBuilder2.setConnector(testConnector2);
+            UMOImmutableEndpoint ep2 = endpointFactory.getInboundEndpoint(endpointBuilder2, managementContext);
+            assertEquals(ep2.getEndpointURI().getUri().toString(), "test://address");
+            assertFalse(ep2.isSynchronous());
+            assertEquals(0, ep2.getRemoteSyncTimeout());
+            assertNotNull(ep.getConnector());
+            assertEquals(testConnector2, ep2.getConnector());
+
+            // Test creating a new endpoint from endpointBuilder1
+            UMOImmutableEndpoint ep3 = endpointFactory.getInboundEndpoint(endpointBuilder1, managementContext);
+            assertEquals(ep3.getEndpointURI().getUri().toString(), "test://address");
+            assertTrue(ep3.getRemoteSyncTimeout() != 0);
+            assertTrue(ep3.isSynchronous());
+            assertNotNull(ep.getConnector());
+            assertEquals(testConnector1, ep3.getConnector());
+        }
+        catch (Exception e)
+        {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+    
 }

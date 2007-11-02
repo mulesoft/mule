@@ -17,7 +17,7 @@ import org.mule.impl.UMOComponentAware;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.util.StringMessageUtils;
@@ -68,7 +68,7 @@ public abstract class AbstractMessageBuilder implements UMOComponentAware, Calla
 
             for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
             {
-                UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
+                UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) iterator.next();
                 Object request = requestMessage.getPayload();
 
                 boolean rsync = eventContext.getMessage().getBooleanProperty(

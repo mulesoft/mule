@@ -146,8 +146,8 @@ public class HttpConnector extends TcpConnector
                     newProperties.put(key, entry.getValue());
                 }
                 // set normalized properties back on the endpoint
-                // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-                ((UMOEndpoint) endpoint).setProperties(newProperties);
+                endpoint.getProperties().clear();
+                endpoint.getProperties().putAll(newProperties);
             }
         }
         // proceed as usual

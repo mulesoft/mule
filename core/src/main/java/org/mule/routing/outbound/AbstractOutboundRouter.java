@@ -19,7 +19,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.InvalidEndpointTypeException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.util.ClassUtils;
@@ -31,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -341,10 +341,10 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements U
      */
     public UMOImmutableEndpoint getEndpoint(String name)
     {
-        UMOEndpoint endpointDescriptor;
+        UMOImmutableEndpoint endpointDescriptor;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            endpointDescriptor = (UMOEndpoint)iterator.next();
+            endpointDescriptor = (UMOImmutableEndpoint)iterator.next();
             if (endpointDescriptor.getName().equals(name))
             {
                 return endpointDescriptor;

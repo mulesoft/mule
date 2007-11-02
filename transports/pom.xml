@@ -17,6 +17,7 @@
         <module>all-transports</module>
         <module>axis</module>
         <module>bpm</module>
+        <!--<module>cxf</module>-->
         <module>ejb</module>
         <module>email</module>
         <module>file</module>

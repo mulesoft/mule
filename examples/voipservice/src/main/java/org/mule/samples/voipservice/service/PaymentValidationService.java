@@ -10,8 +10,10 @@
 
 package org.mule.samples.voipservice.service;
 
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.samples.voipservice.interfaces.PaymentValidation;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
@@ -26,7 +28,7 @@ public class PaymentValidationService implements PaymentValidation
 
     protected static transient Log logger = LogFactory.getLog(PaymentValidationService.class);
 
-    public List getCreditVendors(String cardType)
+    public List getCreditVendors(String cardType) throws UMOException
     {
         logger.info("Inside PaymentValidationService.getCreditVendors() ***************");
         List endPoints = new ArrayList();
@@ -37,9 +39,10 @@ public class PaymentValidationService implements PaymentValidation
         return endPoints;
     }
 
-    private UMOEndpointURI getEndpointUri(String endpointName)
+    private UMOEndpointURI getEndpointUri(String endpointName) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpoint(endpointName);
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            endpointName, MuleServer.getManagementContext());
         return endpoint.getEndpointURI();
     }
 

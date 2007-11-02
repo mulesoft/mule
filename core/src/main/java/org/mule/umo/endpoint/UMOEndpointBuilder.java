@@ -10,6 +10,7 @@
 
 package org.mule.umo.endpoint;
 
+import org.mule.impl.ManagementContextAware;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;
@@ -27,7 +28,7 @@ import java.util.Map;
  * uses, for generic endpoints we can either resolve the transport from uri string or use a default
  * implementation.
  */
-public interface UMOEndpointBuilder
+public interface UMOEndpointBuilder extends ManagementContextAware, Cloneable
 {
 
     /**
@@ -67,6 +68,8 @@ public interface UMOEndpointBuilder
 
     void setName(String name);
 
+    void setProperty(Object key, Object value);
+    
     void setProperties(Map properties);
 
     void setTransactionConfig(UMOTransactionConfig transactionConfig);
@@ -98,5 +101,7 @@ public interface UMOEndpointBuilder
     void setConnectionStrategy(ConnectionStrategy connectionStrategy);
 
     void setEndpointURI(UMOEndpointURI endpointURI);
+
+    Object clone() throws CloneNotSupportedException;
 
 }

@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.impl.MuleMessage;
+import org.mule.impl.endpoint.DynamicEndpointURIEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -90,9 +91,12 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         UMOImmutableEndpoint ep = router.getEndpoint(2, message);
         assertEquals("test://foo?bar", ep.getEndpointURI().toString());
 
-        session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(0)), message);
-        session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(1)), message);
-        session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(2)), message);
+        session.expectAndReturn("sendEvent", C.eq(message, new DynamicEndpointURIEndpoint(
+            (UMOImmutableEndpoint) router.getEndpoints().get(0), new MuleEndpointURI("test://test"))), message);
+        session.expectAndReturn("sendEvent", C.eq(message, new DynamicEndpointURIEndpoint(
+            (UMOImmutableEndpoint) router.getEndpoints().get(1), new MuleEndpointURI("test://test"))), message);
+        session.expectAndReturn("sendEvent", C.eq(message, new DynamicEndpointURIEndpoint(
+            (UMOImmutableEndpoint) router.getEndpoints().get(2), new MuleEndpointURI("test://foo?bar"))), message);
         final UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
         assertNotNull("This is a sync call, we need a result returned.", result);
         assertEquals(message, result);

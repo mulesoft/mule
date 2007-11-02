@@ -50,7 +50,8 @@ public class Rfc822ByteArrayTestCase extends FunctionalTestCase
     protected MimeMessage byteArrayToMimeMessage(byte[] bytes) throws UMOException
     {
         Rfc822ByteArraytoMimeMessage transformer = new Rfc822ByteArraytoMimeMessage();
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("smtp");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            "smtp", managementContext);
         transformer.setEndpoint(endpoint);
         Object result = transformer.transform(bytes);
         assertTrue(result instanceof MimeMessage);

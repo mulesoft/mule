@@ -12,7 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -86,7 +86,7 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
     /**
      * @inheritDocs
      */
-    protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
+    protected UMOMessage getMessagePart(UMOMessage message, UMOImmutableEndpoint endpoint)
     {
         List payloads = (List) payloadContext.get();
 

@@ -49,21 +49,24 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
      */
     public EndpointURIEndpointBuilder(UMOImmutableEndpoint source, UMOManagementContext managementContext)
     {
-        name = source.getName();
-        endpointURI = source.getEndpointURI();
-        endpointEncoding = source.getEncoding();
-        connector = source.getConnector();
-        transformers = source.getTransformers();
-        responseTransformers = source.getResponseTransformers();
-        properties = source.getProperties();
-        transactionConfig = source.getTransactionConfig();
-        deleteUnacceptedMessages = new Boolean(source.isDeleteUnacceptedMessages());
-        initialState = source.getInitialState();
-        remoteSyncTimeout = new Integer(source.getRemoteSyncTimeout());
-        remoteSync = Boolean.valueOf(source.isRemoteSync());
-        filter = source.getFilter();
-        securityFilter = source.getSecurityFilter();
-        connectionStrategy = source.getConnectionStrategy();
+        setName(source.getName());
+        setEndpointURI(source.getEndpointURI());
+        setEndpointEncoding(source.getEncoding());
+        setConnector(source.getConnector());
+        setTransformers(source.getTransformers());
+        setResponseTransformers(source.getResponseTransformers());
+        setProperties(source.getProperties());
+        setTransactionConfig(source.getTransactionConfig());
+        setDeleteUnacceptedMessages(source.isDeleteUnacceptedMessages());
+        setInitialState(source.getInitialState());
+        setRemoteSyncTimeout(source.getRemoteSyncTimeout());
+        setRemoteSync(source.isRemoteSync());
+        setFilter(source.getFilter());
+        setSecurityFilter(source.getSecurityFilter());
+        setConnectionStrategy(source.getConnectionStrategy());
+        setSynchronous(source.isSynchronous());
+        setCreateConnector(source.getCreateConnector());
+        setManagementContext(source.getManagementContext());
     }
     
 }

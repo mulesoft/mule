@@ -31,7 +31,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -573,12 +572,12 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void registerListeners() throws UMOException
     {
-        UMOEndpoint endpoint;
+        UMOImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint) it.next();
+            endpoint = (UMOImmutableEndpoint) it.next();
             try
             {
                 endpoint.getConnector().registerListener(this, endpoint);
@@ -597,12 +596,12 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void unregisterListeners() throws UMOException
     {
-        UMOEndpoint endpoint;
+        UMOImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint) it.next();
+            endpoint = (UMOImmutableEndpoint) it.next();
             try
             {
                 endpoint.getConnector().unregisterListener(this, endpoint);
@@ -621,16 +620,16 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void startListeners() throws UMOException
     {
-        UMOEndpoint endpoint;
+        UMOImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint) it.next();
+            endpoint = (UMOImmutableEndpoint) it.next();
             UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null && endpoint.getConnector().isStarted()
-                && endpoint.getInitialState().equals(UMOEndpoint.INITIAL_STATE_STARTED))
+                && endpoint.getInitialState().equals(UMOImmutableEndpoint.INITIAL_STATE_STARTED))
             {
                 receiver.start();
             }
@@ -639,12 +638,12 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void stopListeners() throws UMOException
     {
-        UMOEndpoint endpoint;
+        UMOImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint) it.next();
+            endpoint = (UMOImmutableEndpoint) it.next();
             UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null)
@@ -656,12 +655,12 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void connectListeners() throws UMOException
     {
-        UMOEndpoint endpoint;
+        UMOImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint) it.next();
+            endpoint = (UMOImmutableEndpoint) it.next();
             UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null)
@@ -683,12 +682,12 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void disconnectListeners() throws UMOException
     {
-        UMOEndpoint endpoint;
+        UMOImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOEndpoint) it.next();
+            endpoint = (UMOImmutableEndpoint) it.next();
             UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null)

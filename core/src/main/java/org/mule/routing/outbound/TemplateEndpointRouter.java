@@ -11,12 +11,13 @@
 package org.mule.routing.outbound;
 
 import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.endpoint.DynamicEndpointURIEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutePathNotFoundException;
 import org.mule.umo.routing.RoutingException;
@@ -49,7 +50,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
         }
         try
         {
-            UMOEndpoint ep = (UMOEndpoint) endpoints.get(0);
+            UMOImmutableEndpoint ep = (UMOImmutableEndpoint) endpoints.get(0);
             String uri = ep.getEndpointURI().toString();
             if (logger.isDebugEnabled())
             {
@@ -75,7 +76,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
                 throw new CouldNotRouteOutboundMessageException(CoreMessages.schemeCannotChangeForRouter(
                     ep.getEndpointURI().getScheme(), newUri.getScheme()), message, ep);
             }
-            ep.setEndpointURI(new MuleEndpointURI(uri));
+            ep = new DynamicEndpointURIEndpoint(ep, new MuleEndpointURI(uri));
             if (synchronous)
             {
                 result = send(session, message, ep);
@@ -87,7 +88,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
         }
         catch (UMOException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint) endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, (UMOImmutableEndpoint) endpoints.get(0), e);
         }
         return result;
     }

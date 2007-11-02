@@ -13,7 +13,7 @@ package org.mule.umo.routing;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.List;
 
@@ -31,9 +31,9 @@ public interface UMOResponseRouterCollection extends UMORouterCollection
 
     UMOResponseRouter removeRouter(UMOResponseRouter router);
 
-    void addEndpoint(UMOEndpoint endpoint);
+    void addEndpoint(UMOImmutableEndpoint endpoint);
 
-    boolean removeEndpoint(UMOEndpoint endpoint);
+    boolean removeEndpoint(UMOImmutableEndpoint endpoint);
 
     List getEndpoints();
 
@@ -42,7 +42,7 @@ public interface UMOResponseRouterCollection extends UMORouterCollection
      * @return the Endpoint or null if the endpointUri is not registered
      * @see UMOResponseRouterCollection
      */
-    UMOEndpoint getEndpoint(String name);
+    UMOImmutableEndpoint getEndpoint(String name);
 
     void setEndpoints(List endpoints);
 

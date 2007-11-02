@@ -10,6 +10,8 @@
 
 package org.mule.samples.voipservice.interfaces;
 
+import org.mule.umo.UMOException;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -21,6 +23,6 @@ public interface PaymentValidation
     String CREDIT_AGENCY_LOOKUP_NAME = "CreditAgency";
     String BANK_AGENCY_LOOKUP_NAME = "BankAgency";
 
-    List getCreditVendors(String cardType) throws IOException;
+    List getCreditVendors(String cardType) throws IOException, UMOException;
 
 }

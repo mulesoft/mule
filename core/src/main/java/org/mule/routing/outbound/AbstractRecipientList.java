@@ -16,7 +16,6 @@ import org.mule.registry.RegistrationException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
@@ -141,7 +140,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
                 throw new RegistrationException("Failed to create endpoint for: " + recipient);
             }
 
-            UMOImmutableEndpoint existingEndpoint = (UMOEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
+            UMOImmutableEndpoint existingEndpoint = (UMOImmutableEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
             if (existingEndpoint != null)
             {
                 endpoint = existingEndpoint;
@@ -161,7 +160,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         if (null != getManagementContext() && null != getManagementContext().getRegistry())
         {
             endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(uri,
-                UMOEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
+                UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, getManagementContext());
         }
         if (null != endpoint)
         {
@@ -173,7 +172,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
     protected UMOImmutableEndpoint getRecipientEndpointFromString(UMOMessage message, String recipient)
             throws UMOException
     {
-        UMOImmutableEndpoint endpoint = (UMOEndpoint) recipientCache.get(recipient);
+        UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) recipientCache.get(recipient);
         if (null == endpoint && null != getManagementContext() && null != getManagementContext().getRegistry())
         {
             endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(recipient,

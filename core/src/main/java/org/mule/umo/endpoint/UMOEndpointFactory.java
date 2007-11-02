@@ -10,6 +10,7 @@
 
 package org.mule.umo.endpoint;
 
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -100,11 +101,33 @@ public interface UMOEndpointFactory
      * @param endpointType
      * @param managementContext
      * @return
-     * @throws EndpointException
      * @throws UMOException
+     * @deprecated
      */
     UMOImmutableEndpoint getEndpoint(UMOEndpointURI endpointUri,
                                         String endpointType,
-                                        UMOManagementContext managementContext) throws EndpointException, UMOException;
+                                        UMOManagementContext managementContext) throws UMOException;
+
+    /**
+     * Used to retrieve the an EndpointBuilder equal to the one would be used to create an endpoint.<br/><br/>
+     *  This is
+     * useful if you need to customize a builder before creation of an endpoint as you can use this method to
+     * obtain the endpoint builder, custommize it and then call the factory methods that take a
+     * EndpointBuilder rather than a String. <br/><br/><i>(Of course if you know the uri is a uri rather than a global
+     * endpoint identifier you could create your own EndpointURIEndpointBuilder locally, this method allows
+     * the uri to be substituted with a global endpoint name and returns it's builder if this is the case.
+     * allow the uri parameter to be either a uri or a global endpoint identifier you need this method.</i> <br/><br/>
+     * Each and every call to this method, even if it is for the same uri/global endpoint name will return a new EndpoointBuilder instance.
+     * 
+     * 
+     * 
+     * @param uri endpoint identifier or uri
+     * @param managementContext
+     * @return
+     * @throws UMOException
+     * @see UMOEndpointBuilder
+     * @see EndpointURIEndpointBuilder
+     */
+    UMOEndpointBuilder getEndpointBuilder(String uri, UMOManagementContext managementContext) throws UMOException;
 
 }

@@ -14,6 +14,7 @@ import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.http.servlet.MuleRESTReceiverServlet;
@@ -22,6 +23,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.lifecycle.LifecycleException;
@@ -77,12 +79,13 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                     path = "/";
                 }
 
+                UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("servlet://" + path.substring(1),
+                    connector.getManagementContext());
+                endpointBuilder.setTransformers(endpoint.getTransformers());
                 UMOImmutableEndpoint ep = connector.getManagementContext()
                     .getRegistry()
                     .lookupEndpointFactory()
-                    .getInboundEndpoint("servlet://" + path.substring(1), connector.getManagementContext());
-                // TODO DF: Endpoint mutability
-                ((UMOEndpoint) ep).setTransformers(endpoint.getTransformers());
+                    .getInboundEndpoint(endpointBuilder, connector.getManagementContext());
                 scon.registerListener(component, ep);
             }
             catch (Exception e)

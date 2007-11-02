@@ -22,10 +22,8 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -202,20 +200,20 @@ public abstract class AbstractRegistry implements Registry
 
     public UMOImmutableEndpoint lookupEndpoint(String name, UMOManagementContext managementContext)
     {
-        Object o = lookupObject(name);
-        if (o instanceof UMOEndpointBuilder)
+        Object obj = lookupObject(name);
+        if (obj instanceof UMOImmutableEndpoint)
         {
-            try
-            {
-                o = lookupEndpointFactory().getInboundEndpoint((UMOEndpointBuilder) o, managementContext);
-            }
-            catch (UMOException e)
-            {
-                logger.error(e);
-                return null;
-            }
+            return (UMOImmutableEndpoint) obj;
         }
-        return (UMOImmutableEndpoint) o;
+        else
+        {
+            logger.debug("No endpoint with the name: "
+                         + name
+                         + "found.  If "
+                         + name
+                         + " is a global endpoint you should use the EndpointFactory to create endpoint instances from global endpoints.");
+            return null;
+        }
     }
 
     public UMOImmutableEndpoint lookupEndpoint(String name)
@@ -225,7 +223,7 @@ public abstract class AbstractRegistry implements Registry
     
     public UMOEndpointBuilder lookupEndpointBuilder(String name)
     {
-        // TODO DF: This is spring spefic because if uses "&" to lookup FactoryBean and thus builder.
+        // TODO DF: This is spring specific because if uses "&" to lookup FactoryBean and thus builder.
         Object o = lookupObject(name);
         if (o instanceof UMOEndpointBuilder)
         {
@@ -252,33 +250,6 @@ public abstract class AbstractRegistry implements Registry
     public UMOEndpointFactory lookupEndpointFactory()
     {
         return (UMOEndpointFactory) lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
-    }
-
-    public UMOImmutableEndpoint lookupInboundEndpoint(String name, UMOManagementContext managementContext)
-            throws UMOException
-    {
-        return (UMOImmutableEndpoint) lookupObject(name);
-    }
-
-    public UMOImmutableEndpoint lookupOutboundEndpoint(String name, UMOManagementContext managementContext)
-            throws UMOException
-    {
-        return (UMOImmutableEndpoint) lookupObject(name);
-    }
-
-    public UMOImmutableEndpoint lookupResponseEndpoint(String name, UMOManagementContext managementContext)
-            throws UMOException
-    {
-        return (UMOImmutableEndpoint) lookupObject(name);
-    }
-
-    /** @deprecated  */
-    public UMOImmutableEndpoint createEndpoint(UMOEndpointURI endpointUri,
-                                               String endpointType,
-                                               UMOManagementContext managementContext)
-            throws EndpointException, UMOException
-    {
-        return lookupEndpointFactory().getEndpoint(endpointUri, endpointType, managementContext);
     }
 
     public UMOTransformer lookupTransformer(String name)

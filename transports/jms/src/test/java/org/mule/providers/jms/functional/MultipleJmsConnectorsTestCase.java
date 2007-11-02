@@ -22,9 +22,11 @@ public class MultipleJmsConnectorsTestCase extends FunctionalTestCase
     
     public void testMultipleJmsClientConnections() throws Exception
     {
-        UMOImmutableEndpoint ep1 = managementContext.getRegistry().lookupEndpoint("ep1");
+        UMOImmutableEndpoint ep1 = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ep1",
+            managementContext);
         ep1.dispatch(getTestEvent("testing"));
-        UMOImmutableEndpoint ep2 = managementContext.getRegistry().lookupEndpoint("ep2");
+        UMOImmutableEndpoint ep2 = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ep2",
+            managementContext);
         ep2.dispatch(getTestEvent("testing"));
 
         // wait a bit to let the messages go on their way

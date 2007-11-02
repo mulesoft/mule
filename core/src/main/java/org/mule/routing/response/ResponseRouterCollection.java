@@ -17,7 +17,6 @@ import org.mule.routing.AbstractRouterCollection;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.InvalidEndpointTypeException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.RoutingException;
@@ -52,7 +51,7 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
         super.initialise();
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
+            UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) iterator.next();
             endpoint.initialise();
         }
     }
@@ -133,11 +132,11 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
         }
     }
 
-    public void addEndpoint(UMOEndpoint endpoint)
+    public void addEndpoint(UMOImmutableEndpoint endpoint)
     {
         if (endpoint != null)
         {
-            if (!UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
+            if (!UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
             {
                 throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseResponseEndpoints(
                     this, endpoint));
@@ -150,7 +149,7 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
         }
     }
 
-    public boolean removeEndpoint(UMOEndpoint endpoint)
+    public boolean removeEndpoint(UMOImmutableEndpoint endpoint)
     {
         return endpoints.remove(endpoint);
     }
@@ -171,7 +170,7 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
             for (Iterator it = this.endpoints.iterator(); it.hasNext();)
             {
                 UMOImmutableEndpoint endpoint=(UMOImmutableEndpoint) it.next();
-                if (!UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
+                if (!UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
                 {
                     throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseResponseEndpoints(
                         this, endpoint));
@@ -190,12 +189,12 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
      * @return the Endpoint or null if the endpointUri is not registered
      * @see org.mule.umo.routing.UMOInboundRouterCollection
      */
-    public UMOEndpoint getEndpoint(String name)
+    public UMOImmutableEndpoint getEndpoint(String name)
     {
-        UMOEndpoint endpointDescriptor;
+        UMOImmutableEndpoint endpointDescriptor;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            endpointDescriptor = (UMOEndpoint) iterator.next();
+            endpointDescriptor = (UMOImmutableEndpoint) iterator.next();
             if (endpointDescriptor.getName().equals(name))
             {
                 return endpointDescriptor;

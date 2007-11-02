@@ -18,7 +18,8 @@ import org.mule.impl.model.AbstractComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
 
@@ -61,17 +62,6 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // get the endpoint for this url
         UMOImmutableEndpoint endpoint = getEndpoint(event, replyToEndpoint);
 
-        if (transformers == null)
-        {
-            transformers = event.getEndpoint().getResponseTransformers();
-        }
-
-        if (transformers != null)
-        {
-            //TODO DF: Endpoint mutabily issue pending
-            ((UMOEndpoint) endpoint).setTransformers(transformers);
-        }
-
         // make sure remove the replyTo property as not cause a a forever
         // replyto loop
         returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
@@ -103,8 +93,19 @@ public class DefaultReplyToHandler implements ReplyToHandler
         UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) endpointCache.get(endpointUri);
         if (endpoint == null)
         {
-            endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointUri,
+            UMOEndpointFactory endpointFactory = RegistryContext.getRegistry().lookupEndpointFactory();
+            UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpointUri,
                 event.getManagementContext());
+            if (transformers == null)
+            {
+                transformers = event.getEndpoint().getResponseTransformers();
+            }
+
+            if (transformers != null)
+            {
+                endpointBuilder.setTransformers(transformers);
+            }
+            endpoint = endpointFactory.getOutboundEndpoint(endpointBuilder, event.getManagementContext());
             endpointCache.put(endpointUri, endpoint);
         }
         return endpoint;

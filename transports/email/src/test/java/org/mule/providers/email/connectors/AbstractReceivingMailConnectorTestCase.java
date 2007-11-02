@@ -71,7 +71,6 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         UMOImmutableEndpoint ep = 
             managementContext.getRegistry().lookupEndpointFactory()
                 .getInboundEndpoint(getTestEndpointURI(), managementContext);
-        ep.initialise();
         UMOInboundRouterCollection inboundRouter = new InboundRouterCollection();
         inboundRouter.addEndpoint(ep);
         component.setInboundRouter(inboundRouter);

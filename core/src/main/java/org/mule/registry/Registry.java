@@ -87,51 +87,6 @@ public interface Registry extends Initialisable, Disposable
     UMOEndpointBuilder lookupEndpointBuilder(String name);
     
     UMOEndpointFactory lookupEndpointFactory();
-    
-    /**
-     * Returns immutable endpoint instance with the "INBOUND" role. <br/><br/> The uri paramater can be one
-     * of the following:
-     * <li> A global endpoint name
-     * <li> The name of a concrete endpoint configured with a name via the name attribute.
-     * <li> A uri string as documented here :<a
-     * href="http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs">http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs</a>
-     * <br/><br/> The {@link UMOImmutableEndpoint} interface is currently used as the return type but this
-     * will be replaces by and more specific interface. SEE MULE-2292
-     * 
-     */
-    //TODO MULE-2494
-    //UMOImmutableEndpoint lookupInboundEndpoint(String uri, UMOManagementContext managementContext)
-    //    throws UMOException;
-
-    /**
-     * Returns immutable endpoint instance with the "OUTBOUND" role. <br/><br/> The uri paramater can be one
-     * of the following:
-     * <li> A global endpoint name
-     * <li> The name of a concrete endpoint configured with a name via the name attribute.
-     * <li> A uri string as documented here :<a
-     * href="http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs">http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs</a>
-     * <br/><br/> The {@link UMOImmutableEndpoint} interface is currently used as the return type but this
-     * will be replaces by and more specific interface. SEE MULE-2292
-     * 
-     */
-    //TODO MULE-2494
-    //UMOImmutableEndpoint lookupOutboundEndpoint(String uri, UMOManagementContext managementContext)
-    //    throws UMOException;
-
-    /**
-     * Returns immutable endpoint instance with the "RESPONSE" role. <br/><br/> The uri paramater can be one
-     * of the following:
-     * <li> A global endpoint name
-     * <li> The name of a concrete endpoint configured with a name via the name attribute.
-     * <li> A uri string as documented here :<a
-     * href="http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs">http://mule.codehaus.org/display/MULE/Mule+Endpoint+URIs</a>
-     * <br/><br/> The {@link UMOImmutableEndpoint} interface is currently used as the return type but this
-     * will be replaces by and more specific interface. SEE MULE-2292
-     * 
-     */
-    //TODO MULE-2494
-    //UMOImmutableEndpoint lookupResponseEndpoint(String uri, UMOManagementContext managementContext)
-    //    throws UMOException;
 
     UMOTransformer lookupTransformer(String name);
 

@@ -11,12 +11,15 @@
 package org.mule.impl.endpoint;
 
 import org.mule.RegistryContext;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.util.BeanUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -146,4 +149,30 @@ public class EndpointFactory implements UMOEndpointFactory
         // TODO 1) Store in repo, 2) Register in registry, 3) Lifecycle ?
         return builder.buildResponseEndpoint();
     }
+
+    public UMOEndpointBuilder getEndpointBuilder(String uri, UMOManagementContext managementContext)
+        throws UMOException
+    {
+        logger.debug("EndpointFactory request for endpoint builder for uri: " + uri);
+        UMOEndpointBuilder endpointBuilder = lookupEndpointBuilder(uri);
+        if (endpointBuilder != null)
+        {
+            try
+            {
+                endpointBuilder = (UMOEndpointBuilder) endpointBuilder.clone();
+                endpointBuilder.setManagementContext(managementContext);
+            }
+            catch (Exception e)
+            {
+                throw new EndpointException(CoreMessages.failedToClone("global endpoint EndpointBuilder"), e);
+            }
+        }
+        else
+        {
+            logger.debug("Named EndpointBuilder not found, creating endpoint builder for uri");
+            endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+        }
+        return endpointBuilder;
+    }
+    
 }

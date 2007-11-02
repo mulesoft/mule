@@ -10,9 +10,7 @@
 
 package org.mule.impl;
 
-import org.mule.RegistryContext;
 import org.mule.config.MuleManifest;
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.service.TransportFactory;
 import org.mule.transformers.TransformerUtils;
@@ -21,7 +19,6 @@ import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransactionConfig;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -31,10 +28,6 @@ import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,6 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -123,7 +119,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     /**
      * whether events received by this endpoint should execute in a single thread
      */
-    protected Boolean synchronous = null;
+    protected boolean synchronous;
 
     /**
      * Determines whether a synchronous call should block to obtain a response from a remote server (if the
@@ -132,7 +128,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      * the replyTo destination. If the JMSReplyTo is already set on the message that destination will be used
      * instead.
      */
-    protected Boolean remoteSync = null;
+    protected boolean remoteSync;
 
     /**
      * How long to block when performing a remote synchronisation to a remote host. This property is optional
@@ -193,7 +189,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     public List getTransformers()
     {
-        lazyInitTransformers();
         return (List) transformers.get();
     }
 
@@ -332,39 +327,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return deleteUnacceptedMessages;
     }
 
-    // TODO 
-    protected void lazyInitTransformers()
-    {
-        // for efficiency
-        if (TransformerUtils.isUndefined((List) transformers.get()))
-        {
-            List newTransformers;
-            if (connector instanceof AbstractConnector)
-            {
-                if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
-                {
-                    newTransformers = ((AbstractConnector) connector).getDefaultOutboundTransformers();
-                }
-                else
-                {
-                    newTransformers = ((AbstractConnector) connector).getDefaultInboundTransformers();
-                }
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Creating new transformer " + newTransformers + " for endpoint " + this + " of type "
-                                 + type);
-                }
-            }
-            else
-            {
-                newTransformers = TransformerUtils.UNDEFINED;
-                // Why would a connector not inherit AbstractConnector?
-                logger.warn("Connector " + connector.getName() + " does not inherit AbstractConnector");
-            }
-            setTransformersIfUndefined(transformers, newTransformers);
-        }
-    }
-
     protected void setTransformersIfUndefined(AtomicReference reference, List transformers)
     {
         TransformerUtils.discourageNullTransformers(transformers);
@@ -409,16 +371,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     public boolean isSynchronous()
     {
-        if (synchronous == null)
-        {
-            return RegistryContext.getConfiguration().isDefaultSynchronousEndpoints();
-        }
-        return synchronous.booleanValue();
-    }
-
-    public boolean isSynchronousSet()
-    {
-        return (synchronous != null);
+        return synchronous;
     }
 
     public int getCreateConnector()
@@ -435,19 +388,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     public boolean isRemoteSync()
     {
-        if (remoteSync == null)
-        {
-            // what is this for?!
-            if (connector == null || connector.isRemoteSyncEnabled())
-            {
-                remoteSync = Boolean.FALSE;
-            }
-            else
-            {
-                remoteSync = Boolean.FALSE;
-            }
-        }
-        return remoteSync.booleanValue();
+        return remoteSync;
     }
 
     /**

@@ -18,7 +18,7 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
@@ -111,7 +111,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
      * @return an array of UMOEndpoint objects or an empty array
      * @throws RoutingException
      */
-    public UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws MessagingException
+    public UMOImmutableEndpoint[] getEndpointsForMessage(UMOMessage message) throws MessagingException
     {
         List endpoints = new ArrayList();
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
@@ -127,8 +127,8 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
             }
         }
 
-        UMOEndpoint[] result = new UMOEndpoint[endpoints.size()];
-        return (UMOEndpoint[]) endpoints.toArray(result);
+        UMOImmutableEndpoint[] result = new UMOImmutableEndpoint[endpoints.size()];
+        return (UMOImmutableEndpoint[]) endpoints.toArray(result);
     }
 
     protected UMOMessage catchAll(UMOMessage message, UMOSession session, boolean synchronous)

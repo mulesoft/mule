@@ -125,6 +125,18 @@ public interface UMOConnector extends Lifecycle, ManagementContextAware, NamedOb
     UMOMessageDispatcherFactory getDispatcherFactory();
 
     boolean isRemoteSyncEnabled();
+    
+    /**
+     * Used to define is this connectors endpoints' should be synchronous by default rather than using mule's
+     * instance wide default. The endpoint is passed through to this method so that transports like axis/xfire
+     * can determine if synchronous should be default depending on the endpoint transport e.g. http/vm/jms
+     * etc.
+     * 
+     * @param endpoint
+     * @return
+     * @see UMOImmutableEndpoint#isSynchronous()
+     */
+    boolean isSyncEnabled(UMOImmutableEndpoint endpoint);
 
     /**
      * Dispatches an event from the endpoint to the external system

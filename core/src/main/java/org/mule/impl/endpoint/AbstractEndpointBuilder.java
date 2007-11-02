@@ -55,6 +55,7 @@ import java.util.Properties;
  */
 public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 {
+ 
     public static final int GET_OR_CREATE_CONNECTOR = 0;
     public static final int ALWAYS_CREATE_CONNECTOR = 1;
 
@@ -128,13 +129,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         }
         else
         {
-            // Don't use default values for sync when configuring endpoint as with other attributes as
-            // itcauses issue with XFireConnector. For now null=unset, and
-            // default value is resolved in isSynchronous() method.
-            if (synchronous != null)
-            {
-                ep.setSynchronous(synchronous.booleanValue());
-            }
+            ep.setSynchronous(getSynchronous(connector, ep));
         }
         ep.setManagementContext(managementContext);
     }
@@ -164,16 +159,23 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         return ep;
     }
 
-    protected boolean getStreaming(UMOConnector connector)
+    protected boolean getSynchronous(UMOConnector connector, UMOImmutableEndpoint endpoint)
     {
-        return streaming != null ? streaming.booleanValue() : getDefaultStreaming(connector);
-    }
+        return synchronous != null ? synchronous.booleanValue() : getDefaultSynchronous(connector, endpoint);
+    } 
 
-    protected boolean getDefaultStreaming(UMOConnector connector)
+    protected boolean getDefaultSynchronous(UMOConnector connector, UMOImmutableEndpoint endpoint)
     {
-        return false;
+        if (connector != null && connector.isSyncEnabled(endpoint))
+        {
+            return true;
+        }
+        else
+        {
+            return RegistryContext.getConfiguration().isDefaultSynchronousEndpoints();
+        }
     }
-
+    
     protected ConnectionStrategy getConnectionStrategy(UMOConnector connector)
     {
         return connectionStrategy != null ? connectionStrategy : getDefaultConnectionStrategy(connector);
@@ -262,7 +264,15 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected boolean getDefaultRemoteSync(UMOConnector connector)
     {
-        return false;
+        // what is this for?!
+        if (connector == null || connector.isRemoteSyncEnabled())
+        {
+            return false;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     protected boolean getDeleteUnacceptedMessages(UMOConnector connector)
@@ -566,7 +576,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
      * @param key the property key
      * @param value the value of the property
      */
-    public void setProperty(String key, Object value)
+    public void setProperty(Object key, Object value)
     {
         properties.put(key, value);
     }
@@ -665,5 +675,176 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         this.endpointURI = endpointURI;
 
     }
+    
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((connectionStrategy == null) ? 0 : connectionStrategy.hashCode());
+        result = prime * result + ((connector == null) ? 0 : connector.hashCode());
+        result = prime * result + ((createConnector == null) ? 0 : createConnector.hashCode());
+        result = prime * result + ((deleteUnacceptedMessages == null) ? 0 : deleteUnacceptedMessages.hashCode());
+        result = prime * result + ((endpointEncoding == null) ? 0 : endpointEncoding.hashCode());
+        result = prime * result + ((endpointURI == null) ? 0 : endpointURI.hashCode());
+        result = prime * result + ((filter == null) ? 0 : filter.hashCode());
+        result = prime * result + ((initialState == null) ? 0 : initialState.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((properties == null) ? 0 : properties.hashCode());
+        result = prime * result + ((remoteSync == null) ? 0 : remoteSync.hashCode());
+        result = prime * result + ((remoteSyncTimeout == null) ? 0 : remoteSyncTimeout.hashCode());
+        result = prime * result + ((responseTransformers == null) ? 0 : responseTransformers.hashCode());
+        result = prime * result + ((securityFilter == null) ? 0 : securityFilter.hashCode());
+        result = prime * result + ((streaming == null) ? 0 : streaming.hashCode());
+        result = prime * result + ((synchronous == null) ? 0 : synchronous.hashCode());
+        result = prime * result + ((transactionConfig == null) ? 0 : transactionConfig.hashCode());
+        result = prime * result + ((transformers == null) ? 0 : transformers.hashCode());
+        return result;
+    }
 
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        final AbstractEndpointBuilder other = (AbstractEndpointBuilder) obj;
+        if (connectionStrategy == null)
+        {
+            if (other.connectionStrategy != null) return false;
+        }
+        else if (!connectionStrategy.equals(other.connectionStrategy)) return false;
+        if (connector == null)
+        {
+            if (other.connector != null) return false;
+        }
+        else if (!connector.equals(other.connector)) return false;
+        if (createConnector == null)
+        {
+            if (other.createConnector != null) return false;
+        }
+        else if (!createConnector.equals(other.createConnector)) return false;
+        if (deleteUnacceptedMessages == null)
+        {
+            if (other.deleteUnacceptedMessages != null) return false;
+        }
+        else if (!deleteUnacceptedMessages.equals(other.deleteUnacceptedMessages)) return false;
+        if (endpointEncoding == null)
+        {
+            if (other.endpointEncoding != null) return false;
+        }
+        else if (!endpointEncoding.equals(other.endpointEncoding)) return false;
+        if (endpointURI == null)
+        {
+            if (other.endpointURI != null) return false;
+        }
+        else if (!endpointURI.equals(other.endpointURI)) return false;
+        if (filter == null)
+        {
+            if (other.filter != null) return false;
+        }
+        else if (!filter.equals(other.filter)) return false;
+        if (initialState == null)
+        {
+            if (other.initialState != null) return false;
+        }
+        else if (!initialState.equals(other.initialState)) return false;
+        if (name == null)
+        {
+            if (other.name != null) return false;
+        }
+        else if (!name.equals(other.name)) return false;
+        if (properties == null)
+        {
+            if (other.properties != null) return false;
+        }
+        else if (!properties.equals(other.properties)) return false;
+        if (remoteSync == null)
+        {
+            if (other.remoteSync != null) return false;
+        }
+        else if (!remoteSync.equals(other.remoteSync)) return false;
+        if (remoteSyncTimeout == null)
+        {
+            if (other.remoteSyncTimeout != null) return false;
+        }
+        else if (!remoteSyncTimeout.equals(other.remoteSyncTimeout)) return false;
+        if (responseTransformers == null)
+        {
+            if (other.responseTransformers != null) return false;
+        }
+        else if (!responseTransformers.equals(other.responseTransformers)) return false;
+        if (securityFilter == null)
+        {
+            if (other.securityFilter != null) return false;
+        }
+        else if (!securityFilter.equals(other.securityFilter)) return false;
+        if (streaming == null)
+        {
+            if (other.streaming != null) return false;
+        }
+        else if (!streaming.equals(other.streaming)) return false;
+        if (synchronous == null)
+        {
+            if (other.synchronous != null) return false;
+        }
+        else if (!synchronous.equals(other.synchronous)) return false;
+        if (transactionConfig == null)
+        {
+            if (other.transactionConfig != null) return false;
+        }
+        else if (!transactionConfig.equals(other.transactionConfig)) return false;
+        if (transformers == null)
+        {
+            if (other.transformers != null) return false;
+        }
+        else if (!transformers.equals(other.transformers)) return false;
+        return true;
+    }
+
+    public Object clone() throws CloneNotSupportedException
+    {
+        UMOEndpointBuilder builder = (UMOEndpointBuilder) super.clone();
+        builder.setConnector(connector);
+        builder.setEndpointURI(endpointURI);
+        builder.setTransformers(transformers);
+        builder.setResponseTransformers(responseTransformers);
+        builder.setName(name);
+        builder.setProperties(properties);
+        builder.setTransactionConfig(transactionConfig);
+        builder.setFilter(filter);
+        builder.setSecurityFilter(securityFilter);
+        builder.setInitialState(initialState);
+        builder.setEndpointEncoding(endpointEncoding);
+        builder.setRegistryId(registryId);
+        builder.setManagementContext(managementContext);
+        builder.setConnectionStrategy(connectionStrategy);
+
+        if (deleteUnacceptedMessages != null)
+        {
+            builder.setDeleteUnacceptedMessages(deleteUnacceptedMessages.booleanValue());
+        }
+        if (createConnector != null)
+        {
+            builder.setCreateConnector(createConnector.intValue());
+        }
+        if (synchronous != null)
+        {
+            builder.setSynchronous(synchronous.booleanValue());
+        }
+        if (remoteSync != null)
+        {
+            builder.setRemoteSync(remoteSync.booleanValue());
+        }
+        if (remoteSyncTimeout != null)
+        {
+            builder.setRemoteSyncTimeout(remoteSyncTimeout.intValue());
+        }
+        if (streaming != null)
+        {
+            builder.setStreaming(streaming.booleanValue());
+
+        }
+
+        return builder;
+    }
+    
 }

@@ -11,13 +11,13 @@
 package org.mule.routing.outbound;
 
 import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.endpoint.DynamicEndpointURIEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
@@ -102,7 +102,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         {
             throw new RoutingException(
                     CoreMessages.transformFailedBeforeFilter(),
-                    message, (UMOEndpoint) endpoints.get(0), e);
+                    message, (UMOImmutableEndpoint) endpoints.get(0), e);
         }
         return getFilter().accept(message);
     }
@@ -175,8 +175,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
                         CoreMessages.schemeCannotChangeForRouter(ep.getEndpointURI().getScheme(),
                         newUri.getScheme()), message, ep);
                 }
-                //TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-                ((UMOEndpoint) ep).setEndpointURI(newUri);
+                ep = new DynamicEndpointURIEndpoint(ep, newUri);
             }
             catch (EndpointException e)
             {

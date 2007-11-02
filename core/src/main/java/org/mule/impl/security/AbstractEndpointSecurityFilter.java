@@ -124,10 +124,9 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         }
         else
         {
-            throw new InitialisationException(
-                    CoreMessages.authEndpointTypeForFilterMustBe(
-                            UMOEndpoint.ENDPOINT_TYPE_SENDER + " or " + UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
-                            endpoint.getType()), this);
+            throw new InitialisationException(CoreMessages.authEndpointTypeForFilterMustBe(
+                UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER + " or " + UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER,
+                endpoint.getType()), this);
         }
         doInitialise();
     }

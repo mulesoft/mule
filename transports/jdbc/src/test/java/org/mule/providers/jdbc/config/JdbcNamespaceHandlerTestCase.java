@@ -79,7 +79,9 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
     public void testEndpointQueryOverride() throws Exception
     {
         JdbcConnector c = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector3");
-        UMOImmutableEndpoint testJdbcEndpoint =  managementContext.getRegistry().lookupEndpoint("testJdbcEndpoint");
+        UMOImmutableEndpoint testJdbcEndpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint("testJdbcEndpoint", managementContext);
         
         //On connector, not overridden
         assertNotNull(c.getQuery(testJdbcEndpoint, "getTest"));

@@ -12,7 +12,7 @@ package org.mule.umo.routing;
 
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>RoutePathNotFoundException</code> is thrown if a routing path for an event
@@ -26,24 +26,24 @@ public class RoutePathNotFoundException extends RoutingException
      */
     private static final long serialVersionUID = -8481434966594513065L;
 
-    public RoutePathNotFoundException(UMOMessage message, UMOEndpoint endpoint)
+    public RoutePathNotFoundException(UMOMessage message, UMOImmutableEndpoint endpoint)
     {
         super(message, endpoint);
     }
 
-    public RoutePathNotFoundException(UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    public RoutePathNotFoundException(UMOMessage umoMessage, UMOImmutableEndpoint endpoint, Throwable cause)
     {
         super(umoMessage, endpoint, cause);
     }
 
-    public RoutePathNotFoundException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
+    public RoutePathNotFoundException(Message message, UMOMessage umoMessage, UMOImmutableEndpoint endpoint)
     {
         super(message, umoMessage, endpoint);
     }
 
     public RoutePathNotFoundException(Message message,
                                       UMOMessage umoMessage,
-                                      UMOEndpoint endpoint,
+                                      UMOImmutableEndpoint endpoint,
                                       Throwable cause)
     {
         super(message, umoMessage, endpoint, cause);

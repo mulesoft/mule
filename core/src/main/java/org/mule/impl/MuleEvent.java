@@ -15,14 +15,12 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.security.MuleCredentials;
-import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.PropertyScope;
 import org.mule.umo.security.UMOCredentials;
@@ -649,8 +647,10 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
     private void writeObject(ObjectOutputStream out) throws IOException
     {
         out.defaultWriteObject();
+        //TODO DF: Serializale endpoints registry id (name?) rather than uri.
         out.writeObject(endpoint.getEndpointURI().toString());
-        marshallTransformers(endpoint.getTransformers(), out);
+        //TODO DF: No need to marshall tranformers
+        //marshallTransformers(endpoint.getTransformers(), out);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -658,17 +658,20 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         logger = LogFactory.getLog(getClass());
         in.defaultReadObject();
         String uri = (String) in.readObject();
-        List transformers = unmarshallTransformers(in);
+        //TODO DF: No need to unmarshall tranformers
+        //List transformers = unmarshallTransformers(in);
         try
         {
+            //TODO DF: Lookup existing endpoint from registry of correct type.
             endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri,
                 getManagementContext());
 
-            if (TransformerUtils.isUndefined(endpoint.getTransformers()))
-            {
-                //TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-                ((UMOEndpoint) endpoint).setTransformers(transformers);
-            }
+            //TODO DF: No need to unmarshall tranformers
+            //if (TransformerUtils.isUndefined(endpoint.getTransformers()))
+            //{
+            //    //TODO DF: MULE-2291 Resolve pending endpoint mutability issues
+            //    ((UMOEndpoint) endpoint).setTransformers(transformers);
+            //}
         }
         catch (UMOException e)
         {

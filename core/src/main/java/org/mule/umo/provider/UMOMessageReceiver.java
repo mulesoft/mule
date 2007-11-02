@@ -14,7 +14,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Lifecycle;
@@ -51,7 +50,7 @@ public interface UMOMessageReceiver extends Lifecycle, UMOConnectable
 
     /**
      * @param endpoint the endpoint to listen on
-     * @see UMOEndpoint
+     * @see UMOImmutableEndpoint
      */
     void setEndpoint(UMOImmutableEndpoint endpoint);
 

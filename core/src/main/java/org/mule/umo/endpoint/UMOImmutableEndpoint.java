@@ -210,12 +210,6 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
     boolean isSynchronous();
 
     /**
-     * Determines if the synchronous porperty has been set on the endpoint
-     *
-     */
-    boolean isSynchronousSet();
-
-    /**
      * For certain providers that support the notion of a backchannel such as sockets
      * (outputStream) or Jms (ReplyTo) Mule can automatically wait for a response
      * from a backchannel when dispatching over these protocols. This is different

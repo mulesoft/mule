@@ -77,7 +77,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     }
 
     // @Override
-    public void testGlobalEndpointConfig()
+    public void testGlobalEndpointConfig() throws UMOException
     {
         super.testGlobalEndpointConfig();
         UMOImmutableEndpoint endpoint = null;
@@ -102,7 +102,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     }
 
     // @Override
-    public void testEndpointConfig()
+    public void testEndpointConfig() throws UMOException
     {
         super.testEndpointConfig();
 

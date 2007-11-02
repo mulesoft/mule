@@ -72,9 +72,10 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
     }
 
-    public void testGlobalEndpointConfig()
+    public void testGlobalEndpointConfig() throws UMOException
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("fruitBowlEndpoint");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            "fruitBowlEndpoint", managementContext);
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
         assertNotNull(endpoint.getFilter());
@@ -91,10 +92,11 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         //assertEquals(3000, ((SimpleRetryConnectionStrategy) ep.getConnectionStrategy()).getRetryFrequency());
     }
 
-    public void testEndpointConfig()
+    public void testEndpointConfig() throws UMOException
     {
         // test that endpoints have been resolved on endpoints
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("waterMelonEndpoint");
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            "waterMelonEndpoint", managementContext);
         assertNotNull(endpoint);
         // aliases no longer possible
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());

@@ -13,7 +13,7 @@ package org.mule.umo.routing;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>UMOOutboundRouterCollection</code> is responsible for holding all outbound routers for a service component.
@@ -39,7 +39,7 @@ public interface UMOOutboundRouterCollection extends UMORouterCollection
      * @return an array of UMOEndpoint objects or an empty array
      * @throws RoutingException if there is a filter exception
      */
-    UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws MessagingException;
+    UMOImmutableEndpoint[] getEndpointsForMessage(UMOMessage message) throws MessagingException;
 
     /**
      * Determines if any endpoints have been set on this router.

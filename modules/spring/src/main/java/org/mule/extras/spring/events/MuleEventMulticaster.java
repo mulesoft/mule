@@ -21,22 +21,20 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
-import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
+import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
@@ -46,15 +44,15 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.SimpleObjectFactory;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -637,10 +635,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             {
                 endpoint = (String) iterator.next();
                 
-                UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
-                UMOImmutableEndpoint ep = managementContext.getRegistry()
-                    .lookupEndpointFactory()
-                    .getInboundEndpoint(builder, managementContext);
+                UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+                    endpoint, managementContext);
 
                 // check whether the endpoint has already been set on the MuleEventMulticastor
                 if (component.getInboundRouter().getEndpoint(ep.getName()) == null)
@@ -814,15 +810,12 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             for (int i = 0; i < subscriptions.length; i++)
             {
                 String subscription = subscriptions[i];
-                UMOImmutableEndpoint endpoint = managementContext.getRegistry()
-                    .lookupEndpointFactory()
-                    .getInboundEndpoint(subscription,
-                    managementContext);
-                if (!asynchronous)
-                {
-                    // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-                    ((UMOEndpoint) endpoint).setSynchronous(true);
-                }
+                
+                UMOEndpointFactory endpointFactory = managementContext.getRegistry().lookupEndpointFactory();
+                UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(subscription, managementContext);
+                endpointBuilder.setSynchronous(!asynchronous);
+                UMOImmutableEndpoint endpoint = endpointFactory.getInboundEndpoint(endpointBuilder, managementContext);
+
                 messageRouter.addEndpoint(endpoint);
             }
         }

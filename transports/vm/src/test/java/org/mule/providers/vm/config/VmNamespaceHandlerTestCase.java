@@ -73,7 +73,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testGlobalEndpoint() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("vmEndpoint", managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vmEndpoint", managementContext);
         assertNotNull(endpoint);
         UMOEndpointURI uri = endpoint.getEndpointURI();
         assertNotNull(uri);

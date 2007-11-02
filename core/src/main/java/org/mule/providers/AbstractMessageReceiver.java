@@ -23,14 +23,12 @@ import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
@@ -43,10 +41,9 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import java.io.OutputStream;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -111,7 +108,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
      *                  the receiver implementation i.e. an email address, a directory, a
      *                  jms destination or port address.
      * @see UMOComponent
-     * @see UMOEndpoint
+     * @see UMOImmutableEndpoint
      */
     public AbstractMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
@@ -581,7 +578,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             if (authorised)
             {
                 // This is a replyTo event for a current request
-                if (UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
+                if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
                 {
                     component.getResponseRouter().route(muleEvent);
                     return null;

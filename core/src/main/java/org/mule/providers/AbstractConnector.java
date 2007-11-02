@@ -56,15 +56,6 @@ import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
-import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import java.beans.ExceptionListener;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,6 +70,14 @@ import java.util.Properties;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1086,6 +1085,11 @@ public abstract class AbstractConnector
     }
 
     public boolean isRemoteSyncEnabled()
+    {
+        return false;
+    }
+    
+    public boolean isSyncEnabled(UMOImmutableEndpoint endpoint)
     {
         return false;
     }

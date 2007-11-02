@@ -13,7 +13,6 @@ package org.mule.providers.soap.axis;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.model.seda.SedaComponent;
@@ -25,6 +24,7 @@ import org.mule.providers.soap.axis.extensions.MuleTransport;
 import org.mule.providers.soap.axis.extensions.WSDDFileProvider;
 import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
 import org.mule.providers.soap.axis.i18n.AxisMessages;
+import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -92,6 +92,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     public static final String AXIS = "axis";
 
     private String serverConfig = DEFAULT_MULE_AXIS_SERVER_CONFIG;
+
     private AxisServer axis = null;
     private SimpleProvider serverProvider = null;
     private String clientConfig = DEFAULT_MULE_AXIS_CLIENT_CONFIG;
@@ -309,24 +310,6 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         }
     }
 
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
-    {
-        // this is always initialised as synchronous as ws invocations should
-        // always execute in a single thread unless the endpoint has explicitly
-        // been set to run asynchronously
-        if (!endpoint.isSynchronousSet() && !endpoint.isSynchronous())
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("overriding endpoint synchronicity and setting it to true. Web service requests are executed in a single thread");
-            }
-            // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-            ((MuleEndpoint) endpoint).setSynchronous(true);
-        }
-
-        return super.createReceiver(component, endpoint);
-    }
-
     protected void unregisterReceiverWithMuleService(UMOMessageReceiver receiver, UMOEndpointURI ep)
             throws UMOException
     {
@@ -399,57 +382,41 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             logger.debug("Modified endpoint with " + scheme + " scheme to " + endpoint);
         }
 
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        UMOEndpoint receiverEndpoint = (UMOEndpoint) receiver.getEndpoint();
-
-        // Default to using synchronous for socket based protocols unless the
-        // synchronous property has been set explicitly
-        boolean sync = false;
-        if (!receiverEndpoint.isSynchronousSet())
-        {
-            if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl")
-                    || scheme.equals("tcp"))
-            {
-                sync = true;
-            }
-        }
-        else
-        {
-            sync = receiverEndpoint.isSynchronous();
-        }
-
-        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
-        builder.setSynchronous(sync);
-        builder.setName(ep.getScheme() + ":" + serviceName);
-
+        boolean sync = receiver.getEndpoint().isSynchronous();
+        
+        UMOEndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint, managementContext);
+        serviceEndpointbuilder.setSynchronous(sync);
+        serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName);
         // Set the transformers on the endpoint too
-        builder.setTransformers(receiver.getEndpoint().getTransformers());
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((MuleEndpoint) receiver.getEndpoint()).setTransformers(new LinkedList());
-
-        builder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers());
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((MuleEndpoint) receiver.getEndpoint()).setResponseTransformers(new LinkedList());
-
+        serviceEndpointbuilder.setTransformers(receiver.getEndpoint().getTransformers());
+        serviceEndpointbuilder.setResponseTransformers(receiver.getEndpoint().getResponseTransformers());
         // set the filter on the axis endpoint on the real receiver endpoint
-        builder.setFilter(receiver.getEndpoint().getFilter());
-        // Remove the Axis filter now
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((MuleEndpoint) receiver.getEndpoint()).setFilter(null);
-
+        serviceEndpointbuilder.setFilter(receiver.getEndpoint().getFilter());
         // set the Security filter on the axis endpoint on the real receiver
         // endpoint
-        builder.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
-        // Remove the Axis Receiver Security filter now
-        // TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-        ((MuleEndpoint) receiver.getEndpoint()).setSecurityFilter(null);
+        serviceEndpointbuilder.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
 
-        // propagate properties to the service endpoint
-        builder.setProperties(receiverEndpoint.getProperties());
+        // TODO Do we really need to modify the existing receiver endpoint? What happnes if we don't security,
+        // filters and transformers will get invoked twice?
+        UMOEndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint(),
+            managementContext);
+        receiverEndpointBuilder.setTransformers(TransformerUtils.UNDEFINED);
+        receiverEndpointBuilder.setResponseTransformers(TransformerUtils.UNDEFINED);
+        // Remove the Axis filter now
+        receiverEndpointBuilder.setFilter(null);
+        // Remove the Axis Receiver Security filter now
+        receiverEndpointBuilder.setSecurityFilter(null);
 
         UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint(builder, managementContext);
+            .getInboundEndpoint(serviceEndpointbuilder, managementContext);
+
+        UMOImmutableEndpoint receiverEndpoint = managementContext.getRegistry()
+            .lookupEndpointFactory()
+            .getInboundEndpoint(receiverEndpointBuilder, managementContext);
+
+        receiver.setEndpoint(receiverEndpoint);
+
         
         axisComponent.getInboundRouter().addEndpoint(serviceEndpoint);
     }
@@ -705,4 +672,19 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             }
         }
     }
+    
+    public boolean isSyncEnabled(UMOImmutableEndpoint endpoint)
+    {
+        String scheme = endpoint.getEndpointURI().getScheme().toLowerCase();
+        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")
+            || scheme.equals("servlet"))
+        {
+            return true;
+        }
+        else
+        {
+            return super.isSyncEnabled(endpoint);
+        }
+    }
+
 }

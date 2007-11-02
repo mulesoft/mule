@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
@@ -70,6 +71,19 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
         {
             return super.generateChildBeanName(element);
         }
+    }
+    
+    //@Override
+    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
+    {
+        // Not sure if this is required. Adding for now for backwards compatability
+        if (element.getParentNode().getNodeName().equals("chaining-router")
+            || element.getParentNode().getNodeName().equals("exception-based-router"))
+        {
+            builder.addPropertyValue("remoteSync", Boolean.TRUE);
+        }
+
+        super.parseChild(element, parserContext, builder);
     }
 
 }
