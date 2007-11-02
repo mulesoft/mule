@@ -44,10 +44,6 @@
             <type>pom</type>
             <exclusions>
                 <exclusion>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-boot</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>jotm</groupId>
                     <artifactId>jotm</artifactId>
                 </exclusion>
