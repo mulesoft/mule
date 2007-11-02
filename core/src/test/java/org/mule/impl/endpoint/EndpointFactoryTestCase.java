@@ -288,7 +288,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         }
     }
     
-    public void testCreateEndpointDontnowName() throws UMOException
+    public void testCreateEndpointByCustomizingEndpointBuilder() throws UMOException
     {
         Registry r = managementContext.getRegistry();
         
