@@ -11,6 +11,8 @@ org.mule.providers.jms.issues.ActiveMQJmsTransactionMule2071TestCase
 org.mule.providers.jms.transactions.ActiveMQJmsXaTransactionFunctionalTestCase
 org.mule.providers.jms.transactions.ActiveMQJmsSingleResourceTransactionFunctionalTestCase
 org.mule.providers.jms.transactions.ActiveMQJmsTransactionFunctionalTestCase
+org.mule.providers.jms.transactions.JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase
+org.mule.providers.jms.transactions.JmsClientAcknowledgeTransactionFunctionalTestCase
 
 # These fail intermittently too, but look different to the 2071 errors
 org.mule.providers.jms.functional.ActiveMQJmsTopicFunctionalTestCase
@@ -20,5 +22,5 @@ org.mule.providers.jms.functional.ActiveMQJmsQueueFunctionalTestCase
 org.mule.providers.jms.functional.MultipleJmsConnectorsTestCase
 
 # Andrew P working on these?
-#org.mule.providers.jms.integration.JmsMuleSideDurableTopicXATxTestCase
-#org.mule.providers.jms.integration.JmsDurableTopicSingleTxTestCase
+org.mule.providers.jms.integration.JmsMuleSideDurableTopicXATxTestCase
+org.mule.providers.jms.integration.JmsDurableTopicSingleTxTestCase
