@@ -7,23 +7,18 @@
     things which can be specified in this file.
 -->
 <settings>
-
     <!-- Required for WIN only.
          RMI will fail to resolve libraries in folders containing spaces,
          which is the default case for M2 installation on Windows.
          Repository MUST be moved to a different location. Otherwise, some
          Mule (and not only Mule) tests will fail.
-         
+
          See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4496398
     -->
-    
-         
-         
-    <!-- settings>
+    <!--<settings>
         <localRepository>c:/.m2/repository</localRepository>
-    </settings -->
-    
-    
+    </settings>-->
+
     <!-- Enable this if your machine is behind a firewall.
     <proxies>
         <proxy>
@@ -36,8 +31,11 @@
     </proxies>
     -->
 
-    <!-- Set your Codehaus credentials here in order to be able to upload to the Mule
-         distribution area using "mvn deploy". -->
+    <!-- 
+         Set your Codehaus credentials here in order to be able to upload to the Mule
+         distribution area using "mvn deploy". 
+    -->
+    <!--
     <servers>
         <server>
             <id>mule-releases</id>
@@ -55,10 +53,13 @@
             <password>mypassword</password>
         </server>
     </servers>
+    -->
 
     <!-- Set your preferences for downloading new snapshots.  Note the default setting
-         is "daily".  Setting updatePolicy="never" will only download a snapshot if one
-         doesn't already exist.  -->
+         is "daily". Setting updatePolicy="never" will only download a snapshot if one
+         doesn't already exist.  
+    -->
+    <!--
     <profiles>
         <profile>
             <activation>
@@ -80,26 +81,76 @@
             </repositories>
         </profile>
     </profiles>
+    -->
 
     <!--
         Set the default build profiles for your user.
         (see http://maven.apache.org/guides/introduction/introduction-to-profiles.html)
     -->
     <activeProfiles>
+        <!-- Enable this profile to run all integration tests. -->
+        <activeProfile>tests</activeProfile>
+
         <!-- Enable this profile to always build the Mule distributions (.tar.gz, .zip, .rar)
             <activeProfile>distributions</activeProfile>
         -->
-        <!-- Enable this profile to skip all tests which require a network connection.
-            <activeProfile>offline</activeProfile>
-        -->
-        <!-- Enable this profile to run integration tests with an Oracle database.
-            <activeProfile>oracle</activeProfile>
-        -->
-        <!-- Enable this profile to run integration tests with IBM AS400 Data Queue messaging server.
-            <activeProfile>as400</activeProfile>
-        -->
-        <!-- Enable this profile to run integration tests with SAP.
-            <activeProfile>sap</activeProfile>
-        -->
     </activeProfiles>
+
+    <!-- 
+         These are mirrors of the central Maven repository. The standard Maven repository
+         (repo1.maven.org) should be sufficient in all cases so think wisely before
+         activating a mirror
+    -->
+    <!--
+    <mirrors>
+        <mirror>
+            <mirrorOf>central</mirrorOf>
+            <name>Mergere Mirror Repository</name>
+            <url>http://repo.mergere.com/maven2</url>
+            <id>central-mirror</id>
+        </mirror>
+        <mirror>
+            <!- The Netherlands, Amsterdam ->
+            <id>ggi-project.org</id>
+            <url>http://ftp.ggi-project.org/pub/packages/maven2</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+        <mirror>
+            <!- Australia, Queensland ->
+            <id>planetmirror.com</id>
+            <url>http://downloads.planetmirror.com/pub/maven2</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+        <mirror>
+            <!- United States, Louisiana ->
+            <id>lsu.edu</id>
+            <url>http://ibiblio.lsu.edu/main/pub/packages/maven2</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+        <mirror>
+            <!- United States, North Carolina ->
+            <id>ibiblio.net</id>
+            <url>http://www.ibiblio.net/pub/packages/maven2</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+        <mirror>
+            <!- The Netherlands, Amsterdam ->
+            <id>sateh.com</id>
+            <url>http://maven.sateh.com/repository</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+        <mirror>
+            <!- Denmark ->
+            <id>dotsrc.org</id>
+            <url>http://mirrors.dotsrc.org/maven2</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+        <mirror>
+            <!- Denmark ->
+            <id>sunsite.dk</id>
+            <url>http://mirrors.sunsite.dk/maven2</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+    </mirrors>
+    -->
 </settings>
