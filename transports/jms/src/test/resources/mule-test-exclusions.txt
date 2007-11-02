@@ -21,6 +21,6 @@ org.mule.providers.jms.functional.ActiveMQJmsQueueFunctionalTestCase
 # MULE-2646
 org.mule.providers.jms.functional.MultipleJmsConnectorsTestCase
 
-# Andrew P working on these?
-org.mule.providers.jms.integration.JmsMuleSideDurableTopicXATxTestCase
-org.mule.providers.jms.integration.JmsDurableTopicSingleTxTestCase
+# Andrew P working on these? 
+#org.mule.providers.jms.integration.JmsMuleSideDurableTopicXATxTestCase
+#org.mule.providers.jms.integration.JmsDurableTopicSingleTxTestCase
