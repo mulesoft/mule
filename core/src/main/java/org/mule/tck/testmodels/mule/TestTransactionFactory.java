@@ -24,6 +24,10 @@ import com.mockobjects.dynamic.Mock;
 
 public class TestTransactionFactory implements UMOTransactionFactory
 {
+
+    // for testsing properties
+    private String value;
+
     public UMOTransaction beginTransaction(UMOManagementContext managementContext) throws TransactionException
     {
         return (UMOTransaction) new Mock(UMOTransaction.class).proxy();
@@ -33,4 +37,15 @@ public class TestTransactionFactory implements UMOTransactionFactory
     {
         return true;
     }
+
+    public String getValue()
+    {
+        return value;
+    }
+
+    public void setValue(String value)
+    {
+        this.value = value;
+    }
+
 }

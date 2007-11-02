@@ -14,6 +14,7 @@ import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.test.TestConnectionFactory;
 import org.mule.providers.jms.test.TestRedeliveryHandler;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import javax.jms.Session;
 
@@ -136,4 +137,12 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
 //        assertTrue(c.getConnectionFactory().create() instanceof TestConnectionFactory);
 //        assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
 //    }
+
+    public void testTransactionFactory()
+    {
+        TestTransactionFactory factory = (TestTransactionFactory) managementContext.getRegistry().lookupObject("txFactory");
+        assertNotNull(factory);
+        assertEquals("foo", factory.getValue());
+    }
+
 }

@@ -595,6 +595,9 @@
     <xsd:complexType name="customTransactionFactoryType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransactionFactoryType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
             </xsd:extension>

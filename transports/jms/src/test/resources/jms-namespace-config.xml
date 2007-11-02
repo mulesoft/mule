@@ -54,4 +54,8 @@
         <jms:redelivery-handler class="org.mule.providers.jms.test.TestRedeliveryHandler" />
     </test:connector>
 
+    <custom-transaction-factory name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory">
+        <spring:property name="value" value="foo"/>
+    </custom-transaction-factory>
+
 </mule>
