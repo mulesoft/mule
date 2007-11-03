@@ -219,8 +219,7 @@
     <profiles>
         <profile>
 
-            <id>distributions</id>
-            <!-- id>schemadocs</id -->
+            <id>schemadocs</id>
 
             <build>
                 <plugins>
