@@ -1,39 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="Mule_Axis_VM_Bridge" version="1.0">
-
-    <mule-environment-properties synchronous="true"/>
-
-    <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
-        <properties>
-            <property name="doAutoTypes" value="false"/>
-            <list name="beanTypes">
-                <entry value="org.mule.test.usecases.axis.clientbridge.ComplexData"/>
-            </list>
-        </properties>
-    </connector>
+    <axis:connector name="axisConnector" doAutoTypes="false">
+        <axis:bean-type>org.mule.test.usecases.axis.clientbridge.ComplexData</axis:bean-type>
+    </axis:connector>
 
     <model name="main">
-
-        <mule-descriptor name="test" implementation="org.mule.components.simple.BridgeComponent">
+        <service name="test">
             <inbound-router>
-                <endpoint address="vm://complexRequest" synchronous="true"/>
+                <inbound-endpoint address="vm://complexRequest" synchronous="true"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="axis:http://localhost:8002/axisService/doSomeWork?method=executeComplexity"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="axis:http://localhost:8002/axisService/doSomeWork?method=executeComplexity"/>
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="doSomeWork" implementation="org.mule.test.usecases.axis.clientbridge.DoSomeWork">
+        <service name="doSomeWork">
+            <component class="org.mule.test.usecases.axis.clientbridge.DoSomeWork"/>
             <inbound-router>
-                <endpoint address="axis:http://localhost:8002/axisService"/>
+                <inbound-endpoint address="axis:http://localhost:8002/axisService"/>
             </inbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-
-</mule-configuration>
+</mule>
