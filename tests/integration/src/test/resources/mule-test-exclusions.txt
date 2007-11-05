@@ -118,7 +118,6 @@ org.mule.test.integration.config.MultiContainerTestCase
 
 # Not yet reviewed
 org.mule.test.integration.providers.axis.AxisOverJMSWithTransactionsTestCase
-org.mule.test.integration.providers.file.OutputPatternFromEndpointTestCase
 org.mule.test.integration.providers.jdbc.JdbcConnectionTestCase
 org.mule.test.integration.providers.jdbc.JdbcNonTransactionalFunctionalTestCase
 org.mule.test.integration.providers.jdbc.JdbcNullParamsTestCase
