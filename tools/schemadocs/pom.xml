@@ -205,17 +205,6 @@
         </dependency>
     </dependencies>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>mojo.codehaus</id>
-            <name>Mojo plugins at Codehaus</name>
-            <url>http://repository.codehaus.org</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
     <profiles>
         <profile>
 
