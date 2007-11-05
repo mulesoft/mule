@@ -19,9 +19,17 @@ versionPattern = Pattern.compile("\\s*<version>.*</version>.*")
 root.eachFileRecurse()
 { file ->
 
-    if ((file.directory == false) && (file.name == 'pom.xml'))
+    if (file.directory == false)
     {
-        process(file)
+        if (file.name == 'pom.xml')
+        {
+            process(file)
+        }
+        else if (file.name == 'install.xml')
+        {
+            // MULE-2659: take care of the installer configuration file as well
+            switchAppVersion(file)
+        }
     }
 }
 
@@ -84,6 +92,36 @@ def process(input)
     outputFile.renameTo(input)
 
     // remove the backup file
+    backupFile.delete()
+}
+
+//-----------------------------------------------------------------------------
+def switchAppVersion(installerConfigFile)
+//-----------------------------------------------------------------------------
+{
+    println("processing " + installerConfigFile)
+
+    def outputFile = new File(installerConfigFile.getParent(), "install.xml.new")
+    def output = new BufferedWriter(new FileWriter(outputFile))
+
+    installerConfigFile.eachLine
+    { line ->
+
+        if (line.indexOf("<appversion>") > -1)
+        {
+            outputLine(output, switchVersion(line, "appversion", oldVersion, newVersion))
+        }
+        else
+        {
+            outputLine(output, line)
+        }
+    }
+
+    output.close()
+
+    def backupFile = new File(installerConfigFile.getParent(), "install.xml.orig")
+    installerConfigFile.renameTo(backupFile)
+    outputFile.renameTo(installerConfigFile)
     backupFile.delete()
 }
 
