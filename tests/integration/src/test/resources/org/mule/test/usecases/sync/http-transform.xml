@@ -1,78 +1,59 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xmlns:xm="http://www.mulesource.org/schema/mule/xml/2.0"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-<mule-configuration id="test" version="1.0">
+    <endpoint name="httpEndpoint" address="http://localhost:18080/RemoteService" synchronous="true">
+        <properties>
+            <spring:entry key="Content-Type" value="text/plain"/>
+        </properties>
+    </endpoint>
+    <endpoint name="httpEndpoint2" address="http://localhost:18081/RemoteService?method=post" synchronous="true"/>
+    <endpoint name="vmEndpoint" address="vm://LocalService" synchronous="true"/>
 
-    <!-- Mule properties -->
-    <mule-environment-properties synchronous="false" remoteSync="false" />
-
-    <transformers>
-        <transformer name="ByteArrayToString"
-            className="org.mule.transformers.simple.ByteArrayToString" />
-        <transformer name="ByteArrayToSerializable"
-            className="org.mule.transformers.simple.ByteArrayToSerializable" />
-        <transformer name="SerializableToByteArray"
-            className="org.mule.transformers.simple.SerializableToByteArray" />
-        <transformer name="ObjectToXml"
-            className="org.mule.transformers.xml.ObjectToXml"
-            returnClass="java.lang.String" />
-        <transformer name="Compress"
-            className="org.mule.transformers.compression.GZipCompressTransformer" />
-        <transformer name="ToHttpResponse"
-            className="org.mule.providers.http.transformers.UMOMessageToHttpResponse" />
-    </transformers>
-
-    <global-endpoints>
-        <endpoint name="httpEndpoint"
-                  address="http://localhost:18080/RemoteService"
-                  synchronous="true">
-            <properties>
-                <property name="Content-Type" value="text/plain"/>
-            </properties>
-        </endpoint>
-        <endpoint name="httpEndpoint2"
-                  address="http://localhost:18081/RemoteService?method=post"
-                  synchronous="true">
-        </endpoint>
-        <endpoint name="vmEndpoint"
-                  address="vm://LocalService"
-                  synchronous="true">
-        </endpoint>
-    </global-endpoints>
+    <transformer-byte-array-to-string name="ByteArrayToString"/>
+    <transformer-byte-array-to-serializable name="ByteArrayToSerializable"/>
+    <transformer-serializable-to-byte-array name="SerializableToByteArray"/>
+    <xm:object-to-xml name="ObjectToXml"/>
+    <transformer-gzip-compress name="Compress"/>
+    <http:message-to-http-response name="ToHttpResponse"/>
 
     <model name="model">
-        <mule-descriptor name="HttpService"
-            implementation="org.mule.components.simple.EchoComponent">
+        <service name="HttpService">
+            <echo-component/>
             <inbound-router>
-                <global-endpoint name="httpEndpoint" transformers="ByteArrayToString"
-                    responseTransformers="ObjectToXml Compress ToHttpResponse"/>
+                <inbound-endpoint ref="httpEndpoint" transformer-ref="ByteArrayToString"
+                    responseTransformer-ref="ObjectToXml Compress ToHttpResponse"/>
             </inbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="HttpService2"
-            implementation="org.mule.components.simple.EchoComponent">
+        <service name="HttpService2">
+            <echo-component/>
             <inbound-router>
-                <endpoint address="httpEndpoint2" transformers="ByteArrayToSerializable"
-                          responseTransformers="SerializableToByteArray ToHttpResponse"/>
+                <inbound-endpoint ref="httpEndpoint2" transformer-ref="ByteArrayToSerializable"
+                          responseTransformer-ref="SerializableToByteArray ToHttpResponse"/>
             </inbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="LocalService"
-            implementation="org.mule.components.simple.NullComponent">
-
+        <service name="LocalService">
             <inbound-router>
-                <endpoint address="vmEndpoint"/>
-                <router className="org.mule.routing.inbound.ForwardingConsumer"/>
+                <inbound-endpoint ref="vmEndpoint"/>
+                <forwarding-router/>
             </inbound-router>
-
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="httpEndpoint2" transformers="SerializableToByteArray"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="httpEndpoint2" transformer-ref="SerializableToByteArray"/>
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
-
+        </service>
     </model>
-
-</mule-configuration>
+</mule>
