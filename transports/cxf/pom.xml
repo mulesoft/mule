@@ -61,6 +61,12 @@
           <name>Apache Incubating Repository</name>
           <url>http://people.apache.org/repo/m2-incubating-repository/</url>
         </repository>
+        <repository>
+          <id>java.net</id>
+          <name>Java.net Repository</name>
+          <url>http://download.java.net/maven/1/</url>
+          <layout>legacy</layout>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -126,7 +132,16 @@
       <artifactId>cxf-testutils</artifactId>
       <version>2.0.1-incubator</version>
     </dependency>
-    
+    <dependency>
+      <groupId>javax.xml.soap</groupId>
+	  <artifactId>saaj-api</artifactId>
+	  <version>1.3</version>
+	</dependency>
+    <dependency>
+      <groupId>com.sun.xml.messaging.saaj</groupId>
+	  <artifactId>saaj-impl</artifactId>
+	  <version>1.3</version>
+	</dependency>
     <!-- TODO can we get rid of this dependency? -->
     <dependency>
       <groupId>org.apache.cxf</groupId>

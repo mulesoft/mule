@@ -50,7 +50,6 @@ import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
-import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 
@@ -231,6 +230,11 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         UMOMessage msg = event.getMessage();
         String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
+        
+        
+        setPropertyFromEndpoint(event, msg, HttpConstants.HEADER_CONTENT_TYPE);
+        setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+        
         URI uri = event.getEndpoint().getEndpointURI().getUri();
         HttpMethod httpMethod;
         Object body = event.getTransformedMessage();
@@ -295,6 +299,18 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             client.getParams().setAuthenticationPreemptive(false);
         }
         return httpMethod;
+    }
+
+    protected void setPropertyFromEndpoint(UMOEvent event, UMOMessage msg, String prop)
+    {
+        Object o = msg.getProperty(prop, null);
+        if (o == null) {
+            
+            o = event.getEndpoint().getProperty(prop);
+            if (o != null) {
+                msg.setProperty(prop, o);
+            }
+        }
     }
 
     protected HttpMethod createEntityMethod(UMOEvent event, Object body, EntityEnclosingMethod postMethod)

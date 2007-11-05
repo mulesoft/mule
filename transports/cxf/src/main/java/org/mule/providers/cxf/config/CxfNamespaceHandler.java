@@ -25,6 +25,7 @@ public class CxfNamespaceHandler extends NamespaceHandlerSupport
         String[] endpointProps = new String[] { 
             "frontend", 
             "bindingUri",
+            "bridge",
             "endpointName",
             "serviceName",
             "wsdlLocation" 

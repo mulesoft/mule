@@ -151,7 +151,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 service = connector.getServiceFactory().create(exposedInterface,
                     new QName(namespace, component.getName()), new URL(wsdlUrl), props);
             }
-
+            
             List inList = connector.getServerInHandlers();
             if (inList != null)
             {

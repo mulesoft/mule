@@ -10,4 +10,5 @@ public interface CxfConstants
     String SIMPLE_FRONTEND = "simple";
     String WSDL_LOCATION = "wsdlLocation";
     String NAMESPACE = "namespace";
+    Object BRIDGE = "bridge";
 }

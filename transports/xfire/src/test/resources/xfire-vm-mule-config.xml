@@ -12,14 +12,14 @@
 
     <model name="test">
         <service name="mycomponent">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="xfire:vm://mycomponent"/>
             </inbound-router>
         </service>
 
         <service name="mycomponent2">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="xfire:vm://mycomponent2">
                     <properties>
@@ -35,14 +35,14 @@
         </service>
 
         <service name="mycomponent3">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="xfire:vm://mycomponent3"/>
             </inbound-router>
         </service>
 
         <service name="mycomponent4">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="xfire:vm://mycomponent4" synchronous="false"/>
             </inbound-router>

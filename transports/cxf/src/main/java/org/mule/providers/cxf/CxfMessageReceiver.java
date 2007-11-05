@@ -10,7 +10,6 @@
 
 package org.mule.providers.cxf;
 
-import org.mule.components.simple.BridgeComponent;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.cxf.i18n.CxfMessages;
 import org.mule.providers.cxf.support.ProviderService;
@@ -31,6 +30,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -60,6 +60,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         connector = (CxfConnector) umoConnector;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void doInitialise() throws InitialisationException
     {
@@ -72,10 +73,10 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             String databinding = (String) endpointProps.get(CxfConstants.DATA_BINDING);
             String bindingId = (String) endpointProps.get(CxfConstants.BINDING_ID);
             String frontend = (String) endpointProps.get(CxfConstants.FRONTEND);
+            String bridge = (String) endpointProps.get(CxfConstants.BRIDGE);
 
-            if (exposedInterface.equals(BridgeComponent.class))
+            if (BooleanUtils.toBoolean(bridge))
             {
-                bridge = true;
                 exposedInterface = ProviderService.class;
                 frontend = "jaxws";
             }

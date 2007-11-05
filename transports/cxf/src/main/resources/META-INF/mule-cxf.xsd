@@ -49,6 +49,7 @@
     
     <xsd:attributeGroup name="endpointAttributes">
         <xsd:attribute name="address" type="xsd:string"/>
+        <xsd:attribute name="bridge" type="xsd:boolean"/>
         <xsd:attribute name="frontend" type="xsd:string"/>
         <xsd:attribute name="bindingUri" type="xsd:string"/>
         <xsd:attribute name="endpointName" type="xsd:string"/>

@@ -2,19 +2,18 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
+       xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-               http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd
+               http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <mule:model name="BridgeTest">
     
         <mule:bridge-service name="receiver">
-            <mule:inbound-endpoint address="cxf:http://localhost:63081/services/Echo"/>
-            
+            <cxf:inbound-endpoint address="http://localhost:63081/services/Echo" bridge="true"/>
             <mule:outbound-endpoint address="vm://test" />
         </mule:bridge-service>
         

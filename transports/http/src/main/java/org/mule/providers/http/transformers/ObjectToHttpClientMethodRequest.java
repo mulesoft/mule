@@ -24,14 +24,15 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.OutputHandler;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringUtils;
-import org.mule.RegistryContext;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
@@ -320,6 +321,19 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             }
         }
 
+        Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+        if (customHeaders != null) 
+        {
+            Map.Entry entry;
+            for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();)
+            {
+                entry = (Map.Entry)iterator.next();
+                if (entry.getValue() != null)
+                {
+                    httpMethod.addRequestHeader(entry.getKey().toString(), entry.getValue().toString());
+                }
+            }
+        }
 
         Set attNams = msg.getAttachmentNames();
         if (msg.getPayload() instanceof InputStream
