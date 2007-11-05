@@ -14,3 +14,4 @@ org.mule.providers.cxf.ServiceUsingAxisEndpointTestCase
 
 # Not working yet...
 org.mule.providers.cxf.client.GeneratedClientTestCase
+org.mule.providers.cxf.bridge.BridgeTest
