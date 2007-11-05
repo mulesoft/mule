@@ -928,7 +928,6 @@
     </reporting>
 
     <modules>
-        <module>borked</module>
         <module>buildtools</module>
         <module>core</module>
         <module>modules</module>
