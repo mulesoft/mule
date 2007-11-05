@@ -45,9 +45,6 @@ public class XFireMessageReceiverFunctionalTestCase extends FunctionalTestCase
 
     public void testQname() throws Exception
     {
-        // TODO AC: this should probably be mgmtContext.start()?
-        // MuleManager.getInstance().start();
-
         AbstractConnector umoConnector = (AbstractConnector) managementContext.getRegistry().lookupConnector(
             "xfireConnector");
         Map map = umoConnector.getReceivers();
