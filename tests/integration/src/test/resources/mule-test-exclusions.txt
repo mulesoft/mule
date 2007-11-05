@@ -114,7 +114,6 @@ org.mule.test.integration.config.MultiContainerTestCase
 
 # Not yet reviewed
 org.mule.test.integration.providers.axis.AxisOverJMSWithTransactionsTestCase
-org.mule.test.integration.providers.file.FileAppendConnectorTestCase
 org.mule.test.integration.providers.file.FileAppendEndpointTestCase
 org.mule.test.integration.providers.file.FileExceptionStrategyFunctionalTestCase
 org.mule.test.integration.providers.file.FileFunctionalTestCase
