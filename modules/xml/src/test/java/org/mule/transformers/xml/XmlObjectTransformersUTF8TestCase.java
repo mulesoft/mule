@@ -32,15 +32,6 @@ public class XmlObjectTransformersUTF8TestCase extends AbstractTransformerTestCa
             TEST_STRING.getBytes("UTF-8"), "</string>".getBytes("ASCII")));
     }
 
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-
-        // TODO MULE-2647: how does one set the encoding in Mule2?
-        // the test passes without this setting, but I'm not sure if this is only by accident
-        // MuleManager.getConfiguration().setEncoding("UTF-8");
-    }
-
     public UMOTransformer getTransformer() throws Exception
     {
         return new XmlToObject();
