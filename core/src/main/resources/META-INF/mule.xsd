@@ -656,7 +656,12 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="wildcard-filter" type="patternFilterType" substitutionGroup="abstract-filter"/>
+    <xsd:element name="wildcard-filter" type="wildcardFilterType" substitutionGroup="abstract-filter"/>
+    <xsd:complexType name="wildcardFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="patternFilterType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
     <xsd:element name="regex-filter" type="patternFilterType" substitutionGroup="abstract-filter"/>
     <xsd:element name="message-property-filter" type="patternFilterType" substitutionGroup="abstract-filter"/>
     <xsd:complexType name="patternFilterType">

@@ -1,19 +1,21 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="file_test" version="1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd">
 
     <model name="test">
-        <mule-descriptor name="mycomponent"
-                         implementation="org.mule.test.integration.providers.file.FileFunctionalTestCase$FileTestComponent">
+        <service name="mycomponent">
+            <component class="org.mule.test.integration.providers.file.FileFunctionalTestCase$FileTestComponent"/>
             <inbound-router>
-                <endpoint address="file://./test">
-                    <filter pattern="*.data" className="org.mule.providers.file.filters.FilenameWildcardFilter"/>
-                </endpoint>
+                <inbound-endpoint address="file://./test">
+                    <file:filter-filename-wildcard pattern="*.data"/>
+                </inbound-endpoint>
             </inbound-router>
-        </mule-descriptor>
-
+        </service>
     </model>
-</mule-configuration>
+</mule>

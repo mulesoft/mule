@@ -109,15 +109,15 @@ org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
 org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
 org.mule.test.integration.models.SedaPipelineTestCase
 
+# Config uses an internal class "FileFunctionalTestCase$FileTestComponent" and the schema
+# rejects it because it is not a valid NMTOKEN.
+org.mule.test.integration.providers.file.FileFunctionalTestCase
+
 # TODO MULE-1789
 org.mule.test.integration.config.MultiContainerTestCase
 
 # Not yet reviewed
 org.mule.test.integration.providers.axis.AxisOverJMSWithTransactionsTestCase
-org.mule.test.integration.providers.file.FileAppendEndpointTestCase
-org.mule.test.integration.providers.file.FileExceptionStrategyFunctionalTestCase
-org.mule.test.integration.providers.file.FileFunctionalTestCase
-org.mule.test.integration.providers.file.FileRuntimeExceptionStrategyFunctionalTestCase
 org.mule.test.integration.providers.file.OutputPatternFromEndpointTestCase
 org.mule.test.integration.providers.jdbc.JdbcConnectionTestCase
 org.mule.test.integration.providers.jdbc.JdbcNonTransactionalFunctionalTestCase

@@ -13,6 +13,7 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.FilenameParser;
+import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.providers.file.transformers.FileToByteArray;
 import org.mule.providers.file.transformers.FileToString;
 
@@ -31,5 +32,6 @@ public class FileNamespaceHandler extends NamespaceHandlerSupport
                     new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
         registerBeanDefinitionParser("transformer-file-to-byte-array", new MuleOrphanDefinitionParser(FileToByteArray.class, false));
         registerBeanDefinitionParser("transformer-file-to-string", new MuleOrphanDefinitionParser(FileToString.class, false));
+        registerBeanDefinitionParser("filter-filename-wildcard", new ChildDefinitionParser("filter", FilenameWildcardFilter.class));
     }
 }

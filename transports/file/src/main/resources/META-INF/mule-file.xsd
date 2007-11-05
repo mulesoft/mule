@@ -119,4 +119,6 @@
 
     <xsd:element name="transformer-file-to-byte-array" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:element name="transformer-file-to-string" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+
+    <xsd:element name="filter-filename-wildcard" type="mule:wildcardFilterType" substitutionGroup="mule:abstract-filter"/>
 </xsd:schema>
