@@ -21,7 +21,8 @@ import org.mule.umo.UMOTransactionFactory;
  */
 public class JmsTransactionFactory implements UMOTransactionFactory
 {
-
+    private String name;
+    
     /*
      * (non-Javadoc)
      * 
@@ -39,4 +40,13 @@ public class JmsTransactionFactory implements UMOTransactionFactory
         return true;
     }
 
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 }

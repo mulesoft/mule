@@ -144,4 +144,10 @@
     <xsd:element name="weblogic-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:element name="websphere-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
  
+    <xsd:element name="transaction-factory" type="jmsTransactionFactoryType" substitutionGroup="mule:abstract-transaction-factory"/>
+    <xsd:complexType name="jmsTransactionFactoryType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransactionFactoryType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>

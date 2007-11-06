@@ -133,7 +133,6 @@ org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchJobTestCase
 org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchUsingDelegatingJobTestCase
 	
 # Not yet reviewed
-org.mule.test.integration.providers.axis.AxisOverJMSWithTransactionsTestCase
 org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 org.mule.test.integration.spring.MuleAdminTestCase
 org.mule.test.integration.streaming.FileToTcpStreamingTestCase

@@ -9,7 +9,9 @@
  */
 package org.mule.providers.jms.config;
 
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
+import org.mule.providers.jms.JmsTransactionFactory;
 import org.mule.providers.jms.activemq.ActiveMQJmsConnector;
 import org.mule.providers.jms.activemq.ActiveMQXAJmsConnector;
 import org.mule.providers.jms.weblogic.WeblogicJmsConnector;
@@ -37,6 +39,8 @@ public class JmsNamespaceHandler extends NamespaceHandlerSupport
 
         registerBeanDefinitionParser("connection-factory", new ConnectionFactoryDefinitionParser());
         registerBeanDefinitionParser("redelivery-handler", new ObjectFactoryDefinitionParser("redeliveryHandler"));
+
+        registerBeanDefinitionParser("transaction-factory", new MuleOrphanDefinitionParser(JmsTransactionFactory.class, true));
     }
 
 }
