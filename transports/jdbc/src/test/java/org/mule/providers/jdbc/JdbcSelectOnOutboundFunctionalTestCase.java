@@ -62,6 +62,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
 
     }
 
+    // @Override
     protected void doTearDown() throws Exception
     {
         JdbcConnector jdbcConnector = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector");
@@ -72,6 +73,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
         super.doTearDown();
     }
 
+    // @Override
     protected void suitePreSetUp() throws Exception
     {
         MuleDerbyUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
