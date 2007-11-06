@@ -18,15 +18,15 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.dbutils.QueryRunner;
 
 public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
 {
 
-    public static final String[] TEST_VALUES = {"Test", "The Moon", "Terra"};
+    private  static final String[] TEST_VALUES = {"Test", "The Moon", "Terra"};
 
     protected String getConfigResources()
     {
@@ -85,11 +85,11 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         UMOMessage reply = client.send("vm://jdbc.test", new MuleMessage(NullPayload.getInstance()));
         assertNotNull(reply.getPayload());
-        assertTrue(reply.getPayload() instanceof ArrayList);
-        ArrayList resultList = (ArrayList) reply.getPayload();
+        assertTrue(reply.getPayload() instanceof List);
+        List resultList = (List) reply.getPayload();
         assertTrue(resultList.size() == 1);
-        assertTrue(resultList.get(0) instanceof HashMap);
-        HashMap resultMap = (HashMap) resultList.get(0);
+        assertTrue(resultList.get(0) instanceof Map);
+        Map resultMap = (Map) resultList.get(0);
         assertEquals(new Integer(1), resultMap.get("TYPE"));
         assertEquals(TEST_VALUES[0], resultMap.get("DATA"));
     }
@@ -100,12 +100,12 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
         MyMessage payload = new MyMessage(2);
         UMOMessage reply = client.send("vm://terra", new MuleMessage(payload));
         assertNotNull(reply.getPayload());
-        assertTrue(reply.getPayload() instanceof ArrayList);
-        ArrayList resultList = (ArrayList) reply.getPayload();
+        assertTrue(reply.getPayload() instanceof List);
+        List resultList = (List) reply.getPayload();
         logger.debug("resultList.size() " + resultList.size());
         assertTrue(resultList.size() == 1);
-        assertTrue(resultList.get(0) instanceof HashMap);
-        HashMap resultMap = (HashMap) resultList.get(0);
+        assertTrue(resultList.get(0) instanceof Map);
+        Map resultMap = (Map) resultList.get(0);
         assertEquals(new Integer(2), resultMap.get("TYPE"));
         assertEquals(TEST_VALUES[1], resultMap.get("DATA"));
     }
