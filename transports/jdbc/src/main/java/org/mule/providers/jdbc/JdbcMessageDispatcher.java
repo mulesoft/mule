@@ -162,7 +162,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             return event.getMessage();
         }
         
-        return doReceive(event.getTimeout());
+        return doReceive(event.getTimeout(),event);
         
     }
 
@@ -178,6 +178,20 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      * @throws Exception if the call to the underlying protocol causes an exception
      */
     protected UMOMessage doReceive(long timeout) throws Exception
+    {
+        return doReceive(timeout, null);
+    }
+
+    /**
+     * Make a specific request to the underlying transport
+     * Special case: The event is need when doReceive was called from doSend
+     * @param timeout only for compatibility with doReceive(long timeout)
+     * @param event There is a need to get params from message
+     * @return the result of the request wrapped in a UMOMessage object. Null will be
+     *         returned if no data was available
+     * @throws Exception if the call to the underlying protocol causes an exception
+     */
+    protected UMOMessage doReceive(long timeout, UMOEvent event) throws Exception
     {
         if (logger.isDebugEnabled())
         {
@@ -205,7 +219,11 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             do
             {
                 result = connector.createQueryRunner().query(con, readStmt,
-                    connector.getParams(endpoint, readParams, null, this.endpoint.getEndpointURI().getAddress()), connector.createResultSetHandler());
+                                                             connector.getParams(endpoint,
+                                                                                 readParams,
+                                                                                 event!=null ? event.getMessage() : null,
+                                                                                 this.endpoint.getEndpointURI().getAddress()),
+                                                             connector.createResultSetHandler());
                 if (result != null)
                 {
                     if (logger.isDebugEnabled())
@@ -215,7 +233,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
                     break;
                 }
                 long sleep = Math.min(this.connector.getPollingFrequency(),
-                    timeout - (System.currentTimeMillis() - t0));
+                                      timeout - (System.currentTimeMillis() - t0));
                 if (sleep > 0)
                 {
                     if (logger.isDebugEnabled())
@@ -234,7 +252,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             if (ackStmt != null)
             {
                 int nbRows = connector.createQueryRunner().update(con, ackStmt,
-                    connector.getParams(endpoint, ackParams, result, ackStmt));
+                                                                  connector.getParams(endpoint, ackParams, result, ackStmt));
                 if (nbRows != 1)
                 {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
@@ -250,7 +268,9 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             JdbcUtils.rollbackAndClose(con);
             throw e;
         }
+
     }
+
 
     protected void doConnect() throws Exception
     {
