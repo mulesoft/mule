@@ -86,6 +86,7 @@ org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
 org.mule.test.integration.client.MuleClientListenerTestCase
 org.mule.test.integration.client.RemoteExceptionTestCase
 org.mule.test.integration.EventMetaDataPropagationTestCase
+org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
 
 # Convert to XML config-based test
 org.mule.test.integration.message.AttachmentsPropagationTestCase
@@ -121,11 +122,19 @@ org.mule.test.integration.providers.file.FileFunctionalTestCase
 # TODO MULE-1789
 org.mule.test.integration.config.MultiContainerTestCase
 
+# Might have to do with message-api changes?
+#   java.lang.IllegalStateException: Only owner thread can write to message: Thread[main,5,main]/Thread[DefaultQuartzScheduler_Worker-3,5,main]
+#	  at org.mule.providers.AbstractMessageAdapter.newException(AbstractMessageAdapter.java:560)
+#	  at org.mule.providers.AbstractMessageAdapter.checkMutable(AbstractMessageAdapter.java:546)
+#	  at org.mule.providers.AbstractMessageAdapter.assertAccess(AbstractMessageAdapter.java:487)
+#	  at org.mule.providers.AbstractMessageAdapter.addProperties(AbstractMessageAdapter.java:152)
+#	  at org.mule.impl.MuleMessage.addProperties(MuleMessage.java:542)
+org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchJobTestCase
+org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchUsingDelegatingJobTestCase
+	
 # Not yet reviewed
 org.mule.test.integration.providers.axis.AxisOverJMSWithTransactionsTestCase
 org.mule.test.integration.providers.jms.QosHeadersTestCase
-org.mule.test.integration.providers.quartz.QuartzFunctionalTestCase
-org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
 org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 org.mule.test.integration.spring.MuleAdminTestCase
 org.mule.test.integration.streaming.FileToTcpStreamingTestCase

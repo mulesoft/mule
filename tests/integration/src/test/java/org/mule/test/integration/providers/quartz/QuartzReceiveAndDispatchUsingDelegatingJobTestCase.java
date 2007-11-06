@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: QuartzFunctionalTestCase.java 8077 2007-08-27 20:15:25Z aperepel $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -10,12 +10,10 @@
 
 package org.mule.test.integration.providers.quartz;
 
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.quartz.QuartzConnector;
 import org.mule.providers.quartz.jobs.MuleClientReceiveJob;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,38 +21,18 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class QuartzFunctionalTestCase extends AbstractMuleTestCase
+public class QuartzReceiveAndDispatchUsingDelegatingJobTestCase extends FunctionalTestCase
 {
     protected static CountDownLatch countDown;
 
-    public void testMuleClientDispatchJob() throws Exception
+    protected String getConfigResources()
     {
-        countDown = new CountDownLatch(3);
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/providers/quartz/quartz-dispatch.xml");
-        new MuleClient().send("vm://quartz.scheduler", "quartz test", null);
-        assertTrue(countDown.await(5000, TimeUnit.MILLISECONDS));
-    }
-
-    public void testMuleClientReceiveAndDispatchJob() throws Exception
-    {
-        countDown = new CountDownLatch(3);
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/providers/quartz/quartz-receive-dispatch.xml");
-
-        new MuleClient().send("vm://event.queue", "quartz test", null);
-        new MuleClient().send("vm://event.queue", "quartz test", null);
-        new MuleClient().send("vm://event.queue", "quartz test", null);
-
-        new MuleClient().send("vm://quartz.scheduler", "test", null);
-        assertTrue(countDown.await(5000, TimeUnit.MILLISECONDS));
+        return "org/mule/test/integration/providers/quartz/quartz-receive-dispatch-delegating-job.xml";
     }
 
     public void testMuleClientReceiveAndDispatchUsingDelegatingJobAsPayload() throws Exception
     {
         countDown = new CountDownLatch(3);
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/providers/quartz/quartz-receive-dispatch-delegating-job.xml");
 
         new MuleClient().send("vm://event.queue", "quartz test", null);
         new MuleClient().send("vm://event.queue", "quartz test", null);
@@ -71,8 +49,6 @@ public class QuartzFunctionalTestCase extends AbstractMuleTestCase
     public void testMuleClientReceiveAndDispatchUsingDelegatingJobAsProperty() throws Exception
     {
         countDown = new CountDownLatch(3);
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/providers/quartz/quartz-receive-dispatch-delegating-job.xml");
 
         new MuleClient().send("vm://event.queue", "quartz test", null);
         new MuleClient().send("vm://event.queue", "quartz test", null);
@@ -90,8 +66,6 @@ public class QuartzFunctionalTestCase extends AbstractMuleTestCase
     public void testMuleClientReceiveAndDispatchUsingDelegatingJobAsPropertyRef() throws Exception
     {
         countDown = new CountDownLatch(3);
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/providers/quartz/quartz-receive-dispatch-delegating-job.xml");
 
         new MuleClient().send("vm://event.queue", "quartz test", null);
         new MuleClient().send("vm://event.queue", "quartz test", null);
@@ -108,5 +82,4 @@ public class QuartzFunctionalTestCase extends AbstractMuleTestCase
         new MuleClient().send("vm://quartz.scheduler", "test", props);
         assertTrue(countDown.await(5000, TimeUnit.MILLISECONDS));
     }
-
 }

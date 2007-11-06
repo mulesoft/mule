@@ -20,10 +20,9 @@ public class TestComponent implements Callable
     {
         if (eventContext.getMessageAsString().equals("quartz test"))
         {
-            if (QuartzFunctionalTestCase.countDown != null)
-            {
-                QuartzFunctionalTestCase.countDown.countDown();
-            }
+            QuartzDispatchJobTestCase.countDown.countDown();
+            QuartzReceiveAndDispatchJobTestCase.countDown.countDown();
+            QuartzReceiveAndDispatchUsingDelegatingJobTestCase.countDown.countDown();
         }
         else
         {
