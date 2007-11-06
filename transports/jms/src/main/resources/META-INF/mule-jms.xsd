@@ -150,4 +150,7 @@
             <xsd:extension base="mule:abstractTransactionFactoryType"/>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="transformer-jmsmessage-to-object" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="transformer-object-to-jmsmessage" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
 </xsd:schema>

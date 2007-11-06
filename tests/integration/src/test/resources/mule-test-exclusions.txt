@@ -138,4 +138,3 @@ org.mule.test.integration.spring.MuleAdminTestCase
 org.mule.test.integration.streaming.FileToTcpStreamingTestCase
 org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
 org.mule.test.integration.util.ObjectNameHelperTestCase
-org.mule.test.usecases.sync.TcpJmsResponseBridgeTestCase

@@ -11,9 +11,12 @@ package org.mule.providers.jms.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.providers.jms.JmsTransactionFactory;
 import org.mule.providers.jms.activemq.ActiveMQJmsConnector;
 import org.mule.providers.jms.activemq.ActiveMQXAJmsConnector;
+import org.mule.providers.jms.transformers.JMSMessageToObject;
+import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.providers.jms.weblogic.WeblogicJmsConnector;
 import org.mule.providers.jms.websphere.WebsphereJmsConnector;
 
@@ -41,7 +44,9 @@ public class JmsNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("redelivery-handler", new ObjectFactoryDefinitionParser("redeliveryHandler"));
 
         registerBeanDefinitionParser("transaction-factory", new MuleOrphanDefinitionParser(JmsTransactionFactory.class, true));
-    }
 
+        registerBeanDefinitionParser("transformer-jmsmessage-to-object", new TransformerDefinitionParser(JMSMessageToObject.class));   
+        registerBeanDefinitionParser("transformer-object-to-jmsmessage", new TransformerDefinitionParser(ObjectToJMSMessage.class));   
+    }
 }
 

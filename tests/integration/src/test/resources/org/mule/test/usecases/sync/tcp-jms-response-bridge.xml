@@ -1,62 +1,38 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="test" version="1.0">
-
-    <!-- Mule properties -->
-    <mule-environment-properties />
-
-    <!-- embed Spring configuration to create a Jms Connection factory -->
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
-        <properties>
-            <text-property name="configuration">
-                <![CDATA[
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
-    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value></property>
-    </bean>
-</beans>
-                ]]>
-            </text-property>
-        </properties>
-    </container-context>
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
     <!-- Testing with ActiveMq -->
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
-        <properties>
-            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
-            <property name="specification" value="1.1"/>
-        </properties>
-    </connector>
+    <jms:activemq-connector name="jmsConnector"/>
 
-    <transformers>
-        <transformer name="jmsmessagetoobject" className="org.mule.providers.jms.transformers.JMSMessageToObject"/>
-        <transformer name="inboundtransformer" className="org.mule.transformers.simple.ByteArrayToString"/>
-        <transformer name="responsetransformer" className="org.mule.transformers.simple.StringToByteArray"/>
-    </transformers>
-
+    <jms:transformer-jmsmessage-to-object name="jmsmessagetoobject"/>
+    <transformer-byte-array-to-string name="inboundtransformer"/>
+    <transformer-string-to-byte-array name="responsetransformer"/>
+    
     <model name="model">
-        <mule-descriptor name="TcpReceiver"
-            implementation="org.mule.components.simple.EchoComponent">
+        <service name="TcpReceiver">
+            <echo-component/>
             <inbound-router>
-                <endpoint address="tcp://localhost:4444" remoteSync="true"/>
+                <inbound-endpoint address="tcp://localhost:4444" remoteSync="true"/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://queue_in" responseTransformers="responsetransformer" />
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="jms://queue_in" responseTransformer-ref="responsetransformer" />
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="JMSReplyProvider"
-            implementation="org.mule.test.integration.service.TestReceiver">
+        <service name="JMSReplyProvider">
+            <component class="org.mule.test.integration.service.TestReceiver"/>
             <inbound-router>
-                <endpoint address="jms://queue_in" transformers="jmsmessagetoobject inboundtransformer"/>
+                <inbound-endpoint address="jms://queue_in" transformer-ref="jmsmessagetoobject inboundtransformer"/>
             </inbound-router>
-        </mule-descriptor>
-
+        </service>
     </model>
-
-</mule-configuration>
+</mule>
