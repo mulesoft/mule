@@ -90,6 +90,11 @@ org.mule.test.integration.EventMetaDataPropagationTestCase
 # Convert to XML config-based test
 org.mule.test.integration.message.AttachmentsPropagationTestCase
 org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
+org.mule.test.integration.providers.jdbc.JdbcConnectionTestCase
+org.mule.test.integration.providers.jdbc.JdbcNonTransactionalFunctionalTestCase
+org.mule.test.integration.providers.jdbc.JdbcNullParamsTestCase
+org.mule.test.integration.providers.jdbc.JdbcTransactionalJdbcFunctionalTestCase
+org.mule.test.integration.providers.jdbc.JdbcTransactionalXaFunctionalTestCase
 
 # Convert transacted endpoint to XML config
 org.mule.test.integration.client.MuleClientTransactionTestCase
@@ -118,11 +123,6 @@ org.mule.test.integration.config.MultiContainerTestCase
 
 # Not yet reviewed
 org.mule.test.integration.providers.axis.AxisOverJMSWithTransactionsTestCase
-org.mule.test.integration.providers.jdbc.JdbcConnectionTestCase
-org.mule.test.integration.providers.jdbc.JdbcNonTransactionalFunctionalTestCase
-org.mule.test.integration.providers.jdbc.JdbcNullParamsTestCase
-org.mule.test.integration.providers.jdbc.JdbcTransactionalJdbcFunctionalTestCase
-org.mule.test.integration.providers.jdbc.JdbcTransactionalXaFunctionalTestCase
 org.mule.test.integration.providers.jms.QosHeadersTestCase
 org.mule.test.integration.providers.quartz.QuartzFunctionalTestCase
 org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
