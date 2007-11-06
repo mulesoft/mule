@@ -10,6 +10,7 @@
 
 package org.mule.providers;
 
+import org.mule.config.i18n.MessageFactory;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnectable;
 import org.mule.umo.provider.UMOConnector;
@@ -43,7 +44,13 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
         {
             try
             {
-                getWorkManager().scheduleWork(new Work()
+                UMOWorkManager wm = getWorkManager();
+                if (wm == null)
+                {
+                    throw new FatalConnectException(MessageFactory.createStaticMessage("No WorkManager is available"), connectable);
+                }
+                
+                wm.scheduleWork(new Work()
                 {
                     public void release()
                     {
