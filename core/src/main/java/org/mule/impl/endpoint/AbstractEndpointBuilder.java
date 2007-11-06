@@ -148,6 +148,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         OutboundEndpoint ep = new OutboundEndpoint();
         configureEndpoint(ep);
         ep.setTransformers(getOutboundTransformers(ep.getConnector(), ep.getEndpointURI()));
+        ep.setResponseTransformers(getResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
         return ep;
     }
 
