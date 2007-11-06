@@ -29,11 +29,16 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("cde", c.getOutputPattern());
         assertEquals(2345, c.getPollingFrequency());
         // don't test these - they force directory creation
-//        assertEquals("efg", c.getReadFromDirectory());
-//        assertEquals("fgh", c.getWriteToDirectory());
+        //assertEquals("efg", c.getReadFromDirectory());
+        //assertEquals("fgh", c.getWriteToDirectory());
         assertEquals(false, c.isAutoDelete());
         assertEquals(true, c.isOutputAppend());
         assertEquals(true, c.isSerialiseObjects());
+
+        // Not implemented yet, see MULE-2671
+        //assertNull(c.getComparator());
+        //assertFalse(c.isReverseOrder());
+
         FilenameParser parser = c.getFilenameParser();
         assertTrue(parser.getClass().getName(), c.getFilenameParser() instanceof DummyFilenameParser);
 
