@@ -35,14 +35,14 @@
     </contributors>
     <issueManagement>
         <system>jira</system>
-        <url>http://dev.mulesource.org/jira/browse/MULE</url>
+        <url>http://mule.mulesource.org/jira/browse/MULE</url>
     </issueManagement>
 
     <!-- Build -->
     <scm>
         <connection>scm:svn:http://svn.codehaus.org/mule/trunk/mule</connection>
         <developerConnection>scm:svn:https://svn.codehaus.org/mule/trunk/mule</developerConnection>
-        <url>http://svn.mule.codehaus.org/</url>
+        <url>http://svn.mule.codehaus.org</url>
     </scm>
 
     <properties>
