@@ -62,7 +62,7 @@ public class JdbcSelectOnOutboundFunctionalTestCase extends FunctionalTestCase
 
     }
 
-    protected void doFunctionalTearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         JdbcConnector jdbcConnector = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector");
         QueryRunner qr = jdbcConnector.createQueryRunner();
