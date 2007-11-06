@@ -96,7 +96,7 @@ public class FileConnector extends AbstractConnector
 
     private boolean serialiseObjects = false;
 
-    private boolean streamFiles = true;
+    private boolean streaming = true;
     
     public FilenameParser filenameParser;
 
@@ -571,14 +571,14 @@ public class FileConnector extends AbstractConnector
         return getFilenameParser().getFilename(message, pattern);
     }
 
-    public boolean isStreamFiles()
+    public boolean isStreaming()
     {
-        return streamFiles;
+        return streaming;
     }
 
-    public void setStreamFiles(boolean streamFiles)
+    public void setStreaming(boolean streaming)
     {
-        this.streamFiles = streamFiles;
+        this.streaming = streaming;
     }
     
     

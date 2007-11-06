@@ -37,7 +37,6 @@ import java.nio.channels.FileLock;
 import java.util.Comparator;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-
 import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.commons.io.IOUtils;
 
@@ -200,7 +199,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         FileConnector fc = ((FileConnector) connector);
         // We can't move files if they're going to be deleted on the stream close
-        if (!fc.isStreamFiles() || (fc.isStreamFiles() && !fc.isAutoDelete())) 
+        if (!fc.isStreaming() || (fc.isStreaming() && !fc.isAutoDelete())) 
         {
             moveAndDelete(sourceFile, destinationFile, sourceFileOriginalName, msgAdapter, fileIn);
         }
@@ -274,7 +273,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             this.routeMessage(new MuleMessage(msgAdapter), endpoint.isSynchronous());
 
             // Delete the file if we didn't stream it
-            if (!((FileConnector) connector).isStreamFiles())
+            if (!((FileConnector) connector).isStreaming())
             {
                 boolean moveTo = destinationFile != null;
                 File current = moveTo ? destinationFile : sourceFile;
@@ -303,7 +302,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private Object getPayload(final File sourceFile, boolean moveTo) throws FileNotFoundException
     {
         Object payload = null;
-        if (((FileConnector) connector).isStreamFiles()) 
+        if (((FileConnector) connector).isStreaming())
         {
             payload = new ReceiverFileInputStream(sourceFile, moveTo);
         }
