@@ -102,14 +102,14 @@
                 <xsd:attribute name="comparator" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Comparator class name
+                            Comparator class name to use to sort files for processing.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="reverseOrder" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Should reverse comparator?
+                            Should comparator order be reversed?
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
