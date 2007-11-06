@@ -18,7 +18,6 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.StreamPayloadRequestEntity;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.transformers.AbstractMessageAwareTransformer;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.OutputHandler;
@@ -32,7 +31,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
@@ -55,16 +53,15 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 
 public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransformer
 {
-    private final SerializableToByteArray serializableToByteArray;
 
     public ObjectToHttpClientMethodRequest()
     {
         setReturnClass(HttpMethod.class);
+        registerSourceType(UMOMessage.class);
         registerSourceType(byte[].class);
         registerSourceType(String.class);
         registerSourceType(InputStream.class);
         registerSourceType(OutputHandler.class);
-        serializableToByteArray = new SerializableToByteArray();
     }
 
     private int addParameters(String queryString, PostMethod postMethod)

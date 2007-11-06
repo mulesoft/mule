@@ -24,17 +24,17 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * <code>ReflectEntryPointResolver</code> is used to detemine the entry point on a component
+ * <code>ReflectEntryPointResolver</code> is used to determine the entry point on a component
  * after an event has been received for it. The entrypoint is  discovered using
  * the event payload type(s) as the argument using reflection. An entry point will try and match for
  * different argument types, so it's possible to have multiple entry points on a
  * single component.
  * <p/>
- * For multiple parameters the payload of context.getMessage().geTPayload() should be an Array of objects.
+ * For multiple parameters the payload of context.getMessage().getPayload() should be an Array of objects.
  * If the message payload is of type {@link org.mule.providers.NullPayload} the resolver will look for a no-argument
- * method to call that doesn't match the set of ignoredMethods on the resover.
+ * method to call that doesn't match the set of ignoredMethods on the resolver.
  * <p/>
- * Also a set of 'ingorred' methods are available (and the use can add others) to tell the resolver to not
+ * Also a set of 'ignored' methods are available (and the use can add others) to tell the resolver to not
  * resolve to these methods. The default ones are:
  * <ul>
  * <li>{@link #toString()}

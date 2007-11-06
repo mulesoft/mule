@@ -17,7 +17,6 @@ import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpResponse;
 import org.mule.transformers.AbstractMessageAwareTransformer;
-import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
@@ -194,6 +193,7 @@ public class UMOMessageToHttpResponse extends AbstractMessageAwareTransformer
 
         int status = msg.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
         String version = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
+        String etag = msg.getStringProperty(HttpConstants.HEADER_ETAG, null);
         
         String date;
         synchronized (format)
@@ -211,6 +211,10 @@ public class UMOMessageToHttpResponse extends AbstractMessageAwareTransformer
         if (msg.getProperty(HttpConstants.HEADER_EXPIRES) == null)
         {
             response.setHeader(new Header(HttpConstants.HEADER_EXPIRES, date));
+        }
+        if (etag != null)
+        {
+            response.setHeader(new Header(HttpConstants.HEADER_ETAG, etag));
         }
         response.setFallbackCharset(encoding);
 

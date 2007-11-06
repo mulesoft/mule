@@ -230,7 +230,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         UMOMessage msg = event.getMessage();
         String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
-        
+        String ifNoneMatch = msg.getStringProperty(HttpConstants.HEADER_IF_NONE_MATCH, null);
         
         setPropertyFromEndpoint(event, msg, HttpConstants.HEADER_CONTENT_TYPE);
         setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
@@ -298,6 +298,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             // don't use preemptive if there are no credentials to send
             client.getParams().setAuthenticationPreemptive(false);
         }
+        
+        if (ifNoneMatch != null)
+        {
+            httpMethod.setRequestHeader(HttpConstants.HEADER_IF_NONE_MATCH, ifNoneMatch);
+        }
+        
         return httpMethod;
     }
 

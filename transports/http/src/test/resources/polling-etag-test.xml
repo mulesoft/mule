@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+       xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
+
+    <http:connector name="PollingHttpConnector">
+        <service-overrides messageReceiver="org.mule.providers.http.PollingHttpMessageReceiver"/>
+    </http:connector>
+
+    <http:connector name="HttpConnector"/>
+
+    <model name="main">
+
+        <!-- singleton for easier testing only -->
+        <service name="Test" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
+                                  address="http://localhost:60206/TestServer"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="stdio://System.out"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+        <service name="TestServer">
+            <singleton-object class="org.mule.providers.http.functional.ETagComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="http://localhost:60206" remoteSync="true" connector-ref="HttpConnector"/>
+            </inbound-router>
+        </service>
+
+    </model>
+
+</mule>
