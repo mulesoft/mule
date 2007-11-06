@@ -86,6 +86,7 @@
         <xsd:attribute name="durable" type="mule:substitutableBoolean"/>
         <xsd:attribute name="noLocal" type="mule:substitutableBoolean"/>
         <xsd:attribute name="persistentDelivery" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="honorQosHeaders" type="mule:substitutableBoolean"/>
         <xsd:attribute name="maxRedelivery" type="mule:substitutableInt"/>
         <xsd:attribute name="cacheJmsSessions" type="mule:substitutableBoolean"/>
         <xsd:attribute name="recoverJmsConnections" type="mule:substitutableBoolean"/>
