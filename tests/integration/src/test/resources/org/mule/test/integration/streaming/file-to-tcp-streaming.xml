@@ -1,38 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="FileToTcp" version="1.0">
-
-    <mule-environment-properties synchronous="true"/>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
     
-    <model name="main" type="streaming">
-        <mule-descriptor name="bridge1" implementation="org.mule.components.simple.StreamingBridgeComponent">
+    <model name="main">
+        <service name="bridge1">
             <inbound-router>
-                <endpoint address="file://${mule.working.dir}/test-data/in" streaming="true"/>
+                <inbound-endpoint address="file://${mule.working.dir}/test-data/in"/>
+                <forwarding-router/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="tcp://localhost:34561" streaming="true"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="tcp://localhost:34561"/>
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="bridge2" implementation="org.mule.test.integration.streaming.SimpleStreamingBean">
+        <service name="bridge2">
+            <component class="org.mule.test.integration.streaming.SimpleStreamingBean"/>
             <inbound-router>
-                <endpoint address="tcp://localhost:34561" streaming="true"/>
+                <inbound-endpoint address="tcp://localhost:34561"/>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <!--<endpoint address="stdio://System.out" streaming="true"/>-->
-                    <endpoint address="file://${mule.working.dir}/test-data/out" encoding="UTF8" streaming="true">
+                <multicasting-router>
+                    <!--<outbound-endpoint address="stdio://System.out" streaming="true"/>-->
+                    <outbound-endpoint address="file://${mule.working.dir}/test-data/out" encoding="UTF8">
                         <properties>
-                            <property name="outputPattern" value="foo.txt.processed"/>
+                            <spring:entry key="outputPattern" value="foo.txt.processed"/>
                         </properties>
-                    </endpoint>
-                </router>
+                    </outbound-endpoint>
+                </multicasting-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-</mule-configuration>
+</mule>
