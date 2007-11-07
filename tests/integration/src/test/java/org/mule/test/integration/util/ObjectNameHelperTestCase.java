@@ -19,13 +19,13 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
     {
 
         UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "jms://cn=foo,name=queue", managementContext);
+            "test://cn=foo,name=queue", managementContext);
         managementContext.getRegistry().registerEndpoint(ep);
-        assertEquals("endpoint.jms.cn.foo.name.queue", ep.getName());
+        assertEquals("endpoint.test.cn.foo.name.queue", ep.getName());
 
-        ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("jms://cn=foo,name=queue",
+        ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("test://cn=foo,name=queue",
             managementContext);
-        assertEquals("endpoint.jms.cn.foo.name.queue.1", ep.getName());
+        assertEquals("endpoint.test.cn.foo.name.queue.1", ep.getName());
 
         // Test generating a unique name when there is a matching endpoint
         ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vm://my.queue",
@@ -39,21 +39,21 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
     public void testEndpointNames() throws Exception
     {
         UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "jms://cn=foo,name=queue?endpointName=foo", managementContext);
+            "test://cn=foo,name=queue?endpointName=foo", managementContext);
         managementContext.getRegistry().registerEndpoint(ep);
         assertEquals("foo", ep.getName());
 
         ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "jms://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x", managementContext);
+            "test://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x", managementContext);
         assertEquals("this.is.aWierd.Name.x", ep.getName());
         managementContext.getRegistry().registerEndpoint(ep);
 
         // Test generating a unique name when there is a matching endpoint
         ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "jms://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x", managementContext);
+            "test://cn=foo,name=queue?endpointName=this_is@aWierd-Name:x", managementContext);
         assertEquals("this.is.aWierd.Name.x", ep.getName());
         ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "jms://cn=foo,name=queue?endpointName=this____is+another=@Wierd----Name:x:::", managementContext);
+            "test://cn=foo,name=queue?endpointName=this____is+another=@Wierd----Name:x:::", managementContext);
         assertEquals("this.is.another.Wierd.Name.x", ep.getName());
     }
 

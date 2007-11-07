@@ -141,6 +141,8 @@ org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
 #	at org.mule.config.spring.editors.EndpointURIPropertyEditor.setAsText(EndpointURIPropertyEditor.java:32)
 org.mule.test.integration.streaming.FileToTcpStreamingTestCase
 	
-# Not yet reviewed
+# Does this still need to work for 2.x?
 org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
+
+# @ in URI is not getting replaced (1 of 3 tests fails)
 org.mule.test.integration.util.ObjectNameHelperTestCase
