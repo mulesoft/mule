@@ -1063,20 +1063,12 @@
                     <name>!skipBuildnumber</name>
                 </property>
             </activation>
-            <pluginRepositories>
-                <!-- for buildnumber plugin -->
-                <!--<pluginRepository>-->
-                    <!--<id>tlc</id>-->
-                    <!--<name>TLC Repository</name>-->
-                    <!--<url>http://commons.ucalgary.ca/pub/m2</url>-->
-                <!--</pluginRepository>-->
-            </pluginRepositories>
             <build>
                 <plugins>
                     <!-- add repository revision to manifests -->
-                    <!--<plugin>
+                    <plugin>
                         <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>maven-buildnumber-plugin</artifactId>
+                        <artifactId>buildnumber-maven-plugin</artifactId>
                         <executions>
                             <execution>
                                 <phase>validate</phase>
@@ -1085,10 +1077,10 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>-->
+                        <configuration>
                             <!-- never touch svn -->
-                            <!--<doCheck>false</doCheck>-->
-                            <!--<doUpdate>false</doUpdate>-->
+                            <doCheck>false</doCheck>
+                            <doUpdate>false</doUpdate>
                             <!-- Keep the format and items commented out -->
                             <!--
                                 <format>{0,date,yyyy-MMM-dd-HH:mm:ss}</format>
@@ -1096,8 +1088,8 @@
                                     <item>timestamp</item>
                                 </items>
                             -->
-                        <!--</configuration>-->
-                     <!--</plugin>-->
+                        </configuration>
+                     </plugin>
                 </plugins>
             </build>
         </profile>
