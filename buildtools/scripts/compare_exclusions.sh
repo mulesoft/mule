@@ -20,7 +20,7 @@ function process() {
   name="$2"
   echo "reading $name"
   tmp=`mktemp "${name}.XXX"`
-  find "$dir" -name mule-test-exclusions.txt -exec egrep "^[a-z]" \{} \; | sort > "$tmp"
+  find "$dir" \( -name ".svn" -prune \) -o \( -name "target" -prune \) -o \( -name mule-test-exclusions.txt -exec egrep "^[a-z]" \{} \; \) | sort > "$tmp"
   
 }
 
