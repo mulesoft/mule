@@ -1,6 +1,6 @@
-#
-# Test cases listed in this file are not run.
-#
+##########################################################################
+# Mule 1.x
+##########################################################################
 
 # These tests hang if you're behind a firewall.
 # Figure out how to use proxy settings here.
@@ -37,19 +37,41 @@ org.mule.test.integration.providers.jms.NestedRouterTestCase
 org.mule.test.usecases.sync.TcpToFileTestCase
 
 ##########################################################################
-# Mule 2.x-specific failures
+# Convert to XML-based config
 ##########################################################################
 
-# Only testClientSendDirect() (1 of 6) is failing.
-# I'm not sure that RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true)
-# actually has any effect.
-org.mule.test.integration.client.MuleClientTestCase
+org.mule.test.integration.message.AttachmentsPropagationTestCase
+org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
+org.mule.test.integration.providers.jdbc.JdbcConnectionTestCase
+org.mule.test.integration.providers.jdbc.JdbcNonTransactionalFunctionalTestCase
+org.mule.test.integration.providers.jdbc.JdbcNullParamsTestCase
+org.mule.test.integration.providers.jdbc.JdbcTransactionalJdbcFunctionalTestCase
+org.mule.test.integration.providers.jdbc.JdbcTransactionalXaFunctionalTestCase
+# Convert transacted endpoint to XML config
+org.mule.test.integration.client.MuleClientTransactionTestCase
+
+##########################################################################
+# Missing config file
+##########################################################################
+
+org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
+org.mule.test.integration.client.MuleClientListenerTestCase
+org.mule.test.integration.client.RemoteExceptionTestCase
+org.mule.test.integration.EventMetaDataPropagationTestCase
+org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
+
+##########################################################################
+# Unfinished 2.x implementation
+##########################################################################
 
 # Need to finish implementation of <static-recipient-list-router>
 org.mule.test.integration.routing.AggregatorIntegrationTestCase
 
 # Need to finish implementation of <wire-tap-router>
 org.mule.test.integration.routing.WireTapTestCase
+
+# Message chunking router not working?
+org.mule.test.integration.routing.MessageChunkingTestCase
 
 # How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
 org.mule.test.integration.persistence.FilePersistenceTestCase
@@ -62,8 +84,32 @@ org.mule.test.integration.client.MuleClientRemotingTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 org.mule.test.integration.spring.MuleAdminTestCase
 
-# Message chunking router not working?
-org.mule.test.integration.routing.MessageChunkingTestCase
+# These need <model-direct>, <model-pipeline>, etc. (or <direct:model>, <pipeline:model>?) elements configured.  
+# BTW, Is anyone actually using these?
+org.mule.test.integration.models.ConfigureModelTestCase
+org.mule.test.integration.models.DirectPipelineTestCase
+org.mule.test.integration.models.OptimisedSedaPipelineTestCase
+org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
+org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
+org.mule.test.integration.models.SedaPipelineTestCase
+
+# Not sure what to do about the "test:" namespace in 2.x
+org.mule.test.integration.MuleEndpointConfigurationTestCase
+
+# TODO MULE-1789
+org.mule.test.integration.config.MultiContainerTestCase
+
+# Does this still need to work for 2.x?
+org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
+
+##########################################################################
+# Mule 2.x-specific failures
+##########################################################################
+
+# Only testClientSendDirect() (1 of 6) is failing.
+# I'm not sure that RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true)
+# actually has any effect.
+org.mule.test.integration.client.MuleClientTestCase
 
 # Note: this test does not appear to be in very good shape, half the config is commented-out
 #
@@ -82,46 +128,12 @@ org.mule.test.integration.routing.replyto.ReplytoChainIntegrationTestCase
 # OutputHandler has to do with StreamMessageAdapter, could this be a streaming issue?
 org.mule.test.usecases.sync.HttpTransformTestCase
 
-# These tests can't find their config file: Where, oh where has this little file gone?
-org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
-org.mule.test.integration.client.MuleClientListenerTestCase
-org.mule.test.integration.client.RemoteExceptionTestCase
-org.mule.test.integration.EventMetaDataPropagationTestCase
-org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
-
-# Convert to XML config-based test
-org.mule.test.integration.message.AttachmentsPropagationTestCase
-org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
-org.mule.test.integration.providers.jdbc.JdbcConnectionTestCase
-org.mule.test.integration.providers.jdbc.JdbcNonTransactionalFunctionalTestCase
-org.mule.test.integration.providers.jdbc.JdbcNullParamsTestCase
-org.mule.test.integration.providers.jdbc.JdbcTransactionalJdbcFunctionalTestCase
-org.mule.test.integration.providers.jdbc.JdbcTransactionalXaFunctionalTestCase
-
-# Convert transacted endpoint to XML config
-org.mule.test.integration.client.MuleClientTransactionTestCase
-
-# Not sure what to do about the "test:" namespace in 2.x
-org.mule.test.integration.MuleEndpointConfigurationTestCase
-
 # Hangs for a long, long time
 org.mule.test.integration.transaction.XAJdbcMule1479TestCase
-
-# These need <model-direct>, <model-pipeline>, etc. (or <direct:model>, <pipeline:model>?) elements configured.  
-# BTW, Is anyone actually using these?
-org.mule.test.integration.models.ConfigureModelTestCase
-org.mule.test.integration.models.DirectPipelineTestCase
-org.mule.test.integration.models.OptimisedSedaPipelineTestCase
-org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
-org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
-org.mule.test.integration.models.SedaPipelineTestCase
 
 # Config uses an internal class "FileFunctionalTestCase$FileTestComponent" and the schema
 # rejects it because it is not a valid NMTOKEN.
 org.mule.test.integration.providers.file.FileFunctionalTestCase
-
-# TODO MULE-1789
-org.mule.test.integration.config.MultiContainerTestCase
 
 # Might have to do with message-api changes?
 #   java.lang.IllegalStateException: Only owner thread can write to message: Thread[main,5,main]/Thread[DefaultQuartzScheduler_Worker-3,5,main]
@@ -141,8 +153,5 @@ org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
 #	at org.mule.config.spring.editors.EndpointURIPropertyEditor.setAsText(EndpointURIPropertyEditor.java:32)
 org.mule.test.integration.streaming.FileToTcpStreamingTestCase
 	
-# Does this still need to work for 2.x?
-org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
-
 # @ in URI is not getting replaced (1 of 3 tests fails)
 org.mule.test.integration.util.ObjectNameHelperTestCase
