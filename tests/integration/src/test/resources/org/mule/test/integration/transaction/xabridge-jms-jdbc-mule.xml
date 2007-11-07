@@ -1,74 +1,118 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
+       xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd
+       http://www.mulesource.org/schema/mule/jbossts/2.0 http://www.mulesource.org/schema/mule/jbossts/2.0/mule-jbossts.xsd">
 
-<mule-configuration id="test" version="1.0">
-
-   <mule-environment-properties synchronous="true" synchronousEventTimeout="5000">
+    <!-- 
+    <mule-environment-properties synchronous="true" synchronousEventTimeout="5000">
        <threading-profile id="default" maxThreadsActive="1" maxThreadsIdle="1" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>
-   </mule-environment-properties>
+    </mule-environment-properties>
+    -->
 
-    <!-- Container context -->
-    <container-context name="spring"  className="org.mule.extras.spring.SpringContainerContext">
-        <properties>
-            <property name="configFile" value="org/mule/test/integration/transaction/xabridge-jms-jdbc-spring.xml"/>
-        </properties>
-    </container-context>
+    <!-- JOTM Transaction manager -->
+    <spring:bean name="ArjunaFactory" class="org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
+
+    <spring:bean id="arjunaTM"
+        factory-bean="ArjunaFactory" factory-method="create"/>
+
+
+    <spring:bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	    <spring:property name="location">
+            <spring:value>classpath:derby.properties</spring:value>
+        </spring:property>
+    </spring:bean>
+    <!-- Data Source -->
+    <spring:bean id="jdbcDataSource"
+        class="org.enhydra.jdbc.standard.StandardXADataSource"
+        destroy-method="shutdown">
+        <spring:property name="transactionManager">
+            <spring:ref local="arjunaTM"/>
+        </spring:property>
+        <spring:property name="driverName">
+            <spring:value>org.apache.derby.jdbc.EmbeddedDriver</spring:value>
+        </spring:property>
+        <spring:property name="url">
+            <spring:value>${database.connection}</spring:value>
+        </spring:property>
+    </spring:bean>
+    <!--
+    <spring:bean id="jdbcDataSourceXa"
+        class="org.enhydra.jdbc.pool.StandardXAPoolDataSource"
+        destroy-method="shutdown">
+        <spring:property name="dataSource">
+            <spring:ref local="innerDataSource"/>
+        </spring:property>
+        <spring:property name="maxSize">
+            <spring:value>10</spring:value>
+        </spring:property>
+    </spring:bean>
+    -->
 
     <!-- Transaction manager -->
-    <transaction-manager
-        factory="org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory" />
+    <jbossts:jboss-transaction-manager/>
 
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
-        <properties>
-            <container-property name="connectionFactory" reference="jmsConnectionFactoryXa"/>
-            <property name="specification" value="1.1"/>
-            <property name="eagerConsumer" value="false"/>
-        </properties>
-    </connector>
+    <custom-transaction-factory name="xaTxFactory" class="org.mule.transaction.XaTransactionFactory"/>
 
-    <connector name="jdbcConnector" className="org.mule.providers.jdbc.JdbcConnector">
-        <properties>
-            <property name="pollingFrequency" value="1000"/>
-            <container-property name="dataSource" reference="jdbcDataSource"/>
-            <map name="queries">
-                <property name="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
-                <property name="getTest.ack" value="UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}" />
-                <property name="writeTest" value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)" />
-            </map>
-        </properties>
-       <threading-profile id="default" maxThreadsActive="2" maxThreadsIdle="2" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>
-    </connector>
+    <jms:connector name="jmsConnector" eagerConsumer="false">
+        <jms:connection-factory class="org.apache.activemq.ActiveMQXAConnectionFactory">
+            <properties>
+                <spring:entry key="brokerURL" value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
+            </properties>
+        </jms:connection-factory>
+    </jms:connector>
+
+    <jdbc:connector name="jdbcConnector" pollingFrequency="1000">
+        <receiver-threading-profile maxThreadsActive="2" maxThreadsIdle="2" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>
+        <dispatcher-threading-profile maxThreadsActive="2" maxThreadsIdle="2" maxBufferSize="1" doThreading="false" poolExhaustedAction="WAIT"/>
+        
+        <jdbc:dataSource instance-ref="jdbcDataSource" scope="singleton" />
+        <jdbc:queries>
+            <spring:entry key="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
+            <spring:entry key="getTest.ack" value="UPDATE TEST SET ACK = ${function:NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}" />
+            <spring:entry key="writeTest" value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)" />
+        </jdbc:queries>
+    </jdbc:connector>
 
     <model name="model">
-
-        <mule-descriptor name="JdbcToJms"
-            implementation="org.mule.test.integration.transaction.XABridgeComponent">
+        <service name="JdbcToJms">
+            <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <inbound-router>
-                <endpoint address="jdbc://getTest?type=1">
-                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>
-                </endpoint>
+                <inbound-endpoint address="jdbc://getTest?type=1">
+                    <transaction action="ALWAYS_BEGIN">
+                        <transaction-factory ref="xaTxFactory"/>
+                    </transaction>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://my.queue" />
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="jms://my.queue" />
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
 
-        <mule-descriptor name="JmsToJdbc"
-            implementation="org.mule.test.integration.transaction.XABridgeComponent">
+        <service name="JmsToJdbc">
+            <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <inbound-router>
-                <endpoint address="jms://my.queue?frequency=60000&amp;reuseSession=false">
-                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>
-                </endpoint>
+                <inbound-endpoint address="jms://my.queue?frequency=60000&amp;reuseSession=false">
+                    <transaction action="ALWAYS_BEGIN">
+                        <transaction-factory ref="xaTxFactory"/>
+                    </transaction>
+                </inbound-endpoint>
             </inbound-router>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jdbc://writeTest?type=2" />
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="jdbc://writeTest?type=2" />
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
-
+        </service>
     </model>
-</mule-configuration>
+</mule>
