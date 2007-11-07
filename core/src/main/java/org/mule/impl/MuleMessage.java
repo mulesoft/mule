@@ -631,6 +631,7 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
                     {
                         originalAdapter = adapter;
                     }
+                    //TODO RM*: Must make sure this works for all scenarios
                     if (result instanceof UMOMessage)
                     {
                         synchronized (this)
