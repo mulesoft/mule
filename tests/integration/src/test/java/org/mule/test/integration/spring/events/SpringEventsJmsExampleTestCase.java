@@ -12,12 +12,13 @@ package org.mule.test.integration.spring.events;
 
 import org.mule.RegistryContext;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -25,24 +26,24 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * example config in the documentation. This test is not run when building this
  * module as it relies on JMS; it's used to verify that the example config works.
  */
-public class SpringEventsJmsExampleTestCase extends AbstractMuleTestCase
+public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
 {
     private static final AtomicInteger eventCount = new AtomicInteger(0);
 
     private static ClassPathXmlApplicationContext context;
 
+    protected String getConfigResources()
+    {
+        return "org/mule/test/integration/spring/events/mule-events-example-app-context.xml";
+    }
+
+    public SpringEventsJmsExampleTestCase()
+    {
+        setStartContext(false);
+    }
+    
     protected void doSetUp() throws Exception
     {
-        if (context == null)
-        {
-            context = new ClassPathXmlApplicationContext(
-                "org/mule/test/integration/spring/events/mule-events-example-app-context.xml");
-        }
-        else
-        {
-            context.refresh();
-        }
-
         eventCount.set(0);
     }
 

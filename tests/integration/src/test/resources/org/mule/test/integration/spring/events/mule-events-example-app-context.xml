@@ -1,40 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <constructor-arg>
-            <value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value>
-        </constructor-arg>
-    </bean>
-
-    <!-- the jms server connector config -->
-    <bean id="jmsConnector" class="org.mule.providers.jms.JmsConnector">
-        <property name="connectionFactory"><ref local="jmsConnectionFactory"/></property>
-        <property name="specification"><value>1.1</value></property>
-    </bean>
-
+    <jms:activemq-connector name="jmsConnector"/>
+    
    <!-- The Mule implementation of the Spring ApplicationEventMulticaster.  On startup the
    application context will look in the container for a bean called applicationEventMulticaster and
    register it as the spring context event multicaster  -->
-   <bean id="applicationEventMulticaster" class="org.mule.extras.spring.events.MuleEventMulticaster"/>
+   <spring:bean id="applicationEventMulticaster" class="org.mule.extras.spring.events.MuleEventMulticaster"/>
 
    <!-- Our ourderManager bean -->
-    <bean id="orderManager" class="org.mule.test.integration.spring.events.OrderManagerBean">
-        <property name="subscriptions">
-        <list>
-            <value>jms://orders.queue</value>
-<!--            <value>pop3://user:password@mail.myrestaurant.com?transformers=EmailMessageToString,StringToOrder</value>-->
-            <value>axis:http://localhost:44444/mule/orderManager</value>
-        </list>
-        </property>
-    </bean>
+    <spring:bean id="orderManager" class="org.mule.test.integration.spring.events.OrderManagerBean">
+        <spring:property name="subscriptions">
+        <spring:list>
+            <spring:value>jms://orders.queue</spring:value>
+<!--            <spring:value>pop3://user:password@mail.myrestaurant.com?transformers=EmailMessageToString,StringToOrder</spring:value>-->
+            <spring:value>axis:http://localhost:44444/mule/orderManager</spring:value>
+        </spring:list>
+        </spring:property>
+    </spring:bean>
 
 
-<!--    <bean id="EmailMessageToString" class="org.mule.providers.email.transformers.EmailMessageToString"/>-->
+<!--    <spring:bean id="EmailMessageToString" class="org.mule.providers.email.transformers.EmailMessageToString"/>-->
 
-    <bean id="StringToOrder" class="org.mule.test.integration.spring.events.StringToOrder">
-        <property name="returnClass"><value>org.mule.test.integration.spring.events.Order</value></property>
-    </bean>
-
-</beans>
+    <spring:bean id="StringToOrder" class="org.mule.test.integration.spring.events.StringToOrder">
+        <spring:property name="returnClass">
+            <spring:value>org.mule.test.integration.spring.events.Order</spring:value>
+        </spring:property>
+    </spring:bean>
+</mule>
