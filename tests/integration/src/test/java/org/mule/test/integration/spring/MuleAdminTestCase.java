@@ -10,8 +10,6 @@
 
 package org.mule.test.integration.spring;
 
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
@@ -19,15 +17,9 @@ import org.mule.umo.UMOMessage;
 
 public class MuleAdminTestCase extends FunctionalTestCase
 {
-
     protected String getConfigResources()
     {
         return "org/mule/test/integration/spring/mule-admin-spring.xml";
-    }
-
-    protected ConfigurationBuilder getBuilder()
-    {
-        return new MuleXmlConfigurationBuilder();
     }
 
     public void testMuleAdminChannelInSpring() throws Exception
@@ -37,5 +29,4 @@ public class MuleAdminTestCase extends FunctionalTestCase
         UMOMessage result = rd.sendToRemoteComponent("appleComponent", "string", null);
         assertNotNull(result);
     }
-
 }

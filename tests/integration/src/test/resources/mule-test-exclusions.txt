@@ -60,6 +60,7 @@ org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 # Remoting does not seem to be working yet in 2.x?
 org.mule.test.integration.client.MuleClientRemotingTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
+org.mule.test.integration.spring.MuleAdminTestCase
 
 # Message chunking router not working?
 org.mule.test.integration.routing.MessageChunkingTestCase
@@ -142,5 +143,4 @@ org.mule.test.integration.streaming.FileToTcpStreamingTestCase
 	
 # Not yet reviewed
 org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
-org.mule.test.integration.spring.MuleAdminTestCase
 org.mule.test.integration.util.ObjectNameHelperTestCase
