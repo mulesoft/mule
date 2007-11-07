@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+               http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
+
+    <custom-transformer name="SetLendersAsRecipients"
+                        class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
+    <custom-transformer name="ObjectToJMSMessage"
+                        class="org.mule.providers.jms.transformers.ObjectToJMSMessage"/>
+    <custom-transformer name="JMSMessageToObject"
+                        class="org.mule.providers.jms.transformers.JMSMessageToObject"/>
+
+    <jms:activemq-connector name="default"/>
+    
+    <jms:activemq-connector name="noOutbound">
+        <service-overrides responseTransformer="org.mule.transformers.NoActionTransformer"/>
+    </jms:activemq-connector>
+
+    <model name="test">
+        <service name="test service">
+            <component class="org.mule.examples.loanbroker.issues.SimpleEchoComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="jms://in"
+                                  connector-ref="noOutbound"
+                                  synchronous="true"
+                                  transformer-ref="JMSMessageToObject SetLendersAsRecipients ObjectToJMSMessage"/>
+            </inbound-router>
+        </service>
+    </model>
+
+</mule>
+

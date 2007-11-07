@@ -33,6 +33,7 @@ import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -210,9 +211,10 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             }
             else
             {
-                event.getMessage().applyTransformer(
-                        new TransformerTemplate(
-                                new TransformerTemplate.OverwitePayloadCallback(result)));
+                event.getMessage().applyTransformers(
+                        Collections.singletonList(
+                                new TransformerTemplate(
+                                        new TransformerTemplate.OverwitePayloadCallback(result))));
                 resultMessage = event.getMessage();
             }
         }

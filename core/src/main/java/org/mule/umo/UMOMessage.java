@@ -48,8 +48,6 @@ public interface UMOMessage extends UMOMessageAdapter
      */
     public void applyTransformers(List transformers) throws TransformerException;
 
-    public void applyTransformer(UMOTransformer transformer) throws TransformerException;
-
     /**
      * Will apply a list of transformers to the payload of the message. This *Will* change the payload of the
      * message. This method provides the only way to alter the paylaod of this message without recreating a

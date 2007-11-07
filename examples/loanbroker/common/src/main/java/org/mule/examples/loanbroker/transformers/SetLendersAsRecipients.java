@@ -43,6 +43,7 @@ public class SetLendersAsRecipients extends AbstractMessageAwareTransformer
             recipients += lenders[i].getEndpoint();
         }
 
+        logger.debug("Setting recipients to '" + recipients + "'");
         message.setProperty(StaticRecipientList.RECIPIENTS_PROPERTY, recipients);
         return message;
     }

@@ -51,18 +51,13 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
 {
     /** Serial version */
     private static final long serialVersionUID = 1541720810851984842L;
-
     private static Log logger = LogFactory.getLog(MuleMessage.class);
 
     private UMOMessageAdapter adapter;
-
     private UMOMessageAdapter originalAdapter = null;
-
-    private transient List previousTransformHashCode = new CopyOnWriteArrayList();
-
+    private transient List appliedTransformerHashCodes = new CopyOnWriteArrayList();
     private transient ObjectToString objectToString = new ObjectToString();
     private transient ObjectToByteArray objectToByteArray = new ObjectToByteArray();
-
     private byte[] cache;
 
     public MuleMessage(Object message)
@@ -580,124 +575,88 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
         cache = null;
     }
 
-    public void applyTransformer(UMOTransformer transformer) throws TransformerException
-    {
-        if(transformer!=null &&! (transformer instanceof VoidTransformer))
-        {
-            setPayload(transformer.transform(this));
-        }
-
-    }
-
     /** {@inheritDoc} */
     public void applyTransformers(List transformers) throws TransformerException
     {
         applyTransformers(transformers, null);
     }
 
-    /** {@inheritDoc} */
-    //TODO RM*: I don't like having to treat transformers differently if there is a collection of them
     public void applyTransformers(List transformers, Class outputType) throws TransformerException
     {
-        if (TransformerUtils.isUndefined(transformers) || transformers.size() == 0)
-        {
-            if (outputType != null)
-            {
-                Object object = getPayload(outputType);
-                setPayload(object);
-                return;
-            }
-            return;
-        }
-
-        Object transformedMessage = null;
-        //If we have already performed the same transform do not do it again.  Trigger this by setting the
-        //transformers to null and the transformedPAyload to the current payload.
-        //This will still allow use to perform any further transformation based on the required
-        //outputType (if it is set)
-        if (previousTransformHashCode.contains(new Integer(transformers.hashCode())))
-        {
-            transformers = null;
-            transformedMessage = getPayload();
-        }
-
-
-        if (null != transformers)
+        if (TransformerUtils.isDefined(transformers) && transformers.size() > 0 &&
+                !appliedTransformerHashCodes.contains(new Integer(transformers.hashCode())))
         {
             applyAllTransformers(transformers);
-            transformedMessage = getPayload(outputType);
-            previousTransformHashCode.add(new Integer(transformers.hashCode()));
-        }
-        else if (outputType != null && !transformedMessage.getClass().isAssignableFrom(outputType))
-        {
-            transformedMessage = getPayload(outputType);
-        }
-        if (transformedMessage != null)
-        {
-            setPayload(transformedMessage);
+            appliedTransformerHashCodes.add(new Integer(transformers.hashCode()));
         }
 
+        if (null != outputType && !getPayload().getClass().isAssignableFrom(outputType))
+        {
+            setPayload(getPayload(outputType));
+        }
     }
 
     protected void applyAllTransformers(List transformers) throws TransformerException
     {
-        // no transformer, so do nothing.
-        if (TransformerUtils.isUndefined(transformers) || 0 == transformers.size())
+        if (TransformerUtils.isDefined(transformers) && transformers.size() > 0)
         {
-            return;
-        }
 
-        Iterator iterator = transformers.iterator();
-        while (iterator.hasNext())
-        {
-            UMOTransformer transformer = (UMOTransformer) iterator.next();
-
-            if (getPayload() == null)
+            Iterator iterator = transformers.iterator();
+            while (iterator.hasNext())
             {
-                if (transformer.isAcceptNull())
+                UMOTransformer transformer = (UMOTransformer) iterator.next();
+
+                if (getPayload() == null)
                 {
-                    setPayload(NullPayload.getInstance());
+                    if (transformer.isAcceptNull())
+                    {
+                        setPayload(NullPayload.getInstance());
+                    }
+                    else
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Transformer " + transformer + " doesn't support the null payload.");
+                        }
+                        break;
+                    }
                 }
-                else
+
+                Class srcCls = getPayload().getClass();
+                if (transformer.isSourceTypeSupported(srcCls))
                 {
+                    Object result = transformer.transform(this);
+
+                    if (originalAdapter == null && DebugOptions.isCacheMessageOriginalPayload())
+                    {
+                        originalAdapter = adapter;
+                    }
+                    if (result instanceof UMOMessage)
+                    {
+                        synchronized (this)
+                        {
+                            adapter = ((UMOMessage) result).getAdapter();
+                        }
+                    }
+                    else
+                    {
+                        setPayload(result);
+                    }
+                }
+                else if (!transformer.isIgnoreBadInput())
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Transformer " + transformer + " doesn't support the source payload: " + srcCls);
+                    }
                     break;
                 }
-            }
-
-            Class srcCls = getPayload().getClass();
-            if (transformer.isSourceTypeSupported(srcCls))
-            {
-                Object result = transformer.transform(this);
-
-                if (originalAdapter == null && DebugOptions.isCacheMessageOriginalPayload())
-                {
-                    originalAdapter = adapter;
-                }
-                //TODO RM*: Must make sure this works for all scenarios
-                if (result instanceof UMOMessage)
-                {
-                    synchronized (adapter)
-                    {
-                        this.adapter = ((UMOMessage) result).getAdapter();
-                    }
-                    return;
-                }
-                setPayload(result);
-            }
-            else if (!transformer.isIgnoreBadInput())
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Transformer: " + iterator + " doesn't support the result payload: "
-                            + getPayload().getClass());
-                }
-                break;
             }
         }
     }
 
-
     //////////////////////////////// ThreadSafeAccess Impl ///////////////////////////////
+
     /** {@inheritDoc} */
     public ThreadSafeAccess newThreadCopy()
     {
