@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector"/>
+
+    <model name="Test-Case">
+        <service name="TestComponent">
+            <echo-component/>
+            <inbound-router>
+                <inbound-endpoint address="axis:jms://TestComponent">
+                    <transaction action="ALWAYS_BEGIN">
+                        <jms:transaction-factory name="error"/>
+                    </transaction>
+                </inbound-endpoint>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="jms://testout"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+</mule>

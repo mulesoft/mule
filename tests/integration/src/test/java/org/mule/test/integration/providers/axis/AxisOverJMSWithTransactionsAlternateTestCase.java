@@ -11,16 +11,14 @@
 package org.mule.test.integration.providers.axis;
 
 /**
- * Reference to a global transaction factort
+ * Embedded transaction factory
  */
-public class AxisOverJMSWithTransactionsTestCase extends AbstractAxisOverJMSWithTransactionsTestCase
+public class AxisOverJMSWithTransactionsAlternateTestCase extends AbstractAxisOverJMSWithTransactionsTestCase
 {
 
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/providers/axis/axis-over-jms-config.xml";
+        return "org/mule/test/integration/providers/axis/axis-over-jms-config-alternate.xml";
     }
 
 }
-
-

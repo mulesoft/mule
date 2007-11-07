@@ -34,7 +34,7 @@ import org.mule.config.spring.parsers.specific.BridgeServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
-import org.mule.config.spring.parsers.specific.CustomTransactionFactoryDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.EnvironmentPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
@@ -216,7 +216,7 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("outbound-endpoint", new GenericEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("response-endpoint", new GenericEndpointDefinitionParser(ResponseEndpointFactoryBean.class));
         registerBeanDefinitionParser("transaction", new TransactionConfigDefinitionParser());
-        registerBeanDefinitionParser("custom-transaction-factory", new CustomTransactionFactoryDefinitionParser());
+        registerBeanDefinitionParser("custom-transaction-factory", new TransactionFactoryDefinitionParser());
         registerMuleDefinitionParser("transaction-factory", new ParentDefinitionParser()).addAlias("ref", "factory");
 
         //Container contexts
