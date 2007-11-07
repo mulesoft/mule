@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd">
@@ -16,16 +16,19 @@
         </spring:bean>
 
         <!--<spring:bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
-            <!--<spring:property name="location">-->
-                <!--<spring:value>classpath:derby.properties</spring:value>-->
-            <!--</spring:property>-->
+        <!--<spring:property name="location">-->
+        <!--<spring:value>classpath:derby.properties</spring:value>-->
+        <!--</spring:property>-->
         <!--</spring:bean>-->
     </spring:beans>
 
     <jdbc:connector name="jdbcConnector" pollingFrequency="1000">
-        <jdbc:dataSource instance-ref="jdbcDataSource" scope="singleton" />
+        <jdbc:dataSource instance-ref="jdbcDataSource" scope="singleton"/>
         <jdbc:queries>
-            <spring:entry key="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${map:type} AND ACK IS NULL"/>
+            <spring:entry key="getTest"
+                          value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
+            <spring:entry key="getTestPayload"
+                          value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${jxpath:type} AND ACK IS NULL"/>
         </jdbc:queries>
     </jdbc:connector>
 
@@ -50,7 +53,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="jdbc://getTest"/>
+                    <outbound-endpoint address="jdbc://getTestPayload"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
