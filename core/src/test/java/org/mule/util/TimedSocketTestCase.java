@@ -23,6 +23,8 @@ import java.net.SocketException;
  * Note:
  * <p>These test cases do not cover all possible connection failures. 
  * It is e.g. not easily possible to simulate an unplugged cable.</p>
+ * 
+ * Note: this test will fail if off-line.
  */
 public class TimedSocketTestCase extends AbstractMuleTestCase
 {
