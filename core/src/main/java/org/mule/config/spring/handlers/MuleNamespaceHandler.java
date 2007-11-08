@@ -34,7 +34,6 @@ import org.mule.config.spring.parsers.specific.BridgeServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.EnvironmentPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
@@ -47,6 +46,8 @@ import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimplePojoServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionConfigDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
@@ -201,14 +202,13 @@ public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
         registerBeanDefinitionParser("transformer-append-string", new TransformerDefinitionParser(StringAppendTransformer.class));
 
         //Transaction Managers
-        //TODO RM*: Need to review these, since Spring have some facilities for configuring the transactionManager
-        registerBeanDefinitionParser("custom-transaction-manager", new MuleOrphanDefinitionParser(true));
-        registerBeanDefinitionParser("transaction-manager-jndi", new MuleOrphanDefinitionParser(GenericTransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("transaction-manager-weblogic", new MuleOrphanDefinitionParser(WeblogicTransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("transaction-manager-jboss", new MuleOrphanDefinitionParser(JBossTransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("transaction-manager-jrun", new MuleOrphanDefinitionParser(JRunTransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("transaction-manager-resin", new MuleOrphanDefinitionParser(Resin3TransactionManagerLookupFactory.class, true));
-        registerBeanDefinitionParser("transaction-manager-websphere", new MuleOrphanDefinitionParser(WebsphereTransactionManagerLookupFactory.class, true));
+        registerBeanDefinitionParser("custom-transaction-manager", new TransactionManagerDefinitionParser());
+        registerBeanDefinitionParser("transaction-manager-jndi", new TransactionManagerDefinitionParser(GenericTransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("transaction-manager-weblogic", new TransactionManagerDefinitionParser(WeblogicTransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("transaction-manager-jboss", new TransactionManagerDefinitionParser(JBossTransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("transaction-manager-jrun", new TransactionManagerDefinitionParser(JRunTransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("transaction-manager-resin", new TransactionManagerDefinitionParser(Resin3TransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("transaction-manager-websphere", new TransactionManagerDefinitionParser(WebsphereTransactionManagerLookupFactory.class));
 
         //Endpoint elements
         registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
