@@ -19,26 +19,27 @@ import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDef
 /**
  * This is intended for use by endpoint-specific parsers for non-global endpoint
  * elements.  It will not allow the "ref" attribute with any of the
- * {@link org.mule.config.spring.parsers.specific.LazyEndpointURI#ATTRIBUTES}.
+ * {@link org.mule.config.spring.parsers.specific.LazyEndpointURI#ALL_ATTRIBUTES}.
  *
  * <p>It generates both an endpoint (which should subclass
  * {@link org.mule.impl.endpoint.MuleEndpoint}) and a
  * {@link org.mule.config.spring.parsers.specific.LazyEndpointURI}.  The URI is
  * then injected into the endpoint.  So the associated schema can enable any of the
- * suitable {@link org.mule.config.spring.parsers.specific.LazyEndpointURI#ATTRIBUTES}
+ * suitable {@link org.mule.config.spring.parsers.specific.LazyEndpointURI# ALL_ATTRIBUTES}
  * or add appropriate mappings.
  */
 public class TransportEndpointDefinitionParser extends AddressedEndpointDefinitionParser
 {
 
-    public TransportEndpointDefinitionParser(String protocol, Class endpoint)
+    public TransportEndpointDefinitionParser(String protocol, Class endpoint, String[] requiredAttributes)
     {
-        this(protocol, PROTOCOL, endpoint);
+        this(protocol, PROTOCOL, endpoint, requiredAttributes);
     }
 
-    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint)
+    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint,
+                                             String[] requiredAttributes)
     {
-        this(metaOrProtocol, isMeta, endpoint, new String[]{});
+        this(metaOrProtocol, isMeta, endpoint, new String[]{}, requiredAttributes);
     }
 
     /**
@@ -47,18 +48,14 @@ public class TransportEndpointDefinitionParser extends AddressedEndpointDefiniti
      * @param endpoint The endpoint class
      * @param properties A list of attribute names which will be set as properties on the
      * endpointParser
+     * @param requiredAttributes These are the subset of the alternate address attributes that must be
+     * specified if "address" isn't defined.
      */
-    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint, String[] properties)
+    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint,
+                                             String[] properties, String[] requiredAttributes)
     {
-        super(metaOrProtocol, isMeta, new ChildEndpointDefinitionParser(endpoint), properties);
-        registerPreProcessor(
-                new CheckExclusiveAttributes(new String[][]{
-                        new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},
-                        LazyEndpointURI.ATTRIBUTES}));
-        registerPreProcessor(
-                new CheckExclusiveAttributes(new String[][]{
-                        new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},
-                        properties}));
+        super(metaOrProtocol, isMeta, new ChildEndpointDefinitionParser(endpoint),
+                properties, requiredAttributes);
     }
 
 }

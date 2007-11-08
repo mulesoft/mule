@@ -31,8 +31,12 @@ public class CoreXMLUtils
         buf.append(e.getTagName()).append("{");
         for (int i = 0; i < e.getAttributes().getLength(); i++)
         {
+            if (i > 0)
+            {
+                buf.append(", ");
+            }
             Node n = e.getAttributes().item(i);
-            buf.append(attributeName((Attr) n)).append("=").append(n.getNodeValue()).append(", ");
+            buf.append(attributeName((Attr) n)).append("=").append(n.getNodeValue());
         }
         buf.append("}");
         return buf.toString();

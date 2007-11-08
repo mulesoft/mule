@@ -24,6 +24,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Attr;
 
+/**
+ * Attributes from two different sets cannot appear together
+ */
 public class CheckExclusiveAttributes implements PreProcessor
 {
 
@@ -51,7 +54,7 @@ public class CheckExclusiveAttributes implements PreProcessor
         for (int i = 0; i < attributes.getLength(); i++)
         {
             String alias = CoreXMLUtils.attributeName((Attr) attributes.item(i));
-            String name = config.translateName(alias);
+            String name = null == config ? alias : config.translateName(alias);
             if (knownAttributes.containsKey(name))
             {
                 int index = ((Integer) knownAttributes.get(name)).intValue();

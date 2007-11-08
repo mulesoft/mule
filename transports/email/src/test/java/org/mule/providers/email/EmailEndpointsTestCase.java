@@ -65,7 +65,7 @@ public class EmailEndpointsTestCase extends AbstractMuleTestCase
         MuleEndpointURI endpointUri = new MuleEndpointURI(
             "imap://username:password@imap.lotsofmail.org/MyMail");
         endpointUri.initialise();
-        assertEquals("imap", endpointUri.getScheme());
+        assertEquals(ImapConnector.IMAP, endpointUri.getScheme());
         assertEquals("username@lotsofmail.org", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
         assertEquals(-1, endpointUri.getPort());

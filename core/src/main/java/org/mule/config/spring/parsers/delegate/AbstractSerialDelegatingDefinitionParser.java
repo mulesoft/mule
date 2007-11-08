@@ -178,9 +178,19 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
         enableAttributes(delegate, attributes, true);
     }
 
+    public static void enableAttribute(MuleDefinitionParser delegate, String attribute)
+    {
+        enableAttributes(delegate, new String[]{attribute}, true);
+    }
+
     public static void disableAttributes(MuleDefinitionParser delegate, String[] attributes)
     {
         enableAttributes(delegate, attributes, false);
+    }
+
+    public static void disableAttribute(MuleDefinitionParser delegate, String attribute)
+    {
+        enableAttributes(delegate, new String[]{attribute}, false);
     }
 
 }

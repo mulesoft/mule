@@ -14,17 +14,20 @@ import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpoin
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 
+/**
+ * A parser for global endpoints.  Note that the blocking of "ref" is left to the schema.
+ */
 public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDefinitionParser
 {
 
-    public TransportGlobalEndpointDefinitionParser(String protocol)
+    public TransportGlobalEndpointDefinitionParser(String protocol, String[] requiredAttributes)
     {
-        this(protocol, PROTOCOL);
+        this(protocol, PROTOCOL, requiredAttributes);
     }
 
-    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta)
+    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, String[] requiredAttributes)
     {
-        this(metaOrProtocol, isMeta, new String[]{});
+        this(metaOrProtocol, isMeta, new String[]{}, requiredAttributes);
     }
 
     /**
@@ -32,10 +35,14 @@ public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDe
      * @param isMeta Whether transport is "meta" or not (eg cxf)
      * @param properties A list of attribute names which will be set as properties on the
      * endpointParser
+     * @param requiredAttributes These are the subset of the alternate address attributes that must be
+     * specified if "address" isn't defined.
      */
-    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, String[] properties)
+    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
+                                                   String[] properties, String[] requiredAttributes)
     {
-        super(metaOrProtocol, isMeta, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class), properties);
+        super(metaOrProtocol, isMeta, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class),
+                properties, requiredAttributes);
     }
 
 }

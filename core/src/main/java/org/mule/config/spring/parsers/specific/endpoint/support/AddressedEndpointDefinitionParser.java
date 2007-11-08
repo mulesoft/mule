@@ -16,6 +16,8 @@ import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.processors.BlockAttribute;
+import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
+import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 
 import org.apache.commons.logging.Log;
@@ -36,8 +38,6 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     protected Log logger = LogFactory.getLog(getClass());
     public static final boolean META = ChildAddressDefinitionParser.META;
     public static final boolean PROTOCOL = ChildAddressDefinitionParser.PROTOCOL;
-    public static final String[] BAD_ADDRESS_ATTRIBUTES =
-            new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF};
 
     // this is an example of parsing a single element with several parsers.  in this case
     // (because we extend SingleParentFamilyDefinitionParser) the first parser is expected to
@@ -53,7 +53,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
     public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, MuleDefinitionParser endpointParser)
     {
-        this(metaOrProtocol, isMeta, endpointParser, new String[]{});
+        this(metaOrProtocol, isMeta, endpointParser, new String[]{}, new String[]{});
     }
 
     /**
@@ -62,34 +62,55 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
      * @param endpointParser The parser for the endpoint
      * @param propertyAttributes A list of attribute names which will be set as properties on the
      * endpointParser
+     * @param requiredAddressAttributes A list of attribute names that are required if "address"
+     * isn't present (currently these should be a subset of
+     * {@link org.mule.config.spring.parsers.specific.LazyEndpointURI#ALL_ATTRIBUTES})
      */
     public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
                                              MuleDefinitionParser endpointParser,
-                                             String[] propertyAttributes)
+                                             String[] propertyAttributes,
+                                             String[] requiredAddressAttributes)
     {
         // the first delegate, the parent, is an endpoint; we block address and property
         // related attributes
-        disableAttributes(endpointParser, LazyEndpointURI.ATTRIBUTES);
+        disableAttributes(endpointParser, LazyEndpointURI.ALL_ATTRIBUTES);
         disableAttributes(endpointParser, propertyAttributes);
         addDelegate(endpointParser);
 
         // the next delegate parses the address.  it will see the endpoint as parent automatically.
         MuleChildDefinitionParser addressParser = new ChildAddressDefinitionParser(metaOrProtocol, isMeta);
-        // it should see only the endpoint attributes
-        enableAttributes(addressParser, LazyEndpointURI.ATTRIBUTES);
-        addChildDelegate(addressParser);
 
         // the next delegate parses property attributes
         MuleChildDefinitionParser propertiesParser = new AttributePropertiesDefinitionParser("properties");
-        enableAttributes(propertiesParser, propertyAttributes);
-        addChildDelegate(propertiesParser);
 
         // this handles the "ref problem" - we don't want these parsers to be used if a "ref"
         // defines the address so add a preprocessor to check for that and indicate that the
-        // exception should be handled internally, rather than shown to the user
-        addressParser.registerPreProcessor(new BlockAttribute(BAD_ADDRESS_ATTRIBUTES));
-        propertiesParser.registerPreProcessor(new BlockAttribute(BAD_ADDRESS_ATTRIBUTES));
+        // exception should be handled internally, rather than shown to the user.
+        // we do this before the extra processors below so that this is called last,
+        // allowing other processors to check for conflicts between ref and other attributes
+        addressParser.registerPreProcessor(new BlockAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
+        propertiesParser.registerPreProcessor(new BlockAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
         addHandledException(BlockAttribute.BlockAttributeException.class);
+
+        // the address parser see only the endpoint attributes
+        enableAttributes(addressParser, LazyEndpointURI.ALL_ATTRIBUTES);
+        // we require either a reference, an address, or the attributes specified
+        String[][] addressAttributeSets = new String[][]{
+                new String[]{LazyEndpointURI.ADDRESS},
+                new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},
+                requiredAddressAttributes};
+        addressParser.registerPreProcessor(new CheckRequiredAttributes(addressAttributeSets));
+        // and they must be exclusive
+        addressParser.registerPreProcessor(new CheckExclusiveAttributes(addressAttributeSets));
+        addChildDelegate(addressParser);
+
+        // the properties parser should only see properties
+        enableAttributes(propertiesParser, propertyAttributes);
+        // we also enable "ref" so that we can throw an error if present
+        enableAttribute(propertiesParser, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
+        propertiesParser.registerPreProcessor(new CheckExclusiveAttributes(
+                new String[][]{propertyAttributes, new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF}}));
+        addChildDelegate(propertiesParser);
     }
 
 }

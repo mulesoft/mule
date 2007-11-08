@@ -115,23 +115,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <!-- xsd:complexType name="tcpConnectorType">
-        <xsd:complexContent>
-            <xsd:extension base="noProtocolTcpConnectorType">
-                <xsd:attribute name="tcpProtocolClassName" type="xsd:NMTOKEN">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The class name for the protocol handler. This controls how the raw data stream is converted
-                            into messages. By default messages are constructed as dara are received, with no correction
-                            for multiple packets or fragmentation. You nearly always want to change this (or use a
-                            transport that includes a protocol, like HTTP).
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType -->
-
     <xsd:complexType name="tcpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="noProtocolTcpConnectorType">

@@ -17,9 +17,9 @@
 
         <service name="relay">
             <inbound-router>
-                <inbound-endpoint address="imap://bob:password@localhost:65433">
+                <imap:inbound-endpoint address="imap://bob:password@localhost:65433">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
-                </inbound-endpoint>
+                </imap:inbound-endpoint>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>

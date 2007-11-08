@@ -116,13 +116,19 @@
     </xsd:complexType>
 
     <xsd:element name="abstract-inbound-endpoint" abstract="true" type="abstractInboundEndpointType"/>
-    <xsd:complexType name="abstractInboundEndpointType"/>
+    <xsd:complexType name="abstractInboundEndpointType">
+        <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
 
     <xsd:element name="abstract-outbound-endpoint" abstract="true" type="abstractOutboundEndpointType"/>
-    <xsd:complexType name="abstractOutboundEndpointType"/>
+    <xsd:complexType name="abstractOutboundEndpointType">
+        <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
 
     <xsd:element name="abstract-response-endpoint" abstract="true" type="abstractResponseEndpointType"/>
-    <xsd:complexType name="abstractResponseEndpointType"/>
+    <xsd:complexType name="abstractResponseEndpointType">
+        <xsd:attribute name="name" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
 
     <xsd:element name="abstract-transformer" abstract="true" type="abstractTransformerType"/>
     <xsd:complexType name="abstractTransformerType">
@@ -491,7 +497,6 @@
         <xsd:complexContent>
             <xsd:extension base="abstractInboundEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
-                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -502,7 +507,6 @@
         <xsd:complexContent>
             <xsd:extension base="abstractOutboundEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
-                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -513,7 +517,6 @@
         <xsd:complexContent>
             <xsd:extension base="abstractResponseEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
-                <xsd:attribute name="name" type="xsd:NMTOKEN"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>

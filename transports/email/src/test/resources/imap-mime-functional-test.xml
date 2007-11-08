@@ -20,9 +20,10 @@
 
         <service name="relay">
             <inbound-router>
-                <inbound-endpoint address="imap://bob:password@localhost:65443" transformer-ref="noActionTransformer">
+                <imap:inbound-endpoint username="bob" password="password" hostname="localhost" port="65443"
+                                       transformer-ref="noActionTransformer">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
-                </inbound-endpoint>
+                </imap:inbound-endpoint>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>

@@ -34,12 +34,20 @@ public class LazyEndpointURI implements UMOEndpointURI
     private static final String DOTS = ":";
     private static final String DOTS_SLASHES = DOTS + "//";
 
-    public static final String ADDRESS = "address";
-    public static final String PROTOCOL = "protocol";
     public static final String META = "meta";
-    // TODO - pull out other strings as needed
-    public static final String[] ATTRIBUTES =
-            new String[]{META, PROTOCOL, "username", "password", "hostname", ADDRESS, "port", "path"};
+    public static final String PROTOCOL = "protocol";
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
+    public static final String HOSTNAME = "hostname";
+    public static final String ADDRESS = "address";
+    public static final String PORT = "port";
+    public static final String PATH = "path";
+
+    public static final String[] ALL_ATTRIBUTES =
+            new String[]{META, PROTOCOL, USERNAME, PASSWORD, HOSTNAME, ADDRESS, PORT, PATH};
+    // combinations used in various endpoint parsers to validate required attributes
+    public static final String[] PATH_ATTRIBUTES = new String[]{PATH};
+    public static final String[] UPH_ATTRIBUTES = new String[]{USERNAME, PASSWORD, HOSTNAME};
 
     private String address;
     private String meta;
