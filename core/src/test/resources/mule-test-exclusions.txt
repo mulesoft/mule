@@ -7,10 +7,8 @@ org.mule.impl.endpoint.MuleCopiedEndpointURITestCase
 # MULE-2509
 org.mule.util.concurrent.WaitPolicyTestCase
 
-# Update after MULE-2233
-org.mule.mule.commonspool.CommonsPoolTestCase
-# Delete after MULE-2233
-org.mule.mule.commonspool.CommonsPoolProxyFactoryTestCase
+# There are some issues with disposing objects in the pool
+org.mule.util.object.PooledObjectFactoryTestCase
 
 # MULE-2536
 org.mule.util.queue.FilePersistenceTestCase

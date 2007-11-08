@@ -199,7 +199,19 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
     // Getters and Setters
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public PoolingProfile getPoolingProfile()
+    public int getPoolSize()
+    {
+        if (pool != null)
+        {
+            return pool.getNumActive();
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    
+   public PoolingProfile getPoolingProfile()
     {
         return poolingProfile;
     }
