@@ -23,6 +23,9 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
+/**
+ * Note: this test will fail if off-line.
+ */
 public class SchemaValidationMule2225TestCase extends AbstractMuleTestCase
 {
 
