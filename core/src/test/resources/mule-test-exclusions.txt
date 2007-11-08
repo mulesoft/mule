@@ -7,7 +7,7 @@ org.mule.impl.endpoint.MuleCopiedEndpointURITestCase
 # MULE-2509
 org.mule.util.concurrent.WaitPolicyTestCase
 
-# There are some issues with disposing objects in the pool
+# MULE-2676 There are some issues with disposing objects in the pool
 org.mule.util.object.PooledObjectFactoryTestCase
 
 # MULE-2536
