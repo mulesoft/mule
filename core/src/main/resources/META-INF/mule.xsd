@@ -304,6 +304,7 @@
                         <xsd:restriction base="xsd:NMTOKEN">
                             <xsd:enumeration value="started"/>
                             <xsd:enumeration value="stopped"/>
+                            <xsd:enumeration value="paused"/>
                         </xsd:restriction>
                     </xsd:simpleType>
                 </xsd:attribute>

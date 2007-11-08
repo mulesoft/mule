@@ -12,10 +12,8 @@ package org.mule.impl.model;
 
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultLifecycleAdapterFactory;
-import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -25,8 +23,6 @@ import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.model.UMOModel;
 
 import java.beans.ExceptionListener;
-import java.util.Collection;
-import java.util.Iterator;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -324,87 +320,87 @@ public abstract class AbstractModel implements UMOModel
         }
     }
 
-    /**
-     * Starts a single Mule Component. This can be useful when stopping and starting
-     * some Mule UMOs while letting others continue
-     *
-     * @param name the name of the Mule UMO to start
-     * @throws UMOException if the MuleUMO is not registered or the component failed
-     *                      to start
-     */
-    public void startComponent(UMOComponent component) throws UMOException
-    {
-        if (component.isStarted())
-        {
-            logger.info("Component is already started: " + component);
-        }
-        else if (component.getInitialState().equals(
-                ImmutableMuleDescriptor.INITIAL_STATE_STARTED))
-        {
-            component.start();
-            logger.info("Component " + component + " has been started successfully");
-        }
-        else if (component.getInitialState().equals(
-                ImmutableMuleDescriptor.INITIAL_STATE_PAUSED))
-        {
-            // TODO Why should we have to cast here?
-            ((AbstractComponent) component).start(true);
-            logger.info("Component " + component
-                    + " has been started and paused (initial state = 'paused')");
-        }
-        else
-        {
-            logger.info("Component " + component
-                    + " has not been started (initial state = 'stopped')");
-        }
-        logger.info("Mule " + component.toString() + " has been started successfully");
-    }
-
-    /**
-     * Stops a single Mule Component. This can be useful when stopping and starting
-     * some Mule UMOs while letting others continue.
-     *
-     * @param name the name of the Mule UMO to stop
-     * @throws UMOException if the MuleUMO is not registered
-     */
-    public void stopComponent(UMOComponent component) throws UMOException
-    {
-        component.stop();
-        logger.info("Mule " + name + " has been stopped successfully");
-    }
-
-    /**
-     * Pauses event processing for a single Mule Component. Unlike stopComponent(), a
-     * paused component will still consume messages from the underlying transport,
-     * but those messages will be queued until the component is resumed. <p/> In
-     * order to persist these queued messages you can set the 'recoverableMode'
-     * property on the Muleconfiguration to true. this causes all internal queues to
-     * store their state.
-     *
-     * @param name the name of the Mule UMO to stop
-     * @throws org.mule.umo.UMOException if the MuleUMO is not registered or the
-     *                                   component failed to pause.
-     * @see org.mule.config.MuleConfiguration
-     */
-    public void pauseComponent(UMOComponent component) throws UMOException
-    {
-        component.pause();
-        logger.info("Mule Component " + name + " has been paused successfully");
-    }
-
-    /**
-     * Resumes a single Mule Component that has been paused. If the component is not
-     * paused nothing is executed.
-     *
-     * @param name the name of the Mule UMO to resume
-     * @throws org.mule.umo.UMOException if the MuleUMO is not registered or the
-     *                                   component failed to resume
-     */
-    public void resumeComponent(UMOComponent component) throws UMOException
-    {
-        component.resume();
-        logger.info("Mule Component " + name + " has been resumed successfully");
-    }
+//    /**
+//     * Starts a single Mule Component. This can be useful when stopping and starting
+//     * some Mule UMOs while letting others continue
+//     *
+//     * @param name the name of the Mule UMO to start
+//     * @throws UMOException if the MuleUMO is not registered or the component failed
+//     *                      to start
+//     */
+//    public void startComponent(UMOComponent component) throws UMOException
+//    {
+//        if (component.isStarted())
+//        {
+//            logger.info("Component is already started: " + component);
+//        }
+//        else if (component.getInitialState().equals(
+//                ImmutableMuleDescriptor.INITIAL_STATE_STARTED))
+//        {
+//            component.start();
+//            logger.info("Component " + component + " has been started successfully");
+//        }
+//        else if (component.getInitialState().equals(
+//                ImmutableMuleDescriptor.INITIAL_STATE_PAUSED))
+//        {
+//            // TODO Why should we have to cast here?
+//            ((AbstractComponent) component).start(true);
+//            logger.info("Component " + component
+//                    + " has been started and paused (initial state = 'paused')");
+//        }
+//        else
+//        {
+//            logger.info("Component " + component
+//                    + " has not been started (initial state = 'stopped')");
+//        }
+//        logger.info("Mule " + component.toString() + " has been started successfully");
+//    }
+//
+//    /**
+//     * Stops a single Mule Component. This can be useful when stopping and starting
+//     * some Mule UMOs while letting others continue.
+//     *
+//     * @param name the name of the Mule UMO to stop
+//     * @throws UMOException if the MuleUMO is not registered
+//     */
+//    public void stopComponent(UMOComponent component) throws UMOException
+//    {
+//        component.stop();
+//        logger.info("Mule " + name + " has been stopped successfully");
+//    }
+//
+//    /**
+//     * Pauses event processing for a single Mule Component. Unlike stopComponent(), a
+//     * paused component will still consume messages from the underlying transport,
+//     * but those messages will be queued until the component is resumed. <p/> In
+//     * order to persist these queued messages you can set the 'recoverableMode'
+//     * property on the Muleconfiguration to true. this causes all internal queues to
+//     * store their state.
+//     *
+//     * @param name the name of the Mule UMO to stop
+//     * @throws org.mule.umo.UMOException if the MuleUMO is not registered or the
+//     *                                   component failed to pause.
+//     * @see org.mule.config.MuleConfiguration
+//     */
+//    public void pauseComponent(UMOComponent component) throws UMOException
+//    {
+//        component.pause();
+//        logger.info("Mule Component " + name + " has been paused successfully");
+//    }
+//
+//    /**
+//     * Resumes a single Mule Component that has been paused. If the component is not
+//     * paused nothing is executed.
+//     *
+//     * @param name the name of the Mule UMO to resume
+//     * @throws org.mule.umo.UMOException if the MuleUMO is not registered or the
+//     *                                   component failed to resume
+//     */
+//    public void resumeComponent(UMOComponent component) throws UMOException
+//    {
+//        component.resume();
+//        logger.info("Mule Component " + name + " has been resumed successfully");
+//    }
 
 //    public void setServiceDescriptors(List descriptors) throws UMOException
 //    {

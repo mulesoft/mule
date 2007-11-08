@@ -13,6 +13,7 @@ package org.mule.impl.model;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.DefaultComponentExceptionStrategy;
+import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.InitialisationCallback;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.OptimizedRequestContext;
@@ -31,6 +32,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -137,6 +139,11 @@ public abstract class AbstractComponent implements UMOComponent
     protected String initialState = INITIAL_STATE_STARTED;
 
     protected List initialisationCallbacks = new ArrayList();
+
+    /**
+     * Indicates whether a component has passed its initial startup state. 
+     */
+    private AtomicBoolean beyondInitialState = new AtomicBoolean(false);
 
     /**
      * The properties for the Mule UMO.
@@ -266,12 +273,34 @@ public abstract class AbstractComponent implements UMOComponent
             stopped.set(true);
             initialised.set(false);
             fireComponentNotification(ComponentNotification.COMPONENT_STOPPED);
+            logger.info("Mule Component " + name + " has been stopped successfully");
         }
     }
 
     public void start() throws UMOException
     {
-        start(false);
+        if (isStarted())
+        {
+            logger.info("Component is already started: " + name);
+            return;
+        }
+        
+        if (!beyondInitialState.get() && initialState.equals(ImmutableMuleDescriptor.INITIAL_STATE_STOPPED))
+        {
+            logger.info("Component " + name + " has not been started (initial state = 'stopped')");
+        }
+        else if (!beyondInitialState.get() && initialState.equals(ImmutableMuleDescriptor.INITIAL_STATE_PAUSED))
+        {
+            start(/*startPaused*/true);
+            logger.info("Component " + name + " has been started and paused (initial state = 'paused')");
+        }
+        else
+        {
+            start(/*startPaused*/false);
+            logger.info("Component " + name + " has been started successfully");
+        }
+
+        beyondInitialState.set(true);
     }
 
     /**
@@ -280,9 +309,8 @@ public abstract class AbstractComponent implements UMOComponent
      * @param startPaused - Start component in a "paused" state (messages are
      *            received but not processed).
      */
-    void start(boolean startPaused) throws UMOException
+    protected void start(boolean startPaused) throws UMOException
     {
-
         // Create the receivers for the component but do not start them yet.
         registerListeners();
 
@@ -311,7 +339,7 @@ public abstract class AbstractComponent implements UMOComponent
         // gets routed to the component before it is started,
         // org.mule.impl.model.AbstractComponent.dispatchEvent() will throw a
         // ComponentException with message COMPONENT_X_IS_STOPPED (see MULE-526).
-        startListeners();
+        startListeners();        
     }
 
     /**
@@ -321,10 +349,10 @@ public abstract class AbstractComponent implements UMOComponent
      */
     public final void pause() throws UMOException
     {
-
         doPause();
         paused.set(true);
         fireComponentNotification(ComponentNotification.COMPONENT_PAUSED);
+        logger.info("Mule Component " + name + " has been paused successfully");
     }
 
     /**
@@ -336,6 +364,7 @@ public abstract class AbstractComponent implements UMOComponent
         doResume();
         paused.set(false);
         fireComponentNotification(ComponentNotification.COMPONENT_RESUMED);
+        logger.info("Mule Component " + name + " has been resumed successfully");
     }
 
     /**
@@ -572,12 +601,12 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void registerListeners() throws UMOException
     {
-        UMOImmutableEndpoint endpoint;
+        UMOEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOImmutableEndpoint) it.next();
+            endpoint = (UMOEndpoint) it.next();
             try
             {
                 endpoint.getConnector().registerListener(this, endpoint);
@@ -596,12 +625,12 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void unregisterListeners() throws UMOException
     {
-        UMOImmutableEndpoint endpoint;
+        UMOEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOImmutableEndpoint) it.next();
+            endpoint = (UMOEndpoint) it.next();
             try
             {
                 endpoint.getConnector().unregisterListener(this, endpoint);
@@ -620,16 +649,16 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void startListeners() throws UMOException
     {
-        UMOImmutableEndpoint endpoint;
+        UMOEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOImmutableEndpoint) it.next();
+            endpoint = (UMOEndpoint) it.next();
             UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null && endpoint.getConnector().isStarted()
-                && endpoint.getInitialState().equals(UMOImmutableEndpoint.INITIAL_STATE_STARTED))
+                && endpoint.getInitialState().equals(UMOEndpoint.INITIAL_STATE_STARTED))
             {
                 receiver.start();
             }
@@ -638,12 +667,12 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void stopListeners() throws UMOException
     {
-        UMOImmutableEndpoint endpoint;
+        UMOEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOImmutableEndpoint) it.next();
+            endpoint = (UMOEndpoint) it.next();
             UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null)
@@ -655,12 +684,12 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void connectListeners() throws UMOException
     {
-        UMOImmutableEndpoint endpoint;
+        UMOEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOImmutableEndpoint) it.next();
+            endpoint = (UMOEndpoint) it.next();
             UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null)
@@ -682,12 +711,12 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void disconnectListeners() throws UMOException
     {
-        UMOImmutableEndpoint endpoint;
+        UMOEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (UMOImmutableEndpoint) it.next();
+            endpoint = (UMOEndpoint) it.next();
             UMOMessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                 endpoint);
             if (receiver != null)
