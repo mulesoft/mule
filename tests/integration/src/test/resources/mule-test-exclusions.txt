@@ -54,7 +54,6 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # Missing config file
 ##########################################################################
 
-org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
 org.mule.test.integration.client.MuleClientListenerTestCase
 org.mule.test.integration.client.RemoteExceptionTestCase
 org.mule.test.integration.EventMetaDataPropagationTestCase

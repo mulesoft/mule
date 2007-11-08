@@ -65,7 +65,7 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
 
         MuleClient client = new MuleClient();
         MuleMessage request = new MuleMessage("payload");
-        UMOMessage reply = client.send("vm://inbound", request);
+        UMOMessage reply = client.send("inboundEndpoint", request);
         assertNotNull(reply);
 
         assertTrue("First callback never fired", hop1made.get());

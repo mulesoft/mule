@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <transformer-message-properties name="hop1ResponseEnricher">
+        <add-properties>
+            <spring:entry key="TICKET" value="hop1"/>
+        </add-properties>
+    </transformer-message-properties>
+    <transformer-message-properties name="hop2enricher">
+        <add-properties>
+            <spring:entry key="TTL" value="10000"/>
+        </add-properties>
+    </transformer-message-properties>
+
+    <endpoint name="inboundEndpoint" address="vm://inbound"/>
+    <endpoint name="hop1Endpoint" address="vm://hop1"/>
+    <endpoint name="hop2Endpoint" address="vm://hop2"/>
+
+    <model name="main">
+        <service name="chainingComponent">
+            <inbound-router>
+                <inbound-endpoint ref="inboundEndpoint" synchronous="true"/>
+                <forwarding-router/>
+            </inbound-router>
+            <outbound-router>
+                <chaining-router>
+                    <outbound-endpoint ref="hop1Endpoint"/>
+                    <outbound-endpoint ref="hop2Endpoint"/>
+                </chaining-router>
+            </outbound-router>
+        </service>
+
+        <service name="hop1Service">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <inbound-endpoint ref="hop1Endpoint" responseTransformer-ref="hop1ResponseEnricher"/>
+            </inbound-router>
+        </service>
+
+        <service name="hop2Service">
+            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <inbound-endpoint ref="hop2Endpoint" transformer-ref="hop2enricher"/>
+            </inbound-router>
+        </service>
+    </model>
+</mule>
