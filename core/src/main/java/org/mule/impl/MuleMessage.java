@@ -616,7 +616,8 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
                     {
                         if (logger.isDebugEnabled())
                         {
-                            logger.debug("Transformer " + transformer + " doesn't support the null payload.");
+                            logger.debug("Transformer " + transformer +
+                                    " doesn't support the null payload, exiting from transformer chain.");
                         }
                         break;
                     }
@@ -644,13 +645,20 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
                         setPayload(result);
                     }
                 }
-                else if (!transformer.isIgnoreBadInput())
+                else
                 {
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Transformer " + transformer + " doesn't support the source payload: " + srcCls);
                     }
-                    break;
+                    if (!transformer.isIgnoreBadInput())
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Exiting from transformer chain (ignoreBadInput = false)");
+                        }
+                        break;
+                    }
                 }
             }
         }
