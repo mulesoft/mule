@@ -30,12 +30,9 @@ public class VmNamespaceHandler extends AbstractIgnorableNamespaceHandler
 
     public void init()
     {
+        registerStandardTransportEndpoints(VMConnector.VM, LazyEndpointURI.PATH_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(VMConnector.class, true));
         registerBeanDefinitionParser("queueProfile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
-        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser("vm", LazyEndpointURI.PATH_ATTRIBUTES));
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser("vm", InboundEndpointFactoryBean.class, LazyEndpointURI.PATH_ATTRIBUTES));
-        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser("vm", OutboundEndpointFactoryBean.class, LazyEndpointURI.PATH_ATTRIBUTES));
-        registerBeanDefinitionParser("response-endpoint", new TransportEndpointDefinitionParser("vm", ResponseEndpointFactoryBean.class, LazyEndpointURI.PATH_ATTRIBUTES));
     }
 
 }

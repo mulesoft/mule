@@ -17,7 +17,7 @@
         <service name="TestComponent">
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="xfire:http://localhost:63381/services"/>
+                <xfire:inbound-endpoint address="http://localhost:63381/services"/>
             </inbound-router>
         </service>
     </model>

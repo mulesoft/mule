@@ -26,17 +26,17 @@
     <endpoint name="ProcessEngine" address="bpm://LoanBroker" />
 
     <!-- Customer loan requests to the Loan Broker -->
-    <endpoint name="CustomerRequests" address="vm://customer.requests" connector-ref="syncVm" />
+    <vm:endpoint name="CustomerRequests" path="customer.requests" connector-ref="syncVm" />
     <!-- Requests to the credit agency -->
-    <endpoint name="CreditAgency" address="vm://credit.agency" connector-ref="syncVm" />
+    <vm:endpoint name="CreditAgency" path="credit.agency" connector-ref="syncVm" />
     <!-- Customer credit profiles from the credit agency -->
-    <endpoint name="CreditProfiles" address="vm://credit.profiles" connector-ref="syncVm" />
+    <vm:endpoint name="CreditProfiles" path="credit.profiles" connector-ref="syncVm" />
     <!-- Final loan quote to the customer -->
-    <endpoint name="CustomerResponses" address="vm://customer.responses" connector-ref="asyncVm" />
+    <vm:endpoint name="CustomerResponses" path="customer.responses" connector-ref="asyncVm" />
     <!-- Bigger banks handle bigger loans.  -->
-    <endpoint name="BigBank" address="vm://big.bank" connector-ref="syncVm" />
-    <endpoint name="MediumBank" address="vm://medium.bank" connector-ref="syncVm" />
-    <endpoint name="SmallBank" address="vm://small.bank" connector-ref="syncVm" />
+    <vm:endpoint name="BigBank" path="big.bank" connector-ref="syncVm" />
+    <vm:endpoint name="MediumBank" path="medium.bank" connector-ref="syncVm" />
+    <vm:endpoint name="SmallBank" path="small.bank" connector-ref="syncVm" />
 
     <model name="loan-broker">
 

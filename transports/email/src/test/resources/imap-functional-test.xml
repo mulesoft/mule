@@ -17,14 +17,14 @@
 
         <service name="relay">
             <inbound-router>
-                <imap:inbound-endpoint address="imap://bob:password@localhost:65433">
+                <imap:inbound-endpoint username="bob" password="password" hostname="localhost" port="65433">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </imap:inbound-endpoint>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://receive"/>
+                    <vm:outbound-endpoint path="receive"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

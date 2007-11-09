@@ -1,1 +1,2 @@
 http\://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd=META-INF/mule-xfire.xsd
+http\://www.mulesource.org/schema/mule/wsdl-xfire/2.0/mule-wsdl-xfire.xsd=META-INF/mule-wsdl-xfire.xsd

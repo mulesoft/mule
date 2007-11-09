@@ -2,7 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/imap/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
-            xmlns:email-download="http://www.mulesource.org/schema/mule/email-download/2.0"
+            xmlns:email="http://www.mulesource.org/schema/mule/email/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/imap/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -12,15 +12,15 @@
                 schemaLocation="http://www.springframework.org/schema/beans"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
-    <xsd:import namespace="http://www.mulesource.org/schema/mule/email-download/2.0"
-                schemaLocation="http://www.mulesource.org/schema/mule/mule-email-download/2.0/mule-email-download.xsd"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/email/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd"/>
 
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"/>
 
     <xsd:element name="connector" type="imapConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="imapConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="email-download:emailDownloadConnectorType"/>
+            <xsd:extension base="email:emailDownloadConnectorType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -28,7 +28,7 @@
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:inboundEndpointType">
-                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="email:addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -37,7 +37,7 @@
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
-                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="email:addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -46,7 +46,7 @@
     <xsd:complexType name="responseEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:responseEndpointType">
-                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="email:addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -55,16 +55,9 @@
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
-                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="email:addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="username" type="xsd:string"/>
-        <xsd:attribute name="password" type="xsd:string"/>
-        <xsd:attribute name="hostname" type="xsd:string"/>
-        <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
-    </xsd:attributeGroup>
 
 </xsd:schema>

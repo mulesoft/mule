@@ -10,18 +10,19 @@
 package org.mule.providers.email.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
+import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
 import org.mule.providers.email.Pop3Connector;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
  *
  */
-public class Pop3NamespaceHandler extends NamespaceHandlerSupport
+public class Pop3NamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
     public void init()
     {
+        registerStandardTransportEndpoints(Pop3Connector.POP3, LazyEndpointURI.USERHOST_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(Pop3Connector.class, true));
     }
 }

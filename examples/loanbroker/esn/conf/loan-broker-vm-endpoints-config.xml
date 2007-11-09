@@ -19,26 +19,26 @@
 
     <custom-transformer name="SetLendersAsRecipients" class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
 
-    <endpoint name="CustomerRequests" address="vm://customer.requests" connector-ref="syncVm"/>
-    <endpoint name="LoanBrokerQuotes" address="vm://loan.quotes" connector-ref="syncVm"/>
-    <endpoint name="CreditAgency" address="vm://credit.agency" connector-ref="syncVm"/>
-    <endpoint name="CreditAgencyIn" address="vm://credit.agency" connector-ref="syncVm"/>
-    <endpoint name="LenderService" address="vm://lender.service?method=setLenderList" connector-ref="syncVm"/>
-    <endpoint name="BankGateway" address="vm://bank.gateway" connector-ref="syncVm"/>
+    <vm:endpoint name="CustomerRequests" path="customer.requests" connector-ref="syncVm"/>
+    <vm:endpoint name="LoanBrokerQuotes" path="loan.quotes" connector-ref="syncVm"/>
+    <vm:endpoint name="CreditAgency" path="credit.agency" connector-ref="syncVm"/>
+    <vm:endpoint name="CreditAgencyIn" path="credit.agency" connector-ref="syncVm"/>
+    <vm:endpoint name="LenderService" path="lender.service?method=setLenderList" connector-ref="syncVm"/>
+    <vm:endpoint name="BankGateway" path="bank.gateway" connector-ref="syncVm"/>
 
-    <endpoint name="Bank1" address="vm://bank.1" connector-ref="syncVm"/>
-    <endpoint name="Bank1In" address="vm://bank.1" connector-ref="syncVm"/>
+    <vm:endpoint name="Bank1" path="bank.1" connector-ref="syncVm"/>
+    <vm:endpoint name="Bank1In" path="bank.1" connector-ref="syncVm"/>
 
-    <endpoint name="Bank2" address="vm://bank.2" connector-ref="syncVm"/>
-    <endpoint name="Bank2In" address="vm://bank.2" connector-ref="syncVm"/>
+    <vm:endpoint name="Bank2" path="bank.2" connector-ref="syncVm"/>
+    <vm:endpoint name="Bank2In" path="bank.2" connector-ref="syncVm"/>
 
-    <endpoint name="Bank3" address="vm://bank.3" connector-ref="syncVm"/>
-    <endpoint name="Bank3In" address="vm://bank.3" connector-ref="syncVm"/>
+    <vm:endpoint name="Bank3" path="bank.3" connector-ref="syncVm"/>
+    <vm:endpoint name="Bank3In" path="bank.3" connector-ref="syncVm"/>
 
-    <endpoint name="Bank4" address="vm://bank.4" connector-ref="syncVm"/>
-    <endpoint name="Bank4In" address="vm://bank.4" connector-ref="syncVm"/>
+    <vm:endpoint name="Bank4" path="bank.4" connector-ref="syncVm"/>
+    <vm:endpoint name="Bank4In" path="bank.4" connector-ref="syncVm"/>
 
-    <endpoint name="Bank5" address="vm://bank.5" connector-ref="syncVm"/>
-    <endpoint name="Bank5In" address="vm://bank.5" connector-ref="syncVm"/>
+    <vm:endpoint name="Bank5" path="bank.5" connector-ref="syncVm"/>
+    <vm:endpoint name="Bank5In" path="bank.5" connector-ref="syncVm"/>
 
 </mule>

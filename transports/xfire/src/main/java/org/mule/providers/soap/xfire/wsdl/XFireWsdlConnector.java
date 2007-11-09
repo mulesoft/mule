@@ -18,6 +18,8 @@ import org.mule.providers.soap.xfire.XFireConnector;
 public class XFireWsdlConnector extends XFireConnector
 {
 
+    public static final String WSDL_XFIRE = "wsdl-xfire";
+
     protected void registerProtocols()
     {
         registerSupportedProtocol("http");
@@ -31,6 +33,7 @@ public class XFireWsdlConnector extends XFireConnector
 
     public String getProtocol()
     {
-        return "wsdl-xfire";
+        return WSDL_XFIRE;
     }
+
 }

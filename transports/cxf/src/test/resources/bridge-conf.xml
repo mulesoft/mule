@@ -14,7 +14,7 @@
     
         <mule:bridge-service name="receiver">
             <cxf:inbound-endpoint address="http://localhost:63081/services/Echo" bridge="true"/>
-            <mule:outbound-endpoint address="vm://test" />
+            <vm:outbound-endpoint path="test" />
         </mule:bridge-service>
         
         <mule:service name="echoService">

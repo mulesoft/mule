@@ -26,6 +26,7 @@ import javax.mail.URLName;
 public class SmtpsConnector extends SmtpConnector implements TlsIndirectTrustStore, TlsIndirectKeyStore
 {
 
+    public static final String SMTPS = "smtps";
     public static final String DEFAULT_SOCKET_FACTORY = SmtpsSocketFactory.class.getName();
 
     private String socketFactory = DEFAULT_SOCKET_FACTORY;

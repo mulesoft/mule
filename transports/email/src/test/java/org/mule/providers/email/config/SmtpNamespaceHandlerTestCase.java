@@ -11,14 +11,14 @@ package org.mule.providers.email.config;
 
 import org.mule.providers.email.SmtpConnector;
 import org.mule.providers.email.SmtpsConnector;
+import org.mule.providers.email.Pop3Connector;
+import org.mule.providers.email.Pop3sConnector;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOException;
 
 import java.util.Properties;
 
-/**
- * TODO
- */
-public class SmtpNamespaceHandlerTestCase extends FunctionalTestCase
+public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
     protected String getConfigResources()
     {
@@ -80,4 +80,11 @@ public class SmtpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    public void testEndpoint() throws UMOException
+    {
+        testEndpoint("global1", SmtpConnector.SMTP);
+        testEndpoint("global2", SmtpConnector.SMTP);
+        testEndpoint("global1s", SmtpsConnector.SMTPS);
+        testEndpoint("global2s", SmtpsConnector.SMTPS);
+    }
 }

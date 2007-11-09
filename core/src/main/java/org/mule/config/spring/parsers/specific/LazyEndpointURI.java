@@ -47,7 +47,8 @@ public class LazyEndpointURI implements UMOEndpointURI
             new String[]{META, PROTOCOL, USERNAME, PASSWORD, HOSTNAME, ADDRESS, PORT, PATH};
     // combinations used in various endpoint parsers to validate required attributes
     public static final String[] PATH_ATTRIBUTES = new String[]{PATH};
-    public static final String[] UPH_ATTRIBUTES = new String[]{USERNAME, PASSWORD, HOSTNAME};
+    public static final String[] HOSTNAME_ATTRIBUTES = new String[]{HOSTNAME};
+    public static final String[] USERHOST_ATTRIBUTES = new String[]{USERNAME, HOSTNAME};
 
     private String address;
     private String meta;
@@ -82,6 +83,7 @@ public class LazyEndpointURI implements UMOEndpointURI
     {
         assertNotYetInjected();
         this.address = address;
+        assertAddressConsistent();
     }
 
     public void setPort(int port)
@@ -94,6 +96,7 @@ public class LazyEndpointURI implements UMOEndpointURI
     {
         assertNotYetInjected();
         this.protocol = protocol;
+        assertAddressConsistent();
     }
 
     public void setMeta(String meta)
@@ -105,6 +108,10 @@ public class LazyEndpointURI implements UMOEndpointURI
     public void setPath(String path)
     {
         assertNotYetInjected();
+        if (null != path && path.indexOf(DOTS_SLASHES) > -1)
+        {
+            throw new IllegalArgumentException("Unusual syntax in path: '" + path + "' contains " + DOTS_SLASHES);
+        }
         this.path = path;
     }
 
@@ -131,6 +138,7 @@ public class LazyEndpointURI implements UMOEndpointURI
             }
             buffer.append(protocol);
             buffer.append(DOTS_SLASHES);
+            boolean atStart = true;
             if (null != username)
             {
                 buffer.append(username);
@@ -140,6 +148,7 @@ public class LazyEndpointURI implements UMOEndpointURI
                     buffer.append(password);
                 }
                 buffer.append("@");
+                atStart = false;
             }
             if (null != hostname)
             {
@@ -149,11 +158,11 @@ public class LazyEndpointURI implements UMOEndpointURI
                     buffer.append(":");
                     buffer.append(port);
                 }
+                atStart = false;
             }
             if (null != path)
             {
-                // this allows us to use path for vm://foo, for example
-                if (buffer.length() > DOTS_SLASHES.length())
+                if (! atStart)
                 {
                     buffer.append("/");
                 }
@@ -312,6 +321,49 @@ public class LazyEndpointURI implements UMOEndpointURI
     public void initialise() throws InitialisationException
     {
         lazyDelegate().initialise();
+    }
+
+    protected void assertAddressConsistent()
+    {
+        if (null != meta)
+        {
+            if (null != address)
+            {
+                if (address.startsWith(meta + DOTS))
+                {
+                    throw new IllegalArgumentException("Meta-protocol '" + meta +
+                            "' should not be specified in the address '" + address +
+                            "' - it is implicit in the element namespace.");
+                }
+                if (null != protocol)
+                {
+                    assertProtocolConsistent();
+                }
+                else
+                {
+                    if (address.indexOf(DOTS_SLASHES) == -1)
+                    {
+                        throw new IllegalArgumentException("Address '" + address +
+                                "' does not have a transport protocol prefix " +
+                                "(omit the meta protocol prefix, '" + meta + DOTS + 
+                                "' - it is implicit in the element namespace).");
+                    }
+                }
+            }
+        }
+        else
+        {
+            assertProtocolConsistent();
+        }
+    }
+
+    protected void assertProtocolConsistent()
+    {
+        if (null != protocol && null != address && !address.startsWith(protocol + DOTS_SLASHES))
+        {
+            throw new IllegalArgumentException("Address '" + address + "' for protocol '" + protocol +
+                    "' should start with " + protocol + DOTS_SLASHES);
+        }
     }
 
 }

@@ -3,10 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-               http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
+               http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <description>
     This loan broker example is modeled on the Enterprise integration Patterns book sample.
@@ -30,12 +32,12 @@
 
     <custom-transformer name="SetLendersAsRecipients" class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
 
-    <endpoint name="CustomerRequests" address="vm://customer.requests" connector-ref="syncVm"/>
-    <endpoint name="LoanBrokerQuotes" address="vm://loan.quotes" connector-ref="syncVm"/>
+    <vm:endpoint name="CustomerRequests" path="customer.requests" connector-ref="syncVm"/>
+    <vm:endpoint name="LoanBrokerQuotes" path="loan.quotes" connector-ref="syncVm"/>
     <endpoint name="CreditAgency" address="axis:http://localhost:18080/mule/TheCreditAgencyService?method=getCreditProfile"/>
     <endpoint name="CreditAgencyIn" address="axis:http://localhost:18080/mule"/>
-    <endpoint name="LenderService" address="vm://lender.service?method=setLenderList" connector-ref="syncVm"/>
-    <endpoint name="BankGateway" address="vm://bank.gateway" connector-ref="syncVm"/>
+    <vm:endpoint name="LenderService" path="lender.service?method=setLenderList" connector-ref="syncVm"/>
+    <vm:endpoint name="BankGateway" path="bank.gateway" connector-ref="syncVm"/>
 
     <endpoint name="Bank1" address="axis:http://localhost:10080/mule/TheBank1?method=getLoanQuote"/>
     <endpoint name="Bank1In" address="axis:http://localhost:10080/mule"/>

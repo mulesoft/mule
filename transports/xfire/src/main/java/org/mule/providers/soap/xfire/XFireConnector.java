@@ -64,9 +64,11 @@ import org.codehaus.xfire.wsdl11.builder.WSDLBuilderFactory;
 public class XFireConnector extends AbstractConnector
     implements ManagerNotificationListener
 {
+
+    public static final String XFIRE = "xfire";
     public static final String XFIRE_SERVICE_COMPONENT_NAME = "_xfireServiceComponent";
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
-    public static final String XFIRE_PROPERTY = "xfire";
+    public static final String XFIRE_PROPERTY = XFIRE;
     public static final String XFIRE_TRANSPORT = "transportClass";
 
     public static final String CLASSNAME_ANNOTATIONS = "org.codehaus.xfire.annotations.jsr181.Jsr181WebAnnotations";
@@ -114,7 +116,7 @@ public class XFireConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "xfire";
+        return XFIRE;
     }
 
     protected void doInitialise() throws InitialisationException

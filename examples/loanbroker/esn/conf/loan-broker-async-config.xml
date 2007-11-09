@@ -25,7 +25,7 @@
     <vm:connector name="asyncVm" queueEvents="true"/>
 
     <!-- only used for the async loan broker to send the lowest quote back to the customer -->
-    <endpoint name="CustomerResponses" address="vm://customer.responses" connector-ref="asyncVm"/>
+    <vm:endpoint name="CustomerResponses" path="customer.responses" connector-ref="asyncVm"/>
 
     <!--
        The Mule model initialises and manages your UMO components

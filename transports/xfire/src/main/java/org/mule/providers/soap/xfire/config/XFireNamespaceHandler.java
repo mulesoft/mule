@@ -11,14 +11,15 @@
 package org.mule.providers.soap.xfire.config;
 
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.providers.soap.xfire.XFireConnector;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
-
-public class XFireNamespaceHandler extends NamespaceHandlerSupport
+public class XFireNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
 
     public void init()
     {
+        registerMetaTransportEndpoints(XFireConnector.XFIRE);
         registerBeanDefinitionParser("connector", new XfireElementDefinitionParser());
         registerBeanDefinitionParser("client-in-handler", new ChildListEntryDefinitionParser("clientInHandlers"));
         registerBeanDefinitionParser("client-out-handler", new ChildListEntryDefinitionParser("clientOutHandlers"));
@@ -26,6 +27,7 @@ public class XFireNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("server-in-handler", new ChildListEntryDefinitionParser("serverInHandlers"));
         registerBeanDefinitionParser("server-out-handler", new ChildListEntryDefinitionParser("serverOutHandlers"));
     }
+    
 }
 
 

@@ -19,7 +19,7 @@
         <service name="WebService">
             <echo-component/>
             <inbound-router>
-                <inbound-endpoint address="xfire:http://localhost:6065"/>
+                <xfire:inbound-endpoint address="http://localhost:6065"/>
             </inbound-router>
         </service>
 

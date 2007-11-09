@@ -83,4 +83,13 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="inbound-endpoint" type="mule:inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+
+    <xsd:element name="outbound-endpoint" type="mule:outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+
+    <xsd:element name="response-endpoint" type="mule:responseEndpointType" substitutionGroup="mule:abstract-response-endpoint"/>
+
+    <xsd:element name="endpoint" type="mule:globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+
 </xsd:schema>

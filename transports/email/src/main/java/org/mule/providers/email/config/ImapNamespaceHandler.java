@@ -10,30 +10,21 @@
 package org.mule.providers.email.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.config.spring.factories.ResponseEndpointFactoryBean;
+import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
 import org.mule.providers.email.ImapConnector;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
  *
  */
-public class ImapNamespaceHandler extends NamespaceHandlerSupport
+public class ImapNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
 
     public void init()
     {
+        registerStandardTransportEndpoints(ImapConnector.IMAP, LazyEndpointURI.USERHOST_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(ImapConnector.class, true));
-        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(ImapConnector.IMAP, LazyEndpointURI.UPH_ATTRIBUTES));
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(ImapConnector.IMAP, InboundEndpointFactoryBean.class, LazyEndpointURI.UPH_ATTRIBUTES));
-        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(ImapConnector.IMAP, OutboundEndpointFactoryBean.class, LazyEndpointURI.UPH_ATTRIBUTES));
-        registerBeanDefinitionParser("response-endpoint", new TransportEndpointDefinitionParser(ImapConnector.IMAP, ResponseEndpointFactoryBean.class, LazyEndpointURI.UPH_ATTRIBUTES));
     }
 
 }

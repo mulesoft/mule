@@ -11,7 +11,13 @@ package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 import org.mule.config.spring.parsers.delegate.AbstractDelegatingDefinitionParser;
+import org.mule.config.spring.factories.InboundEndpointFactoryBean;
+import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
+import org.mule.config.spring.factories.ResponseEndpointFactoryBean;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -52,6 +58,22 @@ public abstract class AbstractIgnorableNamespaceHandler extends NamespaceHandler
         {
             return null;
         }
+    }
+
+    protected void registerStandardTransportEndpoints(String protocol, String[] requiredAttributes)
+    {
+        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(protocol, requiredAttributes));
+        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(protocol, InboundEndpointFactoryBean.class, requiredAttributes));
+        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(protocol, OutboundEndpointFactoryBean.class, requiredAttributes));
+        registerBeanDefinitionParser("response-endpoint", new TransportEndpointDefinitionParser(protocol, ResponseEndpointFactoryBean.class, requiredAttributes));
+    }
+
+    protected void registerMetaTransportEndpoints(String protocol)
+    {
+        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(protocol, TransportGlobalEndpointDefinitionParser.META, new String[]{}));
+        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(protocol, TransportEndpointDefinitionParser.META, InboundEndpointFactoryBean.class, new String[]{}));
+        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(protocol, TransportEndpointDefinitionParser.META, OutboundEndpointFactoryBean.class, new String[]{}));
+        registerBeanDefinitionParser("response-endpoint", new TransportEndpointDefinitionParser(protocol, TransportEndpointDefinitionParser.META, ResponseEndpointFactoryBean.class, new String[]{}));
     }
 
 }

@@ -13,8 +13,8 @@
     <vm:connector name="default"/>
     <vm:connector name="queue" queueEvents="true"/>
 
-    <endpoint name="in" address="vm://in" connector-ref="default"/>
-    <endpoint name="notxml" address="vm://notxml" connector-ref="queue"/>
+    <vm:endpoint name="in" address="vm://in" connector-ref="default"/>
+    <vm:endpoint name="notxml" path="notxml" connector-ref="queue"/>
     <endpoint name="self" address="vm://self" connector-ref="queue"/>
     <endpoint name="other" address="vm://other" connector-ref="queue"/>
 
@@ -41,7 +41,7 @@
 
         <service name="filter xml for content">
             <inbound-router>
-                <inbound-endpoint address="vm://xml" connector-ref="default"/>
+                <vm:inbound-endpoint path="xml" connector-ref="default"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>

@@ -4,11 +4,13 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
-       http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd">
+       http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <description>
         The StockQuote SOAP example uses the Mule RestServiceWrapper to invoke a remote .Net service
@@ -52,7 +54,7 @@
         -->
         <service name="serviceProxy">
             <inbound-router>
-                <inbound-endpoint address="vm://stockquote"/>
+                <vm:inbound-endpoint address="stockquote"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>

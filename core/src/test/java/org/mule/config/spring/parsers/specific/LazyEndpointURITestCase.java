@@ -17,8 +17,8 @@ public class LazyEndpointURITestCase extends AbstractMuleTestCase
     {
         LazyEndpointURI uri = new LazyEndpointURI();
         uri.setMeta("foo");
-        uri.setAddress("foo://bar");
-        assertEquals("foo:foo://bar", uri.toString());
+        uri.setAddress("baz://bar");
+        assertEquals("foo:baz://bar", uri.toString());
     }
 
 }

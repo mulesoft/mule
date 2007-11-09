@@ -14,13 +14,13 @@
     <vm:connector name="queue" queueEvents="true"/>
 
     <endpoint name="split" address="vm://split" connector-ref="default"/>
-    <endpoint name="service1" address="vm://service1" connector-ref="queue"/>
+    <vm:endpoint name="service1" path="service1" connector-ref="queue"/>
     <endpoint name="service2" address="vm://service2" connector-ref="queue"/>
 
-    <endpoint name="roundrobin-det" address="vm://roundrobin-det" connector-ref="default"/>
-    <endpoint name="roundrobin-indet" address="vm://roundrobin-indet" connector-ref="default"/>
+    <vm:endpoint name="roundrobin-det" address="vm://roundrobin-det" connector-ref="default"/>
+    <vm:endpoint name="roundrobin-indet" path="roundrobin-indet" connector-ref="default"/>
     <endpoint name="robin1" address="vm://robin1" connector-ref="queue"/>
-    <endpoint name="robin2" address="vm://robin2" connector-ref="queue"/>
+    <vm:endpoint name="robin2" path="robin2" connector-ref="queue"/>
 
     <spring:bean name="dom4jpe" class="org.mule.xml.util.properties.XPathPayloadPropertyExtractor"/>
 

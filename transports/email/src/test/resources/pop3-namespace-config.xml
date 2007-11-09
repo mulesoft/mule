@@ -22,4 +22,9 @@
         <pop3s:tls-trust-store trustStore="greenmail-truststore" trustStorePassword="password"/>
     </pop3s:connector>
 
+    <pop3:endpoint name="global1" hostname="localhost" password="secret" port="123" username="bob"/>
+    <pop3:endpoint name="global2" address="pop3://bob:secret@localhost:123"/>
+    <pop3s:endpoint name="global1s" hostname="localhost" password="secret" port="123" username="bob"/>
+    <pop3s:endpoint name="global2s" address="pop3s://bob:secret@localhost:123"/>
+
 </mule>

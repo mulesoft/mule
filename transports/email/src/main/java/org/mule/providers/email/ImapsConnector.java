@@ -15,6 +15,7 @@ package org.mule.providers.email;
  */
 public class ImapsConnector extends AbstractTlsRetrieveMailConnector
 {
+    
     public static final String IMAPS = "imaps";
     public static final int DEFAULT_IMAPS_PORT = 993;
 

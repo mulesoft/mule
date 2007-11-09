@@ -1,1 +1,3 @@
 http\://www.mulesource.org/schema/mule/xfire/2.0=org.mule.providers.soap.xfire.config.XFireNamespaceHandler
+http\://www.mulesource.org/schema/mule/wsdl-xfire/2.0=org.mule.providers.soap.xfire.config.WsdlXFireNamespaceHandler
+

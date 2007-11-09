@@ -15,10 +15,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-/**
- * TODO
- */
-public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
+public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
     protected String getConfigResources()
     {
@@ -68,18 +65,10 @@ public class ImapNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testEndpoint() throws UMOException
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "global", managementContext);
-        assertNotNull(endpoint);
-        String address = endpoint.getEndpointURI().getAddress();
-        assertNotNull(address);
-        assertEquals("bob@localhost:123", address);
-        String password = endpoint.getEndpointURI().getPassword();
-        assertNotNull(password);
-        assertEquals("secret", password);
-        String protocol = endpoint.getProtocol();
-        assertNotNull(protocol);
-        assertEquals("imap", protocol);
+        testEndpoint("global1", ImapConnector.IMAP);
+        testEndpoint("global2", ImapConnector.IMAP);
+        testEndpoint("global1s", ImapsConnector.IMAPS);
+        testEndpoint("global2s", ImapsConnector.IMAPS);
     }
 
 }

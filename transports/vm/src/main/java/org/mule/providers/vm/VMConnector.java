@@ -41,6 +41,8 @@ import java.util.Iterator;
  */
 public class VMConnector extends AbstractConnector
 {
+
+    public static final String VM = "vm";
     private boolean queueEvents = false;
     private QueueProfile queueProfile;
     private int queueTimeout = 1000;

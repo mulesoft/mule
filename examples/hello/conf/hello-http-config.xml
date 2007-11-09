@@ -62,30 +62,30 @@
                     <not-filter>
                         <wildcard-filter pattern="/favicon.ico"/>   
                     </not-filter>
-                </inbound-endpoint>                    
+                </inbound-endpoint>
                 
                 <!-- Incoming Servlet requests -->
                 <inbound-endpoint address="servlet://rest" transformer-ref="StringToNameString" responseTransformer-ref="PlainTextResponseTransformer" synchronous="true"/>
 
                 <!-- Incoming VM requests -->
-                <inbound-endpoint address="vm://greeter" transformer-ref="StringToNameString" synchronous="true"/>
+                <vm:inbound-endpoint path="greeter" transformer-ref="StringToNameString" synchronous="true"/>
             </inbound-router>
 
             <outbound-router>
                 <filtering-router>
-                    <outbound-endpoint address="vm://chitchatter"/>
+                    <vm:outbound-endpoint path="chitchatter"/>
                     <payload-type-filter expectedType="org.mule.samples.hello.NameString"/>
                 </filtering-router>
                 
                 <filtering-router>
-                    <outbound-endpoint address="vm://userErrorHandler"/>
+                    <vm:outbound-endpoint path="userErrorHandler"/>
                     <payload-type-filter expectedType="java.lang.Exception"/>
                 </filtering-router>
             </outbound-router>
 
             <!-- Route unexpected errors to separate error handler -->
             <default-component-exception-strategy>
-                <outbound-endpoint address="vm://systemErrorHandler"/>
+                <vm:outbound-endpoint path="systemErrorHandler"/>
             </default-component-exception-strategy>
         </service>
 
@@ -95,7 +95,7 @@
             <component class="org.mule.samples.hello.ChitChatter"/>
             
             <inbound-router>
-                <inbound-endpoint address="vm://chitchatter" transformer-ref="NameStringToChatString" responseTransformer-ref="ChatStringToString" synchronous="true"/>
+                <vm:inbound-endpoint path="chitchatter" transformer-ref="NameStringToChatString" responseTransformer-ref="ChatStringToString" synchronous="true"/>
             </inbound-router>
         </service>
 
@@ -103,7 +103,7 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
             <inbound-router>
-                <inbound-endpoint address="vm://userErrorHandler" responseTransformer-ref="ExceptionToString" synchronous="true"/>
+                <vm:inbound-endpoint path="userErrorHandler" responseTransformer-ref="ExceptionToString" synchronous="true"/>
                 <forwarding-router/>
             </inbound-router>
         </service>
@@ -112,7 +112,7 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="SystemErrorHandler">
             <inbound-router>
-                <inbound-endpoint address="vm://systemErrorHandler" synchronous="true"/>
+                <vm:inbound-endpoint path="systemErrorHandler" synchronous="true"/>
                 <forwarding-router/>
             </inbound-router>
             

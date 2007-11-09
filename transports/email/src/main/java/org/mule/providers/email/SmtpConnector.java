@@ -23,6 +23,8 @@ import java.util.Properties;
  */
 public class SmtpConnector extends AbstractMailConnector
 {
+
+    public static final String SMTP = "smtp";
     public static final String DEFAULT_SMTP_HOST = "localhost";
     public static final int DEFAULT_SMTP_PORT = 25;
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";

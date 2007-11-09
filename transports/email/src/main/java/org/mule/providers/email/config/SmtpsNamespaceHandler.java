@@ -12,18 +12,19 @@ package org.mule.providers.email.config;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
+import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
 import org.mule.providers.email.SmtpsConnector;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
  *
  */
-public class SmtpsNamespaceHandler extends NamespaceHandlerSupport
+public class SmtpsNamespaceHandler extends AbstractIgnorableNamespaceHandler
 {
     public void init()
     {
+        registerStandardTransportEndpoints(SmtpsConnector.SMTPS, LazyEndpointURI.HOSTNAME_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(SmtpsConnector.class, true));
         registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "key", "value"));
         registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());

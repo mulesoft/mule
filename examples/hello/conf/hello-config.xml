@@ -75,12 +75,12 @@
             
             <outbound-router>
                 <filtering-router>
-                    <outbound-endpoint address="vm://chitchatter"/>
+                    <vm:outbound-endpoint path="chitchatter"/>
                     <payload-type-filter expectedType="org.mule.samples.hello.NameString"/>
                 </filtering-router>
                 
                 <filtering-router>
-                    <outbound-endpoint address="vm://userErrorHandler"/>
+                    <vm:outbound-endpoint path="userErrorHandler"/>
                     <payload-type-filter expectedType="java.lang.Exception"/>
                 </filtering-router>
             </outbound-router>
@@ -94,7 +94,7 @@
             
             <!-- Route unexpected errors to separate error handler -->
             <default-component-exception-strategy>
-                <outbound-endpoint address="vm://systemErrorHandler"/>
+                <vm:outbound-endpoint path="systemErrorHandler"/>
             </default-component-exception-strategy>
         </service>
 
@@ -102,7 +102,7 @@
             <component class="org.mule.samples.hello.ChitChatter"/>
 
             <inbound-router>
-                <inbound-endpoint address="vm://chitchatter" transformer-ref="NameStringToChatString"/>
+                <vm:inbound-endpoint path="chitchatter" transformer-ref="NameStringToChatString"/>
             </inbound-router>
                 
             <outbound-router>
@@ -120,7 +120,7 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
             <inbound-router>
-                <inbound-endpoint address="vm://userErrorHandler" transformer-ref="ExceptionToString"/>
+                <vm:inbound-endpoint path="userErrorHandler" transformer-ref="ExceptionToString"/>
                 <forwarding-router/>
             </inbound-router>
             
@@ -135,7 +135,7 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="SystemErrorHandler">
             <inbound-router>
-                <inbound-endpoint address="vm://systemErrorHandler"/>
+                <vm:inbound-endpoint path="systemErrorHandler"/>
                 <forwarding-router/>
             </inbound-router>
                 

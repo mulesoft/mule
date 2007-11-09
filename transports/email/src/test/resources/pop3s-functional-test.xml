@@ -23,14 +23,14 @@
 
         <service name="relay">
             <inbound-router>
-                <inbound-endpoint address="pop3s://bob:password@localhost:65436">
+                <pop3s:inbound-endpoint username="bob" password="password" hostname="localhost" port="65436">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
-                </inbound-endpoint>
+                </pop3s:inbound-endpoint>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://receive"/>
+                    <vm:outbound-endpoint path="receive"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

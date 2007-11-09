@@ -11,12 +11,15 @@ package org.mule.providers.email.config;
 
 import org.mule.providers.email.Pop3Connector;
 import org.mule.providers.email.Pop3sConnector;
+import org.mule.providers.email.ImapConnector;
+import org.mule.providers.email.ImapsConnector;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOException;
 
 /**
  * TODO
  */
-public class Pop3NamespaceHandlerTestCase extends FunctionalTestCase
+public class Pop3NamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
     protected String getConfigResources()
     {
@@ -63,6 +66,14 @@ public class Pop3NamespaceHandlerTestCase extends FunctionalTestCase
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
+    }
+
+    public void testEndpoint() throws UMOException
+    {
+        testEndpoint("global1", Pop3Connector.POP3);
+        testEndpoint("global2", Pop3Connector.POP3);
+        testEndpoint("global1s", Pop3sConnector.POP3S);
+        testEndpoint("global2s", Pop3sConnector.POP3S);
     }
 
 }

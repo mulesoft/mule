@@ -12,7 +12,7 @@
 
         <service name="bridge">
             <inbound-router>
-                <inbound-endpoint address="vm://bridge" synchronous="true"/>
+                <vm:inbound-endpoint path="bridge" synchronous="true"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
@@ -30,7 +30,7 @@
         <service name="responder">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="vm://responder" synchronous="true"/>
+                <vm:inbound-endpoint path="responder" synchronous="true"/>
             </inbound-router>
         </service>
 

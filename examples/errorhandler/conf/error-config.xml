@@ -57,11 +57,12 @@
         </spring:property>
     </spring:bean>
 
-    <jms:activemq-connector name="JMSConnector"/>
-    <!-- TODO DO: how to specify this? Fortunately it's the default of AMQ connector but it
-         would be good to show an example to specify this anyway
-    -->
-<!--                            brokerURL="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>-->
+    <jms:activemq-connector name="JMSConnector">
+        <!-- there used to be a comment here asking how to configure the property below,
+             using the old syntax - i have left this commented out since presumably it is
+             not needed, but in general you would use spring:property -->
+        <!-- spring:property name="brokerURL" value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/ -->
+    </jms:activemq-connector>
     
     <file:connector name="FileConnector" 
                     pollingFrequency="1000" 

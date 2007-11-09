@@ -12,10 +12,11 @@ package org.mule.providers.vm.i18n;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.providers.vm.VMConnector;
 
 public class VMMessages extends MessageFactory
 {
-    private static final String BUNDLE_PATH = getBundlePath("vm");
+    private static final String BUNDLE_PATH = getBundlePath(VMConnector.VM);
 
     public static Message noReceiverForEndpoint(String name, Object uri)
     {

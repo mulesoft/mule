@@ -3,10 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:smtps="http://www.mulesource.org/schema/mule/smtps/2.0"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/smtps/2.0 http://www.mulesource.org/schema/mule/smtps/2.0/mule-smtps.xsd">
+       http://www.mulesource.org/schema/mule/smtps/2.0 http://www.mulesource.org/schema/mule/smtps/2.0/mule-smtps.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <smtps:connector name="smtpsConnector">
         <smtps:tls-client clientKeyStore="clientKeystore" clientKeyStorePassword="mulepassword"/>
@@ -17,16 +19,16 @@
 
         <service name="relay">
             <inbound-router>
-                <inbound-endpoint address="vm://send"/>
+                <vm:inbound-endpoint path="send"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="smtps://localhost:65439">
+                    <smtps:outbound-endpoint hostname="localhost" port="65439">
                         <properties>
                             <spring:entry key="toAddresses" value="bob@example.com"/>
                         </properties>
-                    </outbound-endpoint>
+                    </smtps:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

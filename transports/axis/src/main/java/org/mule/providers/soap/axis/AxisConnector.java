@@ -41,7 +41,6 @@ import org.mule.util.object.SingletonObjectFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -144,14 +143,14 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             supportedSchemes.add("vm");
             supportedSchemes.add("jms");
             supportedSchemes.add("xmpp");
+            supportedSchemes.add("ssl");
+            supportedSchemes.add("tcp");
             supportedSchemes.add("smtp");
             supportedSchemes.add("smtps");
             supportedSchemes.add("pop3");
             supportedSchemes.add("pop3s");
             supportedSchemes.add("imap");
             supportedSchemes.add("imaps");
-            supportedSchemes.add("ssl");
-            supportedSchemes.add("tcp");
         }
 
         for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();)

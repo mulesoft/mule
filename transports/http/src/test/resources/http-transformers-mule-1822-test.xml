@@ -106,7 +106,7 @@
         <service name="bothService2">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="vm://echo3" synchronous="true" 
+                <inbound-endpoint address="vm://echo3" synchronous="true"
                 				  responseTransformer-ref="appendResponse2">
                   <transformer-object-to-string />
                   <transformer ref="appendString2" />

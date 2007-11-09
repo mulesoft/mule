@@ -2,10 +2,12 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
-       
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
     <description>
         This examples was published as a part of a featured article on java.net titled 
         'Service Provisioning Through ESB'.
@@ -15,12 +17,12 @@
 
     <configuration serverId="" defaultSynchronousEndpoints="true"/>
 
-    <endpoint name="VoipBrokerRequests" address="vm://VoipBrokerRequests"/>
+    <vm:endpoint name="VoipBrokerRequests" path="VoipBrokerRequests"/>
 
     <endpoint name="AddressValidation" address="axis:http://localhost:18080/mule/AddressValidationService?method=validateAddress"/>
     <endpoint name="AddressValidationReceiver" address="axis:http://localhost:18080/mule"/>
     
-    <endpoint name="PaymentValidation" address="vm://PaymentValidationService?method=getCreditVendors"/>
+    <vm:endpoint name="PaymentValidation" path="PaymentValidationService?method=getCreditVendors"/>
     
     <endpoint name="CreditAgency" address="axis:http://localhost:18081/mule/CreditAgencyService?method=getCreditProfile"/>
     <endpoint name="CreditAgencyReceiver" address="axis:http://localhost:18081/mule"/>
@@ -28,7 +30,7 @@
     <endpoint name="BankAgency" address="axis:http://localhost:18082/mule/BankAgencyService?method=getAuthorisedStatus"/>
     <endpoint name="BankAgencyReceiver" address="axis:http://localhost:18082/mule"/>
 
-    <endpoint name="PaymentValidationResponse" address="vm://PaymentValidationResponse"/>
+    <vm:endpoint name="PaymentValidationResponse" path="PaymentValidationResponse"/>
     
     <model name="voip-broker">
         <service name="VoipBroker">

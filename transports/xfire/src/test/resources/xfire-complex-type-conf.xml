@@ -3,12 +3,14 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:xfire="http://www.mulesource.org/schema/mule/xfire/2.0"
+       xmlns:wsdl-xfire="http://www.mulesource.org/schema/mule/wsdl-xfire/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
+       http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd
+       http://www.mulesource.org/schema/mule/wsdl-xfire/2.0 http://www.mulesource.org/schema/mule/wsdl-xfire/2.0/mule-wsdl-xfire.xsd">
 
-    <endpoint address="wsdl-xfire:http://localhost:63999/services/PeopleServiceWS?WSDL&amp;method=addPersonWithConfirmation" name="wsdlEndpoint">
+    <wsdl-xfire:endpoint address="http://localhost:63999/services/PeopleServiceWS?WSDL&amp;method=addPersonWithConfirmation" name="wsdlEndpoint">
         <properties>
             <spring:entry key="complexTypes">
                 <spring:map>
@@ -19,9 +21,9 @@
                 </spring:map>
             </spring:entry>
         </properties>
-    </endpoint>
+    </wsdl-xfire:endpoint>
 
-    <endpoint address="xfire:http://localhost:63999/services/PeopleServiceWS?method=addPersonWithConfirmation" name="xfireEndpoint">
+    <xfire:endpoint address="http://localhost:63999/services/PeopleServiceWS?method=addPersonWithConfirmation" name="xfireEndpoint">
         <properties>
             <spring:entry key="complexTypes">
                 <spring:map>
@@ -32,7 +34,7 @@
                 </spring:map>
             </spring:entry>
         </properties>
-    </endpoint>
+    </xfire:endpoint>
 
     <model name="ComplexTypes">
         <service name="PeopleServiceWS">
@@ -44,7 +46,7 @@
                 </properties>
             </component>
             <inbound-router>
-                <inbound-endpoint address="xfire:http://localhost:63999/services"/>
+                <xfire:inbound-endpoint address="http://localhost:63999/services"/>
             </inbound-router>
         </service>
     </model>

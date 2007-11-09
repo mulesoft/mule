@@ -51,7 +51,7 @@
         <service name="TestComponent2">
             <component class="org.mule.test.integration.service.TestComponent"/>
             <inbound-router>
-                <inbound-endpoint address="test://localhost/test.queue" createConnector="ALWAYS_CREATE" 
+                <inbound-endpoint address="test://localhost/test.queue" createConnector="ALWAYS_CREATE"
                     transformer-ref="XmlToObject" />
             </inbound-router>
         </service>

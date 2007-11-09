@@ -16,6 +16,8 @@ package org.mule.providers.email;
  */
 public class Pop3sConnector extends AbstractTlsRetrieveMailConnector
 {
+
+    public static final String POP3S = "pop3s";
     public static final int DEFAULT_POP3S_PORT = 995;
 
     public Pop3sConnector()

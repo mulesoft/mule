@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/wsdl-xfire/2.0"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+    targetNamespace="http://www.mulesource.org/schema/mule/wsdl-xfire/2.0"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+
+    <xsd:element name="inbound-endpoint" type="mule:inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+
+    <xsd:element name="outbound-endpoint" type="mule:outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+
+    <xsd:element name="response-endpoint" type="mule:responseEndpointType" substitutionGroup="mule:abstract-response-endpoint"/>
+
+    <xsd:element name="endpoint" type="mule:globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+
+</xsd:schema>
