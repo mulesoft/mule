@@ -161,7 +161,7 @@ public class TransientRegistry extends AbstractRegistry
             applyProcessors(getEndpoints());
             applyProcessors(getAgents());
             applyProcessors(getModels());
-            applyProcessors(getServices());
+            applyProcessors(lookupComponents());
             applyProcessors(lookupObjects(Object.class));
 
             //MuleServer.getManagementContext().fireNotification(new RegistryNotification(this, RegistryNotification.REGISTRY_INITIALISED));

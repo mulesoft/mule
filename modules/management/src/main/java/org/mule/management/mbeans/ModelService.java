@@ -10,8 +10,6 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.RegistryContext;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.model.UMOModel;
 

@@ -10,12 +10,10 @@
 
 package org.mule.impl.model.seda.optimised;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.MuleProxy;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.model.UMOModel;
 
 /**
  * Same as <code>SedaComponent</code> except that it assumes that components implement the Callable 
@@ -37,15 +35,14 @@ public class OptimisedSedaComponent extends SedaComponent
     }
 
     //@Override
-    protected MuleProxy createComponentProxy(Object component, MuleDescriptor descriptor, UMOModel model) 
-    throws UMOException
+    protected MuleProxy createComponentProxy(Object pojoService) throws UMOException
     {
-        if (!(component instanceof Callable))
+        if (!(pojoService instanceof Callable))
         {
             throw new IllegalArgumentException("Components for the Optimised Mule proxy must implement: "
                                                + Callable.class.getName());
         }
-        MuleProxy proxy = new OptimisedMuleProxy((Callable) component, descriptor);
+        MuleProxy proxy = new OptimisedMuleProxy((Callable) pojoService, this);
         proxy.setStatistics(getStatistics());
         return proxy;
     }

@@ -10,7 +10,6 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 
 /**

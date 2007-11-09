@@ -34,7 +34,6 @@ import org.mule.transformers.TransformerUtils;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -50,9 +49,6 @@ import org.mule.umo.provider.ReceiveException;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.StringUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,6 +56,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -924,11 +922,11 @@ public class MuleClient implements Disposable
      * @see org.mule.umo.model.UMOModel
      * @deprecated Use the RegistryContext to get the registry and register the component there
      */
-    public void registerComponent(UMODescriptor descriptor) throws UMOException
-    {
-        throw new UnsupportedOperationException("registerComponent");
-        //builder.registerComponent(descriptor);
-    }
+//    public void registerComponent(UMODescriptor descriptor) throws UMOException
+//    {
+//        throw new UnsupportedOperationException("registerComponent");
+//        //builder.registerComponent(descriptor);
+//    }
 
     /**
      * Unregisters a previously register components. This will also unregister any

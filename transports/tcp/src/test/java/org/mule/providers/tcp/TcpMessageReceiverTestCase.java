@@ -13,7 +13,6 @@ package org.mule.providers.tcp;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -25,9 +24,7 @@ public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         Mock mockComponent = new Mock(UMOComponent.class);
-        Mock mockDescriptor = new Mock(UMODescriptor.class);
-        mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
-        mockDescriptor.expectAndReturn("getResponseTransformer", null);
+        mockComponent.expectAndReturn("getResponseTransformer", null);
         return new TcpMessageReceiver((AbstractConnector)endpoint.getConnector(),
             (UMOComponent)mockComponent.proxy(), endpoint);
     }

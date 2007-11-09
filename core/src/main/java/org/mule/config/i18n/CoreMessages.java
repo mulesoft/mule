@@ -13,7 +13,6 @@ package org.mule.config.i18n;
 import org.mule.config.MuleManifest;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.model.UMOEntryPointResolver;
@@ -883,10 +882,10 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 230, name);
     }
 
-    public static Message modelNameDoesNotMatchModel(UMOImmutableDescriptor descriptor, String modelName)
-    {
-        return createMessage(BUNDLE_PATH, 231, descriptor.getName(), descriptor.getModelName(), modelName);
-    }
+//    public static Message modelNameDoesNotMatchModel(UMOImmutableDescriptor descriptor, String modelName)
+//    {
+//        return createMessage(BUNDLE_PATH, 231, descriptor.getName(), descriptor.getModelName(), modelName);
+//    }
 
     //These endpoint errors should go away once we make setting endpoints on routers typesafe
 

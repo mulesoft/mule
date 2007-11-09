@@ -119,9 +119,6 @@ public interface Registry extends Initialisable, Disposable
     /** @deprecated Use lookupAgent() instead */
     Collection getAgents();
 
-    /** @deprecated Use lookupService() instead */
-    Collection getServices();
-
     /** @deprecated Use lookupTransformer() instead */
     Collection getTransformers();
 

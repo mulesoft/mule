@@ -13,11 +13,10 @@ package org.mule.ra;
 import org.mule.MuleException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -39,9 +38,9 @@ public class JcaComponent extends AbstractComponent //implements UMOComponent, M
      */
     private static final long serialVersionUID = -1510441245219710451L;
 
-    private transient final MuleDescriptor descriptor;
+    private transient final UMOComponent component;
     private transient UMOEntryPoint entryPoint;
-    private Object component;
+    private Object pojoService;
     private ComponentStatistics stats;
     private UMOManagementContext managementContext;
 
@@ -55,14 +54,9 @@ public class JcaComponent extends AbstractComponent //implements UMOComponent, M
      */
     private final AtomicBoolean started = new AtomicBoolean(false);
 
-    public JcaComponent(MuleDescriptor descriptor)
+    public JcaComponent(UMOComponent component)
     {
-        if (descriptor == null)
-        {
-            throw new IllegalArgumentException("Descriptor cannot be null");
-        }
-
-        this.descriptor = descriptor;
+        this.component = component;
     }
 
     public void setManagementContext(UMOManagementContext context)
@@ -70,9 +64,9 @@ public class JcaComponent extends AbstractComponent //implements UMOComponent, M
         this.managementContext = context;
     }
 
-    public UMODescriptor getDescriptor()
+    public UMOComponent getComponent()
     {
-        return descriptor;
+        return component;
     }
 
     public void dispatchEvent(UMOEvent event) throws UMOException
@@ -80,12 +74,12 @@ public class JcaComponent extends AbstractComponent //implements UMOComponent, M
         try
         {
             // Invoke method
-            entryPoint.invoke(component, RequestContext.getEventContext());
+            entryPoint.invoke(pojoService, RequestContext.getEventContext());
         }
         catch (Exception e)
         {
             throw new MuleException(
-                CoreMessages.failedToInvoke("UMO Component: " + descriptor.getName()), e);
+                CoreMessages.failedToInvoke("UMO Component: " + component.getName()), e);
         }
     }
 
@@ -212,7 +206,7 @@ public class JcaComponent extends AbstractComponent //implements UMOComponent, M
      */
     public Object getInstance() throws UMOException
     {
-        return component;
+        return pojoService;
     }
 
     protected void doDispatch(UMOEvent event) throws UMOException

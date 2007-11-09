@@ -13,7 +13,6 @@ package org.mule.impl.model;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.DefaultComponentExceptionStrategy;
-import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.InitialisationCallback;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.OptimizedRequestContext;
@@ -285,11 +284,11 @@ public abstract class AbstractComponent implements UMOComponent
             return;
         }
         
-        if (!beyondInitialState.get() && initialState.equals(ImmutableMuleDescriptor.INITIAL_STATE_STOPPED))
+        if (!beyondInitialState.get() && initialState.equals(AbstractComponent.INITIAL_STATE_STOPPED))
         {
             logger.info("Component " + name + " has not been started (initial state = 'stopped')");
         }
-        else if (!beyondInitialState.get() && initialState.equals(ImmutableMuleDescriptor.INITIAL_STATE_PAUSED))
+        else if (!beyondInitialState.get() && initialState.equals(AbstractComponent.INITIAL_STATE_PAUSED))
         {
             start(/*startPaused*/true);
             logger.info("Component " + name + " has been started and paused (initial state = 'paused')");

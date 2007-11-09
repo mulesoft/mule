@@ -13,7 +13,6 @@ package org.mule.providers.udp;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -28,9 +27,7 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "udp://localhost:10100", managementContext);
         Mock mockComponent = new Mock(UMOComponent.class);
-        Mock mockDescriptor = new Mock(UMODescriptor.class);
-        mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
-        mockDescriptor.expectAndReturn("getResponseTransformer", null);
+        mockComponent.expectAndReturn("getResponseTransformer", null);
 
         return new UdpMessageReceiver(endpoint.getConnector(), (UMOComponent) mockComponent.proxy(), endpoint);
     }

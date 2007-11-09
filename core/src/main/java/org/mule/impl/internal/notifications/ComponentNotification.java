@@ -10,7 +10,6 @@
 
 package org.mule.impl.internal.notifications;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.manager.UMOServerNotification;
 
@@ -54,6 +53,6 @@ public class ComponentNotification extends UMOServerNotification
 
     protected String getPayloadToString()
     {
-        return ((MuleDescriptor) source).getName();
+        return ((UMOComponent) source).getName();
     }
 }

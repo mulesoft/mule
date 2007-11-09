@@ -22,7 +22,7 @@ public class Invocation
 {
     /** The components descriptor */
     // @GuardedBy(itself)
-    private final UMOImmutableDescriptor descriptor;
+    private final UMOComponent component;
 
     /** the next invocation in the chain */
     // @GuardedBy(itself)
@@ -39,9 +39,9 @@ public class Invocation
      * @param message the current message
      * @param invocation the next invocation in the chain or null.
      */
-    public Invocation(UMOImmutableDescriptor descriptor, UMOMessage message, Invocation invocation)
+    public Invocation(UMOComponent component, UMOMessage message, Invocation invocation)
     {
-        this.descriptor = descriptor;
+        this.component = component;
         this.message = message;
         this.invocation = invocation;
     }
@@ -62,9 +62,9 @@ public class Invocation
      * 
      * @return the descriptor for the component associated with this invocation
      */
-    public UMOImmutableDescriptor getDescriptor()
+    public UMOComponent getComponent()
     {
-        return descriptor;
+        return component;
     }
 
     public UMOEvent getEvent()

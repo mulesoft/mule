@@ -10,8 +10,9 @@
 
 package org.mule.components.script;
 
+import org.mule.config.ConfigurationException;
 import org.mule.impl.UMOComponentAware;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -47,13 +48,13 @@ public abstract class AbstractScriptComponent
 
     private String scriptText = null;
     private boolean autoReload = true;
-    protected UMODescriptor descriptor;
+    protected UMOComponent component;
     private FileMonitor monitor;
     private long reloadInterval = DEFAULT_RELOAD_INTERVAL_MS;
 
-    public void setDescriptor(UMODescriptor descriptor)
+    public void setComponent(UMOComponent component) throws ConfigurationException
     {
-        this.descriptor = descriptor;
+        this.component = component;
     }
 
     public void initialise() throws InitialisationException
@@ -65,8 +66,8 @@ public abstract class AbstractScriptComponent
             {
                 extension = "." + extension;
             }
-            setScript(descriptor.getName() + extension);
-            logger.info("script name is not set, using default: " + descriptor.getName() + extension);
+            setScript(component.getName() + extension);
+            logger.info("script name is not set, using default: " + component.getName() + extension);
         }
 
         if (getScriptText() != null)

@@ -10,10 +10,7 @@
 
 package org.mule.ra;
 
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 
 /**
  * Creates a model suitable for Jca execution
@@ -22,15 +19,8 @@ public class JcaModel extends AbstractModel
 {
     public static final String JCA_MODEL_TYPE = "jca";
 
-
-    protected UMOComponent createComponent(UMODescriptor descriptor)
-    {
-        return new JcaComponent((MuleDescriptor)descriptor);
-    }
-
     public String getType()
     {
         return JCA_MODEL_TYPE;
     }
-
 }

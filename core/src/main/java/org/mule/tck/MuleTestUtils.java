@@ -26,7 +26,6 @@ import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOManagementContext;
@@ -276,11 +275,6 @@ public final class MuleTestUtils
     public static Mock getMockEndpointURI()
     {
         return new Mock(UMOEndpointURI.class, "umoEndpointUri");
-    }
-
-    public static Mock getMockDescriptor()
-    {
-        return new Mock(UMODescriptor.class, "umoDescriptor");
     }
 
     public static Mock getMockTransaction()

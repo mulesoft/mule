@@ -15,7 +15,7 @@
     <model name="main">
 
         <service name="PassingThrough">
-            <component class="org.mule.components.simple.PassThroughComponent"/>
+            <pass-through-component/>
             <inbound-router>
                 <inbound-endpoint address="udp://${hostname}:61000"/>
             </inbound-router>

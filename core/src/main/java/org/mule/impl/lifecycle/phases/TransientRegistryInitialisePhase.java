@@ -12,7 +12,7 @@ package org.mule.impl.lifecycle.phases;
 import org.mule.impl.lifecycle.LifecyclePhase;
 import org.mule.impl.lifecycle.NotificationLifecycleObject;
 import org.mule.registry.Registry;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -53,7 +53,7 @@ public class TransientRegistryInitialisePhase extends LifecyclePhase
         initOrderedObjects.add(new NotificationLifecycleObject(UMOTransformer.class));
         initOrderedObjects.add(new NotificationLifecycleObject(UMOImmutableEndpoint.class));
         initOrderedObjects.add(new NotificationLifecycleObject(UMOAgent.class));
-        initOrderedObjects.add(new NotificationLifecycleObject(UMODescriptor.class));
+        initOrderedObjects.add(new NotificationLifecycleObject(UMOComponent.class));
         initOrderedObjects.add(new NotificationLifecycleObject(UMOModel.class));
 
         initOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));

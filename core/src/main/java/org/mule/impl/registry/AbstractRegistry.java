@@ -19,7 +19,6 @@ import org.mule.impl.ManagementContextAware;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
@@ -321,11 +320,6 @@ public abstract class AbstractRegistry implements Registry
     public Collection getEndpoints()
     {
         return lookupObjects(UMOImmutableEndpoint.class);
-    }
-
-    public Collection getServices()
-    {
-        return lookupObjects(UMODescriptor.class);
     }
 
     public Collection getTransformers()

@@ -11,7 +11,7 @@
 package org.mule.config.spring.processors;
 
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOContainerContext;
@@ -64,11 +64,11 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
                 endpoint.setName(name);
             }
         }
-        else if (o instanceof UMODescriptor)
+        else if (o instanceof UMOComponent)
         {
-            if (((UMODescriptor)o).getName() == null || overwrite)
+            if (((UMOComponent)o).getName() == null || overwrite)
             {
-                ((UMODescriptor)o).setName(s);
+                ((UMOComponent)o).setName(s);
             }
         }
         else if (o instanceof UMOModel)
