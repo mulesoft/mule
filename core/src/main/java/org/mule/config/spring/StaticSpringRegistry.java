@@ -178,14 +178,13 @@ public class StaticSpringRegistry extends SpringRegistry
     /**
      * {@inheritDoc}
      */
-    public UMOConnector unregisterConnector(String connectorName) throws UMOException
+    public void unregisterConnector(String connectorName) throws UMOException
     {
         UMOConnector c = lookupConnector(connectorName);
         if (c != null)
         {
             c.dispose();
         }
-        return c;
     }
 
 
@@ -200,14 +199,13 @@ public class StaticSpringRegistry extends SpringRegistry
     /**
      * {@inheritDoc}
      */
-    public UMOImmutableEndpoint unregisterEndpoint(String endpointName)
+    public void unregisterEndpoint(String endpointName)
     {
         UMOImmutableEndpoint ep = lookupEndpoint(endpointName);
         if (ep != null)
         {
             //TODO Kill it
         }
-        return ep;
     }
 
     /**
@@ -221,13 +219,12 @@ public class StaticSpringRegistry extends SpringRegistry
     /**
      * {@inheritDoc}
      */
-    public UMOTransformer unregisterTransformer(String transformerName)
+    public void unregisterTransformer(String transformerName)
     {
         UMOTransformer t = lookupTransformer(transformerName);
         if(t!=null && t instanceof Disposable) {
             ((Disposable)t).dispose();
         }
-        return t;
     }
 
     /**
@@ -241,14 +238,13 @@ public class StaticSpringRegistry extends SpringRegistry
     /**
      * {@inheritDoc}
      */
-    public UMOModel unregisterModel(String name)
+    public void unregisterModel(String name)
     {
         UMOModel model = lookupModel(name);
         if (model != null)
         {
             model.dispose();
         }
-        return model;
     }
 
     /**
@@ -262,9 +258,8 @@ public class StaticSpringRegistry extends SpringRegistry
     /**
      * {@inheritDoc}
      */
-    public UMOAgent unregisterAgent(String name) throws UMOException
+    public void unregisterAgent(String name) throws UMOException
     {
-
         UMOAgent agent = (UMOAgent) lookupObject(name);
         if (agent != null)
         {
@@ -272,7 +267,6 @@ public class StaticSpringRegistry extends SpringRegistry
             agent.dispose();
             agent.unregistered();
         }
-        return agent;
     }
 
     //@java.lang.Override

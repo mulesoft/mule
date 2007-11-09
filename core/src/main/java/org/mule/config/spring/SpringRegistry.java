@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.spring;
 
 import org.mule.config.MuleConfiguration;
@@ -17,9 +18,14 @@ import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
 import org.mule.impl.registry.AbstractRegistry;
+import org.mule.registry.RegistrationException;
 import org.mule.registry.ServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOManagementContext;
+import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -51,8 +57,9 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
 
     /**
      * TODO MULE-1908
+     * 
      * @deprecated Should MultiContainerContext still be used in 2.x? MULE-1908
-     */     
+     */
     protected MultiContainerContext containerContext;
 
     public SpringRegistry()
@@ -80,8 +87,10 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
     protected UMOLifecycleManager createLifecycleManager()
     {
         GenericLifecycleManager lcm = new GenericLifecycleManager();
-        lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME));
-        lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME));
+        lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME,
+            Initialisable.class, Disposable.PHASE_NAME));
+        lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Disposable.PHASE_NAME, Disposable.class,
+            Initialisable.PHASE_NAME));
         return lcm;
     }
 
@@ -89,11 +98,12 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
     {
         if (StringUtils.isBlank(key))
         {
-            logger.warn(MessageFactory.createStaticMessage("Detected a lookup attempt with an empty or null key"),
-                        new Throwable().fillInStackTrace());
+            logger.warn(
+                MessageFactory.createStaticMessage("Detected a lookup attempt with an empty or null key"),
+                new Throwable().fillInStackTrace());
             return null;
         }
-        
+
         try
         {
             return applicationContext.getBean(key);
@@ -105,26 +115,27 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         }
     }
 
-//  TODO MULE-1908
-//    protected Object doLookupInContainerContext(String key, Class returntype) throws ObjectNotFoundException
-//    {
-//        if(containerContext==null)
-//        {
-//            containerContext = new MultiContainerContext();
-//
-//            Collection containers = doLookupObjects(UMOContainerContext.class);
-//            if(containers.size()>0)
-//            {
-//                for (Iterator iterator = containers.iterator(); iterator.hasNext();)
-//                {
-//                    UMOContainerContext context = (UMOContainerContext) iterator.next();
-//                    containerContext.addContainer(context);
-//                }
-//            }
-//        }
-//        Object o = containerContext.getComponent(key);
-//        return o;
-//    }
+    // TODO MULE-1908
+    // protected Object doLookupInContainerContext(String key, Class returntype)
+    // throws ObjectNotFoundException
+    // {
+    // if(containerContext==null)
+    // {
+    // containerContext = new MultiContainerContext();
+    //
+    // Collection containers = doLookupObjects(UMOContainerContext.class);
+    // if(containers.size()>0)
+    // {
+    // for (Iterator iterator = containers.iterator(); iterator.hasNext();)
+    // {
+    // UMOContainerContext context = (UMOContainerContext) iterator.next();
+    // containerContext.addContainer(context);
+    // }
+    // }
+    // }
+    // Object o = containerContext.getComponent(key);
+    // return o;
+    // }
 
     protected Collection doLookupObjects(Class type)
     {
@@ -136,7 +147,8 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         this.applicationContext = applicationContext;
     }
 
-    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
+    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
+        throws ServiceException
     {
         Properties props = SpiUtils.findServiceDescriptor(type, name);
         if (props == null)
@@ -152,9 +164,8 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
      */
     protected synchronized MuleConfiguration getLocalConfiguration()
     {
-        return (MuleConfiguration)applicationContext.getBean(MuleProperties.OBJECT_MULE_CONFIGURATION);        
+        return (MuleConfiguration)applicationContext.getBean(MuleProperties.OBJECT_MULE_CONFIGURATION);
     }
-
 
     /** {@inheritDoc} */
     public TransactionManager getTransactionManager()
@@ -162,7 +173,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         Map m = applicationContext.getBeansOfType(TransactionManager.class);
         if (m.size() > 0)
         {
-            return (TransactionManager) m.values().iterator().next();
+            return (TransactionManager)m.values().iterator().next();
         }
         return null;
     }
@@ -195,7 +206,6 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         return applicationContext.getBeansOfType(UMOTransformer.class).values();
     }
 
-
     public boolean isReadOnly()
     {
         return true;
@@ -206,5 +216,99 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         return false;
     }
 
-}
+    public void registerConnector(UMOConnector connector, UMOManagementContext managementContext)
+        throws UMOException
+    {
+        unsupportedOperation("registerConnector", connector);
+    }
 
+    public void unregisterConnector(String connectorName) throws UMOException
+    {
+        unsupportedOperation("unregisterConnector", connectorName);
+    }
+
+    public void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
+        throws UMOException
+    {
+        unsupportedOperation("registerEndpoint", endpoint);
+    }
+
+    public void unregisterEndpoint(String endpointName)
+    {
+        unsupportedOperation("unregisterEndpoint", endpointName);
+    }
+
+    public void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext)
+        throws UMOException
+    {
+        unsupportedOperation("registerTransformer", transformer);
+    }
+
+    public void unregisterTransformer(String transformerName)
+    {
+        unsupportedOperation("unregistertransformer", transformerName);
+    }
+
+    /** {@inheritDoc} */
+    public void registerComponent(UMOComponent component, UMOManagementContext managementContext)
+        throws UMOException
+    {
+        unsupportedOperation("registerComponent", component);
+    }
+
+    public void unregisterComponent(String componentName)
+    {
+        unsupportedOperation("unregisterComponent", componentName);
+    }
+
+    public void registerModel(UMOModel model, UMOManagementContext managementContext) throws UMOException
+    {
+        unsupportedOperation("registerModel", model);
+    }
+
+    public void unregisterModel(String modelName)
+    {
+        unsupportedOperation("unregisterModel", modelName);
+    }
+
+    public void registerAgent(UMOAgent agent, UMOManagementContext managementContext) throws UMOException
+    {
+        unsupportedOperation("registerAgent", agent);
+    }
+
+    public void unregisterAgent(String agentName) throws UMOException
+    {
+        unsupportedOperation("unregisterAgent", agentName);
+    }
+
+    protected void doRegisterObject(String key,
+                                    Object value,
+                                    Object metadata,
+                                    UMOManagementContext managementContext) throws RegistrationException
+    {
+        unsupportedOperation("doRegisterObject", key);
+    }
+
+    public void unregisterObject(String key)
+    {
+        unsupportedOperation("unregisterObject", key);
+    }
+
+    public void registerObjects(Map objects) throws RegistrationException
+    {
+        unsupportedOperation("registryObjects", objects);
+    }
+
+    public void setConfiguration(MuleConfiguration config)
+    {
+        unsupportedOperation("setConfiguration", config);
+    }
+
+    public void registerEndpointBuilder(String name,
+                                        UMOEndpointBuilder builder,
+                                        UMOManagementContext managementContext) throws UMOException
+    {
+        unsupportedOperation("registerEndpointBuilder", builder);
+    }
+
+}

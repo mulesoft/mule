@@ -532,34 +532,10 @@ public abstract class AbstractRegistry implements Registry
         registerConnector(connector, MuleServer.getManagementContext());
     }
 
-    public void registerConnector(UMOConnector connector, UMOManagementContext managementContext)
-            throws UMOException
-    {
-        unsupportedOperation("registerConnector", connector);
-    }
-
-    public UMOConnector unregisterConnector(String connectorName) throws UMOException
-    {
-        unsupportedOperation("unregisterConnector", connectorName);
-        return null;
-    }
-
     /** {@inheritDoc} */
     public void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
     {
         registerEndpoint(endpoint, MuleServer.getManagementContext());
-    }
-
-    public void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
-            throws UMOException
-    {
-        unsupportedOperation("registerEndpoint", endpoint);
-    }
-
-    public UMOImmutableEndpoint unregisterEndpoint(String endpointName)
-    {
-        unsupportedOperation("unregisterEndpoint", endpointName);
-        return null;
     }
 
     /** {@inheritDoc} */
@@ -568,62 +544,16 @@ public abstract class AbstractRegistry implements Registry
         registerTransformer(transformer, MuleServer.getManagementContext());
     }
 
-    public void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext)
-            throws UMOException
-    {
-        unsupportedOperation("registerTransformer", transformer);
-    }
-
-    public UMOTransformer unregisterTransformer(String transformerName)
-    {
-        unsupportedOperation("unregistertransformer", transformerName);
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    public void registerComponent(UMOComponent component, UMOManagementContext managementContext) throws UMOException
-    {
-        unsupportedOperation("registerComponent", component);
-    }
-
-    public UMOComponent unregisterComponent(String componentName)
-    {
-        unsupportedOperation("unregisterComponent", componentName);
-        return null;
-    }
-
     /** {@inheritDoc} */
     public void registerModel(UMOModel model) throws UMOException
     {
         registerModel(model, MuleServer.getManagementContext());
     }
 
-    public void registerModel(UMOModel model, UMOManagementContext managementContext) throws UMOException
-    {
-        unsupportedOperation("registerModel", model);
-    }
-
-    public UMOModel unregisterModel(String modelName)
-    {
-        unsupportedOperation("unregisterModel", modelName);
-        return null;
-    }
-
     /** {@inheritDoc} */
     public void registerAgent(UMOAgent agent) throws UMOException
     {
         registerAgent(agent, MuleServer.getManagementContext());
-    }
-
-    public void registerAgent(UMOAgent agent, UMOManagementContext managementContext) throws UMOException
-    {
-        unsupportedOperation("registerAgent", agent);
-    }
-
-    public UMOAgent unregisterAgent(String agentName) throws UMOException
-    {
-        unsupportedOperation("unregisterAgent", agentName);
-        return null;
     }
 
     public final void registerObject(String key, Object value) throws RegistrationException
@@ -661,24 +591,11 @@ public abstract class AbstractRegistry implements Registry
         doRegisterObject(key, value, metadata, managementContext);
     }
 
-    protected void doRegisterObject(String key,
-                                    Object value,
-                                    Object metadata,
-                                    UMOManagementContext managementContext) throws RegistrationException
-    {
-        unsupportedOperation("doRegisterObject", key);
-    }
-
-    public void unregisterObject(String key)
-    {
-        unsupportedOperation("unregisterObject", key);
-    }
-
-    public void registerObjects(Map objects) throws RegistrationException
-    {
-        unsupportedOperation("registryObjects", objects);
-    }
-
+    protected abstract void doRegisterObject(String key,
+                                            Object value,
+                                            Object metadata,
+                                            UMOManagementContext managementContext) throws RegistrationException;
+    
     public final MuleConfiguration getConfiguration()
     {
         MuleConfiguration config = getLocalConfiguration();
@@ -692,11 +609,6 @@ public abstract class AbstractRegistry implements Registry
             setConfiguration(config);
         }
         return config;
-    }
-
-    public void setConfiguration(MuleConfiguration config)
-    {
-        unsupportedOperation("setConfiguration", config);
     }
 
     public int getDefaultScope()
@@ -744,11 +656,4 @@ public abstract class AbstractRegistry implements Registry
 //        }
 //        return null;
 //    }
-
-
-    public void registerEndpointBuilder(String name, UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException
-    {
-        unsupportedOperation("registerEndpointBuilder", builder);
-    }
-
 }

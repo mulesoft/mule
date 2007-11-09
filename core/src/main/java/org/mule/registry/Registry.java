@@ -138,7 +138,7 @@ public interface Registry extends Initialisable, Disposable
 
     void registerObjects(Map objects) throws RegistrationException;
 
-    void unregisterObject(String key);
+    void unregisterObject(String key) throws UMOException;
 
     // TODO MULE-2139 The following methods are Mule-specific and should be split out into a separate class;
     // leave this one as a "pure" registry interface.
@@ -156,7 +156,7 @@ public interface Registry extends Initialisable, Disposable
      */
     void registerConnector(UMOConnector connector) throws UMOException;
 
-    UMOConnector unregisterConnector(String connectorName) throws UMOException;
+    void unregisterConnector(String connectorName) throws UMOException;
 
     //TODO MULE-2494
     void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
@@ -167,7 +167,7 @@ public interface Registry extends Initialisable, Disposable
     void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException;
 
     //TODO MULE-2494
-    UMOImmutableEndpoint unregisterEndpoint(String endpointName);
+    void unregisterEndpoint(String endpointName) throws UMOException;
 
     
     public void registerEndpointBuilder(String name, UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException;
@@ -182,24 +182,25 @@ public interface Registry extends Initialisable, Disposable
      */
     void registerTransformer(UMOTransformer transformer) throws UMOException;
 
-    UMOTransformer unregisterTransformer(String transformerName);
+    void unregisterTransformer(String transformerName) throws UMOException;
 
     void registerComponent(UMOComponent component, UMOManagementContext managementContext) throws UMOException;
-    UMOComponent unregisterComponent(String componentName);
+
+    void unregisterComponent(String componentName) throws UMOException;
 
     void registerModel(UMOModel model, UMOManagementContext managementContext) throws UMOException;
 
     /** @deprecated Use registerModel(UMOModel model, UMOManagementContext managementContext) instead. */
     void registerModel(UMOModel model) throws UMOException;
 
-    UMOModel unregisterModel(String modelName);
+    void unregisterModel(String modelName) throws UMOException;
 
     void registerAgent(UMOAgent agent, UMOManagementContext managementContext) throws UMOException;
 
     /** @deprecated Use registerAgent(UMOAgent agent, UMOManagementContext managementContext) instead. */
     void registerAgent(UMOAgent agent) throws UMOException;
 
-    UMOAgent unregisterAgent(String agentName) throws UMOException;
+    void unregisterAgent(String agentName) throws UMOException;
 
     // TODO MULE-2162 MuleConfiguration belongs in the ManagementContext rather than the Registry
     void setConfiguration(MuleConfiguration config);
