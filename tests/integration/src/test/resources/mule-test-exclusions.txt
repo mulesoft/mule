@@ -40,7 +40,10 @@ org.mule.test.usecases.sync.TcpToFileTestCase
 # Convert to XML-based config
 ##########################################################################
 
+org.mule.test.integration.EventMetaDataPropagationTestCase
+org.mule.test.integration.client.RemoteExceptionTestCase
 org.mule.test.integration.message.AttachmentsPropagationTestCase
+org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
 org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
 org.mule.test.integration.providers.jdbc.JdbcConnectionTestCase
 org.mule.test.integration.providers.jdbc.JdbcNonTransactionalFunctionalTestCase
@@ -49,14 +52,6 @@ org.mule.test.integration.providers.jdbc.JdbcTransactionalJdbcFunctionalTestCase
 org.mule.test.integration.providers.jdbc.JdbcTransactionalXaFunctionalTestCase
 # Convert transacted endpoint to XML config
 org.mule.test.integration.client.MuleClientTransactionTestCase
-
-##########################################################################
-# Missing config file
-##########################################################################
-
-org.mule.test.integration.client.RemoteExceptionTestCase
-org.mule.test.integration.EventMetaDataPropagationTestCase
-org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
 
 ##########################################################################
 # Unfinished 2.x implementation
