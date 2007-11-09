@@ -18,6 +18,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -204,7 +205,14 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 logger.warn("No endpoint was registered with key: " + key);
                 return;
             }
-            managementContext.getRegistry().unregisterComponent(component.getName());
+            try
+            {
+                managementContext.getRegistry().unregisterComponent(component.getName());
+            }
+            catch (UMOException e)
+            {
+                logger.warn(e);
+            }
         }
 
     }
