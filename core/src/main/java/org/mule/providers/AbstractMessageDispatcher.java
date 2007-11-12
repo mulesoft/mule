@@ -197,7 +197,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
         event.setSynchronous(true);
         event.getMessage().setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,
-            event.getEndpoint().getEndpointURI().toString());
+            event.getEndpoint().getEndpointURI().getUri().toString());
         event = OptimizedRequestContext.unsafeSetEvent(event);
 
         // Apply Security filter if one is set
@@ -503,7 +503,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     protected String getConnectEventId(UMOImmutableEndpoint endpoint)
     {
-        return connector.getName() + ".dispatcher(" + endpoint.getEndpointURI() + ")";
+        return connector.getName() + ".dispatcher(" + endpoint.getEndpointURI().getUri() + ")";
     }
 
     public final boolean isConnected()
@@ -631,7 +631,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         final StringBuffer sb = new StringBuffer(80);
         sb.append(ClassUtils.getSimpleName(this.getClass()));
         sb.append("{this=").append(Integer.toHexString(System.identityHashCode(this)));
-        sb.append(", endpoint=").append(endpoint.getEndpointURI());
+        sb.append(", endpoint=").append(endpoint.getEndpointURI().getUri());
         sb.append(", disposed=").append(disposed);
         sb.append('}');
         return sb.toString();

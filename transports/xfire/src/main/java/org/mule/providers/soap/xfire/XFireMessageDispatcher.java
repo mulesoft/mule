@@ -138,9 +138,9 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
         }
 
         Transport transport = (Transport)transportClazz.getConstructor(null).newInstance(null);
-        Client client = new Client(transport, service, endpoint.getEndpointURI().toString());
+        Client client = new Client(transport, service, endpoint.getEndpointURI().getUri().toString());
         client.setXFire(xfire);
-        client.setEndpointUri(endpoint.getEndpointURI().toString());
+        client.setEndpointUri(endpoint.getEndpointURI().getUri().toString());
         return configureXFireClient(client);
     }
 

@@ -46,6 +46,7 @@ public class EndpointUtils
 
     private static void processConnectorDependency(BeanAssembler assembler, Element element)
     {
+        // does this ever work - it doesn't match "connector-ref"
         if (StringUtils.isNotBlank(element.getAttribute(CONNECTOR_ATTRIBUTE)))
         {
             assembler.getBean().addDependsOn(element.getAttribute(CONNECTOR_ATTRIBUTE));

@@ -115,27 +115,23 @@ public class LazyEndpointURI implements UMOEndpointURI
         this.path = path;
     }
 
-    public String toString()
+    /**
+     * @return The String supplied to the delegate constructor
+     */
+    protected String toConstructor()
     {
+        StringBuffer buffer = new StringBuffer();
+        if (null != meta)
+        {
+            buffer.append(meta);
+            buffer.append(DOTS);
+        }
         if (null != address)
         {
-            if (null != meta)
-            {
-                return meta + DOTS + address;
-            }
-            else
-            {
-                return address;
-            }
+            buffer.append(address);
         }
         else
         {
-            StringBuffer buffer = new StringBuffer();
-            if (null != meta)
-            {
-                buffer.append(meta);
-                buffer.append(DOTS);
-            }
             buffer.append(protocol);
             buffer.append(DOTS_SLASHES);
             boolean atStart = true;
@@ -168,8 +164,8 @@ public class LazyEndpointURI implements UMOEndpointURI
                 }
                 buffer.append(path);
             }
-            return buffer.toString();
         }
+        return buffer.toString();
     }
 
     protected void assertNotYetInjected()
@@ -191,7 +187,7 @@ public class LazyEndpointURI implements UMOEndpointURI
         {
             try
             {
-                delegate.compareAndSet(null, new MuleEndpointURI(toString()));
+                delegate.compareAndSet(null, new MuleEndpointURI(toConstructor()));
             }
             catch (EndpointException e)
             {
@@ -220,7 +216,7 @@ public class LazyEndpointURI implements UMOEndpointURI
 
     public void setEndpointName(String name)
     {
-        throw new UnsupportedOperationException("EndpointAddress.setEdpointName");
+        throw new UnsupportedOperationException("LazyEndpointURI.setEdpointName");
     }
 
     public Properties getParams()
@@ -363,6 +359,34 @@ public class LazyEndpointURI implements UMOEndpointURI
         {
             throw new IllegalArgumentException("Address '" + address + "' for protocol '" + protocol +
                     "' should start with " + protocol + DOTS_SLASHES);
+        }
+    }
+
+    public int hashCode()
+    {
+        return lazyDelegate().hashCode();
+    }
+
+    public boolean equals(Object obj)
+    {
+        return lazyDelegate().equals(obj);
+    }
+    
+    /**
+     * This doesn't perfectly mirror the delegate behaviour because toString() on the delegate does
+     * not return the consructor argument when meta-info is present.  However, it is close enough
+     * in practice, since this is only used for debugging before the delegate is created.
+     */
+    public String toString()
+    {
+        UMOEndpointURI exists = (UMOEndpointURI) delegate.get();
+        if (null != exists)
+        {
+            return exists.toString();
+        }
+        else
+        {
+            return toConstructor();
         }
     }
 

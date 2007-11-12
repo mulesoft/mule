@@ -5,7 +5,6 @@
 # MULE-2071
 # These are intermittent, unfortunately - there may be more, but I've re-enabled many tests
 # as I seem to have fixed some issues.  So sorry, but we need to wait for failures again.
-# (and this particular test now seems to have an additional error!)
 # Note - all these have similar errors and all extend AbstractJmsTransactionFunctionalTest
 org.mule.providers.jms.issues.ActiveMQJmsTransactionMule2071TestCase
 org.mule.providers.jms.transactions.ActiveMQJmsXaTransactionFunctionalTestCase
