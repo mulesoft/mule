@@ -14,8 +14,9 @@
     <name>Mule Tests</name>
 
     <modules>
+        <module>common</module>
+        <module>axis</module>
         <module>xfire</module>
     </modules>
-
 </project>
 

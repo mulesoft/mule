@@ -1001,17 +1001,6 @@
         </profile>
 
         <profile>
-            <!-- Integration tests -->
-            <id>tests</id>
-            <activation>
-                <property>
-                    <name>tests</name>
-                    <value>true</value>
-                </property>
-            </activation>
-        </profile>
-
-        <profile>
             <id>distributions</id>
             <activation>
                 <property>
