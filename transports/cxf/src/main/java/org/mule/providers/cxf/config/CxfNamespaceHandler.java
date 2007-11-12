@@ -33,12 +33,17 @@ public class CxfNamespaceHandler extends NamespaceHandlerSupport
         
         registerBeanDefinitionParser("connector", new OrphanDefinitionParser(CxfConnector.class, true));
         registerBeanDefinitionParser("endpoint", 
-            new TransportGlobalEndpointDefinitionParser("cxf", true, endpointProps));
+            new TransportGlobalEndpointDefinitionParser(
+                    "cxf",
+                    TransportGlobalEndpointDefinitionParser.META,
+                    endpointProps, 
+                    new String[]{}));
         registerBeanDefinitionParser("inbound-endpoint", 
             new TransportEndpointDefinitionParser(
-                "cxf", 
-                true,
-                InboundEndpointFactoryBean.class,
-                endpointProps ));
+                    "cxf",
+                    TransportEndpointDefinitionParser.META,
+                    InboundEndpointFactoryBean.class,
+                    endpointProps,
+                    new String[]{}));
     }
 }
