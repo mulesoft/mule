@@ -28,7 +28,7 @@
                 -->
                 <chaining-router>
                     <vm:outbound-endpoint path="stockquote"/>
-                    <outbound-endpoint address="stdio://System.out" transformer-ref="XmlDecoder Xslt XmlToObject"/>
+                    <outbound-endpoint address="stdio://System.out"/>
                 </chaining-router>
             </outbound-router>
         </service>

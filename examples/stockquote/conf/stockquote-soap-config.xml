@@ -43,6 +43,7 @@
     <custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
         <spring:property name="xslFile" value="xsl/soap-stock.xsl"/>
     </custom-transformer>
+    <transformer-object-to-string name="ToString"/>
 
     <!--
         The Mule model initialises and manages your UMO components
@@ -54,7 +55,8 @@
         -->
         <service name="serviceProxy">
             <inbound-router>
-                <vm:inbound-endpoint address="stockquote"/>
+                <vm:inbound-endpoint address="stockquote"
+                                     responseTransformer-ref="ToString XmlDecoder Xslt XmlToObject"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>

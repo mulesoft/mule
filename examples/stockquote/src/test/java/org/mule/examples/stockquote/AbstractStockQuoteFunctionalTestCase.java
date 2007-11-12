@@ -31,8 +31,10 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
         {
             if (null == response.getExceptionPayload())
             {
-                assertTrue("Stock quote should contain \"BLOCK\": " + response.getPayload(),
-                            StringUtils.contains(response.getPayloadAsString(), "BLOCK"));
+                String text = response.getPayloadAsString();
+                assertNotNull("Null response", text);
+                assertTrue("Stock quote should contain \"BLOCK\": " + text, StringUtils.contains(text, "BLOCK"));
+                assertTrue("Stock quote should start with \"StockQuote[\":" + text, text.startsWith("StockQuote["));
                 logger.debug("**********");
                 logger.debug(response.getPayload());
                 logger.debug(response.getPayloadAsString());

@@ -38,6 +38,7 @@
     <custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
         <spring:property name="xslFile" value="xsl/rest-stock.xsl"/>
     </custom-transformer>
+    <transformer-object-to-string name="ToString"/>
 
     <model name="Sample-Rest">
         <service name="HTTPPostSample">
@@ -59,7 +60,7 @@
 
             <inbound-router>
                 <vm:inbound-endpoint path="stockquote"
-                                     responseTransformer-ref="XmlDecoder Xslt XmlToObject"/>
+                                     responseTransformer-ref="ToString XmlDecoder Xslt XmlToObject"/>
             </inbound-router>
         </service>
     </model>

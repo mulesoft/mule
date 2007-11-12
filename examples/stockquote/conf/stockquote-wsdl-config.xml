@@ -41,7 +41,7 @@
     <custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
     <transformer-xml-entity-decoder name="XmlDecoder"/>
     <custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
-        <spring:property name="xslFile" value="xsl/rest-stock.xsl"/>
+        <spring:property name="xslFile" value="xsl/soap-stock.xsl"/>
     </custom-transformer>
 
     <model name="Sample-WSDL">
@@ -51,7 +51,8 @@
         -->
         <service name="serviceProxy">
             <inbound-router>
-                <vm:inbound-endpoint path="stockquote"/>
+                <vm:inbound-endpoint path="stockquote"
+                                     responseTransformer-ref="XmlDecoder Xslt XmlToObject"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
