@@ -1,4 +1,5 @@
 #
 # Test cases listed in this file are not run.
 #
+# MULE-2681
 org.mule.examples.stockquote.SoapStockQuoteFunctionalTestCase

@@ -55,7 +55,7 @@
         -->
         <service name="serviceProxy">
             <inbound-router>
-                <vm:inbound-endpoint address="stockquote"
+                <vm:inbound-endpoint path="stockquote"
                                      responseTransformer-ref="ToString XmlDecoder Xslt XmlToObject"/>
                 <forwarding-router/>
             </inbound-router>
