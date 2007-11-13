@@ -37,7 +37,7 @@
             <version>1.4</version>
         </dependency>
         <dependency>
-            <groupId>axis</groupId>
+            <groupId>org.apache.axis</groupId>
             <artifactId>axis-saaj</artifactId>
             <version>1.4</version>
         </dependency>
@@ -148,5 +148,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>
