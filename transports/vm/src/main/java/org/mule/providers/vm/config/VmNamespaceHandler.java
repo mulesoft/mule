@@ -13,7 +13,7 @@ import org.mule.config.QueueProfile;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 import org.mule.providers.vm.VMConnector;
 
 /**
@@ -25,7 +25,7 @@ public class VmNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerStandardTransportEndpoints(VMConnector.VM, URIBuilder.PATH_ATTRIBUTES);
+        registerStandardTransportEndpoints(VMConnector.VM, LazyEndpointURI.PATH_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(VMConnector.class, true));
         registerBeanDefinitionParser("queueProfile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
     }

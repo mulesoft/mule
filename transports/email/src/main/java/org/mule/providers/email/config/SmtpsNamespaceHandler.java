@@ -12,7 +12,7 @@ package org.mule.providers.email.config;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.email.SmtpsConnector;
 
@@ -24,7 +24,7 @@ public class SmtpsNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerStandardTransportEndpoints(SmtpsConnector.SMTPS, URIBuilder.HOST_ATTRIBUTES);
+        registerStandardTransportEndpoints(SmtpsConnector.SMTPS, LazyEndpointURI.HOST_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(SmtpsConnector.class, true));
         registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "key", "value"));
         registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());

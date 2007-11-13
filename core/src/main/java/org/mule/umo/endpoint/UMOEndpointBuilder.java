@@ -10,7 +10,6 @@
 
 package org.mule.umo.endpoint;
 
-import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.impl.ManagementContextAware;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.umo.UMOFilter;
@@ -101,7 +100,7 @@ public interface UMOEndpointBuilder extends ManagementContextAware, Cloneable
 
     void setConnectionStrategy(ConnectionStrategy connectionStrategy);
 
-    void setURIBuilder(URIBuilder URIBuilder);
+    void setEndpointURI(UMOEndpointURI endpointURI);
 
     Object clone() throws CloneNotSupportedException;
 

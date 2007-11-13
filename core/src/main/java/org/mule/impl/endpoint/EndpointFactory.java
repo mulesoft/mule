@@ -19,6 +19,7 @@ import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.util.BeanUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

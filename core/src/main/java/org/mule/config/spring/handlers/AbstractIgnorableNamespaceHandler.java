@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * This Namespace handler extends the default Spring {@link org.springframework.beans.factory.xml.NamespaceHandlerSupport}
  * to allow certain elements in document to be ignored by the handler.
  */
-public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSupport
+public abstract class AbstractIgnorableNamespaceHandler extends NamespaceHandlerSupport
 {
 
     /**

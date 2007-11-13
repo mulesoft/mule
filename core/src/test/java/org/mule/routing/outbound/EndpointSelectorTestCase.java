@@ -107,16 +107,14 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     {
         Map props = new HashMap();
         props.put(router.getSelectorProperty(), "dest5");
+        UMOMessage message = new MuleMessage("test event", props);
 
         try
         {
-            // this test used to fail at the router; it now fails earlier when the message is
-            // constructed.  i don't think this is a problem.
-            UMOMessage message = new MuleMessage("test event", props);
             router.route(message, (UMOSession) session.proxy(), false);
             fail("Router should have thrown an exception if endpoint was not found.");
         }
-        catch (Exception e)
+        catch (CouldNotRouteOutboundMessageException e)
         {
             // expected
         }

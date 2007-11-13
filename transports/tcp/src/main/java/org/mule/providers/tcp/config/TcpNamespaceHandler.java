@@ -11,7 +11,7 @@ package org.mule.providers.tcp.config;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.providers.tcp.TcpProtocol;
@@ -36,7 +36,7 @@ public class TcpNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerStandardTransportEndpoints(TcpConnector.TCP, URIBuilder.SOCKET_ATTRIBUTES);
+        registerStandardTransportEndpoints(TcpConnector.TCP, LazyEndpointURI.SOCKET_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(TcpConnector.class, true));
         registerBeanDefinitionParser("custom-protocol", new ChildDefinitionParser("tcpProtocol", null, TcpProtocol.class, true));
         registerBeanDefinitionParser("xml-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageProtocol.class));

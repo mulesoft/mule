@@ -18,11 +18,8 @@
                 <entry key="org.mule.umo.provider.UMOConnector">
                     <bean class="org.mule.config.spring.editors.ConnectorPropertyEditor"/>
                 </entry>
-                <!-- entry key="org.mule.umo.endpoint.UMOEndpointURI">
+                <entry key="org.mule.umo.endpoint.UMOEndpointURI">
                     <bean class="org.mule.config.spring.editors.EndpointURIPropertyEditor"/>
-                </entry -->
-                <entry key="org.mule.config.spring.parsers.specific.URIBuilder">
-                    <bean class="org.mule.config.spring.editors.URIBuilderPropertyEditor"/>
                 </entry>
             </map>
         </property>

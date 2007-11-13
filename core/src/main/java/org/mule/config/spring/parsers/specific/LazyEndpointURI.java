@@ -13,9 +13,12 @@ package org.mule.config.spring.parsers.specific;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
 
+import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeSet;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
@@ -27,10 +30,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
  * (use required attributes to guarantee entries)
  *
  * TODO - check that we have sufficient control via XML (what about empty strings?)
- *
- * Not called EndpointURIBuilder because of {@link org.mule.impl.endpoint.EndpointURIBuilder}
  */
-public class URIBuilder
+public class LazyEndpointURI implements UMOEndpointURI
 {
 
     private static final String DOTS = ":";
@@ -64,80 +65,57 @@ public class URIBuilder
     private String host;
     private Integer port;
     private String path;
-    private Map queryMap;
+    private Map queries;
 
-    private AtomicReference cache = new AtomicReference();
-
-    public URIBuilder()
-    {
-        // default
-    }
-
-    public URIBuilder(UMOEndpointURI endpointURI)
-    {
-        cache.set(endpointURI);
-    }
-
-    public URIBuilder(String address)
-    {
-        // separate meta from address, if necessary
-        int dots = address.indexOf(DOTS);
-        int dotsSlashes = address.indexOf(DOTS_SLASHES);
-        if (dots > -1 && dots < dotsSlashes)
-        {
-            this.meta = address.substring(0, dots);
-            address = address.substring(dots+1);
-        }
-        this.address = address;
-    }
+    private AtomicReference delegate = new AtomicReference();
 
     public void setUser(String user)
     {
-        assertNotUsed();
+        assertNotYetInjected();
         this.user = user;
     }
 
     public void setPassword(String password)
     {
-        assertNotUsed();
+        assertNotYetInjected();
         this.password = password;
     }
 
     public void setHost(String host)
     {
-        assertNotUsed();
+        assertNotYetInjected();
         this.host = host;
     }
 
     public void setAddress(String address)
     {
-        assertNotUsed();
+        assertNotYetInjected();
         this.address = address;
         assertAddressConsistent();
     }
 
     public void setPort(int port)
     {
-        assertNotUsed();
+        assertNotYetInjected();
         this.port = new Integer(port);
     }
 
     public void setProtocol(String protocol)
     {
-        assertNotUsed();
+        assertNotYetInjected();
         this.protocol = protocol;
         assertAddressConsistent();
     }
 
     public void setMeta(String meta)
     {
-        assertNotUsed();
+        assertNotYetInjected();
         this.meta = meta;
     }
 
     public void setPath(String path)
     {
-        assertNotUsed();
+        assertNotYetInjected();
         if (null != path && path.indexOf(DOTS_SLASHES) > -1)
         {
             throw new IllegalArgumentException("Unusual syntax in path: '" + path + "' contains " + DOTS_SLASHES);
@@ -145,33 +123,16 @@ public class URIBuilder
         this.path = path;
     }
 
-    public void setQueryMap(Map queryMap)
+    public void setQueries(Map queries)
     {
-        assertNotUsed();
-        this.queryMap = queryMap;
-    }
-
-    public UMOEndpointURI getEndpoint()
-    {
-        if (null == cache.get())
-        {
-            try
-            {
-                UMOEndpointURI endpointUri = new MuleEndpointURI(getConstructor());
-                cache.compareAndSet(null, endpointUri);
-            }
-            catch (EndpointException e)
-            {
-                throw (IllegalStateException)new IllegalStateException("Bad endpoint configuration").initCause(e);
-            }
-        }
-        return (UMOEndpointURI)cache.get();
+        assertNotYetInjected();
+        this.queries = queries;
     }
 
     /**
      * @return The String supplied to the delegate constructor
      */
-    protected String getConstructor()
+    protected String toConstructor()
     {
         StringBuffer buffer = new StringBuffer();
         appendMeta(buffer);
@@ -239,12 +200,12 @@ public class URIBuilder
 
     private void appendQueries(StringBuffer buffer)
     {
-        if (null != queryMap)
+        if (null != queries)
         {
             // crude, but probably sufficient to allow literal values in path
             boolean first = buffer.indexOf(QUERY) == -1;
             // order so that testing is simpler
-            Iterator keys = new TreeSet(queryMap.keySet()).iterator();
+            Iterator keys = new TreeSet(queries.keySet()).iterator();
             while (keys.hasNext())
             {
                 if (first)
@@ -259,17 +220,160 @@ public class URIBuilder
                 String key = (String)keys.next();
                 buffer.append(key);
                 buffer.append(EQUALS);
-                buffer.append((String) queryMap.get(key));
+                buffer.append((String)queries.get(key));
             }
         }
     }
 
-    protected void assertNotUsed()
+    protected void assertNotYetInjected()
     {
-        if (null != cache.get())
+        if (null != delegate.get())
         {
-            throw new IllegalStateException("Too late to set values - builder already used");
+            throw new IllegalStateException("Too late to set values now!");
         }
+    }
+
+    protected UMOEndpointURI lazyDelegate()
+    {
+        UMOEndpointURI exists = (UMOEndpointURI) delegate.get();
+        if (null != exists)
+        {
+            return exists;
+        }
+        else
+        {
+            try
+            {
+                delegate.compareAndSet(null, new MuleEndpointURI(toConstructor()));
+            }
+            catch (EndpointException e)
+            {
+                throw (IllegalStateException) new IllegalStateException("Bad address").initCause(e);
+            }
+            return lazyDelegate();
+        }
+    }
+
+    // these are called after injection
+
+    public String getAddress()
+    {
+        return lazyDelegate().getAddress();
+    }
+
+    public String getFilterAddress()
+    {
+        return lazyDelegate().getFilterAddress();
+    }
+
+    public String getEndpointName()
+    {
+        return lazyDelegate().getEndpointName();
+    }
+
+    public void setEndpointName(String name)
+    {
+        throw new UnsupportedOperationException("LazyEndpointURI.setEdpointName");
+    }
+
+    public Properties getParams()
+    {
+        return lazyDelegate().getParams();
+    }
+
+    public Properties getUserParams()
+    {
+        return lazyDelegate().getUserParams();
+    }
+
+    public String getScheme()
+    {
+        return lazyDelegate().getScheme();
+    }
+
+    public String getSchemeMetaInfo()
+    {
+        return lazyDelegate().getSchemeMetaInfo();
+    }
+
+    public String getFullScheme()
+    {
+        return lazyDelegate().getFullScheme();
+    }
+
+    public String getAuthority()
+    {
+        return lazyDelegate().getAuthority();
+    }
+
+    public String getHost()
+    {
+        return lazyDelegate().getHost();
+    }
+
+    public int getPort()
+    {
+        return lazyDelegate().getPort();
+    }
+
+    public String getPath()
+    {
+        return lazyDelegate().getPath();
+    }
+
+    public String getQuery()
+    {
+        return lazyDelegate().getQuery();
+    }
+
+    public String getUserInfo()
+    {
+        return lazyDelegate().getUserInfo();
+    }
+
+    public String getTransformers()
+    {
+        return lazyDelegate().getTransformers();
+    }
+
+    public String getResponseTransformers()
+    {
+        return lazyDelegate().getResponseTransformers();
+    }
+
+    public int getCreateConnector()
+    {
+        return lazyDelegate().getCreateConnector();
+    }
+
+    public URI getUri()
+    {
+        return lazyDelegate().getUri();
+    }
+
+    public String getConnectorName()
+    {
+        return lazyDelegate().getConnectorName();
+    }
+
+    public String getResourceInfo()
+    {
+        return lazyDelegate().getResourceInfo();
+    }
+
+    public String getUser()
+    {
+        return lazyDelegate().getUser();
+    }
+
+    public String getPassword()
+    {
+        return lazyDelegate().getPassword();
+    }
+
+    public void initialise() throws InitialisationException
+    {
+        lazyDelegate().initialise();
     }
 
     protected void assertAddressConsistent()
@@ -294,7 +398,7 @@ public class URIBuilder
                     {
                         throw new IllegalArgumentException("Address '" + address +
                                 "' does not have a transport protocol prefix " +
-                                "(omit the meta protocol prefix, '" + meta + DOTS +
+                                "(omit the meta protocol prefix, '" + meta + DOTS + 
                                 "' - it is implicit in the element namespace).");
                     }
                 }
@@ -315,9 +419,32 @@ public class URIBuilder
         }
     }
 
+    public int hashCode()
+    {
+        return lazyDelegate().hashCode();
+    }
+
+    public boolean equals(Object obj)
+    {
+        return lazyDelegate().equals(obj);
+    }
+    
+    /**
+     * This doesn't perfectly mirror the delegate behaviour because toString() on the delegate does
+     * not return the consructor argument when meta-info is present.  However, it is close enough
+     * in practice, since this is only used for debugging before the delegate is created.
+     */
     public String toString()
     {
-        return getConstructor();
+        UMOEndpointURI exists = (UMOEndpointURI) delegate.get();
+        if (null != exists)
+        {
+            return exists.toString();
+        }
+        else
+        {
+            return toConstructor();
+        }
     }
 
 }
