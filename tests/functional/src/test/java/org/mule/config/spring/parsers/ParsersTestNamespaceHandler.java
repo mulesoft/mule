@@ -62,7 +62,7 @@ public class ParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("string-endpoint", new StringAddressEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
         registerBeanDefinitionParser("unaddressed-endpoint", new UnaddressedEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
-        registerMuleDefinitionParser("address", new ChildAddressDefinitionParser("test")).addAlias("address", "hostname");
+        registerMuleDefinitionParser("address", new ChildAddressDefinitionParser("test")).addAlias("address", "host");
         registerBeanDefinitionParser("addressed-endpoint", new AddressedEndpointDefinitionParser("test", AddressedEndpointDefinitionParser.PROTOCOL, new UnaddressedEndpointDefinitionParser(EndpointURIEndpointBuilder.class), new String[]{}, new String[]{"path"}));
         registerBeanDefinitionParser("orphan-endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
         registerBeanDefinitionParser("child-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
