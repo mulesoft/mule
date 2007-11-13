@@ -43,9 +43,9 @@
                                trustStorePassword="password"/>
     </smtps:connector>
 
-    <smtp:endpoint name="global1" hostname="localhost" password="secret" port="123" username="bob"/>
+    <smtp:endpoint name="global1" host="localhost" password="secret" port="123" user="bob"/>
     <smtp:endpoint name="global2" address="smtp://bob:secret@localhost:123"/>
-    <smtps:endpoint name="global1s" hostname="localhost" password="secret" port="123" username="bob"/>
+    <smtps:endpoint name="global1s" host="localhost" password="secret" port="123" user="bob"/>
     <smtps:endpoint name="global2s" address="smtps://bob:secret@localhost:123"/>
 
 </mule>

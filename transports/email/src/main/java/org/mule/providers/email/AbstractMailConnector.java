@@ -103,7 +103,7 @@ public abstract class AbstractMailConnector extends AbstractConnector
 
         UMOEndpointURI uri = endpoint.getEndpointURI();
         return new URLName(uri.getScheme(), uri.getHost(), uri.getPort(), inbox,
-                uri.getUsername(), uri.getPassword());
+                uri.getUser(), uri.getPassword());
     }
     
     /**

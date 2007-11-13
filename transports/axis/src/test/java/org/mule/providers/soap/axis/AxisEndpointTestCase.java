@@ -59,7 +59,7 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         assertEquals("getSomething", endpointUri.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
         assertEquals(3, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());
-        assertEquals("admin", endpointUri.getUsername());
+        assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
     }
 

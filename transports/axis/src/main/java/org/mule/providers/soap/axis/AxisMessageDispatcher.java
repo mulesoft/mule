@@ -282,7 +282,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         if (endpointUri.getUserInfo() != null)
         {
-            call.setUsername(endpointUri.getUsername());
+            call.setUsername(endpointUri.getUser());
             call.setPassword(endpointUri.getPassword());
         }
     }

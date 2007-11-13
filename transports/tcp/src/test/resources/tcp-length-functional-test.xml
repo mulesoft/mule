@@ -13,9 +13,9 @@
         <tcp:length-protocol payloadOnly="true"/>
     </tcp:connector>
 
-    <tcp:endpoint name="clientEndpoint" hostname="localhost" port="60198" synchronous="true"/>
+    <tcp:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
 
-    <tcp:endpoint name="asyncClientEndpoint" hostname="localhost" port="60199" synchronous="false"/>
+    <tcp:endpoint name="asyncClientEndpoint" host="localhost" port="60199" synchronous="false"/>
 
     <model name="main">
         <service name="testComponent1">

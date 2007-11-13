@@ -42,7 +42,7 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
         assertEquals("http://localhost:8080", endpointUri.getAddress());
         assertEquals(0, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());
-        assertEquals("admin", endpointUri.getUsername());
+        assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
         assertEquals("jetty", endpointUri.getSchemeMetaInfo());
     }
@@ -75,7 +75,7 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
         assertEquals(endpointUri.getPath(), "/app/path");
         assertEquals(0, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());
-        assertEquals("admin", endpointUri.getUsername());
+        assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
         assertEquals("jetty", endpointUri.getSchemeMetaInfo());
     }
@@ -93,7 +93,7 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
         assertEquals(endpointUri.getPath(), "/app/path");
         assertEquals(0, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());
-        assertEquals("admin", endpointUri.getUsername());
+        assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
         assertEquals("jetty", endpointUri.getSchemeMetaInfo());
     }

@@ -57,9 +57,9 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="addressAttributes">
-        <xsd:attribute name="username" type="xsd:string"/>
+        <xsd:attribute name="user" type="xsd:string"/>
         <xsd:attribute name="password" type="xsd:string"/>
-        <xsd:attribute name="hostname" type="xsd:string"/>
+        <xsd:attribute name="host" type="xsd:string"/>
         <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
     </xsd:attributeGroup>
 

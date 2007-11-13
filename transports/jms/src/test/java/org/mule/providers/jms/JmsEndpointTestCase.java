@@ -90,7 +90,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("topic1", url.getAddress());
         assertEquals("topic", url.getResourceInfo());
         assertEquals("user:password", url.getUserInfo());
-        assertEquals("user", url.getUsername());
+        assertEquals("user", url.getUser());
         assertEquals("password", url.getPassword());
         assertEquals("jms://user:password@topic:topic1", url.toString());
     }
@@ -104,7 +104,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jmsProvider", url.getEndpointName());
         assertEquals("topic", url.getResourceInfo());
         assertEquals("user:password", url.getUserInfo());
-        assertEquals("user", url.getUsername());
+        assertEquals("user", url.getUser());
         assertEquals("password", url.getPassword());
         assertEquals("jms://user:password@topic:topic1?endpointName=jmsProvider", url.toString());
     }
@@ -116,7 +116,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms", url.getScheme());
         assertEquals("/myQueues/myQueue", url.getAddress());
         assertEquals("user:password", url.getUserInfo());
-        assertEquals("user", url.getUsername());
+        assertEquals("user", url.getUser());
         assertEquals("password", url.getPassword());
         assertEquals(TransportFactory.ALWAYS_CREATE_CONNECTOR, url.getCreateConnector());
         assertEquals("jms://user:password@?address=/myQueues/myQueue&createConnector=ALWAYS", url.toString());
@@ -129,7 +129,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms", url.getScheme());
         assertEquals("myQueues/myQueue", url.getAddress());
         assertEquals("user:password", url.getUserInfo());
-        assertEquals("user", url.getUsername());
+        assertEquals("user", url.getUser());
         assertEquals("password", url.getPassword());
         assertEquals(TransportFactory.ALWAYS_CREATE_CONNECTOR, url.getCreateConnector());
         assertEquals("jms://user:password@myQueues/myQueue?createConnector=ALWAYS", url.toString());

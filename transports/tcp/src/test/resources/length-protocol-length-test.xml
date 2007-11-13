@@ -24,7 +24,7 @@
                 </properties>
             </component>
             <inbound-router>
-                <tcp:inbound-endpoint name="safe" hostname="localhost" port="65432"
+                <tcp:inbound-endpoint name="safe" host="localhost" port="65432"
                                   connector-ref="safe-connector" synchronous="true"/>
                 <!-- legacy style -->
                 <inbound-endpoint name="length" address="tcp://localhost:65433"

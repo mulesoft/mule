@@ -24,7 +24,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <smtps:outbound-endpoint hostname="localhost" port="65439">
+                    <smtps:outbound-endpoint host="localhost" port="65439">
                         <properties>
                             <spring:entry key="toAddresses" value="bob@example.com"/>
                         </properties>

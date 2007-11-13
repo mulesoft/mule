@@ -12,7 +12,7 @@
         <tcp:length-protocol payloadOnly="false"/>
     </tcp:connector>
 
-    <tcp:endpoint hostname="localhost" port="60198" synchronous="true" name="clientEndpoint"/>
+    <tcp:endpoint host="localhost" port="60198" synchronous="true" name="clientEndpoint"/>
 
     <model name="main">
         <service name="testComponent">

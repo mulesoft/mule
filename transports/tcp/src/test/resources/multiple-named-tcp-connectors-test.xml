@@ -16,7 +16,7 @@
             <inbound-router>
                 <!-- if the connector-ref was removed this would give an error
                      since we have multiple connectors -->
-                <tcp:inbound-endpoint hostname="localhost" port="12345" connector-ref="tcpConnector2"/>
+                <tcp:inbound-endpoint host="localhost" port="12345" connector-ref="tcpConnector2"/>
                 <forwarding-router/>
             </inbound-router>
         </service>

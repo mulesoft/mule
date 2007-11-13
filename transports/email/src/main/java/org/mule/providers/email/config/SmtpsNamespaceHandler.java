@@ -24,7 +24,7 @@ public class SmtpsNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerStandardTransportEndpoints(SmtpsConnector.SMTPS, LazyEndpointURI.HOSTNAME_ATTRIBUTES);
+        registerStandardTransportEndpoints(SmtpsConnector.SMTPS, LazyEndpointURI.HOST_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(SmtpsConnector.class, true));
         registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "key", "value"));
         registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());

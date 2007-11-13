@@ -53,7 +53,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
             {
                 transport = castConnector().getSessionDetails(endpoint).newTransport();
                 UMOEndpointURI uri = endpoint.getEndpointURI();
-                transport.connect(uri.getHost(), uri.getPort(), uri.getUsername(), uri.getPassword());
+                transport.connect(uri.getHost(), uri.getPort(), uri.getUser(), uri.getPassword());
             }
             catch (Exception e)
             {
@@ -141,7 +141,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
             {
                 logger.info("Connection closed by remote server. Reconnecting.");
             }
-            transport.connect(uri.getHost(), uri.getPort(), uri.getUsername(), uri.getPassword());
+            transport.connect(uri.getHost(), uri.getPort(), uri.getUser(), uri.getPassword());
         }
 
         transport.sendMessage(message, message.getAllRecipients());

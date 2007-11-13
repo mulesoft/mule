@@ -45,7 +45,7 @@ public class FtpConnectionFactory implements PoolableObjectFactory
             {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
-            if (!client.login(uri.getUsername(), uri.getPassword()))
+            if (!client.login(uri.getUser(), uri.getPassword()))
             {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }

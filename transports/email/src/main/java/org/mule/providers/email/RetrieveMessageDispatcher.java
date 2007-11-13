@@ -52,7 +52,7 @@ public class RetrieveMessageDispatcher extends AbstractMessageDispatcher
             Store store = castConnector().getSessionDetails(endpoint).newStore();
 
             UMOEndpointURI uri = endpoint.getEndpointURI();
-            store.connect(uri.getHost(), uri.getPort(), uri.getUsername(), uri.getPassword());
+            store.connect(uri.getHost(), uri.getPort(), uri.getUser(), uri.getPassword());
 
             folder = store.getFolder(castConnector().getMailboxFolder());
             if (!folder.isOpen())

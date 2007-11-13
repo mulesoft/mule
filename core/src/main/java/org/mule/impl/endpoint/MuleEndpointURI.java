@@ -406,7 +406,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         endpointName = name;
     }
 
-    public String getUsername()
+    public String getUser()
     {
         if (StringUtils.isNotBlank(userInfo))
         {

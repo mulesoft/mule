@@ -72,7 +72,7 @@ public class XmppConnector extends AbstractConnector
     {
         logger.info("Trying to find XMPP connection for uri: " + endpointURI);
 
-        String username = endpointURI.getUsername();
+        String username = endpointURI.getUser();
         String hostname = endpointURI.getHost();
         String password = endpointURI.getPassword();
         String resource = (String)endpointURI.getParams().get("resource");

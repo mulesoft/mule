@@ -24,7 +24,7 @@
             </inbound-router>
             <outbound-router>
                 <message-chunking-router messageSize="90">
-                    <tcp:outbound-endpoint hostname="localhost" port="63994"/>
+                    <tcp:outbound-endpoint host="localhost" port="63994"/>
                 </message-chunking-router>
             </outbound-router>
         </service>
@@ -32,7 +32,7 @@
         <service name="BridgeOut">
             <pass-through-component/>
             <inbound-router>
-                <tcp:inbound-endpoint hostname="localhost" port="63994"/>
+                <tcp:inbound-endpoint host="localhost" port="63994"/>
                 <message-chunking-aggregator-router/>
             </inbound-router>
             <outbound-router>

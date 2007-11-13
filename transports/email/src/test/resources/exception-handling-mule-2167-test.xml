@@ -25,7 +25,7 @@
             <outbound-router>
                 <exception-based-router>
                     <!-- this doesn't exist -->
-                    <smtp:outbound-endpoint username="error" hostname="localhost" port="65040" connector-ref="smtp"/>
+                    <smtp:outbound-endpoint user="error" host="localhost" port="65040" connector-ref="smtp"/>
                     <vm:outbound-endpoint path="out-default" connector-ref="queue"/>
                 </exception-based-router>
             </outbound-router>

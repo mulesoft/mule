@@ -84,7 +84,7 @@ public interface UMOEndpointURI extends Serializable, Initialisable
 
     String getResourceInfo();
 
-    String getUsername();
+    String getUser();
 
     String getPassword();
 }

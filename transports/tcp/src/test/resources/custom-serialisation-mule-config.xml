@@ -27,7 +27,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <tcp:outbound-endpoint hostname="localhost" port="9994">
+                    <tcp:outbound-endpoint host="localhost" port="9994">
                         <custom-transformer class="org.mule.transformers.NoActionTransformer"/>
                     </tcp:outbound-endpoint>
                 </outbound-pass-through-router>
@@ -36,7 +36,7 @@
 
         <service name="BridgeOut">
             <inbound-router>
-                <tcp:inbound-endpoint hostname="localhost" port="9994" transformer-ref="NoAction"/>
+                <tcp:inbound-endpoint host="localhost" port="9994" transformer-ref="NoAction"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>

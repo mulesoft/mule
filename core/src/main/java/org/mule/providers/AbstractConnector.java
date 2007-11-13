@@ -1724,7 +1724,7 @@ public abstract class AbstractConnector
         // auto set username and password
         if (endpointUri.getUserInfo() != null)
         {
-            props.setProperty("username", endpointUri.getUsername());
+            props.setProperty("username", endpointUri.getUser());
             String passwd = endpointUri.getPassword();
             if (passwd != null)
             {

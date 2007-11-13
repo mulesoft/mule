@@ -285,7 +285,7 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
     {
         if (null != endpoint && null != endpoint.getEndpointURI() && null != endpoint.getEndpointURI().getUserInfo())
         {
-            final String userName = endpoint.getEndpointURI().getUsername();
+            final String userName = endpoint.getEndpointURI().getUser();
             final String password = endpoint.getEndpointURI().getPassword();
             if (password != null && userName != null)
             {

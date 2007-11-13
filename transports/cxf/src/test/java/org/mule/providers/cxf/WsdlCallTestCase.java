@@ -41,15 +41,15 @@ public class WsdlCallTestCase extends FunctionalTestCase
         super.doSetUp();
         httpServer = new Server();
         SocketListener socketListener = new SocketListener(new InetAddrPort(HTTP_PORT));
-        httpServer.addListener(socketListener);
+//        httpServer.addListener(socketListener);
 
-        HttpContext context = httpServer.getContext("/");
-        context.setRequestLog(null);
+//        HttpContext context = httpServer.getContext("/");
+//        context.setRequestLog(null);
 
         ServletHandler handler = new ServletHandler();
-        handler.addServlet("MuleReceiverServlet", "/services/*", MuleReceiverServlet.class.getName());
+//        handler.addServlet("MuleReceiverServlet", "/services/*", MuleReceiverServlet.class.getName());
 
-        context.addHandler(handler);
+//        context.addHandler(handler);
         httpServer.start();
     }
 

@@ -47,7 +47,7 @@ public class AxisWsdlMessageDispatcher extends AxisMessageDispatcher
         Parser parser = new Parser();
         if (event.getEndpoint().getEndpointURI().getUserInfo() != null)
         {
-            parser.setUsername(event.getEndpoint().getEndpointURI().getUsername());
+            parser.setUsername(event.getEndpoint().getEndpointURI().getUser());
             parser.setPassword(event.getEndpoint().getEndpointURI().getPassword());
         }
         parser.run(wsdlUrl);

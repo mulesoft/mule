@@ -22,7 +22,7 @@
 
         <service name="source">
             <inbound-router>
-                <pop3:inbound-endpoint username="bob" password="secret" hostname="localhost" port="62002">
+                <pop3:inbound-endpoint user="bob" password="secret" host="localhost" port="62002">
                     <transformer ref="mime-rfc822"/>
                 </pop3:inbound-endpoint>
                 <forwarding-router/>
@@ -42,7 +42,7 @@
             <outbound-router>
                 <multicasting-router>
                     <vm:outbound-endpoint connector-ref="queue" path="rfc822"/>
-                    <smtp:outbound-endpoint username="alice" password="secret" hostname="localhost" port="62000">
+                    <smtp:outbound-endpoint user="alice" password="secret" host="localhost" port="62000">
                         <transformer ref="rfc822-mime"/>
                     </smtp:outbound-endpoint>
                 </multicasting-router>

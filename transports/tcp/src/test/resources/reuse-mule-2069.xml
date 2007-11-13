@@ -9,7 +9,7 @@
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
     <tcp:connector name="tcp" reuseAddress="true"/>
-    <tcp:endpoint name="clientEndpoint" hostname="localhost" port="60198" synchronous="true"/>
+    <tcp:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
 
     <model name="main">
         <service name="service">

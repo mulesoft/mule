@@ -14,7 +14,7 @@
         <tcp:direct-protocol payloadOnly="true"/>
     </tcp:connector>
 
-    <tcp:endpoint name="clientEndpoint" hostname="localhost" port="60198" synchronous="true"/>
+    <tcp:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
 
     <!-- legacy style -->
     <endpoint name="asyncClientEndpoint" address="tcp://localhost:60199" synchronous="false"/>

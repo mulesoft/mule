@@ -12,7 +12,7 @@
         <service name="testComponent">
             <singleton-object class="org.mule.providers.tcp.issues.InputStreamSource"/>
             <inbound-router>
-                <tcp:inbound-endpoint hostname="localhost" port="65432"/>
+                <tcp:inbound-endpoint host="localhost" port="65432"/>
             </inbound-router>
         </service>
     </model>

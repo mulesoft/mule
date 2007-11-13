@@ -190,7 +190,7 @@ public class FtpConnector extends AbstractConnector
         {
             logger.debug("=== get pool for " + uri);
         }
-        String key = uri.getUsername() + ":" + uri.getPassword() + "@" + uri.getHost() + ":" + uri.getPort();
+        String key = uri.getUser() + ":" + uri.getPassword() + "@" + uri.getHost() + ":" + uri.getPort();
         ObjectPool pool = (ObjectPool) pools.get(key);
         if (pool == null)
         {

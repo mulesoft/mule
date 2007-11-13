@@ -41,7 +41,7 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
         assertEquals("http://localhost:8080", endpointUri.getAddress());
         assertEquals(0, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());
-        assertEquals("admin", endpointUri.getUsername());
+        assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
     }
 
@@ -72,7 +72,7 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
         assertEquals(endpointUri.getPath(), "/app/path");
         assertEquals(0, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());
-        assertEquals("admin", endpointUri.getUsername());
+        assertEquals("admin", endpointUri.getUser());
         assertEquals("pwd", endpointUri.getPassword());
     }
 }
