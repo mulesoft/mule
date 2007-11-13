@@ -42,37 +42,37 @@ public class LazyEndpointURI implements UMOEndpointURI
 
     public static final String META = "meta";
     public static final String PROTOCOL = "protocol";
-    public static final String USERNAME = "username";
+    public static final String USER = "user";
     public static final String PASSWORD = "password";
-    public static final String HOSTNAME = "hostname";
+    public static final String HOST = "host";
     public static final String ADDRESS = "address";
     public static final String PORT = "port";
     public static final String PATH = "path";
 
     public static final String[] ALL_ATTRIBUTES =
-            new String[]{META, PROTOCOL, USERNAME, PASSWORD, HOSTNAME, ADDRESS, PORT, PATH};
+            new String[]{META, PROTOCOL, USER, PASSWORD, HOST, ADDRESS, PORT, PATH};
     // combinations used in various endpoint parsers to validate required attributes
     public static final String[] PATH_ATTRIBUTES = new String[]{PATH};
-    public static final String[] HOSTNAME_ATTRIBUTES = new String[]{HOSTNAME};
-    public static final String[] SOCKET_ATTRIBUTES = new String[]{HOSTNAME, PORT};
-    public static final String[] USERHOST_ATTRIBUTES = new String[]{USERNAME, HOSTNAME};
+    public static final String[] HOST_ATTRIBUTES = new String[]{HOST};
+    public static final String[] SOCKET_ATTRIBUTES = new String[]{HOST, PORT};
+    public static final String[] USERHOST_ATTRIBUTES = new String[]{USER, HOST};
 
     private String address;
     private String meta;
     private String protocol;
-    private String username;
+    private String user;
     private String password;
-    private String hostname;
+    private String host;
     private Integer port;
     private String path;
     private Map queries;
 
     private AtomicReference delegate = new AtomicReference();
 
-    public void setUsername(String username)
+    public void setUser(String user)
     {
         assertNotYetInjected();
-        this.username = username;
+        this.user = user;
     }
 
     public void setPassword(String password)
@@ -81,10 +81,10 @@ public class LazyEndpointURI implements UMOEndpointURI
         this.password = password;
     }
 
-    public void setHostname(String hostname)
+    public void setHost(String host)
     {
         assertNotYetInjected();
-        this.hostname = hostname;
+        this.host = host;
     }
 
     public void setAddress(String address)
@@ -167,9 +167,9 @@ public class LazyEndpointURI implements UMOEndpointURI
         buffer.append(protocol);
         buffer.append(DOTS_SLASHES);
         boolean atStart = true;
-        if (null != username)
+        if (null != user)
         {
-            buffer.append(username);
+            buffer.append(user);
             if (null != password)
             {
                 buffer.append(":");
@@ -178,9 +178,9 @@ public class LazyEndpointURI implements UMOEndpointURI
             buffer.append("@");
             atStart = false;
         }
-        if (null != hostname)
+        if (null != host)
         {
-            buffer.append(hostname);
+            buffer.append(host);
             if (null != port)
             {
                 buffer.append(":");
@@ -203,7 +203,7 @@ public class LazyEndpointURI implements UMOEndpointURI
         if (null != queries)
         {
             // crude, but probably sufficient to allow literal values in path
-            boolean first = buffer.indexOf(QUERY) > -1;
+            boolean first = buffer.indexOf(QUERY) == -1;
             // order so that testing is simpler
             Iterator keys = new TreeSet(queries.keySet()).iterator();
             while (keys.hasNext())
@@ -361,9 +361,9 @@ public class LazyEndpointURI implements UMOEndpointURI
         return lazyDelegate().getResourceInfo();
     }
 
-    public String getUsername()
+    public String getUser()
     {
-        return lazyDelegate().getUsername();
+        return lazyDelegate().getUser();
     }
 
     public String getPassword()
