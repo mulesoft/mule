@@ -145,10 +145,10 @@ public class URIBuilder
         this.path = path;
     }
 
-    public void setQueryMap(Map quieryMap)
+    public void setQueryMap(Map queryMap)
     {
         assertNotUsed();
-        this.queryMap = quieryMap;
+        this.queryMap = queryMap;
     }
 
     public UMOEndpointURI getEndpoint()
