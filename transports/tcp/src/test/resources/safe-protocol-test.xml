@@ -17,8 +17,9 @@
         <service name="service">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
+                <!-- legacy style -->
                 <inbound-endpoint address="tcp://localhost:65432" connector-ref="safe" synchronous="true"/>
-                <inbound-endpoint address="tcp://localhost:65433" connector-ref="unsafe" synchronous="true"/>
+                <tcp:inbound-endpoint hostname="localhost" port="65433" connector-ref="unsafe" synchronous="true"/>
             </inbound-router>
         </service>
     </model>

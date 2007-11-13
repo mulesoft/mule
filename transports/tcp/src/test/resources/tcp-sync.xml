@@ -14,13 +14,14 @@
         <tcp:length-protocol payloadOnly="true"/>
     </tcp:connector>
 
-    <endpoint name="clientEndpoint" address="${test.endpoint}"/>
+    <!-- what is this for? -->
+    <tcp:endpoint name="clientEndpoint" address="${test.endpoint}"/>
 
     <model name="model">
         <service name="service">
             <echo-component/>
             <inbound-router>
-                <inbound-endpoint address="${test.endpoint}" synchronous="true"/>
+                <tcp:inbound-endpoint address="${test.endpoint}" synchronous="true"/>
             </inbound-router>
         </service>
     </model>

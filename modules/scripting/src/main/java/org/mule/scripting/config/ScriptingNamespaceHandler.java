@@ -10,10 +10,10 @@
 
 package org.mule.scripting.config;
 
-import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 
 
-public class ScriptingNamespaceHandler extends AbstractIgnorableNamespaceHandler
+public class ScriptingNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {

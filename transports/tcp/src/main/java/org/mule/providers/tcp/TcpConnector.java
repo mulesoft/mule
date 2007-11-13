@@ -40,6 +40,8 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  */
 public class TcpConnector extends AbstractConnector
 {
+    public static final String TCP = "tcp";
+
     /** Property can be set on the endpoint to configure how the socket is managed */
     public static final String KEEP_SEND_SOCKET_OPEN_PROPERTY = "keepSendSocketOpen";
     public static final int DEFAULT_SOCKET_TIMEOUT = INT_VALUE_NOT_SET;
@@ -227,7 +229,7 @@ public class TcpConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "tcp";
+        return TCP;
     }
 
     // getters and setters ---------------------------------------------------------

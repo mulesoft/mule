@@ -29,7 +29,7 @@ import org.mule.xml.util.properties.BeanPayloadPropertyExtractor;
 import org.mule.xml.util.properties.JXPathPropertyExtractor;
 import org.mule.xml.util.properties.XPathPayloadPropertyExtractor;
 
-public class XmlNamespaceHandler extends AbstractIgnorableNamespaceHandler
+public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public void init()

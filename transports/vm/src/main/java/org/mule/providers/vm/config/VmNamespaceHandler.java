@@ -10,22 +10,17 @@
 package org.mule.providers.vm.config;
 
 import org.mule.config.QueueProfile;
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.config.spring.factories.ResponseEndpointFactoryBean;
-import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.providers.vm.VMConnector;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><vm:connector></code> elements.
  *
  */
-public class VmNamespaceHandler extends AbstractIgnorableNamespaceHandler
+public class VmNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public void init()

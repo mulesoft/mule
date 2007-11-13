@@ -12,13 +12,13 @@
         <tcp:length-protocol payloadOnly="false"/>
     </tcp:connector>
 
-    <endpoint address="tcp://localhost:60198" synchronous="true" name="clientEndpoint"/>
+    <tcp:endpoint hostname="localhost" port="60198" synchronous="true" name="clientEndpoint"/>
 
     <model name="main">
         <service name="testComponent">
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint ref="clientEndpoint"/>
+                <tcp:inbound-endpoint ref="clientEndpoint"/>
             </inbound-router>
         </service>
     </model>

@@ -10,7 +10,7 @@
 
 package org.mule.extras.wssecurity.config;
 
-import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.extras.wssecurity.filters.WsSecurityFilter;
@@ -18,7 +18,7 @@ import org.mule.extras.wssecurity.filters.WsSecurityFilter;
 /**
  * Registers a Bean Definition Parser for handling WsSecurity related elements.
  */
-public class WsSecurityNamespaceHandler extends AbstractIgnorableNamespaceHandler
+public class WsSecurityNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {

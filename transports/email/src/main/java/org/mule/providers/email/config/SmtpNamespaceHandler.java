@@ -12,14 +12,14 @@ package org.mule.providers.email.config;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.LazyEndpointURI;
-import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.email.SmtpConnector;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
  *
  */
-public class SmtpNamespaceHandler extends AbstractIgnorableNamespaceHandler
+public class SmtpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {

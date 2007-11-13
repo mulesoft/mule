@@ -26,7 +26,7 @@ public class ReuseMule2069TestCase extends TcpFunctionalTestCase
 
     public void testReuseSetOnConnector()
     {
-        assertTrue(((TcpConnector) managementContext.getRegistry().lookupConnector("tcp")).isReuseAddress().booleanValue());
+        assertTrue(((TcpConnector) managementContext.getRegistry().lookupConnector(TcpConnector.TCP)).isReuseAddress().booleanValue());
     }
     
 }

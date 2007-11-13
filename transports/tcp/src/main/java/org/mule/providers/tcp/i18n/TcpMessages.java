@@ -12,12 +12,13 @@ package org.mule.providers.tcp.i18n;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.providers.tcp.TcpConnector;
 
 import java.net.URI;
 
 public class TcpMessages extends MessageFactory
 {
-    private static final String BUNDLE_PATH = getBundlePath("tcp");
+    private static final String BUNDLE_PATH = getBundlePath(TcpConnector.TCP);
 
     public static Message failedToBindToUri(URI uri)
     {

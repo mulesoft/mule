@@ -10,13 +10,16 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
 
-import java.util.Properties;
 import java.net.URI;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeSet;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
@@ -33,6 +36,9 @@ public class LazyEndpointURI implements UMOEndpointURI
 
     private static final String DOTS = ":";
     private static final String DOTS_SLASHES = DOTS + "//";
+    private static final String QUERY = "?";
+    private static final String AND = "&";
+    private static final String EQUALS = "=";
 
     public static final String META = "meta";
     public static final String PROTOCOL = "protocol";
@@ -48,6 +54,7 @@ public class LazyEndpointURI implements UMOEndpointURI
     // combinations used in various endpoint parsers to validate required attributes
     public static final String[] PATH_ATTRIBUTES = new String[]{PATH};
     public static final String[] HOSTNAME_ATTRIBUTES = new String[]{HOSTNAME};
+    public static final String[] SOCKET_ATTRIBUTES = new String[]{HOSTNAME, PORT};
     public static final String[] USERHOST_ATTRIBUTES = new String[]{USERNAME, HOSTNAME};
 
     private String address;
@@ -58,6 +65,7 @@ public class LazyEndpointURI implements UMOEndpointURI
     private String hostname;
     private Integer port;
     private String path;
+    private Map queries;
 
     private AtomicReference delegate = new AtomicReference();
 
@@ -115,57 +123,106 @@ public class LazyEndpointURI implements UMOEndpointURI
         this.path = path;
     }
 
+    public void setQueries(Map queries)
+    {
+        assertNotYetInjected();
+        this.queries = queries;
+    }
+
     /**
      * @return The String supplied to the delegate constructor
      */
     protected String toConstructor()
     {
         StringBuffer buffer = new StringBuffer();
+        appendMeta(buffer);
+        appendAddress(buffer);
+        appendQueries(buffer);
+        return buffer.toString();
+    }
+
+    private void appendMeta(StringBuffer buffer)
+    {
         if (null != meta)
         {
             buffer.append(meta);
             buffer.append(DOTS);
         }
+    }
+
+    private void appendAddress(StringBuffer buffer)
+    {
         if (null != address)
         {
             buffer.append(address);
         }
         else
         {
-            buffer.append(protocol);
-            buffer.append(DOTS_SLASHES);
-            boolean atStart = true;
-            if (null != username)
+            constructAddress(buffer);
+        }
+    }
+
+    private void constructAddress(StringBuffer buffer)
+    {
+        buffer.append(protocol);
+        buffer.append(DOTS_SLASHES);
+        boolean atStart = true;
+        if (null != username)
+        {
+            buffer.append(username);
+            if (null != password)
             {
-                buffer.append(username);
-                if (null != password)
-                {
-                    buffer.append(":");
-                    buffer.append(password);
-                }
-                buffer.append("@");
-                atStart = false;
+                buffer.append(":");
+                buffer.append(password);
             }
-            if (null != hostname)
+            buffer.append("@");
+            atStart = false;
+        }
+        if (null != hostname)
+        {
+            buffer.append(hostname);
+            if (null != port)
             {
-                buffer.append(hostname);
-                if (null != port)
-                {
-                    buffer.append(":");
-                    buffer.append(port);
-                }
-                atStart = false;
+                buffer.append(":");
+                buffer.append(port);
             }
-            if (null != path)
+            atStart = false;
+        }
+        if (null != path)
+        {
+            if (! atStart)
             {
-                if (! atStart)
+                buffer.append("/");
+            }
+            buffer.append(path);
+        }
+    }
+
+    private void appendQueries(StringBuffer buffer)
+    {
+        if (null != queries)
+        {
+            // crude, but probably sufficient to allow literal values in path
+            boolean first = buffer.indexOf(QUERY) > -1;
+            // order so that testing is simpler
+            Iterator keys = new TreeSet(queries.keySet()).iterator();
+            while (keys.hasNext())
+            {
+                if (first)
                 {
-                    buffer.append("/");
+                    buffer.append(QUERY);
+                    first = false;
                 }
-                buffer.append(path);
+                else
+                {
+                    buffer.append(AND);
+                }
+                String key = (String)keys.next();
+                buffer.append(key);
+                buffer.append(EQUALS);
+                buffer.append((String)queries.get(key));
             }
         }
-        return buffer.toString();
     }
 
     protected void assertNotYetInjected()

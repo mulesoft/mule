@@ -11,10 +11,10 @@
 package org.mule.providers.soap.xfire.config;
 
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.soap.xfire.XFireConnector;
 
-public class XFireNamespaceHandler extends AbstractIgnorableNamespaceHandler
+public class XFireNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public void init()

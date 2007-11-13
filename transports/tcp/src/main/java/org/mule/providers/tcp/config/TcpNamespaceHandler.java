@@ -11,6 +11,8 @@ package org.mule.providers.tcp.config;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.LazyEndpointURI;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.providers.tcp.TcpProtocol;
 import org.mule.providers.tcp.protocols.DirectProtocol;
@@ -24,18 +26,18 @@ import org.mule.providers.tcp.protocols.SafeProtocol;
 import org.mule.providers.tcp.protocols.StreamingProtocol;
 import org.mule.providers.tcp.protocols.XmlMessageEOFProtocol;
 import org.mule.providers.tcp.protocols.XmlMessageProtocol;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.mule.providers.vm.VMConnector;
 
 /**
  * Registers a Bean Definition Parser for handling <code><tcp:connector></code> elements.
  *
  */
-public class TcpNamespaceHandler extends NamespaceHandlerSupport
+public class TcpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public void init()
     {
+        registerStandardTransportEndpoints(TcpConnector.TCP, LazyEndpointURI.SOCKET_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(TcpConnector.class, true));
         registerBeanDefinitionParser("custom-protocol", new ChildDefinitionParser("tcpProtocol", null, TcpProtocol.class, true));
         registerBeanDefinitionParser("xml-protocol", new ChildDefinitionParser("tcpProtocol", XmlMessageProtocol.class));

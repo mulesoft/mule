@@ -10,11 +10,11 @@
 
 package org.mule.providers.soap.xfire.config;
 
-import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.soap.xfire.wsdl.XFireWsdlConnector;
 
 
-public class WsdlXFireNamespaceHandler extends AbstractIgnorableNamespaceHandler
+public class WsdlXFireNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public void init()

@@ -26,7 +26,7 @@ import org.mule.management.agents.RmiRegistryAgent;
  * Handles all configuration elements in the Mule Management module.
  *
  */
-public class ManagementNamespaceHandler extends AbstractIgnorableNamespaceHandler
+public class ManagementNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public void init()

@@ -21,7 +21,7 @@ public class TcpEndpointTestCase extends AbstractMuleTestCase
     {
         UMOEndpointURI url = new MuleEndpointURI("tcp://localhost:7856");
         url.initialise();
-        assertEquals("tcp", url.getScheme());
+        assertEquals(TcpConnector.TCP, url.getScheme());
         assertEquals("tcp://localhost:7856", url.getAddress());
         assertNull(url.getEndpointName());
         assertEquals(7856, url.getPort());
@@ -35,7 +35,7 @@ public class TcpEndpointTestCase extends AbstractMuleTestCase
         UMOEndpointURI url = new MuleEndpointURI("tcp://localhost:7856?param=1");
         url.initialise();
 
-        assertEquals("tcp", url.getScheme());
+        assertEquals(TcpConnector.TCP, url.getScheme());
         assertEquals("tcp://localhost:7856", url.getAddress());
         assertNull(url.getEndpointName());
         assertEquals(7856, url.getPort());
@@ -51,7 +51,7 @@ public class TcpEndpointTestCase extends AbstractMuleTestCase
             "tcp://localhost:7856?param=1&endpointName=tcpProvider&blankParam=");
         url.initialise();
         
-        assertEquals("tcp", url.getScheme());
+        assertEquals(TcpConnector.TCP, url.getScheme());
         assertEquals("tcp://localhost:7856", url.getAddress());
         assertNotNull(url.getEndpointName());
         assertEquals("tcpProvider", url.getEndpointName());

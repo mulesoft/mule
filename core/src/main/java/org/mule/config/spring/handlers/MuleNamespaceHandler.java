@@ -137,7 +137,7 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
  * <code>http://www.mulesource.org/schema/mule/core/2.0</code> Namespace.
  */
-public class MuleNamespaceHandler extends AbstractIgnorableNamespaceHandler
+public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public void init()

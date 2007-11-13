@@ -22,26 +22,26 @@
 
         <service name="BridgeIn">
             <inbound-router>
-                <inbound-endpoint address="vm://in"/>
+                <vm:inbound-endpoint path="in"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="tcp://localhost:9994">
+                    <tcp:outbound-endpoint hostname="localhost" port="9994">
                         <custom-transformer class="org.mule.transformers.NoActionTransformer"/>
-                    </outbound-endpoint>
+                    </tcp:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
 
         <service name="BridgeOut">
             <inbound-router>
-                <inbound-endpoint address="tcp://localhost:9994" transformer-ref="NoAction"/>
+                <tcp:inbound-endpoint hostname="localhost" port="9994" transformer-ref="NoAction"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://out"/>
+                    <vm:outbound-endpoint path="out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
