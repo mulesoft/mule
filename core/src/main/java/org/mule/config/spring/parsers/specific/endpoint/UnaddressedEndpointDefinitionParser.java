@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 public class UnaddressedEndpointDefinitionParser extends AbstractChildDefinitionParser
 {
 
-    public static final String ENDPOINT_URI_ATTRIBUTE = EndpointUtils.ENDPOINT_URI_ATTRIBUTE;
+    public static final String ENDPOINT_URI_ATTRIBUTE = EndpointUtils.ENDPOINT_BUILDER_ATTRIBUTE;
     public static final String ADDRESS_ATTRIBUTE = EndpointUtils.ADDRESS_ATTRIBUTE;
 
     private Class endpointClass;

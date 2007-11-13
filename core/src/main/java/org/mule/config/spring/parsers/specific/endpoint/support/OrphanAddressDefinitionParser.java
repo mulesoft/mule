@@ -11,7 +11,7 @@
 package org.mule.config.spring.parsers.specific.endpoint.support;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.LazyEndpointURI;
+import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.config.spring.parsers.processors.AddAttribute;
 
 /**
@@ -25,10 +25,11 @@ public class OrphanAddressDefinitionParser extends OrphanDefinitionParser
 
     public OrphanAddressDefinitionParser(String metaOrProtocol, boolean isMeta)
     {
-        super(LazyEndpointURI.class, true);
-        registerPreProcessor(new AddAttribute(
-                isMeta ? LazyEndpointURI.META : LazyEndpointURI.PROTOCOL,
-                metaOrProtocol));
+        super(URIBuilder.class, true);
+        registerPreProcessor(
+                new AddAttribute(
+                        isMeta ? URIBuilder.META : URIBuilder.PROTOCOL,
+                        metaOrProtocol));
     }
 
 }

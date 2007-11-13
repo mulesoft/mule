@@ -11,7 +11,7 @@ package org.mule.providers.email.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.LazyEndpointURI;
+import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.email.Pop3sConnector;
 
@@ -23,7 +23,7 @@ public class Pop3sNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerStandardTransportEndpoints(Pop3sConnector.POP3S, LazyEndpointURI.USERHOST_ATTRIBUTES);
+        registerStandardTransportEndpoints(Pop3sConnector.POP3S, URIBuilder.USERHOST_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(Pop3sConnector.class, true));
         registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());

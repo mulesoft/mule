@@ -10,22 +10,19 @@
 
 package org.mule.config.spring.parsers.specific.endpoint;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
-import org.mule.config.spring.parsers.specific.LazyEndpointURI;
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 
 /**
  * This is intended for use by endpoint-specific parsers for non-global endpoint
  * elements.  It will not allow the "ref" attribute with any of the
- * {@link org.mule.config.spring.parsers.specific.LazyEndpointURI#ALL_ATTRIBUTES}.
+ * {@link org.mule.config.spring.parsers.specific.URIBuilder#ALL_ATTRIBUTES}.
  *
  * <p>It generates both an endpoint (which should subclass
  * {@link org.mule.impl.endpoint.MuleEndpoint}) and a
- * {@link org.mule.config.spring.parsers.specific.LazyEndpointURI}.  The URI is
+ * {@link org.mule.config.spring.parsers.specific.URIBuilder}.  The URI is
  * then injected into the endpoint.  So the associated schema can enable any of the
- * suitable {@link org.mule.config.spring.parsers.specific.LazyEndpointURI# ALL_ATTRIBUTES}
+ * suitable {@link org.mule.config.spring.parsers.specific.URIBuilder# ALL_ATTRIBUTES}
  * or add appropriate mappings.
  */
 public class TransportEndpointDefinitionParser extends AddressedEndpointDefinitionParser

@@ -21,7 +21,7 @@ import java.net.URLDecoder;
 import java.util.Properties;
 
 /**
- * <code>UrlEndpointBuilder</code> is the default endpointUri strategy suitable for
+ * {@link UrlEndpointURIBuilder} is the default endpointUri strategy suitable for
  * most connectors
  */
 

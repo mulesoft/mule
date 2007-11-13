@@ -10,7 +10,7 @@
 package org.mule.providers.email.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.LazyEndpointURI;
+import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.email.ImapConnector;
 
@@ -23,7 +23,7 @@ public class ImapNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerStandardTransportEndpoints(ImapConnector.IMAP, LazyEndpointURI.USERHOST_ATTRIBUTES);
+        registerStandardTransportEndpoints(ImapConnector.IMAP, URIBuilder.USERHOST_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(ImapConnector.class, true));
     }
 

@@ -18,7 +18,7 @@ import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinit
 import org.mule.config.spring.parsers.processors.BlockAttribute;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
-import org.mule.config.spring.parsers.specific.LazyEndpointURI;
+import org.mule.config.spring.parsers.specific.URIBuilder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,7 +64,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
      * endpointParser
      * @param requiredAddressAttributes A list of attribute names that are required if "address"
      * isn't present (currently these should be a subset of
-     * {@link org.mule.config.spring.parsers.specific.LazyEndpointURI#ALL_ATTRIBUTES})
+     * {@link org.mule.config.spring.parsers.specific.URIBuilder#ALL_ATTRIBUTES}
      */
     public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
                                              MuleDefinitionParser endpointParser,
@@ -73,7 +73,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     {
         // the first delegate, the parent, is an endpoint; we block address and property
         // related attributes
-        disableAttributes(endpointParser, LazyEndpointURI.ALL_ATTRIBUTES);
+        disableAttributes(endpointParser, URIBuilder.ALL_ATTRIBUTES);
         disableAttributes(endpointParser, propertyAttributes);
         addDelegate(endpointParser);
 
@@ -93,10 +93,10 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         addHandledException(BlockAttribute.BlockAttributeException.class);
 
         // the address parser see only the endpoint attributes
-        enableAttributes(addressParser, LazyEndpointURI.ALL_ATTRIBUTES);
+        enableAttributes(addressParser, URIBuilder.ALL_ATTRIBUTES);
         // we require either a reference, an address, or the attributes specified
         String[][] addressAttributeSets = new String[][]{
-                new String[]{LazyEndpointURI.ADDRESS},
+                new String[]{URIBuilder.ADDRESS},
                 new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},
                 requiredAddressAttributes};
         addressParser.registerPreProcessor(new CheckRequiredAttributes(addressAttributeSets));
