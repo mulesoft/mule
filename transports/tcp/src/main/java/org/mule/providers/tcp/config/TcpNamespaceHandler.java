@@ -26,7 +26,6 @@ import org.mule.providers.tcp.protocols.SafeProtocol;
 import org.mule.providers.tcp.protocols.StreamingProtocol;
 import org.mule.providers.tcp.protocols.XmlMessageEOFProtocol;
 import org.mule.providers.tcp.protocols.XmlMessageProtocol;
-import org.mule.providers.vm.VMConnector;
 
 /**
  * Registers a Bean Definition Parser for handling <code><tcp:connector></code> elements.
