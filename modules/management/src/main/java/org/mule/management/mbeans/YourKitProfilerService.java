@@ -12,6 +12,7 @@ package org.mule.management.mbeans;
 
 import com.yourkit.api.Controller;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,94 +24,120 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private final Controller controller;
-    private boolean capturing = false;
+    private AtomicBoolean capturing = new AtomicBoolean(false);
 
     public YourKitProfilerService() throws Exception
     {
         controller = new Controller();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public String getHost()
     {
         return controller.getHost();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public int getPort()
     {
         return controller.getPort();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public String captureMemorySnapshot() throws Exception
     {
         return controller.captureMemorySnapshot();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public String captureSnapshot(long snapshotFlags) throws Exception
     {
         return controller.captureSnapshot(snapshotFlags);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void startAllocationRecording(long mode) throws Exception
     {
         controller.startAllocationRecording(mode);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void stopAllocationRecording() throws Exception
     {
         controller.stopAllocationRecording();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void startCPUProfiling(long mode, String filters) throws Exception
     {
         controller.startCPUProfiling(mode, filters);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void stopCPUProfiling() throws Exception
     {
         controller.stopCPUProfiling();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void startMonitorProfiling() throws Exception
     {
         controller.startMonitorProfiling();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void stopMonitorProfiling() throws Exception
     {
         controller.stopMonitorProfiling();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void advanceGeneration(String description)
     {
         controller.advanceGeneration(description);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public long[] forceGC() throws Exception
     {
         return controller.forceGC();
     }
 
-    /** {@inheritDoc} */
-    public void startCapturingMemorySnapshotEverySeconds(final int seconds)
+    /**
+     * {@inheritDoc}
+     */
+    public void startCapturingMemSnapshot(final int seconds)
     {
-        if (this.capturing)
+        if (!this.capturing.compareAndSet(false, true))
         {
             return;
         }
 
-        this.capturing = true;
+
         final Thread thread = new Thread(
                 new Runnable()
                 {
@@ -118,7 +145,7 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
                     {
                         try
                         {
-                            while (capturing)
+                            while (capturing.get())
                             {
                                 controller.captureMemorySnapshot();
                                 Thread.sleep(seconds * 1000 /* millis in second */);
@@ -135,16 +162,21 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
         thread.start();
     }
 
-    /** {@inheritDoc} */
-    public void stopCapturingMemorySnapshot()
+    /**
+     * {@inheritDoc}
+     */
+    public void stopCapturingMemSnapshot()
     {
-        this.capturing = false;
+        this.capturing.set(false);
     }
 
-    /** {@inheritDoc} */
+
+    /**
+     * {@inheritDoc}
+     */
     public long getStatus() throws java.lang.Exception
     {
-        return controller.getStatus();
+        return (this.capturing.get()) ? (controller.getStatus() | SNAPSHOT_CAPTURING) : controller.getStatus();
     }
 
 }
