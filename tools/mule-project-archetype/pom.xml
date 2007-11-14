@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.tools</groupId>
+        <artifactId>mule-tools</artifactId>
+        <version>2.0.0-RC1-SNAPSHOT</version>
+    </parent>
+    <packaging>maven-plugin</packaging>
+    <name>Mule Project Archetype</name>
+    <!-- Do not specify group here, otherwise deployment will break -->
+    <artifactId>mule-project-archetype</artifactId>
+    <version>2.0.0-RC1-SNAPSHOT</version>
+    <description>An architype for creating Mule projects. This can handle the subtle configuration differences between a
+        stand-alone prject, a Mule module being hosted on MuleForge and a Mule example.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tools</groupId>
+            <artifactId>bobberplus</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- Due to the Maven 2.0.4 prerequisites.
+            By default, maven-plugin-test-plugin uses 2.0.1 -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-embedder</artifactId>
+            <version>2.0.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>2.0.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-test-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>pre-it-test</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>stage</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-it-test</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>unstage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <!-- 
+                         all repositories for org.apache.maven.shared.file-management seem to
+                         be broken. Hard-code a dependency here so the build will not fail
+                         -->
+                    <dependency>
+                        <groupId>org.apache.maven.shared</groupId>
+                        <artifactId>file-management</artifactId>
+                        <version>1.1</version>
+                        <scope>test</scope>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!-- Testing the result of the it pom.xml -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>it-test</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <!-- TODO: enable once MULETOOLS-46 is fixed -->
+                            <!--<includes>-->
+                            <!--<include>**/*MavenTest.class</include>-->
+                            <!--</includes>-->
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <!--MULETOOLS-36  -->
+                        <exclude>**/*MavenTest.*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

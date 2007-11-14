@@ -1,0 +1,1 @@
+http\://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}=${groupId}.${ModuleNameLower}.config.${ModuleName}NamespaceHandler

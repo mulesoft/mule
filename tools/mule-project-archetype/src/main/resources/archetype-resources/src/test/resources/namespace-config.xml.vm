@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:${ModuleNameLower}="http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}"
+    xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion} http://www.mulesource.org/schema/mule/core/${MuleMajorMinorVersion}/mule.xsd
+       http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion} http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}/mule-${ModuleNameLower}.xsd">
+
+        <!-- TODO Add your configuration elements here and Add specific properties here and then assert that
+             they have been set properly in org.mule.providers.${ModuleNameLower}.${ModuleName}NamespaceHandlerTestCase -->
+
+</mule>
