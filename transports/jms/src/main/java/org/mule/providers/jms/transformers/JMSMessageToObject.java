@@ -10,6 +10,7 @@
 
 package org.mule.providers.jms.transformers;
 
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassUtils;
 
@@ -40,16 +41,16 @@ public class JMSMessageToObject extends AbstractJmsTransformer
         registerSourceType(Message.class);
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
     {
         try
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Source object is " + ClassUtils.getSimpleName(src.getClass()));
+                logger.debug("Source object is " + ClassUtils.getSimpleName(message.getPayload().getClass()));
             }
 
-            Object result = transformFromMessage((Message) src);
+            Object result = transformFromMessage((Message) message.getPayload());
 
             //We need to handle String / byte[] explicitly since this transformer does not nefine a single return type
             //TODO I don't think we should allow a null return class
@@ -57,11 +58,11 @@ public class JMSMessageToObject extends AbstractJmsTransformer
             {
                 if (returnClass.equals(byte[].class) && result instanceof String)
                 {
-                    result = result.toString().getBytes(encoding);
+                    result = result.toString().getBytes(outputEncoding);
                 }
                 else if (returnClass.equals(String.class) && result instanceof byte[])
                 {
-                    result = new String((byte[]) result, encoding);
+                    result = new String((byte[]) result, outputEncoding);
                 }
             }
 

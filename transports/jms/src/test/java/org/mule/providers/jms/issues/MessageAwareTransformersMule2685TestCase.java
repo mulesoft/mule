@@ -29,10 +29,7 @@ import javax.jms.TextMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations.
- */
-
+/** <code>JmsTransformersTestCase</code> Tests the JMS transformer implementations. */
 public class MessageAwareTransformersMule2685TestCase extends AbstractJmsFunctionalTestCase
 {
     protected final Log logger = LogFactory.getLog(getClass());
@@ -79,7 +76,7 @@ public class MessageAwareTransformersMule2685TestCase extends AbstractJmsFunctio
 
         AbstractJmsTransformer trans2 = new SessionEnabledObjectToJMSMessage(session);
         Message result2 = (Message) trans2.transform(result1);
-        
+
         // Test to see that ObjectToJMSMessage transformer transformed to JMS message correctly
         assertTrue("Transformed object should be a TextMessage", result2 instanceof TextMessage);
         assertEquals("This is a test TextMessage", ((TextMessage) result2).getText());
@@ -111,9 +108,7 @@ public class MessageAwareTransformersMule2685TestCase extends AbstractJmsFunctio
         }
     }
 
-    /**
-     * Test <i>AbstractMessageAwareTransformer</i> which sets Message properties
-     */
+    /** Test <i>AbstractMessageAwareTransformer</i> which sets Message properties */
     private class SetTestRecipientsTransformer extends AbstractMessageAwareTransformer
     {
 

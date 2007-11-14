@@ -11,13 +11,11 @@
 package org.mule.providers.jms.transformers;
 
 import org.mule.config.MuleProperties;
-import org.mule.impl.RequestContext;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.UMOEventContext;
+import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -38,7 +36,7 @@ import javax.jms.Session;
  * object. It provides services for compressing and uncompressing messages.
  */
 
-public abstract class AbstractJmsTransformer extends AbstractTransformer
+public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransformer
 {
 
     public AbstractJmsTransformer()
@@ -46,13 +44,14 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         super();
     }
 
-    protected Message transformToMessage(Object src) throws TransformerException
+    protected Message transformToMessage(UMOMessage message) throws TransformerException
     {
         Session session = null;
         try
         {
             Message result;
 
+            Object src = message.getPayload();
             if (src instanceof Message)
             {
                 result = (Message) src;
@@ -63,16 +62,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
                 session = this.getSession();
                 result = JmsMessageUtils.toMessage(src, session);
             }
-
-            // set the event properties on the Message
-            UMOEventContext ctx = RequestContext.getEventContext();
-            if (ctx == null)
-            {
-                logger.warn("There is no current event context");
-                return result;
-            }
-
-            this.setJmsProperties(ctx.getMessage(), result);
+            this.setJmsProperties(message, result);
 
             return result;
         }
@@ -117,7 +107,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Closing an orphaned, but transacted jms session: " + session +
-                                    ", transaction: " + muleTx);
+                                ", transaction: " + muleTx);
                     }
                     connector.closeQuietly(session);
                 }
@@ -146,7 +136,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
                 UMOConnector connector = endpoint.getConnector();
                 if (connector instanceof JmsConnector)
                 {
-                    jmsSpec = ((JmsConnector)connector).getSpecification();
+                    jmsSpec = ((JmsConnector) connector).getSpecification();
                 }
             }
 
@@ -205,13 +195,12 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
     {
         if (endpoint != null)
         {
-            return ((JmsConnector)endpoint.getConnector()).getSession(endpoint);
+            return ((JmsConnector) endpoint.getConnector()).getSession(endpoint);
         }
         else
         {
             throw new TransformerException(this, new IllegalStateException(
-                "This transformer needs a valid endpoint"));
+                    "This transformer needs a valid endpoint"));
         }
     }
-
 }

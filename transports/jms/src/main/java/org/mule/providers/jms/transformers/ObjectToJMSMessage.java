@@ -10,6 +10,7 @@
 
 package org.mule.providers.jms.transformers;
 
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassUtils;
 
@@ -29,7 +30,6 @@ import javax.jms.Message;
  * Note that if compression is turned on then a <code>javax.jms.BytesMessage</code>
  * is sent.
  */
-
 public class ObjectToJMSMessage extends AbstractJmsTransformer
 {
 
@@ -38,16 +38,16 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
         setReturnClass(Message.class);
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
     {
         try
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Source object is " + ClassUtils.getSimpleName(src.getClass()));
+                logger.debug("Source object is " + ClassUtils.getSimpleName(message.getPayload().getClass()));
             }
 
-            Object result = transformToMessage(src);
+            Object result = transformToMessage(message);
 
             if (logger.isDebugEnabled())
             {

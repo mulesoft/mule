@@ -24,5 +24,3 @@ org.mule.providers.jms.functional.MultipleJmsConnectorsTestCase
 #org.mule.providers.jms.integration.JmsMuleSideDurableTopicXATxTestCase
 #org.mule.providers.jms.integration.JmsDurableTopicSingleTxTestCase
 
-# MULE-2685
-org.mule.providers.jms.issues.MessageAwareTransformersMule2685TestCase
