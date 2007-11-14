@@ -7,6 +7,11 @@
             <defvalue></defvalue>
         </variable>
         <variable>
+            <name>muleVersion</name>
+            <description>Which version of Mule is this transport targeted at?</description>
+            <defvalue>${muleVersion}</defvalue>
+        </variable>
+        <variable>
             <name>ForgeProject</name>
             <description>Will This project be hosted on MuleForge? [y] or [n]</description>
             <defvalue>y</defvalue>
