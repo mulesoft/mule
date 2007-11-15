@@ -10,6 +10,8 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.management.i18n.ManagementMessages;
+
 import com.yourkit.api.Controller;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
@@ -122,9 +124,10 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
     /**
      * {@inheritDoc}
      */
-    public long[] forceGC() throws Exception
+    public String forceGC() throws Exception
     {
-        return controller.forceGC();
+        long[] heapSizes = controller.forceGC();
+        return ManagementMessages.forceGC(heapSizes).getMessage();
     }
 
     /**

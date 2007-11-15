@@ -12,6 +12,7 @@ package org.mule.management.i18n;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.util.StringUtils;
 
 public class ManagementMessages extends MessageFactory
 {
@@ -31,6 +32,13 @@ public class ManagementMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 3);
     }
+
+    public static Message forceGC(long[] heapSizes)
+    {
+        return createMessage(BUNDLE_PATH, 4, String.valueOf(heapSizes[0]),String.valueOf(heapSizes[1]));
+    }
+
+
 }
 
 

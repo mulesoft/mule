@@ -145,9 +145,12 @@ public interface YourKitProfilerServiceMBean
     public void stopCPUProfiling() throws Exception;
 
     /**
-     * @return array of 2 elements: [0] - size of objects in heap before GC, bytes, [1] - size of objects in heap after GC, bytes
+     * Force GC
+     *
+     * @return Message contains size of objects in heap before GC, bytes and size of objects in heap after GC, bytes
+     * @throws Exception
      */
-    public long[] forceGC() throws Exception;
+    public String forceGC() throws Exception;
 
     /**
      * Start monitor profiling (requires that the profiled application runs on Java 5 or newer)
