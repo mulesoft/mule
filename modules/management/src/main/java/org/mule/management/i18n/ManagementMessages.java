@@ -35,7 +35,7 @@ public class ManagementMessages extends MessageFactory
 
     public static Message forceGC(long[] heapSizes)
     {
-        return createMessage(BUNDLE_PATH, 4, String.valueOf(heapSizes[0]),String.valueOf(heapSizes[1]));
+        return createMessage(BUNDLE_PATH, 4, String.valueOf(heapSizes[0]), String.valueOf(heapSizes[1]));
     }
 
 
