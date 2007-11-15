@@ -128,13 +128,7 @@ org.mule.test.integration.transaction.XAJdbcMule1479TestCase
 # rejects it because it is not a valid NMTOKEN.
 org.mule.test.integration.providers.file.FileFunctionalTestCase
 
-# Might have to do with message-api changes?
-#   java.lang.IllegalStateException: Only owner thread can write to message: Thread[main,5,main]/Thread[DefaultQuartzScheduler_Worker-3,5,main]
-#	  at org.mule.providers.AbstractMessageAdapter.newException(AbstractMessageAdapter.java:560)
-#	  at org.mule.providers.AbstractMessageAdapter.checkMutable(AbstractMessageAdapter.java:546)
-#	  at org.mule.providers.AbstractMessageAdapter.assertAccess(AbstractMessageAdapter.java:487)
-#	  at org.mule.providers.AbstractMessageAdapter.addProperties(AbstractMessageAdapter.java:152)
-#	  at org.mule.impl.MuleMessage.addProperties(MuleMessage.java:542)
+# MULE-2688
 org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchJobTestCase
 org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchUsingDelegatingJobTestCase
 	
