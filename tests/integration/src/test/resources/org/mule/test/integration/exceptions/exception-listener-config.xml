@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
@@ -12,7 +12,11 @@
 
     <model name="test">
         <service name="mycomponent">
-            <component class="org.mule.components.simple.NullComponent"/>
+            <component class="org.mule.tck.functional.FunctionalTestComponent">
+                <properties>
+                    <spring:entry key="throwException" value="true"/>
+                </properties>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="vm://component.in"/>
             </inbound-router>
@@ -25,6 +29,8 @@
             <default-component-exception-strategy>
                 <outbound-endpoint address="vm://error.queue"/>
             </default-component-exception-strategy>
+
+
         </service>
     </model>
 </mule>
