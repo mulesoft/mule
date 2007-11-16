@@ -321,6 +321,8 @@ public final class MuleSession implements UMOSession
                 }
 
                 UMOMessage response = event.getEndpoint().send(event);
+                // See MULE-2692
+                response = OptimizedRequestContext.unsafeRewriteEvent(response);
                 processResponse(response);
                 return response;
             }

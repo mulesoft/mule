@@ -88,8 +88,8 @@
                 <mule:component class="org.mule.examples.loanbroker.AsynchronousLoanBroker" />
 
                 <mule:inbound-router>
-                    <inbound-endpoint ref="CustomerRequestsREST" transformer-ref="RestRequestToCustomerRequest" />
-                    <inbound-endpoint ref="CustomerRequests" />
+                    <mule:inbound-endpoint ref="CustomerRequestsREST" transformer-ref="RestRequestToCustomerRequest" />
+                    <mule:inbound-endpoint ref="CustomerRequests" />
                 </mule:inbound-router>
 
                 <mule:outbound-router>
@@ -98,7 +98,7 @@
                     </mule:outbound-pass-through-router>
                 </mule:outbound-router>
 
-                <mule:response-router timeout="1000000">
+                <mule:response-router timeout="10000">
                     <mule:response-endpoint ref="LoanQuotes" />
                     <mule:custom-response-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator" />
                 </mule:response-router>
@@ -110,7 +110,7 @@
             <mule:service name="CreditAgencyGatewayService">
                 <mule:component class="org.mule.components.builder.ReflectionMessageBuilder" />
                 <mule:inbound-router>
-                    <inbound-endpoint ref="CreditAgencyGateway" />
+                    <mule:inbound-endpoint ref="CreditAgencyGateway" />
                 </mule:inbound-router>
                 <mule:outbound-router>
                     <mule:filtering-router>
@@ -126,7 +126,7 @@
 
             <mule:service name="LenderGatewayService">
                 <mule:inbound-router>
-                    <inbound-endpoint ref="LenderGateway" />
+                    <mule:inbound-endpoint ref="LenderGateway" />
                     <mule:forwarding-router/>
                 </mule:inbound-router>
                 <mule:outbound-router>
@@ -141,13 +141,13 @@
             <mule:service name="LenderServiceService">
                 <mule:component class="org.mule.examples.loanbroker.lender.DefaultLender" />
                 <mule:inbound-router>
-                    <inbound-endpoint ref="LenderService" />
+                    <mule:inbound-endpoint ref="LenderService" />
                 </mule:inbound-router>
             </mule:service>
 
             <mule:service name="BankingGatewayService">
                 <mule:inbound-router>
-                    <inbound-endpoint ref="BankingGateway" />
+                    <mule:inbound-endpoint ref="BankingGateway" />
                     <mule:forwarding-router/>
                 </mule:inbound-router>
                 <mule:outbound-router>
@@ -168,35 +168,35 @@
             <mule:service name="TheBank1">
                 <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
                 <mule:inbound-router>
-                    <inbound-endpoint ref="Bank1In" />
+                    <mule:inbound-endpoint ref="Bank1In" />
                 </mule:inbound-router>
             </mule:service>
 
             <mule:service name="TheBank2">
                 <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
                 <mule:inbound-router>
-                    <inbound-endpoint ref="Bank2In" />
+                    <mule:inbound-endpoint ref="Bank2In" />
                 </mule:inbound-router>
             </mule:service>
 
             <mule:service name="TheBank3">
                 <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
                 <mule:inbound-router>
-                    <inbound-endpoint ref="Bank3In" />
+                    <mule:inbound-endpoint ref="Bank3In" />
                 </mule:inbound-router>
             </mule:service>
 
             <mule:service name="TheBank4">
                 <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
                 <mule:inbound-router>
-                    <inbound-endpoint ref="Bank4In" />
+                    <mule:inbound-endpoint ref="Bank4In" />
                 </mule:inbound-router>
             </mule:service>
 
             <mule:service name="TheBank5">
                 <mule:component class="org.mule.examples.loanbroker.bank.Bank" />
                 <mule:inbound-router>
-                    <inbound-endpoint ref="Bank5In" />
+                    <mule:inbound-endpoint ref="Bank5In" />
                 </mule:inbound-router>
             </mule:service>
 

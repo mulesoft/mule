@@ -573,7 +573,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         {
             try
             {
-                RequestContext.setEvent(event);
+                event = RequestContext.setEvent(event);
                 // Make sure we are connected
                 connectionStrategy.connect(AbstractMessageDispatcher.this);
                 AbstractMessageDispatcher.this.doDispatch(event);
