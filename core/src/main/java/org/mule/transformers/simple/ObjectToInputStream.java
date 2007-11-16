@@ -42,13 +42,13 @@ public class ObjectToInputStream extends SerializableToByteArray
             {
                 return new ByteArrayInputStream(((String) src).getBytes(encoding));
             }
-            else if (src instanceof OutputHandler) 
+            else if (src instanceof OutputHandler)
             {
                 OutputHandler oh = (OutputHandler) src;
-                
+
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 oh.write(RequestContext.getEvent(), out);
-                
+
                 return new ByteArrayInputStream(out.toByteArray());
             }
         }
@@ -57,9 +57,9 @@ public class ObjectToInputStream extends SerializableToByteArray
             throw new TransformerException(this, e);
         }
 
-        
-        return super.doTransform(src, encoding);
-        
+
+        byte[] bytes = (byte[]) super.doTransform(src, encoding);
+        return new ByteArrayInputStream(bytes);
     }
 
 }
