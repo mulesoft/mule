@@ -15,7 +15,6 @@ import org.mule.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.Serializable;
 
 /**
  * <code>ObjectToByteArray</code> converts serilaizable object to a byte array but
@@ -27,9 +26,8 @@ public class ObjectToByteArray extends SerializableToByteArray
 
     public ObjectToByteArray()
     {
-        this.registerSourceType(String.class);
-        this.registerSourceType(Serializable.class);
         this.registerSourceType(InputStream.class);
+        this.registerSourceType(String.class);
         setReturnClass(byte[].class);
     }
 
@@ -46,11 +44,11 @@ public class ObjectToByteArray extends SerializableToByteArray
             {
                 InputStream is = (InputStream) src;
                 ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-                try 
+                try
                 {
                     IOUtils.copy(is, byteOut);
                 }
-                finally 
+                finally
                 {
                     is.close();
                 }
@@ -62,9 +60,9 @@ public class ObjectToByteArray extends SerializableToByteArray
             throw new TransformerException(this, e);
         }
 
-        
+
         return super.doTransform(src, encoding);
-        
+
     }
 
 }

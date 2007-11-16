@@ -12,6 +12,7 @@ package org.mule.transformers.simple;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.InputStream;
@@ -22,8 +23,11 @@ import org.apache.commons.lang.SerializationUtils;
  * <code>ByteArrayToSerializable</code> converts a serialized object to its object
  * representation
  */
-public class ByteArrayToSerializable extends AbstractTransformer
+public class ByteArrayToSerializable extends AbstractTransformer implements DiscoverableTransformer
 {
+
+    /** Give core transformers a slighty higher priority */
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
     public ByteArrayToSerializable()
     {
@@ -48,8 +52,17 @@ public class ByteArrayToSerializable extends AbstractTransformer
         catch (Exception e)
         {
             throw new TransformerException(
-                CoreMessages.transformFailed("byte[]", "Object"), this, e);
+                    CoreMessages.transformFailed("byte[]", "Object"), this, e);
         }
     }
 
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
+    }
 }

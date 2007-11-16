@@ -20,6 +20,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassUtils;
 
@@ -36,8 +37,10 @@ import javax.jms.Session;
  * object. It provides services for compressing and uncompressing messages.
  */
 
-public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransformer
+public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransformer implements DiscoverableTransformer
 {
+
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public AbstractJmsTransformer()
     {
@@ -202,5 +205,15 @@ public abstract class AbstractJmsTransformer extends AbstractMessageAwareTransfo
             throw new TransformerException(this, new IllegalStateException(
                     "This transformer needs a valid endpoint"));
         }
+    }
+
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
     }
 }

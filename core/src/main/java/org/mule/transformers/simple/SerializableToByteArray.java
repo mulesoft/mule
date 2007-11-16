@@ -12,6 +12,7 @@ package org.mule.transformers.simple;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.Serializable;
@@ -25,8 +26,10 @@ import org.apache.commons.lang.SerializationUtils;
  * will be serialised. This is useful for transports such as TCP where the message
  * headers would normally be lost.
  */
-public class SerializableToByteArray extends AbstractTransformer
+public class SerializableToByteArray extends AbstractTransformer implements DiscoverableTransformer
 {
+
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public SerializableToByteArray()
     {
@@ -68,6 +71,16 @@ public class SerializableToByteArray extends AbstractTransformer
         {
             throw new TransformerException(this, e);
         }
+    }
+
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
     }
 
 }

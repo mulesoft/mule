@@ -11,6 +11,7 @@ package org.mule.transformers.xml;
 
 import org.mule.umo.UMOEvent;
 import org.mule.umo.provider.OutputHandler;
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ import java.io.OutputStream;
 import org.dom4j.Document;
 
 /** TODO */
-public class DocumentToOutputHandler extends AbstractXmlTransformer
+public class DocumentToOutputHandler extends AbstractXmlTransformer implements DiscoverableTransformer
 {
     public DocumentToOutputHandler()
     {

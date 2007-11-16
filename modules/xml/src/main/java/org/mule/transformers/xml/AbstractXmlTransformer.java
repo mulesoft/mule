@@ -11,6 +11,7 @@
 package org.mule.transformers.xml;
 
 import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.DiscoverableTransformer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -38,8 +39,10 @@ import org.dom4j.io.DocumentSource;
  * other XML-ish) object.
  */
 
-public abstract class AbstractXmlTransformer extends AbstractTransformer
+public abstract class AbstractXmlTransformer extends AbstractTransformer implements DiscoverableTransformer
 {
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+
     private String outputEncoding;
 
     public AbstractXmlTransformer()
@@ -58,7 +61,7 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
     {
         if (src instanceof byte[])
         {
-            return new StreamSource(new ByteArrayInputStream((byte[])src));
+            return new StreamSource(new ByteArrayInputStream((byte[]) src));
         }
         else if (src instanceof InputStream)
         {
@@ -66,27 +69,27 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         }
         else if (src instanceof String)
         {
-            return new StreamSource(new StringReader((String)src));
+            return new StreamSource(new StringReader((String) src));
         }
         else if (src instanceof DocumentSource)
         {
-            return (Source)src;
+            return (Source) src;
         }
         else if (src instanceof Document)
         {
-            return new DocumentSource((Document)src);
+            return new DocumentSource((Document) src);
         }
         else if (src instanceof org.w3c.dom.Document || src instanceof org.w3c.dom.Element)
         {
-            return new DOMSource((org.w3c.dom.Node)src);
+            return new DOMSource((org.w3c.dom.Node) src);
         }
         else
+        {
             return null;
+        }
     }
 
-    /**
-     * Result callback interface used when processing XML through JAXP
-     */
+    /** Result callback interface used when processing XML through JAXP */
     protected static interface ResultHolder
     {
 
@@ -96,9 +99,7 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
          */
         Result getResult();
 
-        /**
-         * @return The actual result as produced after the call to 'transform'.
-         */
+        /** @return The actual result as produced after the call to 'transform'. */
         Object getResultObject();
     }
 
@@ -109,7 +110,10 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
      */
     protected static ResultHolder getResultHolder(Class desiredClass)
     {
-        if (desiredClass == null) return null;
+        if (desiredClass == null)
+        {
+            return null;
+        }
         if (byte[].class.equals(desiredClass) || InputStream.class.isAssignableFrom(desiredClass))
         {
             return new ResultHolder()
@@ -202,17 +206,17 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
 
     /**
      * Converts an XML in-memory representation to a String
-     * 
-     * @param obj Object to convert (could be byte[], String, DOM, DOM4J) 
-     * @return String including XML header using default (UTF-8) encoding  
-
-     * @throws TransformerFactoryConfigurationError On error
-     * @throws javax.xml.transform.TransformerException On error
-     * 
-     * @deprecated Replaced by convertToText(Object obj, String ouputEncoding) 
+     *
+     * @param obj Object to convert (could be byte[], String, DOM, DOM4J)
+     * @return String including XML header using default (UTF-8) encoding
+     * @throws TransformerFactoryConfigurationError
+     *          On error
+     * @throws javax.xml.transform.TransformerException
+     *          On error
+     * @deprecated Replaced by convertToText(Object obj, String ouputEncoding)
      */
     protected String convertToText(Object obj)
-        throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException
+            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException
     {
         return convertToText(obj, null);
     }
@@ -221,31 +225,35 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
      * Converts an XML in-memory representation to a String using a specific encoding.
      * If using an encoding which cannot represent specific characters, these are
      * written as entities, even if they can be represented as a Java String.
-     * 
-     * @param obj Object to convert (could be byte[], String, DOM, or DOM4J Document).
-     * If the object is a byte[], the character
-     * encoding used MUST match the declared encoding standard, or a parse error will occur.
+     *
+     * @param obj            Object to convert (could be byte[], String, DOM, or DOM4J Document).
+     *                       If the object is a byte[], the character
+     *                       encoding used MUST match the declared encoding standard, or a parse error will occur.
      * @param outputEncoding Name of the XML encoding to use, e.g. US-ASCII, or null for UTF-8
-     * @return String including XML header using the specified encoding  
-
-     * @throws TransformerFactoryConfigurationError On error
-     * @throws javax.xml.transform.TransformerException On error
+     * @return String including XML header using the specified encoding
+     * @throws TransformerFactoryConfigurationError
+     *          On error
+     * @throws javax.xml.transform.TransformerException
+     *          On error
      */
     protected String convertToText(Object obj, String outputEncoding)
-    throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException
+            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException
     {
         // Catch the direct translations
         if (obj instanceof String)
         {
-            return (String)obj;
+            return (String) obj;
         }
         else if (obj instanceof Document)
         {
-            return ((Document)obj).asXML();
+            return ((Document) obj).asXML();
         }
         // No easy fix, so use the transformer.
         Source src = getXmlSource(obj);
-        if (src == null) return null;
+        if (src == null)
+        {
+            return null;
+        }
 
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
@@ -258,26 +266,29 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         idTransformer.transform(src, result);
         return writer.getBuffer().toString();
     }
-    
+
     /**
      * Converts an XML in-memory representation to a String using a specific encoding.
-     * 
-     * @param obj Object to convert (could be byte[], String, DOM, or DOM4J Document).
-     * If the object is a byte[], the character
-     * encoding used MUST match the declared encoding standard, or a parse error will occur.
-     *   
+     *
+     * @param obj            Object to convert (could be byte[], String, DOM, or DOM4J Document).
+     *                       If the object is a byte[], the character
+     *                       encoding used MUST match the declared encoding standard, or a parse error will occur.
      * @param outputEncoding Name of the XML encoding to use, e.g. US-ASCII, or null for UTF-8
-     * @return String including XML header using the specified encoding  
-
-     * @throws TransformerFactoryConfigurationError On error
-     * @throws javax.xml.transform.TransformerException On error
+     * @return String including XML header using the specified encoding
+     * @throws TransformerFactoryConfigurationError
+     *          On error
+     * @throws javax.xml.transform.TransformerException
+     *          On error
      */
     protected String convertToBytes(Object obj, String outputEncoding)
-        throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException
+            throws TransformerFactoryConfigurationError, javax.xml.transform.TransformerException
     {
         // Always use the transformer, even for byte[] (to get the encoding right!)
         Source src = getXmlSource(obj);
-        if (src == null) return null;
+        if (src == null)
+        {
+            return null;
+        }
 
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
@@ -288,20 +299,25 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         return writer.getBuffer().toString();
     }
 
-    /**
-     * @return the outputEncoding
-     */
+    /** @return the outputEncoding */
     public String getOutputEncoding()
     {
         return outputEncoding;
     }
 
-    /**
-     * @param outputEncoding the outputEncoding to set
-     */
+    /** @param outputEncoding the outputEncoding to set */
     public void setOutputEncoding(String outputEncoding)
     {
         this.outputEncoding = outputEncoding;
     }
-        
+
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
+    }
 }

@@ -164,8 +164,6 @@ public class TransientRegistry extends AbstractRegistry
             applyProcessors(getModels());
             applyProcessors(lookupComponents());
             applyProcessors(lookupObjects(Object.class));
-
-            //MuleServer.getManagementContext().fireNotification(new RegistryNotification(this, RegistryNotification.REGISTRY_INITIALISED));
         }
         finally
         {
@@ -195,7 +193,10 @@ public class TransientRegistry extends AbstractRegistry
 
     public void registerObjects(Map objects) throws RegistrationException
     {
-        if(objects==null) return;
+        if (objects == null)
+        {
+            return;
+        }
 
         for (Iterator iterator = objects.entrySet().iterator(); iterator.hasNext();)
         {
@@ -337,7 +338,7 @@ public class TransientRegistry extends AbstractRegistry
 
     /**
      * Allows for arbitary registration of transient objects
-     * 
+     *
      * @param key
      * @param value
      */
@@ -409,6 +410,12 @@ public class TransientRegistry extends AbstractRegistry
     //@java.lang.Override
     public void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext) throws UMOException
     {
+        //TODO should we always throw an exception if an object already exists
+        if (lookupTransformer(transformer.getName()) != null)
+        {
+            throw new RegistrationException(CoreMessages.objectAlreadyRegistered("transformer: " +
+                    transformer.getName(), lookupTransformer(transformer.getName()), transformer).getMessage());
+        }
         registerObject(transformer.getName(), transformer, UMOTransformer.class, managementContext);
     }
 
@@ -549,7 +556,7 @@ public class TransientRegistry extends AbstractRegistry
         RegistryContext.setRegistry(registry);
 
         registry.getObjectTypeMap(ObjectProcessor.class).put(MuleProperties.OBJECT_MANAGMENT_CONTEXT_PROCESSOR,
-                  new ManagementContextDependencyProcessor(context));
+                new ManagementContextDependencyProcessor(context));
 
         context.setId(UUID.getUUID());
 

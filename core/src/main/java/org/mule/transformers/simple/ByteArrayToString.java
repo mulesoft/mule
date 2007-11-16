@@ -12,15 +12,16 @@ package org.mule.transformers.simple;
 
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.UnsupportedEncodingException;
 
-/**
- * <code>ByteArrayToString</code> converts a byte array into a String.
- */
-public class ByteArrayToString extends AbstractTransformer
+/** <code>ByteArrayToString</code> converts a byte array into a String. */
+public class ByteArrayToString extends AbstractTransformer implements DiscoverableTransformer
 {
+    /** Give core transformers a slighty higher priority */
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
     public ByteArrayToString()
     {
@@ -44,8 +45,18 @@ public class ByteArrayToString extends AbstractTransformer
             catch (UnsupportedEncodingException e)
             {
                 throw new TransformerException(MessageFactory
-                    .createStaticMessage("Unable to convert byte[] to String."), e);
+                        .createStaticMessage("Unable to convert byte[] to String."), e);
             }
         }
+    }
+
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
     }
 }

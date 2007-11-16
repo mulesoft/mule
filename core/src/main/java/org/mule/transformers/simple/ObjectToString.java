@@ -12,6 +12,7 @@ package org.mule.transformers.simple;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
@@ -26,13 +27,18 @@ import java.io.UnsupportedEncodingException;
  * human-readable output for various kinds of objects. Right now, it is just coded to
  * handle Map and Collection objects. Others will be added.
  */
-public class ObjectToString extends AbstractTransformer
+public class ObjectToString extends AbstractTransformer implements DiscoverableTransformer
 {
     protected static final int DEFAULT_BUFFER_SIZE = 80;
+
+    /** Give core transformers a slighty higher priority */
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
     public ObjectToString()
     {
         registerSourceType(Object.class);
+        registerSourceType(byte[].class);
+        registerSourceType(InputStream.class);
         setReturnClass(String.class);
     }
 
@@ -69,7 +75,7 @@ public class ObjectToString extends AbstractTransformer
         {
             try
             {
-                output = new String((byte[])src, encoding);
+                output = new String((byte[]) src, encoding);
             }
             catch (UnsupportedEncodingException e)
             {
@@ -84,4 +90,13 @@ public class ObjectToString extends AbstractTransformer
         return output;
     }
 
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
+    }
 }

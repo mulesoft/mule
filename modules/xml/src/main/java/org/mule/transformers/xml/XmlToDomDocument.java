@@ -19,29 +19,26 @@ import javax.xml.transform.TransformerFactory;
 
 import org.w3c.dom.Document;
 
-/**
- * <code>XmlToDomDocument</code> transforms a XML String to org.w3c.dom.Document.
- */
+/** <code>XmlToDomDocument</code> transforms a XML String to org.w3c.dom.Document. */
 public class XmlToDomDocument extends AbstractXmlTransformer
 {
-
-    public XmlToDomDocument()
-    {
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-    }
-
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try
         {
             Source sourceDoc = getXmlSource(src);
-            if (sourceDoc == null) return null;
+            if (sourceDoc == null)
+            {
+                return null;
+            }
 
             // If returnClass is not set, assume W3C DOM
             // This is the original behaviour
             ResultHolder holder = getResultHolder(returnClass);
-            if (holder == null) holder = getResultHolder(Document.class);
+            if (holder == null)
+            {
+                holder = getResultHolder(Document.class);
+            }
 
             Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
             idTransformer.setOutputProperty(OutputKeys.ENCODING, encoding);

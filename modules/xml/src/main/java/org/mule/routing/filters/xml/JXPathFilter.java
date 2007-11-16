@@ -68,7 +68,7 @@ public class JXPathFilter implements UMOFilter
             }
             catch (Exception e)
             {
-                logger.debug("JxPath filter rejected message because it could not convert from byte[] to String" + e.getMessage(), e);
+                logger.warn("JxPath filter rejected message because it could not convert from byte[] to String" + e.getMessage(), e);
                 return false;
             }
         }
@@ -114,7 +114,7 @@ public class JXPathFilter implements UMOFilter
             if (namespaces == null)
             {
                 // no namespace defined, let's perform a direct evaluation
-                xpathResult = ((Document)obj).valueOf(pattern);
+                xpathResult = ((Document) obj).valueOf(pattern);
             }
             else
             {
@@ -130,13 +130,15 @@ public class JXPathFilter implements UMOFilter
         {
             try
             {
-                return accept(DocumentHelper.parseText((String)obj));
+                return accept(DocumentHelper.parseText((String) obj));
             }
             catch (DocumentException e)
             {
                 logger.warn("JXPathFilter unable to parse XML document: " + e.getMessage(), e);
                 if (logger.isDebugEnabled())
-                    logger.debug("XML = " + StringMessageUtils.truncate((String)obj, 200, false));
+                {
+                    logger.debug("XML = " + StringMessageUtils.truncate((String) obj, 200, false));
+                }
                 return false;
             }
         }
@@ -155,7 +157,7 @@ public class JXPathFilter implements UMOFilter
         if (logger.isDebugEnabled())
         {
             logger.debug("JXPathFilter Expression result = '" + xpathResult + "' -  Expected value = '"
-                         + expectedValue + "'");
+                    + expectedValue + "'");
         }
         // Compare the XPath result with the expected result.
         if (xpathResult != null)
@@ -187,7 +189,7 @@ public class JXPathFilter implements UMOFilter
     /**
      * Initializes the JXPathContext based on any relevant properties set for the
      * filter.
-     * 
+     *
      * @param context the JXPathContext to initialize
      */
     protected void initialise(JXPathContext context)
@@ -202,7 +204,7 @@ public class JXPathFilter implements UMOFilter
 
             for (Iterator iterator = namespaces.entrySet().iterator(); iterator.hasNext();)
             {
-                entry = (Map.Entry)iterator.next();
+                entry = (Map.Entry) iterator.next();
                 context.registerNamespace(entry.getKey().toString(), entry.getValue().toString());
             }
         }
@@ -216,7 +218,7 @@ public class JXPathFilter implements UMOFilter
 
             for (Iterator iterator = contextProperties.entrySet().iterator(); iterator.hasNext();)
             {
-                entry = (Map.Entry)iterator.next();
+                entry = (Map.Entry) iterator.next();
                 context.setValue(entry.getKey().toString(), entry.getValue());
             }
         }
@@ -229,33 +231,25 @@ public class JXPathFilter implements UMOFilter
         context.setLenient(lenient);
     }
 
-    /**
-     * @return XPath expression
-     */
+    /** @return XPath expression */
     public String getPattern()
     {
         return pattern;
     }
 
-    /**
-     * @param pattern The XPath expression
-     */
+    /** @param pattern The XPath expression */
     public void setPattern(String pattern)
     {
         this.pattern = pattern;
     }
 
-    /**
-     * @return The expected result value of the XPath expression
-     */
+    /** @return The expected result value of the XPath expression */
     public String getExpectedValue()
     {
         return expectedValue;
     }
 
-    /**
-     * Sets the expected result value of the XPath expression
-     */
+    /** Sets the expected result value of the XPath expression */
     public void setExpectedValue(String expectedValue)
     {
         this.expectedValue = expectedValue;
@@ -272,7 +266,7 @@ public class JXPathFilter implements UMOFilter
 
     /**
      * Sets the expected result value of the XPath expression
-     * 
+     *
      * @deprecated Use <code>setExpectedValue(String expectedValue)</code>.
      */
     public void setValue(String value)

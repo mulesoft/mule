@@ -22,7 +22,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.DocumentHelper;
-import org.dom4j.InvalidXPathException;
 import org.xml.sax.InputSource;
 
 public class JXPathFilterTestCase extends AbstractMuleTestCase
@@ -47,7 +46,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         xmlStringInput = IOUtils.toString(is);
         dom4jDocumentInput = DocumentHelper.parseText(xmlStringInput);
         w3cDocumentInput = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-            new InputSource(new StringReader(xmlStringInput)));
+                new InputSource(new StringReader(xmlStringInput)));
         simpleFilter = new JXPathFilter();
 
         // Read Namespace Xml file
@@ -58,7 +57,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         w3cDocumentInputNS = dbf.newDocumentBuilder().parse(
-            new InputSource(new StringReader(xmlStringInputNS)));
+                new InputSource(new StringReader(xmlStringInputNS)));
         nsAwareFilter = new JXPathFilter();
         Map namespaces = new HashMap();
         namespaces.put("nsone", "http://one.org");
@@ -75,7 +74,8 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
             myFilter.accept(new MuleMessage(xmlStringInput));
             fail("Invalid XPath should have thrown an exception");
         }
-        catch (InvalidXPathException e)
+        //Now we have Jaxen on the class path we get a Jaxen exception, but this is an unchecked exception
+        catch (Exception e)
         {
             // expected
         }
@@ -133,7 +133,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
     {
         doTestExpectedValueFilter(xmlStringInput);
     }
-    
+
     public void testExpectedValueFilterXmlByteArray() throws Exception
     {
         doTestExpectedValueFilter(xmlStringInput.getBytes());

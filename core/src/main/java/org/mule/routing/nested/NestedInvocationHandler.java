@@ -17,11 +17,12 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.UMONestedRouter;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -71,7 +72,7 @@ public class NestedInvocationHandler implements InvocationHandler
         if (router == null)
         {
             throw new IllegalArgumentException(
-                CoreMessages.cannotFindBindingForMethod(method.getName()).toString());
+                    CoreMessages.cannotFindBindingForMethod(method.getName()).toString());
         }
 
         UMOMessage reply;
@@ -82,7 +83,14 @@ public class NestedInvocationHandler implements InvocationHandler
 
         if (reply != null)
         {
-            return reply.getPayload();
+            if (reply.getExceptionPayload() != null)
+            {
+                throw reply.getExceptionPayload().getException();
+            }
+            else
+            {
+                return reply.getPayload();
+            }
         }
         else
         {

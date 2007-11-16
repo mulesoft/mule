@@ -14,6 +14,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.provider.OutputHandler;
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.IOException;
@@ -23,11 +24,12 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.SerializationUtils;
 
-/**
- * <code>ObjectToOutputHandler</code> converts a byte array into a String.
- */
-public class ObjectToOutputHandler extends AbstractTransformer
+/** <code>ObjectToOutputHandler</code> converts a byte array into a String. */
+public class ObjectToOutputHandler extends AbstractTransformer implements DiscoverableTransformer
 {
+
+    /** Give core transformers a slighty higher priority */
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
 
     public ObjectToOutputHandler()
     {
@@ -41,7 +43,7 @@ public class ObjectToOutputHandler extends AbstractTransformer
     {
         if (src instanceof String)
         {
-            return new OutputHandler() 
+            return new OutputHandler()
             {
                 public void write(UMOEvent event, OutputStream out) throws IOException
                 {
@@ -51,7 +53,7 @@ public class ObjectToOutputHandler extends AbstractTransformer
         }
         else if (src instanceof byte[])
         {
-            return new OutputHandler() 
+            return new OutputHandler()
             {
                 public void write(UMOEvent event, OutputStream out) throws IOException
                 {
@@ -61,7 +63,7 @@ public class ObjectToOutputHandler extends AbstractTransformer
         }
         else if (src instanceof Serializable)
         {
-            return new OutputHandler() 
+            return new OutputHandler()
             {
                 public void write(UMOEvent event, OutputStream out) throws IOException
                 {
@@ -69,10 +71,20 @@ public class ObjectToOutputHandler extends AbstractTransformer
                 }
             };
         }
-        else 
+        else
         {
             throw new TransformerException(MessageFactory
-                .createStaticMessage("Unable to convert " + src.getClass() + " to OutputHandler."));
+                    .createStaticMessage("Unable to convert " + src.getClass() + " to OutputHandler."));
         }
+    }
+
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
     }
 }

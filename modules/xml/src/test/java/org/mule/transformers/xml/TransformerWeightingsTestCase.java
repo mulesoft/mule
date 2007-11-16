@@ -7,12 +7,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.umo.transformer;
+package org.mule.transformers.xml;
 
-/**
- * A marker interface that declares that the implementing transformer does not alter the message payload
- * */
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformers.simple.ObjectToByteArray;
 
-public interface UMOHeaderOnlyTransformer
+public class TransformerWeightingsTestCase extends AbstractMuleTestCase
 {
+    public void testNearMatch() throws Exception
+    {
+        ObjectToByteArray trans = new ObjectToByteArray();
+
+    }
 }

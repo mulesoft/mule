@@ -29,6 +29,7 @@ public class ObjectToXml extends AbstractXStreamTransformer
     public ObjectToXml()
     {
         this.registerSourceType(Object.class);
+        this.setReturnClass(String.class);
     }
 
     public boolean isAcceptUMOMessage()
@@ -61,7 +62,6 @@ public class ObjectToXml extends AbstractXStreamTransformer
         {
             src = message;
         }
-
         return this.getXStream().toXML(src);
     }
 }

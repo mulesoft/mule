@@ -116,14 +116,12 @@ import org.mule.transformers.encryption.EncryptionTransformer;
 import org.mule.transformers.simple.ByteArrayToHexString;
 import org.mule.transformers.simple.ByteArrayToObject;
 import org.mule.transformers.simple.ByteArrayToSerializable;
-import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.transformers.simple.HexStringToByteArray;
 import org.mule.transformers.simple.MessagePropertiesTransformer;
 import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.transformers.simple.ObjectToString;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.transformers.simple.StringAppendTransformer;
-import org.mule.transformers.simple.StringToByteArray;
 import org.mule.util.object.PooledObjectFactory;
 import org.mule.util.object.PrototypeObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
@@ -150,9 +148,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("environment-property", new EnvironmentPropertyDefinitionParser());
         registerBeanDefinitionParser("admin-agent", new MuleAdminAgentDefinitionParser());
         registerBeanDefinitionParser("default-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleConfiguration.DEFAULT_THREADING_PROFILE));
-        registerBeanDefinitionParser("default-dispatcher-threading-profile", new  DefaultThreadingProfileDefinitionParser(MuleConfiguration.DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
-        registerBeanDefinitionParser("default-receiver-threading-profile", new  DefaultThreadingProfileDefinitionParser(MuleConfiguration.DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
-        registerBeanDefinitionParser("default-component-threading-profile", new  DefaultThreadingProfileDefinitionParser(MuleConfiguration.DEFAULT_COMPONENT_THREADING_PROFILE));
+        registerBeanDefinitionParser("default-dispatcher-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleConfiguration.DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
+        registerBeanDefinitionParser("default-receiver-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleConfiguration.DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
+        registerBeanDefinitionParser("default-component-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleConfiguration.DEFAULT_COMPONENT_THREADING_PROFILE));
         registerBeanDefinitionParser("default-dispatcher-connection-strategy", new ConnectionStrategyDefinitionParser());
         registerBeanDefinitionParser("default-receiver-connection-strategy", new ConnectionStrategyDefinitionParser());
 
@@ -196,8 +194,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("transformer-object-to-string", new TransformerDefinitionParser(ObjectToString.class));
         registerBeanDefinitionParser("transformer-byte-array-to-serializable", new TransformerDefinitionParser(ByteArrayToSerializable.class));
         registerBeanDefinitionParser("transformer-serializable-to-byte-array", new TransformerDefinitionParser(SerializableToByteArray.class));
-        registerBeanDefinitionParser("transformer-byte-array-to-string", new TransformerDefinitionParser(ByteArrayToString.class));
-        registerBeanDefinitionParser("transformer-string-to-byte-array", new TransformerDefinitionParser(StringToByteArray.class));
+        registerBeanDefinitionParser("transformer-byte-array-to-string", new TransformerDefinitionParser(ObjectToString.class));
+        registerBeanDefinitionParser("transformer-string-to-byte-array", new TransformerDefinitionParser(ObjectToByteArray.class));
 
         registerBeanDefinitionParser("transformer-append-string", new TransformerDefinitionParser(StringAppendTransformer.class));
 

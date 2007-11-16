@@ -7,16 +7,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-    package org.mule.config.bootstrap;
+package org.mule.config.bootstrap;
 
+import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ManagementContextAware;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.transformer.DiscoverableTransformer;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
+import org.mule.util.PropertiesUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -31,39 +35,39 @@ import java.util.Properties;
  * module or transport to load stateless transformers into the registry.
  * For this file to be located it must be present in the modules META-INF directory under
  * <code>META-INF/services/org/mule/config/</code>
- *
+ * <p/>
  * The format of this file is a simple key / value pair. i.e.
  * <code>
  * myobject=org.foo.MyObject
  * </code>
- * 
- * Will register an instance of MyObject with a key of 'myobject'. If you don't care about the object name and want to 
+ * <p/>
+ * Will register an instance of MyObject with a key of 'myobject'. If you don't care about the object name and want to
  * ensure that the ojbect gets a unique name you can use -
  * <code>
  * object.1=org.foo.MyObject
  * object.2=org.bar.MyObject
  * </code>
- *
+ * <p/>
  * or
  * <code>
  * myFoo=org.foo.MyObject
  * myBar=org.bar.MyObject
  * </code>
- *
- *
+ * <p/>
+ * <p/>
  * Loading transformers has a slightly different notation since you can define the 'returnClass' and 'name'of
  * the transformer as parameters i.e.
- *
+ * <p/>
  * <code>
  * transformer.1=org.mule.providers.jms.transformers.JMSMessageToObject,returnClass=byte[]
  * transformer.2=org.mule.providers.jms.transformers.JMSMessageToObject,returnClass=java.lang.String, name=JMSMessageToString
  * transformer.3=org.mule.providers.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
  * </code>
- *
+ * <p/>
  * Note that the key used for transformers must be 'transformer.x' where 'x' is a sequential number.  The transformer name will be
  * automatically generated as JMSMessageToXXX where XXX is the return class name i.e. JMSMessageToString unless a 'name'
  * parameter is specified. If no 'returnClass' is specified the defualt in the transformer will be used.
- *
+ * <p/>
  * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
  * {@link org.mule.impl.ManagementContextAware} and lifecylce interfaces such as {@link org.mule.umo.lifecycle.Initialisable}.
  */
@@ -89,11 +93,11 @@ public class SimpleRegistryBootstrap implements Initialisable, ManagementContext
     public void initialise() throws InitialisationException
     {
         Enumeration e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
-        while(e.hasMoreElements())
+        while (e.hasMoreElements())
         {
             try
             {
-                URL url = (URL)e.nextElement();
+                URL url = (URL) e.nextElement();
                 Properties p = new Properties();
                 p.load(url.openStream());
                 process(p);
@@ -118,19 +122,22 @@ public class SimpleRegistryBootstrap implements Initialisable, ManagementContext
     {
         int i = 1;
         String transString = props.getProperty(TRANSFORMER_PREFIX + i);
+        String name = null;
+        String returnClassString = null;
+
         while (transString != null)
         {
             Class returnClass = null;
-
-            int pos = transString.indexOf('(');
-            if (pos == -1)
+            int x = transString.indexOf(",");
+            if (x > -1)
             {
-                pos = transString.length();
+                Properties p = PropertiesUtils.getPropertiesFromString(transString.substring(i + 1), ',');
+                name = p.getProperty("name", null);
+                returnClassString = p.getProperty("returnClass", null);
             }
-            String clazz = transString.substring(0, pos);
-            if (pos != transString.length())
+
+            if (returnClassString != null)
             {
-                String returnClassString = transString.substring(pos + 1, transString.length() - 1);
                 if (returnClassString.equals("byte[]"))
                 {
                     returnClass = byte[].class;
@@ -140,13 +147,32 @@ public class SimpleRegistryBootstrap implements Initialisable, ManagementContext
                     returnClass = ClassUtils.loadClass(returnClassString, getClass());
                 }
             }
-            UMOTransformer trans = (UMOTransformer) ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS);
-            if(returnClass!=null)
+            String transClass = (x == -1 ? transString : transString.substring(0, x));
+            UMOTransformer trans = (UMOTransformer) ClassUtils.instanciateClass(transClass, ClassUtils.NO_ARGS);
+            if (!(trans instanceof DiscoverableTransformer))
+            {
+                throw new TransformerException(CoreMessages.transformerNotImplementDiscoverable(trans));
+            }
+            if (returnClass != null)
             {
                 trans.setReturnClass(returnClass);
             }
+            if (name != null)
+            {
+                trans.setName(name);
+            }
+            else
+            {
+                //This will generate a default name for the transformer
+                name = trans.getName();
+                //We then prefix the name to ensure there is less chance of conflict if the user registers
+                // the transformer with the same name
+                trans.setName("_" + name);
+            }
             registry.registerTransformer(trans);
             props.remove(TRANSFORMER_PREFIX + i++);
+            name = null;
+            returnClass = null;
             transString = props.getProperty(TRANSFORMER_PREFIX + i);
         }
     }

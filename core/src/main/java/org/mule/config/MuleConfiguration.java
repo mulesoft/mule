@@ -16,6 +16,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.registry.RegistrationException;
+import org.mule.umo.UMOException;
 import org.mule.umo.manager.DefaultWorkListener;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -34,9 +35,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleConfiguration
 {
-    /**
-     * logger used by this class
-     */
+    /** logger used by this class */
     protected transient Log logger = LogFactory.getLog(getClass());
 
 
@@ -48,20 +47,14 @@ public class MuleConfiguration
     public static final String SYNCHRONOUS_PROPERTY = "synchronous";
 
     public static final String DEFAULT_ENCODING = "UTF-8";
-    /**
-     * Default encoding used in OS running Mule
-     */
+    /** Default encoding used in OS running Mule */
     public static final String DEFAULT_OS_ENCODING = System.getProperty("file.encoding");
 
 
-    /**
-     * Default value for SYNCHRONOUS_PROPERTY
-     */
+    /** Default value for SYNCHRONOUS_PROPERTY */
     public static final boolean DEFAULT_SYNCHRONOUS = false;
 
-    /**
-     * Default value for MAX_OUTSTANDING_MESSAGES_PROPERTY
-     */
+    /** Default value for MAX_OUTSTANDING_MESSAGES_PROPERTY */
 
     public static final int DEFAULT_TIMEOUT = 10000;
 
@@ -69,33 +62,23 @@ public class MuleConfiguration
 
     public static final String DEFAULT_SYSTEM_MODEL_TYPE = "seda";
 
-    /**
-     * Where Mule stores any runtime files to disk
-     */
+    /** Where Mule stores any runtime files to disk */
     public static final String DEFAULT_WORKING_DIRECTORY = "./.mule";
 
-    /**
-     * The default queueStore directory for persistence
-     */
+    /** The default queueStore directory for persistence */
     public static final String DEFAULT_QUEUE_STORE = "queuestore";
 
-    /**
-     * holds the value for SYNCHRONOUS
-     */
+    /** holds the value for SYNCHRONOUS */
     private boolean synchronous = DEFAULT_SYNCHRONOUS;
 
-    /**
-     * The type of model used for the internal system model where system created services are registered
-     */
+    /** The type of model used for the internal system model where system created services are registered */
     private String systemModelType = DEFAULT_SYSTEM_MODEL_TYPE;
 
     private String encoding = DEFAULT_ENCODING;
 
     private String osEncoding = DEFAULT_OS_ENCODING;
 
-    /**
-     * Names of threading profiles in the registry
-     */
+    /** Names of threading profiles in the registry */
     public static final String DEFAULT_THREADING_PROFILE = "defaultThreadingProfile";
     public static final String DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE = "defaultMessageDispatcherThreadingProfile";
     public static final String DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "defaultMessageReceiverThreadingProfile";
@@ -120,14 +103,10 @@ public class MuleConfiguration
      */
     private boolean remoteSync = false;
 
-    /**
-     * Where mule will store any runtime files to disk
-     */
+    /** Where mule will store any runtime files to disk */
     private String workingDirectory;
 
-    /**
-     * The configuration resources used to configure the MuleManager instance
-     */
+    /** The configuration resources used to configure the MuleManager instance */
     private String[] configResources = new String[]{};
 
     /**
@@ -136,19 +115,13 @@ public class MuleConfiguration
      */
     private boolean clientMode = false;
 
-    /**
-     * The unique Id for this ManagementContext
-     */
+    /** The unique Id for this ManagementContext */
     private String id;
 
-    /**
-     * The cluster Id for this ManagementContext
-     */
+    /** The cluster Id for this ManagementContext */
     private String clusterId;
 
-    /**
-     * The Domain Id for this ManagementContext
-     */
+    /** The Domain Id for this ManagementContext */
     private String domainId;
 
     /**
@@ -167,9 +140,7 @@ public class MuleConfiguration
         setDomainId("org.mule");
     }
 
-    /**
-     * @return true if the model is running synchronously or false otherwise
-     */
+    /** @return true if the model is running synchronously or false otherwise */
     public boolean isDefaultSynchronousEndpoints()
     {
         return synchronous;
@@ -387,6 +358,14 @@ public class MuleConfiguration
     {
         if (RegistryContext.getRegistry() != null)
         {
+            try
+            {
+                RegistryContext.getRegistry().unregisterObject(name);
+            }
+            catch (UMOException e)
+            {
+                //ignore
+            }
             try
             {
                 RegistryContext.getRegistry().registerObject(name, value);

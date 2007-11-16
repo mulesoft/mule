@@ -13,7 +13,6 @@ package org.mule.transformers.simple;
 import org.mule.transformers.AbstractMessageAwareTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOHeaderOnlyTransformer;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -29,13 +28,13 @@ import java.util.Set;
  * 'deleteProperties' names to remove from the message and can also set a {@link Map}
  * of 'addProperties' that will be added to the message and possibly overwrite
  * existing properties with the same name.
- * <p>
+ * <p/>
  * If {@link #overwrite} is set to <code>false</code>, and a property exists on
  * the message (even if the value is <code>null</code>, it will be left intact.
  * The transformer then acts as a more gentle 'enricher'. The default setting is
  * <code>true</code>.
  */
-public class MessagePropertiesTransformer extends AbstractMessageAwareTransformer implements UMOHeaderOnlyTransformer
+public class MessagePropertiesTransformer extends AbstractMessageAwareTransformer
 {
     private List deleteProperties = null;
     private Map addProperties = null;
@@ -109,7 +108,7 @@ public class MessagePropertiesTransformer extends AbstractMessageAwareTransforme
                             {
                                 logger.debug(MessageFormat.format(
                                         "Message already contains the property and overwrite is false, skipping: key={0}, value={1}",
-                                        new Object[] {key, value}));
+                                        new Object[]{key, value}));
                             }
                         }
                     }

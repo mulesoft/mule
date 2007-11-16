@@ -13,6 +13,8 @@ package org.mule.util;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -20,8 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>PropertiesHelper</code> is a utility class for manipulating and filtering
@@ -41,7 +41,7 @@ public final class PropertiesUtils
     }
 
     /** Do not instanciate. */
-    protected PropertiesUtils ()
+    protected PropertiesUtils()
     {
         // no-op
     }
@@ -49,7 +49,7 @@ public final class PropertiesUtils
     /**
      * Register a property name for masking. This will prevent certain values from
      * leaking e.g. into debugging output or logfiles.
-     * 
+     *
      * @param name the key of the property to be masked.
      * @throws IllegalArgumentException is name is null or empty.
      */
@@ -69,7 +69,7 @@ public final class PropertiesUtils
      * Returns the String representation of the property value or a masked String if
      * the property key has been registered previously via
      * {@link #registerMaskedPropertyName(String)}.
-     * 
+     *
      * @param property a key/value pair
      * @return String of the property value or a "masked" String that hides the
      *         contents, or <code>null</code> if the property, its key or its value
@@ -103,17 +103,17 @@ public final class PropertiesUtils
     /**
      * Read in the properties from a properties file. The file may be on the file
      * system or the classpath.
-     * 
-     * @param fileName - The name of the properties file
+     *
+     * @param fileName     - The name of the properties file
      * @param callingClass - The Class which is calling this method. This is used to
-     *            determine the classpath.
+     *                     determine the classpath.
      * @return a java.util.Properties object containing the properties.
      */
     public static synchronized Properties loadProperties(String fileName, final Class callingClass)
-        throws IOException
+            throws IOException
     {
         InputStream is = IOUtils.getResourceAsStream(fileName, callingClass,
-        /* tryAsFile */true, /* tryAsUrl */false);
+                /* tryAsFile */true, /* tryAsUrl */false);
         if (is == null)
         {
             Message error = CoreMessages.cannotLoadFromClasspath(fileName);
@@ -160,16 +160,19 @@ public final class PropertiesUtils
     /**
      * Will create a map of properties where the names have a prefix Allows the
      * callee to supply the target map so a comparator can be set
-     * 
-     * @param props the source set of properties
-     * @param prefix the prefix to filter on
+     *
+     * @param props    the source set of properties
+     * @param prefix   the prefix to filter on
      * @param newProps return map containing the filtered list of properties or an
-     *            empty map if no properties matched the prefix
+     *                 empty map if no properties matched the prefix
      */
     public static void getPropertiesWithPrefix(Map props, String prefix, Map newProps)
     {
-        if(props==null) return;
-        
+        if (props == null)
+        {
+            return;
+        }
+
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry) iterator.next();
@@ -208,7 +211,7 @@ public final class PropertiesUtils
         query = new StringBuffer(query.length() + 1).append('&').append(query).toString();
 
         int x = 0;
-        while ((x = addProperty(query, x, props)) != -1)
+        while ((x = addProperty(query, x, '&', props)) != -1)
         {
             // run
         }
@@ -216,10 +219,30 @@ public final class PropertiesUtils
         return props;
     }
 
-    private static int addProperty(String query, int start, Properties properties)
+    public static Properties getPropertiesFromString(String query, char separator)
     {
-        int i = query.indexOf('&', start);
-        int i2 = query.indexOf('&', i + 1);
+        Properties props = new Properties();
+
+        if (query == null)
+        {
+            return props;
+        }
+
+        query = new StringBuffer(query.length() + 1).append(separator).append(query).toString();
+
+        int x = 0;
+        while ((x = addProperty(query, x, separator, props)) != -1)
+        {
+            // run
+        }
+
+        return props;
+    }
+
+    private static int addProperty(String query, int start, char separator, Properties properties)
+    {
+        int i = query.indexOf(separator, start);
+        int i2 = query.indexOf(separator, i + 1);
         String pair;
         if (i > -1 && i2 > -1)
         {
@@ -250,9 +273,7 @@ public final class PropertiesUtils
         return i2;
     }
 
-    /**
-     * @deprecated Use {@link MapUtils#toString(Map, boolean)} instead
-     */
+    /** @deprecated Use {@link MapUtils#toString(Map, boolean)} instead */
     public static String propertiesToString(Map props, boolean newline)
     {
         return MapUtils.toString(props, newline);

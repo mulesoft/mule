@@ -15,6 +15,8 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.util.List;
+
 /**
  * A unique transformer instance than indicates an error (typically that the transformer
  * in question has not been initialised).
@@ -32,7 +34,8 @@ public class VoidTransformer implements UMOTransformer
         return SingletonHolder.instance;
     }
 
-    private VoidTransformer() {
+    private VoidTransformer()
+    {
         // no-op
     }
 
@@ -77,6 +80,11 @@ public class VoidTransformer implements UMOTransformer
     }
 
     public void setName(String newName)
+    {
+        throw new IllegalStateException("Void transformer");
+    }
+
+    public List getSourceTypes()
     {
         throw new IllegalStateException("Void transformer");
     }

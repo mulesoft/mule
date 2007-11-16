@@ -23,7 +23,7 @@ import java.io.UnsupportedEncodingException;
  * java object graph. This transformer uses XStream. Xstream uses some clever tricks so
  * objects that get marshalled to XML do not need to implement any interfaces including
  * Serializable and you don't even need to specify a default constructor.
- * 
+ *
  * @see org.mule.transformers.xml.ObjectToXml
  */
 
@@ -38,6 +38,7 @@ public class XmlToObject extends AbstractXStreamTransformer
         registerSourceType(byte[].class);
         registerSourceType(org.w3c.dom.Document.class);
         registerSourceType(org.dom4j.Document.class);
+        setReturnClass(Object.class);
     }
 
     public Object transform(UMOMessage message, String outputEncoding) throws TransformerException

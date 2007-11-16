@@ -16,9 +16,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.providers.NullPayload;
+import org.mule.registry.RegistrationException;
 import org.mule.transformers.TransformerUtils;
-import org.mule.transformers.simple.ObjectToByteArray;
-import org.mule.transformers.simple.ObjectToString;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.PropertyScope;
@@ -56,8 +55,6 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
     private UMOMessageAdapter adapter;
     private UMOMessageAdapter originalAdapter = null;
     private transient List appliedTransformerHashCodes = new CopyOnWriteArrayList();
-    private transient ObjectToString objectToString = new ObjectToString();
-    private transient ObjectToByteArray objectToByteArray = new ObjectToByteArray();
     private byte[] cache;
 
     public MuleMessage(Object message)
@@ -85,7 +82,7 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
         if (message instanceof UMOMessageAdapter)
         {
             adapter = (UMOMessageAdapter) message;
-            ((ThreadSafeAccess)adapter).resetAccessControl();
+            ((ThreadSafeAccess) adapter).resetAccessControl();
         }
         else
         {
@@ -159,86 +156,29 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
             return getPayload();
         }
         //Grab a list of transformers that batch out input/output requirements
-        List transformers = RegistryContext.getRegistry().lookupTransformers(inputCls, outputType);
+        // List transformers = RegistryContext.getRegistry().lookupTransformers(inputCls, outputType);
 
         //The transformer to execute on this message
         UMOTransformer transformer = null;
-
-        //If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
-        //byte[]
-        UMOTransformer secondPass = null;
-
-        if (transformers.size() == 0)
+        try
         {
-            //If no transformers were found but the output type is String or byte[] we can perform a more general search
-            // using Object.class and then convert to String or byte[] using the second pass transformer
-            if (outputType.equals(String.class))
-            {
-                //TODO encoding
-                secondPass = objectToString;
-            }
-            else if (outputType.equals(byte[].class))
-            {
-                //TODO encoding
-                secondPass = objectToByteArray;
-            }
-            else
-            {
-                throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputCls, outputType));
-            }
-            //Perform a more general search
-            transformers = RegistryContext.getRegistry().lookupTransformers(inputCls, Object.class);
+            transformer = RegistryContext.getRegistry().lookupTransformer(inputCls, outputType);
+        }
+        catch (RegistrationException e)
+        {
+            //TODO Maybe the lookupTransformer() method should throw TransformerException
+            throw new TransformerException(CoreMessages.failedToLoad("transformers"), e);
         }
 
-        //Still no transformers found
-        if (transformers.size() == 0)
+        //no transformers found
+        if (transformer == null)
         {
             throw new TransformerException(CoreMessages.noTransformerFoundForMessage(inputCls, outputType));
-
-        }
-        //Exact match
-        else if (transformers.size() == 1)
-        {
-            transformer = (UMOTransformer) transformers.get(0);
-        }
-        else
-        {
-            //We have more than one match. Next we go through the list and perform additionl checks
-            for (Iterator iterator = transformers.iterator(); iterator.hasNext();)
-            {
-                //fallack to the first in the list
-                transformer = (UMOTransformer) transformers.get(0);
-                UMOTransformer umoTransformer = (UMOTransformer) iterator.next();
-                //Does the transformer live in the same module as the Message adapter wrapped by this message?
-                //If so, that transformer should be used
-                if (umoTransformer.getClass().getPackage().getName().startsWith(adapter.getClass().getPackage().getName()))
-                {
-                    transformer = umoTransformer;
-                    //Do we have an exact type match? If so, we can stop going through the list
-                    //TODO not sure this check is required
-                    if (outputType.equals(umoTransformer.getReturnClass()))
-                    {
-                        //If this is an exact match then break
-                        break;
-                    }
-                }
-            }
-            //Default to the first transformer if there is no specific match. This might cause problems
-            if (transformer == null)
-            {
-                transformer = (UMOTransformer) transformers.get(0);
-                logger.warn("No exact match transformer was found to convert from: " + inputCls + " to " + outputType + ". Defaulting to: " + transformer);
-            }
         }
 
         // Pass in the adapter itself, so we respect the encoding
         Object result = transformer.transform(this);
 
-        //If a second pass is required, run it straight after
-        if (secondPass != null)
-        {
-            result = secondPass.transform(result);
-        }
         //TODO Unless we disallow Object.class as a valid return type we need to do this extra check
         if (!outputType.isAssignableFrom(result.getClass()))
         {
@@ -291,7 +231,7 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
     {
         adapter.setProperty(key, value, scope);
     }
-   
+
 
     /** {@inheritDoc} */
     public Object getProperty(String key)
@@ -310,7 +250,7 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
     {
         adapter.setProperty(key, value);
     }
-    
+
     /** {@inheritDoc} */
     public final String getPayloadAsString() throws Exception
     {
@@ -322,12 +262,12 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
     public byte[] getPayloadAsBytes() throws Exception
     {
         assertAccess(READ);
-        if(cache!=null)
+        if (cache != null)
         {
             return cache;
         }
         byte[] result = (byte[]) getPayload(byte[].class);
-        if(DebugOptions.isCacheMessageAsBytes())
+        if (DebugOptions.isCacheMessageAsBytes())
         {
             cache = result;
         }
@@ -338,12 +278,12 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
     public String getPayloadAsString(String encoding) throws Exception
     {
         assertAccess(READ);
-        if(cache!=null)
+        if (cache != null)
         {
             return new String(cache, encoding);
         }
         String result = (String) getPayload(String.class);
-        if(DebugOptions.isCacheMessageAsBytes())
+        if (DebugOptions.isCacheMessageAsBytes())
         {
             cache = result.getBytes(encoding);
         }
@@ -553,13 +493,13 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
     public synchronized void setPayload(Object payload)
     {
         //TODO we may want to enforce stricter rules here, rather than silently wrapping the existing adapter
-        if(!(adapter instanceof UMOMutableMessageAdapter))
+        if (!(adapter instanceof UMOMutableMessageAdapter))
         {
             adapter = new DefaultMessageAdapter(payload, adapter);
         }
         else
         {
-            ((UMOMutableMessageAdapter)adapter).setPayload(payload);
+            ((UMOMutableMessageAdapter) adapter).setPayload(payload);
         }
         cache = null;
     }
@@ -568,7 +508,7 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
     public void release()
     {
         adapter.release();
-        if(originalAdapter!=null)
+        if (originalAdapter != null)
         {
             originalAdapter.release();
         }

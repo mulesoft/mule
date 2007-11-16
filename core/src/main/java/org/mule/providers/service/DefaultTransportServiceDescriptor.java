@@ -30,6 +30,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UMOSessionHandler;
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
@@ -81,7 +82,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         endpointBuilder = removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, props);
         sessionHandler = removeProperty(MuleProperties.CONNECTOR_SESSION_HANDLER, props);
 
-
 //        try
 //        {
 //                registerDefaultTransformers(registry);
@@ -92,8 +92,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 //        }
     }
 
-
-   
 
     private void registerDefaultTransformers(Registry registry) throws UMOException
     {
@@ -112,7 +110,15 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         for (Iterator iterator = trans.iterator(); iterator.hasNext();)
         {
             UMOTransformer transformer = (UMOTransformer) iterator.next();
-            registry.registerTransformer(transformer);
+            if (transformer instanceof DiscoverableTransformer)
+            {
+                registry.registerTransformer(transformer);
+            }
+            else
+            {
+                logger.warn("Transformer does not implement the DiscoverableTransformer interface, so will not be " +
+                        "registered as a default implementation with the Registry. Transformr is: " + transformer);
+            }
         }
     }
 
@@ -494,7 +500,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
                 throw new TransportFactoryException(CoreMessages.failedToLoadTransformer("response", defaultResponseTransformer), e);
             }
         }
-        return TransformerUtils.UNDEFINED;        
+        return TransformerUtils.UNDEFINED;
     }
 
     /* (non-Javadoc)

@@ -11,19 +11,24 @@
 package org.mule.transformers.simple;
 
 import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.StringUtils;
 
 /**
- * <code>ObjectArrayToString</code> transformer is the opposite of 
+ * <code>ObjectArrayToString</code> transformer is the opposite of
  * StringToObjectArray - it simply converts Object[] to a String in which each
  * element is separated by a configurable delimiter (default is a space).
  */
 
-public class ObjectArrayToString extends AbstractTransformer
+public class ObjectArrayToString extends AbstractTransformer implements DiscoverableTransformer
 {
-    private String delimiter = null;
+    /** Give core transformers a slighty higher priority */
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
+
     private static final String DEFAULT_DELIMITER = " ";
+
+    private String delimiter = null;
 
     public ObjectArrayToString()
     {
@@ -33,9 +38,12 @@ public class ObjectArrayToString extends AbstractTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        if (src == null) return src;
+        if (src == null)
+        {
+            return src;
+        }
 
-        Object[] in = (Object[])src;
+        Object[] in = (Object[]) src;
         String out = StringUtils.join(in, getDelimiter());
 
         /*
@@ -52,23 +60,32 @@ public class ObjectArrayToString extends AbstractTransformer
         return out;
     }
 
-    /**
-     * @return the delimiter
-     */
+    /** @return the delimiter */
     public String getDelimiter()
     {
         if (delimiter == null)
+        {
             return DEFAULT_DELIMITER;
+        }
         else
+        {
             return delimiter;
+        }
     }
 
-    /**
-     * @param sets the delimiter
-     */
+    /** @param sets the delimiter */
     public void setDelimiter(String delimiter)
     {
         this.delimiter = delimiter;
     }
-        
+
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
+    }
 }

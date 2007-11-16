@@ -26,6 +26,7 @@ import org.mule.util.StringUtils;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.transform.stream.StreamSource;
@@ -56,9 +57,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     protected String name = null;
 
-    /**
-     * The endpoint that this transformer instance is configured on
-     */
+    /** The endpoint that this transformer instance is configured on */
     protected UMOImmutableEndpoint endpoint = null;
 
     /**
@@ -67,9 +66,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     protected final List sourceTypes = new CopyOnWriteArrayList();
 
-    /**
-     * This is the following transformer in the chain of transformers.
-     */
+    /** This is the following transformer in the chain of transformers. */
     protected UMOTransformer nextTransformer;
 
     /**
@@ -78,9 +75,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     private boolean ignoreBadInput = false;
 
-    /**
-     * default constructor required for discovery
-     */
+    /** default constructor required for discovery */
     public AbstractTransformer()
     {
 
@@ -93,8 +88,8 @@ public abstract class AbstractTransformer implements UMOTransformer
             if (!returnClass.isInstance(object))
             {
                 throw new TransformerException(
-                    CoreMessages.transformUnexpectedType(object.getClass(), returnClass),
-                    this);
+                        CoreMessages.transformUnexpectedType(object.getClass(), returnClass),
+                        this);
             }
         }
 
@@ -125,21 +120,17 @@ public abstract class AbstractTransformer implements UMOTransformer
         sourceTypes.remove(aClass);
     }
 
-    /**
-     * @return transformer name
-     */
+    /** @return transformer name */
     public String getName()
     {
-        if(name==null)
+        if (name == null)
         {
             name = this.generateTransformerName();
         }
         return name;
     }
 
-    /**
-     * @param string
-     */
+    /** @param string  */
     public void setName(String string)
     {
         if (string == null)
@@ -221,9 +212,9 @@ public abstract class AbstractTransformer implements UMOTransformer
             encoding = ((UMOMessageAdapter) src).getEncoding();
             adapter = (UMOMessageAdapter) src;
             if ((!isSourceTypeSupported(UMOMessageAdapter.class, true)
-                        && !isSourceTypeSupported(UMOMessage.class, true)
+                    && !isSourceTypeSupported(UMOMessage.class, true)
                     && !(this instanceof AbstractMessageAwareTransformer))
-                  )
+                    )
             {
                 src = ((UMOMessageAdapter) src).getPayload();
                 payload = adapter.getPayload();
@@ -250,8 +241,8 @@ public abstract class AbstractTransformer implements UMOTransformer
             else
             {
                 throw new TransformerException(
-                    CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(this.getName(),
-                        payload.getClass(), endpoint), this);
+                        CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(this.getName(),
+                                payload.getClass(), endpoint), this);
             }
         }
 
@@ -259,18 +250,18 @@ public abstract class AbstractTransformer implements UMOTransformer
         {
             logger.debug("Applying transformer " + getName() + " (" + getClass().getName() + ")");
             logger.debug("Object before transform: "
-                            + StringMessageUtils.truncate(StringMessageUtils.toString(payload), DEFAULT_TRUNCATE_LENGTH, false));
+                    + StringMessageUtils.truncate(StringMessageUtils.toString(payload), DEFAULT_TRUNCATE_LENGTH, false));
         }
 
         Object result;
-        if(src instanceof UMOMessage && this instanceof AbstractMessageAwareTransformer)
-        {
-            result = ((AbstractMessageAwareTransformer)this).transform((UMOMessage)src, encoding);
-        }
-        else
-        {
-            result = doTransform(payload, encoding);
-        }
+//        if(src instanceof UMOMessage && this instanceof AbstractMessageAwareTransformer)
+//        {
+//            result = ((AbstractMessageAwareTransformer)this).transform((UMOMessage)src, encoding);
+//        }
+//        else
+//        {
+        result = doTransform(payload, encoding);
+        // }
         if (result == null)
         {
             result = NullPayload.getInstance();
@@ -279,7 +270,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         if (logger.isDebugEnabled())
         {
             logger.debug("Object after transform: "
-                            + StringMessageUtils.truncate(StringMessageUtils.toString(result), DEFAULT_TRUNCATE_LENGTH, false));
+                    + StringMessageUtils.truncate(StringMessageUtils.toString(result), DEFAULT_TRUNCATE_LENGTH, false));
         }
 
         result = checkReturnClass(result);
@@ -323,18 +314,21 @@ public abstract class AbstractTransformer implements UMOTransformer
     {
         String name = ClassUtils.getSimpleName(this.getClass());
         int i = name.indexOf("To");
-        if(i > 0 && returnClass!=null)
+        if (i > 0 && returnClass != null)
         {
             String target = ClassUtils.getSimpleName(returnClass);
-            if(target.equals("byte[]")) target = "byteArray";
-            name = name.substring(0, i +2) + StringUtils.capitalize(target);
+            if (target.equals("byte[]"))
+            {
+                target = "byteArray";
+            }
+            name = name.substring(0, i + 2) + StringUtils.capitalize(target);
         }
         return name;
     }
 
     public List getSourceTypes()
     {
-        return sourceTypes;
+        return Collections.unmodifiableList(sourceTypes);
     }
 
     public boolean isIgnoreBadInput()
@@ -358,7 +352,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         sb.append(", returnClass=").append(returnClass);
         sb.append(", sourceTypes=").append(sourceTypes);
         sb.append('}');
-        return sb.toString();                        
+        return sb.toString();
     }
 
     public boolean isAcceptNull()
