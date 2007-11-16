@@ -11,7 +11,6 @@
 package org.mule.transformers.xml;
 
 import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.DiscoverableTransformer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -38,11 +37,8 @@ import org.dom4j.io.DocumentSource;
  * <code>AbstractXmlTransformer</code> offers some XSLT transform on a DOM (or
  * other XML-ish) object.
  */
-
-public abstract class AbstractXmlTransformer extends AbstractTransformer implements DiscoverableTransformer
+public abstract class AbstractXmlTransformer extends AbstractTransformer
 {
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
-
     private String outputEncoding;
 
     public AbstractXmlTransformer()
@@ -309,15 +305,5 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer impleme
     public void setOutputEncoding(String outputEncoding)
     {
         this.outputEncoding = outputEncoding;
-    }
-
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
     }
 }

@@ -10,13 +10,13 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 
-/**
- * <code>DomDocumentToXml</code> Transform a org.w3c.dom.Document to XML String
- */
-public class DomDocumentToXml extends AbstractXmlTransformer
+/** <code>DomDocumentToXml</code> Transform a org.w3c.dom.Document to XML String */
+public class DomDocumentToXml extends AbstractXmlTransformer implements DiscoverableTransformer
 {
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public DomDocumentToXml()
     {
@@ -30,9 +30,13 @@ public class DomDocumentToXml extends AbstractXmlTransformer
             // We now offer XML in byte OR String form.
             // String remains the default like before.
             if (byte[].class.equals(returnClass))
+            {
                 return convertToBytes(src, encoding);
+            }
             else
+            {
                 return convertToText(src, encoding);
+            }
         }
         catch (Exception e)
         {
@@ -40,4 +44,13 @@ public class DomDocumentToXml extends AbstractXmlTransformer
         }
     }
 
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
+    }
 }

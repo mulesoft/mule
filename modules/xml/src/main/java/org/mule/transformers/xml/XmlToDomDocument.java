@@ -10,6 +10,7 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import javax.xml.transform.OutputKeys;
@@ -20,8 +21,10 @@ import javax.xml.transform.TransformerFactory;
 import org.w3c.dom.Document;
 
 /** <code>XmlToDomDocument</code> transforms a XML String to org.w3c.dom.Document. */
-public class XmlToDomDocument extends AbstractXmlTransformer
+public class XmlToDomDocument extends AbstractXmlTransformer implements DiscoverableTransformer
 {
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try
@@ -50,5 +53,15 @@ public class XmlToDomDocument extends AbstractXmlTransformer
         {
             throw new TransformerException(this, e);
         }
+    }
+
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
     }
 }

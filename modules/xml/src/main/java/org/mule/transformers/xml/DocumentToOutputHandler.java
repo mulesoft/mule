@@ -22,6 +22,8 @@ import org.dom4j.Document;
 /** TODO */
 public class DocumentToOutputHandler extends AbstractXmlTransformer implements DiscoverableTransformer
 {
+    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+
     public DocumentToOutputHandler()
     {
         registerSourceType(Document.class);
@@ -45,5 +47,15 @@ public class DocumentToOutputHandler extends AbstractXmlTransformer implements D
                 }
             }
         };
+    }
+
+    public int getPriorityWeighting()
+    {
+        return priorityWeighting;
+    }
+
+    public void setPriorityWeighting(int priorityWeighting)
+    {
+        this.priorityWeighting = priorityWeighting;
     }
 }
