@@ -117,13 +117,13 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
     public Object transform(UMOMessage msg, String outputEncoding) throws TransformerException
     {
         Object src = msg.getPayload();
-        
+
         String endpoint = msg.getStringProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
         if (endpoint == null)
         {
             throw new TransformerException(
-                HttpMessages.eventPropertyNotSetCannotProcessRequest(
-                    MuleProperties.MULE_ENDPOINT_PROPERTY), this);
+                    HttpMessages.eventPropertyNotSetCannotProcessRequest(
+                            MuleProperties.MULE_ENDPOINT_PROPERTY), this);
         }
 
         String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
@@ -136,7 +136,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             {
                 httpMethod = new GetMethod(uri.toString());
                 String paramName = msg.getStringProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
-                    HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
+                        HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
                 String query = uri.getQuery();
                 if (!(src instanceof NullPayload) && !StringUtils.EMPTY.equals(src))
                 {
@@ -167,7 +167,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 {
                     postMethod.addParameter(paramName, src.toString());
                 }
-                
+
                 httpMethod = postMethod;
             }
             else if (HttpConstants.METHOD_PUT.equalsIgnoreCase(method))
@@ -175,7 +175,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 PutMethod putMethod = new PutMethod(uri.toString());
 
                 setupEntityMethod(src, outputEncoding, msg, uri, putMethod);
-                
+
                 httpMethod = putMethod;
             }
             else if (HttpConstants.METHOD_DELETE.equalsIgnoreCase(method))
@@ -199,10 +199,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 throw new TransformerException(HttpMessages.unsupportedMethod(method));
             }
 
-            setHeaders(httpMethod, msg);
-            
             // Allow the user to set HttpMethodParams as an object on the message
-            HttpMethodParams params = (HttpMethodParams)msg.removeProperty(HttpConnector.HTTP_PARAMS_PROPERTY);
+            HttpMethodParams params = (HttpMethodParams) msg.removeProperty(HttpConnector.HTTP_PARAMS_PROPERTY);
             if (params != null)
             {
                 httpMethod.setParams(params);
@@ -211,7 +209,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             {
                 // TODO we should propbably set other propserties here
                 String httpVersion = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY,
-                    HttpConstants.HTTP11);
+                        HttpConstants.HTTP11);
                 if (HttpConstants.HTTP10.equals(httpVersion))
                 {
                     httpMethod.getParams().setVersion(HttpVersion.HTTP_1_0);
@@ -236,7 +234,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                                    UMOMessage msg,
                                    URI uri,
                                    EntityEnclosingMethod postMethod)
-        throws UnsupportedEncodingException, TransformerException
+            throws UnsupportedEncodingException, TransformerException
     {
         // Dont set a POST payload if the body is a Null Payload.
         // This way client calls
@@ -258,26 +256,35 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                         mimeType = mimeType.substring(0, parameterIndex);
                     }
                 }
-                if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                if (mimeType == null)
+                {
+                    mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                }
 
                 postMethod.setRequestEntity(new StringRequestEntity(src.toString(), mimeType,
-                    encoding));
+                        encoding));
             }
             else if (src instanceof InputStream)
             {
                 // TODO Danger here! We don't know if the content is
                 // really text or not
-                if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream)src,
-                    mimeType));
+                if (mimeType == null)
+                {
+                    mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                }
+                postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream) src,
+                        mimeType));
             }
             else if (src instanceof byte[])
             {
                 // TODO Danger here! We don't know if the content is
                 // really text or not
-                if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                postMethod.setRequestEntity(new ByteArrayRequestEntity((byte[])src,
-                    mimeType));
+                if (mimeType == null)
+                {
+                    mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                }
+                postMethod.setRequestEntity(new ByteArrayRequestEntity((byte[]) src,
+                        mimeType));
             }
             else if (src instanceof OutputHandler)
             {
@@ -294,7 +301,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 throw new IllegalArgumentException("this should never happen");
             }
         }
-       
+
     }
 
     protected void setHeaders(HttpMethod httpMethod, UMOMessage msg)
@@ -304,7 +311,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         String headerName;
         for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
         {
-            headerName = (String)iterator.next();
+            headerName = (String) iterator.next();
 
             headerValue = msg.getStringProperty(headerName, null);
             if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null)
@@ -319,12 +326,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         }
 
         Map customHeaders = (Map) msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
-        if (customHeaders != null) 
+        if (customHeaders != null)
         {
             Map.Entry entry;
             for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();)
             {
-                entry = (Map.Entry)iterator.next();
+                entry = (Map.Entry) iterator.next();
                 if (entry.getValue() != null)
                 {
                     httpMethod.addRequestHeader(entry.getKey().toString(), entry.getValue().toString());
@@ -334,7 +341,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
 
         Set attNams = msg.getAttachmentNames();
         if (msg.getPayload() instanceof InputStream
-                        && attNams != null && attNams.size() > 0)
+                && attNams != null && attNams.size() > 0)
         {
             // must set this for receiver to properly parse attachments
             httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related");
