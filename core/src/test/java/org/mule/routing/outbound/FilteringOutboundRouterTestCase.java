@@ -113,6 +113,9 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
         UMOImmutableEndpoint ep = router.getEndpoint(0, message);
+        // MULE-2690: assert that templated endpoints are not mutated
+        assertNotSame(endpoint1, ep);
+        // assert that the returned endpoint has a resolved URI
         assertEquals("test://foo?bar", ep.getEndpointURI().toString());
     }
 }
