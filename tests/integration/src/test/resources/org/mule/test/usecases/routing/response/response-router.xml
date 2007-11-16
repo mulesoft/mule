@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd">
 
-    <file:connector name="FileConnector" 
-        pollingFrequency="1000" moveToDirectory="/tmp/test-data/out" outputPattern="${DATE}.pdf"/>
+    <file:connector name="FileConnector"
+                    pollingFrequency="1000" moveToDirectory="/tmp/test-data/out" outputPattern="${DATE}.pdf"/>
 
-<!--    <connector name="MidFileConnector" className="org.mule.providers.file.FileConnector">-->
-<!--        <properties>-->
-<!--            <property name="pollingFrequency" value="1000"/>-->
-<!--            <property name="moveToDirectory" value="../test-data/out"/>-->
-<!--            <property name="outputPattern" value="${DATE}${COUNT}.xml"/>-->
-<!--            <property name="binaryMode" value="false"/>-->
-<!--        </properties>-->
-<!--    </connector>-->
+    <!--    <connector name="MidFileConnector" className="org.mule.providers.file.FileConnector">-->
+    <!--        <properties>-->
+    <!--            <property name="pollingFrequency" value="1000"/>-->
+    <!--            <property name="moveToDirectory" value="../test-data/out"/>-->
+    <!--            <property name="outputPattern" value="${DATE}${COUNT}.xml"/>-->
+    <!--            <property name="binaryMode" value="false"/>-->
+    <!--        </properties>-->
+    <!--    </connector>-->
 
-<!--    <transformers>-->
-<!--        <transformer name="W10LaszloToW10Report" className="org.mule.transformers.xml.XsltTransformer"-->
-<!--            returnClass="java.lang.String">-->
-<!--            <properties>-->
-<!--                <property name="xslFile" value="/home/bkalbfu/workspace31/W10_Output/src/w10laszlo_to_w10report.xsl"/>-->
-<!--            </properties>-->
-<!--        </transformer>-->
-<!--        <transformer name="W10ReportToFormattingObjects" className="org.mule.transformers.xml.XsltTransformer"-->
-<!--            returnClass="java.lang.String">-->
-<!--            <properties>-->
-<!--                <property name="xslFile" value="/home/bkalbfu/workspace31/W10_Output/src/w10report_to_w10fo.xsl"/>-->
-<!--            </properties>-->
-<!--        </transformer>-->
-<!--        <transformer name="FormattingObjectsToPDF" className="org.hhcc.fop.FormattingObjectsToPDF"-->
-<!--            returnClass="java.lang.Object"/>-->
-<!--        <transformer name="ByteArrayToString" className="org.mule.transformers.simple.ByteArrayToString"-->
-<!--            returnClass="java.lang.String"/>-->
-<!--        <transformer name="XMLToDOM" className="org.mule.transformers.xml.XmlToDomDocument"-->
-<!--            returnClass="org.w3c.dom.Document"/>-->
-<!--        <transformer name="DOMToXML" className="org.mule.transformers.xml.DomDocumentToXml"-->
-<!--            returnClass="java.lang.String"/>-->
-<!--    </transformers>-->
+    <!--    <transformers>-->
+    <!--        <transformer name="W10LaszloToW10Report" className="org.mule.transformers.xml.XsltTransformer"-->
+    <!--            returnClass="java.lang.String">-->
+    <!--            <properties>-->
+    <!--                <property name="xslFile" value="/home/bkalbfu/workspace31/W10_Output/src/w10laszlo_to_w10report.xsl"/>-->
+    <!--            </properties>-->
+    <!--        </transformer>-->
+    <!--        <transformer name="W10ReportToFormattingObjects" className="org.mule.transformers.xml.XsltTransformer"-->
+    <!--            returnClass="java.lang.String">-->
+    <!--            <properties>-->
+    <!--                <property name="xslFile" value="/home/bkalbfu/workspace31/W10_Output/src/w10report_to_w10fo.xsl"/>-->
+    <!--            </properties>-->
+    <!--        </transformer>-->
+    <!--        <transformer name="FormattingObjectsToPDF" className="org.hhcc.fop.FormattingObjectsToPDF"-->
+    <!--            returnClass="java.lang.Object"/>-->
+    <!--        <transformer name="ByteArrayToString" className="org.mule.transformers.simple.ByteArrayToObject"-->
+    <!--            returnClass="java.lang.String"/>-->
+    <!--        <transformer name="XMLToDOM" className="org.mule.transformers.xml.XmlToDomDocument"-->
+    <!--            returnClass="org.w3c.dom.Document"/>-->
+    <!--        <transformer name="DOMToXML" className="org.mule.transformers.xml.DomDocumentToXml"-->
+    <!--            returnClass="java.lang.String"/>-->
+    <!--    </transformers>-->
 
     <model name="fo">
         <service name="getLaszloW10">
@@ -52,10 +52,10 @@
             <outbound-router matchAll="false">
                 <multicasting-router>
                     <outbound-endpoint address="vm://getReportW10"/>
-<!--                    <properties>-->
-<!--                        <property name="replyTo" value="vm://W10Response"/>-->
-<!--                        <property name="correlationId" value="true"/>-->
-<!--                    </properties>-->
+                    <!--                    <properties>-->
+                    <!--                        <property name="replyTo" value="vm://W10Response"/>-->
+                    <!--                        <property name="correlationId" value="true"/>-->
+                    <!--                    </properties>-->
                 </multicasting-router>
             </outbound-router>
             <response-router>
@@ -71,11 +71,11 @@
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-<!--                    <endpoint address="file://home/bkalbfu/workspace31/test-data/out" connector="MidFileConnector"/>-->
+                    <!--                    <endpoint address="file://home/bkalbfu/workspace31/test-data/out" connector="MidFileConnector"/>-->
                     <outbound-endpoint address="vm://getFO"/>
-<!--                    <properties>-->
-<!--                        <property name="correlationId" value="false"/>-->
-<!--                    </properties>-->
+                    <!--                    <properties>-->
+                    <!--                        <property name="correlationId" value="false"/>-->
+                    <!--                    </properties>-->
                 </multicasting-router>
             </outbound-router>
         </service>
@@ -91,9 +91,9 @@
                 <multicasting-router>
                     <outbound-endpoint address="file://temp/test-data/out"/>
                     <outbound-endpoint address="vm://W10Response"/>
-<!--                    <properties>-->
-<!--                        <property name="correlationId" value="false"/>-->
-<!--                    </properties>-->
+                    <!--                    <properties>-->
+                    <!--                        <property name="correlationId" value="false"/>-->
+                    <!--                    </properties>-->
                 </multicasting-router>
             </outbound-router>
         </service>

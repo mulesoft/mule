@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:spring="http://www.springframework.org/schema/beans"
-  xmlns:osgi="http://www.springframework.org/schema/osgi"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:osgi="http://www.springframework.org/schema/osgi"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi-1.0-m3.xsd">
 
     <spring:bean id="muleManager" class="org.mule.modules.osgi.MuleSoaManager"/>
@@ -12,7 +12,7 @@
     <spring:bean id="muleNameProcessor" class="org.mule.extras.spring.MuleObjectNameProcessor"/>
 
     <spring:bean id="fileConnector" class="org.mule.providers.file.FileConnector">
-            <spring:property name="pollingFrequency" value="1000"/>
+        <spring:property name="pollingFrequency" value="1000"/>
     </spring:bean>
 
     <spring:bean id="httpConnector" class="org.mule.providers.http.HttpConnector">
@@ -25,30 +25,40 @@
            determine which method to call on our components based on the return types of these
            transformers.
        -->
-    <spring:bean id="BytesToString" class="org.mule.transformers.simple.ByteArrayToString">
-        <spring:property name="returnClass"><spring:value>java.lang.String</spring:value></spring:property>
+    <spring:bean id="BytesToString" class="org.mule.transformers.simple.ByteArrayToObject">
+        <spring:property name="returnClass">
+            <spring:value>java.lang.String</spring:value>
+        </spring:property>
     </spring:bean>
-    <osgi:service ref="BytesToString" interface="org.mule.umo.transformer.UMOTransformer" />
+    <osgi:service ref="BytesToString" interface="org.mule.umo.transformer.UMOTransformer"/>
 
     <spring:bean id="HttpToString" class="org.mule.samples.hello.HttpRequestToString">
-        <spring:property name="returnClass"><spring:value>java.lang.String</spring:value></spring:property>
+        <spring:property name="returnClass">
+            <spring:value>java.lang.String</spring:value>
+        </spring:property>
     </spring:bean>
-    <osgi:service ref="HttpToString" interface="org.mule.umo.transformer.UMOTransformer" />
+    <osgi:service ref="HttpToString" interface="org.mule.umo.transformer.UMOTransformer"/>
 
     <spring:bean id="StringToNameString" class="org.mule.samples.hello.StringToNameString">
-        <spring:property name="returnClass"><spring:value>org.mule.samples.hello.NameString</spring:value></spring:property>
+        <spring:property name="returnClass">
+            <spring:value>org.mule.samples.hello.NameString</spring:value>
+        </spring:property>
     </spring:bean>
-    <osgi:service ref="StringToNameString" interface="org.mule.umo.transformer.UMOTransformer" />
+    <osgi:service ref="StringToNameString" interface="org.mule.umo.transformer.UMOTransformer"/>
 
     <spring:bean id="NameStringToChatString" class="org.mule.samples.hello.NameStringToChatString">
-        <spring:property name="returnClass"><spring:value>org.mule.samples.hello.ChatString</spring:value></spring:property>
+        <spring:property name="returnClass">
+            <spring:value>org.mule.samples.hello.ChatString</spring:value>
+        </spring:property>
     </spring:bean>
-    <osgi:service ref="NameStringToChatString" interface="org.mule.umo.transformer.UMOTransformer" />
+    <osgi:service ref="NameStringToChatString" interface="org.mule.umo.transformer.UMOTransformer"/>
 
     <spring:bean id="ChatStringToString" class="org.mule.samples.hello.ChatStringToString">
-        <spring:property name="returnClass"><spring:value>java.lang.String</spring:value></spring:property>
+        <spring:property name="returnClass">
+            <spring:value>java.lang.String</spring:value>
+        </spring:property>
     </spring:bean>
-    <osgi:service ref="ChatStringToString" interface="org.mule.umo.transformer.UMOTransformer" />
+    <osgi:service ref="ChatStringToString" interface="org.mule.umo.transformer.UMOTransformer"/>
 
     <!--
         A Mule descriptor defines all the necessary information about how your components will
@@ -57,28 +67,30 @@
     -->
     <spring:bean id="GreeterUMO" class="org.mule.impl.MuleDescriptor">
         <spring:property name="inboundEndpoint">
-            <spring:bean  class="org.mule.impl.endpoint.MuleEndpoint">
+            <spring:bean class="org.mule.impl.endpoint.MuleEndpoint">
                 <spring:property name="endpointURI">
                     <spring:bean class="org.mule.impl.endpoint.MuleEndpointURI">
                         <constructor-arg>
                             <spring:value>file:///tmp/in?transformers=BytesToString,StringToNameString</spring:value>
                         </constructor-arg>
                     </spring:bean>
-               </spring:property>
+                </spring:property>
             </spring:bean>
         </spring:property>
         <spring:property name="outboundEndpoint">
-            <spring:bean  class="org.mule.impl.endpoint.MuleEndpoint">
+            <spring:bean class="org.mule.impl.endpoint.MuleEndpoint">
                 <spring:property name="endpointURI">
                     <spring:bean class="org.mule.impl.endpoint.MuleEndpointURI">
                         <constructor-arg>
                             <spring:value>vm://chitchatter</spring:value>
                         </constructor-arg>
                     </spring:bean>
-               </spring:property>
+                </spring:property>
             </spring:bean>
         </spring:property>
-        <spring:property name="implementation"><spring:value>Greeter</spring:value></spring:property>
+        <spring:property name="implementation">
+            <spring:value>Greeter</spring:value>
+        </spring:property>
     </spring:bean>
 
     <!--
@@ -89,28 +101,30 @@
 
     <spring:bean id="ChitChatUMO" class="org.mule.impl.MuleDescriptor">
         <spring:property name="inboundEndpoint">
-            <spring:bean  class="org.mule.impl.endpoint.MuleEndpoint">
+            <spring:bean class="org.mule.impl.endpoint.MuleEndpoint">
                 <spring:property name="endpointURI">
                     <spring:bean class="org.mule.impl.endpoint.MuleEndpointURI">
                         <constructor-arg>
                             <spring:value>vm://chitchatter?transformers=NameStringToChatString</spring:value>
                         </constructor-arg>
                     </spring:bean>
-               </spring:property>
+                </spring:property>
             </spring:bean>
         </spring:property>
         <spring:property name="outboundEndpoint">
-            <spring:bean  class="org.mule.impl.endpoint.MuleEndpoint">
+            <spring:bean class="org.mule.impl.endpoint.MuleEndpoint">
                 <spring:property name="endpointURI">
                     <spring:bean class="org.mule.impl.endpoint.MuleEndpointURI">
                         <constructor-arg>
                             <spring:value>file:///tmp/out?transformers=ChatStringToString</spring:value>
                         </constructor-arg>
                     </spring:bean>
-               </spring:property>
+                </spring:property>
             </spring:bean>
         </spring:property>
-        <spring:property name="implementation"><spring:value>ChitChatter</spring:value></spring:property>
+        <spring:property name="implementation">
+            <spring:value>ChitChatter</spring:value>
+        </spring:property>
     </spring:bean>
 
     <!--

@@ -14,22 +14,18 @@ import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.jms.JmsTransactionFactory;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
-import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MuleClientTransactionTestCase extends FunctionalTestCase
@@ -64,8 +60,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
         UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
-            .lookupEndpointFactory()
-            .getOutboundEndpoint(endpointBuilder, managementContext);
+                .lookupEndpointFactory()
+                .getOutboundEndpoint(endpointBuilder, managementContext);
         client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
 
 
@@ -113,8 +109,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
         UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
-            .lookupEndpointFactory()
-            .getOutboundEndpoint(endpointBuilder, managementContext);
+                .lookupEndpointFactory()
+                .getOutboundEndpoint(endpointBuilder, managementContext);
         client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
 
         TransactionTemplate tt = new TransactionTemplate(tc, null, managementContext);
@@ -167,8 +163,8 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
         UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
-            .lookupEndpointFactory()
-            .getOutboundEndpoint(endpointBuilder, managementContext);
+                .lookupEndpointFactory()
+                .getOutboundEndpoint(endpointBuilder, managementContext);
         client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
 
 

@@ -17,7 +17,7 @@ import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformers.simple.StringToByteArray;
+import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -49,7 +49,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage("test event");
 
         UMOEndpoint endpoint = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        UMOEvent event = new MuleEvent(message, endpoint, (UMOSession)session.proxy(), false);
+        UMOEvent event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
         assertTrue(router.isMatch(event));
 
         session.expect("dispatchEvent", C.eq(event));
@@ -57,7 +57,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         messageRouter.route(event);
         session.verify();
 
-        event = new MuleEvent(message, endpoint, (UMOSession)session.proxy(), true);
+        event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), true);
 
         session.expectAndReturn("sendEvent", C.eq(event), message);
         session.expectAndReturn("getComponent", testComponent);
@@ -70,7 +70,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         session.expectAndReturn("toString", "");
         message = new MuleMessage(new Exception());
 
-        event = new MuleEvent(message, endpoint, (UMOSession)session.proxy(), false);
+        event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
         assertTrue(!router.isMatch(event));
 
         messageRouter.route(event);
@@ -94,8 +94,8 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage("test event");
 
         UMOEndpoint endpoint = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        endpoint.setTransformers(CollectionUtils.singletonList(new StringToByteArray()));
-        UMOEvent event = new MuleEvent(message, endpoint, (UMOSession)session.proxy(), false);
+        endpoint.setTransformers(CollectionUtils.singletonList(new ObjectToByteArray()));
+        UMOEvent event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
         assertTrue(router.isMatch(event));
 
         session.expect("dispatchEvent", C.eq(event));
@@ -103,7 +103,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         messageRouter.route(event);
         session.verify();
 
-        event = new MuleEvent(message, endpoint, (UMOSession)session.proxy(), true);
+        event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), true);
 
         session.expectAndReturn("sendEvent", C.eq(event), message);
         session.expectAndReturn("getComponent", testComponent);
@@ -116,7 +116,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         session.expectAndReturn("toString", "");
         message = new MuleMessage("Hello String");
 
-        event = new MuleEvent(message, endpoint, (UMOSession)session.proxy(), false);
+        event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
         router.setTransformFirst(false);
         assertTrue(!router.isMatch(event));
 

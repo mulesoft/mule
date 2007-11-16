@@ -20,12 +20,12 @@ public class StringByteArrayTransformersTestCase extends AbstractTransformerTest
 
     public UMOTransformer getTransformer() throws Exception
     {
-        return new StringToByteArray();
+        return new ObjectToByteArray();
     }
 
     public UMOTransformer getRoundTripTransformer() throws Exception
     {
-        return new ByteArrayToString();
+        return new ByteArrayToObject();
     }
 
     public Object getTestData()
@@ -49,7 +49,7 @@ public class StringByteArrayTransformersTestCase extends AbstractTransformerTest
         {
             return false;
         }
-        return Arrays.equals((byte[])src, (byte[])result);
+        return Arrays.equals((byte[]) src, (byte[]) result);
     }
 
     // @Override
