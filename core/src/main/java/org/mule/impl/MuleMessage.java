@@ -16,7 +16,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.providers.NullPayload;
-import org.mule.registry.RegistrationException;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
@@ -160,15 +159,7 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
 
         //The transformer to execute on this message
         UMOTransformer transformer = null;
-        try
-        {
-            transformer = RegistryContext.getRegistry().lookupTransformer(inputCls, outputType);
-        }
-        catch (RegistrationException e)
-        {
-            //TODO Maybe the lookupTransformer() method should throw TransformerException
-            throw new TransformerException(CoreMessages.failedToLoad("transformers"), e);
-        }
+        transformer = RegistryContext.getRegistry().lookupTransformer(inputCls, outputType);
 
         //no transformers found
         if (transformer == null)

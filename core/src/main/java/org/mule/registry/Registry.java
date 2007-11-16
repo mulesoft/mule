@@ -94,9 +94,25 @@ public interface Registry extends Initialisable, Disposable
 
     UMOComponent lookupComponent(String component);
 
+    /**
+     * This method will return a list of {@link org.mule.umo.transformer.UMOTransformer} objects that accept the given
+     * input and return the given output type of object
+     *
+     * @param input  The  desiered input type for the transformer
+     * @param output the desired output type for the transformer
+     * @return a list of matching transformers. If there were no matchers an empty list is returned.
+     */
     List lookupTransformers(Class input, Class output);
 
-    UMOTransformer lookupTransformer(Class input, Class output) throws RegistrationException, TransformerException;
+    /**
+     * Will find a transformer that is the closest match to the desired input and output.
+     *
+     * @param input  The  desiered input type for the transformer
+     * @param output the desired output type for the transformer
+     * @return A transformer that exactly matches or the will accept the input and output parameters
+     * @throws TransformerException will be thrown if there is more than one match
+     */
+    UMOTransformer lookupTransformer(Class input, Class output) throws TransformerException;
 
     Collection/*<UMOComponent>*/ lookupComponents(String model);
 

@@ -68,7 +68,8 @@ public abstract class AbstractRegistry implements Registry
     protected transient Log logger = LogFactory.getLog(getClass());
 
     protected UMOLifecycleManager lifecycleManager;
-    protected Map transformerCache = new ConcurrentHashMap(8);
+    protected Map transformerListCache = new ConcurrentHashMap(8);
+    protected Map exactTransformerCache = new ConcurrentHashMap(8);
 
     /** Default Constructor */
     protected AbstractRegistry(String id)
@@ -110,6 +111,9 @@ public abstract class AbstractRegistry implements Registry
 
         try
         {
+            exactTransformerCache.clear();
+            transformerListCache.clear();
+
             doDispose();
             lifecycleManager.firePhase(MuleServer.getManagementContext(), Disposable.PHASE_NAME);
             if (getParent() != null)
@@ -262,11 +266,17 @@ public abstract class AbstractRegistry implements Registry
         return (UMOTransformer) lookupObject(name);
     }
 
-    public UMOTransformer lookupTransformer(Class inputType, Class outputType) throws RegistrationException, TransformerException
+    /** {@inheritDoc} */
+    public UMOTransformer lookupTransformer(Class inputType, Class outputType) throws TransformerException
     {
+        UMOTransformer result = (UMOTransformer) exactTransformerCache.get(inputType.getName() + outputType.getName());
+        if (result != null)
+        {
+            return result;
+        }
         List trans = lookupTransformers(inputType, outputType);
 
-        UMOTransformer result = getNearestTransformerMatch(trans, inputType, outputType);
+        result = getNearestTransformerMatch(trans, inputType, outputType);
         //If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
         //byte[]
         UMOTransformer secondPass = null;
@@ -296,10 +306,15 @@ public abstract class AbstractRegistry implements Registry
                 result = new TransformerCollection(new UMOTransformer[]{result, secondPass});
             }
         }
+
+        if (result != null)
+        {
+            exactTransformerCache.put(inputType.getName() + outputType.getName(), result);
+        }
         return result;
     }
 
-    protected UMOTransformer getNearestTransformerMatch(List trans, Class input, Class output) throws RegistrationException
+    protected UMOTransformer getNearestTransformerMatch(List trans, Class input, Class output) throws TransformerException
     {
         if (trans.size() > 1)
         {
@@ -324,10 +339,8 @@ public abstract class AbstractRegistry implements Registry
                         //We may have two transformers that are exactly the same, in which case we can use either i.e. use the current
                         if (!weighting.getTransformer().getClass().equals(current.getTransformer().getClass()))
                         {
-                            throw new RegistrationException("There is more than one transformer that is an exact match for input: "
-                                    + input + ", output: " + output + ". Transformers are: " + current.getTransformer().getName() +
-                                    "(" + current.getTransformer().getClass() + "), " +
-                                    weighting.getTransformer().getName() + "(" + weighting.getTransformer().getClass() + ")");
+                            throw new TransformerException(CoreMessages.transformHasMultipleMatches(input, output,
+                                    current.getTransformer(), weighting.getTransformer()));
                         }
                     }
                 }
@@ -344,11 +357,10 @@ public abstract class AbstractRegistry implements Registry
         }
     }
 
+    /** {@inheritDoc} */
     public List lookupTransformers(Class input, Class output)
     {
-        // TODO: Optimize & Cache
-
-        List results = (List) transformerCache.get(input.getName() + output.getName());
+        List results = (List) transformerListCache.get(input.getName() + output.getName());
         if (results != null)
         {
             return results;
@@ -378,7 +390,7 @@ public abstract class AbstractRegistry implements Registry
             }
         }
 
-        transformerCache.put(input.getName() + output.getName(), results);
+        transformerListCache.put(input.getName() + output.getName(), results);
         return results;
     }
 
@@ -633,6 +645,19 @@ public abstract class AbstractRegistry implements Registry
     {
         registerTransformer(transformer, MuleServer.getManagementContext());
     }
+
+    public final void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext) throws UMOException
+    {
+        if (transformer instanceof DiscoverableTransformer)
+        {
+            exactTransformerCache.clear();
+            transformerListCache.clear();
+        }
+        doRegisterTransformer(transformer, managementContext);
+
+    }
+
+    protected abstract void doRegisterTransformer(UMOTransformer transformer, UMOManagementContext managementContext) throws UMOException;
 
     /** {@inheritDoc} */
     public void registerModel(UMOModel model) throws UMOException

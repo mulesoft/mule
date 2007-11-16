@@ -71,6 +71,7 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
+import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.BeanUtils;
 import org.mule.util.SpiUtils;
@@ -408,7 +409,7 @@ public class TransientRegistry extends AbstractRegistry
     }
 
     //@java.lang.Override
-    public void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext) throws UMOException
+    protected void doRegisterTransformer(UMOTransformer transformer, UMOManagementContext managementContext) throws UMOException
     {
         //TODO should we always throw an exception if an object already exists
         if (lookupTransformer(transformer.getName()) != null)
@@ -473,6 +474,12 @@ public class TransientRegistry extends AbstractRegistry
     //@java.lang.Override
     public void unregisterTransformer(String transformerName) throws UMOException
     {
+        UMOTransformer transformer = lookupTransformer(transformerName);
+        if (transformer instanceof DiscoverableTransformer)
+        {
+            exactTransformerCache.clear();
+            transformerListCache.clear();
+        }
         unregisterObject(transformerName, UMOTransformer.class);
     }
 

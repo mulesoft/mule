@@ -57,7 +57,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
 
     /**
      * TODO MULE-1908
-     * 
+     *
      * @deprecated Should MultiContainerContext still be used in 2.x? MULE-1908
      */
     protected MultiContainerContext containerContext;
@@ -88,9 +88,9 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
     {
         GenericLifecycleManager lcm = new GenericLifecycleManager();
         lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME,
-            Initialisable.class, Disposable.PHASE_NAME));
+                Initialisable.class, Disposable.PHASE_NAME));
         lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Disposable.PHASE_NAME, Disposable.class,
-            Initialisable.PHASE_NAME));
+                Initialisable.PHASE_NAME));
         return lcm;
     }
 
@@ -99,8 +99,8 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         if (StringUtils.isBlank(key))
         {
             logger.warn(
-                MessageFactory.createStaticMessage("Detected a lookup attempt with an empty or null key"),
-                new Throwable().fillInStackTrace());
+                    MessageFactory.createStaticMessage("Detected a lookup attempt with an empty or null key"),
+                    new Throwable().fillInStackTrace());
             return null;
         }
 
@@ -148,7 +148,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
     }
 
     public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
-        throws ServiceException
+            throws ServiceException
     {
         Properties props = SpiUtils.findServiceDescriptor(type, name);
         if (props == null)
@@ -164,7 +164,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
      */
     protected synchronized MuleConfiguration getLocalConfiguration()
     {
-        return (MuleConfiguration)applicationContext.getBean(MuleProperties.OBJECT_MULE_CONFIGURATION);
+        return (MuleConfiguration) applicationContext.getBean(MuleProperties.OBJECT_MULE_CONFIGURATION);
     }
 
     /** {@inheritDoc} */
@@ -173,7 +173,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         Map m = applicationContext.getBeansOfType(TransactionManager.class);
         if (m.size() > 0)
         {
-            return (TransactionManager)m.values().iterator().next();
+            return (TransactionManager) m.values().iterator().next();
         }
         return null;
     }
@@ -217,7 +217,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
     }
 
     public void registerConnector(UMOConnector connector, UMOManagementContext managementContext)
-        throws UMOException
+            throws UMOException
     {
         unsupportedOperation("registerConnector", connector);
     }
@@ -228,7 +228,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
     }
 
     public void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
-        throws UMOException
+            throws UMOException
     {
         unsupportedOperation("registerEndpoint", endpoint);
     }
@@ -238,8 +238,8 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         unsupportedOperation("unregisterEndpoint", endpointName);
     }
 
-    public void registerTransformer(UMOTransformer transformer, UMOManagementContext managementContext)
-        throws UMOException
+    protected void doRegisterTransformer(UMOTransformer transformer, UMOManagementContext managementContext)
+            throws UMOException
     {
         unsupportedOperation("registerTransformer", transformer);
     }
@@ -251,7 +251,7 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
 
     /** {@inheritDoc} */
     public void registerComponent(UMOComponent component, UMOManagementContext managementContext)
-        throws UMOException
+            throws UMOException
     {
         unsupportedOperation("registerComponent", component);
     }

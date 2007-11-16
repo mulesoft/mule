@@ -19,6 +19,7 @@ import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseRouterCollection;
+import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
@@ -1018,8 +1019,14 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 254, name, origObject + "." + origObject.getClass(), newObject + "." + newObject.getClass());
     }
 
-    public static Message transformerNotImplementDiscoverable(Object transformer)
+    public static Message transformerNotImplementDiscoverable(UMOTransformer transformer)
     {
         return createMessage(BUNDLE_PATH, 255, transformer);
+    }
+
+    public static Message transformHasMultipleMatches(Class input, Class output, UMOTransformer transformer1, UMOTransformer transformer2)
+    {
+        return createMessage(BUNDLE_PATH, 256, new Object[]{input, output, transformer1.getName() + "(" + transformer1.getClass() + ")",
+                transformer2.getName() + "(" + transformer2.getClass() + ")"});
     }
 }
