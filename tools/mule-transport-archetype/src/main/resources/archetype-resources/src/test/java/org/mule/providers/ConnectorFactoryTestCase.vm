@@ -24,12 +24,11 @@ public class ${TransportName}ConnectorFactoryTestCase extends AbstractMuleTestCa
 
     public void testCreateFromFactory() throws Exception
     {
-        MuleEndpointURI url = new MuleEndpointURI(getEndpointURI());
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().createEndpoint(
-                url, UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+                .lookupEndpointFactory().getInboundEndpoint(getEndpointURI(), managementContext);
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
-        assertTrue(endpoint.getConnector() instanceof Test2Connector);
+        assertTrue(endpoint.getConnector() instanceof ${TransportName}Connector);
         assertEquals(getEndpointURI(), endpoint.getEndpointURI().getAddress());
     }
     

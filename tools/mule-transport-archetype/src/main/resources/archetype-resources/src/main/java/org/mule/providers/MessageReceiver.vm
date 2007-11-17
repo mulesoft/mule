@@ -17,7 +17,7 @@ import org.mule.providers.AbstractPollingMessageReceiver;
 import org.mule.providers.AbstractMessageReceiver;
 #end
 import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 
@@ -31,7 +31,7 @@ public class ${TransportName}MessageReceiver extends #if( $isPollingReceiver == 
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
     public ${TransportName}MessageReceiver(UMOConnector connector, UMOComponent component,
-                              UMOEndpoint endpoint)
+                              UMOImmutableEndpoint endpoint)
             throws CreateException
     {
         super(connector, component, endpoint);

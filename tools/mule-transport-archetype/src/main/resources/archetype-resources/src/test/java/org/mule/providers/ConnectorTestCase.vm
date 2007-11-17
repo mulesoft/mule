@@ -26,8 +26,8 @@ public class ${TransportName}ConnectorTestCase extends AbstractConnectorTestCase
         /* IMPLEMENTATION NOTE: Create and initialise an instance of your
            connector here. Do not actually call the connect method. */
 
-        Test2Connector c = new Test2Connector();
-        c.setName("Test-Test2");
+        ${TransportName}Connector c = new ${TransportName}Connector();
+        c.setName("Test");
         // TODO Set any additional properties on the connector here
         return c;
     }

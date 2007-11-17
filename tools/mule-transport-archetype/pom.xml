@@ -90,7 +90,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
-                            <!-- TODO: enable once MULETOOLS-46 is fixed -->
+                            <!-- TODO: enable once maven embedder releaes a new version -->
                             <!--<includes>-->
                             <!--<include>**/*MavenTest.class</include>-->
                             <!--</includes>-->
@@ -99,11 +99,57 @@
                 </executions>
                 <configuration>
                     <excludes>
-                        <!--MULETOOLS-36  -->
+                        <!-- need a new version of MAven embedder  -->
                         <exclude>**/*MavenTest.*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
+            <!-- Attempt to run the plugin and then compile it in way of testing that it works -->
+            <!--<plugin>-->
+            <!--<artifactId>maven-compiler-plugin</artifactId>-->
+            <!--<configuration>-->
+            <!--<debug>true</debug>-->
+            <!--<projectsDirectory>xxx</projectsDirectory>-->
+            <!--<pomIncludes>-->
+            <!--<pomInclude>pom.xml</pomInclude>-->
+            <!--</pomIncludes>-->
+            <!--</configuration>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<id>test</id>-->
+            <!--<phase>test</phase>-->
+            <!--<goals>-->
+            <!--<goal>compile</goal>-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+            <!--<groupId>org.mule.tools</groupId>-->
+            <!--<artifactId>mule-transport-archetype</artifactId>-->
+            <!--<version>2.0.0-RC1-SNAPSHOT</version>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<id>generate</id>-->
+            <!--<phase>test-compile</phase>-->
+            <!--<goals>-->
+            <!--<goal>create</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+            <!--<transportId>xxx</transportId>-->
+            <!--<muleVersion>${version}</muleVersion>-->
+            <!--<interactive>false</interactive>-->
+            <!--</configuration>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--<dependencies>-->
+            <!--<dependency>-->
+            <!--<artifactId>mule-transport-archetype</artifactId>-->
+            <!--<groupId>org.mule.tools</groupId>-->
+            <!--<version>2.0.0-RC1-SNAPSHOT</version>-->
+            <!--</dependency>-->
+            <!--</dependencies>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 </project>
