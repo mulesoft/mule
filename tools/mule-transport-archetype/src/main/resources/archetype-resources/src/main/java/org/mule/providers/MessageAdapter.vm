@@ -26,6 +26,10 @@ public class ${TransportName}MessageAdapter extends AbstractMessageAdapter
     /* IMPLEMENTATION NOTE: The MessageAdapter is used to wrap an underlying
        message. It should store a copy of the underlying message as an
        instance variable. */
+
+    /* IMPLEMENTATION NOTE: If the underlying transport data is available as a stream
+        it is recommended that you pass the stream object into the MessageAdapter as the payload.
+        This will ensure that Mule will use streaming where possible. */
     
     public ${TransportName}MessageAdapter(Object message) throws MessagingException
     {
