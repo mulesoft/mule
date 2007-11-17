@@ -4,11 +4,11 @@
 #set($ModuleNameLower = "${ModuleName.toLowerCase()}")
 #set($MuleVersion = "$muleVersion")
 #set($id = "")
-#set($groupId = "$Package.replaceAll('/', '.')")
-#if($ProjectType == "m")
+#set($groupId = "$package.replaceAll('/', '.')")
+#if($projectType == "m")
   #set($artifactId = "mule-module-${ModuleNameLower}")
   #set($ModuleType = "Module")
-#elseif($ProjectType == "e")
+#elseif($projectType == "e")
   #set($artifactId = "mule-example-${ModuleNameLower}")
   #set($ModuleType = "Example")
 #else
@@ -21,13 +21,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
    <modelVersion>4.0.0</modelVersion>
-   #if($ProjectType == "m")
+   #if($projectType == "m")
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
         <version>${MuleVersion}</version>
     </parent>
-   #elseif($ProjectType == "e")
+   #elseif($projectType == "e")
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
@@ -39,13 +39,13 @@
    <packaging>jar</packaging>
    <name>Mule ${ModuleName} ${ModuleType}</name>
    <version>${version}</version>
-   <description>${ModuleDescription}</description>
+   <description>${description}</description>
 
    <properties>
        <mule.version>${MuleVersion}</mule.version>
    </properties>
 
-#if($ForgeProject == "y")
+#if($forgeProject == "y")
    <!-- Mule Forge Configuration -->
    <issueManagement>
        <system>Jira</system>
@@ -127,7 +127,7 @@
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-surefire-report-plugin</artifactId>
            </plugin>
-#if($ForgeProject == "y")
+#if($forgeProject == "y")
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-checkstyle-plugin</artifactId>

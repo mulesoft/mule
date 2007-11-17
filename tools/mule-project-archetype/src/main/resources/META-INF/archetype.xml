@@ -2,7 +2,7 @@
     <id>maven-archetype-mule-project</id>
     <variables>
         <variable>
-            <name>ModuleDescription</name>
+            <name>description</name>
             <description>Provide a description of what the project does:</description>
         </variable>
         <variable>
@@ -11,19 +11,19 @@
             <defvalue>${muleVersion}</defvalue>
         </variable>
         <variable>
-            <name>Package</name>
+            <name>package</name>
             <description>What is the base Java package path for this module? (i.e. org/mule/modules or
                 org/mule/examples):
             </description>
             <defvalue>org/mule/applications</defvalue>
         </variable>
         <variable>
-            <name>ForgeProject</name>
+            <name>forgeProject</name>
             <description>Will This project be hosted on MuleForge? [y] or [n]</description>
             <defvalue>y</defvalue>
         </variable>
         <variable>
-            <name>ProjectType</name>
+            <name>projectType</name>
             <description>What type of project is this?
                 - [s]tand alone project
                 - [e]xample project that may be hosted on the MuleForge or in the Mule distribution
@@ -32,12 +32,12 @@
             <defvalue>s</defvalue>
         </variable>
         <variable>
-            <name>CustomSchema</name>
+            <name>hasCustomSchema</name>
             <description>Will This project have a custom schema for configuring the module in Xml?</description>
             <defvalue>n</defvalue>
         </variable>
         <variable>
-            <name>Bootstrap</name>
+            <name>hasBootstrap</name>
             <description>Will This project need to make objects available in the Registry as soon as it's loaded?
             </description>
             <defvalue>n</defvalue>
@@ -58,7 +58,7 @@
         <template>
             <file>src/main/java/org/mule/modules/Messages.vm</file>
             <output>
-                src/main/java/${Package}/${ModuleNameLower}/i18n/${ModuleName}Messages.java
+                src/main/java/${package}/${ModuleNameLower}/i18n/${ModuleName}Messages.java
             </output>
         </template>
         <template>
@@ -69,36 +69,36 @@
         <template>
             <file>src/main/resources/META-INF/services/org/mule/config/registry-bootstrap.properties</file>
             <output>src/main/resources/META-INF/services/org/mule/config/registry-bootstrap.properties</output>
-            <dependsOnVar>Bootstrap=y</dependsOnVar>
+            <dependsOnVar>hasBootstrap=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/resources/META-INF/spring.handlers.vm</file>
             <output>src/main/resources/META-INF/spring.handlers</output>
-            <dependsOnVar>CustomSchema=y</dependsOnVar>
+            <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/resources/META-INF/spring.schemas.vm</file>
             <output>src/main/resources/META-INF/spring.schemas</output>
-            <dependsOnVar>CustomSchema=y</dependsOnVar>
+            <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/resources/META-INF/schema.vm</file>
             <output>src/main/resources/META-INF/mule-${ModuleNameLower}.xsd</output>
-            <dependsOnVar>CustomSchema=y</dependsOnVar>
+            <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/main/java/org/mule/modules/config/NamespaceHandler.vm</file>
             <output>
-                src/main/java/${Package}/${ModuleNameLower}/config/${ModuleName}NamespaceHandler.java
+                src/main/java/${package}/${ModuleNameLower}/config/${ModuleName}NamespaceHandler.java
             </output>
-            <dependsOnVar>CustomSchema=y</dependsOnVar>
+            <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
 
         <!-- Test Cases -->
         <template>
             <file>src/test/java/org/mule/modules/FunctionalTestCase.vm</file>
             <output>
-                src/test/java/${Package}/${ModuleNameLower}/${ModuleName}TestCase.java
+                src/test/java/${package}/${ModuleNameLower}/${ModuleName}TestCase.java
             </output>
         </template>
         <template>
@@ -110,16 +110,16 @@
         <template>
             <file>src/test/java/org/mule/modules/NamespaceHandlerTestCase.vm</file>
             <output>
-                src/test/java/${Package}/${ModuleNameLower}/${ModuleName}NamespaceHandlerTestCase.java
+                src/test/java/${package}/${ModuleNameLower}/${ModuleName}NamespaceHandlerTestCase.java
             </output>
-            <dependsOnVar>CustomSchema=y</dependsOnVar>
+            <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
         <template>
             <file>src/test/resources/namespace-config.xml.vm</file>
             <output>
                 src/test/resources/${ModuleNameLower}-namespace-config.xml
             </output>
-            <dependsOnVar>CustomSchema=y</dependsOnVar>
+            <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
     </templates>
 </archetype>

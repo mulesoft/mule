@@ -2,6 +2,6 @@
 <head><title>Mule - ${ModuleName} Module</title>
 </head>
 <body>
-<p>${ModuleDescription}</p>
+<p>${description}</p>
 </body>
 </html>
