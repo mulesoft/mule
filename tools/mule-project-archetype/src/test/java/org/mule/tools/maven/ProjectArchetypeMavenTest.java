@@ -9,8 +9,6 @@
  */
 package org.mule.tools.maven;
 
-import org.mule.util.FileUtils;
-
 import java.io.File;
 import java.util.Collections;
 
@@ -30,7 +28,6 @@ import org.codehaus.plexus.PlexusTestCase;
  * a new project from the archetype and compile it (the most we can probably do is
  * compile to make sure it builds with the correct version of Mule)
  * <p/>
- * TODO eve though maven is holding up this test we still can't perform the test until MULETOOLS-46 is fixed
  */
 public class ProjectArchetypeMavenTest extends PlexusTestCase
 {
@@ -59,12 +56,15 @@ public class ProjectArchetypeMavenTest extends PlexusTestCase
                         new PlexusLoggerAdapter(
                                 new MavenEmbedderConsoleLogger()));
 
-        //mvn mule-transport-archetype:create -DtransportId=test2 -DmuleVersion=2.0-M2-SNAPSHOT
+        //mvn mule-transport-archetype:create -DtransportId=test2 -DmuleVersion=2.0-M2-SNAPSHOT -Dinteractive=false
 
         System.setProperty("artifactId", "xxx");
         System.setProperty("muleVersion", pom.getVersion());
+        System.setProperty("interactive", "false");
 
-        //
+        //Create the project in target so it gets delete on clean
+        System.setProperty("basedir", "./target");
+
         maven.execute(pom,
                 Collections.singletonList(
                         "org.mule.tools:mule-project-archetype:" + pom.getVersion() + ":create"),
@@ -74,12 +74,5 @@ public class ProjectArchetypeMavenTest extends PlexusTestCase
                 itbasedir);
 
         maven.stop();
-    }
-
-    //@java.lang.Override
-    protected void tearDown() throws Exception
-    {
-        FileUtils.deleteTree(new File("xxx"));
-        super.tearDown();
     }
 }

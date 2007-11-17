@@ -9,8 +9,6 @@
  */
 package org.mule.tools.maven;
 
-import org.mule.util.FileUtils;
-
 import java.io.File;
 import java.util.Collections;
 
@@ -63,8 +61,9 @@ public class TransportArchetypeMavenTest extends PlexusTestCase
         System.setProperty("transportId", "xxx");
         System.setProperty("muleVersion", pom.getVersion());
         System.setProperty("interactive", "false");
+        //Create the project in target so it gets delete on clean
+        System.setProperty("basedir", "./target");
 
-        //
         maven.execute(pom,
                 Collections.singletonList(
                         "org.mule.tools:mule-transport-archetype:" + pom.getVersion() + ":create"),
@@ -74,12 +73,5 @@ public class TransportArchetypeMavenTest extends PlexusTestCase
                 itbasedir);
 
         maven.stop();
-    }
-
-    //@java.lang.Override
-    protected void tearDown() throws Exception
-    {
-        FileUtils.deleteTree(new File("xxx"));
-        super.tearDown();
     }
 }
