@@ -77,7 +77,7 @@
                 licenses are violated by uploading dependencies to this location
            -->
            <id>${thransportId}-deps</id>
-           <name>${MUleTransport} Dependencies</name>
+           <name>${TransportName} Dependencies</name>
            <url>http://dist.muleforge.org/${artefactId}/dependencies/maven2</url>
            <snapshots>
                <enabled>false</enabled>
