@@ -212,6 +212,13 @@ public class BobberArchetype
         try
         {
             inInteractiveMode = settingsBuilder.buildSettings().getInteractiveMode().booleanValue();
+            //TODO there must be a cleaner way of doing this
+            String temp = System.getProperty("interactive", null);
+            if (temp != null)
+            {
+                inInteractiveMode = Boolean.valueOf(temp).booleanValue();
+            }
+            getLogger().info("Interactive is: " + inInteractiveMode);
         }
         catch (Exception ie)
         {
@@ -469,14 +476,14 @@ public class BobberArchetype
                 if (var.getVariables() != null)
                 {
                     //keep processing the variables picking up the default values
-                    processVariables(var.getVariables().iterator(), context, false);
+                    processVariables(var.getVariables().iterator(), context, interactiveMode);
 
                 }
             }
             else if (var.getVariables() != null)
             {
                 //keep processing the variables picking up the default values
-                processVariables(var.getVariables().iterator(), context, true);
+                processVariables(var.getVariables().iterator(), context, interactiveMode);
 
             }
         }
