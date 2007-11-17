@@ -15,15 +15,15 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.UMOEventContext;
 
 /**
- * <code>${OutboundTransformer}</code> TODO Document
+ * <code>${outboundTransformer}</code> TODO Document
  */
-public class ${OutboundTransformer} extends AbstractEventAwareTransformer
+public class ${outboundTransformer} extends AbstractEventAwareTransformer
 {
 
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
-    public ${OutboundTransformer}()
+    public ${outboundTransformer}()
     {
         /* IMPLEMENTATION NOTE: Here you can set default types that the
            transformer will accept at runtime.  Mule will then validate the

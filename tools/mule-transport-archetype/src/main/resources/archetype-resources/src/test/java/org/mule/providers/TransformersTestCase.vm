@@ -56,8 +56,8 @@ public class ${TransportName}TransformersTestCase extends AbstractTransformerTes
      */
     public UMOTransformer getTransformer()
     {
-#if( $InboundTransformer != "n")
-        UMOTransformer t = new ${InboundTransformer}();
+#if( $inboundTransformer != "n")
+        UMOTransformer t = new ${inboundTransformer}();
         // Set the correct return class for this roundtrip test
         t.setReturnClass(this.getResultData().getClass());
         return t;
@@ -74,8 +74,8 @@ public class ${TransportName}TransformersTestCase extends AbstractTransformerTes
      */
     public UMOTransformer getRoundTripTransformer()
     {
-#if( $OutboundTransformer != "n")
-        UMOTransformer t = new ${OutboundTransformer}();
+#if( $outboundTransformer != "n")
+        UMOTransformer t = new ${outboundTransformer}();
         // Set the correct return class for this roundtrip test
         t.setReturnClass(this.getTestData().getClass());
         return t;

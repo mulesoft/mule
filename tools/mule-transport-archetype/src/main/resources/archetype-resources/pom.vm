@@ -22,13 +22,13 @@
    <packaging>jar</packaging>
    <name>Mule ${TransportName} Transport</name>
    <version>${version}</version>
-   <description>${TransportDescription}</description>
+   <description>${description}</description>
 
    <properties>
        <mule.version>${MuleVersion}</mule.version>
    </properties>
 
-#if($ForgeProject == "y")
+#if($forgeProject == "y")
    <!-- Mule Forge Configuration -->
    <issueManagement>
        <system>Jira</system>
@@ -110,7 +110,7 @@
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-surefire-report-plugin</artifactId>
            </plugin>
-#if($ForgeProject == "y")
+#if($forgeProject == "y")
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-checkstyle-plugin</artifactId>

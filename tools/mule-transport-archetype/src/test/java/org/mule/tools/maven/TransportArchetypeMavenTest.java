@@ -30,7 +30,6 @@ import org.codehaus.plexus.PlexusTestCase;
  * a new project from the archetype and compile it (the most we can probably do is
  * compile to make sure it builds with the correct version of Mule)
  * <p/>
- * TODO eve though maven is holding up this test we still can't perform the test until MULETOOLS-46 is fixed
  */
 public class TransportArchetypeMavenTest extends PlexusTestCase
 {
@@ -59,10 +58,11 @@ public class TransportArchetypeMavenTest extends PlexusTestCase
                         new PlexusLoggerAdapter(
                                 new MavenEmbedderConsoleLogger()));
 
-        //mvn mule-transport-archetype:create -DtransportId=test2 -DmuleVersion=2.0-M2-SNAPSHOT
+        //mvn mule-transport-archetype:create -DtransportId=test2 -DmuleVersion=2.0-M2-SNAPSHOT -Dinteractive=false
 
         System.setProperty("transportId", "xxx");
         System.setProperty("muleVersion", pom.getVersion());
+        System.setProperty("interactive", "false");
 
         //
         maven.execute(pom,

@@ -15,7 +15,7 @@ message.adapter=org.mule.providers.${TransportNameLower}.${TransportName}Message
 #The message adapter to use if the inbound endpoint is marked for streaming
 streaming.message.adapter=org.mule.providers.${TransportNameLower}.${TransportName}StreamingMessageAdapter
 #end
-#if( $Dispatcher == "y")
+#if( $hasDispatcher == "y")
 
 #The factory used to create dispatchers responsible for sending events from the underlying technology
 dispatcher.factory=org.mule.providers.${TransportNameLower}.${TransportName}MessageDispatcherFactory
@@ -25,20 +25,20 @@ dispatcher.factory=org.mule.providers.${TransportNameLower}.${TransportName}Mess
 #The standard message receiver used to consume events from the underlying technology
 message.receiver=org.mule.providers.${TransportNameLower}.${TransportName}MessageReceiver
 #end
-#if( $Transactions == "y")
+#if( $hasTransactions == "y")
 
 #The message receiver to use if the endpoint is marked as transacted.
 transacted.message.receiver=org.mule.providers.${TransportNameLower}.${TransportName}TransactedMessageReceiver
 #end
 
-#if( $InboundTransformer && $InboundTransformer != "n")
+#if( $inboundTransformer && $inboundTransformer != "n")
 #The Default inbound transformer for this component
-inbound.transformer=org.mule.providers.${TransportNameLower}.transformers.$InboundTransformer
+inbound.transformer=org.mule.providers.${TransportNameLower}.transformers.$inboundTransformer
 #end
-#if( $OutboundTransformer && $OutboundTransformer != "n")
+#if( $outboundTransformer && $outboundTransformer != "n")
 
 #The Default utbound transformer for this component
-outbound.transformer=org.mule.providers.${TransportNameLower}.transformers.$OutboundTransformer
+outbound.transformer=org.mule.providers.${TransportNameLower}.transformers.$outboundTransformer
 #end
 
 #Defines the way in which endpoints for your transport will be constructed
@@ -47,11 +47,11 @@ outbound.transformer=org.mule.providers.${TransportNameLower}.transformers.$Outb
 #org.mule.impl.endpoint.UrlEndpointBuilder i.e. axis:http://localhost:1234/context/Service?params
 #org.mule.impl.endpoint.SocketEndpointBuilder i.e. udp://localhost:2222
 
-#if($EndpointBuilder == "r")
+#if($endpointBuilder == "r")
 endpoint.builder=org.mule.impl.endpoint.ResourceEndpointURIBuilder
-#elseif($EndpointBuilder == "u")
+#elseif($endpointBuilder == "u")
 endpoint.builder=org.mule.impl.endpoint.UrlEndpointURIBuilder
-#elseif($EndpointBuilder == "s")
+#elseif($endpointBuilder == "s")
 endpoint.builder=org.mule.impl.endpoint.SocketEndpointURIBuilder
 #else
 endpoint.builder=org.mule.providers.${TransportNameLower}.${TransportName}EndpointURIBuilder

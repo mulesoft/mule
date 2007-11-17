@@ -15,7 +15,7 @@
     <xsd:element name="connector" type="${TransportNameLower}ConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
-                ${TransportDescription}
+                ${description}
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

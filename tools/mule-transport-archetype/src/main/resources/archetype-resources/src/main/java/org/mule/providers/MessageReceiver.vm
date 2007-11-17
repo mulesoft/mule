@@ -11,7 +11,7 @@
 package org.mule.providers.${TransportNameLower};
 
 import org.mule.providers.ConnectException;
-#if( $PollingMessageReceiver == "y")
+#if( $isPollingReceiver == "y")
 import org.mule.providers.AbstractPollingMessageReceiver;
 #else
 import org.mule.providers.AbstractMessageReceiver;
@@ -24,7 +24,7 @@ import org.mule.umo.provider.UMOConnector;
 /**
  * <code>${TransportName}MessageReceiver</code> TODO document
  */
-public class ${TransportName}MessageReceiver extends #if( $PollingMessageReceiver == "y") AbstractPollingMessageReceiver #else AbstractMessageReceiver #end
+public class ${TransportName}MessageReceiver extends #if( $isPollingReceiver == "y") AbstractPollingMessageReceiver #else AbstractMessageReceiver #end
 {
 
     /* For general guidelines on writing transports see
@@ -111,7 +111,7 @@ public class ${TransportName}MessageReceiver extends #if( $PollingMessageReceive
            methods will be called implicitly when this method is called. */
     }
 
-#if( $PollingMessageReceiver == "y")
+#if( $isPollingReceiver == "y")
     public void poll() throws Exception
     {
         /* IMPLEMENTATION NOTE: Once you have read the object it can be passed

@@ -2,6 +2,6 @@
 <head><title>Mule - ${TransportName} Transport</title>
 </head>
 <body>
-<p>${TransportDescription}</p>
+<p>${description}</p>
 </body>
 </html>
