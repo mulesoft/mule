@@ -10,22 +10,39 @@
 
 package org.mule.issues;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.extras.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
-public class ResponseTransformerMule2165TestCase  extends FunctionalTestCase
+public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
 {
 
     public static final long TIMEOUT = 1000L;
     public static final String MESSAGE = "a message";
     // i don't know if this is the "correct" response - it's *one* of the responses in 1.4,
     // and it seems vaguely reasonable.
-    public static final String LOCAL_RESPONSE = MESSAGE + " outbound outbound inbound response";
+
+    /* RM
+    Described as:
+    1. Client dispatch = "outbound"
+    2. Compoennt receiver = "inbound"
+    3. Response from Component = "response"
+    Note that because the response transformer is configured locally on the outbound endppoint it only gets called once
+    */
+    public static final String LOCAL_RESPONSE = MESSAGE + " outbound inbound response";
     // an alternative in 1.4 is " outbound outbound response response" for the global
     // transformers, which also makes some sense
-    public static final String GLOBAL_RESPONSE = MESSAGE + " outbound outbound response response";
+    /* RM
+    Described as:
+    1. Client dispatch = "outbound"
+    2. Compoennt receiver = "inbound"
+    3. Response from Component = "response"
+    4. Response from outbound endpoint (to the component) = "response"
+    Note that because the global outbound inpoint is also the inbound endpoint of the bounce component
+    The "response" ResponseTransformer gets called twice
+    */
+    public static final String GLOBAL_RESPONSE = MESSAGE + " outbound inbound response response";
 
     protected String getConfigResources()
     {
@@ -35,7 +52,7 @@ public class ResponseTransformerMule2165TestCase  extends FunctionalTestCase
     protected MuleClient send(String endpoint) throws UMOException
     {
         MuleClient client = new MuleClient();
-        client.dispatch(endpoint, MESSAGE, null);
+        client.sendNoReceive(endpoint, MESSAGE, null);
         return client;
     }
 

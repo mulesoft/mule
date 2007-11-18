@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
@@ -20,17 +20,24 @@
         <spring:property name="message" value=" response"/>
     </custom-transformer>
 
-    <vm:endpoint name="in-global-name-global-transformer" path="in-global-name-global-transformer" connector-ref="default"/>
-    <vm:endpoint name="out-global-name-global-transformer" path="out-global-name-global-transformer" connector-ref="queue"/>
-    <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer" connector-ref="default" responseTransformer-ref="response" synchronous="true"/>
+    <vm:endpoint name="in-global-name-global-transformer" path="in-global-name-global-transformer"
+                 connector-ref="default"/>
+    <vm:endpoint name="out-global-name-global-transformer" path="out-global-name-global-transformer"
+                 connector-ref="queue"/>
+    <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer" connector-ref="default"
+                 responseTransformer-ref="response" synchronous="true"/>
 
     <vm:endpoint name="in-global-name-url-transformer" path="in-global-name-url-transformer" connector-ref="default"/>
     <vm:endpoint name="out-global-name-url-transformer" path="out-global-name-url-transformer" connector-ref="queue"/>
-    <vm:endpoint name="global-name-url-transformer" path="global-name-url-transformer?responseTransformers=response" connector-ref="default" synchronous="true"/>
+    <vm:endpoint name="global-name-url-transformer" path="global-name-url-transformer?responseTransformers=response"
+                 connector-ref="default" synchronous="true"/>
 
-    <vm:endpoint name="in-global-name-local-transformer" path="in-global-name-local-transformer" connector-ref="default"/>
-    <vm:endpoint name="out-global-name-local-transformer" path="out-global-name-local-transformer" connector-ref="queue"/>
-    <vm:endpoint name="global-name-local-transformer" path="global-name-local-transformer" connector-ref="default" synchronous="true"/>
+    <vm:endpoint name="in-global-name-local-transformer" path="in-global-name-local-transformer"
+                 connector-ref="default"/>
+    <vm:endpoint name="out-global-name-local-transformer" path="out-global-name-local-transformer"
+                 connector-ref="queue"/>
+    <vm:endpoint name="global-name-local-transformer" path="global-name-local-transformer" connector-ref="default"
+                 synchronous="true"/>
 
     <vm:endpoint name="in-local-name-local-transformer" path="in-local-name-local-transformer" connector-ref="default"/>
     <vm:endpoint name="out-local-name-local-transformer" path="out-local-name-local-transformer" connector-ref="queue"/>
@@ -41,7 +48,7 @@
     <model name="response transformer tests">
 
         <service name="gngt">
-            <bridge-component/>
+            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="in-global-name-global-transformer"/>
             </inbound-router>
@@ -61,7 +68,7 @@
         </service>
 
         <service name="gnut">
-            <bridge-component/>
+            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="in-global-name-url-transformer"/>
             </inbound-router>
@@ -81,7 +88,7 @@
         </service>
 
         <service name="gnlt">
-            <bridge-component/>
+            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="in-global-name-local-transformer"/>
             </inbound-router>
@@ -101,13 +108,14 @@
         </service>
 
         <service name="lnlt">
-            <bridge-component/>
+            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="in-local-name-local-transformer"/>
             </inbound-router>
             <outbound-router>
                 <chaining-router>
-                    <vm:outbound-endpoint path="local-name-local-transformer" responseTransformer-ref="response" synchronous="true" connector-ref="default"/>
+                    <vm:outbound-endpoint path="local-name-local-transformer" responseTransformer-ref="response"
+                                          synchronous="true" connector-ref="default"/>
                     <outbound-endpoint ref="out-local-name-local-transformer"/>
                 </chaining-router>
             </outbound-router>
@@ -121,13 +129,14 @@
         </service>
 
         <service name="lnut">
-            <bridge-component/>
+            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="in-local-name-url-transformer"/>
             </inbound-router>
             <outbound-router>
                 <chaining-router>
-                    <vm:outbound-endpoint path="local-name-url-transformer?responseTransformers=response" synchronous="true" connector-ref="default"/>
+                    <vm:outbound-endpoint path="local-name-url-transformer?responseTransformers=response"
+                                          synchronous="true" connector-ref="default"/>
                     <outbound-endpoint ref="out-local-name-url-transformer"/>
                 </chaining-router>
             </outbound-router>
