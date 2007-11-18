@@ -504,6 +504,7 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
             originalAdapter.release();
         }
         cache = null;
+        appliedTransformerHashCodes.clear();
     }
 
     /** {@inheritDoc} */
