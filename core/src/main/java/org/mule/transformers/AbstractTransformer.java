@@ -254,12 +254,6 @@ public abstract class AbstractTransformer implements UMOTransformer
         }
 
         Object result;
-//        if(src instanceof UMOMessage && this instanceof AbstractMessageAwareTransformer)
-//        {
-//            result = ((AbstractMessageAwareTransformer)this).transform((UMOMessage)src, encoding);
-//        }
-//        else
-//        {
         result = doTransform(payload, encoding);
         // }
         if (result == null)
