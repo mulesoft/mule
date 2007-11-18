@@ -2,8 +2,6 @@
 # Test cases listed in this file are not run.
 #
 
-org.mule.issues.PropertyScribblingMule893TestCase
-
 # MULE-2474
 org.mule.issues.MessageChunkingMule2192TestCase
 
