@@ -12,6 +12,7 @@ package org.mule.providers.vm;
 
 import org.mule.MuleException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.TransactedPollingMessageReceiver;
 import org.mule.transaction.TransactionCoordination;
@@ -20,7 +21,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
@@ -85,6 +85,10 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
      */
     public void onEvent(UMOEvent event) throws UMOException
     {
+        //Rewrite the event to treat it as a new event        
+        event = new MuleEvent(new MuleMessage(event.getMessage().getPayload(), event.getMessage()),
+                endpoint, component, event);
+
         if (connector.isQueueEvents())
         {
             QueueSession queueSession = connector.getQueueSession();
@@ -101,7 +105,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
         else
         {
-            UMOMessage msg = new MuleMessage(event.getTransformedMessage(), event.getMessage());
+            UMOMessage msg = event.getMessage();
             synchronized (lock)
             {
                 routeMessage(msg);
@@ -111,8 +115,12 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
     public Object onCall(UMOEvent event) throws UMOException
     {
+        //Rewrite the event to treat it as a new event
+        event = new MuleEvent(new MuleMessage(event.getMessage().getPayload(), event.getMessage()),
+                endpoint, component, event);
+
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        if(tx==null)
+        if (tx == null)
         {
             return routeMessage(event.getMessage(), event.isSynchronous());
         }
@@ -129,7 +137,9 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         UMOEvent event = (UMOEvent) queue.poll(connector.getQueueTimeout());
         if (event != null)
         {
-            routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()));
+            //Rewrite the message to treat it as a new message
+            UMOMessage msg = new MuleMessage(new MuleMessage(event.getMessage().getPayload(), event.getMessage()));
+            routeMessage(msg);
         }
         return null;
     }

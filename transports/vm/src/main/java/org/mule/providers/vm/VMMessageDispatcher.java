@@ -13,7 +13,6 @@ package org.mule.providers.vm;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.vm.i18n.VMMessages;
-import org.mule.transformers.simple.ObjectToByteArray;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -34,16 +33,16 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     public VMMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
-        this.connector = (VMConnector)endpoint.getConnector();
+        this.connector = (VMConnector) endpoint.getConnector();
     }
 
     /**
      * Make a specific request to the underlying transport
-     * 
+     *
      * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
+     *                The call should return immediately if there is data available. If
+     *                no data becomes available before the timeout elapses, null will be
+     *                returned
      * @return the result of the request wrapped in a UMOMessage object. Null will be
      *         returned if no data was available
      * @throws Exception if the call to the underlying protocol causes an exception
@@ -77,7 +76,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
                 }
                 try
                 {
-                    event = (UMOEvent)queue.poll(timeout);
+                    event = (UMOEvent) queue.poll(timeout);
                 }
                 catch (InterruptedException e)
                 {
@@ -110,17 +109,13 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     protected void doDispatch(UMOEvent event) throws Exception
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-
-        // because this is vm th emessage will not be serialized, even though it will
-        // be passed to a new thread.  so we need to generate a new copy of the message
-        // at this point
-        //event = event.newCopy();
-        // doesn't help needs to be later?
+        //Apply any outbound transformers on this event before we dispatch
+        event.getTransformedMessage();
 
         if (endpointUri == null)
         {
             throw new DispatchException(
-                CoreMessages.objectIsNull("Endpoint"), event.getMessage(), event.getEndpoint());
+                    CoreMessages.objectIsNull("Endpoint"), event.getMessage(), event.getEndpoint());
         }
         if (connector.isQueueEvents())
         {
@@ -136,6 +131,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
                 logger.warn("No receiver for endpointUri: " + event.getEndpoint().getEndpointURI());
                 return;
             }
+
             receiver.onEvent(event);
         }
         if (logger.isDebugEnabled())
@@ -158,8 +154,8 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Writing to queue as there is no receiver on connector: "
-                                 + connector.getName() + ", for endpointUri: "
-                                 + event.getEndpoint().getEndpointURI());
+                            + connector.getName() + ", for endpointUri: "
+                            + event.getEndpoint().getEndpointURI());
                 }
                 doDispatch(event);
                 return null;
@@ -167,12 +163,12 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             else
             {
                 throw new NoReceiverForEndpointException(
-                    VMMessages.noReceiverForEndpoint(connector.getName(), 
-                        event.getEndpoint().getEndpointURI()));
+                        VMMessages.noReceiverForEndpoint(connector.getName(),
+                                event.getEndpoint().getEndpointURI()));
             }
         }
 
-        retMessage = (UMOMessage)receiver.onCall(event);
+        retMessage = (UMOMessage) receiver.onCall(event);
 
         if (logger.isDebugEnabled())
         {
@@ -192,7 +188,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         {
             // use the default queue profile to configure this queue.
             connector.getQueueProfile().configureQueue(
-                endpoint.getEndpointURI().getAddress(), connector.getManagementContext().getQueueManager());
+                    endpoint.getEndpointURI().getAddress(), connector.getManagementContext().getQueueManager());
         }
     }
 
