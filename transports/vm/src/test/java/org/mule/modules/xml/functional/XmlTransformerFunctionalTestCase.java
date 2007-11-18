@@ -23,8 +23,8 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
     public static final String SIMPLE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<parent><child name=\"poot\"/></parent>";
     public static final String CHILDLESS_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<parent/>";
     public static final String SERIALIZED = "<org.mule.modules.xml.functional.XmlTransformerFunctionalTestCase_-Parent>\n" +
-                    "  <child/>\n" +
-                    "</org.mule.modules.xml.functional.XmlTransformerFunctionalTestCase_-Parent>";
+            "  <child/>\n" +
+            "</org.mule.modules.xml.functional.XmlTransformerFunctionalTestCase_-Parent>";
 
     protected String getConfigResources()
     {
@@ -87,6 +87,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
     public void testObjectXmlOut() throws Exception
     {
         String xml = (String) receive(sendObject(), "object-xml-out", String.class);
+        System.out.println(xml);
         XMLAssert.assertXMLEqual(SERIALIZED, xml);
     }
 

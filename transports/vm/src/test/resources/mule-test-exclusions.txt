@@ -17,3 +17,6 @@ org.mule.issues.MulticastRouterMule2136TestCase
 # MULE-2620
 org.mule.modules.xml.functional.BeanPropertyExtractorMultipleEndpointsTestCase
 org.mule.modules.xml.functional.BeanPropertyExtractorTestCase
+
+#MULE-2703
+org.mule.modules.xml.functional.XmlTransformerFunctionalTestCase
