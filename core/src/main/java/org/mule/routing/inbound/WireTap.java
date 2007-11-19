@@ -10,11 +10,16 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.RegistryContext;
+import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleSession;
+import org.mule.impl.NullSessionHandler;
+import org.mule.impl.RequestContext;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.DispatchException;
 
 /**
  * An inbound router that can forward every message to another destination as defined
@@ -24,12 +29,11 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
  */
 public class WireTap extends SelectiveConsumer
 {
-    private volatile String endpoint;
     private volatile UMOImmutableEndpoint tap;
 
     public boolean isMatch(UMOEvent event) throws MessagingException
     {
-        if (endpoint != null)
+        if (tap != null)
         {
             return super.isMatch(event);
         }
@@ -42,31 +46,32 @@ public class WireTap extends SelectiveConsumer
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
+        RequestContext.setEvent(null);
         try
         {
-            event.getSession().dispatchEvent(event.getMessage(), tap);
+            //We have to create a new session for this dispatch, since the session may get altered
+            //using this call, changing the behaviour of the request
+            UMOSession session = new MuleSession(event.getMessage(), new NullSessionHandler());
+            tap.dispatch(new MuleEvent(event.getMessage(), tap, session, false));
+        }
+        catch (MessagingException e)
+        {
+            throw e;
         }
         catch (UMOException e)
         {
-            // TODO MULE-863: What should we really do?
-            logger.error(e.getMessage(), e);
+            throw new DispatchException(event.getMessage(), tap, e);
         }
         return super.process(event);
     }
 
-    public String getEndpoint()
+    public UMOImmutableEndpoint getEndpoint()
     {
-        return endpoint;
+        return tap;
     }
 
-    public void setEndpoint(String endpoint) throws UMOException
+    public void setEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        this.endpoint = endpoint;
-        if (this.endpoint != null)
-        {
-            tap = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(this.endpoint,
-                getManagementContext());
-        }
+        this.tap = endpoint;
     }
-
 }

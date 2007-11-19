@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <model name="main">
-       <service name="Receiver">
-           <component class="org.mule.tck.functional.FunctionalTestComponent"/>
-           <inbound-router>
-               <inbound-endpoint address="vm://inbound.channel"/>
-               <wire-tap-router>
-                   <inbound-endpoint address="vm://tapped.channel"/>
-               </wire-tap-router>
-           </inbound-router>
+        <service name="Receiver">
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="vm://inbound.channel"/>
+                <wire-tap-router>
+                    <outbound-endpoint address="vm://tapped.channel"/>
+                </wire-tap-router>
+            </inbound-router>
         </service>
 
-       <service name="TappedReceiver">
-           <component class="org.mule.tck.functional.FunctionalTestComponent"/>
-           <inbound-router>
-               <inbound-endpoint address="vm://tapped.channel"/>
-           </inbound-router>
+        <service name="TappedReceiver">
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <inbound-router>
+                <inbound-endpoint address="vm://tapped.channel"/>
+            </inbound-router>
         </service>
     </model>
 </mule>

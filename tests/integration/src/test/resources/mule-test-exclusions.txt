@@ -60,8 +60,6 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # Need to finish implementation of <static-recipient-list-router>
 org.mule.test.integration.routing.AggregatorIntegrationTestCase
 
-# Need to finish implementation of <wire-tap-router>
-org.mule.test.integration.routing.WireTapTestCase
 
 # Message chunking router not working?
 org.mule.test.integration.routing.MessageChunkingTestCase
