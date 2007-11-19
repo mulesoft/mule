@@ -24,6 +24,8 @@ import org.jivesoftware.smack.XMPPException;
  */
 public class XmppConnector extends AbstractConnector
 {
+
+    public static final String XMPP = "xmpp";
     public static final String XMPP_PROPERTY_PREFIX = "";
     public static final String XMPP_SUBJECT = XMPP_PROPERTY_PREFIX + "subject";
     public static final String XMPP_THREAD = XMPP_PROPERTY_PREFIX + "thread";
@@ -65,7 +67,7 @@ public class XmppConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "xmpp";
+        return XMPP;
     }
 
     public XMPPConnection createXmppConnection(UMOEndpointURI endpointURI) throws XMPPException

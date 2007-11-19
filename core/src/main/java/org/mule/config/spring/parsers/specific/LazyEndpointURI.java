@@ -56,6 +56,7 @@ public class LazyEndpointURI implements UMOEndpointURI
     public static final String[] HOST_ATTRIBUTES = new String[]{HOST};
     public static final String[] SOCKET_ATTRIBUTES = new String[]{HOST, PORT};
     public static final String[] USERHOST_ATTRIBUTES = new String[]{USER, HOST};
+    public static final String[] TRANSPORT_ATTRIBUTES = new String[]{USER, PASSWORD, HOST, ADDRESS, PORT, PATH};
 
     private String address;
     private String meta;

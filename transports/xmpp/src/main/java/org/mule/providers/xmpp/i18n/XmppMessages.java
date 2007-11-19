@@ -12,10 +12,11 @@ package org.mule.providers.xmpp.i18n;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.providers.xmpp.XmppConnector;
 
 public class XmppMessages extends MessageFactory
 {
-    private static final String BUNDLE_PATH = getBundlePath("xmpp");
+    private static final String BUNDLE_PATH = getBundlePath(XmppConnector.XMPP);
 
     public static Message noRecipientInUri()
     {
