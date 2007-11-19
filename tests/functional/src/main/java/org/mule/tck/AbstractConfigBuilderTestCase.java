@@ -119,6 +119,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
             fail(e.getMessage());
         }
         assertNotNull(endpoint);
+        assertEquals("UTF-8-TEST", endpoint.getEncoding());
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
         UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent2");

@@ -67,7 +67,7 @@
         </mule:endpoint>
         <!-- cannot have aliases -->
         <!-- mule:endpoint name="waterMelonEndpoint" ref="TestQueue"/ -->
-        <mule:endpoint name="waterMelonEndpoint" address="test://test.queue"/>
+        <mule:endpoint name="waterMelonEndpoint" address="test://test.queue" encoding="UTF-8-TEST"/>
         <mule:endpoint name="appleInEndpoint" address="test://AppleQueue"/>
         <mule:endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue"/>
         <mule:endpoint name="orangeEndpoint" address="test://orangeQ">

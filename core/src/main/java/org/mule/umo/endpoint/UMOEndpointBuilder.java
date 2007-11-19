@@ -90,7 +90,7 @@ public interface UMOEndpointBuilder extends ManagementContextAware, Cloneable
 
     void setInitialState(String initialState);
 
-    void setEndpointEncoding(String endpointEncoding);
+    void setEncoding(String encoding);
 
     void setCreateConnector(int createConnector);
 

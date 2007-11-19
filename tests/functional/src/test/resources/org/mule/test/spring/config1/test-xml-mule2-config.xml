@@ -57,7 +57,7 @@
             <mxml:namespace prefix="bar" uri="http://bar.com"/>
         </mxml:jxpath-filter>
     </endpoint>
-    <endpoint name="waterMelonEndpoint" address="test://test.queue"/>
+    <endpoint name="waterMelonEndpoint" address="test://test.queue" encoding="UTF-8-TEST"/>
     <endpoint name="appleInEndpoint" address="test://AppleQueue"/>
     <endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue"/>
     <endpoint name="orangeEndpoint" address="test://orangeQ">

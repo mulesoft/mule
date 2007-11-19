@@ -51,7 +51,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
     {
         setName(source.getName());
         setEndpointURI(source.getEndpointURI());
-        setEndpointEncoding(source.getEncoding());
+        setEncoding(source.getEncoding());
         setConnector(source.getConnector());
         setTransformers(source.getTransformers());
         setResponseTransformers(source.getResponseTransformers());

@@ -77,7 +77,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     protected Integer remoteSyncTimeout;
     protected Boolean streaming;
     protected String initialState = UMOImmutableEndpoint.INITIAL_STATE_STARTED;
-    protected String endpointEncoding;
+    protected String encoding;
     protected Integer createConnector;
     protected String registryId = null;
     protected UMOManagementContext managementContext;
@@ -291,7 +291,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected String getEndpointEncoding(UMOConnector connector)
     {
-        return endpointEncoding != null ? endpointEncoding : getDefaultEndpointEncoding(connector);
+        return encoding != null ? encoding : getDefaultEndpointEncoding(connector);
     }
 
     protected String getDefaultEndpointEncoding(UMOConnector connector)
@@ -636,9 +636,9 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     }
 
-    public void setEndpointEncoding(String endpointEncoding)
+    public void setEncoding(String encoding)
     {
-        this.endpointEncoding = endpointEncoding;
+        this.encoding = encoding;
 
     }
 
@@ -685,7 +685,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         result = prime * result + ((connector == null) ? 0 : connector.hashCode());
         result = prime * result + ((createConnector == null) ? 0 : createConnector.hashCode());
         result = prime * result + ((deleteUnacceptedMessages == null) ? 0 : deleteUnacceptedMessages.hashCode());
-        result = prime * result + ((endpointEncoding == null) ? 0 : endpointEncoding.hashCode());
+        result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
         result = prime * result + ((endpointURI == null) ? 0 : endpointURI.hashCode());
         result = prime * result + ((filter == null) ? 0 : filter.hashCode());
         result = prime * result + ((initialState == null) ? 0 : initialState.hashCode());
@@ -728,11 +728,11 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
             if (other.deleteUnacceptedMessages != null) return false;
         }
         else if (!deleteUnacceptedMessages.equals(other.deleteUnacceptedMessages)) return false;
-        if (endpointEncoding == null)
+        if (encoding == null)
         {
-            if (other.endpointEncoding != null) return false;
+            if (other.encoding != null) return false;
         }
-        else if (!endpointEncoding.equals(other.endpointEncoding)) return false;
+        else if (!encoding.equals(other.encoding)) return false;
         if (endpointURI == null)
         {
             if (other.endpointURI != null) return false;
@@ -814,7 +814,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         builder.setFilter(filter);
         builder.setSecurityFilter(securityFilter);
         builder.setInitialState(initialState);
-        builder.setEndpointEncoding(endpointEncoding);
+        builder.setEncoding(encoding);
         builder.setRegistryId(registryId);
         builder.setManagementContext(managementContext);
         builder.setConnectionStrategy(connectionStrategy);

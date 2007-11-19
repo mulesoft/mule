@@ -20,6 +20,7 @@ import org.mule.tck.testmodels.mule.TestOutboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseTransformer;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.ObjectNameHelper;
@@ -94,7 +95,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         }
     }
 
-    protected void testDefaultCommonEndpointAttributes(UMOImmutableEndpoint ep)
+    public void testDefaultCommonEndpointAttributes(UMOImmutableEndpoint ep)
     {
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
         assertEquals(managementContext.getRegistry().getConfiguration().getDefaultSynchronousEventTimeout(),
@@ -113,5 +114,13 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertEquals(null, ep.getFilter());
         assertEquals(UMOImmutableEndpoint.INITIAL_STATE_STARTED, ep.getInitialState());
     }
-
+    
+    public void testHasSetEncodingMethod() throws EndpointException, SecurityException, NoSuchMethodException
+    {
+        String uri = "test://address";
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri,
+            MuleServer.getManagementContext());
+        assertNotNull(endpointBuilder.getClass().getMethod("setEncoding", new Class[]{String.class}));
+    }
+    
 }
