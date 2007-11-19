@@ -29,7 +29,7 @@ public class EndpointUtils
     public static final String CONNECTOR_ATTRIBUTE = "connector";
     public static final String TRANSFORMERS_ATTRIBUTE = "transformers";
     public static final String RESPONSE_TRANSFORMERS_ATTRIBUTE = "responseTransformers";
-    public static final String ENDPOINT_URI_ATTRIBUTE = "endpointURI";
+    public static final String URI_BUILDER_ATTRIBUTE = "URIBuilder";
     public static final String ADDRESS_ATTRIBUTE = "address";
 
     private static void processTransformerDependencies(BeanAssembler assembler, Element element, String attributeName)
@@ -68,7 +68,7 @@ public class EndpointUtils
 
     public static void addProperties(MuleDefinitionParser parser)
     {
-        parser.addAlias(ADDRESS_ATTRIBUTE, ENDPOINT_URI_ATTRIBUTE);
+        parser.addAlias(ADDRESS_ATTRIBUTE, URI_BUILDER_ATTRIBUTE);
         parser.addMapping("createConnector", "GET_OR_CREATE=0,ALWAYS_CREATE=1,NEVER_CREATE=2");
     }
 

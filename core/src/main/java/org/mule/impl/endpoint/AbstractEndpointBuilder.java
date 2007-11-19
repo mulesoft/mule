@@ -14,6 +14,7 @@ import org.mule.MuleException;
 import org.mule.RegistryContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.ConnectionStrategy;
@@ -62,8 +63,8 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     public static final int NEVER_CREATE_CONNECTOR = 2;
     public static final int USE_CONNECTOR = 3;
 
+    protected URIBuilder uriBuilder;
     protected UMOConnector connector;
-    protected UMOEndpointURI endpointURI;
     protected List transformers = TransformerUtils.UNDEFINED;
     protected List responseTransformers = TransformerUtils.UNDEFINED;
     protected String name;
@@ -101,6 +102,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     protected void configureEndpoint(MuleEndpoint ep) throws InitialisationException, EndpointException
     {
         // protected String registryId = null; ??
+        UMOEndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
         ep.setEndpointURI(endpointURI);
         ep.setCreateConnector(getCreateConnector());
@@ -214,7 +216,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected UMOConnector getDefaultConnector() throws EndpointException
     {
-        return getConnector(endpointURI, managementContext);
+        return getConnector(uriBuilder.getEndpoint(), managementContext);
     }
 
     protected int getCreateConnector()
@@ -225,7 +227,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         }
         else
         {
-            return endpointURI.getCreateConnector();
+            return uriBuilder.getEndpoint().getCreateConnector();
         }
     }
 
@@ -236,7 +238,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected String getName(UMOImmutableEndpoint endpoint)
     {
-        String uriName = endpointURI.getEndpointName();
+        String uriName = uriBuilder.getEndpoint().getEndpointName();
         return name != null ? name :
                 (StringUtils.isNotEmpty(uriName) ? uriName : ObjectNameHelper.getEndpointName(endpoint));
     }
@@ -249,8 +251,9 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         {
             props.putAll(properties);
         }
-        if (endpointURI.getParams() != null)
+        if (null != uriBuilder)
         {
+            UMOEndpointURI endpointURI = uriBuilder.getEndpoint();
             props.putAll(endpointURI.getParams());
         }
         props = Collections.unmodifiableMap(props);
@@ -364,7 +367,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         try
         {
             return TransformerUtils.getDefaultInboundTransformers(getNonNullServiceDescriptor(
-                endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
+                uriBuilder.getEndpoint().getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -397,7 +400,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         try
         {
             return TransformerUtils.getDefaultOutboundTransformers(getNonNullServiceDescriptor(
-                endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
+                uriBuilder.getEndpoint().getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -430,7 +433,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         try
         {
             return TransformerUtils.getDefaultResponseTransformers(getNonNullServiceDescriptor(
-                endpointURI.getSchemeMetaInfo(), getOverrides(connector)));
+                uriBuilder.getEndpoint().getSchemeMetaInfo(), getOverrides(connector)));
         }
         catch (Exception e)
         {
@@ -483,7 +486,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     private UMOConnector getConnector(UMOEndpointURI endpointURI, UMOManagementContext managementContext)
         throws EndpointException
     {
-        String scheme = endpointURI.getFullScheme();
+        String scheme = uriBuilder.getEndpoint().getFullScheme();
         UMOConnector connector;
         try
         {
@@ -497,13 +500,13 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
             {
                 connector = TransportFactory.getConnectorByProtocol(scheme);
             }
-            else if (endpointURI.getConnectorName() != null)
+            else if (uriBuilder.getEndpoint().getConnectorName() != null)
             {
-                connector = managementContext.getRegistry().lookupConnector(endpointURI.getConnectorName());
+                connector = managementContext.getRegistry().lookupConnector(uriBuilder.getEndpoint().getConnectorName());
                 if (connector == null)
                 {
                     throw new TransportFactoryException(CoreMessages.objectNotRegistered("Connector",
-                        endpointURI.getConnectorName()));
+                        uriBuilder.getEndpoint().getConnectorName()));
                 }
             }
             else
@@ -666,14 +669,14 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     }
 
-    public UMOEndpointURI getEndpointURI()
+    public URIBuilder getEndpointBuilder()
     {
-        return endpointURI;
+        return uriBuilder;
     }
 
-    public void setEndpointURI(UMOEndpointURI endpointURI)
+    public void setURIBuilder(URIBuilder URIBuilder)
     {
-        this.endpointURI = endpointURI;
+        this.uriBuilder = URIBuilder;
 
     }
     
@@ -686,7 +689,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         result = prime * result + ((createConnector == null) ? 0 : createConnector.hashCode());
         result = prime * result + ((deleteUnacceptedMessages == null) ? 0 : deleteUnacceptedMessages.hashCode());
         result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
-        result = prime * result + ((endpointURI == null) ? 0 : endpointURI.hashCode());
+        result = prime * result + ((uriBuilder == null) ? 0 : uriBuilder.getEndpoint().hashCode());
         result = prime * result + ((filter == null) ? 0 : filter.hashCode());
         result = prime * result + ((initialState == null) ? 0 : initialState.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
@@ -733,11 +736,12 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
             if (other.encoding != null) return false;
         }
         else if (!encoding.equals(other.encoding)) return false;
-        if (endpointURI == null)
+        if (uriBuilder == null)
         {
-            if (other.endpointURI != null) return false;
+            if (other.uriBuilder != null) return false;
         }
-        else if (!endpointURI.equals(other.endpointURI)) return false;
+        else if (null == other.uriBuilder) return false;
+        else if (!uriBuilder.getEndpoint().equals(other.uriBuilder.getEndpoint())) return false;
         if (filter == null)
         {
             if (other.filter != null) return false;
@@ -805,7 +809,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     {
         UMOEndpointBuilder builder = (UMOEndpointBuilder) super.clone();
         builder.setConnector(connector);
-        builder.setEndpointURI(endpointURI);
+        builder.setURIBuilder(uriBuilder);
         builder.setTransformers(transformers);
         builder.setResponseTransformers(responseTransformers);
         builder.setName(name);

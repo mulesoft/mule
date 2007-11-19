@@ -11,7 +11,7 @@
 package org.mule.config.spring.parsers.specific.endpoint.support;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.specific.LazyEndpointURI;
+import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.config.spring.parsers.processors.AddAttribute;
 
 /**
@@ -30,10 +30,11 @@ public class ChildAddressDefinitionParser extends ChildDefinitionParser
 
     public ChildAddressDefinitionParser(String metaOrProtocol, boolean isMeta)
     {
-        super(EndpointUtils.ENDPOINT_URI_ATTRIBUTE, LazyEndpointURI.class);
-        registerPreProcessor(new AddAttribute(
-                isMeta ? LazyEndpointURI.META : LazyEndpointURI.PROTOCOL,
-                metaOrProtocol));
+        super(EndpointUtils.URI_BUILDER_ATTRIBUTE, URIBuilder.class);
+        registerPreProcessor(
+                new AddAttribute(
+                        isMeta ? URIBuilder.META : URIBuilder.PROTOCOL,
+                        metaOrProtocol));
     }
 
 }

@@ -10,11 +10,11 @@
 
 package org.mule.impl.endpoint;
 
+import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOManagementContext;
-import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 
 public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implements ManagementContextAware
 {
@@ -24,33 +24,35 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
         super();
     }
 
-    public EndpointURIEndpointBuilder(final String uri, UMOManagementContext managementContext)
-        throws EndpointException
+    public EndpointURIEndpointBuilder(URIBuilder URIBuilder, UMOManagementContext managementContext)
     {
         this.managementContext = managementContext;
-        this.endpointURI = new MuleEndpointURI(uri);
+        this.uriBuilder = URIBuilder;
     }
 
     /**
-     * @param endpointURI
-     * @param managementContext
+     * @deprecated
+     */
+    public EndpointURIEndpointBuilder(String address, UMOManagementContext managementContext)
+    {
+        this(new URIBuilder(address), managementContext);
+    }
+
+    /**
      * @deprecated
      */
     public EndpointURIEndpointBuilder(UMOEndpointURI endpointURI, UMOManagementContext managementContext)
     {
-        this.managementContext = managementContext;
-        this.endpointURI = endpointURI;
+        this(new URIBuilder(endpointURI), managementContext);
     }
-    
+
     /**
-     * @param endpointURI
-     * @param managementContext
      * @deprecated
      */
     public EndpointURIEndpointBuilder(UMOImmutableEndpoint source, UMOManagementContext managementContext)
     {
+        this(source.getEndpointURI(), managementContext);
         setName(source.getName());
-        setEndpointURI(source.getEndpointURI());
         setEncoding(source.getEncoding());
         setConnector(source.getConnector());
         setTransformers(source.getTransformers());
@@ -68,5 +70,5 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
         setCreateConnector(source.getCreateConnector());
         setManagementContext(source.getManagementContext());
     }
-    
+
 }

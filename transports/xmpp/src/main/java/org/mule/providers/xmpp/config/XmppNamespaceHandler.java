@@ -11,20 +11,18 @@
 package org.mule.providers.xmpp.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.LazyEndpointURI;
-import org.mule.config.spring.handlers.AbstractIgnorableNamespaceHandler;
+import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.xmpp.XmppConnector;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Registers a Bean Definition Parser for handling <code><xmpp:connector></code> elements.
  */
-public class XmppNamespaceHandler extends AbstractIgnorableNamespaceHandler
+public class XmppNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerStandardTransportEndpoints(XmppConnector.XMPP, LazyEndpointURI.TRANSPORT_ATTRIBUTES);
+        registerStandardTransportEndpoints(XmppConnector.XMPP, URIBuilder.ALL_TRANSPORT_ATTRIBUTES);
         this.registerBeanDefinitionParser("connector", 
             new MuleOrphanDefinitionParser(XmppConnector.class, true));
     }
