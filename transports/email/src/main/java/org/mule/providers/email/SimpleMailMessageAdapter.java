@@ -34,8 +34,8 @@ import javax.mail.Message;
 import javax.mail.Part;
 
 /**
- * <code>SimpleMailMessageAdapter</code> is an adapter for mail messages.  
- * Unlike {@link MailMessageAdapter} this preserves the message intact in its original 
+ * <code>SimpleMailMessageAdapter</code> is an adapter for mail messages.
+ * Unlike {@link MailMessageAdapter} this preserves the message intact in its original
  * form.
  *
  * <p>Header values are stored in two formats.  First, as historically used by
@@ -59,16 +59,16 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
     private Part message;
     private byte[] cache = null;
 
-    public SimpleMailMessageAdapter(Object object) throws MessagingException 
+    public SimpleMailMessageAdapter(Object object) throws MessagingException
     {
         Message message = assertMessageType(object);
 
-        try 
+        try
         {
             setMessageDetails(message);
             handleMessage(message);
-        } 
-        catch (Exception e) 
+        }
+        catch (Exception e)
         {
             throw new MessagingException(CoreMessages.failedToCreate("Message Adapter"), e);
         }
@@ -85,12 +85,12 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
      * By default, this simply stores the entire message as a single message.
      * Sub-classes may override with more complex processing.
      */
-    protected void handleMessage(Message message) throws Exception 
+    protected void handleMessage(Message message) throws Exception
     {
         setMessage(message);
     }
 
-    protected void setMessage(Part message) 
+    protected void setMessage(Part message)
     {
         this.message = message;
     }
@@ -99,7 +99,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    public byte[] getPayloadAsBytes() throws Exception 
+    public byte[] getPayloadAsBytes() throws Exception
     {
         return buildCache(getEncoding());
     }
@@ -141,8 +141,8 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
             throw new MessageTypeNotSupportedException(message, MailMessageAdapter.class);
         }
     }
-    
-    private void setMessageDetails(Message message)  throws javax.mail.MessagingException 
+
+    private void setMessageDetails(Message message)  throws javax.mail.MessagingException
     {
         setProperty(MailProperties.INBOUND_TO_ADDRESSES_PROPERTY,
             MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.TO)));
@@ -150,15 +150,31 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
             MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.CC)));
         setProperty(MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY,
             MailUtils.mailAddressesToString(message.getRecipients(Message.RecipientType.BCC)));
-        setProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
-            MailUtils.mailAddressesToString(message.getReplyTo()));
-        setProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
-            MailUtils.mailAddressesToString(message.getFrom()));
+        try 
+        {
+	        setProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
+	            MailUtils.mailAddressesToString(message.getReplyTo()));
+        } 
+        catch (javax.mail.MessagingException me) 
+        {
+        	logger.warn("Invalid address found in ReplyTo header:", me);
+        }
+        
+        try 
+        {
+	        setProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
+	            MailUtils.mailAddressesToString(message.getFrom()));
+	    } 
+        catch (javax.mail.MessagingException me) 
+        {
+	    	logger.warn("Invalid address found in From header:", me);
+	    }
+        
         setProperty(MailProperties.INBOUND_SUBJECT_PROPERTY, StringUtils.defaultIfEmpty(
             message.getSubject(),"(no subject)"));
         setProperty(MailProperties.INBOUND_CONTENT_TYPE_PROPERTY, StringUtils.defaultIfEmpty(
             message.getContentType(), "text/plain"));
-        
+
         Date sentDate = message.getSentDate();
         if (sentDate == null)
         {
@@ -247,7 +263,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
         return stream;
     }
 
-    private byte[] binaryPayload() throws Exception 
+    private byte[] binaryPayload() throws Exception
     {
         InputStream stream = addBuffer(message.getInputStream());
         ByteArrayOutputStream baos = new ByteArrayOutputStream(32768);
@@ -255,7 +271,7 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
         return baos.toByteArray();
     }
 
-    private byte[] textPayload(String encoding) throws Exception 
+    private byte[] textPayload(String encoding) throws Exception
     {
         InputStream stream = addBuffer(message.getInputStream());
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -274,5 +290,4 @@ public class SimpleMailMessageAdapter extends AbstractMessageAdapter
     {
         return new SimpleMailMessageAdapter(this);
     }
-    
 }
