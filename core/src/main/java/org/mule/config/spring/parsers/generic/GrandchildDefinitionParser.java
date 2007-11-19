@@ -9,6 +9,8 @@
  */
 package org.mule.config.spring.parsers.generic;
 
+import org.mule.util.CoreXMLUtils;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -34,7 +36,7 @@ public class GrandchildDefinitionParser extends ChildDefinitionParser
         Node grandparent = parent.getParentNode();
         if (grandparent == null)
         {
-            logger.error("No parent node found for element " + element);
+            logger.error("No parent node found for element " + parent);
             return null;
         }
         Node grandparentNameAttribute = grandparent.getAttributes().getNamedItem("name");
