@@ -29,7 +29,7 @@
             <outbound-router>
                 <multicasting-router>
                     <vm:outbound-endpoint name="xml-object-out" address="vm://xml-object-out"
-                                          connector-ref="queue" transformer-ref="xmlToObject"/>
+                                          connector-ref="queue" transformer-refs="xmlToObject"/>
                 </multicasting-router>
             </outbound-router>
         </service>
@@ -43,8 +43,8 @@
                 <multicasting-router>
                     <vm:outbound-endpoint name="object-out" path="object-out" connector-ref="queue"/>
                     <vm:outbound-endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue"
-                                          transformer-ref="objectToXml"/>
-                    <vm:outbound-endpoint ref="xml-in" transformer-ref="objectToXml"/>
+                                          transformer-refs="objectToXml"/>
+                    <vm:outbound-endpoint ref="xml-in" transformer-refs="objectToXml"/>
                 </multicasting-router>
             </outbound-router>
         </service>

@@ -56,13 +56,13 @@
         <service name="serviceProxy">
             <inbound-router>
                 <vm:inbound-endpoint path="stockquote"
-                                     responseTransformer-ref="ToString XmlDecoder Xslt XmlToObject"/>
+                                     responseTransformer-refs="ToString XmlDecoder Xslt XmlToObject"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote"
-                                       responseTransformer-ref="XmlDecoder Xslt XmlToObject">
+                                       responseTransformer-refs="XmlDecoder Xslt XmlToObject">
                         <properties>
                             <spring:entry key="soapAction" value="[methodNamespace][method]"/>
                             <spring:entry key="soapMethods">

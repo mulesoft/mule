@@ -58,17 +58,17 @@
             
             <inbound-router>
                 <!-- Incoming HTTP requests -->
-                <inbound-endpoint address="http://localhost:8888" transformer-ref="HttpRequestToNameString" synchronous="true">
+                <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" synchronous="true">
                     <not-filter>
                         <wildcard-filter pattern="/favicon.ico"/>   
                     </not-filter>
                 </inbound-endpoint>
                 
                 <!-- Incoming Servlet requests -->
-                <inbound-endpoint address="servlet://rest" transformer-ref="StringToNameString" responseTransformer-ref="PlainTextResponseTransformer" synchronous="true"/>
+                <inbound-endpoint address="servlet://rest" transformer-refs="StringToNameString" responseTransformer-refs="PlainTextResponseTransformer" synchronous="true"/>
 
                 <!-- Incoming VM requests -->
-                <vm:inbound-endpoint path="greeter" transformer-ref="StringToNameString" synchronous="true"/>
+                <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" synchronous="true"/>
             </inbound-router>
 
             <outbound-router>
@@ -95,7 +95,7 @@
             <component class="org.mule.samples.hello.ChitChatter"/>
             
             <inbound-router>
-                <vm:inbound-endpoint path="chitchatter" transformer-ref="NameStringToChatString" responseTransformer-ref="ChatStringToString" synchronous="true"/>
+                <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString" responseTransformer-refs="ChatStringToString" synchronous="true"/>
             </inbound-router>
         </service>
 
@@ -103,7 +103,7 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
             <inbound-router>
-                <vm:inbound-endpoint path="userErrorHandler" responseTransformer-ref="ExceptionToString" synchronous="true"/>
+                <vm:inbound-endpoint path="userErrorHandler" responseTransformer-refs="ExceptionToString" synchronous="true"/>
                 <forwarding-router/>
             </inbound-router>
         </service>

@@ -29,7 +29,7 @@
                 <inbound-endpoint address="jms://in"
                                   connector-ref="noOutbound"
                                   synchronous="true"
-                                  transformer-ref="JMSMessageToObject SetLendersAsRecipients ObjectToJMSMessage"/>
+                                  transformer-refs="JMSMessageToObject SetLendersAsRecipients ObjectToJMSMessage"/>
             </inbound-router>
         </service>
     </model>

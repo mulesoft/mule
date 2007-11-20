@@ -28,7 +28,7 @@
         <service name="FolderTO">
             <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint ref="get" transformer-ref="FileToByteArray">
+                <inbound-endpoint ref="get" transformer-refs="FileToByteArray">
                     <properties>
                         <spring:entry key="comparator" value="org.mule.providers.file.comparator.OlderFirstComparator"/>
                         <spring:entry key="reverseOrder" value="true"/>

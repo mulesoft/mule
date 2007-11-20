@@ -113,6 +113,7 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
     {
         return (references.contains(dropRef(attributeName))
                 || attributeName.endsWith(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX)
+                || attributeName.endsWith(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REFS_SUFFIX)
                 || attributeName.equals(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
     }
 
@@ -150,7 +151,9 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
     protected String dropRef(String name)
     {
-        return org.mule.util.StringUtils.chomp(name, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX);
+        return org.mule.util.StringUtils.chomp(
+                org.mule.util.StringUtils.chomp(name, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX),
+                AbstractMuleBeanDefinitionParser.ATTRIBUTE_REFS_SUFFIX);
     }
 
     public String translateValue(String name, String value)

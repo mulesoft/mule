@@ -24,9 +24,9 @@
     <endpoint name="server1" address="tcp://localhost:45431" />
     <endpoint name="server2" address="tcp://localhost:45432" />
     <endpoint name="server3" address="tcp://localhost:45433" />
-    <endpoint name="testEndpoint" address="vm://another.queue" connector-ref="vmConnector1" transformer-ref="ObjectToXml" />
+    <endpoint name="testEndpoint" address="vm://another.queue" connector-ref="vmConnector1" transformer-refs="ObjectToXml" />
     <endpoint name="testEndpoint2" address="vm://yet.another.queue" connector-ref="vmConnector1"
-        transformer-ref="ObjectToXml" />
+        transformer-refs="ObjectToXml" />
 
     <model name="main">
         <!-- Test sendEndpoint and receive endpoint as URIs where the test connector will be
@@ -52,7 +52,7 @@
             <component class="org.mule.test.integration.service.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="test://localhost/test.queue" createConnector="ALWAYS_CREATE"
-                    transformer-ref="XmlToObject" />
+                    transformer-refs="XmlToObject" />
             </inbound-router>
         </service>
 

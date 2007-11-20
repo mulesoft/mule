@@ -55,7 +55,7 @@
     <endpoint name="xml-in" address="vm://xml-in" connector-ref="default"/>
     <vm:endpoint name="object-in" path="object-in" connector-ref="default"/>
     <endpoint name="object-in-2" address="vm://object-in-2" connector-ref="default"/>
-    <vm:endpoint name="dom-in" address="vm://dom-in" connector-ref="default" transformer-ref="xmlToDom"/>
+    <vm:endpoint name="dom-in" address="vm://dom-in" connector-ref="default" transformer-refs="xmlToDom"/>
 
     <model name="xml transformer tests">
 
@@ -68,15 +68,15 @@
                 <multicasting-router>
                     <outbound-endpoint name="xml-out" address="vm://xml-out" connector-ref="queue"/>
                     <vm:outbound-endpoint name="xml-xslt-out" path="xml-xslt-out"
-                                          connector-ref="queue" transformer-ref="xslt"/>
+                                          connector-ref="queue" transformer-refs="xslt"/>
                     <vm:outbound-endpoint name="xml-xslt-out-string" path="xml-xslt-out"
-                                          connector-ref="queue" transformer-ref="xslt-string"/>
+                                          connector-ref="queue" transformer-refs="xslt-string"/>
                     <outbound-endpoint name="xml-jxpath-out" address="vm://xml-jxpath-out" connector-ref="queue"
-                                       transformer-ref="jxpath"/>
+                                       transformer-refs="jxpath"/>
                     <outbound-endpoint name="xml-dom-out" address="vm://xml-dom-out" connector-ref="queue"
-                                       transformer-ref="xmlToDom"/>
+                                       transformer-refs="xmlToDom"/>
                     <vm:outbound-endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue"
-                                          transformer-ref="xmlToObject"/>
+                                          transformer-refs="xmlToObject"/>
                     <vm:outbound-endpoint ref="dom-in"/>
                 </multicasting-router>
             </outbound-router>
@@ -91,7 +91,7 @@
                 <multicasting-router>
                     <outbound-endpoint name="object-out" address="vm://object-out" connector-ref="queue"/>
                     <vm:outbound-endpoint name="object-xml-out" path="object-xml-out"
-                                          connector-ref="queue" transformer-ref="objectToXml"/>
+                                          connector-ref="queue" transformer-refs="objectToXml"/>
                     <!-- MULE-2136 -->
                     <!-- mule:endpoint ref="xml-in" transformers="objectToXml"/ -->
                 </multicasting-router>
@@ -109,7 +109,7 @@
                     <!-- MULE-2136 -->
                     <!-- mule:endpoint name="object-out" address="vm://object-out" connector-ref="queue"/ -->
                     <!-- mule:endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue" transformers="objectToXml"/ -->
-                    <outbound-endpoint ref="xml-in" transformer-ref="objectToXml"/>
+                    <outbound-endpoint ref="xml-in" transformer-refs="objectToXml"/>
                 </multicasting-router>
             </outbound-router>
         </service>
@@ -122,7 +122,7 @@
             <outbound-router>
                 <multicasting-router>
                     <outbound-endpoint name="dom-xml-out" address="vm://dom-xml-out" connector-ref="queue"
-                                       transformer-ref="domToXml"/>
+                                       transformer-refs="domToXml"/>
                 </multicasting-router>
             </outbound-router>
         </service>

@@ -47,7 +47,7 @@ public class AttributeMapDefinitionParser extends ChildDefinitionParser
             //TODO How can I use bestGuessName
             String name = beanPropertyConfiguration.translateName(oldName);
             String value = beanPropertyConfiguration.translateValue(oldName, attribute.getNodeValue());
-            if (oldName.endsWith(ATTRIBUTE_REF_SUFFIX))
+            if (beanPropertyConfiguration.isReference(oldName))
             {
                 values.put(name, new RuntimeBeanReference(attribute.getNodeValue()));
             }

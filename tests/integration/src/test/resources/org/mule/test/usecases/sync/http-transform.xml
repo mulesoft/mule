@@ -31,16 +31,16 @@
         <service name="HttpService">
             <echo-component/>
             <inbound-router>
-                <inbound-endpoint ref="httpEndpoint" transformer-ref="ByteArrayToString"
-                    responseTransformer-ref="ObjectToXml Compress ToHttpResponse"/>
+                <inbound-endpoint ref="httpEndpoint" transformer-refs="ByteArrayToString"
+                    responseTransformer-refs="ObjectToXml Compress ToHttpResponse"/>
             </inbound-router>
         </service>
 
         <service name="HttpService2">
             <echo-component/>
             <inbound-router>
-                <inbound-endpoint ref="httpEndpoint2" transformer-ref="ByteArrayToSerializable"
-                          responseTransformer-ref="SerializableToByteArray ToHttpResponse"/>
+                <inbound-endpoint ref="httpEndpoint2" transformer-refs="ByteArrayToSerializable"
+                          responseTransformer-refs="SerializableToByteArray ToHttpResponse"/>
             </inbound-router>
         </service>
 
@@ -51,7 +51,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="httpEndpoint2" transformer-ref="SerializableToByteArray"/>
+                    <outbound-endpoint ref="httpEndpoint2" transformer-refs="SerializableToByteArray"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

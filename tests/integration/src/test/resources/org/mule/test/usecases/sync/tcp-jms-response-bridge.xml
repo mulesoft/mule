@@ -23,7 +23,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="jms://queue_in" responseTransformer-ref="responsetransformer" />
+                    <outbound-endpoint address="jms://queue_in" responseTransformer-refs="responsetransformer" />
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -31,7 +31,7 @@
         <service name="JMSReplyProvider">
             <component class="org.mule.test.integration.service.TestReceiver"/>
             <inbound-router>
-                <inbound-endpoint address="jms://queue_in" transformer-ref="jmsmessagetoobject inboundtransformer"/>
+                <inbound-endpoint address="jms://queue_in" transformer-refs="jmsmessagetoobject inboundtransformer"/>
             </inbound-router>
         </service>
     </model>

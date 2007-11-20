@@ -13,7 +13,7 @@
     <model name="test">
         <service name="Bridge">
             <inbound-router>
-                <inbound-endpoint ref="in" transformer-ref="StringtoByteArray"/>
+                <inbound-endpoint ref="in" transformer-refs="StringtoByteArray"/>
                 <forwarding-router/>
             </inbound-router>
         </service>

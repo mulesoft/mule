@@ -34,6 +34,7 @@ public class EndpointUtils
 
     private static void processTransformerDependencies(BeanAssembler assembler, Element element, String attributeName)
     {
+        // this isn't going to match references either?
         if(StringUtils.isNotBlank(element.getAttribute(attributeName)))
         {
             String[] trans = StringUtils.split(element.getAttribute(attributeName), " ,;");

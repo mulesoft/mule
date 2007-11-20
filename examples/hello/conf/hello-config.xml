@@ -70,7 +70,7 @@
             <component class="org.mule.samples.hello.Greeter"/>
             
             <inbound-router>
-                <inbound-endpoint address="stdio://System.in" transformer-ref="StdinToNameString"/>
+                <inbound-endpoint address="stdio://System.in" transformer-refs="StdinToNameString"/>
             </inbound-router>
             
             <outbound-router>
@@ -102,12 +102,12 @@
             <component class="org.mule.samples.hello.ChitChatter"/>
 
             <inbound-router>
-                <vm:inbound-endpoint path="chitchatter" transformer-ref="NameStringToChatString"/>
+                <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString"/>
             </inbound-router>
                 
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="stdio://System.out" transformer-ref="ChatStringToString" />
+                    <outbound-endpoint address="stdio://System.out" transformer-refs="ChatStringToString" />
                 </outbound-pass-through-router>
             </outbound-router>
 
@@ -120,7 +120,7 @@
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
             <inbound-router>
-                <vm:inbound-endpoint path="userErrorHandler" transformer-ref="ExceptionToString"/>
+                <vm:inbound-endpoint path="userErrorHandler" transformer-refs="ExceptionToString"/>
                 <forwarding-router/>
             </inbound-router>
             

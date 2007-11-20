@@ -40,7 +40,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="middle" transformer-ref="ObjectToJMSMessage"/>
+                    <outbound-endpoint ref="middle" transformer-refs="ObjectToJMSMessage"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -60,7 +60,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="out" transformer-ref="ObjectToJMSMessage"/>
+                    <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

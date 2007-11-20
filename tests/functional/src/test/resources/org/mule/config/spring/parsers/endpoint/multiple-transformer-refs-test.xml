@@ -10,7 +10,7 @@
     <transformer-append-string message="b" name="b"/>
     <transformer-append-string message="c" name="c"/>
 
-    <parsers-test:addressed-endpoint name="many" path="foo" transformer-ref="a b c"/>
-    <parsers-test:addressed-endpoint name="single" path="foo" transformer-ref="a"/>
+    <parsers-test:addressed-endpoint name="many" path="foo" transformer-refs="a b c"/>
+    <parsers-test:addressed-endpoint name="single" path="foo" transformer-refs="a"/>
 
 </mule>

@@ -82,7 +82,7 @@ public class XFireWsdlCallTestCase extends FunctionalTestCase
 
         assertTrue(result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "").startsWith(
             "text/xml"));
-
+        
         if (logger.isDebugEnabled())
         {
             logger.debug(result.getPayloadAsString());

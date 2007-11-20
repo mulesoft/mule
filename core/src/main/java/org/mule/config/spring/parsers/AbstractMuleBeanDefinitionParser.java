@@ -88,7 +88,9 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     public static final String ATTRIBUTE_NAME = "name";
     public static final String ATTRIBUTE_CLASS = "class";
     public static final String ATTRIBUTE_REF = "ref";
+    public static final String ATTRIBUTE_REFS = "refs";
     public static final String ATTRIBUTE_REF_SUFFIX = "-" + ATTRIBUTE_REF;
+    public static final String ATTRIBUTE_REFS_SUFFIX = "-" + ATTRIBUTE_REFS;
 
     /**
      * logger used by this class

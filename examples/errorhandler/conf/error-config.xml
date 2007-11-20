@@ -124,7 +124,7 @@
             </component>
             <inbound-router>
                 <inbound-endpoint address="file://./test-data/in"
-                               transformer-ref="XMLToExceptionBean ExceptionBeanToErrorMessage">
+                               transformer-refs="XMLToExceptionBean ExceptionBeanToErrorMessage">
                     <!-- Ignore other files than our XML error input. When running this example from
                          a svn checkout the file connector would try to process subversion's meta
                          dirs which is not what we want.
@@ -138,18 +138,18 @@
             <outbound-router>
                 <custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>
                 
-                <filtering-router transformer-ref="ErrorMessageToException">
+                <filtering-router transformer-refs="ErrorMessageToException">
                     <outbound-endpoint address="file://./test-data/exceptions"
-                                   transformer-ref="ErrorMessageToExceptionBean ExceptionBeanToXML">
+                                   transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML">
                         <properties>
                             <spring:entry key="outputPattern" value="Exception-[UUID].xml"/>
                         </properties>
                     </outbound-endpoint>
                 </filtering-router>
                 
-                <filtering-router transformer-ref="ErrorMessageToException">
+                <filtering-router transformer-refs="ErrorMessageToException">
                     <outbound-endpoint address="smtp://${smtp.username}:${smtp.password}@${smtp.host}:${smtp.port}?address=${email.toAddress}"
-                                   transformer-ref="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
+                                   transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
                         <properties>
                             <spring:entry key="fromAddress" value="${email.fromAddress}"/>
                             <spring:entry key="subject" value="${email.subject}"/>
@@ -158,9 +158,9 @@
                     <payload-type-filter expectedType="org.mule.umo.lifecycle.FatalException"/>
                 </filtering-router>
                 
-                <filtering-router transformer-ref="ErrorMessageToException">
+                <filtering-router transformer-refs="ErrorMessageToException">
                     <outbound-endpoint address="jms://exception.queue"
-                                   transformer-ref="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
+                                   transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
                     <payload-type-filter expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
                 </filtering-router>
 
@@ -173,7 +173,7 @@
             <component class="org.mule.samples.errorhandler.BusinessErrorManager"/>
             <inbound-router>
                 <inbound-endpoint address="jms://exception.queue"
-                               transformer-ref="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
+                               transformer-refs="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
             </inbound-router>
         </service>
     </model>

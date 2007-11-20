@@ -72,7 +72,7 @@
                  </inbound-router>
                  <outbound-router>
                      <outbound-pass-through-router>
-                         <outbound-endpoint ref="BankGateway" transformer-ref="SetLendersAsRecipients"/>
+                         <outbound-endpoint ref="BankGateway" transformer-refs="SetLendersAsRecipients"/>
                      </outbound-pass-through-router>
                  </outbound-router>
              </service>

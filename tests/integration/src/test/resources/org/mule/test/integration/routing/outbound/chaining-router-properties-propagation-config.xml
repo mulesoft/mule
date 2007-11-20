@@ -38,14 +38,14 @@
         <service name="hop1Service">
             <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint ref="hop1Endpoint" responseTransformer-ref="hop1ResponseEnricher"/>
+                <inbound-endpoint ref="hop1Endpoint" responseTransformer-refs="hop1ResponseEnricher"/>
             </inbound-router>
         </service>
 
         <service name="hop2Service">
             <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
-                <inbound-endpoint ref="hop2Endpoint" transformer-ref="hop2enricher"/>
+                <inbound-endpoint ref="hop2Endpoint" transformer-refs="hop2enricher"/>
             </inbound-router>
         </service>
     </model>

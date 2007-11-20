@@ -151,10 +151,10 @@
                                 address="test://catch.all"/>
                     </mule:forwarding-catch-all-strategy>
                     <mule:inbound-endpoint name="Orange"
-                                           address="test://orange/" transformer-ref="TestCompressionTransformer"
-                                           responseTransformer-ref="TestCompressionTransformer"/>
+                                           address="test://orange/" transformer-refs="TestCompressionTransformer"
+                                           responseTransformer-refs="TestCompressionTransformer"/>
                     <mule:inbound-endpoint ref="orangeEndpoint"
-                                           transformer-ref="TestCompressionTransformer">
+                                           transformer-refs="TestCompressionTransformer">
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                         <mule:properties>
                             <entry key="testLocal" value="value1"/>
@@ -174,7 +174,7 @@
                 <mule:outbound-router>
                     <mule:outbound-pass-through-router>
                         <mule:outbound-endpoint ref="appleInEndpoint"
-                                                transformer-ref="TestCompressionTransformer"/>
+                                                transformer-refs="TestCompressionTransformer"/>
                     </mule:outbound-pass-through-router>
                 </mule:outbound-router>
 

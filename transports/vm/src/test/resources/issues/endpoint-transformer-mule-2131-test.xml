@@ -14,7 +14,7 @@
     <vm:endpoint name="in" address="vm://in" connector-ref="default"/>
     <endpoint name="direct" address="vm://direct" connector-ref="queue"/>
     <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer"
-                 connector-ref="queue" transformer-ref="transformer"/>
+                 connector-ref="queue" transformer-refs="transformer"/>
     <endpoint name="global-name-local-transformer" address="vm://global-name-local-transformer"
               connector-ref="queue"/>
 
@@ -32,11 +32,11 @@
                     <outbound-endpoint ref="direct"/>
                     <outbound-endpoint ref="global-name-global-transformer"/>
                     <vm:outbound-endpoint name="local-name-local-transformer" address="vm://local-name-local-transformer"
-                                          connector-ref="queue" transformer-ref="transformer"/>
+                                          connector-ref="queue" transformer-refs="transformer"/>
                     <!-- these two don't transform -->
-                    <outbound-endpoint ref="global-name-local-transformer" transformer-ref="transformer"/>
+                    <outbound-endpoint ref="global-name-local-transformer" transformer-refs="transformer"/>
                     <vm:outbound-endpoint path="no-name-local-transformer" connector-ref="queue"
-                                          transformer-ref="transformer"/>
+                                          transformer-refs="transformer"/>
                 </multicasting-router>
             </outbound-router>
         </service>

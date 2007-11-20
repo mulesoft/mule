@@ -569,8 +569,8 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
-        <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
-        <xsd:attribute name="responseTransformer-ref" type="xsd:NMTOKENS"/>
+        <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS"/>
+        <xsd:attribute name="responseTransformer-refs" type="xsd:NMTOKENS"/>
     </xsd:attributeGroup>
 
     <xsd:element name="transaction" type="transactionType" substitutionGroup="abstract-transaction"/>
@@ -1238,7 +1238,7 @@
                 <xsd:sequence>
                     <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
+                <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS"/>
                 <xsd:attribute name="transformerFirst" type="substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -1357,7 +1357,7 @@
                     <xsd:element ref="abstract-filter" minOccurs="0"/>
                     <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
+                <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

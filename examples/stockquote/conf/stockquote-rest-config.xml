@@ -60,7 +60,7 @@
 
             <inbound-router>
                 <vm:inbound-endpoint path="stockquote"
-                                     responseTransformer-ref="ToString XmlDecoder Xslt XmlToObject"/>
+                                     responseTransformer-refs="ToString XmlDecoder Xslt XmlToObject"/>
             </inbound-router>
         </service>
     </model>

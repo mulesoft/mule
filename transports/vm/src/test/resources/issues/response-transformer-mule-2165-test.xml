@@ -25,7 +25,7 @@
     <vm:endpoint name="out-global-name-global-transformer" path="out-global-name-global-transformer"
                  connector-ref="queue"/>
     <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer" connector-ref="default"
-                 responseTransformer-ref="response" synchronous="true"/>
+                 responseTransformer-refs="response" synchronous="true"/>
 
     <vm:endpoint name="in-global-name-url-transformer" path="in-global-name-url-transformer" connector-ref="default"/>
     <vm:endpoint name="out-global-name-url-transformer" path="out-global-name-url-transformer" connector-ref="queue"/>
@@ -94,7 +94,7 @@
             </inbound-router>
             <outbound-router>
                 <chaining-router>
-                    <outbound-endpoint ref="global-name-local-transformer" responseTransformer-ref="response"/>
+                    <outbound-endpoint ref="global-name-local-transformer" responseTransformer-refs="response"/>
                     <outbound-endpoint ref="out-global-name-local-transformer"/>
                 </chaining-router>
             </outbound-router>
@@ -114,7 +114,7 @@
             </inbound-router>
             <outbound-router>
                 <chaining-router>
-                    <vm:outbound-endpoint path="local-name-local-transformer" responseTransformer-ref="response"
+                    <vm:outbound-endpoint path="local-name-local-transformer" responseTransformer-refs="response"
                                           synchronous="true" connector-ref="default"/>
                     <outbound-endpoint ref="out-local-name-local-transformer"/>
                 </chaining-router>
