@@ -18,7 +18,6 @@
         <service name="OGNLServiceWrapper1">
             <inbound-router>
                 <inbound-endpoint address="vm://in" connector-ref="VMConnector"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <filtering-router>

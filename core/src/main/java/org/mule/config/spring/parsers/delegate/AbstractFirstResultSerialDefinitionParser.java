@@ -29,7 +29,18 @@ public class AbstractFirstResultSerialDefinitionParser extends AbstractSerialDel
     {
         try
         {
-            AbstractBeanDefinition result = super.doSingleBean(index, parser, element, parserContext);
+            AbstractBeanDefinition result = null;
+            try
+            {
+                result = super.doSingleBean(index, parser, element, parserContext);
+            }
+            catch (RuntimeException e)
+            {
+                if (!isExceptionHandled(e))
+                {
+                    throw e;
+                }
+            }
             if (0 == index)
             {
                 firstDefinition = result;

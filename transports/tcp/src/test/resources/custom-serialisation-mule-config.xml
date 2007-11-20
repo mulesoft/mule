@@ -23,7 +23,6 @@
         <service name="BridgeIn">
             <inbound-router>
                 <vm:inbound-endpoint path="in"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

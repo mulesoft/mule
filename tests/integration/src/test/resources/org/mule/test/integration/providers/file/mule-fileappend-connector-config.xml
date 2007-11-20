@@ -14,7 +14,6 @@
         <service name="Bridge">
             <inbound-router>
                 <inbound-endpoint address="vm://fileappend"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

@@ -47,7 +47,6 @@
         <service name="LocalService">
             <inbound-router>
                 <inbound-endpoint ref="vmEndpoint"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

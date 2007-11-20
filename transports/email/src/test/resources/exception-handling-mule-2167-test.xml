@@ -20,7 +20,6 @@
         <service name="default config">
             <inbound-router>
                 <vm:inbound-endpoint path="in-default" connector-ref="defaultVm"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <exception-based-router>

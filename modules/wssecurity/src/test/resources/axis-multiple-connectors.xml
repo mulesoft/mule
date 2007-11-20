@@ -40,7 +40,6 @@
         <service name="SecureBridge">
             <inbound-router>
                 <inbound-endpoint address="vm://secured"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -54,7 +53,6 @@
         <service name="UnSecureBridge1">
             <inbound-router>
                 <inbound-endpoint address="vm://unsecured1"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -67,7 +65,6 @@
         <service name="UnSecureBridge2">
             <inbound-router>
                 <inbound-endpoint address="vm://unsecured2"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

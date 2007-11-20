@@ -14,7 +14,6 @@
         <service name="Echo1">
             <inbound-router>
                 <tcp:inbound-endpoint host="localhost" port="6161" remoteSync="true"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

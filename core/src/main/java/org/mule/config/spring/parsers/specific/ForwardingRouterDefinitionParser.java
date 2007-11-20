@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitio
 import org.mule.config.spring.parsers.generic.GrandchildDefinitionParser;
 import org.mule.routing.inbound.ForwardingConsumer;
 import org.mule.util.object.SingletonObjectFactory;
+import org.mule.util.object.AbstractObjectFactory;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -52,7 +53,7 @@ public class ForwardingRouterDefinitionParser extends AbstractSerialDelegatingDe
         
         protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
         {
-            builder.addPropertyValue("objectClassName", NullComponent.class.getName());
+            builder.addPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME, NullComponent.class.getName());
             super.parseChild(element, parserContext, builder);
         }
     }

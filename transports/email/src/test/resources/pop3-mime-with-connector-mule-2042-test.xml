@@ -24,7 +24,6 @@
                                        transformer-refs="noActionTransformer" connector-ref="pop3Connector">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </pop3:inbound-endpoint>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

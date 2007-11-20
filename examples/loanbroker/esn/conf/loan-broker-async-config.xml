@@ -97,7 +97,6 @@
         </service>
 
         <service name="TheBankGateway">
-            <bridge-component/>
             <inbound-router>
                 <inbound-endpoint ref="BankGateway"/>
             </inbound-router>

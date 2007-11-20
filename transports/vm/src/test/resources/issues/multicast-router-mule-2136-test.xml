@@ -24,7 +24,6 @@
         <service name="xml to ...">
             <inbound-router>
                 <inbound-endpoint ref="xml-in"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
@@ -37,7 +36,6 @@
         <service name="object to xml">
             <inbound-router>
                 <inbound-endpoint ref="object-in"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>

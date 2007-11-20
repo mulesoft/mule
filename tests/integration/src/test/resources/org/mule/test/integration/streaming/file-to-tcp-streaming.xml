@@ -10,7 +10,6 @@
         <service name="bridge1">
             <inbound-router>
                 <inbound-endpoint address="file://${mule.working.dir}/test-data/in"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

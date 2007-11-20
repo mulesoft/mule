@@ -68,7 +68,7 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
             }
             catch (RuntimeException e)
             {
-                if (handledExceptions.contains(e.getClass()))
+                if (isExceptionHandled(e))
                 {
                     bean = null;
                 }
@@ -90,6 +90,11 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
             }
         }
         return bean;
+    }
+
+    protected boolean isExceptionHandled(Exception e)
+    {
+        return handledExceptions.contains(e.getClass());
     }
 
     protected AbstractBeanDefinition doSingleBean(int index, MuleDefinitionParser parser,

@@ -77,7 +77,6 @@
         <service name="BankGateway">
             <inbound-router>
                 <inbound-endpoint ref="BankGateway"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <logging-catch-all-strategy/>

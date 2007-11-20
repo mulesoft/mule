@@ -25,7 +25,6 @@
                 <pop3:inbound-endpoint user="bob" password="secret" host="localhost" port="62002">
                     <transformer ref="mime-rfc822"/>
                 </pop3:inbound-endpoint>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -37,7 +36,6 @@
         <service name="sink">
             <inbound-router>
                 <vm:inbound-endpoint connector-ref="default" path="sink"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>

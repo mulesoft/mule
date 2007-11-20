@@ -34,7 +34,8 @@
         </service>
 
         <service name="EchoUMO">
-            <bridge-component/>
+            <!-- not needed -->
+            <!-- bridge-component/ -->
             <inbound-router>
                 <vm:inbound-endpoint path="echo"/>
             </inbound-router>

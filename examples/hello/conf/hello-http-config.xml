@@ -104,7 +104,6 @@
         <service name="UserErrorHandler">
             <inbound-router>
                 <vm:inbound-endpoint path="userErrorHandler" responseTransformer-refs="ExceptionToString" synchronous="true"/>
-                <forwarding-router/>
             </inbound-router>
         </service>
                 
@@ -113,7 +112,6 @@
         <service name="SystemErrorHandler">
             <inbound-router>
                 <vm:inbound-endpoint path="systemErrorHandler" synchronous="true"/>
-                <forwarding-router/>
             </inbound-router>
             
             <outbound-router>

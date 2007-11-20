@@ -24,7 +24,6 @@
                                        transformer-refs="noActionTransformer">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </imap:inbound-endpoint>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

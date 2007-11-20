@@ -25,7 +25,6 @@
         <service name="testServiceChained">
             <inbound-router>
                 <vm:inbound-endpoint path="chained"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

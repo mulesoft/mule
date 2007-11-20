@@ -25,7 +25,6 @@
                 <imaps:inbound-endpoint user="bob" password="password" host="localhost" port="65444">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </imaps:inbound-endpoint>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

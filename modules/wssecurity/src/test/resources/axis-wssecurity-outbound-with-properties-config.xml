@@ -34,7 +34,6 @@
         <service name="BridgeUMO">
             <inbound-router>
                 <inbound-endpoint address="vm://testin"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

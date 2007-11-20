@@ -11,10 +11,12 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.util.StringUtils;
 import org.mule.util.object.PooledObjectFactory;
 import org.mule.util.object.SimpleObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
+import org.mule.util.object.AbstractObjectFactory;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -37,7 +39,7 @@ public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
     {
         super(setterMethod, null);
         setAllowClassAttribute(false);
-        addAlias("class", "objectClassName");
+        addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS, AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME);
     }                                                             
     
     protected Class getBeanClass(Element element)

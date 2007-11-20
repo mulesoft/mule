@@ -50,7 +50,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     protected FunctionalTestComponent lookupTestComponent(String modelName, String componentName) throws UMOException
     {
         UMOComponent c = managementContext.getRegistry().lookupComponent(componentName);
-        assertNotNull("Component " + c + " not found", c);
+        assertNotNull("Component " + componentName + " not found", c);
         assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
         Object pojoService = ((TestSedaComponent) c).getOrCreateService();
         assertNotNull(pojoService);

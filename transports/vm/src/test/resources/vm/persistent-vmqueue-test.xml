@@ -21,7 +21,6 @@
         <service name="ReceiverUMO">
             <inbound-router>
                 <vm:inbound-endpoint path="receiver"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -35,7 +34,6 @@
         <service name="EchoUMO">
             <inbound-router>
                 <vm:inbound-endpoint path="echo"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

@@ -20,7 +20,6 @@
         <service name="relay">
             <inbound-router>
                 <vm:inbound-endpoint path="send"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>

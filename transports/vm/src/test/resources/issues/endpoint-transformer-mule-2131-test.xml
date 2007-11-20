@@ -25,7 +25,6 @@
         <service name="main">
             <inbound-router>
                 <inbound-endpoint ref="in"/>
-                <forwarding-router/>
             </inbound-router>
             <outbound-router>
                 <multicasting-router>

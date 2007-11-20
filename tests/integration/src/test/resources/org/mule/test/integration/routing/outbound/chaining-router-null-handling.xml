@@ -13,7 +13,6 @@
         <service name="bridge1">
             <inbound-router>
                 <inbound-endpoint address="vm://incomingPass"/>
-                <forwarding-router/>
             </inbound-router>
 
             <outbound-router>
@@ -30,7 +29,6 @@
         <service name="bridge2">
             <inbound-router>
                 <inbound-endpoint address="vm://incomingLastFail"/>
-                <forwarding-router/>
             </inbound-router>
 
             <outbound-router>
@@ -47,7 +45,6 @@
         <service name="bridge3">
             <inbound-router>
                 <inbound-endpoint address="vm://incomingFirstFail"/>
-                <forwarding-router/>
             </inbound-router>
 
             <outbound-router>
