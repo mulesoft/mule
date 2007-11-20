@@ -20,6 +20,7 @@
                 <inbound-endpoint address="file://./.mule/in">
                     <custom-transformer name="failPoint" class="org.mule.test.transformers.FailingTransformer"/>
                 </inbound-endpoint>
+                <forwarding-router/>
             </inbound-router>
 
             <outbound-router>
