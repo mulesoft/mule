@@ -93,9 +93,9 @@
             -->
             
             <!-- Route unexpected errors to separate error handler -->
-            <default-component-exception-strategy>
+            <default-service-exception-strategy>
                 <vm:outbound-endpoint path="systemErrorHandler"/>
-            </default-component-exception-strategy>
+            </default-service-exception-strategy>
         </service>
 
         <service name="ChitChatUMO">

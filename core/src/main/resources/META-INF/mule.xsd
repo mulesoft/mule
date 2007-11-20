@@ -1007,7 +1007,7 @@
     <!--   Exception strategies                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="default-component-exception-strategy" type="exceptionStrategyType"
+    <xsd:element name="default-service-exception-strategy" type="exceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy"/>
     <xsd:element name="default-connector-exception-strategy" type="exceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy"/>

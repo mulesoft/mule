@@ -218,7 +218,7 @@
                     </mule:filtering-router>
                 </mule:outbound-router>
 
-                <mule:default-component-exception-strategy/>
+                <mule:default-service-exception-strategy/>
 
             </mule:service>
 

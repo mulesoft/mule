@@ -150,9 +150,9 @@
                 <custom-response-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
             </response-router>
 
-            <default-component-exception-strategy>
+            <default-service-exception-strategy>
                 <outbound-endpoint address="test://orange.exceptions"/>
-            </default-component-exception-strategy>
+            </default-service-exception-strategy>
         </service>
 
         <service name="appleComponent">

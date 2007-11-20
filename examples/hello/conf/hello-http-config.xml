@@ -84,9 +84,9 @@
             </outbound-router>
 
             <!-- Route unexpected errors to separate error handler -->
-            <default-component-exception-strategy>
+            <default-service-exception-strategy>
                 <vm:outbound-endpoint path="systemErrorHandler"/>
-            </default-component-exception-strategy>
+            </default-service-exception-strategy>
         </service>
 
         <!-- note the response transformer on this component. even though there is no outbound provider

@@ -26,9 +26,9 @@
                 </outbound-pass-through-router>
             </outbound-router>
 
-            <default-component-exception-strategy>
+            <default-service-exception-strategy>
                 <outbound-endpoint address="vm://error.queue"/>
-            </default-component-exception-strategy>
+            </default-service-exception-strategy>
 
 
         </service>
