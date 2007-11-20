@@ -210,8 +210,8 @@
     <xsd:element name="abstract-response-router" abstract="true" type="abstractResponseRouterType"/>
     <xsd:complexType name="abstractResponseRouterType"/>
 
-    <xsd:element name="abstract-threading-profile" abstract="true" type="abstractThreadingProfileType"/>
-    <xsd:complexType name="abstractThreadingProfileType"/>
+    <xsd:element name="abstract-component-threading-profile" abstract="true" type="abstractComponentThreadingProfileType"/>
+    <xsd:complexType name="abstractComponentThreadingProfileType"/>
 
     <xsd:element name="abstract-exception-strategy" abstract="true" type="abstractExceptionStrategyType"/>
     <xsd:complexType name="abstractExceptionStrategyType"/>
@@ -330,7 +330,7 @@
         <xsd:complexContent>
             <xsd:extension base="baseServiceType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-threading-profile" minOccurs="0"/>
+                    <xsd:element ref="abstract-component-threading-profile" minOccurs="0"/>
                     <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="queueTimeout" type="xsd:integer"/>
@@ -977,10 +977,13 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="threading-profile" type="threadingProfileType" substitutionGroup="abstract-threading-profile"/>
+    <xsd:element name="component-threading-profile" type="threadingProfileType" substitutionGroup="abstract-component-threading-profile"/>
+    <!-- this is a general threading type used by various elements here -->
     <xsd:complexType name="threadingProfileType">
         <xsd:complexContent>
-            <xsd:extension base="abstractThreadingProfileType">
+            <!-- this is a hack that allows us to use this general threading profile as a component threading profile
+                 without retyping everything -->
+            <xsd:extension base="abstractComponentThreadingProfileType">
                 <xsd:attribute name="maxThreadsActive" type="xsd:string"/>
                 <xsd:attribute name="maxThreadsIdle" type="xsd:string"/>
                 <xsd:attribute name="threadTTL" type="xsd:string"/>

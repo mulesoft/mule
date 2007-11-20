@@ -155,7 +155,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("default-receiver-connection-strategy", new ConnectionStrategyDefinitionParser());
 
         //registerBeanDefinitionParser("mule-configuration", new ManagementContextDefinitionParser());
-        registerBeanDefinitionParser("threading-profile", new ThreadingProfileDefinitionParser("threadingProfile", MuleConfiguration.DEFAULT_COMPONENT_THREADING_PROFILE));
+        registerBeanDefinitionParser("component-threading-profile", new ThreadingProfileDefinitionParser("threadingProfile", MuleConfiguration.DEFAULT_COMPONENT_THREADING_PROFILE));
         registerBeanDefinitionParser("custom-exception-strategy", new ChildDefinitionParser("exceptionListener", null));
         registerBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultComponentExceptionStrategy.class));
         registerBeanDefinitionParser("default-connector-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultExceptionStrategy.class));
@@ -165,7 +165,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //Connector elements
         registerBeanDefinitionParser("dispatcher-threading-profile", new ThreadingProfileDefinitionParser("dispatcherThreadingProfile", MuleConfiguration.DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
         registerBeanDefinitionParser("receiver-threading-profile", new ThreadingProfileDefinitionParser("receiverThreadingProfile", MuleConfiguration.DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
-        registerBeanDefinitionParser("dispatcher-connection-straqtegy", new ConnectionStrategyDefinitionParser("dispatcherConnectionStrategy"));
+        registerBeanDefinitionParser("dispatcher-connection-strategy", new ConnectionStrategyDefinitionParser("dispatcherConnectionStrategy"));
         registerBeanDefinitionParser("receiver-connection-straqtegy", new ConnectionStrategyDefinitionParser("receiverConnectionStrategy"));
         registerBeanDefinitionParser("service-overrides", new ServiceOverridesDefinitionParser());
         registerBeanDefinitionParser("custom-connector", new MuleOrphanDefinitionParser(true));

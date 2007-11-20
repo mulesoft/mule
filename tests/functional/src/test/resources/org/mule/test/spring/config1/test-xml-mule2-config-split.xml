@@ -38,7 +38,7 @@
                 </filtering-router>
             </outbound-router>
 
-            <threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
+            <component-threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
             <!--<pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>-->
             <!--<queue-profile maxOutstandingMessages="102"/>-->
         </service>
