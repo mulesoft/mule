@@ -9,6 +9,7 @@
  */
 package org.mule.config.spring.handlers;
 
+import org.mule.components.simple.BridgeComponent;
 import org.mule.components.simple.EchoComponent;
 import org.mule.components.simple.LogComponent;
 import org.mule.components.simple.NoArgsCallWrapper;
@@ -30,7 +31,6 @@ import org.mule.config.spring.parsers.generic.NameTransferDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.BridgeServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConnectionStrategyDefinitionParser;
@@ -240,9 +240,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         BeanDefinitionParser bdpSedaComponent = new ComponentDefinitionParser(SedaComponent.class);
         registerBeanDefinitionParser("seda-component", bdpSedaComponent);
         registerBeanDefinitionParser("service", bdpSedaComponent);
-        registerBeanDefinitionParser("bridge-service", new BridgeServiceDefinitionParser());
 
         // Common POJO Services
+        registerBeanDefinitionParser("bridge-component", new SimplePojoServiceDefinitionParser(PassThroughComponent.class));
         registerBeanDefinitionParser("pass-through-component", new SimplePojoServiceDefinitionParser(PassThroughComponent.class));
         registerBeanDefinitionParser("log-component", new SimplePojoServiceDefinitionParser(LogComponent.class));
         registerBeanDefinitionParser("echo-component", new SimplePojoServiceDefinitionParser(EchoComponent.class));

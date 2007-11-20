@@ -88,7 +88,7 @@
 </link><link>
 <item>mule:service</item><page>SchemaBasics</page>
 </link><link>
-<item>mule:bridge-service</item><page>SchemaBasics</page>
+<item>mule:bridge-component</item><page>SchemaBasics</page>
 </link><link>
 <item>mule:outbound-router</item><page>SchemaBasics</page>
 </link><link>

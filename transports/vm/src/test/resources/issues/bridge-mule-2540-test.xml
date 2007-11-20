@@ -19,17 +19,31 @@
 
     <model name="test">
 
-        <bridge-service name="ReceiverUMO">
-            <vm:inbound-endpoint path="receiver"/>
-            <vm:outbound-endpoint path="echo">
-                <transformer ref="testTransformer"/>
-            </vm:outbound-endpoint>
-        </bridge-service>
+        <service name="ReceiverUMO">
+            <bridge-component/>
+            <inbound-router>
+                <vm:inbound-endpoint path="receiver"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint path="echo">
+                        <transformer ref="testTransformer"/>
+                    </vm:outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
-        <bridge-service name="EchoUMO">
-            <vm:inbound-endpoint path="echo"/>
-            <vm:outbound-endpoint path="out"/>
-        </bridge-service>
+        <service name="EchoUMO">
+            <bridge-component/>
+            <inbound-router>
+                <vm:inbound-endpoint path="echo"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint path="out"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
 
     </model>
 

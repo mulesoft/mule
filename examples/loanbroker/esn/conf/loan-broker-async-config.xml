@@ -96,8 +96,11 @@
             </outbound-router>
         </service>
 
-        <bridge-service name="TheBankGateway">
-            <inbound-endpoint ref="BankGateway"/>
+        <service name="TheBankGateway">
+            <bridge-component/>
+            <inbound-router>
+                <inbound-endpoint ref="BankGateway"/>
+            </inbound-router>
             <outbound-router>
                 <logging-catch-all-strategy/>
                 <custom-outbound-router class="org.mule.routing.outbound.StaticRecipientList">
@@ -105,7 +108,7 @@
                     <message-property-filter pattern="recipients!=null"/>
                 </custom-outbound-router>
             </outbound-router>
-        </bridge-service>
+        </service>
 
         <!--
         These are mock bank services that represent remote bank loan services

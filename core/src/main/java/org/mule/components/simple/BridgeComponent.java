@@ -30,8 +30,8 @@ import java.util.Iterator;
  * improvement. Note that because the component is never actually invoked any interceptors configured on the component
  * will not be invoked either.
  *
- * @deprecated along with bridge-component - bridge-service is generated in config from
- * {@link org.mule.components.simple.NullComponent} and {@link org.mule.routing.inbound.ForwardingConsumer}
+ * @deprecated along with bridge-component - use an empty service and, if you want an efficient transfer of messages,
+ * add a forwarding-consumer.
  */
 public class BridgeComponent implements UMOComponentAware, Callable
 {

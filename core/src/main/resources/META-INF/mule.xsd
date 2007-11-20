@@ -338,23 +338,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="bridge-service" type="bridgeServiceType" substitutionGroup="abstract-service"/>
-    <xsd:complexType name="bridgeServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractServiceType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
-                    <xsd:choice>
-                        <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
-                        <!-- extra sugar - this is inserted in the first outbound pass through router
-                             (one is added if necessary) -->
-                        <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    </xsd:choice>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <!--==============================================================-->
     <!-- POJO components                                              -->
     <!--==============================================================-->
@@ -365,6 +348,14 @@
             <xsd:extension base="pooledObjectFactoryType"/>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="bridge-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
+        <xsd:annotation>
+            <xsd:documentation>
+                Built-in BridgeComponent that enables a bridge between an inbound and outbound endpoints.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="pass-through-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
         <xsd:annotation>
