@@ -555,7 +555,7 @@
     <xsd:group name="defaultEndpointElements">
         <xsd:sequence>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                <xsd:element ref="abstract-transformer" minOccurs="0"/>
+                <xsd:group ref="endpointTransformers"/>
                 <xsd:element ref="abstract-transaction" minOccurs="0"/>
                 <xsd:element ref="abstract-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-security-filter" minOccurs="0"/>
@@ -654,6 +654,40 @@
         <xsd:attribute name="address" type="xsd:string" use="required"/>
     </xsd:complexType>
 
+    <xsd:group name="endpointTransformers">
+        <xsd:annotation>
+            <xsd:documentation>
+                This allows the user to specify either a simple list of (normal) transformers or
+                separate bracketed lists of normal and response transformers.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:choice>
+            <xsd:group ref="transformersList"/>
+            <xsd:sequence>
+                <xsd:element name="transformers" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:group ref="transformersList"/>
+                    </xsd:complexType>
+                </xsd:element>
+                <xsd:element name="responseTransformers" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:group ref="transformersList"/>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:choice>
+    </xsd:group>
+    
+    <xsd:group name="transformersList">
+        <xsd:annotation>
+            <xsd:documentation>
+                A list of transformers - normal or response, depending on context.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:group>
 
     <!--==============================================================-->
     <!--   Filter elements                                            -->

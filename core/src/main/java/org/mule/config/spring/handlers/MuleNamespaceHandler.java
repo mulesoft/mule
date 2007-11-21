@@ -50,6 +50,7 @@ import org.mule.config.spring.parsers.specific.TransactionConfigDefinitionParser
 import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.impl.DefaultComponentExceptionStrategy;
@@ -169,7 +170,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-connector", new MuleOrphanDefinitionParser(true));
 
         //Transformer elements
-        registerBeanDefinitionParser("transformer", new ParentDefinitionParser().addAlias("ref", "transformer"));
+        registerBeanDefinitionParser("transformers", new ParentDefinitionParser());
+        registerBeanDefinitionParser("responseTransformers", new ParentDefinitionParser().addAlias("transformer", "responseTransformer"));
+
+        registerBeanDefinitionParser("transformer", new TransformerRefDefinitionParser());
 
         registerBeanDefinitionParser("custom-transformer", new TransformerDefinitionParser());
         registerBeanDefinitionParser("transformer-no-action", new TransformerDefinitionParser(NoActionTransformer.class));

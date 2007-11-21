@@ -31,8 +31,16 @@
         <service name="HttpService">
             <echo-component/>
             <inbound-router>
-                <inbound-endpoint ref="httpEndpoint" transformer-refs="ByteArrayToString"
-                    responseTransformer-refs="ObjectToXml Compress ToHttpResponse"/>
+                <inbound-endpoint ref="httpEndpoint">
+                    <transformers>
+                        <transformer ref="ByteArrayToString"/>
+                    </transformers>
+                    <responseTransformers>
+                        <transformer ref="ObjectToXml"/>
+                        <transformer ref="Compress"/>
+                        <transformer ref="ToHttpResponse"/>
+                    </responseTransformers>
+                </inbound-endpoint>
             </inbound-router>
         </service>
 

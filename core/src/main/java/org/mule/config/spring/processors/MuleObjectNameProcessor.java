@@ -50,7 +50,10 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
         }
         else if (o instanceof UMOTransformer)
         {
-            ((UMOTransformer)o).setName(s);
+            if (((UMOTransformer)o).getName() == null || overwrite)
+            {
+               ((UMOTransformer)o).setName(s);
+            }
         }
         else if (o instanceof UMOEndpoint)
         {
