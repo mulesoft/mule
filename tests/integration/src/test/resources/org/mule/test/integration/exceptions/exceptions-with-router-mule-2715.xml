@@ -39,6 +39,10 @@
                     <vm:outbound-endpoint path="without-router-out"/>
                 </outbound-pass-through-router>
             </outbound-router>
+            <!-- need this instead -->
+            <default-service-exception-strategy>
+                <vm:outbound-endpoint path="error"/>
+            </default-service-exception-strategy>
         </service>
 
     </model>
