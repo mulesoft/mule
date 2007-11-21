@@ -10,8 +10,7 @@
 
 package org.mule.management.agents;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOManagementContext;
+import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,60 +20,50 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.management.remote.rmi.RMIConnectorServer;
 
-public class JmxAgentTestCase extends FunctionalTestCase
+public class JmxAgentTestCase extends AbstractMuleTestCase
 {
     private static final String[] VALID_AUTH_TOKEN = {"mule", "mulepassword"};
     private static final String DOMAIN = "JmxAgentTest";
 
-//    private JmxAgent jmxAgent;
+    private JmxAgent jmxAgent;
 
-    protected String getConfigResources()
+    protected void doSetUp() throws Exception
     {
-        return "jmx-agent.xml";
-    }
-    
-//    protected void doSetUp() throws Exception
-//    {
-//        managementContext.setId(DOMAIN);
-//        super.doSetUp();
-//        
-//        RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
-//        rmiRegistryAgent.setManagementContext(managementContext);
-//        rmiRegistryAgent.initialise();
-//        managementContext.getRegistry().registerAgent(rmiRegistryAgent);
-//
-//        jmxAgent = new JmxAgent();
-//        jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
-//        jmxAgent.setManagementContext(managementContext);
-//        jmxAgent.initialise();        
-//    }
+        super.doSetUp();
+        
+        RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
+        rmiRegistryAgent.setManagementContext(managementContext);
+        rmiRegistryAgent.initialise();
+        managementContext.getRegistry().registerAgent(rmiRegistryAgent);
 
-    protected UMOManagementContext createManagementContext() throws Exception
-    {
-        UMOManagementContext context = super.createManagementContext();
-        context.setId(DOMAIN);
-        return context;
+        jmxAgent = new JmxAgent();
+        jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
+        jmxAgent.setManagementContext(managementContext);
+        jmxAgent.initialise();
+        
+        managementContext.setId(DOMAIN);
     }
 
-//    protected void doTearDown()
-//    {
-//        jmxAgent.dispose();
-//    }
+    protected void doTearDown()
+    {
+        jmxAgent.dispose();
+    }
 
     public void testDefaultProperties() throws Exception
     {
-        JmxAgent agent = (JmxAgent) managementContext.getRegistry().lookupAgent("jmxServer");
-        assertNotNull(agent);
-        assertEquals(JmxAgent.DEFAULT_REMOTING_URI, agent.getConnectorServerUrl());
+        jmxAgent.setCredentials(getValidCredentials());
+        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.start();
     }
 
     public void testSuccessfulRemoteConnection() throws Exception
     {
-//        configureProperties();
-//        jmxAgent.setCredentials(getValidCredentials());
-//        managementContext.getRegistry().registerAgent(jmxAgent);
-//        managementContext.start();
+        configureProperties();
+        jmxAgent.setCredentials(getValidCredentials());
+        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.start();
 
         JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
         Map props = new HashMap(1);
@@ -85,53 +74,53 @@ public class JmxAgentTestCase extends FunctionalTestCase
         assertTrue(Arrays.asList(connection.getDomains()).contains("Mule." + DOMAIN));
     }
 
-//    public void testNoCredentialsProvided() throws Exception
-//    {
-////        configureProperties();
-////        jmxAgent.setCredentials(getValidCredentials());
-////        managementContext.getRegistry().registerAgent(jmxAgent);
-////        managementContext.start();
-//
-//        JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
-//        try
-//        {
-//            JMXConnectorFactory.connect(serviceUrl);
-//        }
-//        catch (SecurityException e)
-//        {
-//            // expected
-//        }
-//    }
-//
-//    public void testNonRestrictedAccess() throws Exception
-//    {
-////        configureProperties();
-////        jmxAgent.setCredentials(null);
-////        managementContext.getRegistry().registerAgent(jmxAgent);
-////        managementContext.start();
-//
-//        JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
-//        JMXConnector connector = JMXConnectorFactory.connect(serviceUrl);
-//        MBeanServerConnection connection = connector.getMBeanServerConnection();
-//        // is it the right server?
-//        assertTrue(Arrays.asList(connection.getDomains()).contains("Mule." + DOMAIN));
-//    }
-//
-////    protected Map getValidCredentials()
-////    {
-////        final Map credentials = new HashMap(1);
-////        credentials.put(VALID_AUTH_TOKEN[0], VALID_AUTH_TOKEN[1]);
-////
-////        return credentials;
-////    }
-//
-////    protected void configureProperties()
-////    {
-////        // make multi-NIC dev box happy by sticking RMI clients to a single
-////        // local ip address
-////        Map props = new HashMap();
-////        props.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,
-////                  new FixedHostRmiClientSocketFactory("127.0.0.1"));
-////        jmxAgent.setConnectorServerProperties(props);
-////    }
+    public void testNoCredentialsProvided() throws Exception
+    {
+        configureProperties();
+        jmxAgent.setCredentials(getValidCredentials());
+        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.start();
+
+        JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
+        try
+        {
+            JMXConnector connector = JMXConnectorFactory.connect(serviceUrl);
+        }
+        catch (SecurityException e)
+        {
+            // expected
+        }
+    }
+
+    public void testNonRestrictedAccess() throws Exception
+    {
+        configureProperties();
+        jmxAgent.setCredentials(null);
+        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.start();
+
+        JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
+        JMXConnector connector = JMXConnectorFactory.connect(serviceUrl);
+        MBeanServerConnection connection = connector.getMBeanServerConnection();
+        // is it the right server?
+        assertTrue(Arrays.asList(connection.getDomains()).contains("Mule." + DOMAIN));
+    }
+
+    protected Map getValidCredentials()
+    {
+        final Map credentials = new HashMap(1);
+        credentials.put(VALID_AUTH_TOKEN[0], VALID_AUTH_TOKEN[1]);
+
+        return credentials;
+    }
+
+    protected void configureProperties()
+    {
+        // make multi-NIC dev box happy by sticking RMI clients to a single
+        // local ip address
+        Map props = new HashMap();
+        props.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,
+                  new FixedHostRmiClientSocketFactory("127.0.0.1"));
+        jmxAgent.setConnectorServerProperties(props);
+    }
 }

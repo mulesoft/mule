@@ -1,4 +1,4 @@
 # java.io.IOException: javax.naming.ServiceUnavailableException [Root exception is java.rmi.ConnectException: Connection refused to host: localhost; nested exception is: 
 #	java.net.ConnectException: Connection refused]
 #	at mx4j.remote.resolver.rmi.RMIResolver.bindServer(RMIResolver.java:198)
-#org.mule.management.agents.JmxAgentTestCase
+org.mule.management.agents.JmxAgentTestCase

@@ -357,7 +357,7 @@ public class MuleServer implements Runnable
         msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
         msgs.add(" ");
         msgs.add(CoreMessages.fatalErrorInShutdown());
-        msgs.add(CoreMessages.serverStartedAt(managementContext.getSystemInfo().getStartDate()));
+        msgs.add(CoreMessages.serverStartedAt(managementContext.getStartDate()));
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
 
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
@@ -376,7 +376,7 @@ public class MuleServer implements Runnable
         logger.info("Mule server shutting dow due to normal shutdown request");
         List msgs = new ArrayList();
         msgs.add(CoreMessages.normalShutdown());
-        msgs.add(CoreMessages.serverStartedAt(managementContext.getSystemInfo().getStartDate()).getMessage());
+        msgs.add(CoreMessages.serverStartedAt(managementContext.getStartDate()).getMessage());
         msgs.add(CoreMessages.serverShutdownAt(new Date()).getMessage());
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
         logger.info(shutdownMessage);

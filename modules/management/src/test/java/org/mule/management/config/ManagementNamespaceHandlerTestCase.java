@@ -10,30 +10,28 @@
 
 package org.mule.management.config;
 
-import org.mule.RegistryContext;
-import org.mule.config.spring.SpringRegistry;
 import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
 import org.mule.impl.internal.admin.Log4jNotificationLoggerAgent;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.agents.JmxServerNotificationAgent;
 import org.mule.management.agents.Log4jAgent;
 import org.mule.management.agents.Mx4jAgent;
-import org.mule.management.agents.RmiRegistryAgent;
+import org.mule.management.support.JmxSupportFactory;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
-import org.mule.management.support.JmxSupportFactory;
-import org.mule.registry.Registry;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.umo.manager.UMOAgent;
+import org.mule.RegistryContext;
+import org.mule.config.spring.SpringRegistry;
+import org.mule.registry.Registry;
 
+import javax.management.ObjectInstance;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.ObjectInstance;
 
 public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -76,10 +74,6 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(agent);
         assertEquals(JmxServerNotificationAgent.class, agent.getClass());
 
-        agent = managementContext.getRegistry().lookupAgent("rmiAgent");
-        assertNotNull(agent);
-        assertEquals(RmiRegistryAgent.class, agent.getClass());
-        
         agent = managementContext.getRegistry().lookupAgent("log4JNotificationAgent");
         assertNotNull(agent);
         assertEquals(Log4jNotificationLoggerAgent.class, agent.getClass());
@@ -104,12 +98,11 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         SpringRegistry springRegistry = (SpringRegistry) registry.getParent();
         assertNotNull(springRegistry);
         Collection agents = springRegistry.lookupObjects(UMOAgent.class);
-        assertEquals(agents.size(), 9);
+        assertEquals(agents.size(), 8);
         Iterator iter = agents.iterator();
         assertTrue(iter.next() instanceof JmxAgent);
         assertTrue(iter.next() instanceof Log4jAgent);
         assertTrue(iter.next() instanceof Mx4jAgent);
-        assertTrue(iter.next() instanceof RmiRegistryAgent);
         assertTrue(iter.next() instanceof TestAgent);
         assertTrue(iter.next() instanceof JmxServerNotificationAgent);
         Log4jNotificationLoggerAgent log4jAgent = (Log4jNotificationLoggerAgent) iter.next();

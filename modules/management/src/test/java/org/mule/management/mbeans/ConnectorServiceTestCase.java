@@ -29,8 +29,8 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
         final UMOConnector connector = new TestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();
-        managementContext.getRegistry().registerConnector(connector);
-        managementContext.getRegistry().registerAgent(jmxAgent);
+        managementContext.getRegistry().registerConnector(connector, managementContext);
+        managementContext.getRegistry().registerAgent(jmxAgent, managementContext);
         managementContext.start();
 
         final String query = jmxSupport.getDomainName(managementContext) + ":*";

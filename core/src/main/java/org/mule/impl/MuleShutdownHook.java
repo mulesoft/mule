@@ -85,7 +85,7 @@ public class MuleShutdownHook extends Thread
             UMOManagementContext context = MuleServer.getManagementContext();
             if(context!=null)
             {
-                msgs.add(CoreMessages.serverStartedAt(context.getSystemInfo().getStartDate()));
+                msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
             }
         }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
@@ -112,7 +112,7 @@ public class MuleShutdownHook extends Thread
 
         if(context!=null)
         {
-            msgs.add(CoreMessages.serverStartedAt(context.getSystemInfo().getStartDate()));
+            msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
         }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 86);

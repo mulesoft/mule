@@ -32,8 +32,6 @@ import org.apache.commons.logging.LogFactory;
  * <code>MuleConfiguration</code> holds the runtime configuration specific to the
  * <code>MuleManager</code>. Once the <code>MuleManager</code> has been
  * initialised this class is immutable.
- * 
- * TODO MULE-2162 MuleConfiguration should be a stateless "view" of info. in the Registry
  */
 public class MuleConfiguration
 {
@@ -109,7 +107,7 @@ public class MuleConfiguration
     private String workingDirectory;
 
     /** The configuration resources used to configure the MuleManager instance */
-    //private String[] configResources = new String[]{};
+    private String[] configResources = new String[]{};
 
     /**
      * Whether the server instance is running in client mode, which means that some
@@ -219,26 +217,26 @@ public class MuleConfiguration
         updateApplicationProperty(MuleProperties.MULE_WORKING_DIRECTORY_PROPERTY, this.workingDirectory);
     }
 
-//    public String[] getConfigResources()
-//    {
-//        return configResources;
-//    }
-//
-//    public void setConfigResources(String[] configResources)
-//    {
-//        if (configResources != null)
-//        {
-//            int current = this.configResources.length;
-//            String[] newResources = new String[configResources.length + current];
-//            System.arraycopy(this.configResources, 0, newResources, 0, current);
-//            System.arraycopy(configResources, 0, newResources, current, configResources.length);
-//            this.configResources = newResources;
-//        }
-//        else
-//        {
-//            this.configResources = configResources;
-//        }
-//    }
+    public String[] getConfigResources()
+    {
+        return configResources;
+    }
+
+    public void setConfigResources(String[] configResources)
+    {
+        if (configResources != null)
+        {
+            int current = this.configResources.length;
+            String[] newResources = new String[configResources.length + current];
+            System.arraycopy(this.configResources, 0, newResources, 0, current);
+            System.arraycopy(configResources, 0, newResources, current, configResources.length);
+            this.configResources = newResources;
+        }
+        else
+        {
+            this.configResources = configResources;
+        }
+    }
 
 
     public int getDefaultTransactionTimeout()

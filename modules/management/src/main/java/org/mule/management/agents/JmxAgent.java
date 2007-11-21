@@ -361,7 +361,7 @@ public class JmxAgent extends AbstractAgent
         final WrapperManagerAgent wmAgent = new WrapperManagerAgent();
         if (managementContext.getRegistry().lookupAgent(wmAgent.getName()) == null)
         {
-           managementContext.getRegistry().registerAgent(wmAgent);
+           managementContext.getRegistry().registerAgent(wmAgent, managementContext);
         }
     }
 
