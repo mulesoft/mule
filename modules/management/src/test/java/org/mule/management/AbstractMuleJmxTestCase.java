@@ -10,12 +10,12 @@
 
 package org.mule.management;
 
+import org.mule.RegistryContext;
 import org.mule.management.agents.RmiRegistryAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.RegistryContext;
 
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectInstance;
-import javax.management.ObjectName;
 
 /**
  * This base test case will create a new <code>MBean Server</code> if necessary,
@@ -41,7 +40,7 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
         RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
         rmiRegistryAgent.setManagementContext(managementContext);
         rmiRegistryAgent.initialise();
-        RegistryContext.getRegistry().registerAgent(rmiRegistryAgent, managementContext);
+        RegistryContext.getRegistry().registerAgent(rmiRegistryAgent);
         
         // simulate a running environment with Log4j MBean already registered
         List servers = MBeanServerFactory.findMBeanServer(null);

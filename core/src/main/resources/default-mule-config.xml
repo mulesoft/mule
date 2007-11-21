@@ -7,7 +7,8 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"
        default-init-method="initialise">
 
-    <bean name="_muleManagementContext" class="org.mule.config.spring.ManagementContextFactoryBean">
+    <bean name="_muleManagementContext" class="org.mule.config.spring.ManagementContextFactoryBean" 
+          depends-on="_muleRegistry">
         <constructor-arg ref="_muleLifecycleManager"/>
         <property name="workManager" ref="_muleWorkManager"/>
     </bean>
@@ -49,11 +50,14 @@
     <bean name="_muleRegistry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean">
     </bean>
 
+<!-- 
      <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"
           depends-on="_muleRegistry"/>
-
+-->
     <mule:mule name="_muleSystemModel">
 
+    <bean name="_defaultx" class="org.mule.config.MuleConfiguration"/>
+<!-- 
         <mule:configuration
                 serverId="_defaultx"
                 defaultSynchronousEndpoints="false"
@@ -63,12 +67,13 @@
                 defaultEncoding="UTF-8"
                 defaultTransactionTimeout="5000"
                 workingDirectory=".mule"/>
-
+ -->
+ 
         <mule:model name="_muleSystemModel" />
 
     </mule:mule>
 
-    <bean name="_muleLifecycleManager" class="org.mule.impl.lifecycle.GenericLifecycleManager" scope="prototype">
+    <bean name="_muleLifecycleManager" class="org.mule.impl.lifecycle.GenericLifecycleManager">
         <property name="lifecycles">
             <set>
                 <ref bean="_muleInitLifecycle"/>
@@ -85,10 +90,16 @@
         <constructor-arg value="dispose"/>
     </bean>
 
-    <bean name="_muleStartLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextStartPhase"/>
-
-    <bean name="_muleStopLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextStopPhase"/>
-
+    <bean name="_muleStartLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextStartPhase">
+        <!-- Creates a circular reference 
+        <constructor-arg ref="_muleNotificationManager"/> -->
+    </bean>
+ 
+    <bean name="_muleStopLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextStopPhase">
+        <!-- Creates a circular reference 
+        <constructor-arg ref="_muleNotificationManager"/> -->
+    </bean>
+ 
     <bean name="_muleDisposeLifecycle" class="org.mule.impl.lifecycle.ContainerManagedLifecyclePhase">
         <constructor-arg value="dispose"/>
         <constructor-arg value="org.mule.umo.lifecycle.Disposable"/>

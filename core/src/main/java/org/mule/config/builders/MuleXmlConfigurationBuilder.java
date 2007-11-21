@@ -115,7 +115,7 @@ public class MuleXmlConfigurationBuilder extends AbstractConfigurationBuilder
                 mc.start();
             }
 
-            registry.getConfiguration().setConfigResources(configResources);
+            //registry.getConfiguration().setConfigResources(configResources);
 
             return mc;
         }

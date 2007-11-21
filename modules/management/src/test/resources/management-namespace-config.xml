@@ -19,6 +19,8 @@
 
     <management:jmx-mx4j-adaptor name="jmx-mx4j" jmxAdaptorUrl="http://127.0.0.1:8000"/>
 
+    <management:rmi-server name="rmiAgent"/>
+    
     <management:custom-agent name="test-custom-agent" class="org.mule.tck.testmodels.mule.TestAgent"/>
 
     <management:jmx-notifications name="jmxNotificationAgent"/>
@@ -28,5 +30,4 @@
     <management:chainsaw-notifications chainsawPort="8080" name="chainsawNotificationAgent" chainsawHost="127.0.0.1"/>
 
     <management:publish-notifications name="publishNotificationAgent" endpointAddress="test://test"/>
-
  </mule>

@@ -23,8 +23,8 @@ import org.mule.umo.security.UMOSecurityManager;
 import org.mule.util.ClassUtils;
 import org.mule.util.queue.QueueManager;
 
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.transaction.TransactionManager;
 
@@ -129,11 +129,6 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     {
         super.afterPropertiesSet();
         init();
-        managementContext.setNotificationManager(notificationManager);
-        managementContext.setQueueManager(queueManager);
-        managementContext.setSecurityManager(securityManager);
-        managementContext.setWorkManager(workManager);
-        managementContext.setTransactionManager(transactionManager);
         managementContext.initialise();
     }
 
@@ -238,10 +233,10 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
         }
     }
 
-    public void setManagerId(String managerId)
-    {
-        managementContext.setId(managerId);
-    }
+//    public void setManagerId(String managerId)
+//    {
+//        managementContext.setId(managerId);
+//    }
 
 
     protected void setLegacyProperties(Map props)

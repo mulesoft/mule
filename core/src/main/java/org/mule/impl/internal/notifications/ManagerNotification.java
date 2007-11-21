@@ -10,6 +10,7 @@
 
 package org.mule.impl.internal.notifications;
 
+import org.mule.impl.SystemInfo;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.manager.UMOServerNotification;
 
@@ -57,41 +58,33 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
         registerAction("manager stopped models", MANAGER_STOPPED_MODELS);
     }
 
-    private String clusterId;
-    private String domain;
-
-
-    public ManagerNotification(UMOManagementContext context, String action)
+    private SystemInfo sysInfo;
+    
+    public ManagerNotification(SystemInfo sysInfo, String action)
     {
-        this(context, getActionId(action));
+        this(sysInfo, getActionId(action));
     }
 
-    public ManagerNotification(UMOManagementContext context, int action)
+    public ManagerNotification(SystemInfo sysInfo, int action)
     {
-        super(getId(context), action);
-        resourceIdentifier = getId(context);
-        this.clusterId = context.getClusterId();
-        this.domain = context.getDomain();
-    }
-
-    private static String getId(UMOManagementContext context)
-    {
-        return context.getDomain() + "." + context.getClusterId() + "." + context.getId();
+        super(sysInfo.getCompositeId(), action);
+        resourceIdentifier = sysInfo.getCompositeId();
+        this.sysInfo = sysInfo;
     }
 
     public String getClusterId()
     {
-        return clusterId;
+        return sysInfo.getClusterId();
     }
 
     public String getDomain()
     {
-        return domain;
+        return sysInfo.getDomain();
     }
 
     protected String getPayloadToString()
     {
-        return ((UMOManagementContext) source).getId();
+        return ((UMOManagementContext) source).getSystemInfo().getId();
     }
 
     public String toString()
