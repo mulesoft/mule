@@ -140,3 +140,6 @@ org.mule.test.integration.streaming.FileToTcpStreamingTestCase
 	
 # @ in URI is not getting replaced (1 of 3 tests fails)
 org.mule.test.integration.util.ObjectNameHelperTestCase
+
+# MULE-2715
+org.mule.test.integration.exceptions.ExceptionsWithRouterMule2715TestCase

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <vm:connector name="vm" queueEvents="true">
+        <default-connector-exception-strategy>
+            <vm:outbound-endpoint path="error"/>
+        </default-connector-exception-strategy>
+    </vm:connector>
+
+    <custom-transformer name="fail" class="org.mule.test.transformers.FailingTransformer"/>
+
+    <model name="test">
+
+        <service name="with-router">
+            <inbound-router>
+                <vm:inbound-endpoint path="with-router-in" transformer-refs="fail"/>
+                <forwarding-router/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint path="with-router-out"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+        <service name="without-router">
+            <inbound-router>
+                <vm:inbound-endpoint path="without-router-in" transformer-refs="fail"/>
+            </inbound-router>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint path="without-router-out"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+    </model>
+    
+</mule>
