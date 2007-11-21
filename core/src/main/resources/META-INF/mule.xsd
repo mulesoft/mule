@@ -286,7 +286,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractServiceType">
                 <xsd:sequence>
-                    <!-- minOccurs="0" to allow for <forwarding-router> which doesn't need a service. -->
+                    <!-- minOccurs="0" to allow for <forwarding-router/> and/or default component -->
                     <xsd:element ref="abstract-component" minOccurs="0"/>
                     <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
                     <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>

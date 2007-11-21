@@ -25,23 +25,18 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  */
 public class UdpConnector extends AbstractConnector
 {
+
+    public static final String UDP = "udp";
     public static final int DEFAULT_SOCKET_TIMEOUT = INT_VALUE_NOT_SET;
     public static final int DEFAULT_BUFFER_SIZE = 1024 * 16;
-
     public static final String KEEP_SEND_SOCKET_OPEN_PROPERTY = "keepSendSocketOpen";
 
     protected int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
-
     protected int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
-
     protected int sendBufferSize = DEFAULT_BUFFER_SIZE;
-
     protected int receiveBufferSize = DEFAULT_BUFFER_SIZE;
-
     protected boolean keepSendSocketOpen = true;
-
     protected boolean broadcast;
-
     protected GenericKeyedObjectPool dispatcherSocketsPool = new GenericKeyedObjectPool();
 
 
@@ -88,7 +83,7 @@ public class UdpConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "udp";
+        return UDP;
     }
 
     public int getSendTimeout()

@@ -12,12 +12,13 @@ package org.mule.providers.udp.i18n;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.providers.udp.UdpConnector;
 
 import java.net.URI;
 
 public class UdpMessages extends MessageFactory
 {
-    private static final String BUNDLE_PATH = getBundlePath("udp");
+    private static final String BUNDLE_PATH = getBundlePath(UdpConnector.UDP);
 
     public static Message failedToBind(URI uri)
     {
