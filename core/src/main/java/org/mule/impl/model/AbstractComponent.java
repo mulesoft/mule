@@ -10,6 +10,7 @@
 
 package org.mule.impl.model;
 
+import org.mule.components.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.DefaultComponentExceptionStrategy;
@@ -47,6 +48,7 @@ import org.mule.umo.routing.UMOOutboundRouterCollection;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 import org.mule.util.concurrent.WaitableBoolean;
 import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.SingletonObjectFactory;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
@@ -115,8 +117,9 @@ public abstract class AbstractComponent implements UMOComponent
 
     /**
      * Factory which creates an instance of the actual service object.
+     * By default a singleton object factory with the {@link PassThroughComponent} is used
      */
-    protected ObjectFactory serviceFactory;
+    protected ObjectFactory serviceFactory = new SingletonObjectFactory(PassThroughComponent.class);
 
     /**
      * The component's name
@@ -204,6 +207,8 @@ public abstract class AbstractComponent implements UMOComponent
             ((ManagementContextAware) exceptionListener).setManagementContext(managementContext);
             ((Initialisable) exceptionListener).initialise();
         }
+        
+        serviceFactory.initialise();
         
         doInitialise();
 

@@ -10,12 +10,14 @@
 
 package org.mule.mule;
 
+import org.mule.components.simple.PassThroughComponent;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.util.object.SingletonObjectFactory;
 
 public class MuleDescriptorTestCase extends AbstractMuleTestCase
 {
@@ -35,7 +37,11 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 //        assertEquals("1.0", descriptor.getVersion());
         // assertEquals(2, descriptor.getInitialisationPolicy());
 
-        assertNull("Factory should be null but is " + component.getServiceFactory(), component.getServiceFactory());
+        //assertNull("Factory should be null but is " + component.getServiceFactory(), component.getServiceFactory());
+        assertNotNull(component.getServiceFactory());
+        assertEquals(SingletonObjectFactory.class, component.getServiceFactory().getClass());
+        component.getServiceFactory().initialise();
+        assertTrue(component.getServiceFactory().getOrCreate() instanceof PassThroughComponent);
         assertNull(component.getName());
         //assertEquals(0, component.getProperties().size());
     }

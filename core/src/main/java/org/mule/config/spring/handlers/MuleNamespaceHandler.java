@@ -39,7 +39,6 @@ import org.mule.config.spring.parsers.specific.EnvironmentPropertyDefinitionPars
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ForwardingRouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MuleAdminAgentDefinitionParser;
-import org.mule.config.spring.parsers.specific.PassThroughComponentAdapter;
 import org.mule.config.spring.parsers.specific.PojoComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
@@ -236,8 +235,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //registerBeanDefinitionParser("non-void-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", NonVoidEntryPointResolver.class));
 
         // Services
-        registerBeanDefinitionParser("seda-component", new PassThroughComponentAdapter(new ServiceDefinitionParser(SedaComponent.class)));
-        registerBeanDefinitionParser("service", new PassThroughComponentAdapter(new ServiceDefinitionParser(SedaComponent.class)));
+        registerBeanDefinitionParser("seda-component", new ServiceDefinitionParser(SedaComponent.class));
+        registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaComponent.class));
 
         // Pojo Components
         registerBeanDefinitionParser("component", new ComponentDefinitionParser());
