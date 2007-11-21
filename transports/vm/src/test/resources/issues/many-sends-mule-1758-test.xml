@@ -14,10 +14,12 @@
 
     <model name="synchTestModel">
         <service name="mySynchService">
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="returnMessage" value="Polo"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="Polo"/>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <vm:inbound-endpoint path="s-in" synchronous="true"/>

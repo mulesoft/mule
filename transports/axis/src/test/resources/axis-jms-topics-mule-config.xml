@@ -39,14 +39,18 @@
         </service>
 
         <service name="mycomponent3">
-            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://topic:mycomponent3"/>
             </inbound-router>
         </service>
 
         <service name="mycomponent4">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://topic:mycomponent4" synchronous="false"/>
             </inbound-router>

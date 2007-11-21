@@ -23,7 +23,9 @@
         </service>
 
         <service name="ChunkingReceiver">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent" />
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent" />
+            </component>
             <inbound-router>
                 <inbound-endpoint address="vm://chunking.channel" />
                 <message-chunking-aggregator-router/>

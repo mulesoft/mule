@@ -22,11 +22,13 @@
     <model name="TEST">
 
         <service name="Part1">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
-                </properties>
-            </singleton-object>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
+                    </properties>
+                </singleton-object>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC1"/>
             </inbound-router>
@@ -38,11 +40,13 @@
         </service>
 
         <service name="Part3">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
-                </properties>
-            </singleton-object>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
+                    </properties>
+                </singleton-object>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC2"/>
             </inbound-router>

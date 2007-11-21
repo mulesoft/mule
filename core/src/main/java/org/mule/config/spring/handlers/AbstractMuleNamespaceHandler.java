@@ -9,14 +9,11 @@
  */
 package org.mule.config.spring.handlers;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.delegate.AbstractDelegatingDefinitionParser;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.factories.ResponseEndpointFactoryBean;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -37,18 +34,6 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
     protected final void registerIgnoredElement(String name)
     {
         registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
-    }
-
-    protected final MuleDefinitionParser registerMuleDefinitionParser(String name, AbstractMuleBeanDefinitionParser parser)
-    {
-        super.registerBeanDefinitionParser(name, parser);
-        return parser;
-    }
-
-    protected final MuleDefinitionParser registerDelegateDefinitionParser(String name, AbstractDelegatingDefinitionParser parser)
-    {
-        super.registerBeanDefinitionParser(name, parser);
-        return parser;
     }
 
     private class IgnoredDefinitionParser implements BeanDefinitionParser

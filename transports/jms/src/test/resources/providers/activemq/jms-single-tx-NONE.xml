@@ -24,11 +24,13 @@
     <model name="jmsTest">
 
         <service name="InputPart">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
-                </properties>
-            </singleton-object>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
+                    </properties>
+                </singleton-object>
+            </component>
             <inbound-router>
                 <inbound-endpoint ref="in">
                     <transaction action="NONE">
@@ -44,11 +46,13 @@
         </service>
 
         <service name="OutputPart">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
-                </properties>
-            </singleton-object>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
+                    </properties>
+                </singleton-object>
+            </component>
             <inbound-router>
                 <inbound-endpoint ref="middle"/>
             </inbound-router>

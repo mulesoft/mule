@@ -140,7 +140,9 @@
             with return the result of the invocation
             -->
             <mule:service name="CreditAgencyService">
-                <mule:singleton-object instance-ref="creditAgencyEJB"/>
+                <mule:component>
+                    <mule:singleton-object instance-ref="creditAgencyEJB"/>
+                </mule:component>
                 <mule:inbound-router>
                     <mule:inbound-endpoint ref="CreditAgency" />
                 </mule:inbound-router>

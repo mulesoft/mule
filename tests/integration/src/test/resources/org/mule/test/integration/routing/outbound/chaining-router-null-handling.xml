@@ -56,10 +56,12 @@
         </service>
 
         <service name="component1">
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="appendComponentName" value="true"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="appendComponentName" value="true"/>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <inbound-endpoint address="vm://component1"/>
@@ -67,11 +69,13 @@
         </service>
 
         <service name="component1Fail">
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
                     <spring:entry key="throwException" value="true"/>
                     <spring:entry key="appendComponentName" value="true"/>
-                </properties>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <inbound-endpoint address="vm://component1Fail"/>
@@ -79,10 +83,12 @@
         </service>
 
         <service name="component2Pass">
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="appendComponentName" value="true"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="appendComponentName" value="true"/>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <inbound-endpoint address="vm://component2Pass"/>
@@ -90,11 +96,13 @@
         </service>
 
         <service name="component2Fail">
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="throwException" value="true"/>
-                    <spring:entry key="appendComponentName" value="true"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="throwException" value="true"/>
+                        <spring:entry key="appendComponentName" value="true"/>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <inbound-endpoint address="vm://component2Fail"/>

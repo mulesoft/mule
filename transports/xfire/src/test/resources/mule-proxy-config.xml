@@ -36,10 +36,12 @@
         </service>
 
         <service name="webServiceProxyWitWsdlFromFile">
-            <component class="org.mule.providers.soap.WSProxyService">
-                <properties>
-                    <spring:entry key="wsdlFile" value="localWsdl.wsdl"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.providers.soap.WSProxyService">
+                    <properties>
+                        <spring:entry key="wsdlFile" value="localWsdl.wsdl"/>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <inbound-endpoint address="http://localhost:6075/webServiceProxy"/>

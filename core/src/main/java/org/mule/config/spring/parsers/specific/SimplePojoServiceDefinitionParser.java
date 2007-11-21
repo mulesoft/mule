@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * In order to further customize components and use serviceFactory properties the
  * &lt;mule:component/&gt; element should be used.
  */
-public class SimplePojoServiceDefinitionParser extends PojoServiceDefinitionParser
+public class SimplePojoServiceDefinitionParser extends PojoComponentDefinitionParser
 {
     private Class clazz;
 

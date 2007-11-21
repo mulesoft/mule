@@ -28,15 +28,17 @@
         </service>
 
         <service name="mycomponent2">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent">
-                <properties>
-                    <spring:entry key="serviceInterfaces">
-                        <spring:list>
-                            <spring:value>org.mule.components.simple.EchoService</spring:value>
-                            <spring:value>org.mule.tck.testmodels.services.DateService</spring:value>
-                        </spring:list>
-                    </spring:entry>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.tck.testmodels.services.TestServiceComponent">
+                    <properties>
+                        <spring:entry key="serviceInterfaces">
+                            <spring:list>
+                                <spring:value>org.mule.components.simple.EchoService</spring:value>
+                                <spring:value>org.mule.tck.testmodels.services.DateService</spring:value>
+                            </spring:list>
+                        </spring:entry>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://mycomponent2"/>
@@ -44,14 +46,18 @@
         </service>
 
         <service name="mycomponent3">
-            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://mycomponent3"/>
             </inbound-router>
         </service>
 
         <service name="mycomponent4">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://mycomponent4" synchronous="false"/>
             </inbound-router>

@@ -24,11 +24,13 @@
     <model name="main">
 
         <service name="GroovyUMO1">
-            <component class="org.mule.components.script.jsr223.ScriptMessageBuilder">
-                <properties>
-                    <spring:entry key="scriptEngineName" value="groovy"/>
-                    <spring:entry key="scriptText" value-ref="scriptText1"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.components.script.jsr223.ScriptMessageBuilder">
+                    <properties>
+                        <spring:entry key="scriptEngineName" value="groovy"/>
+                        <spring:entry key="scriptText" value-ref="scriptText1"/>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <inbound-endpoint address="vm://groovy.1"/>
@@ -42,11 +44,13 @@
         </service>
 
         <service name="GroovyUMO2">
-            <component class="org.mule.components.script.jsr223.ScriptComponent">
-                <properties>
-                    <spring:entry key="scriptEngineName" value="groovy"/>
-                    <spring:entry key="scriptText" value-ref="scriptText2"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
+                    <properties>
+                        <spring:entry key="scriptEngineName" value="groovy"/>
+                        <spring:entry key="scriptText" value-ref="scriptText2"/>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <inbound-endpoint address="vm://groovy.2"/>
@@ -54,12 +58,15 @@
         </service>
 
         <service name="GroovyUMO3">
-            <component class="org.mule.components.script.jsr223.ScriptComponent">
-                <properties>
-                    <spring:entry key="scriptEngineName" value="groovy"/>
-                    <spring:entry key="scriptText" value-ref="scriptText3"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
+                    <properties>
+                        <spring:entry key="scriptEngineName" value="groovy"/>
+                        <spring:entry key="scriptText" value-ref="scriptText3"/>
+                    </properties>
+                </pooled-object>
             </component>
+
             <inbound-router>
                 <inbound-endpoint address="vm://groovy.3"/>
             </inbound-router>

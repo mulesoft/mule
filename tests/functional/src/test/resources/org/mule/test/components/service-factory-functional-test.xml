@@ -12,17 +12,21 @@
         </service>
 
         <service name="orange2">
-            <component class="org.mule.tck.testmodels.fruit.Orange">
-                <properties>
-                    <spring:entry key="brand" value="Florida Sunny"/>
-                    <spring:entry key="segments" value="8"/>
-                    <spring:entry key="radius" value="15"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.tck.testmodels.fruit.Orange">
+                    <properties>
+                        <spring:entry key="brand" value="Florida Sunny"/>
+                        <spring:entry key="segments" value="8"/>
+                        <spring:entry key="radius" value="15"/>
+                    </properties>
+                </pooled-object>
             </component>
         </service>
 
         <service name="orange3">
-            <singleton-object instance-ref="myOnlyOrange"/>
+            <component>
+                <singleton-object instance-ref="myOnlyOrange"/>
+            </component>
         </service>
 
         <!-- TODO MULE-2060  

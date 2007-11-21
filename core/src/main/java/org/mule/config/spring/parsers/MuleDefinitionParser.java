@@ -13,6 +13,7 @@ package org.mule.config.spring.parsers;
 import java.util.Map;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
@@ -27,7 +28,7 @@ import org.w3c.dom.Element;
  * {@link org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#parseInternal(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
  * and so can be delegated).
  */
-public interface MuleDefinitionParser
+public interface MuleDefinitionParser extends BeanDefinitionParser
 {
 
     AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext);

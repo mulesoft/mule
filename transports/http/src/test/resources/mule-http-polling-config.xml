@@ -21,7 +21,9 @@
     <model name="http polling test model">
 
         <service name="pollingUMO">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="http://marie:marie@localhost:60205" connector-ref="PollingHttpConnector">
                     <properties>
@@ -37,7 +39,9 @@
         </service>
 
         <service name="polledUMO">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="http://localhost:60205" connector-ref="HttpConnector"/>
             </inbound-router>

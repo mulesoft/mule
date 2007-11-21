@@ -84,7 +84,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="rest-service-component" type="restServiceWrapperType" substitutionGroup="mule:abstract-object-factory">
+    <xsd:element name="rest-service-component" type="restServiceWrapperType" substitutionGroup="mule:abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in RestServiceWrapper can used to proxy REST style services as local Mule Components.

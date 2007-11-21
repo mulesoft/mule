@@ -14,10 +14,12 @@
     <model name="test">
 
         <service name="mycomponent1">
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="returnMessage" value="mycomponent1"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="mycomponent1"/>
+                    </properties>
+                </pooled-object>
             </component>
 
             <inbound-router>
@@ -26,10 +28,12 @@
         </service>
 
         <service name="mycomponent2">
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="returnMessage" value="mycomponent2"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="mycomponent2"/>
+                    </properties>
+                </pooled-object>
             </component>
 
             <inbound-router>

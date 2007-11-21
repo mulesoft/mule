@@ -26,7 +26,9 @@
     <model name="ESTest">
 
         <service name="FolderTO">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint ref="get" transformer-refs="FileToByteArray">
                     <properties>

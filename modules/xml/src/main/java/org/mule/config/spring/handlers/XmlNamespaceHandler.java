@@ -37,7 +37,7 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("jxpath-filter", new ChildDefinitionParser("filter", JXPathFilter.class));
         registerBeanDefinitionParser("is-xml-filter", new ChildDefinitionParser("filter", IsXmlFilter.class));
         registerBeanDefinitionParser("message-splitter", new RouterDefinitionParser("router", FilteringXmlMessageSplitter.class));
-        registerMuleDefinitionParser("round-robin-splitter", new RouterDefinitionParser("router", RoundRobinXmlSplitter.class)).addAlias("endpointFiltering", "enableEndpointFiltering");
+        registerBeanDefinitionParser("round-robin-splitter", new RouterDefinitionParser("router", RoundRobinXmlSplitter.class).addAlias("endpointFiltering", "enableEndpointFiltering"));
         registerBeanDefinitionParser("dom-to-xml", new MuleOrphanDefinitionParser(DomDocumentToXml.class, false));
         registerBeanDefinitionParser("dom-to-output-handler", new MuleOrphanDefinitionParser(DocumentToOutputHandler.class, false));
         registerBeanDefinitionParser("jxpath-extractor", new MuleOrphanDefinitionParser(JXPathExtractor.class, false));

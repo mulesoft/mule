@@ -10,14 +10,18 @@
 
     <model name="test">
         <service name="mycomponent">
-            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:62108/mule"/>
             </inbound-router>
         </service>
 
         <service name="mycomponent2">
-            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:62109/mule/services">
                     <properties>
@@ -33,14 +37,18 @@
         </service>
 
         <service name="mycomponent3">
-            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:62109"/>
             </inbound-router>
         </service>
 
         <service name="mycomponent4">
-            <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:62110" synchronous="false"/>
             </inbound-router>

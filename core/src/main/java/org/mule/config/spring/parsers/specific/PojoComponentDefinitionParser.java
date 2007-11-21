@@ -19,15 +19,15 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class PojoServiceDefinitionParser extends ObjectFactoryDefinitionParser
+public class PojoComponentDefinitionParser extends ObjectFactoryDefinitionParser
 {
 
-    public PojoServiceDefinitionParser(Class beanClass)
+    public PojoComponentDefinitionParser(Class beanClass)
     {
         this(beanClass, "serviceFactory");
     }                                                             
     
-    public PojoServiceDefinitionParser(Class beanClass, String setterMethod)
+    public PojoComponentDefinitionParser(Class beanClass, String setterMethod)
     {
         super(beanClass, setterMethod);
     }

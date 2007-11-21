@@ -24,10 +24,12 @@
     <model name="samples">
 
         <service name="restTest">
-            <component class="org.mule.samples.rest.RestTester">
-                <properties>
-                    <spring:entry key="prefix" value="Received"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.samples.rest.RestTester">
+                    <properties>
+                        <spring:entry key="prefix" value="Received"/>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <inbound-endpoint address="servlet://restPUTTest"/>

@@ -42,20 +42,22 @@
 
     <model name="Sample-Rest">
         <service name="HTTPPostSample">
-            <component class="org.mule.providers.http.components.RestServiceWrapper">
-                <properties>
-                    <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                    <spring:entry key="payloadParameterNames">
-                        <spring:bean class="org.springframework.beans.factory.config.ListFactoryBean">
-                            <spring:property name="sourceList">
-                                <spring:list>
-                                    <spring:value>symbol</spring:value>
-                                </spring:list>
-                            </spring:property>
-                        </spring:bean>
-                    </spring:entry>
-                    <spring:entry key="httpMethod" value="POST"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.providers.http.components.RestServiceWrapper">
+                    <properties>
+                        <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+                        <spring:entry key="payloadParameterNames">
+                            <spring:bean class="org.springframework.beans.factory.config.ListFactoryBean">
+                                <spring:property name="sourceList">
+                                    <spring:list>
+                                        <spring:value>symbol</spring:value>
+                                    </spring:list>
+                                </spring:property>
+                            </spring:bean>
+                        </spring:entry>
+                        <spring:entry key="httpMethod" value="POST"/>
+                    </properties>
+                </pooled-object>
             </component>
 
             <inbound-router>

@@ -8,25 +8,31 @@
 
     <model name="test">
         <service name="mycomponent">
-            <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="xfire:http://localhost:38103/mule/services"/>
             </inbound-router>
         </service>
 
         <service name="mycomponent2">
-            <singleton-object class="org.mule.test.integration.service.TestServiceComponent">
-                <properties>
-                    <spring:entry key="serviceInterfaces" value="org.mule.components.simple.EchoService"/>
-                </properties>
-            </singleton-object>
+            <component>
+                <singleton-object class="org.mule.test.integration.service.TestServiceComponent">
+                    <properties>
+                        <spring:entry key="serviceInterfaces" value="org.mule.components.simple.EchoService"/>
+                    </properties>
+                </singleton-object>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="xfire:http://localhost:38104/mule/services"/>
             </inbound-router>
         </service>
 
         <service name="mycomponent3">
-            <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="xfire:http://localhost:38104/mule/services"/>
             </inbound-router>

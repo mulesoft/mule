@@ -17,7 +17,9 @@
     <model name="echoModel">
 
         <service name="echo">
-            <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
+            <component>
+                <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
+            </component>
             <inbound-router>
                 <tcp:inbound-endpoint host="localhost" port="65432" synchronous="true"/>
             </inbound-router>
@@ -30,7 +32,9 @@
         </service>
         
         <service name="testComponent">
-            <singleton-object class="org.mule.providers.tcp.integration.EOFStreamingTestComponent"/>
+            <component>
+                <singleton-object class="org.mule.providers.tcp.integration.EOFStreamingTestComponent"/>
+            </component>
             <inbound-router>
                 <tcp:inbound-endpoint host="localhost" port="65433" synchronous="true"/>
             </inbound-router>

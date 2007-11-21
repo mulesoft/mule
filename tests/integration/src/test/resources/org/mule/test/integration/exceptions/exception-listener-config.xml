@@ -12,10 +12,12 @@
 
     <model name="test">
         <service name="mycomponent">
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="throwException" value="true"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="throwException" value="true"/>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <inbound-endpoint address="vm://component.in"/>

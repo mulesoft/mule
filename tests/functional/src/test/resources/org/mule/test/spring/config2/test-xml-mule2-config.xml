@@ -116,35 +116,42 @@
             <!-- component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/ -->
 
             <mule:service name="orangeComponent">
-
-                <mule:singleton-object instance-ref="orange">
-                    <mule:properties>
-                        <entry key="brand" value="Juicy Baby!"/>
-                        <entry key="segments" value="9"/>
-                        <entry key="radius" value="4.21"/>
-                        <entry key="mapProperties">
-                            <map>
-                                <entry key="prop1" value="prop1"/>
-                                <entry key="prop2" value="prop2"/>
-                            </map>
-                        </entry>
-                        <entry key="listProperties">
-                            <list>
-                                <value>prop1</value>
-                                <value>prop2</value>
-                                <value>prop3</value>
-                            </list>
-                        </entry>
-                        <entry key="arrayProperties">
-                            <list>
-                                <value>prop4</value>
-                                <value>prop5</value>
-                                <value>prop6</value>
-                            </list>
-                        </entry>
-                    </mule:properties>
-                </mule:singleton-object>
-
+                <mule:component>
+                    <mule:singleton-object instance-ref="orange">
+                        <mule:properties>
+                            <entry key="brand" value="Juicy Baby!"/>
+                            <entry key="segments" value="9"/>
+                            <entry key="radius" value="4.21"/>
+                            <entry key="mapProperties">
+                                <map>
+                                    <entry key="prop1" value="prop1"/>
+                                    <entry key="prop2" value="prop2"/>
+                                </map>
+                            </entry>
+                            <entry key="listProperties">
+                                <list>
+                                    <value>prop1</value>
+                                    <value>prop2</value>
+                                    <value>prop3</value>
+                                </list>
+                            </entry>
+                            <entry key="arrayProperties">
+                                <list>
+                                    <value>prop4</value>
+                                    <value>prop5</value>
+                                    <value>prop6</value>
+                                </list>
+                            </entry>
+                        </mule:properties>
+                    </mule:singleton-object>
+                    <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
+                        <mule:outbound-endpoint address="test://do.wash"/>
+                    </mule:binding>
+                    <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
+                        <mule:outbound-endpoint address="test://do.polish"/>
+                    </mule:binding>
+                </mule:component>
+                
                 <mule:inbound-router>
                     <mule:forwarding-catch-all-strategy>
                         <mule:outbound-endpoint
@@ -161,15 +168,6 @@
                         </mule:properties>
                     </mule:inbound-endpoint>
                 </mule:inbound-router>
-
-                <mule:nested-router>
-                    <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
-                        <mule:outbound-endpoint address="test://do.wash"/>
-                    </mule:binding>
-                    <mule:binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="polish">
-                        <mule:outbound-endpoint address="test://do.polish"/>
-                    </mule:binding>
-                </mule:nested-router>
 
                 <mule:outbound-router>
                     <mule:outbound-pass-through-router>

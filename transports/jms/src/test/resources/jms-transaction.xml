@@ -10,7 +10,9 @@
 
     <model name="transactionTestModel">
         <service name="component1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="jms://component1In">
                     <transaction action="NONE"/>
@@ -24,7 +26,9 @@
         </service>
 
         <service name="component2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="jms://component2In">
                     <transaction action="ALWAYS_BEGIN">
@@ -42,7 +46,9 @@
         </service>
 
         <service name="component3" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="jms://component3In">
                     <transaction action="NONE">

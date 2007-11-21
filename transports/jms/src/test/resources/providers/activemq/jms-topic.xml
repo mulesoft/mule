@@ -23,7 +23,9 @@
     <model name="echoSample">
 
         <service name="InputPart">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint ref="in"/>
             </inbound-router>
@@ -35,11 +37,13 @@
         </service>
 
         <service name="Topic1">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
-                </properties>
-            </singleton-object>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
+                    </properties>
+                </singleton-object>
+            </component>
             <inbound-router>
                 <inbound-endpoint ref="topic"/>
             </inbound-router>
@@ -51,11 +55,13 @@
         </service>
 
         <service name="Topic2">
-            <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
-                </properties>
-            </singleton-object>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
+                    </properties>
+                </singleton-object>
+            </component>
             <inbound-router>
                 <inbound-endpoint ref="topic"/>
             </inbound-router>

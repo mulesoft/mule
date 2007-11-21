@@ -9,8 +9,6 @@
  */
 package org.mule.config.spring.parsers.generic;
 
-import org.mule.util.CoreXMLUtils;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -23,6 +21,11 @@ public class GrandchildDefinitionParser extends ChildDefinitionParser
     public GrandchildDefinitionParser(String setterMethod, Class clazz)
     {
         super(setterMethod, clazz);
+    }
+
+    public GrandchildDefinitionParser(String setterMethod, Class clazz, Class constraint, boolean allowClassAttribute)
+    {
+        super(setterMethod, clazz, constraint, allowClassAttribute);
     }
 
     protected String getParentBeanName(Element element)

@@ -11,10 +11,14 @@
             <component class="org.mule.tck.services.UniqueComponent" />
         </service>
         <service name="unique2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <singleton-object class="org.mule.tck.services.UniqueComponent" />
+            <component>
+                <singleton-object class="org.mule.tck.services.UniqueComponent" />
+            </component>
         </service>
         <service name="unique3" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <singleton-object instance-ref="myUniqueBean" />
+            <component>
+                <singleton-object instance-ref="myUniqueBean"  />
+            </component>
         </service>
         <!-- SEDA-specific attributes 
         <service name="unique4" serviceFactory-ref="genericFactory" enablePooling="false"/>

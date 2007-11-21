@@ -18,10 +18,12 @@
 
     <model name="main">
         <service name="service">
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="addReceived" value="false"/>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="addReceived" value="false"/>
+                    </properties>
+                </pooled-object>
             </component>
             <inbound-router>
                 <tcp:inbound-endpoint name="safe" host="localhost" port="65432"

@@ -33,17 +33,15 @@
     <model name="loan-broker">
 
         <service name="TheLoanBroker">
-            <component class="org.mule.examples.loanbroker.esn.SynchronousLoanBroker"/>
+            <component class="org.mule.examples.loanbroker.esn.SynchronousLoanBroker">
+                <binding interface="org.mule.examples.loanbroker.credit.CreditAgencyService">
+                    <outbound-endpoint ref="CreditAgency"/>
+                </binding>
+            </component>
 
             <inbound-router>
                 <inbound-endpoint ref="CustomerRequests"/>
             </inbound-router>
-
-            <nested-router>
-                <binding interface="org.mule.examples.loanbroker.credit.CreditAgencyService">
-                    <outbound-endpoint ref="CreditAgency"/>
-                </binding>
-            </nested-router>
 
             <outbound-router>
                 <!-- couldn't this be pass-through? -->

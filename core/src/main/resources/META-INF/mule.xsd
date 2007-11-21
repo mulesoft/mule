@@ -177,12 +177,6 @@
         <xsd:attribute name="not" type="substitutableBoolean"/>
     </xsd:complexType>
 
-    <xsd:complexType name="nestedRouterCollectionType">
-        <xsd:sequence>
-            <xsd:element ref="abstract-binding" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-    </xsd:complexType>
-
     <xsd:element name="abstract-binding" abstract="true" type="abstractBindingType"/>
     <xsd:complexType name="abstractBindingType"/>
 
@@ -293,14 +287,8 @@
             <xsd:extension base="abstractServiceType">
                 <xsd:sequence>
                     <!-- minOccurs="0" to allow for <forwarding-router> which doesn't need a service. -->
-                    <xsd:element ref="abstract-object-factory" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>Factory to create the user's POJO service</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                    <xsd:element ref="properties" minOccurs="0"/>
+                    <xsd:element ref="abstract-component" minOccurs="0"/>
                     <xsd:element name="inbound-router" type="inboundRouterCollectionType" minOccurs="0"/>
-                    <xsd:element name="nested-router" type="nestedRouterCollectionType" minOccurs="0"/>
                     <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
                     <xsd:element name="response-router" type="responseRouterCollectionType" minOccurs="0"/>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
@@ -339,17 +327,59 @@
     </xsd:complexType>
 
     <!--==============================================================-->
-    <!-- POJO components                                              -->
+    <!-- Components                                              -->
     <!--==============================================================-->
 
-    <xsd:element name="component" type="defaultComponentType" substitutionGroup="abstract-object-factory"/>
-    <xsd:complexType name="defaultComponentType">
+    <xsd:element name="abstract-component" abstract="true" type="abstractComponentType"/>
+    <xsd:complexType name="abstractComponentType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A component that will be invoked by mule.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <!--<xsd:element ref="abstract-binding" minOccurs="0" maxOccurs="unbounded"/>-->
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:element name="component" type="pojoComponentType" substitutionGroup="abstract-component"/>
+    <xsd:complexType name="pojoComponentType">
+        <xsd:annotation>
+            <xsd:documentation>Pojo component that will be invoked by mule.</xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
-            <xsd:extension base="pooledObjectFactoryType"/>
+            <xsd:extension base="abstractComponentType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-object-factory" minOccurs="0"/>
+                    <xsd:element name="binding" type="pojoBindingType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="xsd:NMTOKEN"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="pojoBindingType">
+        <xsd:annotation>
+            <xsd:documentation>Binding between the pojo component and endpoints.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="abstractBindingType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="interface" use="required"/>
+                <xsd:attribute name="method" use="optional"/>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="bridge-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
+    <xsd:complexType name="defaultComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractComponentType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="bridge-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in BridgeComponent that enables a bridge between an inbound and outbound endpoints.
@@ -357,7 +387,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="pass-through-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
+    <xsd:element name="pass-through-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in PassThroughComponent that enables a bridge between an inbound and outbound endpoints.
@@ -367,7 +397,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="echo-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
+    <xsd:element name="echo-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in EchoComponent that logs the message and returns the payload back as the result.
@@ -375,7 +405,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="log-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
+    <xsd:element name="log-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in LogComponent that simply logs the message content (or content length if it is a
@@ -384,7 +414,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="null-component" type="defaultComponentType" substitutionGroup="abstract-object-factory">
+    <xsd:element name="null-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in NullComponent that will throw an exception if it receives a message.
@@ -392,7 +422,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="no-args-call-component" type="noArgsCallWrapperType" substitutionGroup="abstract-object-factory">
+    <xsd:element name="no-args-call-component" type="noArgsCallWrapperType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in NoArgsCallWrapper
@@ -1152,22 +1182,6 @@
     <!--==============================================================-->
     <!--  Routers                                                     -->
     <!--==============================================================-->
-
-    <!--Nested Binding-->
-
-    <!-- should this be called nested-binding? -->
-    <xsd:element name="binding" type="nestedBindingType" substitutionGroup="abstract-binding"/>
-    <xsd:complexType name="nestedBindingType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractBindingType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="interface" use="required"/>
-                <xsd:attribute name="method" use="optional"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
 
     <!-- Inbound Router implementations -->

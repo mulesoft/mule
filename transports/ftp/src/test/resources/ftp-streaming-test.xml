@@ -21,7 +21,9 @@
     <model name="main">
 
         <service name="bridge">
-            <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
+            <component>
+                <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="tcp://localhost:60196">
                     <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
@@ -37,7 +39,9 @@
         </service>
 
         <service name="testComponent">
-            <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
+            </component>
             <inbound-router>
                 <inbound-endpoint address="ftp://anonymous:email@localhost:60197">
                     <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
