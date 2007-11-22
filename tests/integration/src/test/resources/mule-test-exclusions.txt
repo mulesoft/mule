@@ -97,7 +97,7 @@ org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 # Mule 2.x-specific failures
 ##########################################################################
 
-# MULE-2702 Only XFire fails
+# MULE-2721 Only XFire fails
 org.mule.test.usecases.ReplyToTestCase
 
 # Only testClientSendDirect() (1 of 6) is failing.

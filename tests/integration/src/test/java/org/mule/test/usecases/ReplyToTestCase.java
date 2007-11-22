@@ -16,7 +16,9 @@ import org.mule.providers.NullPayload;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-// MULE-2702
+/**
+ * @see MULE-2721
+ */ 
 public class ReplyToTestCase extends FunctionalTestCase
 {
     static final long RECEIVE_DELAY = 3000;
