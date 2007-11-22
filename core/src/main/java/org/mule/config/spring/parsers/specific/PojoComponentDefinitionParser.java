@@ -36,37 +36,37 @@ public class PojoComponentDefinitionParser extends ObjectFactoryDefinitionParser
     {
         super.parseChild(element, parserContext, builder);
 
-        try
+        // Get the POJO's class.
+        MutablePropertyValues beanProperties = builder.getBeanDefinition().getPropertyValues();
+        Class objectClass = null;
+        if (beanProperties.getPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS) != null)
         {
-            // Get the POJO's class.
-            MutablePropertyValues beanProperties = builder.getBeanDefinition().getPropertyValues();
-            Class objectClass = null;
-            if (beanProperties.getPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS) != null)
+            objectClass = (Class) beanProperties.getPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS).getValue();
+        }
+        if (objectClass == null)
+        {
+            if (beanProperties.getPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME) != null)
             {
-                objectClass = (Class) beanProperties.getPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS).getValue();
-            }
-            if (objectClass == null)
-            {
-                if (beanProperties.getPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME) != null)
+                String objectClassName = (String) beanProperties.getPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME).getValue();
+                try
                 {
-                    String objectClassName = (String) beanProperties.getPropertyValue(AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME).getValue();
                     objectClass = ClassUtils.getClass(objectClassName);
                 }
+                catch (ClassNotFoundException e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
+        }            
 
-            // Inject the UMOComponent into the POJO if the POJO needs it.
-            if (UMOComponentAware.class.isAssignableFrom(objectClass))
-            {
-                logger.debug("Injecting UMOComponent into class " + objectClass + " which implements the UMOComponentAware interface.");
-                // The UMOComponent should theoretically be the parent node.
-                Element parent = (Element) element.getParentNode();
-                String componentName = parent.getAttribute(ATTRIBUTE_NAME);
-                builder.addPropertyReference("component", componentName);
-            }
-        }
-        catch (Exception e)
+        // Inject the UMOComponent into the POJO if the POJO needs it.
+        if (objectClass != null && UMOComponentAware.class.isAssignableFrom(objectClass))
         {
-            logger.warn(e);
+            logger.debug("Injecting UMOComponent into class " + objectClass + " which implements the UMOComponentAware interface.");
+            // The UMOComponent should theoretically be the parent node.
+            Element parent = (Element) element.getParentNode();
+            String componentName = parent.getAttribute(ATTRIBUTE_NAME);
+            builder.addPropertyReference("component", componentName);
         }
     }
 }
