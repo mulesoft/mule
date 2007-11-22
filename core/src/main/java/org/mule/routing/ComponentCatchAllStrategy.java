@@ -40,14 +40,14 @@ public class ComponentCatchAllStrategy extends AbstractCatchAllStrategy
         throws RoutingException
     {
         UMOEvent event = RequestContext.getEvent();
+        logger.debug("Catch all strategy handling event: " + event);
         try
         {
+            logger.info("Event being routed from catch all strategy for endpoint: " + event.getEndpoint());
             event = new MuleEvent(message, event.getEndpoint(), session.getComponent(), event);
             if (synchronous)
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                logger.info("Event being routed from catch all strategy for endpoint: "
-                            + RequestContext.getEvent().getEndpoint());
                 return session.getComponent().sendEvent(event);
             }
             else

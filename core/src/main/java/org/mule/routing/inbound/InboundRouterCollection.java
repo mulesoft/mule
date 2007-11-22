@@ -140,7 +140,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
                     {
                         logger.warn("Message did not match any routers on: "
                                     + componentName
-                                    + " and there is no catch all strategy configured on this router.  Disposing message.");
+                                    + " and there is no catch all strategy configured on this router.  Disposing message: " + event);
                         if (logger.isDebugEnabled())
                         {
                             try
