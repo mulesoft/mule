@@ -20,14 +20,6 @@
     
     <model name="main">
         <service name="ScriptService">
-            <component>
-                <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
-                    <properties>
-                        <spring:entry key="scriptEngineName" value="groovy"/>
-                        <spring:entry key="scriptText" value-ref="scriptText2"/>
-                    </properties>
-                </pooled-object>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="stdio://System.in">
                     <properties>
@@ -36,6 +28,14 @@
                     </properties>
                 </inbound-endpoint>
             </inbound-router>
+            <component>
+                <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
+                    <properties>
+                        <spring:entry key="scriptEngineName" value="groovy"/>
+                        <spring:entry key="scriptText" value-ref="scriptText2"/>
+                    </properties>
+                </pooled-object>
+            </component>
         </service>
     </model>
 </mule>

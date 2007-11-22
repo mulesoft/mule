@@ -16,14 +16,13 @@
 
     <model name="TestXfire">
         <service name="echoService">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <xfire:inbound-endpoint address="http://localhost:63081/services"/>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
         <service name="echoService2">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <xfire:inbound-endpoint address="http://localhost:63082/services">
                     <properties>
@@ -31,17 +30,17 @@
                     </properties>
                 </xfire:inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
         <service name="echoService3">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <xfire:inbound-endpoint address="http://localhost:63083/services" synchronous="true"/>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
         <service name="echoService4">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <xfire:inbound-endpoint address="http://localhost:63084/services">
                     <properties>
@@ -54,6 +53,7 @@
                     </properties>
                 </xfire:inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
     </model>

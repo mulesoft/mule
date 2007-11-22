@@ -56,6 +56,9 @@
         </service>
 
         <service name="component1">
+            <inbound-router>
+                <inbound-endpoint address="vm://component1"/>
+            </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -63,12 +66,12 @@
                     </properties>
                 </pooled-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://component1"/>
-            </inbound-router>
         </service>
 
         <service name="component1Fail">
+            <inbound-router>
+                <inbound-endpoint address="vm://component1Fail"/>
+            </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -77,12 +80,12 @@
                     </properties>
                 </pooled-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://component1Fail"/>
-            </inbound-router>
         </service>
 
         <service name="component2Pass">
+            <inbound-router>
+                <inbound-endpoint address="vm://component2Pass"/>
+            </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -90,12 +93,12 @@
                     </properties>
                 </pooled-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://component2Pass"/>
-            </inbound-router>
         </service>
 
         <service name="component2Fail">
+            <inbound-router>
+                <inbound-endpoint address="vm://component2Fail"/>
+            </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -104,9 +107,6 @@
                     </properties>
                 </pooled-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://component2Fail"/>
-            </inbound-router>
         </service>
     </model>
 </mule>

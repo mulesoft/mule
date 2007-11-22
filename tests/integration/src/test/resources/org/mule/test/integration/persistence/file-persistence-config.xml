@@ -19,10 +19,10 @@
 
     <model name="main">
         <service name="TestComponent" initialState="stopped">
-            <pass-through-component/>
             <inbound-router>
                 <inbound-endpoint address="vm://test.queue" connector-ref="vmQueue"/>
             </inbound-router>
+            <pass-through-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>

@@ -52,12 +52,12 @@
         </service>
 
         <service name="MySecuredUMO">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:64484" connector-ref="axisConnector">
                     <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>
 

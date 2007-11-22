@@ -8,11 +8,11 @@
 
     <mule:model name="main">
         <mule:service name="echo">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:inbound-endpoint name="in"
                                        address="test://inbound?createConnector=NEVER"/>
             </mule:inbound-router>
+            <mule:component class="org.mule.components.simple.EchoComponent"/>
         </mule:service>
     </mule:model>
 

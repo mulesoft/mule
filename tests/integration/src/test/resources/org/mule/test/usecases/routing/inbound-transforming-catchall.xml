@@ -12,7 +12,6 @@
 
     <model name="test" >
         <service name="BridgeNoTransformer">
-            <pass-through-component/>
             <inbound-router matchAll="true">
                 <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
                     <outbound-endpoint address="vm://catchall" connector-ref="vmQueue"/>
@@ -24,6 +23,7 @@
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </selective-consumer-router>
             </inbound-router>
+            <pass-through-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>
@@ -32,7 +32,6 @@
         </service>
 
         <service name="BridgeTransformed">
-            <pass-through-component/>
             <inbound-router matchAll="true">
                 <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
                     <outbound-endpoint address="vm://catchall" connector-ref="vmQueue">
@@ -48,6 +47,7 @@
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </selective-consumer-router>
             </inbound-router>
+            <pass-through-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>

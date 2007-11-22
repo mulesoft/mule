@@ -10,12 +10,12 @@
 
     <model name="test">
         <service name="mycomponent">
-            <component class="org.mule.test.integration.providers.file.FileFunctionalTestCase$FileTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="file://./test">
                     <file:filter-filename-wildcard pattern="*.data"/>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.test.integration.providers.file.FileFunctionalTestCase$FileTestComponent"/>
         </service>
     </model>
 </mule>

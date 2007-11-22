@@ -15,7 +15,6 @@
   <mule:model name="CXFSoapRequest">
 
     <mule:service name="TestComponent">
-      <mule:component class="org.mule.tck.testmodels.services.TestComponent" />
       <mule:inbound-router>
         <mule:inbound-endpoint
           address="cxf:http://localhost:63381/services/TestComponent">
@@ -24,6 +23,7 @@
           </mule:properties>
         </mule:inbound-endpoint>
       </mule:inbound-router>
+      <mule:component class="org.mule.tck.testmodels.services.TestComponent" />
     </mule:service>
   </mule:model>
 </mule:mule>

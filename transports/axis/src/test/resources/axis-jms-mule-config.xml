@@ -21,13 +21,16 @@
     <model name="test">
 
         <service name="mycomponent">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://mycomponent"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
         <service name="mycomponent2">
+            <inbound-router>
+                <inbound-endpoint address="axis:jms://mycomponent2"/>
+            </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.testmodels.services.TestServiceComponent">
                     <properties>
@@ -40,27 +43,24 @@
                     </properties>
                 </pooled-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="axis:jms://mycomponent2"/>
-            </inbound-router>
         </service>
 
         <service name="mycomponent3">
-            <component>
-                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://mycomponent3"/>
             </inbound-router>
-        </service>
-
-        <service name="mycomponent4">
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>
+        </service>
+
+        <service name="mycomponent4">
             <inbound-router>
                 <inbound-endpoint address="axis:jms://mycomponent4" synchronous="false"/>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
         </service>
 
     </model>

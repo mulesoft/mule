@@ -35,10 +35,11 @@
     <model name="main">
 
         <service name="LoanBroker">
-            <component instance-ref="apple"/>
             <inbound-router>
                 <inbound-endpoint address="vm://LoanBrokerRequests"/>
             </inbound-router>
+
+            <component instance-ref="apple"/>
 
             <!--<outbound-router>-->
             <!--<router-static-recipient-list messageProperty="recipients">-->

@@ -21,6 +21,9 @@
 
     <model name="test">
         <service name="Calculator">
+            <inbound-router>
+                <inbound-endpoint address="axis:http://localhost:62088/axis"/>
+            </inbound-router>
             <component class="org.mule.providers.soap.axis.Calculator">
                 <!-- it's not clear to me (ac) that this is correct.  and if it is, shouldn't we have something simpler? -->
                 <!-- also, email to daniel pending about simpler syntax seen in axis-named-param-mule-config.xml -->
@@ -44,9 +47,6 @@
                     </spring:entry>
                 </properties>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="axis:http://localhost:62088/axis"/>
-            </inbound-router>
         </service>
     </model>
 

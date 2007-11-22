@@ -8,28 +8,28 @@
 
     <model name="main">
         <service name="defaultComponent">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="test://in.default"/>
             </inbound-router>
+            <echo-component/>
         </service>
         <service name="startedComponent" initialState="started">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="test://in.started"/>
             </inbound-router>
+            <echo-component/>
         </service>
         <service name="stoppedComponent" initialState="stopped">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="test://in.stopped"/>
             </inbound-router>
+            <echo-component/>
         </service>
         <service name="pausedComponent" initialState="paused">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="test://in.paused"/>
             </inbound-router>
+            <echo-component/>
         </service>
     </model>
 </mule>

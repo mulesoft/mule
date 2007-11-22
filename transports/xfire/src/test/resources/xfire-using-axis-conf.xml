@@ -16,10 +16,10 @@
 
         <!--Hosting the XFire service-->
         <service name="XfireService">
-            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
                 <xfire:inbound-endpoint address="http://localhost:63382/services"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
         <!--Accessing an XFire hosted web-service using Axis-->

@@ -14,16 +14,13 @@
 
     <model name="main">
 
-
         <service name="WORMS">
-            <no-args-call-component>
-                <delegateClass delegateClass="org.mule.tck.testmodels.fruit.Apple" delegateMethod="toString"/>
-            </no-args-call-component>
-
             <inbound-router>
                 <inbound-endpoint address="vm://in" connector-ref="VmConnector"/>
             </inbound-router>
-
+            <no-args-call-component>
+                <delegateClass delegateClass="org.mule.tck.testmodels.fruit.Apple" delegateMethod="toString"/>
+            </no-args-call-component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out" connector-ref="VmConnector"/>
@@ -32,14 +29,12 @@
         </service>
 
         <service name="TIRANA">
-            <no-args-call-component>
-                <delegateInstance delegateInstance-ref="containerDelegate" delegateMethod="wash"/>
-            </no-args-call-component>
-
             <inbound-router>
                 <inbound-endpoint address="vm://invokeWithInjected" connector-ref="VmConnector"/>
             </inbound-router>
-
+            <no-args-call-component>
+                <delegateInstance delegateInstance-ref="containerDelegate" delegateMethod="wash"/>
+            </no-args-call-component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://outWithInjected" connector-ref="VmConnector"/>

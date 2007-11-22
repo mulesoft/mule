@@ -23,11 +23,11 @@
 
     <model name="main">
         <service name="testComponent">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <!-- legacy style -->
                 <inbound-endpoint ref="clientEndpoint"/>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
     </model>
 

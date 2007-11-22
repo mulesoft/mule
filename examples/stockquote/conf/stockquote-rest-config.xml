@@ -42,6 +42,10 @@
 
     <model name="Sample-Rest">
         <service name="HTTPPostSample">
+            <inbound-router>
+                <vm:inbound-endpoint path="stockquote"
+                                     responseTransformer-refs="ToString XmlDecoder Xslt XmlToObject"/>
+            </inbound-router>
             <component>
                 <pooled-object class="org.mule.providers.http.components.RestServiceWrapper">
                     <properties>
@@ -59,11 +63,6 @@
                     </properties>
                 </pooled-object>
             </component>
-
-            <inbound-router>
-                <vm:inbound-endpoint path="stockquote"
-                                     responseTransformer-refs="ToString XmlDecoder Xslt XmlToObject"/>
-            </inbound-router>
         </service>
     </model>
 </mule>

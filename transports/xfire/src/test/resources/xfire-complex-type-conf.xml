@@ -38,6 +38,9 @@
 
     <model name="ComplexTypes">
         <service name="PeopleServiceWS">
+            <inbound-router>
+                <xfire:inbound-endpoint address="http://localhost:63999/services"/>
+            </inbound-router>
             <component class="org.mule.providers.soap.xfire.testmodels.XFireComplexTypeService">
                 <properties>
                     <spring:entry key="SOAP_NAMESPACE_PROPERTY" value="http://services.testmodels.tck.mule.org"/>
@@ -45,9 +48,6 @@
                     <spring:entry key="use" value="literal"/>
                 </properties>
             </component>
-            <inbound-router>
-                <xfire:inbound-endpoint address="http://localhost:63999/services"/>
-            </inbound-router>
         </service>
     </model>
 

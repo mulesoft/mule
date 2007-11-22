@@ -18,14 +18,14 @@
     <model name="main">
 
         <service name="Component1">
+            <inbound-router>
+                <inbound-endpoint ref="serverEndpoint"/>
+            </inbound-router>
             <component class="org.mule.tck.functional.FunctionalTestComponent">
                 <properties>
                     <spring:entry key="appendComponentName" value="true"/>
                 </properties>
             </component>
-            <inbound-router>
-                <inbound-endpoint ref="serverEndpoint"/>
-            </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://foo"/>
@@ -34,14 +34,14 @@
         </service>
 
         <service name="Component2">
+            <inbound-router>
+                <inbound-endpoint ref="serverEndpoint"/>
+            </inbound-router>
             <component class="org.mule.tck.functional.FunctionalTestComponent">
                 <properties>
                     <spring:entry key="appendComponentName" value="true"/>
                 </properties>
             </component>
-            <inbound-router>
-                <inbound-endpoint ref="serverEndpoint"/>
-            </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://foo"/>
@@ -50,14 +50,14 @@
         </service>
 
         <service name="Component3">
+            <inbound-router>
+                <inbound-endpoint ref="serverEndpoint"/>
+            </inbound-router>
             <component class="org.mule.tck.functional.FunctionalTestComponent">
                 <properties>
                     <spring:entry key="appendComponentName" value="true"/>
                 </properties>
             </component>
-            <inbound-router>
-                <inbound-endpoint ref="serverEndpoint"/>
-            </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://foo"/>

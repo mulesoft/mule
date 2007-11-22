@@ -13,7 +13,6 @@
     <model name="Testing_an_axis_service_using_xfire_dynamic_client">
         <!-- hosting the Axis Service -->
         <service name="AxisService">
-            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:63381/services">
                     <properties>
@@ -22,6 +21,7 @@
                     </properties>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
         <!-- Bridge Component used to test the ExceptionBasedRouting on Axis -->

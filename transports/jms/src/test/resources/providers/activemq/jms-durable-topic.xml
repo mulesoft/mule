@@ -20,6 +20,9 @@
 
     <model name="TEST">
         <service name="InputPart">
+            <inbound-router>
+                <inbound-endpoint ref="in"/>
+            </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -27,9 +30,6 @@
                     </properties>
                 </singleton-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint ref="in"/>
-            </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="topic" transformer-refs="ObjectToJMSMessage"/>

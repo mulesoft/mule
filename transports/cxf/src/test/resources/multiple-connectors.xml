@@ -18,17 +18,17 @@
         
         <!-- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised -->
         <service name="TestComponent1">
-            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="cxf:http://localhost:61081/services/TestComponent1" connector-ref="CxfConnector1"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
         <service name="TestComponent2">
-            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="cxf:http://localhost:61082/services/TestComponent2" connector-ref="CxfConnector2"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
     </model>

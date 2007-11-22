@@ -14,18 +14,18 @@
 
         <!--Hosting the Cxf service-->
         <service name="CxfService">
-            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="cxf:http://localhost:63382/services/CxfService"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
         <!--Accessing a Cxf hosted web-service using Axis-->
         <service name="BridgeToCxfHello">
-            <component class="org.mule.components.simple.BridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://cxf.in"/>
             </inbound-router>
+            <component class="org.mule.components.simple.BridgeComponent"/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="axis:http://localhost:63382/services/CxfService?method=receive">

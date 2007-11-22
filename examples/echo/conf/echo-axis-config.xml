@@ -22,13 +22,13 @@
 
     <model name="echoSample">
         <service name="EchoUMO">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:65081/services"
                     transformer-refs="HttpRequestToSoapRequest"/>
                 <inbound-endpoint address="axis:http://localhost:65082/services"/>
                 <inbound-endpoint address="vm://echo" />
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>
 </mule>

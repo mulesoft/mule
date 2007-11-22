@@ -20,6 +20,9 @@
     
     <model name="main">
         <service name="ScriptService">
+            <inbound-router>
+                <inbound-endpoint address="vm://scripting"/>
+            </inbound-router>
             <component>
                 <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
                     <properties>
@@ -28,9 +31,6 @@
                     </properties>
                 </pooled-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://scripting"/>
-            </inbound-router>
         </service>
     </model>
 

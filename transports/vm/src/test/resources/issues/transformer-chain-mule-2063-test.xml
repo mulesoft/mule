@@ -12,7 +12,6 @@
 
     <model name="model1">
         <service name="service1">
-            <pass-through-component/>
             <inbound-router>
                 <vm:inbound-endpoint path="test1-in">
                     <transformer-append-string message="1"/>
@@ -20,6 +19,7 @@
                     <transformer-append-string message="3"/>
                 </vm:inbound-endpoint>
             </inbound-router>
+            <pass-through-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="test1-out"/>
@@ -34,7 +34,6 @@
 
     <model name="model2">
         <service name="service2">
-            <pass-through-component/>
             <inbound-router>
                 <vm:inbound-endpoint path="test2-in">
                     <!-- TODO Travis had better syntax -->
@@ -43,6 +42,7 @@
                     <transformer ref="3"/>
                 </vm:inbound-endpoint>
             </inbound-router>
+            <pass-through-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="test2-out"/>
@@ -53,7 +53,6 @@
 
     <model name="model3">
         <service name="service3">
-            <pass-through-component/>
             <inbound-router>
                 <vm:inbound-endpoint path="test3-in">
                     <transformer-append-string message="1"/>
@@ -61,6 +60,7 @@
                     <transformer-append-string message="3"/>
                 </vm:inbound-endpoint>
             </inbound-router>
+            <pass-through-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="test3-out">

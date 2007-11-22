@@ -16,12 +16,12 @@
 
     <model name="main">
         <service name="echo">
-            <component>
-                <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
-            </component>
             <inbound-router>
                 <tcp:inbound-endpoint address="tcp://localhost:65432?endpointName=myEndpoint"/>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
+            </component>
         </service>
     </model>
 

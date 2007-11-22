@@ -13,23 +13,26 @@
     <model name="REST Functional TestCase">
 
         <service name="RESTServiceWrapper1">
-            <component class="org.mule.providers.http.components.RestServiceWrapper">
-                <properties>
-                    <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                    <spring:entry key="httpMethod" value="POST"/>
-                    <spring:entry key="payloadParameterNames">
-                        <spring:list>
-                            <spring:value>symbol</spring:value>
-                        </spring:list>
-                    </spring:entry>
-                </properties>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="vm://in1"/>
             </inbound-router>
+            <component class="org.mule.providers.http.components.RestServiceWrapper">
+                <properties>
+                    <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+                    <spring:entry key="httpMethod" value="POST"/>
+                    <spring:entry key="payloadParameterNames">
+                        <spring:list>
+                            <spring:value>symbol</spring:value>
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+            </component>
         </service>
 
         <service name="RESTServiceWrapper2">
+            <inbound-router>
+                <inbound-endpoint address="vm://in2"/>
+            </inbound-router>
             <component class="org.mule.providers.http.components.RestServiceWrapper">
                 <properties>
                     <spring:entry key="serviceUrl"
@@ -43,12 +46,12 @@
                     </spring:entry>
                 </properties>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://in2"/>
-            </inbound-router>
         </service>
 
         <service name="RESTServiceWrapper3">
+            <inbound-router>
+                <inbound-endpoint address="vm://in3"/>
+            </inbound-router>
             <component class="org.mule.providers.http.components.RestServiceWrapper">
                 <properties>
                     <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
@@ -60,12 +63,12 @@
                     </spring:entry>
                 </properties>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://in3"/>
-            </inbound-router>
         </service>
 
         <service name="RESTServiceWrapper4">
+            <inbound-router>
+                <inbound-endpoint address="vm://in4"/>
+            </inbound-router>
             <component class="org.mule.providers.http.components.RestServiceWrapper">
                 <properties>
                     <spring:entry key="serviceUrl"
@@ -79,9 +82,6 @@
                     </spring:entry>
                 </properties>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://in4"/>
-            </inbound-router>
         </service>
     </model>
 </mule>

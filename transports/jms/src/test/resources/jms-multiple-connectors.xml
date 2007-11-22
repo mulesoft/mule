@@ -17,11 +17,11 @@
 
     <model name="model">
         <service name="service">
-            <null-component/>
             <inbound-router>
                 <inbound-endpoint ref="ep1"/>
                 <inbound-endpoint ref="ep2"/>
             </inbound-router>
+            <null-component/>
         </service>
     </model>
 

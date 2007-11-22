@@ -86,6 +86,21 @@
         <custom-entrypoint-resolver class="org.mule.tck.testmodels.mule.TestEntryPointResolverSet"/>
 
         <service name="orangeComponent">
+            <inbound-router>
+
+                <forwarding-catch-all-strategy>
+                    <outbound-endpoint address="test://catch.all"/>
+                </forwarding-catch-all-strategy>
+                <inbound-endpoint name="Orange" address="test://orange/" transformer-refs="TestCompressionTransformer"
+                                  responseTransformer-refs="TestCompressionTransformer"/>
+                <inbound-endpoint ref="orangeEndpoint" transformer-refs="TestCompressionTransformer">
+                    <payload-type-filter expectedType="java.lang.String"/>
+                    <properties>
+                        <spring:entry key="testLocal" value="value1"/>
+                    </properties>
+                </inbound-endpoint>
+            </inbound-router>
+
             <component>
                 <singleton-object instance-ref="orange">
                     <properties>
@@ -121,20 +136,6 @@
                     <outbound-endpoint address="test://do.polish"/>
                 </binding>
             </component>            
-            <inbound-router>
-
-                <forwarding-catch-all-strategy>
-                    <outbound-endpoint address="test://catch.all"/>
-                </forwarding-catch-all-strategy>
-                <inbound-endpoint name="Orange" address="test://orange/" transformer-refs="TestCompressionTransformer"
-                                  responseTransformer-refs="TestCompressionTransformer"/>
-                <inbound-endpoint ref="orangeEndpoint" transformer-refs="TestCompressionTransformer">
-                    <payload-type-filter expectedType="java.lang.String"/>
-                    <properties>
-                        <spring:entry key="testLocal" value="value1"/>
-                    </properties>
-                </inbound-endpoint>
-            </inbound-router>
 
             <outbound-router>
                 <outbound-pass-through-router>
@@ -154,9 +155,6 @@
         </service>
 
         <service name="appleComponent">
-            <component>
-                <singleton-object instance-ref="apple"/>
-            </component>
             <inbound-router>
                 <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <inbound-endpoint ref="appleInEndpoint"/>
@@ -166,6 +164,10 @@
                 <idempotent-receiver-router>
                 </idempotent-receiver-router>
             </inbound-router>
+
+            <component>
+                <singleton-object instance-ref="apple"/>
+            </component>
 
             <outbound-router>
                 <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>

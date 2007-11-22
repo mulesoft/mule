@@ -20,10 +20,10 @@
     <model name="test">
 
         <service name="ReceiverUMO">
-            <bridge-component/>
             <inbound-router>
                 <vm:inbound-endpoint path="receiver"/>
             </inbound-router>
+            <bridge-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="echo">

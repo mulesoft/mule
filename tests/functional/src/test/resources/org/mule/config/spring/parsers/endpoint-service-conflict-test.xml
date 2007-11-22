@@ -12,10 +12,10 @@
 
     <model name="loan-broker">
         <service name="LenderService">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="LenderService"/>
             </inbound-router>
+            <echo-component/>
         </service>
     </model>
 </mule>

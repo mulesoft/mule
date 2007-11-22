@@ -12,7 +12,6 @@
 
     <model name="Test-Case">
         <service name="TestComponent">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://TestComponent">
                     <transaction action="ALWAYS_BEGIN">
@@ -20,6 +19,7 @@
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
+            <echo-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://testout"/>

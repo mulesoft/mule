@@ -13,11 +13,6 @@
         <mule:model name="main" inherit="true">
 
             <mule:service name="appleComponent2">
-                <mule:component>
-                    <mule:pooled-object class="org.mule.tck.testmodels.fruit.Apple">
-                        <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT" initialisationPolicy="INITIALISE_ALL"/>
-                    </mule:pooled-object>
-                </mule:component>
                                                                
                 <mule:inbound-router>
                     <mule:inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
@@ -40,6 +35,12 @@
                     </properties>
                 </endpoint -->
                 </mule:inbound-router>
+
+                <mule:component>
+                    <mule:pooled-object class="org.mule.tck.testmodels.fruit.Apple">
+                        <mule:pooling-profile exhaustedAction="WHEN_EXHAUSTED_WAIT" initialisationPolicy="INITIALISE_ALL"/>
+                    </mule:pooled-object>
+                </mule:component>
 
                 <mule:outbound-router>
                     <mule:filtering-router>

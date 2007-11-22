@@ -33,10 +33,10 @@
             used from the above config and the stdio connector will be create dymanically
         -->
         <service name="TestComponent1">
-            <component class="org.mule.test.integration.service.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="test://localhost/test.queue" connector-ref="testConnector1" />
             </inbound-router>
+            <component class="org.mule.test.integration.service.TestComponent"/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out" />
@@ -49,19 +49,19 @@
             test://localhost/new.queue?create=ALWAYS&transformers=XmlToObject  achieves the same
             result -->
         <service name="TestComponent2">
-            <component class="org.mule.test.integration.service.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="test://localhost/test.queue" createConnector="ALWAYS_CREATE"
                     transformer-refs="XmlToObject" />
             </inbound-router>
+            <component class="org.mule.test.integration.service.TestComponent"/>
         </service>
 
         <!-- Test uri endpoints for send and receive and Uri endpoints on the outbound router -->
         <service name="TestComponent3">
-            <component class="org.mule.test.integration.service.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="testEndpoint" />
             </inbound-router>
+            <component class="org.mule.test.integration.service.TestComponent"/>
             <outbound-router>
                 <filtering-router>
                     <outbound-endpoint name="tcp1" address="tcp://localhost:60201" />
@@ -76,10 +76,10 @@
         <!-- test Uri receiver endpoint specifying a provider with endpoint overrriden and
             test outbound router config combining endpoints -->
         <service name="TestComponent4">
-            <component class="org.mule.test.integration.service.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://queue4" connector-ref="testConnector1" />
             </inbound-router>
+            <component class="org.mule.test.integration.service.TestComponent"/>
             <outbound-router>
                 <filtering-router>
                     <outbound-endpoint address="udp://localhost:56731" />
@@ -89,10 +89,10 @@
         </service>
 
         <service name="TestComponent5">
-            <component class="org.mule.test.integration.service.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://some.queue" connector-ref="vmConnector2" />
             </inbound-router>
+            <component class="org.mule.test.integration.service.TestComponent"/>
             <outbound-router>
                 <filtering-router>
                     <outbound-endpoint ref="server1" />

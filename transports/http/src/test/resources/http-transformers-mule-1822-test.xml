@@ -47,10 +47,10 @@
         </service>
 
         <service name="baseService2">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://echo1" synchronous="true"/>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 
     </model>
@@ -73,10 +73,10 @@
         </service>
 
         <service name="responseService2">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://echo2" synchronous="true" responseTransformer-refs="appendResponse2"/>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 
     </model>
@@ -88,7 +88,6 @@
 
         <service name="bothService1">
             <inbound-router>
-            
                 <inbound-endpoint ref="both" responseTransformer-refs="appendResponse">
                    <transformer-object-to-string/>
                    <transformer ref="appendString" />
@@ -104,7 +103,6 @@
         </service>
 
         <service name="bothService2">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://echo3" synchronous="true"
                 				  responseTransformer-refs="appendResponse2">
@@ -112,6 +110,7 @@
                   <transformer ref="appendString2" />
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 
     </model>

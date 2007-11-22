@@ -13,18 +13,15 @@
     
     <model name="InjectionProblem">
         <service name="pojo1">
-            <echo-component/>
-
             <inbound-router>
                 <inbound-endpoint address="vm://pojo1" remoteSync="true" remoteSyncTimeout="10000"/>
             </inbound-router>
-
+            <echo-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://pojo2"/>
                 </outbound-pass-through-router>
             </outbound-router>
-
             <response-router timeout="7000">
                 <response-endpoint address="jms://response"/>
                 <single-response-router/>
@@ -32,12 +29,10 @@
         </service>
 
         <service name="pojo2">
-            <echo-component/>
-
             <inbound-router>
                 <inbound-endpoint address="jms://pojo2"/>
             </inbound-router>
-
+            <echo-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://pojo3"/>
@@ -47,10 +42,11 @@
         </service>
 
         <service name="pojo3">
-            <component class="org.mule.test.integration.service.TestReceiver"/>
             <inbound-router>
                 <inbound-endpoint address="jms://pojo3"/>
             </inbound-router>
+            <component class="org.mule.test.integration.service.TestReceiver"/>
         </service>
+
     </model>
 </mule>

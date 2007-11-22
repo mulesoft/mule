@@ -13,6 +13,9 @@
 
     <model name="test">
         <service name="mycomponent">
+            <inbound-router>
+                <inbound-endpoint address="axis:http://localhost:62108/mule"/>
+            </inbound-router>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent">
                 <properties>
                     <spring:entry key="style" value="wrapped"/>
@@ -24,9 +27,6 @@
                     </spring:entry>
                 </properties>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="axis:http://localhost:62108/mule"/>
-            </inbound-router>
         </service>
     </model>
 

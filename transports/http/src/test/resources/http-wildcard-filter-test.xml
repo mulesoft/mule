@@ -11,8 +11,6 @@
     <model name="main">
 
         <service name="httpIn">
-            <component class="org.mule.components.simple.EchoComponent"/>
-
             <inbound-router>
                 <inbound-endpoint address="http://localhost:60201" synchronous="true">
                     <not-filter>
@@ -20,15 +18,15 @@
                     </not-filter>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
         <service name="reference">
-            <component class="org.mule.components.simple.EchoComponent"/>
-
             <inbound-router>
                 <inbound-endpoint address="http://localhost:60199" synchronous="true">
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
     </model>

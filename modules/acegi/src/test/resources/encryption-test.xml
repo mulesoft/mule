@@ -35,7 +35,6 @@
 
     <model name="test">
         <service name="echo">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <vm:inbound-endpoint path="my.queue">
                     <encryption-security-filter strategy-ref="PBE"/>
@@ -44,6 +43,7 @@
                     <encryption-security-filter strategy-ref="PBE"/>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>
 

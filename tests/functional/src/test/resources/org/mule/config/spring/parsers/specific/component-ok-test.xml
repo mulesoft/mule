@@ -7,18 +7,21 @@
 
     <model name="componentTest">
         <service name="service">
+            <inbound-router>
+                <inbound-endpoint address="test://test-in" />
+            </inbound-router>
             <component>
                 <singleton-object class="org.mule.components.simple.StaticComponent" />
                 <binding interface="java.lang.String" method="setPrefix">
                     <outbound-endpoint address="test://test" />
                 </binding>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="test://test-in" />
-            </inbound-router>
         </service>
 
         <service name="service2">
+            <inbound-router>
+                <inbound-endpoint address="test://test-in" />
+            </inbound-router>
             <component class="org.mule.components.simple.StaticComponent">
                 <binding interface="java.lang.String" method="setPrefix">
                     <outbound-endpoint address="test://test" />
@@ -27,9 +30,6 @@
                     <outbound-endpoint address="test://test" />
                 </binding>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="test://test-in" />
-            </inbound-router>
         </service>
     </model>
 </mule>

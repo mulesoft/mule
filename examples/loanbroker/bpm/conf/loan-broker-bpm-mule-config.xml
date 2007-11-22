@@ -46,13 +46,13 @@
 
         <!-- Messages sent to the process engine -->
         <service name="ToBPMS">
-            <component class="org.mule.examples.loanbroker.DefaultLoanBroker" />
             <inbound-router>
                 <!-- Incoming message = CustomerRequest -->
                 <inbound-endpoint ref="CustomerRequests" />
                 <!-- Incoming message = CreditProfile -->
                 <inbound-endpoint ref="CreditProfiles" />
             </inbound-router>
+            <component class="org.mule.examples.loanbroker.DefaultLoanBroker" />
             <outbound-router>
                 <filtering-router>
                     <outbound-endpoint ref="ProcessEngine" synchronous="false" />
@@ -62,10 +62,10 @@
 
         <!-- Messages generated from the process engine -->
         <service name="FromBPMS">
-            <component class="org.mule.examples.loanbroker.DefaultLoanBroker" />
             <inbound-router>
                 <inbound-endpoint ref="ProcessEngine" />
             </inbound-router>
+            <component class="org.mule.examples.loanbroker.DefaultLoanBroker" />
             <outbound-router>
                 <endpoint-selector-router selectorProperty="endpoint">
                     <!-- Outgoing message = Customer -->
@@ -100,10 +100,10 @@
             *************************************************** -->
         <!-- The credit agency service will get the credit profile for a customer -->
         <service name="ACreditAgency">
-            <component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency" />
             <inbound-router>
                 <inbound-endpoint ref="CreditAgency" />
             </inbound-router>
+            <component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency" />
             <outbound-router>
                 <filtering-router>
                     <outbound-endpoint ref="CreditProfiles" />
@@ -113,22 +113,22 @@
 
         <!-- These are mock bank services that represent remote bank loan services -->
         <service name="ABigBank">
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
             <inbound-router>
                 <inbound-endpoint ref="BigBank" />
             </inbound-router>
+            <component class="org.mule.examples.loanbroker.bank.Bank" />
         </service>
         <service name="AMediumBank">
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
             <inbound-router>
                 <inbound-endpoint ref="MediumBank" />
             </inbound-router>
+            <component class="org.mule.examples.loanbroker.bank.Bank" />
         </service>
         <service name="ASmallBank">
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
             <inbound-router>
                 <inbound-endpoint ref="SmallBank" />
             </inbound-router>
+            <component class="org.mule.examples.loanbroker.bank.Bank" />
         </service>
     </model>
 

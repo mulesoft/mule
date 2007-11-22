@@ -16,10 +16,10 @@
 
     <model name="main">
         <service name="testComponent">
-            <component class="org.mule.providers.soap.axis.functional.SoapAttachmentsFunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:60198/mule/services" synchronous="true"/>
             </inbound-router>
+            <component class="org.mule.providers.soap.axis.functional.SoapAttachmentsFunctionalTestComponent"/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="test://test" name="test1"/>

@@ -17,17 +17,17 @@
     <model name="WsdlTest">
 
         <service name="mycomponent">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="cxf:servlet://mycomponent" />
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
         
         <service name="cxfService">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="cxf:http://localhost:63082/cxfService" />
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
     </model>

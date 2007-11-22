@@ -12,18 +12,15 @@
 
     <model name="test">
         <service name="mycomponent">
-            <component>
-                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
-            </component>
             <inbound-router>
                 <xfire:inbound-endpoint address="vm://mycomponent"/>
             </inbound-router>
-        </service>
-
-        <service name="mycomponent2">
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>
+        </service>
+
+        <service name="mycomponent2">
             <inbound-router>
                 <xfire:inbound-endpoint address="vm://mycomponent2">
                     <properties>
@@ -36,26 +33,29 @@
                     </properties>
                 </xfire:inbound-endpoint>
             </inbound-router>
-        </service>
-
-        <service name="mycomponent3">
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>
+        </service>
+
+        <service name="mycomponent3">
             <inbound-router>
                 <!-- legacy config -->
                 <inbound-endpoint address="xfire:vm://mycomponent3"/>
             </inbound-router>
-        </service>
-
-        <service name="mycomponent4">
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>
+        </service>
+
+        <service name="mycomponent4">
             <inbound-router>
                 <!-- legacy config -->
                 <inbound-endpoint address="xfire:vm://mycomponent4" synchronous="false"/>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
         </service>
     </model>
 </mule>

@@ -23,12 +23,12 @@
     <model name="echoSample">
 
         <service name="InputPart">
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
             <inbound-router>
                 <inbound-endpoint ref="in"/>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="topic" transformer-refs="ObjectToJMSMessage"/>
@@ -37,6 +37,9 @@
         </service>
 
         <service name="Topic1">
+            <inbound-router>
+                <inbound-endpoint ref="topic"/>
+            </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -44,9 +47,6 @@
                     </properties>
                 </singleton-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint ref="topic"/>
-            </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage"/>
@@ -55,6 +55,9 @@
         </service>
 
         <service name="Topic2">
+            <inbound-router>
+                <inbound-endpoint ref="topic"/>
+            </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -62,9 +65,6 @@
                     </properties>
                 </singleton-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint ref="topic"/>
-            </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage"/>

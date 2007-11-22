@@ -23,10 +23,10 @@
         </service>
 
        <service name="responder">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <vm:inbound-endpoint path="responder" synchronous="true"/>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 
     </model>

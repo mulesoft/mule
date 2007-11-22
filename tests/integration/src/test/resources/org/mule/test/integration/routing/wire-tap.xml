@@ -8,20 +8,20 @@
 
     <model name="main">
         <service name="Receiver">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://inbound.channel"/>
                 <wire-tap-router>
                     <outbound-endpoint address="vm://tapped.channel"/>
                 </wire-tap-router>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 
         <service name="TappedReceiver">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://tapped.channel"/>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
     </model>
 </mule>

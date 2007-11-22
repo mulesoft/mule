@@ -18,13 +18,6 @@
 
     <model name="main">
         <service name="service">
-            <component>
-                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="addReceived" value="false"/>
-                    </properties>
-                </pooled-object>
-            </component>
             <inbound-router>
                 <tcp:inbound-endpoint name="safe" host="localhost" port="65432"
                                   connector-ref="safe-connector" synchronous="true"/>
@@ -32,6 +25,13 @@
                 <inbound-endpoint name="length" address="tcp://localhost:65433"
                                   connector-ref="length-connector" synchronous="true"/>
             </inbound-router>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="addReceived" value="false"/>
+                    </properties>
+                </pooled-object>
+            </component>
         </service>
     </model>
 

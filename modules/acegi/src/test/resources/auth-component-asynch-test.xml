@@ -30,14 +30,14 @@
 
         <mule:model name="test">
             <mule:service name="echoUMO">
-                <mule:component>
-                    <mule:singleton-object instance-ref="echoComponent"/>
-                </mule:component>
                 <mule:inbound-router>
                     <mule:inbound-endpoint address="vm://test">
                         <mule:encryption-security-filter strategy-ref="PBE"/>
                     </mule:inbound-endpoint>
                 </mule:inbound-router>
+                <mule:component>
+                    <mule:singleton-object instance-ref="echoComponent"/>
+                </mule:component>
                 <mule:outbound-router>
                     <mule:outbound-pass-through-router>
                         <mule:outbound-endpoint address="vm://output"/>

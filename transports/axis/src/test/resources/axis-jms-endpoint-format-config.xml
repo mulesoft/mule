@@ -27,17 +27,17 @@
 
     <model name="test">
         <service name="echoComponent">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://soap.my.queue"/>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
         <service name="myComponent">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:jms://myComponent"/>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>
 

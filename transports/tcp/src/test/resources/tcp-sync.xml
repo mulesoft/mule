@@ -19,10 +19,10 @@
 
     <model name="model">
         <service name="service">
-            <echo-component/>
             <inbound-router>
                 <tcp:inbound-endpoint address="${test.endpoint}" synchronous="true"/>
             </inbound-router>
+            <echo-component/>
         </service>
     </model>
 

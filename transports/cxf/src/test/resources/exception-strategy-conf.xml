@@ -14,22 +14,22 @@
 
   <model name="BasicCxfTest">
     <service name="CxfWithExceptionStrategy">
-      <component
-        class="org.mule.providers.cxf.testmodels.TestXFireComponent" />
       <inbound-router>
         <inbound-endpoint
           address="cxf:http://localhost:63181/services/CxfWithExceptionStrategy" />
       </inbound-router>
+      <component
+        class="org.mule.providers.cxf.testmodels.TestXFireComponent" />
       <custom-exception-strategy class="org.mule.providers.cxf.CxfComponentExceptionStrategy"/>
     </service>
 
     <service name="CxfDefault">
-      <component
-        class="org.mule.providers.cxf.testmodels.TestXFireComponent" />
       <inbound-router>
         <inbound-endpoint
           address="cxf:http://localhost:63181/services/CxfDefault" />
       </inbound-router>
+      <component
+        class="org.mule.providers.cxf.testmodels.TestXFireComponent" />
     </service>
   </model>
 

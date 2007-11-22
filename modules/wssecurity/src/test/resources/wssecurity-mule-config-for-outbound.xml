@@ -41,13 +41,13 @@
         </service>
 
         <service name="MySecuredUMO">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="xfire:http://localhost:64484">
                     <wssecurity:security-filter signatureFile="in-signed-security.properties"
                                                 decryptionFile="in-encrypted-security.properties"/>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>
 </mule>

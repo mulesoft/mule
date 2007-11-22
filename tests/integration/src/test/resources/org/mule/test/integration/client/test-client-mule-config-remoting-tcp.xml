@@ -19,10 +19,10 @@
     
     <model name="model">
         <service name="TestReceiverUMO">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://test.queue" connector-ref="vmRemoteQueueConnector"/>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>
@@ -31,14 +31,14 @@
         </service>
 
         <service name="remoteUMO">
+            <inbound-router>
+                <inbound-endpoint address="vm://remote.endpoint" connector-ref="vmRemoteConnector" remoteSync="true"/>
+            </inbound-router>
             <component class="org.mule.components.simple.StaticComponent">
                 <properties>
                     <spring:entry key="data" value="received from remote"/>
                 </properties>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://remote.endpoint" connector-ref="vmRemoteConnector" remoteSync="true"/>
-            </inbound-router>
         </service>
     </model>
 </mule>

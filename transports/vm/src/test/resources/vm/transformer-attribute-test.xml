@@ -12,12 +12,12 @@
 
     <model name="testSimple">
         <service name="testServiceSimple">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <vm:inbound-endpoint path="simple">
                     <transformer ref="appendString"/>
                 </vm:inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
     </model>
 
@@ -33,12 +33,12 @@
             </outbound-router>
         </service>
         <service name="testServiceChainedB">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <vm:inbound-endpoint path="out">
                     <transformer ref="appendString"/>
                 </vm:inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
     </model>
     

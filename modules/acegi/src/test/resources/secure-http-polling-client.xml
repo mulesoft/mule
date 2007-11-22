@@ -21,7 +21,6 @@
     -->
     <model name="http polling test model">
         <service name="pollingUMO">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="http://marie:marie@localhost:4567" connector-ref="PollingHttpConnector">
                     <properties>
@@ -29,6 +28,7 @@
                     </properties>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://toclient"/>

@@ -21,13 +21,16 @@
 
     <model name="main">
         <service name="testComponent1">
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
             <inbound-router>
                 <inbound-endpoint ref="clientEndpoint"/>
             </inbound-router>
+            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 
         <service name="testComponent2">
+            <inbound-router>
+                <inbound-endpoint ref="asyncClientEndpoint"/>
+            </inbound-router>
             <component>
                 <!-- Note: this doesn't need to be a singleton, it's a workaround because I couldn't 
                     figure out how to set the eventCallback bean as a property within mule:properties -->
@@ -39,9 +42,6 @@
                     </properties>
                 </singleton-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint ref="asyncClientEndpoint"/>
-            </inbound-router>
         </service>
     </model>
 

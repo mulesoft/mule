@@ -34,13 +34,13 @@
             Please refer to the Configuration Guide for a full description of all the parameters.
         -->
         <service name="EchoUMO">
-            <component class="org.mule.components.simple.EchoComponent"/>
-
             <!-- any number of endpoints can be added to an inbound router -->
             <inbound-router>
                 <inbound-endpoint address="stdio://System.in"/>
                 <inbound-endpoint address="vm://echo"/>
             </inbound-router>
+
+            <component class="org.mule.components.simple.EchoComponent"/>
 
             <!--
                 An outbound router can have one or more router configurations that can be

@@ -111,17 +111,6 @@
             file:///usr/test-data/samples/errorhandler/in
         -->
         <service name="Error Manager">
-            <component class="org.mule.samples.errorhandler.ErrorManager">
-                <properties>
-                    <spring:entry key="handlers">
-                        <spring:list>
-                            <spring:ref local="fatalHandler"/>
-                            <spring:ref local="defaultHandler"/>
-                            <spring:ref local="businessHandler"/>
-                        </spring:list>
-                    </spring:entry>
-                </properties>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="file://./test-data/in"
                                transformer-refs="XMLToExceptionBean ExceptionBeanToErrorMessage">
@@ -135,6 +124,18 @@
                 </inbound-endpoint>
             </inbound-router>
             
+            <component class="org.mule.samples.errorhandler.ErrorManager">
+                <properties>
+                    <spring:entry key="handlers">
+                        <spring:list>
+                            <spring:ref local="fatalHandler"/>
+                            <spring:ref local="defaultHandler"/>
+                            <spring:ref local="businessHandler"/>
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+            </component>
+
             <outbound-router>
                 <custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>
                 
@@ -170,11 +171,11 @@
         </service>
         
         <service name="Business Error Manager">
-            <component class="org.mule.samples.errorhandler.BusinessErrorManager"/>
             <inbound-router>
                 <inbound-endpoint address="jms://exception.queue"
                                transformer-refs="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
             </inbound-router>
+            <component class="org.mule.samples.errorhandler.BusinessErrorManager"/>
         </service>
     </model>
 </mule>

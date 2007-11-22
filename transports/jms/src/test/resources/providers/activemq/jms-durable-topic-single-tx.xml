@@ -20,13 +20,6 @@
 
     <model name="TEST">
         <service name="InputPart">
-                    <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
-                    </properties>
-                </singleton-object>
-            </component>
             <inbound-router>
                 <inbound-endpoint ref="in">
                     <transaction action="BEGIN_OR_JOIN">
@@ -35,6 +28,13 @@
 
                 </inbound-endpoint>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE"/>
+                    </properties>
+                </singleton-object>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="topic" transformer-refs="ObjectToJMSMessage"/>

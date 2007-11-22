@@ -23,24 +23,22 @@
     
     <mule:model-seda name="BasicCxfTest">
         <mule:service name="echoService">
+            <mule:inbound-router/>
             <mule:component class="org.mule.components.simple.EchoComponent"/>
-            <mule:inbound-router>
-                
-            </mule:inbound-router>
         </mule:service>
         
         <mule:service name="echoServic2e">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="cxf:http://localhost:10082/services/Echo2"/>
             </mule:inbound-router>
+            <mule:component class="org.mule.components.simple.EchoComponent"/>
         </mule:service>
         
         <mule:service name="echoService3">
-            <mule:component class="org.mule.components.simple.EchoComponent"/>
             <mule:inbound-router>
                 <mule:endpoint address="cxf:http://localhost:10083/services/Echo3"/>
             </mule:inbound-router>
+            <mule:component class="org.mule.components.simple.EchoComponent"/>
         </mule:service>
         
     </mule:model-seda>

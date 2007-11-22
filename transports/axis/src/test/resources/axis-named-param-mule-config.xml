@@ -10,10 +10,10 @@
 
     <model name="test">
         <service name="mycomponent1">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://mycomponent1"/>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="axis:http://localhost:62111/mule/mycomponent2?method=echo"
@@ -27,10 +27,10 @@
         </service>
 
         <service name="mycomponent2">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:62111/mule" synchronous="true"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
     </model>
 </mule>

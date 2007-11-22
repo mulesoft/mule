@@ -27,7 +27,6 @@
 
     <model name="test">
         <service name="echo">
-            <component class="org.mule.extras.pgp.EchoMsg"/>
             <inbound-router>
                 <inbound-endpoint address="vm://echo">
                     <pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true"
@@ -35,6 +34,7 @@
                                          keyManager-ref="pgpKeyManager"/>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.extras.pgp.EchoMsg"/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="file://output">

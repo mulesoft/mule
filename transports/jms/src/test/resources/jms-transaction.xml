@@ -10,14 +10,14 @@
 
     <model name="transactionTestModel">
         <service name="component1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="jms://component1In">
                     <transaction action="NONE"/>
                 </inbound-endpoint>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://component1Out"/>
@@ -26,9 +26,6 @@
         </service>
 
         <service name="component2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="jms://component2In">
                     <transaction action="ALWAYS_BEGIN">
@@ -36,6 +33,9 @@
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://component2Out">
@@ -46,9 +46,6 @@
         </service>
 
         <service name="component3" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="jms://component3In">
                     <transaction action="NONE">
@@ -56,6 +53,9 @@
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://component3Out">

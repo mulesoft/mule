@@ -24,13 +24,13 @@
 
     <model name="test">
         <service name="test service">
-            <component class="org.mule.examples.loanbroker.issues.SimpleEchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="jms://in"
                                   connector-ref="noOutbound"
                                   synchronous="true"
                                   transformer-refs="JMSMessageToObject SetLendersAsRecipients ObjectToJMSMessage"/>
             </inbound-router>
+            <component class="org.mule.examples.loanbroker.issues.SimpleEchoComponent"/>
         </service>
     </model>
 

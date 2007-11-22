@@ -17,10 +17,10 @@
     
     <model name="model">
         <service name="TcpReceiver">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="tcp://localhost:4444" remoteSync="true"/>
             </inbound-router>
+            <echo-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://queue_in" responseTransformer-refs="responsetransformer" />
@@ -29,10 +29,10 @@
         </service>
 
         <service name="JMSReplyProvider">
-            <component class="org.mule.test.integration.service.TestReceiver"/>
             <inbound-router>
                 <inbound-endpoint address="jms://queue_in" transformer-refs="jmsmessagetoobject inboundtransformer"/>
             </inbound-router>
+            <component class="org.mule.test.integration.service.TestReceiver"/>
         </service>
     </model>
 </mule>

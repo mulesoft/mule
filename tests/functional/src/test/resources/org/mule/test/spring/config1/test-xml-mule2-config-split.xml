@@ -14,9 +14,6 @@
     <!-- model-inherited name="main" -->
     <model name="main" inherit="true">
         <service name="appleComponent2">
-
-            <component class="org.mule.tck.testmodels.fruit.Apple"/>
-
             <inbound-router>
                 <inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
                 <inbound-endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE"
@@ -31,13 +28,12 @@
                     </properties>
                 </inbound-endpoint>
             </inbound-router>
-
+            <component class="org.mule.tck.testmodels.fruit.Apple"/>
             <outbound-router>
                 <filtering-router>
                     <outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"/>
                 </filtering-router>
             </outbound-router>
-
             <component-threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
             <!--<pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>-->
             <!--<queue-profile maxOutstandingMessages="102"/>-->

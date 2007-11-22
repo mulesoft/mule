@@ -84,7 +84,6 @@
 
     <model name="model">
         <service name="JdbcToJms">
-            <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <inbound-router>
                 <inbound-endpoint address="jdbc://getTest?type=1">
                     <transaction action="ALWAYS_BEGIN">
@@ -92,6 +91,7 @@
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://my.queue" />

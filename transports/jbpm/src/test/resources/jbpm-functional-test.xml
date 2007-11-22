@@ -12,17 +12,17 @@
 
     <model name="processModel">
         <service name="fromSimpleProcess">
-            <component class="org.mule.components.simple.LogComponent"/>
             <inbound-router>
                 <inbound-endpoint address="bpm://simple"/>
             </inbound-router>
+            <component class="org.mule.components.simple.LogComponent"/>
         </service>
 
         <service name="fromMessageProcess">
-            <component class="org.mule.components.simple.LogComponent"/>
             <inbound-router>
                 <inbound-endpoint address="bpm://message"/>
             </inbound-router>
+            <component class="org.mule.components.simple.LogComponent"/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://echo"/>
@@ -31,10 +31,10 @@
         </service>
 
         <service name="echoService">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://echo"/>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>
 

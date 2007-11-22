@@ -116,6 +116,24 @@
             <!-- component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/ -->
 
             <mule:service name="orangeComponent">
+                
+                <mule:inbound-router>
+                    <mule:forwarding-catch-all-strategy>
+                        <mule:outbound-endpoint
+                                address="test://catch.all"/>
+                    </mule:forwarding-catch-all-strategy>
+                    <mule:inbound-endpoint name="Orange"
+                                           address="test://orange/" transformer-refs="TestCompressionTransformer"
+                                           responseTransformer-refs="TestCompressionTransformer"/>
+                    <mule:inbound-endpoint ref="orangeEndpoint"
+                                           transformer-refs="TestCompressionTransformer">
+                        <mule:payload-type-filter expectedType="java.lang.String"/>
+                        <mule:properties>
+                            <entry key="testLocal" value="value1"/>
+                        </mule:properties>
+                    </mule:inbound-endpoint>
+                </mule:inbound-router>
+
                 <mule:component>
                     <mule:singleton-object instance-ref="orange">
                         <mule:properties>
@@ -151,23 +169,6 @@
                         <mule:outbound-endpoint address="test://do.polish"/>
                     </mule:binding>
                 </mule:component>
-                
-                <mule:inbound-router>
-                    <mule:forwarding-catch-all-strategy>
-                        <mule:outbound-endpoint
-                                address="test://catch.all"/>
-                    </mule:forwarding-catch-all-strategy>
-                    <mule:inbound-endpoint name="Orange"
-                                           address="test://orange/" transformer-refs="TestCompressionTransformer"
-                                           responseTransformer-refs="TestCompressionTransformer"/>
-                    <mule:inbound-endpoint ref="orangeEndpoint"
-                                           transformer-refs="TestCompressionTransformer">
-                        <mule:payload-type-filter expectedType="java.lang.String"/>
-                        <mule:properties>
-                            <entry key="testLocal" value="value1"/>
-                        </mule:properties>
-                    </mule:inbound-endpoint>
-                </mule:inbound-router>
 
                 <mule:outbound-router>
                     <mule:outbound-pass-through-router>
@@ -189,8 +190,6 @@
 
             <mule:service name="appleComponent">
 
-                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
-
                 <mule:inbound-router>
                     <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                     <mule:inbound-endpoint ref="appleInEndpoint"/>
@@ -199,6 +198,8 @@
                     </mule:selective-consumer-router>
                     <mule:idempotent-receiver-router/>
                 </mule:inbound-router>
+
+                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
 
                 <mule:outbound-router>
                     <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
@@ -221,8 +222,8 @@
             </mule:service>
 
             <mule:service name="propertyExtractorTestComponent">
-                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                 <mule:inbound-router/>
+                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                 <mule:outbound-router>
                     <mule:filtering-router>
                         <mxml:jxpath-property-extractor/>
@@ -231,8 +232,8 @@
             </mule:service>
 
             <mule:service name="propertyExtractorResponseRouterTestComponent">
-                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                 <mule:inbound-router/>
+                <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                 <mule:response-router>
                     <mule:single-response-router>
                         <mxml:jxpath-property-extractor/>

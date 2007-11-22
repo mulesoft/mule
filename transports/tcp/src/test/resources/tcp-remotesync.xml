@@ -35,11 +35,11 @@
         </service>
 
         <service name="testComponent">
-            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <inbound-router>
                 <tcp:inbound-endpoint host="localhost" port="6162" synchronous="true"/>
                 <vm:inbound-endpoint path="sync" synchronous="true"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
     </model>
 </mule>

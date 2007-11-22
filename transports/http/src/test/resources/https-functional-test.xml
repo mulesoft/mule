@@ -18,12 +18,12 @@
 
     <model name="main">
         <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
             <inbound-router>
                 <inbound-endpoint ref="clientEndpoint"/>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
         </service>
     </model>
 </mule>

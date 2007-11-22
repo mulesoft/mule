@@ -11,31 +11,31 @@
     
     <model name="test">
         <service name="mycomponent">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="cxf:http://localhost:62108/mule/mycomponent"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
         <service name="mycomponent2">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="cxf:http://localhost:62109/mule/services/mycomponent2"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
         <service name="mycomponent3">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="cxf:http://localhost:62109/mycomponent3"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
         <service name="mycomponent4">
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             <inbound-router>
                 <inbound-endpoint address="cxf:http://localhost:62110/mycomponent4" synchronous="false"/>
             </inbound-router>
+            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
     </model>
 

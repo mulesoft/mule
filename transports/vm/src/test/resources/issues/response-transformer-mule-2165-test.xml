@@ -48,10 +48,10 @@
     <model name="response transformer tests">
 
         <service name="gngt">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="in-global-name-global-transformer"/>
             </inbound-router>
+            <echo-component/>
             <outbound-router>
                 <chaining-router>
                     <outbound-endpoint ref="global-name-global-transformer"/>
@@ -61,17 +61,17 @@
         </service>
 
         <service name="gngt-bounce">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="global-name-global-transformer"/>
             </inbound-router>
+            <echo-component/>
         </service>
 
         <service name="gnut">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="in-global-name-url-transformer"/>
             </inbound-router>
+            <echo-component/>
             <outbound-router>
                 <chaining-router>
                     <outbound-endpoint ref="global-name-url-transformer"/>
@@ -81,17 +81,17 @@
         </service>
 
         <service name="gnut-bounce">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="global-name-url-transformer"/>
             </inbound-router>
+            <echo-component/>
         </service>
 
         <service name="gnlt">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="in-global-name-local-transformer"/>
             </inbound-router>
+            <echo-component/>
             <outbound-router>
                 <chaining-router>
                     <outbound-endpoint ref="global-name-local-transformer" responseTransformer-refs="response"/>
@@ -101,17 +101,17 @@
         </service>
 
         <service name="gnlt-bounce">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="global-name-local-transformer"/>
             </inbound-router>
+            <echo-component/>
         </service>
 
         <service name="lnlt">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="in-local-name-local-transformer"/>
             </inbound-router>
+            <echo-component/>
             <outbound-router>
                 <chaining-router>
                     <vm:outbound-endpoint path="local-name-local-transformer" responseTransformer-refs="response"
@@ -122,17 +122,17 @@
         </service>
 
         <service name="lnlt-bounce">
-            <echo-component/>
             <inbound-router>
                 <vm:inbound-endpoint path="local-name-local-transformer" connector-ref="default"/>
             </inbound-router>
+            <echo-component/>
         </service>
 
         <service name="lnut">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="in-local-name-url-transformer"/>
             </inbound-router>
+            <echo-component/>
             <outbound-router>
                 <chaining-router>
                     <vm:outbound-endpoint path="local-name-url-transformer?responseTransformers=response"
@@ -143,10 +143,10 @@
         </service>
 
         <service name="lnut-bounce">
-            <echo-component/>
             <inbound-router>
                 <vm:inbound-endpoint path="local-name-url-transformer" connector-ref="default"/>
             </inbound-router>
+            <echo-component/>
         </service>
 
     </model>

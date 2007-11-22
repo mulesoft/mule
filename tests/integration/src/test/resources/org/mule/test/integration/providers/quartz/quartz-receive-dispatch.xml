@@ -33,10 +33,10 @@
         </service>
 
         <service name="scheduledService">
-            <component class="org.mule.test.integration.providers.quartz.TestComponent"/>
             <inbound-router>
                 <inbound-endpoint address="vm://quartz.in"/>
             </inbound-router>
+            <component class="org.mule.test.integration.providers.quartz.TestComponent"/>
         </service>
     </model>
 </mule>

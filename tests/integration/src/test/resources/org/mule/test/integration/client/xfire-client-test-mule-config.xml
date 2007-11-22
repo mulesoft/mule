@@ -8,15 +8,18 @@
 
     <model name="test">
         <service name="mycomponent">
-            <component>
-                <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="xfire:http://localhost:38103/mule/services"/>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
+            </component>
         </service>
 
         <service name="mycomponent2">
+            <inbound-router>
+                <inbound-endpoint address="xfire:http://localhost:38104/mule/services"/>
+            </inbound-router>
             <component>
                 <singleton-object class="org.mule.test.integration.service.TestServiceComponent">
                     <properties>
@@ -24,18 +27,15 @@
                     </properties>
                 </singleton-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="xfire:http://localhost:38104/mule/services"/>
-            </inbound-router>
         </service>
 
         <service name="mycomponent3">
-            <component>
-                <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="xfire:http://localhost:38104/mule/services"/>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
+            </component>
         </service>
     </model>
 </mule>

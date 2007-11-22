@@ -10,7 +10,6 @@
 
     <model name="test">
         <service name="EchoService1">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:62081/services">
                     <properties>
@@ -18,10 +17,10 @@
                     </properties>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
         <service name="EchoService2">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:62082/services">
                     <properties>
@@ -35,10 +34,10 @@
                     </properties>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
         <service name="EchoService3">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:62083/services">
                     <properties>
@@ -46,6 +45,7 @@
                     </properties>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>
 </mule>

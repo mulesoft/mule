@@ -10,16 +10,16 @@
 
     <model name="main">
         <service name="httpIn">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="http://localhost:60200/foo" synchronous="true"/>
             </inbound-router>
+            <echo-component/>
         </service>
         <service name="jettyIn">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="jetty:http://localhost:60201/foo" synchronous="true"/>
             </inbound-router>
+            <echo-component/>
         </service>
     </model>
 </mule>

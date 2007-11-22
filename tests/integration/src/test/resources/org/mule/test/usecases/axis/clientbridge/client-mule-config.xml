@@ -26,10 +26,10 @@
         </service>
 
         <service name="doSomeWork">
-            <component class="org.mule.test.usecases.axis.clientbridge.DoSomeWork"/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:8002/axisService"/>
             </inbound-router>
+            <component class="org.mule.test.usecases.axis.clientbridge.DoSomeWork"/>
         </service>
     </model>
 </mule>

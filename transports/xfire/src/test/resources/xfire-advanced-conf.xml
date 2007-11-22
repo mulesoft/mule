@@ -14,7 +14,6 @@
 
     <model name="TestXfire">
         <service name="echoServiceWsdlPortType">
-            <echo-component/>
             <inbound-router>
                 <xfire:inbound-endpoint address="http://localhost:63081/services">
                     <properties>
@@ -23,6 +22,7 @@
                     </properties>
                 </xfire:inbound-endpoint>
             </inbound-router>
+            <echo-component/>
         </service>
     </model>
 

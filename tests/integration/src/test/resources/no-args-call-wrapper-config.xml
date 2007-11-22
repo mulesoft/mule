@@ -12,6 +12,9 @@
 
     <model name="NoArgsWrapperModel">
         <service name="WrapperUMO">
+            <inbound-router>
+                <inbound-endpoint address="vm://invoke"/>
+            </inbound-router>
             <component>
                 <pooled-object class="org.mule.components.simple.NoArgsCallWrapper">
                     <properties>
@@ -20,9 +23,6 @@
                     </properties>
                 </pooled-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://invoke"/>
-            </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out"/>
@@ -31,6 +31,9 @@
         </service>
 
         <service name="WrapperUMOInjected">
+            <inbound-router>
+                <inbound-endpoint address="vm://invokeWithInjected"/>
+            </inbound-router>
             <component>
                 <pooled-object class="org.mule.components.simple.NoArgsCallWrapper">
                     <properties>
@@ -41,9 +44,6 @@
                     </properties>
                     </pooled-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint address="vm://invokeWithInjected"/>
-            </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <!--

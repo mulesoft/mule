@@ -18,14 +18,14 @@
     <model name="main">
 
         <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
-            </component>
-            
             <inbound-router>
                 <inbound-endpoint name="in" address="ssl://localhost:61655" synchronous="false"/>
             </inbound-router>
 
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
+            
             <!-- This is just to avoid matching router warnings -->
             <outbound-router>
                 <outbound-pass-through-router>

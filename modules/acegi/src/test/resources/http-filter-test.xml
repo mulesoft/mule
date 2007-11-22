@@ -29,12 +29,12 @@
 
     <model name="http secured test model">
         <service name="SecureUMO">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="http://localhost:4567">
                     <acegi:http-security-filter realm="mule-realm"/>
                 </inbound-endpoint>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>
 

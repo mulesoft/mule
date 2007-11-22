@@ -75,12 +75,12 @@
         </service>
 
         <service name="SecuredWS">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:64070/services" connector-ref="SecuredConnector">
                     <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
                 </inbound-endpoint>
             </inbound-router>
+            <echo-component/>
             <outbound-router>
                 <filtering-router>
                     <outbound-endpoint address="stdio://System.out"/>
@@ -89,10 +89,10 @@
         </service>
 
         <service name="UnsecuredWS1">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:64077/services" connector-ref="UnsecuredConnector"/>
             </inbound-router>
+            <echo-component/>
             <outbound-router>
                 <filtering-router>
                     <outbound-endpoint address="stdio://System.out"/>
@@ -101,10 +101,10 @@
         </service>
 
         <service name="UnsecuredWS2">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:64078/services" connector-ref="UnsecuredConnector"/>
             </inbound-router>
+            <echo-component/>
             <outbound-router>
                 <filtering-router>
                     <outbound-endpoint address="stdio://System.out"/>

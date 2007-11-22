@@ -67,12 +67,13 @@
             Please refer to the Configuration Guide for a full description of all the parameters.
         -->
         <service name="GreeterUMO">
-            <component class="org.mule.samples.hello.Greeter"/>
             
             <inbound-router>
                 <inbound-endpoint address="stdio://System.in" transformer-refs="StdinToNameString"/>
             </inbound-router>
             
+            <component class="org.mule.samples.hello.Greeter"/>
+
             <outbound-router>
                 <filtering-router>
                     <vm:outbound-endpoint path="chitchatter"/>
@@ -99,12 +100,13 @@
         </service>
 
         <service name="ChitChatUMO">
-            <component class="org.mule.samples.hello.ChitChatter"/>
 
             <inbound-router>
                 <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString"/>
             </inbound-router>
                 
+            <component class="org.mule.samples.hello.ChitChatter"/>
+
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out" transformer-refs="ChatStringToString" />

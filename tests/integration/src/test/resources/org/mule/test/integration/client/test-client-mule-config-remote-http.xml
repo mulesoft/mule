@@ -12,10 +12,10 @@
 
     <!-- this connector simulates an existing endpoint on a remote server -->
     <connector name="vmRemoteConnector" className="org.mule.providers.vm.VMConnector">
-        <properties>
             <property name="queueEvents" value="true"/>
         </properties>
     </connector>
+        <properties>
 
     <global-endpoints>
         <endpoint name="vmRemoteEndpoint" connector="vmRemoteConnector" address="vm://remote.endpoint"/>

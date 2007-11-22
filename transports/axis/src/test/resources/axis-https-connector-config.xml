@@ -18,10 +18,10 @@
 
     <model name="Https_Test_Model">
         <service name="TestUMO">
-            <component class="org.mule.components.simple.EchoComponent"/>
             <inbound-router>
                 <inbound-endpoint address="axis:https://localhost:62000"/>
             </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>
 </mule>

@@ -29,7 +29,6 @@
 
     <model name="model">
         <service name="HttpService">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="httpEndpoint">
                     <transformers>
@@ -42,14 +41,15 @@
                     </responseTransformers>
                 </inbound-endpoint>
             </inbound-router>
+            <echo-component/>
         </service>
 
         <service name="HttpService2">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="httpEndpoint2" transformer-refs="ByteArrayToSerializable"
                           responseTransformer-refs="SerializableToByteArray ToHttpResponse"/>
             </inbound-router>
+            <echo-component/>
         </service>
 
         <service name="LocalService">

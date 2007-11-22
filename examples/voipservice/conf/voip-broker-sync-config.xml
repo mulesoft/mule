@@ -34,12 +34,12 @@
     
     <model name="voip-broker">
         <service name="VoipBroker">
-            <component class="org.mule.samples.voipservice.service.SyncVoipBroker"/>
-
             <inbound-router>
                 <inbound-endpoint ref="VoipBrokerRequests"/>
             </inbound-router>
             
+            <component class="org.mule.samples.voipservice.service.SyncVoipBroker"/>
+
             <outbound-router>
                 <filtering-router>
                     <outbound-endpoint ref="AddressValidation"/>
@@ -64,31 +64,31 @@
         </service>
         
         <service name="AddressValidationService">
-            <component class="org.mule.samples.voipservice.service.AddressValidationService"/>
             <inbound-router>
                 <inbound-endpoint ref="AddressValidationReceiver"/>
             </inbound-router>
+            <component class="org.mule.samples.voipservice.service.AddressValidationService"/>
         </service>
         
         <service name="PaymentValidationService">
-            <component class="org.mule.samples.voipservice.service.PaymentValidationService"/>
             <inbound-router>
                 <inbound-endpoint ref="PaymentValidation"/>
             </inbound-router>
+            <component class="org.mule.samples.voipservice.service.PaymentValidationService"/>
         </service>
 
         <service name="CreditAgencyService">
-            <component class="org.mule.samples.voipservice.service.CreditAgencyService"/>
             <inbound-router>
                 <inbound-endpoint ref="CreditAgencyReceiver"/>
             </inbound-router>
+            <component class="org.mule.samples.voipservice.service.CreditAgencyService"/>
         </service>
 
         <service name="BankAgencyService">
-            <component class="org.mule.samples.voipservice.service.BankAgencyService"/>
             <inbound-router>
                 <inbound-endpoint ref="BankAgencyReceiver"/>
             </inbound-router>
+            <component class="org.mule.samples.voipservice.service.BankAgencyService"/>
         </service>
     </model>
 </mule>

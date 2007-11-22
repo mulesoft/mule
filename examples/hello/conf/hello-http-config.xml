@@ -54,8 +54,6 @@
             them all to the same place.
         -->
         <service name="GreeterUMO">
-            <component class="org.mule.samples.hello.Greeter"/>
-            
             <inbound-router>
                 <!-- Incoming HTTP requests -->
                 <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" synchronous="true">
@@ -71,6 +69,8 @@
                 <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" synchronous="true"/>
             </inbound-router>
 
+            <component class="org.mule.samples.hello.Greeter"/>
+            
             <outbound-router>
                 <filtering-router>
                     <vm:outbound-endpoint path="chitchatter"/>
@@ -92,11 +92,10 @@
         <!-- note the response transformer on this component. even though there is no outbound provider
         the transformer will transform the result event and pass it back as the http response -->
         <service name="ChitChatUMO">
-            <component class="org.mule.samples.hello.ChitChatter"/>
-            
             <inbound-router>
                 <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString" responseTransformer-refs="ChatStringToString" synchronous="true"/>
             </inbound-router>
+            <component class="org.mule.samples.hello.ChitChatter"/>
         </service>
 
         <!-- This error handler returns user error messages to caller. Errors could also be routed elsewhere,

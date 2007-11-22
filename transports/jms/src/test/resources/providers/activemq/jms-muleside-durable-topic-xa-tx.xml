@@ -36,6 +36,9 @@
     <model name="TEST">
 
         <service name="InputPart">
+            <inbound-router>
+                <inbound-endpoint ref="in"/>
+            </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -43,9 +46,6 @@
                     </properties>
                 </singleton-object>
             </component>
-            <inbound-router>
-                <inbound-endpoint ref="in"/>
-            </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorTestDriver">
@@ -63,13 +63,6 @@
 
 
         <service name="Part1">
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE-1"/>
-                    </properties>
-                </singleton-object>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC1">
                     <transaction action="BEGIN_OR_JOIN">
@@ -77,6 +70,13 @@
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE-1"/>
+                    </properties>
+                </singleton-object>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out"/>
@@ -85,13 +85,6 @@
         </service>
 
         <service name="Part3">
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE-2"/>
-                    </properties>
-                </singleton-object>
-            </component>
             <inbound-router>
                 <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC2">
                     <transaction action="BEGIN_OR_JOIN">
@@ -99,6 +92,13 @@
                     </transaction>
                 </inbound-endpoint>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="returnMessage" value="OUTPUT MESSAGE-2"/>
+                    </properties>
+                </singleton-object>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out"/>

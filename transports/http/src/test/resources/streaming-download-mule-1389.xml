@@ -8,10 +8,10 @@
 
     <model name="main">
         <service name="testComponent">
-            <component class="org.mule.providers.tcp.issues.InputStreamSource"/>
             <inbound-router>
                 <inbound-endpoint address="http://localhost:60208"/>
             </inbound-router>
+            <component class="org.mule.providers.tcp.issues.InputStreamSource"/>
         </service>
     </model>
 

@@ -20,10 +20,10 @@
         </service>
 
        <service name="Receiver">
-           <component class="org.mule.test.integration.service.TestReceiver"/>
            <inbound-router>
                <inbound-endpoint address="vm://bridge.outbound"/>
            </inbound-router>
+           <component class="org.mule.test.integration.service.TestReceiver"/>
         </service>
     </model>
 </mule>

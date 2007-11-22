@@ -23,13 +23,13 @@
         </service>
 
         <service name="ChunkingReceiver">
-            <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent" />
-            </component>
             <inbound-router>
                 <inbound-endpoint address="vm://chunking.channel" />
                 <message-chunking-aggregator-router/>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent" />
+            </component>
         </service>
     </model>
 </mule>
