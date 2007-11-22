@@ -13,6 +13,7 @@ package org.mule.management.agents;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,13 +66,24 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         managementContext.getRegistry().registerAgent(jmxAgent);
         managementContext.start();
 
-        JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
-        Map props = new HashMap(1);
-        props.put(JMXConnector.CREDENTIALS, VALID_AUTH_TOKEN);
-        JMXConnector connector = JMXConnectorFactory.connect(serviceUrl, props);
-        MBeanServerConnection connection = connector.getMBeanServerConnection();
-        // is it the right server?
-        assertTrue(Arrays.asList(connection.getDomains()).contains("Mule." + DOMAIN));
+        JMXConnector connector = null;
+
+        try
+        {
+            JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
+            Map props = Collections.singletonMap(JMXConnector.CREDENTIALS, VALID_AUTH_TOKEN);
+            connector = JMXConnectorFactory.connect(serviceUrl, props);
+            MBeanServerConnection connection = connector.getMBeanServerConnection();
+            // is it the right server?
+            assertTrue(Arrays.asList(connection.getDomains()).contains("Mule." + DOMAIN));
+        }
+        finally
+        {
+            if (connector != null)
+            {
+                connector.close();
+            }
+        }
     }
 
     public void testNoCredentialsProvided() throws Exception
@@ -81,14 +93,24 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         managementContext.getRegistry().registerAgent(jmxAgent);
         managementContext.start();
 
-        JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
+        JMXConnector connector = null;
+
         try
         {
-            JMXConnector connector = JMXConnectorFactory.connect(serviceUrl);
+            JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
+            connector = JMXConnectorFactory.connect(serviceUrl);
+            fail("expected SecurityException");
         }
         catch (SecurityException e)
         {
             // expected
+        }
+        finally
+        {
+            if (connector != null)
+            {
+                connector.close();
+            }            
         }
     }
 
@@ -99,11 +121,23 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         managementContext.getRegistry().registerAgent(jmxAgent);
         managementContext.start();
 
-        JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
-        JMXConnector connector = JMXConnectorFactory.connect(serviceUrl);
-        MBeanServerConnection connection = connector.getMBeanServerConnection();
-        // is it the right server?
-        assertTrue(Arrays.asList(connection.getDomains()).contains("Mule." + DOMAIN));
+        JMXConnector connector = null;
+
+        try
+        {
+            JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
+            connector = JMXConnectorFactory.connect(serviceUrl);
+            MBeanServerConnection connection = connector.getMBeanServerConnection();
+            // is it the right server?
+            assertTrue(Arrays.asList(connection.getDomains()).contains("Mule." + DOMAIN));
+        }
+        finally
+        {
+            if (connector != null)
+            {
+                connector.close();
+            }
+        }
     }
 
     protected Map getValidCredentials()
