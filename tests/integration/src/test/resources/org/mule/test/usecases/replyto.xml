@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+               http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+               http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <!-- Asynchronous VM connector (uses in-memory queues) -->
+    <vm:connector name="asyncVm" queueEvents="true"/>
+
+    <vm:endpoint name="ReplyTo" path="reply.to" connector-ref="asyncVm"/>
+
+    <vm:endpoint name="EchoVm" path="echo.service"/>
+    
+    <endpoint name="EchoAxisSend" address="axis:http://localhost:10080/mule/EchoService?method=echo"/>
+    <endpoint name="EchoAxisReceive" address="axis:http://localhost:10080/mule"/>
+    
+    <endpoint name="EchoXFireSend" address="xfire:http://localhost:10081/mule/EchoService?method=echo"/>
+    <endpoint name="EchoXFireReceive" address="xfire:http://localhost:10081/mule"/>
+    
+    <model name="ReplyToTestCase">
+        <service name="EchoService">
+            <echo-component/>
+            <inbound-router>
+                <inbound-endpoint ref="EchoVm"/>
+                <inbound-endpoint ref="EchoAxisReceive"/>
+                <inbound-endpoint ref="EchoXFireReceive"/>
+            </inbound-router>
+        </service>
+    </model>
+</mule>
