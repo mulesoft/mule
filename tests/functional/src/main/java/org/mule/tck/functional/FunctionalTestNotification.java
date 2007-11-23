@@ -19,14 +19,14 @@ import org.mule.umo.transformer.TransformerException;
  * when it receives an event. Test cases can register a {@link org.mule.tck.functional.FunctionalTestNotificationListener}
  * with Mule to receive these notifications and make assertions about the number of messages received or the content
  * of the message.
- *
+ * <p/>
  * This Notification contains the current EventContext and reply message. The resource Identifier for this event
  * is the component name that received the message.  This means you can register to listen to Notifications from a
  * selected {@link org.mule.tck.functional.FunctionalTestComponent}. i.e.
  * <code>
  * managementContext.registerListener(this, "*JmsTestCompoennt");
  * </code>
- *
+ * <p/>
  * This registration would only receive {@link org.mule.tck.functional.FunctionalTestNotification} objects
  * from components called 'MyJmsTestComponent' and 'YourJmsTestComponent' but not 'HerFileTestComponent'.
  *
@@ -36,18 +36,21 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class FunctionalTestNotification extends CustomNotification
 {
-    /**
-     * Serial version
-     */
+    /** Serial version */
     private static final long serialVersionUID = -3435373745940904597L;
 
     public static final int EVENT_RECEIVED = -999999;
+
+    static
+    {
+        registerAction("event received", EVENT_RECEIVED);
+    }
 
     private final Object replyMessage;
     private final UMOEventContext eventContext;
 
     public FunctionalTestNotification(UMOEventContext context, Object replyMessage, int action)
-        throws TransformerException
+            throws TransformerException
     {
         super(context.getTransformedMessage(), action);
         resourceIdentifier = context.getComponent().getName();

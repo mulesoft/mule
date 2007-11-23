@@ -14,10 +14,10 @@ import org.mule.RegistryContext;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import java.util.EventObject;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>UMOServerNotification</code> is an event triggered by something happening
@@ -25,6 +25,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class UMOServerNotification extends EventObject
 {
+
+    public static final int NO_ACTION_ID = Integer.MIN_VALUE;
+    public static final String NO_ACTION_NAME = "none";
+
     public static final String TYPE_INFO = "info";
     public static final String TYPE_WARNING = "warn";
     public static final String TYPE_ERROR = "error";
@@ -70,7 +74,7 @@ public abstract class UMOServerNotification extends EventObject
     {
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
-        if (RegistryContext.getRegistry()!=null)
+        if (RegistryContext.getRegistry() != null)
         {
             serverId = message.toString();
         }
@@ -114,7 +118,7 @@ public abstract class UMOServerNotification extends EventObject
     public String toString()
     {
         return EVENT_NAME + "{" + "action=" + getActionName(action) + ", resourceId=" + resourceIdentifier
-               + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
+                + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
     }
 
     protected String getPayloadToString()
@@ -151,6 +155,10 @@ public abstract class UMOServerNotification extends EventObject
 
     public static String getActionName(int action)
     {
+        if (action == NO_ACTION_ID)
+        {
+            return NO_ACTION_NAME;
+        }
         Integer key = new Integer(action);
         if (actionIdToName.containsKey(key))
         {
