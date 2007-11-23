@@ -81,6 +81,7 @@ public class MuleConfiguration
     /** Names of threading profiles in the registry */
     public static final String DEFAULT_THREADING_PROFILE = "defaultThreadingProfile";
     public static final String DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE = "defaultMessageDispatcherThreadingProfile";
+    public static final String DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE = "defaultMessageRequesterThreadingProfile";
     public static final String DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "defaultMessageReceiverThreadingProfile";
     public static final String DEFAULT_COMPONENT_THREADING_PROFILE = "defaultComponentThreadingProfile";
 
@@ -154,6 +155,11 @@ public class MuleConfiguration
     public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
     {
         return getThreadingProfile(DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
+    }
+
+    public ThreadingProfile getDefaultMessageRequesterThreadingProfile()
+    {
+        return getThreadingProfile(DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE);
     }
 
     public ThreadingProfile getDefaultMessageReceiverThreadingProfile()

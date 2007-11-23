@@ -46,6 +46,8 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOMessageRequester;
+import org.mule.umo.provider.UMOMessageRequesterFactory;
 import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
@@ -78,7 +80,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -158,9 +159,19 @@ public abstract class AbstractConnector
     protected volatile UMOMessageDispatcherFactory dispatcherFactory;
 
     /**
+     * Factory used to create requesters for this connector
+     */
+    protected volatile UMOMessageRequesterFactory requesterFactory;
+
+    /**
      * A pool of dispatchers for this connector, keyed by endpoint
      */
     protected final GenericKeyedObjectPool dispatchers = new GenericKeyedObjectPool();
+
+    /**
+     * A pool of requesters for this connector, keyed by endpoint
+     */
+    protected final GenericKeyedObjectPool requesters = new GenericKeyedObjectPool();
 
     /**
      * The collection of listeners on this connector. Keyed by entrypoint
@@ -172,6 +183,12 @@ public abstract class AbstractConnector
      */
     private volatile ThreadingProfile dispatcherThreadingProfile =
             RegistryContext.getConfiguration().getDefaultMessageDispatcherThreadingProfile();
+
+    /**
+     * Defines the requester threading profile
+     */
+    private volatile ThreadingProfile requesterThreadingProfile =
+            RegistryContext.getConfiguration().getDefaultMessageRequesterThreadingProfile();
 
     /**
      * Defines the receiver threading profile
@@ -216,9 +233,14 @@ public abstract class AbstractConnector
     private final AtomicReference/*<UMOWorkManager>*/ receiverWorkManager = new AtomicReference();
 
     /**
-     * A shared work manager for all dispatchers created for this connector.
+     * A shared work manager for all requesters created for this connector.
      */
     private final AtomicReference/*<UMOWorkManager>*/ dispatcherWorkManager = new AtomicReference();
+
+    /**
+     * A shared work manager for all requesters created for this connector.
+     */
+    private final AtomicReference/*<UMOWorkManager>*/ requesterWorkManager = new AtomicReference();
 
     /**
      * A generic scheduling service for tasks that need to be performed periodically.
@@ -262,6 +284,8 @@ public abstract class AbstractConnector
         // but has no way of knowing which way it is going.
         dispatchers.setTestOnBorrow(false);
         dispatchers.setTestOnReturn(true);
+        requesters.setTestOnBorrow(false);
+        requesters.setTestOnReturn(true);
     }
 
     /*
@@ -511,6 +535,7 @@ public abstract class AbstractConnector
 
         this.disposeReceivers();
         this.disposeDispatchers();
+        this.disposeRequesters();
         this.disposeWorkManagers();
 
         this.doDispose();
@@ -623,6 +648,35 @@ public abstract class AbstractConnector
         }
     }
 
+    protected void disposeRequesters()
+    {
+        if (requesters != null)
+        {
+            logger.debug("Disposing Requesters");
+
+            try
+            {
+                // may not be needed for requesters?
+                if (this.isDisposing())
+                {
+                    // close() implies clear()
+                    requesters.close();
+                }
+                else
+                {
+                    requesters.clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                // TODO MULE-863: What should we really do?
+                // ignored
+            }
+
+            logger.debug("Requesters Disposed");
+        }
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -701,7 +755,7 @@ public abstract class AbstractConnector
         }
         else
         {
-            // need to adapt the UMOMessageDispatcherFactory for use by commons-pool
+            // need to adapt the factory for use by commons-pool
             poolFactory = new KeyedPoolMessageDispatcherFactoryAdapter(dispatcherFactory);
         }
 
@@ -710,6 +764,38 @@ public abstract class AbstractConnector
         // we keep a reference to the unadapted factory, otherwise people might end
         // up with ClassCastExceptions on downcast to their implementation (sigh)
         this.dispatcherFactory = dispatcherFactory;
+    }
+
+    /**
+     * @return Returns the requesterFactory.
+     */
+    public UMOMessageRequesterFactory getRequesterFactory()
+    {
+        return requesterFactory;
+    }
+
+    /**
+     * @param requesterFactory The requesterFactory to set.
+     */
+    public void setRequesterFactory(UMOMessageRequesterFactory requesterFactory)
+    {
+        KeyedPoolableObjectFactory poolFactory;
+
+        if (requesterFactory instanceof KeyedPoolableObjectFactory)
+        {
+            poolFactory = (KeyedPoolableObjectFactory) requesterFactory;
+        }
+        else
+        {
+            // need to adapt the factory for use by commons-pool
+            poolFactory = new KeyedPoolMessageRequesterFactoryAdapter(requesterFactory);
+        }
+
+        requesters.setFactory(poolFactory);
+
+        // we keep a reference to the unadapted factory, otherwise people might end
+        // up with ClassCastExceptions on downcast to their implementation (sigh)
+        this.requesterFactory = requesterFactory;
     }
 
     /**
@@ -820,6 +906,120 @@ public abstract class AbstractConnector
                     // up by the factory
                     //RM* I think we should at least log this error so give some indication of what is failing
                     logger.error("Failed to dispose dispatcher for endpoint: " + endpoint +
+                            ". This will cause a memory leak. Please report to", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the maximum number of requesters that can be concurrently active per
+     * endpoint.
+     *
+     * @return max. number of active requesters
+     */
+    public int getMaxRequestersActive()
+    {
+        return this.requesters.getMaxActive();
+    }
+
+    /**
+     * Configures the maximum number of requesters that can be concurrently active
+     * per endpoint
+     *
+     * @param maxActive max. number of active requesters
+     */
+    public void setMaxRequestersActive(int maxActive)
+    {
+        this.requesters.setMaxActive(maxActive);
+        // adjust maxIdle in tandem to avoid thrashing
+        this.requesters.setMaxIdle(maxActive);
+    }
+
+    private UMOMessageRequester getRequester(UMOImmutableEndpoint endpoint) throws UMOException
+    {
+        this.checkDisposed();
+
+        if (endpoint == null)
+        {
+            throw new IllegalArgumentException("Endpoint must not be null");
+        }
+
+        if (!supportsProtocol(endpoint.getConnector().getProtocol()))
+        {
+            throw new IllegalArgumentException(
+                CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(this.getProtocol(),
+                    endpoint.getEndpointURI().toString()).getMessage());
+        }
+
+        UMOMessageRequester requester = null;
+        try
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Borrowing a requester for endpoint: " + endpoint.getEndpointURI());
+            }
+
+            requester = (UMOMessageRequester)requesters.borrowObject(endpoint);
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Borrowed a requester for endpoint: " + endpoint.getEndpointURI() + " = "
+                                + requester.toString());
+            }
+
+            return requester;
+        }
+        catch (Exception ex)
+        {
+            throw new ConnectorException(CoreMessages.connectorCausedError(), this, ex);
+        }
+        finally
+        {
+            try
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Borrowed requester: " + ObjectUtils.toString(requester, "null"));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ConnectorException(CoreMessages.connectorCausedError(), this, ex);
+            }
+        }
+    }
+
+    private void returnRequester(UMOImmutableEndpoint endpoint, UMOMessageRequester requester)
+    {
+        if (endpoint != null && requester != null)
+        {
+            try
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Returning requester for endpoint: " + endpoint.getEndpointURI() + " = "
+                                    + requester.toString());
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //Logging failed
+            }
+            finally
+            {
+                try
+                {
+                    requesters.returnObject(endpoint, requester);
+                }
+                catch (Exception e)
+                {
+                    // TODO MULE-863: What should we really do?
+                    // ignore - if the requester is broken, it will likely get cleaned
+                    // up by the factory
+                    //RM* I think we should at least log this error so give some indication of what is failing
+                    logger.error("Failed to dispose requester for endpoint: " + endpoint +
                             ". This will cause a memory leak. Please report to", e);
                 }
             }
@@ -945,6 +1145,27 @@ public abstract class AbstractConnector
     public void setDispatcherThreadingProfile(ThreadingProfile dispatcherThreadingProfile)
     {
         this.dispatcherThreadingProfile = dispatcherThreadingProfile;
+    }
+
+    /**
+     * Getter for property 'requesterThreadingProfile'.
+     *
+     * @return Value for property 'requesterThreadingProfile'.
+     */
+    public ThreadingProfile getRequesterThreadingProfile()
+    {
+        return requesterThreadingProfile;
+    }
+
+    /**
+     * Setter for property 'requesterThreadingProfile'.
+     *
+     * @param requesterThreadingProfile Value to set for property
+     *            'requesterThreadingProfile'.
+     */
+    public void setRequesterThreadingProfile(ThreadingProfile requesterThreadingProfile)
+    {
+        this.requesterThreadingProfile = requesterThreadingProfile;
     }
 
     /**
@@ -1453,18 +1674,6 @@ public abstract class AbstractConnector
      */
     protected UMOWorkManager getReceiverWorkManager(String receiverName) throws UMOException
     {
-        // lazily created because ThreadingProfile was not yet set in Constructor
-//        if (receiverWorkManager.get() == null)
-//        {
-//            UMOWorkManager newWorkManager = this.getReceiverThreadingProfile().createWorkManager(
-//                this.getName() + '.' + receiverName);
-//
-//            if (receiverWorkManager.compareAndSet(null, newWorkManager))
-//            {
-//                newWorkManager.start();
-//            }
-//        }
-
         return (UMOWorkManager) receiverWorkManager.get();
     }
 
@@ -1475,19 +1684,17 @@ public abstract class AbstractConnector
      */
     protected UMOWorkManager getDispatcherWorkManager() throws UMOException
     {
-        // lazily created because ThreadingProfile was not yet set in Constructor
-//        if (dispatcherWorkManager.get() == null)
-//        {
-//            UMOWorkManager newWorkManager = this.getDispatcherThreadingProfile().createWorkManager(
-//                getName() + ".dispatcher");
-//
-//            if (dispatcherWorkManager.compareAndSet(null, newWorkManager))
-//            {
-//                newWorkManager.start();
-//            }
-//        }
-
         return (UMOWorkManager) dispatcherWorkManager.get();
+    }
+
+    /**
+     * Returns a work manager for message requesters.
+     *
+     * @throws UMOException in case of error
+     */
+    protected UMOWorkManager getRequesterWorkManager() throws UMOException
+    {
+        return (UMOWorkManager) requesterWorkManager.get();
     }
 
     /**
@@ -1616,7 +1823,7 @@ public abstract class AbstractConnector
 
     public UMOMessage receive(String uri, long timeout) throws Exception
     {
-        return this.receive(getManagementContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(uri,
+        return receive(getManagementContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(uri,
             getManagementContext()), timeout);
     }
 
@@ -1637,10 +1844,10 @@ public abstract class AbstractConnector
     }
 
     /**
-     * This method will return the dispatcher to the pool or, if the payload is an inputstream, 
+     * This method will return the dispatcher to the pool or, if the payload is an inputstream,
      * replace the payload with a new DelegatingInputStream which returns the dispatcher to
      * the pool when the stream is closed.
-     * 
+     *
      * @param endpoint
      * @param dispatcher
      * @param result
@@ -1667,10 +1874,71 @@ public abstract class AbstractConnector
             };
             result.setPayload(is);
         }
-        else 
+        else
         {
 
             this.returnDispatcher(endpoint, dispatcher);
+        }
+    }
+
+    public UMOMessage request(String uri, long timeout) throws Exception
+    {
+        return request(getManagementContext().getRegistry().lookupEndpointFactory()
+                .getInboundEndpoint(uri, getManagementContext()),
+                timeout);
+    }
+
+    public UMOMessage request(UMOImmutableEndpoint endpoint, long timeout) throws Exception
+    {
+        UMOMessageRequester requester = null;
+        UMOMessage result = null;
+        try
+        {
+            requester = this.getRequester(endpoint);
+            result = requester.request(timeout);
+            return result;
+        }
+        finally
+        {
+            setupRequestReturn(endpoint, requester, result);
+        }
+    }
+
+    /**
+     * This method will return the requester to the pool or, if the payload is an inputstream,
+     * replace the payload with a new DelegatingInputStream which returns the requester to
+     * the pool when the stream is closed.
+     *
+     * @param endpoint
+     * @param requester
+     * @param result
+     */
+    protected void setupRequestReturn(final UMOImmutableEndpoint endpoint,
+                                      final UMOMessageRequester requester,
+                                      UMOMessage result)
+    {
+        if (result != null && result.getPayload() instanceof InputStream)
+        {
+            DelegatingInputStream is = new DelegatingInputStream((InputStream)result.getPayload())
+            {
+                public void close() throws IOException
+                {
+                    try
+                    {
+                        super.close();
+                    }
+                    finally
+                    {
+                        returnRequester(endpoint, requester);
+                    }
+                }
+            };
+            result.setPayload(is);
+        }
+        else
+        {
+
+            this.returnRequester(endpoint, requester);
         }
     }
 

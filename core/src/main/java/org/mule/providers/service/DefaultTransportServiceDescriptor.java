@@ -29,14 +29,13 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOMessageRequesterFactory;
 import org.mule.umo.provider.UMOSessionHandler;
-import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.object.ObjectFactory;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -46,6 +45,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     private String connector;
     private String connectorFactory;
     private String dispatcherFactory;
+    private String requesterFactory;
     private String transactionFactory;
     private String messageAdapter;
     private String messageReceiver;
@@ -71,6 +71,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         connector = removeProperty(MuleProperties.CONNECTOR_CLASS, props);
         connectorFactory = removeProperty(MuleProperties.CONNECTOR_FACTORY, props);
         dispatcherFactory = removeProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, props);
+        requesterFactory = removeProperty(MuleProperties.CONNECTOR_REQUESTER_FACTORY, props);
         transactionFactory = removeProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, props);
         messageReceiver = removeProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, props);
         transactedMessageReceiver = removeProperty(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, props);
@@ -93,35 +94,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     }
 
 
-    private void registerDefaultTransformers(Registry registry) throws UMOException
-    {
-        doRegisterTransformers(createInboundTransformers(), registry);
-        doRegisterTransformers(createOutboundTransformers(), registry);
-        doRegisterTransformers(createResponseTransformers(), registry);
-    }
-
-    private void doRegisterTransformers(List trans, Registry registry) throws UMOException
-    {
-        if (trans == null || TransformerUtils.isUndefined(trans))
-        {
-            return;
-        }
-
-        for (Iterator iterator = trans.iterator(); iterator.hasNext();)
-        {
-            UMOTransformer transformer = (UMOTransformer) iterator.next();
-            if (transformer instanceof DiscoverableTransformer)
-            {
-                registry.registerTransformer(transformer);
-            }
-            else
-            {
-                logger.warn("Transformer does not implement the DiscoverableTransformer interface, so will not be " +
-                        "registered as a default implementation with the Registry. Transformr is: " + transformer);
-            }
-        }
-    }
-
     public void setOverrides(Properties props)
     {
         if (props == null || props.size() == 0)
@@ -132,6 +104,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         connector = props.getProperty(MuleProperties.CONNECTOR_CLASS, connector);
         connectorFactory = props.getProperty(MuleProperties.CONNECTOR_FACTORY, connectorFactory);
         dispatcherFactory = props.getProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, dispatcherFactory);
+        requesterFactory = props.getProperty(MuleProperties.CONNECTOR_REQUESTER_FACTORY, requesterFactory);
         messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, messageReceiver);
         transactedMessageReceiver = props.getProperty(
                 MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, transactedMessageReceiver);
@@ -174,39 +147,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     {
         return createMessageAdapter(message, messageAdapter);
     }
-
-    /* (non-Javadoc)
-     * @see org.mule.providers.service.TransportServiceDescriptor#createStreamMessageAdapter(java.io.InputStream, java.io.OutputStream)
-     */
-//    public UMOStreamMessageAdapter createStreamMessageAdapter(InputStream in, OutputStream out)
-//    throws TransportServiceException
-//    {
-//        if (streamMessageAdapter == null)
-//        {
-//
-//            // If the stream.message.adapter is not set streaming should not be used
-//            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
-//                "stream.message.adapter", service + " service descriptor"));
-//        }
-//        try
-//        {
-//            if (out == null)
-//            {
-//                return (UMOStreamMessageAdapter)ClassUtils.instanciateClass(streamMessageAdapter,
-//                    new Object[]{in});
-//            }
-//            else
-//            {
-//                return (UMOStreamMessageAdapter)ClassUtils.instanciateClass(streamMessageAdapter,
-//                    new Object[]{in, out});
-//            }
-//        }
-//        catch (Exception e)
-//        {
-//            throw new TransportServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
-//                "Message Adapter", streamMessageAdapter), e);
-//        }
-//    }
 
     protected UMOMessageAdapter createMessageAdapter(Object message, String clazz)
             throws TransportServiceException
@@ -350,10 +290,33 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         else
         {
-            //Its valide not to have a Dispatcher factory on the transport
+            //Its valid not to have a Dispatcher factory on the transport
             return null;
-//            throw new TransportServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
-//                "Message Dispatcher Factory", getService()));
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.providers.service.TransportServiceDescriptor#createRequesterFactory()
+     */
+    public UMOMessageRequesterFactory createRequesterFactory() throws TransportServiceException
+    {
+        if (requesterFactory != null)
+        {
+            try
+            {
+                return (UMOMessageRequesterFactory) ClassUtils.instanciateClass(requesterFactory,
+                        ClassUtils.NO_ARGS);
+            }
+            catch (Exception e)
+            {
+                throw new TransportServiceException(
+                        CoreMessages.failedToCreateObjectWith("Message Requester Factory", requesterFactory), e);
+            }
+        }
+        else
+        {
+            //Its valid not to have a Dispatcher factory on the transport
+            return null;
         }
     }
 

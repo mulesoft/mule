@@ -168,6 +168,10 @@
         <constructor-arg ref="defaultThreadingProfile"/>
     </bean>
 
+    <bean name="defaultMessageRequesterThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="defaultThreadingProfile"/>
+    </bean>
+
     <bean name="defaultMessageReceiverThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
         <constructor-arg ref="defaultThreadingProfile"/>
     </bean>

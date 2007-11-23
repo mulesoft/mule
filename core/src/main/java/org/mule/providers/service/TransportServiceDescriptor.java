@@ -20,6 +20,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOMessageRequesterFactory;
 import org.mule.umo.provider.UMOSessionHandler;
 
 import java.util.List;
@@ -49,6 +50,8 @@ public interface TransportServiceDescriptor extends ServiceDescriptor
                                                              Object[] args) throws UMOException;
 
     public UMOMessageDispatcherFactory createDispatcherFactory() throws TransportServiceException;
+
+    public UMOMessageRequesterFactory createRequesterFactory() throws TransportServiceException;
 
     public UMOTransactionFactory createTransactionFactory() throws TransportServiceException;
 
