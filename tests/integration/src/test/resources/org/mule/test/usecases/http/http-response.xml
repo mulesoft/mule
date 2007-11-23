@@ -26,12 +26,12 @@
         </service>
 
         <service name="HttpWithRemoteSynch">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint address="http://localhost:8989" remoteSync="true">
                     <transformer-byte-array-to-string/>
                 </inbound-endpoint>
             </inbound-router>
+            <echo-component/>
         </service>
     </model>
 </mule>
