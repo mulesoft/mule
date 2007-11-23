@@ -32,8 +32,6 @@ public class AsynchMule1869TestCase extends FunctionalTestCase
         return "tcp-functional-test.xml";
     }
 
-    // have we changed this during translation?
-    // not clear to me why it should work without a queue somewhere...
     public void testDispatchAndReply() throws Exception
     {
         MuleClient client = new MuleClient();

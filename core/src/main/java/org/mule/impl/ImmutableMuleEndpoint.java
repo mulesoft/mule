@@ -460,6 +460,20 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
     }
 
+    public UMOMessage request(long timeout) throws Exception
+    {
+        if (connector != null)
+        {
+            return connector.request(this, timeout);
+        }
+        else
+        {
+            // TODO Either remove because this should never happen or i18n the message
+            throw new IllegalStateException("The connector on the endpoint: " + toString()
+                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
+        }
+    }
+
     public UMOMessage send(UMOEvent event) throws DispatchException
     {
         if (connector != null)

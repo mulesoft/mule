@@ -293,10 +293,6 @@ public abstract class AbstractConnectable implements UMOConnectable, ExceptionLi
 
     protected abstract void doDispose();
 
-    protected abstract void doDispatch(UMOEvent event) throws Exception;
-
-    protected abstract UMOMessage doSend(UMOEvent event) throws Exception;
-
     protected abstract void doConnect() throws Exception;
 
     protected abstract void doDisconnect() throws Exception;
