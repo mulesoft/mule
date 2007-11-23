@@ -18,7 +18,7 @@
     <model name="Sample">
         <service name="Console I/O">
             <inbound-router>
-                <inbound-endpoint address="stdio://System.in"/>
+                <stdio:inbound-endpoint system="IN"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
@@ -28,7 +28,7 @@
                 -->
                 <chaining-router>
                     <vm:outbound-endpoint path="stockquote"/>
-                    <outbound-endpoint address="stdio://System.out"/>
+                    <stdio:outbound-endpoint system="OUT"/>
                 </chaining-router>
             </outbound-router>
         </service>

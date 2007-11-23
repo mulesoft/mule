@@ -54,14 +54,16 @@ public class CheckExclusiveAttributes implements PreProcessor
         for (int i = 0; i < attributes.getLength(); i++)
         {
             String alias = CoreXMLUtils.attributeName((Attr) attributes.item(i));
-            String name = null == config ? alias : config.translateName(alias);
-            if (knownAttributes.containsKey(name))
+            // don't translate to alias because the error message is in terms of the attributes
+            // the user enters - we don't want to expose the details of translations
+//            String name = null == config ? alias : config.translateName(alias);
+            if (knownAttributes.containsKey(alias))
             {
-                int index = ((Integer) knownAttributes.get(name)).intValue();
+                int index = ((Integer) knownAttributes.get(alias)).intValue();
                 if (foundSetIndex != NONE && foundSetIndex != index)
                 {
                     StringBuffer message = new StringBuffer("The attribute '");
-                    message.append(name);
+                    message.append(alias);
                     message.append("' cannot appear with the attribute");
                     if (foundAttributes.size() > 1)
                     {
@@ -82,7 +84,7 @@ public class CheckExclusiveAttributes implements PreProcessor
                 else
                 {
                     foundSetIndex = index;
-                    foundAttributes.add(name);
+                    foundAttributes.add(alias);
                 }
             }
         }

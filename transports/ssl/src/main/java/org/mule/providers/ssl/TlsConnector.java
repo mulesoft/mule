@@ -16,9 +16,11 @@ package org.mule.providers.ssl;
 public class TlsConnector extends SslConnector
 {
 
+    public static final String TLS = "tls";
+
     public String getProtocol()
     {
-        return "tls";
+        return TLS;
     }
 
 }

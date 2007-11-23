@@ -13,12 +13,16 @@ package org.mule.config.spring.parsers.specific.endpoint.support;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
+import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParser;
 import org.mule.config.spring.parsers.processors.BlockAttribute;
-import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
+import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
 import org.mule.config.spring.parsers.specific.URIBuilder;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,6 +78,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         // the first delegate, the parent, is an endpoint; we block address and property
         // related attributes
         disableAttributes(endpointParser, URIBuilder.ALL_ATTRIBUTES);
+        disableAttributes(endpointParser, requiredAddressAttributes);
         disableAttributes(endpointParser, propertyAttributes);
         addDelegate(endpointParser);
 
@@ -94,6 +99,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
         // the address parser see only the endpoint attributes
         enableAttributes(addressParser, URIBuilder.ALL_ATTRIBUTES);
+        enableAttributes(addressParser, requiredAddressAttributes);
         // we require either a reference, an address, or the attributes specified
         String[][] addressAttributeSets = new String[][]{
                 new String[]{URIBuilder.ADDRESS},

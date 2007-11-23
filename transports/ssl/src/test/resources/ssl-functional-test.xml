@@ -17,15 +17,15 @@
 
     <endpoint name="sendEndpoint" address="ssl://localhost:60198" synchronous="true"/>
 
-    <endpoint name="sendManyEndpoint" address="ssl://localhost:60197" synchronous="true"/>
+    <ssl:endpoint name="sendManyEndpoint" address="ssl://localhost:60197" synchronous="true"/>
 
-    <endpoint name="asyncEndpoint" address="ssl://localhost:60196" synchronous="false"/>
+    <ssl:endpoint name="asyncEndpoint" host="localhost" port="60196" synchronous="false"/>
 
     <model name="main">
 
         <service name="testComponent1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
             <inbound-router>
-                <inbound-endpoint ref="sendEndpoint"/>
+                <ssl:inbound-endpoint ref="sendEndpoint"/>
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
@@ -40,7 +40,7 @@
 
         <service name="testComponent2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
             <inbound-router>
-                <inbound-endpoint ref="sendManyEndpoint"/>
+                <ssl:inbound-endpoint ref="sendManyEndpoint"/>
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">

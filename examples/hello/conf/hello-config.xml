@@ -69,7 +69,7 @@
         <service name="GreeterUMO">
             
             <inbound-router>
-                <inbound-endpoint address="stdio://System.in" transformer-refs="StdinToNameString"/>
+                <stdio:inbound-endpoint system="IN" transformer-refs="StdinToNameString"/>
             </inbound-router>
             
             <component class="org.mule.samples.hello.Greeter"/>
@@ -109,7 +109,7 @@
 
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="stdio://System.out" transformer-refs="ChatStringToString" />
+                    <stdio:outbound-endpoint system="OUT" transformer-refs="ChatStringToString" />
                 </outbound-pass-through-router>
             </outbound-router>
 
@@ -127,7 +127,7 @@
             
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="stdio://System.out"/>
+                    <stdio:outbound-endpoint system="OUT"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -141,7 +141,7 @@
                 
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="stdio://System.err"/>
+                    <stdio:outbound-endpoint system="ERR"/>
                 </outbound-pass-through-router>
             </outbound-router>            
         </service>        

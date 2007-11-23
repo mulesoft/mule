@@ -11,17 +11,19 @@ package org.mule.providers.ssl.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.ssl.SslConnector;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><ssl:connector></code> elements.
  */
-public class SslNamespaceHandler extends NamespaceHandlerSupport
+public class SslNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+
     public void init()
     {
+        registerStandardTransportEndpoints(SslConnector.SSL, URIBuilder.SOCKET_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(SslConnector.class, true));
         registerBeanDefinitionParser("ssl-key-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("ssl-client", new ParentDefinitionParser());

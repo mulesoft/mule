@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 public abstract class StdioConnector extends AbstractConnector
 {
 
+    public static final String STDIO = "stdio";
     public static final String STREAM_SYSTEM_IN = "system.in";
     public static final String STREAM_SYSTEM_OUT = "system.out";
     public static final String STREAM_SYSTEM_ERR = "system.err";
@@ -81,7 +82,7 @@ public abstract class StdioConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "stdio";
+        return STDIO;
     }
 
     public InputStream getInputStream()

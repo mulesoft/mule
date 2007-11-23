@@ -54,7 +54,10 @@ public class RequireAttribute implements PreProcessor
             for (int i = 0; i < attributes.getLength() && !found; i++)
             {
                 String alias = CoreXMLUtils.attributeName((Attr) attributes.item(i));
-                found = name.equals(config.translateName(alias));
+                // don't translate to alias because the error message is in terms of the attributes
+                // the user enters - we don't want to expose the details of translations
+//                found = name.equals(config.translateName(alias));
+                found = name.equals(alias);
             }
             if (!found)
             {

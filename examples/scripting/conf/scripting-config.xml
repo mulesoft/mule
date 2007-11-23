@@ -3,10 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:scripting="http://www.mulesource.org/schema/mule/scripting/2.0"
+       xmlns:stdio="http://www.mulesource.org/schema/mule/stdio/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd">
+       http://www.mulesource.org/schema/mule/scripting/2.0 http://www.mulesource.org/schema/mule/scripting/2.0/mule-scripting.xsd
+       http://www.mulesource.org/schema/mule/stdio/2.0 http://www.mulesource.org/schema/mule/stdio/2.0/mule-stdio.xsd">
 
     <description>
         This example demonstrates invoking a Groovy script as the service component.
@@ -21,12 +23,12 @@
     <model name="main">
         <service name="ScriptService">
             <inbound-router>
-                <inbound-endpoint address="stdio://System.in">
+                <stdio:inbound-endpoint system="IN">
                     <properties>
                         <spring:entry key="promptMessage" value="Please enter a message: "/>
                         <spring:entry key="messageDelayTime" value="1000"/>
                     </properties>
-                </inbound-endpoint>
+                </stdio:inbound-endpoint>
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">

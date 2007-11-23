@@ -14,7 +14,7 @@
         <ssl:ssl-server trustStore="trustStore" trustStorePassword="mulepassword"/>
     </ssl:connector>
 
-    <endpoint name="clientEndpoint" address="ssl://localhost:60198" synchronous="true"/>
+    <ssl:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
 
     <model name="main">
 

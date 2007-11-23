@@ -38,6 +38,8 @@ import javax.net.ssl.TrustManagerFactory;
 public class SslConnector extends TcpConnector
         implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
 {
+
+    public static final String SSL = "ssl";
     public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";
     public static final String LOCAL_CERTIFICATES = "LOCAL_CERTIFICATES";
 
@@ -81,7 +83,7 @@ public class SslConnector extends TcpConnector
     // @Override
     public String getProtocol()
     {
-        return "SSL";
+        return SSL;
     }
 
     public String getClientKeyStore()

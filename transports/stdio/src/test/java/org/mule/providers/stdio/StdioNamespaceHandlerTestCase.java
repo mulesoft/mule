@@ -10,6 +10,7 @@
 package org.mule.providers.stdio;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class StdioNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -46,6 +47,20 @@ public class StdioNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
+    }
+
+    public void testSystemAttributeMap()
+    {
+        testEndpointAttribute("in", "system.in");
+        testEndpointAttribute("out", "system.out");
+        testEndpointAttribute("err", "system.err");
+    }
+
+    protected void testEndpointAttribute(String name, String address)
+    {
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(name, managementContext);
+        assertNotNull("Null " + name, endpoint);
+        assertEquals(address, endpoint.getEndpointURI().getAddress());
     }
 
 }

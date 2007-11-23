@@ -20,4 +20,18 @@
             outputMessage="abc"
             promptMessage="bcd"/>
 
+    <model name="model">
+        <service name="service">
+            <inbound-router>
+                <stdio:inbound-endpoint name="in" system="IN" connector-ref="stdioConnector"/>
+            </inbound-router>
+            <outbound-router>
+                <multicasting-router>
+                    <stdio:outbound-endpoint name="out" system="OUT" connector-ref="stdioConnector"/>
+                    <stdio:outbound-endpoint name="err" system="ERR" connector-ref="stdioConnector"/>
+                </multicasting-router>
+            </outbound-router>
+        </service>
+    </model>
+
 </mule>
