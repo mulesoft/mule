@@ -11,8 +11,3 @@ org.mule.providers.soap.xfire.XFireServiceUsingAxisEndpointTestCase
 # MULE-2044 Can't send complex types to WS using Xfire
 org.mule.providers.soap.xfire.ComplexTypeMethodTestCase
 
-# MULE-2708 Intermittent
-org.mule.providers.soap.xfire.XFireWsdlCallTestCase
-org.mule.providers.soap.WSProxyTestCase
-org.mule.providers.soap.xfire.XFireConnectorHttpFunctionalTestCase
-

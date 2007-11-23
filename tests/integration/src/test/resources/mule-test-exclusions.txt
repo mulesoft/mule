@@ -97,9 +97,6 @@ org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 # Mule 2.x-specific failures
 ##########################################################################
 
-# MULE-2708 Intermittent
-org.mule.test.usecases.http.HttpResponseTestCase
-
 # MULE-2721 Only XFire fails
 org.mule.test.usecases.ReplyToTestCase
 
