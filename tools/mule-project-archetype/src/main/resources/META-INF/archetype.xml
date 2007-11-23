@@ -4,6 +4,8 @@
         <variable>
             <name>description</name>
             <description>Provide a description of what the project does:</description>
+            <!-- Note that you always need a <defValue> element for -Dinteractive=false to work -->
+            <defvalue></defvalue>
         </variable>
         <variable>
             <name>muleVersion</name>
