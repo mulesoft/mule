@@ -24,16 +24,12 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * <code>TcpMessageDispatcher</code> will send transformed Mule events over TCP.
  */
 
 public class TcpMessageDispatcher extends AbstractMessageDispatcher
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
 
     private final TcpConnector connector;
 
@@ -131,7 +127,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                 }
                 catch (IOException e)
                 {
-                   throw ((IOException) e);
+                   throw e;
                 }
                 catch (Exception e)
                 {
