@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.tests.archetypes</groupId>
+        <artifactId>mule-tests-archetypes</artifactId>
+        <version>2.0.0-RC1-SNAPSHOT</version>
+    </parent>
+    <groupId>org.mule.tests.archetypes</groupId>
+    <artifactId>transport-archetype</artifactId>
+    <packaging>jar</packaging>
+    <name>Test for Mule Transport Archetype</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.tools</groupId>
+            <artifactId>mule-transport-archetype</artifactId>
+            <version>${version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <!--
+                                Fork Maven from within the current Maven run to generate
+                                a new transport using the mule-transport-archetype
+                            -->
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                            <executable>mvn</executable>
+                            <arguments>
+                                <argument>org.mule.tools:mule-transport-archetype:create</argument>
+                                <argument>-DtransportId=foo</argument>
+                                <argument>-DmuleVersion=${version}</argument>
+                                <argument>-Dinteractive=false</argument>
+                            </arguments>
+                            <!--
+                                Add the generated sources to the test source paths
+                            -->
+                            <testSourceRoot>${project.build.directory}/mule-transport-foo/src/main/java</testSourceRoot>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

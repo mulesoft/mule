@@ -4,19 +4,17 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule</artifactId>
+        <groupId>org.mule.tests</groupId>
+        <artifactId>mule-tests</artifactId>
          <version>2.0.0-RC1-SNAPSHOT</version>
     </parent>
-    <groupId>org.mule.tests</groupId>
-    <artifactId>mule-tests</artifactId>
+    <groupId>org.mule.tests.archetypes</groupId>
+    <artifactId>mule-tests-archetypes</artifactId>
     <packaging>pom</packaging>
-    <name>Mule Tests</name>
+    <name>Mule Tests for Maven Archetypes</name>
 
     <modules>
-        <module>archetypes</module>
-        <module>functional</module>
-        <module>integration</module>
-        <module>external</module>
+        <module>transport-archetype</module>
+        <module>project-archetype</module>
     </modules>
 </project>
