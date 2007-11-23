@@ -13,6 +13,7 @@ import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.lifecycle.LifecyclePhase;
 import org.mule.impl.lifecycle.NotificationLifecycleObject;
 import org.mule.registry.Registry;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Startable;
@@ -50,6 +51,7 @@ public class ManagementContextStartPhase extends LifecyclePhase
         startOrderedObjects.add(new NotificationLifecycleObject(UMOModel.class, ManagerNotification.class,
                 ManagerNotification.getActionName(ManagerNotification.MANAGER_STARTING_MODELS),
                 ManagerNotification.getActionName(ManagerNotification.MANAGER_STARTED_MODELS)));
+        startOrderedObjects.add(new NotificationLifecycleObject(UMOComponent.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 
 

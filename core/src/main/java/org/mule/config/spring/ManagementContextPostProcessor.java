@@ -38,14 +38,14 @@ public class ManagementContextPostProcessor implements BeanPostProcessor, Applic
 
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
     {
-        if(bean instanceof ManagementContextAware)
+        if (bean instanceof ManagementContextAware)
         {
-            if(getManagementContext()==null)
+            if (getManagementContext() == null)
             {
                 return bean;
             }
 
-            ((ManagementContextAware)bean).setManagementContext(getManagementContext());
+            ((ManagementContextAware) bean).setManagementContext(getManagementContext());
         }
         return bean;
     }
@@ -59,22 +59,7 @@ public class ManagementContextPostProcessor implements BeanPostProcessor, Applic
     protected UMOManagementContext getManagementContext()
     {
         return (UMOManagementContext) applicationContext.getBean(MuleProperties.OBJECT_MANAGEMENT_CONTEXT);
-//        //TODO RM* This will not work until we can migrate the ManagementContextFactory Bean to use a ManagementContext not the MuleManager
-//        if(context==null)
-//        {
-//            Map mContexts = applicationContext.getBeansOfType(UMOManagementContext.class, false, true);
-//            if(mContexts.size()==1)
-//            {
-//                context = (UMOManagementContext)mContexts.values().iterator().next();
-//            }
-//            else
-//            {
-//                return null;
-//                //throw new IllegalStateException("There must be exactly one MAnagementContext. Currently there are " + mContexts.size() + " registered");
-//            }
-//        }
-//        return context;
     }
 
-    
+
 }

@@ -119,11 +119,6 @@ public class TransientRegistry extends AbstractRegistry
     {
         registry = new HashMap(8);
 
-        //Register ManagementContext Injector for locally registered objects
-        //TODO this has to be registered once the managementContext is created
-//        getObjectTypeMap(ObjectProcessor.class).put(MuleProperties.OBJECT_MANAGMENT_CONTEXT_PROCESSOR,
-//                new ManagementContextDependencyProcessor(context));
-
         getObjectTypeMap(ObjectProcessor.class).put("_mulePropertyExtractorProcessor",
                 new PropertyExtractorProcessor());
 
@@ -134,7 +129,7 @@ public class TransientRegistry extends AbstractRegistry
         }
         catch (InitialisationException e)
         {
-            e.printStackTrace();
+            logger.error(e);
         }
 
     }
@@ -570,8 +565,6 @@ public class TransientRegistry extends AbstractRegistry
 //      // TODO MULE-2161
         MuleServer.setManagementContext(context);
         registry.registerObject(MuleProperties.OBJECT_MANAGEMENT_CONTEXT, context, context);
-//        registry.registerObject(ObjectProcessor.class, MuleProperties.OBJECT_MANAGEMENT_CONTEXT_PROCESSOR,
-//                new ManagementContextDependencyProcessor(context));
 
         //Register objects so we get lifecycle management
         registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, securityManager, context);

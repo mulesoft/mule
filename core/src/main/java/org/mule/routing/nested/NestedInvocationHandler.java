@@ -16,6 +16,7 @@ import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.UMONestedRouter;
+import org.mule.util.StringMessageUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
@@ -61,6 +62,10 @@ public class NestedInvocationHandler implements InvocationHandler
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
+        if (method.getName().equals("toString"))
+        {
+            return toString();
+        }
 
         UMOMessage message = new MuleMessage(args);
         UMONestedRouter router = (UMONestedRouter) routers.get(method.getName());
@@ -96,5 +101,14 @@ public class NestedInvocationHandler implements InvocationHandler
         {
             return null;
         }
+    }
+
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer();
+        sb.append("NestedInvocation");
+        sb.append("{routers='").append(StringMessageUtils.toString(routers));
+        sb.append('}');
+        return sb.toString();
     }
 }

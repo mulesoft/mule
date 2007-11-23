@@ -13,6 +13,7 @@ import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.lifecycle.LifecyclePhase;
 import org.mule.impl.lifecycle.NotificationLifecycleObject;
 import org.mule.registry.Registry;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Startable;
@@ -50,6 +51,7 @@ public class ManagementContextStopPhase extends LifecyclePhase
         stopOrderedObjects.add(new NotificationLifecycleObject(UMOModel.class, ManagerNotification.class,
                 ManagerNotification.getActionName(ManagerNotification.MANAGER_STOPPING_MODELS),
                 ManagerNotification.getActionName(ManagerNotification.MANAGER_STOPPED_MODELS)));
+        stopOrderedObjects.add(new NotificationLifecycleObject(UMOComponent.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
 
         setIgnorredObjectTypes(ignorredObjects);
