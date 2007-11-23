@@ -2050,21 +2050,6 @@ public abstract class AbstractConnector
                 logger.debug("Transport '" + getProtocol() + "' will not support outbound endpoints: ");
             }
 
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Loading RequesterFactory for connector: " + getName() + " (" + getClass().getName() + ")");
-            }
-
-            UMOMessageRequesterFactory rf = serviceDescriptor.createRequesterFactory();
-            if(df!=null)
-            {
-                this.setRequesterFactory(rf);
-            }
-            else if (logger.isDebugEnabled())
-            {
-                logger.debug("Transport '" + getProtocol() + "' will not support requests: ");
-            }
-
 
             sessionHandler = serviceDescriptor.createSessionHandler();
 

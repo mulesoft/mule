@@ -195,11 +195,6 @@ public class DynamicEndpointURIEndpoint implements UMOImmutableEndpoint
         return endpoint.receive(timeout);
     }
 
-    public UMOMessage request(long timeout) throws Exception
-    {
-        return endpoint.request(timeout);
-    }
-
     public UMOMessage send(UMOEvent event) throws DispatchException
     {
         return endpoint.send(event);
