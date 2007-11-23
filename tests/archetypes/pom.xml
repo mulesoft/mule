@@ -15,6 +15,6 @@
 
     <modules>
         <module>transport-archetype</module>
-        <module>project-archetype</module>
+<!--         <module>project-archetype</module> -->
     </modules>
 </project>
