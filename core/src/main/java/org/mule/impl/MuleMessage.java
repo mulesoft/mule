@@ -630,9 +630,4 @@ public class MuleMessage implements UMOMessage, ThreadSafeAccess
             ((AbstractMessageAdapter) adapter).assertAccess(write);
         }
     }
-
-    protected void finalize() throws Throwable
-    {
-        release();
-    }
 }
