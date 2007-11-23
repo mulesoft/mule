@@ -7,6 +7,11 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"
        default-init-method="initialise">
 
+    <!-- Default ue configuration - the Muleconfiguration object should provide access to these values -->
+    <bean name="mule.working.dir" class="java.lang.String">
+        <constructor-arg value="./.mule"/>
+    </bean>
+
     <bean name="_muleManagementContext" class="org.mule.config.spring.ManagementContextFactoryBean">
         <constructor-arg ref="_muleLifecycleManager"/>
         <property name="workManager" ref="_muleWorkManager"/>
@@ -49,7 +54,7 @@
     <bean name="_muleRegistry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean">
     </bean>
 
-     <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"
+    <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"
           depends-on="_muleRegistry"/>
 
     <mule:mule name="_muleSystemModel">
@@ -64,7 +69,7 @@
                 defaultTransactionTimeout="5000"
                 workingDirectory=".mule"/>
 
-        <mule:model name="_muleSystemModel" />
+        <mule:model name="_muleSystemModel"/>
 
     </mule:mule>
 
@@ -127,7 +132,7 @@
                        value="org.mule.impl.internal.notifications.RegistryNotification"/>
                 <entry key="org.mule.impl.internal.notifications.CustomNotificationListener"
                        value="org.mule.impl.internal.notifications.CustomNotification"/>
-                <entry key="org.mule.impl.internal.notifications.MessageNotificationListener" 
+                <entry key="org.mule.impl.internal.notifications.MessageNotificationListener"
                        value="org.mule.impl.internal.notifications.MessageNotification"/>
                 <entry key="org.mule.impl.internal.notifications.ExceptionNotificationListener"
                        value="org.mule.impl.internal.notifications.ExceptionNotification"/>
@@ -145,9 +150,9 @@
     <bean name="_muleSecurityManager" class="org.mule.impl.security.MuleSecurityManager"/>
 
     <bean name="_muleProperties" class="java.util.HashMap"/>
-    
+
     <bean name="_muleEndpointFactory" class="org.mule.impl.endpoint.EndpointFactory" depends-on="_muleRegistry">
-<!--        <property name="defaultEndpointBuilder" ref="_muleDefaultEndpointBuilder"/>-->
+        <!--        <property name="defaultEndpointBuilder" ref="_muleDefaultEndpointBuilder"/>-->
     </bean>
 
     <bean name="defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
@@ -171,10 +176,10 @@
         <constructor-arg ref="defaultThreadingProfile"/>
     </bean>
 
-<!--    <bean name="_muleDefaultEndpointBuilder" class="org.mule.impl.endpoint.EndpointBuilder"/>-->
+    <!--    <bean name="_muleDefaultEndpointBuilder" class="org.mule.impl.endpoint.EndpointBuilder"/>-->
 
 
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
     the transformers will be available even when using the the TransientRegistry only -->
-    
+
 </beans>
