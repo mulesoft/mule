@@ -57,6 +57,16 @@
     <endpoint name="object-in-2" address="vm://object-in-2" connector-ref="default"/>
     <vm:endpoint name="dom-in" address="vm://dom-in" connector-ref="default" transformer-refs="xmlToDom"/>
 
+    <endpoint name="xml-out" address="vm://xml-out" connector-ref="queue"/>
+    <vm:endpoint name="xml-xslt-out" path="xml-xslt-out" connector-ref="queue"/>
+    <vm:endpoint name="xml-xslt-out-string" path="xml-xslt-out-string" connector-ref="queue"/>
+    <endpoint name="xml-jxpath-out" address="vm://xml-jxpath-out" connector-ref="queue"/>
+    <endpoint name="xml-dom-out" address="vm://xml-dom-out" connector-ref="queue"/>
+    <vm:endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue"/>
+    <endpoint name="object-out" address="vm://object-out" connector-ref="queue"/>
+    <vm:endpoint name="object-xml-out" path="object-xml-out" connector-ref="queue"/>
+    <endpoint name="dom-xml-out" address="vm://dom-xml-out" connector-ref="queue"/>
+
     <model name="xml transformer tests">
 
         <service name="xml to ...">
@@ -66,17 +76,12 @@
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-                    <outbound-endpoint name="xml-out" address="vm://xml-out" connector-ref="queue"/>
-                    <vm:outbound-endpoint name="xml-xslt-out" path="xml-xslt-out"
-                                          connector-ref="queue" transformer-refs="xslt"/>
-                    <vm:outbound-endpoint name="xml-xslt-out-string" path="xml-xslt-out"
-                                          connector-ref="queue" transformer-refs="xslt-string"/>
-                    <outbound-endpoint name="xml-jxpath-out" address="vm://xml-jxpath-out" connector-ref="queue"
-                                       transformer-refs="jxpath"/>
-                    <outbound-endpoint name="xml-dom-out" address="vm://xml-dom-out" connector-ref="queue"
-                                       transformer-refs="xmlToDom"/>
-                    <vm:outbound-endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue"
-                                          transformer-refs="xmlToObject"/>
+                    <outbound-endpoint ref="xml-out" address="vm://xml-out" connector-ref="queue"/>
+                    <vm:outbound-endpoint ref="xml-xslt-out" transformer-refs="xslt"/>
+                    <vm:outbound-endpoint ref="xml-xslt-out-string" transformer-refs="xslt-string"/>
+                    <outbound-endpoint ref="xml-jxpath-out" transformer-refs="jxpath"/>
+                    <outbound-endpoint ref="xml-dom-out" transformer-refs="xmlToDom "/>
+                    <vm:outbound-endpoint ref="xml-object-out" transformer-refs="xmlToObject"/>
                     <vm:outbound-endpoint ref="dom-in"/>
                 </multicasting-router>
             </outbound-router>
@@ -89,9 +94,8 @@
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-                    <outbound-endpoint name="object-out" address="vm://object-out" connector-ref="queue"/>
-                    <vm:outbound-endpoint name="object-xml-out" path="object-xml-out"
-                                          connector-ref="queue" transformer-refs="objectToXml"/>
+                    <outbound-endpoint ref="object-out"/>
+                    <vm:outbound-endpoint ref="object-xml-out" transformer-refs="objectToXml"/>
                     <!-- MULE-2136 -->
                     <!-- mule:endpoint ref="xml-in" transformers="objectToXml"/ -->
                 </multicasting-router>
@@ -121,8 +125,7 @@
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-                    <outbound-endpoint name="dom-xml-out" address="vm://dom-xml-out" connector-ref="queue"
-                                       transformer-refs="domToXml"/>
+                    <outbound-endpoint ref="dom-xml-out" transformer-refs="domToXml"/>
                 </multicasting-router>
             </outbound-router>
         </service>

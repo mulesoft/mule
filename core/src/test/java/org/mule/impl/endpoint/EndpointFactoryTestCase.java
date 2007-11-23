@@ -273,18 +273,19 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     public void testCreateEndpointFromNamedConcreteEndpoint() throws UMOException
     {
         Registry r = managementContext.getRegistry();
+        r.registerObject("myNamedConcreateEndpoint", r.lookupEndpointFactory().getInboundEndpoint("test://test",
+            managementContext), managementContext);
         r.registerObject("&myNamedConcreateEndpoint", new EndpointURIEndpointBuilder("test://address",
             managementContext), managementContext);
-        String uri = "&myNamedConcreateEndpoint";
+        String uri = "myNamedConcreateEndpoint";
         UMOEndpointFactory endpointFactory = new EndpointFactory();
         try
         {
             UMOImmutableEndpoint ep = endpointFactory.getInboundEndpoint(uri, managementContext);
-            assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
+            fail("Expected exception.  Cannot create endpoints from named conrete endpoints.");
         }
         catch (Exception e)
         {
-            fail("Unexpected exception: " + e.getMessage());
         }
     }
     

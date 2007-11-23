@@ -9,11 +9,13 @@
     <parsers-test:string-endpoint address="test://foo" name="string"/>
 
     <parsers-test:orphan-endpoint address="test://foo" name="orphan"/>
+    
+    <parsers-test:orphan-endpoint address="test://foo" name="child"/>
 
     <model name="model">
         <service name="service">
             <inbound-router>
-                <parsers-test:child-endpoint address="test://foo" name="child"/>
+                <parsers-test:child-endpoint ref="child"/>
             </inbound-router>
         </service>
     </model>

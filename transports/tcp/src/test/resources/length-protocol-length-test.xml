@@ -15,15 +15,19 @@
     <tcp:connector name="length-connector">
         <tcp:length-protocol payloadOnly="true" maxMessageLength="10"/>
     </tcp:connector>
+    
+    <tcp:endpoint name="safe" host="localhost" port="65432" connector-ref="safe-connector" 
+                  synchronous="true"/>
+                          
+    <endpoint name="length" address="tcp://localhost:65433" connector-ref="length-connector" 
+              synchronous="true"/>              
 
     <model name="main">
         <service name="service">
             <inbound-router>
-                <tcp:inbound-endpoint name="safe" host="localhost" port="65432"
-                                  connector-ref="safe-connector" synchronous="true"/>
+                <tcp:inbound-endpoint ref="safe"/>
                 <!-- legacy style -->
-                <inbound-endpoint name="length" address="tcp://localhost:65433"
-                                  connector-ref="length-connector" synchronous="true"/>
+                <inbound-endpoint ref="length"/>
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">

@@ -42,13 +42,13 @@ import org.mule.util.CollectionUtils;
 import org.mule.util.UUID;
 import org.mule.util.properties.PropertyExtractorManager;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -232,7 +232,6 @@ public abstract class AbstractRegistry implements Registry
 
     public UMOEndpointBuilder lookupEndpointBuilder(String name)
     {
-        // TODO DF: This is spring specific because if uses "&" to lookup FactoryBean and thus builder.
         Object o = lookupObject(name);
         if (o instanceof UMOEndpointBuilder)
         {
@@ -241,19 +240,10 @@ public abstract class AbstractRegistry implements Registry
         }
         else
         {
-            logger.debug("Global endpoint EndpointBuilder not found, attempting to lookup named concrete endpoint builder with name: "
-                    + name);
-            UMOEndpointBuilder endpointBuilder = (UMOEndpointBuilder) lookupObject("&" + name);
-            if (endpointBuilder != null)
-            {
-                logger.debug("Endpoint builder for concrete endpoint with name: " + name + " found.");
-            }
-            else
-            {
-                logger.debug("Endpoint builder for concrete endpoint with name: " + name + " NOT found.");
-            }
-            return endpointBuilder;
+            logger.debug("No endpoint builder with the name: " + name + "found.");
+            return null;
         }
+            
     }
 
     public UMOEndpointFactory lookupEndpointFactory()

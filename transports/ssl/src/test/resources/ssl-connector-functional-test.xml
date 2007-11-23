@@ -15,11 +15,13 @@
         <ssl:ssl-server trustStore="trustStore" trustStorePassword="mulepassword"/>
     </ssl:connector>
 
+    <endpoint name="in" address="ssl://localhost:61655" synchronous="false"/>
+
     <model name="main">
 
         <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
             <inbound-router>
-                <inbound-endpoint name="in" address="ssl://localhost:61655" synchronous="false"/>
+                <inbound-endpoint ref="in"/>
             </inbound-router>
 
             <component>

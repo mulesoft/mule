@@ -13,11 +13,13 @@
     </spring:beans>
 
     <environment-property name="property" value="value"/>
+    
+    <endpoint name="endpoint" address="test://${property}"/>
 
     <model name="model">
         <service name="service">
             <inbound-router>
-                <inbound-endpoint name="endpoint" address="test://${property}"/>
+                <inbound-endpoint ref="endpoint"/>
             </inbound-router>
             <component>
                 <singleton-object instance-ref="poot"/>

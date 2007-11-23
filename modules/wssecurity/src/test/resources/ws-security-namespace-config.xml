@@ -25,14 +25,16 @@
         <xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>
         <xfire:client-out-handler>org.codehaus.xfire.security.wss4j.WSS4JOutHandler</xfire:client-out-handler>
     </xfire:connector>
+    
+    <endpoint address="xfire:http://localhost:64567" name="endpoint" connector-ref="xfireConnector">
+        <wssecurity:security-filter signatureFile="in-signed-security.properties"
+                                decryptionFile="in-encrypted-security.properties"/>
+    </endpoint>
 
     <model name="test">
         <service name="MySecuredUMO">
             <inbound-router>
-                <inbound-endpoint address="xfire:http://localhost:64567" name="endpoint" connector-ref="xfireConnector">
-                    <wssecurity:security-filter signatureFile="in-signed-security.properties"
-                                                decryptionFile="in-encrypted-security.properties"/>
-                </inbound-endpoint>
+                <inbound-endpoint ref="endpoint"/>
             </inbound-router>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>

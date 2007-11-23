@@ -19,6 +19,8 @@
     <vm:connector name="vmQueue" queueEvents="true"/>
 
     <endpoint address="file://test" name="send" connector-ref="sendConnector"/>
+    
+    <endpoint address="vm://receive" name="receive"/>
 
     <model name="receiveModel">
 
@@ -30,7 +32,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://receive" name="receive"/>
+                    <outbound-endpoint ref="receive"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

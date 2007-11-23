@@ -10,7 +10,10 @@
 
 package org.mule.config.spring.parsers.endpoint;
 
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class StringAddressEndpointTestCase extends AbstractEndpointTestCase
 {
@@ -32,7 +35,13 @@ public class StringAddressEndpointTestCase extends AbstractEndpointTestCase
 
     public void testChildAddress() throws UMOException
     {
-        doTest("child");
+        UMOComponent component = managementContext.getRegistry().lookupComponent("service");
+        UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) component.getInboundRouter().getEndpoints().get(0);
+        assertNotNull(endpoint);
+        UMOEndpointURI uri = endpoint.getEndpointURI();
+        assertNotNull(uri);
+        assertEquals("foo", uri.getAddress());
+        assertEquals("test", uri.getScheme());
     }
 
 }
