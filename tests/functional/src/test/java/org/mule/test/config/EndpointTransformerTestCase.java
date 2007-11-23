@@ -21,17 +21,17 @@ public class EndpointTransformerTestCase extends AbstractMuleTestCase
 
     public void testTransformerProperty() throws UMOException
     {
-        managementContext.getRegistry().registerTransformer(new NoActionTransformer(), managementContext);
+        managementContext.getRegistry().registerTransformer(new NoActionTransformer());
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            "test:///tmp?transformers=NoActionTransformer", managementContext);
+            "test:///tmp?transformers=NoActionTransformer");
         assertEquals("NoActionTransformer", TransformerUtils.firstOrNull(endpoint.getTransformers()).getName());
     }
 
     public void testResponseTransformerProperty() throws UMOException
     {
-        managementContext.getRegistry().registerTransformer(new NoActionTransformer(), managementContext);
+        managementContext.getRegistry().registerTransformer(new NoActionTransformer());
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "test:///tmp?responseTransformers=NoActionTransformer", managementContext);
+            "test:///tmp?responseTransformers=NoActionTransformer");
         assertEquals("NoActionTransformer", TransformerUtils.firstOrNull(endpoint.getResponseTransformers()).getName());
     }
 }

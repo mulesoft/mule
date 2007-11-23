@@ -25,7 +25,7 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "udp://localhost:10100", managementContext);
+            "udp://localhost:10100");
         Mock mockComponent = new Mock(UMOComponent.class);
         mockComponent.expectAndReturn("getResponseTransformer", null);
 
@@ -38,7 +38,7 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         builder.setConnector(new UdpConnector());
         return managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint(builder, managementContext);
+            .getInboundEndpoint(builder);
     }
 
 }

@@ -94,8 +94,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         if (endpoint == null)
         {
             UMOEndpointFactory endpointFactory = RegistryContext.getRegistry().lookupEndpointFactory();
-            UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpointUri,
-                event.getManagementContext());
+            UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpointUri);
             if (transformers == null)
             {
                 transformers = event.getEndpoint().getResponseTransformers();
@@ -105,7 +104,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
             {
                 endpointBuilder.setTransformers(transformers);
             }
-            endpoint = endpointFactory.getOutboundEndpoint(endpointBuilder, event.getManagementContext());
+            endpoint = endpointFactory.getOutboundEndpoint(endpointBuilder);
             endpointCache.put(endpointUri, endpoint);
         }
         return endpoint;

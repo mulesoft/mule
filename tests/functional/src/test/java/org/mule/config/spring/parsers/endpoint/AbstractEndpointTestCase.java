@@ -10,19 +10,18 @@
 
 package org.mule.config.spring.parsers.endpoint;
 
+import org.mule.RegistryContext;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.RegistryContext;
 
 public abstract class AbstractEndpointTestCase extends FunctionalTestCase
 {
 
     public UMOImmutableEndpoint doTest(String name) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name,
-            managementContext);
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name);
         assertNotNull(endpoint);
         UMOEndpointURI uri = endpoint.getEndpointURI();
         assertNotNull(uri);

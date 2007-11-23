@@ -60,7 +60,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
     {
         // UMOEndpointURI uri = new MuleEndpointURI("file:///temp?connector=fileConnector1");
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "file:///temp?connector=fileConnector1", managementContext);
+            "file:///temp?connector=fileConnector1");
 
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
@@ -73,22 +73,19 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector1",
             managementContext);
         builder.setConnector(c);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
-            managementContext);
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
         assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
         UMOEndpointBuilder builder2 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector3",
             managementContext);
         builder.setConnector(c);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder2,
-            managementContext);
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder2);
         assertNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
         UMOEndpointBuilder builder3 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector2",
             managementContext);
         builder.setConnector(c);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder3,
-            managementContext);
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder3);
         assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
     }

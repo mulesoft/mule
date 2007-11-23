@@ -71,20 +71,20 @@ public final class MuleTestUtils
         connector.setManagementContext(context);
         context.applyLifecycle(connector);
 
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://test",context);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://test", context);
         endpointBuilder.setConnector(connector);
         endpointBuilder.setName(name);
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getResponseEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getResponseEndpoint(endpointBuilder);
         }
         else
         {
@@ -106,20 +106,20 @@ public final class MuleTestUtils
         context.applyLifecycle(connector);
         connector.registerSupportedProtocol(protocol);
 
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test:" + protocol + "://test",context);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test:" + protocol + "://test", context);
         endpointBuilder.setConnector(connector);
         endpointBuilder.setName(name);
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
         }
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
         {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getResponseEndpoint(endpointBuilder, context);
+            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getResponseEndpoint(endpointBuilder);
         }
         else
         {
@@ -221,7 +221,7 @@ public final class MuleTestUtils
         c.setModel(model);
         if (initialize)
         {
-            context.getRegistry().registerComponent(c, context);
+            context.getRegistry().registerComponent(c);
             //TODO Why is this necessary
             UMOOutboundRouter router = new OutboundPassThroughRouter();
             c.getOutboundRouter().addRouter(router);

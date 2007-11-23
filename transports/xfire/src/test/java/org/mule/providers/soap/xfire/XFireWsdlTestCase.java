@@ -60,7 +60,7 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
         endpointBuilder.setProperty("wsdlUrl", TEST_URL_WSDL);
         UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint(endpointBuilder, managementContext);
+            .getOutboundEndpoint(endpointBuilder);
 
         UMOMessage message = new MuleMessage("test1");
         UMOSession session = new MuleSession(message, ((AbstractConnector) endpoint.getConnector())

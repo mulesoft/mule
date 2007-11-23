@@ -150,7 +150,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             {
                 UMOEndpointURI uri = new MuleEndpointURI(((MuleActivationSpec) activationSpec).getEndpoint());
                 UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getEndpoint(
-                    uri, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, managementContext);
+                    uri, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
 
                 ((AbstractConnector)endpoint.getConnector()).getReceiverThreadingProfile()
                     .setWorkManagerFactory(new ThreadingProfile.WorkManagerFactory()
@@ -170,7 +170,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 component.setName(name);
                 component.getInboundRouter().addEndpoint(endpoint);
                 component.setServiceFactory(new SingletonObjectFactory(messageEndpoint));
-                managementContext.getRegistry().registerComponent(component, managementContext);
+                managementContext.getRegistry().registerComponent(component);
 
                 MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec)activationSpec);
 

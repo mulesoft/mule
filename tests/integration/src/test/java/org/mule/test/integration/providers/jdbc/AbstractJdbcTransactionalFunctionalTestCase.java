@@ -119,13 +119,13 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         endpointBuilder.setConnector(connector);
         endpointBuilder.setTransactionConfig(txConfig);
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            endpointBuilder, managementContext);
+            endpointBuilder);
 
         UMOEndpointBuilder endpointBuilder2 = new EndpointURIEndpointBuilder(getOutDest(), managementContext);
         endpointBuilder2.setName("testOut");
         endpointBuilder2.setConnector(connector);
         UMOImmutableEndpoint outProvider = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            endpointBuilder2, managementContext);
+            endpointBuilder2);
         
         component.setOutboundRouter(new OutboundRouterCollection());
         OutboundPassThroughRouter router = new OutboundPassThroughRouter();
@@ -138,7 +138,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         props.put("eventCallback", callback);
         component.setProperties(props);
         component.setModel(model);
-        managementContext.getRegistry().registerComponent(component, managementContext);
+        managementContext.getRegistry().registerComponent(component);
         return component;
     }
 

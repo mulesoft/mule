@@ -840,12 +840,12 @@ public class MuleClient implements Disposable
 
     protected UMOImmutableEndpoint getInboundEndpoint(String uri) throws UMOException
     {
-        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(uri, managementContext);
+        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(uri);
     }
 
     protected UMOImmutableEndpoint getOutboundEndpoint(String uri) throws UMOException
     {
-        return managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri, managementContext);
+        return managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
     }
 
     protected UMOImmutableEndpoint getDefaultClientEndpoint(UMOComponent component, Object payload)
@@ -867,8 +867,7 @@ public class MuleClient implements Disposable
                 {
                     UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
                     builder.setTransformers(new LinkedList());
-                    return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
-                        managementContext);
+                    return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
                 }
             }
             else
@@ -880,8 +879,7 @@ public class MuleClient implements Disposable
         {
             UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("vm://mule.client", managementContext);
             builder.setName("muleClientProvider");
-            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder,
-                managementContext);
+            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
         }
         return endpoint;
     }
@@ -1062,7 +1060,7 @@ public class MuleClient implements Disposable
     {
         try
         {
-            managementContext.getRegistry().registerObject(key, value, managementContext);
+            managementContext.getRegistry().registerObject(key, value);
         }
         catch (RegistrationException e)
         {

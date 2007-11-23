@@ -52,12 +52,12 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
 
         UMOComponent component = getTestComponent("anOrange", Orange.class);
         component.setModel(model);
-        managementContext.getRegistry().registerComponent(component, managementContext);
+        managementContext.getRegistry().registerComponent(component);
         UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jdbc://test?sql=SELECT * FROM TABLE", managementContext);
         endpointBuilder.setName("test");
         endpointBuilder.setConnector(connector);
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            endpointBuilder, managementContext);
+            endpointBuilder);
         managementContext.start();
         connector.registerListener(component, endpoint);
 

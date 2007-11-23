@@ -408,11 +408,11 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
         UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint(serviceEndpointbuilder, managementContext);
+            .getInboundEndpoint(serviceEndpointbuilder);
 
         UMOImmutableEndpoint receiverEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint(receiverEndpointBuilder, managementContext);
+            .getInboundEndpoint(receiverEndpointBuilder);
 
         receiver.setEndpoint(receiverEndpoint);
 
@@ -450,7 +450,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             c = new SedaComponent();
             c.setName(AXIS_SERVICE_PROPERTY + getName());
             c.setModel(managementContext.getRegistry().lookupSystemModel());
-            //managementContext.getRegistry().registerComponent(c, managementContext);
+            //managementContext.getRegistry().registerComponent(c);
             //c.setManagementContext(managementContext);
             //c.initialise();
 
@@ -642,7 +642,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
                     {
                         axisComponent = getOrCreateAxisComponent();
                     }
-                    managementContext.getRegistry().registerComponent(axisComponent, managementContext);
+                    managementContext.getRegistry().registerComponent(axisComponent);
 
                     // We have to perform a small hack here to rewrite servlet://
                     // endpoints with the

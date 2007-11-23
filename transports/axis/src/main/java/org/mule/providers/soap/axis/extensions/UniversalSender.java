@@ -218,7 +218,7 @@ public class UniversalSender extends BasicHandler
                 builder.setRemoteSync(true);
                 UMOImmutableEndpoint syncEndpoint = managementContext.getRegistry()
                     .lookupEndpointFactory()
-                    .getOutboundEndpoint(builder, managementContext);
+                    .getOutboundEndpoint(builder);
                 UMOEvent dispatchEvent = new MuleEvent(message, syncEndpoint, session, sync);
                 UMOMessage result = endpoint.send(dispatchEvent);
 
@@ -278,7 +278,7 @@ public class UniversalSender extends BasicHandler
                         logger.debug("Dispatch Endpoint uri: " + uri
                                      + " not found on the cache. Creating the endpoint instead.");
                         ep = managementContext.getRegistry().lookupEndpointFactory()
-                                .getOutboundEndpoint(uri, managementContext);
+                                .getOutboundEndpoint(uri);
                     }
                     else
                     {
@@ -294,7 +294,7 @@ public class UniversalSender extends BasicHandler
         else
         {
             ep = managementContext.getRegistry().lookupEndpointFactory()
-                    .getOutboundEndpoint(uri, managementContext);
+                    .getOutboundEndpoint(uri);
         }
         return ep;
     }

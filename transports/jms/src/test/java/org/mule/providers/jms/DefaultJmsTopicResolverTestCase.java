@@ -44,7 +44,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep1", managementContext);
+            .getInboundEndpoint("ep1");
         assertFalse(resolver.isTopic(endpoint));
     }
 
@@ -52,7 +52,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep1", managementContext);
+            .getInboundEndpoint("ep1");
         assertFalse(resolver.isTopic(endpoint, true));
     }
 
@@ -60,7 +60,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep1", managementContext);
+            .getInboundEndpoint("ep1");
         assertFalse(resolver.isTopic(endpoint, false));
     }
 
@@ -68,7 +68,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep2", managementContext);
+            .getInboundEndpoint("ep2");
         assertTrue(resolver.isTopic(endpoint));
     }
 
@@ -76,7 +76,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep2", managementContext);
+            .getInboundEndpoint("ep2");
         assertTrue(resolver.isTopic(endpoint, true));
     }
 
@@ -84,7 +84,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep2", managementContext);
+            .getInboundEndpoint("ep2");
         assertFalse(resolver.isTopic(endpoint, false));
     }
 
@@ -92,7 +92,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep3", managementContext);
+            .getInboundEndpoint("ep3");
         assertTrue(resolver.isTopic(endpoint));
     }
 
@@ -100,7 +100,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep3", managementContext);
+            .getInboundEndpoint("ep3");
         assertTrue(resolver.isTopic(endpoint, true));
     }
 
@@ -108,7 +108,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep3", managementContext);
+            .getInboundEndpoint("ep3");
         assertTrue(resolver.isTopic(endpoint, false));
     }
 
@@ -116,7 +116,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep4", managementContext);
+            .getInboundEndpoint("ep4");
         assertTrue(resolver.isTopic(endpoint));
     }
 
@@ -124,7 +124,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep4", managementContext);
+            .getInboundEndpoint("ep4");
         assertTrue(resolver.isTopic(endpoint, true));
     }
 
@@ -132,7 +132,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep4", managementContext);
+            .getInboundEndpoint("ep4");
         assertTrue(resolver.isTopic(endpoint, false));
     }
 
@@ -140,7 +140,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("ep5", managementContext);
+            .getInboundEndpoint("ep5");
         assertTrue(resolver.isTopic(endpoint));
     }
 

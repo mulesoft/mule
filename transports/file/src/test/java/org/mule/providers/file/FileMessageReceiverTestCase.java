@@ -52,7 +52,6 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "file://./simple", managementContext);
+        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("file://./simple");
     }
 }

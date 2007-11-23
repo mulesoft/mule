@@ -95,7 +95,7 @@ public class EjbFunctionalTestCase extends FunctionalTestCase
         builder.setProperties(props);
 
         UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            builder, managementContext);
+            builder);
         try
         {
             ep.send(getTestEvent("hello", ep));
@@ -117,7 +117,7 @@ public class EjbFunctionalTestCase extends FunctionalTestCase
         builder.setProperties(props);
         
         UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            builder, managementContext);
+            builder);
         
         try
         {

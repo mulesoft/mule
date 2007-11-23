@@ -151,7 +151,7 @@ public class TransportFactory
             {
                 BeanUtils.populate(connector, uri.getParams());
                 connector.setManagementContext(managementContext);
-                managementContext.getRegistry().registerConnector(connector, managementContext);
+                managementContext.getRegistry().registerConnector(connector);
             }
             catch (Exception e)
             {

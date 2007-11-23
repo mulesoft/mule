@@ -133,12 +133,10 @@ public class MuleManagerComponent implements Callable, Initialisable
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type
             UMOManagementContext managementContext = MuleServer.getManagementContext();
-            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint(),
-                managementContext);
+            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint(), managementContext);
             // TODO - is this correct? it stops any other transformer from being set
             builder.setTransformers(new LinkedList());
-            UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-                builder, managementContext);
+            UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             UMOEvent event = new MuleEvent(action.getMessage(), ep, context.getSession(), context.isSynchronous());
             event = RequestContext.setEvent(event);
 
@@ -172,18 +170,16 @@ public class MuleManagerComponent implements Callable, Initialisable
             if (AdminNotification.ACTION_DISPATCH == action.getAction())
             {
                 endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-                    action.getResourceIdentifier(), managementContext);
+                    action.getResourceIdentifier());
                 context.dispatchEvent(action.getMessage(), endpoint);
                 return null;
             }
             else
             {
                 UMOEndpointFactory endpointFactory = managementContext.getRegistry().lookupEndpointFactory();
-                UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(action.getResourceIdentifier(),
-                    managementContext);
+                UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(action.getResourceIdentifier());
                 endpointBuilder.setRemoteSync(true);
-                endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder,
-                    managementContext);
+                endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
                 result = context.sendEvent(action.getMessage(), endpoint);
                 if (result == null)
                 {
@@ -211,7 +207,7 @@ public class MuleManagerComponent implements Callable, Initialisable
             UMOImmutableEndpoint endpoint = context.getManagementContext()
                 .getRegistry()
                 .lookupEndpointFactory()
-                .getOutboundEndpoint(action.getResourceIdentifier(), MuleServer.getManagementContext());
+                .getOutboundEndpoint(action.getResourceIdentifier());
 
             long timeout = MapUtils.getLongValue(action.getProperties(),
                 MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, getSynchronousEventTimeout());
@@ -266,7 +262,7 @@ public class MuleManagerComponent implements Callable, Initialisable
             endpointBuilder.setName(MANAGER_ENDPOINT_NAME);
             UMOImmutableEndpoint endpoint = managementContext.getRegistry()
                 .lookupEndpointFactory()
-                .getInboundEndpoint(endpointBuilder, managementContext);
+                .getInboundEndpoint(endpointBuilder);
             component.getInboundRouter().addEndpoint(endpoint);
 
             return component;

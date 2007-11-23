@@ -10,7 +10,6 @@
 
 package org.mule.impl.endpoint;
 
-import org.mule.MuleServer;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
@@ -31,7 +30,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     public void testBuildInboundEndpoint() throws UMOException
     {
         String uri = "test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, MuleServer.getManagementContext());
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         try
         {
             UMOImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
@@ -53,7 +52,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     public void testBuildOutboundEndpoint() throws UMOException
     {
         String uri = "test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, MuleServer.getManagementContext());
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         try
         {
             UMOImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
@@ -77,7 +76,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     public void testBuildResponseEndpoint() throws UMOException
     {
         String uri = "test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, MuleServer.getManagementContext());
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         try
         {
             UMOImmutableEndpoint ep = endpointBuilder.buildResponseEndpoint();
@@ -118,8 +117,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     public void testHasSetEncodingMethod() throws EndpointException, SecurityException, NoSuchMethodException
     {
         String uri = "test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri,
-            MuleServer.getManagementContext());
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
         assertNotNull(endpointBuilder.getClass().getMethod("setEncoding", new Class[]{String.class}));
     }
     

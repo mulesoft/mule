@@ -37,7 +37,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     {
         StringToEmailMessage trans = new StringToEmailMessage();
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            "smtp://a:a@a.com", managementContext);
+            "smtp://a:a@a.com");
 
         // We need to init the connector without actually connecting for this test
         // case

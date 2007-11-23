@@ -66,11 +66,11 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         assertNotNull(connector);
 
         UMOComponent component = getTestComponent("anApple", Apple.class);
-        //managementContext.getRegistry().registerComponent(component, managementContext);
-        UMOEndpointBuilder builder=new EndpointURIEndpointBuilder(getTestEndpointURI(), managementContext);
+        //managementContext.getRegistry().registerComponent(component);
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(getTestEndpointURI(), managementContext);
         builder.setName("test");
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            builder, managementContext);
+            builder);
         try
         {
             connector.registerListener(component, endpoint);
@@ -84,14 +84,14 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
 
     public void testSend() throws Exception
     {
-        //managementContext.getRegistry().registerConnector(createConnector(false), managementContext);
+        //managementContext.getRegistry().registerConnector(createConnector(false));
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            getTestEndpointURI(), managementContext);
+            getTestEndpointURI());
         
         UMOComponent component = getTestComponent(uniqueName("testComponent"), FunctionalTestComponent.class);
         // TODO Simplify this API for adding an outbound endpoint.
         ((OutboundPassThroughRouter) component.getOutboundRouter().getRouters().get(0)).addEndpoint(endpoint);
-        //managementContext.getRegistry().registerComponent(component, managementContext);
+        //managementContext.getRegistry().registerComponent(component);
 
         UMOMessage message = new MuleMessage(MESSAGE);
         message.setStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);

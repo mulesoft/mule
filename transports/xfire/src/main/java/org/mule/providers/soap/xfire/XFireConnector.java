@@ -439,11 +439,11 @@ public class XFireConnector extends AbstractConnector
 
         UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint(serviceEndpointbuilder, managementContext);
+            .getInboundEndpoint(serviceEndpointbuilder);
 
         UMOImmutableEndpoint receiverEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint(receiverEndpointBuilder, managementContext);
+            .getInboundEndpoint(receiverEndpointBuilder);
 
         receiver.setEndpoint(receiverEndpoint);
 
@@ -583,7 +583,7 @@ public class XFireConnector extends AbstractConnector
 
                 try
                 {
-                    managementContext.getRegistry().registerComponent(c, managementContext);
+                    managementContext.getRegistry().registerComponent(c);
                 }
                 catch (UMOException e)
                 {

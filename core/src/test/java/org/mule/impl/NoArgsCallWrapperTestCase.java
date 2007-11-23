@@ -39,8 +39,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
         properties.put("delegateClass", Apple.class.getName());
         properties.put("delegateMethod", "toString");
 
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "test://in", managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("test://in");
         UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, properties, managementContext);
         component = managementContext.getRegistry().lookupComponent("WrapperUMO");
         component.start();
@@ -58,8 +57,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
         properties.put("delegateClass", Apple.class.getName());
         properties.put("delegateMethod", "wash");
 
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "test://in", managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("test://in");
         UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, properties, managementContext);
         //managementContext.getRegistry().registerComponent(component, managementContext);
         component = managementContext.getRegistry().lookupComponent("WrapperUMO");
@@ -80,8 +78,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
         properties.put("delegateClass", Apple.class.getName());
         properties.put("delegateMethod", "methodReturningNull");
 
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "test://in", managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("test://in");
         UMOComponent component = MuleTestUtils.getTestComponent("WrapperUMO", NoArgsCallWrapper.class, properties, managementContext);
         //managementContext.getRegistry().registerComponent(component, managementContext);
 

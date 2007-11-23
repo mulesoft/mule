@@ -180,8 +180,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             throw new EndpointException(HttpMessages.httpParameterNotSet("endpoint"));
         }
 
-        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            endpointName, MuleServer.getManagementContext());
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
         if (endpoint == null)
         {
             // if we dont find an endpoint for the given name, lets check the

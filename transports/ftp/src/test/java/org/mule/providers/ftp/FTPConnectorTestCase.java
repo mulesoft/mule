@@ -89,7 +89,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
 
         final UMOImmutableEndpoint endpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("ftp://test:test@example.com", managementContext);
+            .getOutboundEndpoint("ftp://test:test@example.com");
         final UMOEndpointURI endpointURI = endpoint.getEndpointURI();
 
         FtpConnectionFactory testFactory = new TestFtpConnectionFactory(endpointURI);

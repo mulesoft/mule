@@ -63,7 +63,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         managementContext.start();
 
         UMOImmutableEndpoint muleEndpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "jdbc://?sql=SELECT * FROM TEST", managementContext);
+            "jdbc://?sql=SELECT * FROM TEST");
         UMOMessage message = muleEndpoint.receive(1000);
         assertResultSetEmpty(message);
         
@@ -79,7 +79,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         managementContext.start();
 
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            DEFAULT_OUT_URI, managementContext);
+            DEFAULT_OUT_URI);
         
         UMOMessage message = new MuleMessage(DEFAULT_MESSAGE);
         UMOSession session = MuleTestUtils.getTestSession();
@@ -98,7 +98,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         managementContext.start();
 
         UMOImmutableEndpoint muleEndpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            DEFAULT_IN_URI, managementContext);
+            DEFAULT_IN_URI);
         
         UMOMessage message = muleEndpoint.receive(1000);
 
@@ -148,9 +148,9 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         component.setName("testComponent");
         
         UMOImmutableEndpoint in = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            getInDest(), managementContext);
+            getInDest());
         UMOImmutableEndpoint out = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            getOutDest(), managementContext);
+            getOutDest());
 
         UMOInboundRouterCollection inboundRouterCollection = new InboundRouterCollection();
         inboundRouterCollection.addEndpoint(in);
@@ -166,7 +166,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         component.setInboundRouter(inboundRouterCollection);
         component.setOutboundRouter(outboundRouterCollection);
 
-        managementContext.getRegistry().registerComponent(component, managementContext);
+        managementContext.getRegistry().registerComponent(component);
     }
 
 }

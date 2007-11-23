@@ -47,7 +47,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         
         connector.setManagementContext(managementContext);
         //managementContext.applyLifecycle(connector);
-        managementContext.getRegistry().registerConnector(connector, managementContext);
+        managementContext.getRegistry().registerConnector(connector);
         
         super.doSetUp();
     }
@@ -85,7 +85,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             throw new InitialisationException(MessageFactory.createStaticMessage("Connector has not been initialized."), null);
         }
         builder.setConnector(connector);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder, managementContext);
+        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
         return endpoint;
     }
 

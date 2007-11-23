@@ -140,8 +140,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements Managem
                 return ep;
             }
         }
-        return getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName,
-            getManagementContext());
+        return getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
     }
 
     public String getSelectorProperty()

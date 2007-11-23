@@ -71,7 +71,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 
         UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("multicast://228.2.3.4:10100", managementContext);
+            .getOutboundEndpoint("multicast://228.2.3.4:10100");
 
         connector.registerListener(component, endpoint2);
         try

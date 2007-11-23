@@ -35,7 +35,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         logger.debug(url);
         
         UMOImmutableEndpoint endpoint = 
-            managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url, managementContext);
+            managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url);
         relay.getInboundRouter().addEndpoint(endpoint);
         relay.stop();
         relay.start();

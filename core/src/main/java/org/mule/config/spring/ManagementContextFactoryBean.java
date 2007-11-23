@@ -9,6 +9,7 @@
  */
 package org.mule.config.spring;
 
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.ManagementContext;
@@ -23,8 +24,8 @@ import org.mule.umo.security.UMOSecurityManager;
 import org.mule.util.ClassUtils;
 import org.mule.util.queue.QueueManager;
 
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.transaction.TransactionManager;
 
@@ -135,6 +136,7 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
         managementContext.setWorkManager(workManager);
         managementContext.setTransactionManager(transactionManager);
         managementContext.initialise();
+        MuleServer.setManagementContext(managementContext);
     }
 
 

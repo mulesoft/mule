@@ -663,8 +663,7 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         try
         {
             //TODO DF: Lookup existing endpoint from registry of correct type.
-            endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri,
-                getManagementContext());
+            endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
 
             //TODO DF: No need to unmarshall tranformers
             //if (TransformerUtils.isUndefined(endpoint.getTransformers()))

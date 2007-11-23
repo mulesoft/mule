@@ -146,7 +146,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testEndpointFromURI() throws Exception
     {
         UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "test://hello?remoteSync=true&remoteSyncTimeout=2002", managementContext);
+            "test://hello?remoteSync=true&remoteSyncTimeout=2002");
         assertTrue(ep.isRemoteSync());
         assertEquals(2002, ep.getRemoteSyncTimeout());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
@@ -156,7 +156,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals(2002, event.getTimeout());
 
         UMOImmutableEndpoint ep2 = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "test://hello", managementContext);
+            "test://hello");
 
         event = new MuleEvent(new MuleMessage("hello"), ep2, MuleTestUtils.getTestSession(), true);
         // default event timeout set in the test config file

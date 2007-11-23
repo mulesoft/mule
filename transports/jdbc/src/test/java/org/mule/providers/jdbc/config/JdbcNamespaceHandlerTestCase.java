@@ -81,7 +81,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         JdbcConnector c = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector3");
         UMOImmutableEndpoint testJdbcEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("testJdbcEndpoint", managementContext);
+            .getInboundEndpoint("testJdbcEndpoint");
         
         //On connector, not overridden
         assertNotNull(c.getQuery(testJdbcEndpoint, "getTest"));

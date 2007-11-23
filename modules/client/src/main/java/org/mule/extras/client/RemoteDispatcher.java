@@ -10,7 +10,6 @@
 
 package org.mule.extras.client;
 
-import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
@@ -86,12 +85,12 @@ public class RemoteDispatcher implements Disposable
     protected RemoteDispatcher(String endpoint) throws UMOException
     {
         UMOEndpointFactory endpointFactory = RegistryContext.getRegistry().lookupEndpointFactory();
-        asyncServerEndpoint = endpointFactory.getInboundEndpoint(endpoint, MuleServer.getManagementContext());
+        asyncServerEndpoint = endpointFactory.getInboundEndpoint(endpoint);
         
-        UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpoint, MuleServer.getManagementContext());
+        UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpoint);
         endpointBuilder.setRemoteSync(true);
         syncServerEndpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            endpointBuilder, MuleServer.getManagementContext());
+            endpointBuilder);
 
         wireFormat = new SerializationWireFormat();
     }

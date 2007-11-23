@@ -34,7 +34,7 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public UMOImmutableEndpoint getEndpoint() throws Exception
     {
         endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "http://localhost:6789", managementContext);
+            "http://localhost:6789");
         ((UMOEndpoint) endpoint).setResponseTransformers(CollectionUtils.singletonList(new UMOMessageToHttpResponse()));
         return endpoint;
     }

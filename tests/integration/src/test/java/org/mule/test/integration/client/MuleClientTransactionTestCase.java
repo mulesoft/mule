@@ -61,7 +61,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         endpointBuilder.setName("TransactedTest.Queue");
         UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
                 .lookupEndpointFactory()
-                .getOutboundEndpoint(endpointBuilder, managementContext);
+                .getOutboundEndpoint(endpointBuilder);
         client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
 
 
@@ -110,7 +110,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         endpointBuilder.setName("TransactedTest.Queue");
         UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
                 .lookupEndpointFactory()
-                .getOutboundEndpoint(endpointBuilder, managementContext);
+                .getOutboundEndpoint(endpointBuilder);
         client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
 
         TransactionTemplate tt = new TransactionTemplate(tc, null, managementContext);
@@ -164,7 +164,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         endpointBuilder.setName("TransactedTest.Queue");
         UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
                 .lookupEndpointFactory()
-                .getOutboundEndpoint(endpointBuilder, managementContext);
+                .getOutboundEndpoint(endpointBuilder);
         client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
 
 

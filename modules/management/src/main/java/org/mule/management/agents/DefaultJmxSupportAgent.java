@@ -114,29 +114,29 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             UMOAgent agent = createRmiAgent();
             if (!isAgentRegistered(agent))
             {
-                RegistryContext.getRegistry().registerAgent(agent, managementContext);
+                RegistryContext.getRegistry().registerAgent(agent);
             }
             agent = createJmxAgent();
             if (!isAgentRegistered(agent))
             {
-                RegistryContext.getRegistry().registerAgent(agent, managementContext);
+                RegistryContext.getRegistry().registerAgent(agent);
             }
             agent = createLog4jAgent();
             if (!isAgentRegistered(agent))
             {
-                RegistryContext.getRegistry().registerAgent(agent, managementContext);
+                RegistryContext.getRegistry().registerAgent(agent);
             }
             agent = createJmxNotificationAgent();
             if (!isAgentRegistered(agent))
             {
-                RegistryContext.getRegistry().registerAgent(agent, managementContext);
+                RegistryContext.getRegistry().registerAgent(agent);
             }
             if (loadJdmkAgent)
             {
                 agent = createJdmkAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    RegistryContext.getRegistry().registerAgent(agent, managementContext);
+                    RegistryContext.getRegistry().registerAgent(agent);
                 }
             }
 
@@ -145,7 +145,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createMx4jAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    RegistryContext.getRegistry().registerAgent(agent, managementContext);
+                    RegistryContext.getRegistry().registerAgent(agent);
                 }
             }
 
@@ -154,7 +154,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
                 agent = createProfilerAgent();
                 if (!isAgentRegistered(agent))
                 {
-                    RegistryContext.getRegistry().registerAgent(agent, managementContext);
+                    RegistryContext.getRegistry().registerAgent(agent);
                 }
             }
 

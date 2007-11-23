@@ -80,6 +80,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -1823,8 +1824,7 @@ public abstract class AbstractConnector
 
     public UMOMessage receive(String uri, long timeout) throws Exception
     {
-        return receive(getManagementContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(uri,
-            getManagementContext()), timeout);
+        return receive(getManagementContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(uri), timeout);
     }
 
     public UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
@@ -1884,7 +1884,7 @@ public abstract class AbstractConnector
     public UMOMessage request(String uri, long timeout) throws Exception
     {
         return request(getManagementContext().getRegistry().lookupEndpointFactory()
-                .getInboundEndpoint(uri, getManagementContext()),
+                .getInboundEndpoint(uri),
                 timeout);
     }
 

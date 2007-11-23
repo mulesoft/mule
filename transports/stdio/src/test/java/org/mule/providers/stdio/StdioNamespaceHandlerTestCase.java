@@ -58,7 +58,7 @@ public class StdioNamespaceHandlerTestCase extends FunctionalTestCase
 
     protected void testEndpointAttribute(String name, String address)
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(name, managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(name);
         assertNotNull("Null " + name, endpoint);
         assertEquals(address, endpoint.getEndpointURI().getAddress());
     }

@@ -103,7 +103,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         
         UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("ssl://localhost:30303", managementContext);
+            .getOutboundEndpoint("ssl://localhost:30303");
 
         connector.registerListener(component, endpoint2);
         try

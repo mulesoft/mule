@@ -70,11 +70,11 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         UMOComponent component = MuleTestUtils.getTestComponent(uniqueName("testComponent"), FunctionalTestComponent.class, props, managementContext, /*initialize*/false);
         UMOImmutableEndpoint ep = 
             managementContext.getRegistry().lookupEndpointFactory()
-                .getInboundEndpoint(getTestEndpointURI(), managementContext);
+                .getInboundEndpoint(getTestEndpointURI());
         UMOInboundRouterCollection inboundRouter = new InboundRouterCollection();
         inboundRouter.addEndpoint(ep);
         component.setInboundRouter(inboundRouter);
-        managementContext.getRegistry().registerComponent(component, managementContext);
+        managementContext.getRegistry().registerComponent(component);
         //managementContext.applyLifecycle(component);
         if (!managementContext.isStarted())
         {

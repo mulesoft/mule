@@ -23,7 +23,7 @@ public class ResponseTransformerTestCase extends FunctionalTestCase
 
     public void testTransformers()
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("endpoint", managementContext);
+        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint("endpoint");
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertEquals(2, endpoint.getTransformers().size());
         checkNames("normal", endpoint.getTransformers());

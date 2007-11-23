@@ -71,7 +71,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                 UMOManagementContext managementContext = MuleServer.getManagementContext();
                 scon.setManagementContext(managementContext);
                 //managementContext.applyLifecycle(scon);
-                managementContext.getRegistry().registerConnector(scon, managementContext);
+                managementContext.getRegistry().registerConnector(scon);
 
                 String path = endpoint.getEndpointURI().getPath();
                 if (StringUtils.isEmpty(path))
@@ -85,7 +85,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                 UMOImmutableEndpoint ep = connector.getManagementContext()
                     .getRegistry()
                     .lookupEndpointFactory()
-                    .getInboundEndpoint(endpointBuilder, connector.getManagementContext());
+                    .getInboundEndpoint(endpointBuilder);
                 scon.registerListener(component, ep);
             }
             catch (Exception e)

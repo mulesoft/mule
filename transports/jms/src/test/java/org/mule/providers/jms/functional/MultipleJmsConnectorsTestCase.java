@@ -25,7 +25,7 @@ public class MultipleJmsConnectorsTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         client.dispatch("ep1", "test", null);
-        UMOImmutableEndpoint ep1 = managementContext.getRegistry().lookupEndpoint("ep1", managementContext);
+        UMOImmutableEndpoint ep1 = managementContext.getRegistry().lookupEndpoint("ep1");
         assertNotNull("cannot retrieve ep1", ep1);
         UMOImmutableEndpoint ep2 = managementContext.getRegistry().lookupEndpoint("ep2");
         assertNotNull("cannot retrieve ep2", ep2);

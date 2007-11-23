@@ -336,7 +336,7 @@ public class MuleUniversalChannel extends AbstractChannel
 
     protected UMOMessage send(String uri, UMOMessageAdapter adapter) throws UMOException
     {
-        UMOImmutableEndpoint ep = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri, managementContext);
+        UMOImmutableEndpoint ep = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
         UMOMessage message = new MuleMessage(adapter);
         UMOEvent event = new MuleEvent(message, ep, RequestContext.getEventContext().getSession(), true);
         return ep.send(event);

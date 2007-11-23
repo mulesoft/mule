@@ -34,7 +34,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
     {
         UMOMessage message = new MuleMessage(payload);
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            endpointUri, managementContext);
+            endpointUri);
         MuleSession session = new MuleSession(message, new NullSessionHandler());
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
         event.setTimeout(60000);

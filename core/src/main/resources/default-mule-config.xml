@@ -55,10 +55,13 @@
     </bean>
 
     <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"
-          depends-on="_muleRegistry"/>
+          depends-on="_muleRegistry,_muleManagementContext"/>
 
     <mule:mule name="_muleSystemModel">
 
+     <bean name="_muleConfiguration" class="org.mule.config.MuleConfiguration" depends-on="_muleManagementContext"/>
+
+    <!-- 
         <mule:configuration
                 serverId="_defaultx"
                 defaultSynchronousEndpoints="false"
@@ -68,7 +71,8 @@
                 defaultEncoding="UTF-8"
                 defaultTransactionTimeout="5000"
                 workingDirectory=".mule"/>
-
+     -->
+     
         <mule:model name="_muleSystemModel"/>
 
     </mule:mule>

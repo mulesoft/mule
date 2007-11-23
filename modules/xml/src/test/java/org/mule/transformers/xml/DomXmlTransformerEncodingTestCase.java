@@ -44,7 +44,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
         UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", managementContext);
         builder.setEncoding("US-ASCII");
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            builder, managementContext);
+            builder);
 
         trans.setEndpoint(endpoint);
         return trans;

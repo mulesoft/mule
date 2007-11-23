@@ -51,7 +51,7 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
     {
         return managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint("in", managementContext)
+            .getInboundEndpoint("in")
             .getEndpointURI()
             .getUri();
     }

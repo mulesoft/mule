@@ -329,7 +329,7 @@ public class TransientRegistry extends AbstractRegistry
      */
     protected void doRegisterObject(String key, Object value) throws RegistrationException
     {
-        doRegisterObject(key, value, Object.class, null);
+        doRegisterObject(key, value, Object.class);
     }
 
     /**
@@ -338,7 +338,7 @@ public class TransientRegistry extends AbstractRegistry
      * @param key
      * @param value
      */
-    protected void doRegisterObject(String key, Object value, Object metadata, UMOManagementContext managementContext) throws RegistrationException
+    protected void doRegisterObject(String key, Object value, Object metadata) throws RegistrationException
     {
         if (isInitialised() || isInitialising())
         {
@@ -356,16 +356,21 @@ public class TransientRegistry extends AbstractRegistry
                 logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
             }
             objectMap.put(key, value);
-            if (managementContext != null) // need this check to call doRegisterObject(String, Object) successfully
+            try
             {
-                try
+                UMOManagementContext mc = MuleServer.getManagementContext();
+                if (mc != null)
                 {
-                    managementContext.applyLifecycle(value);
+                    mc.applyLifecycle(value);
                 }
-                catch (UMOException e)
+                else
                 {
-                    throw new RegistrationException(e);
+                    throw new RegistrationException("Unable to register object because ManagementContext has not yet been created.");
                 }
+            }
+            catch (UMOException e)
+            {
+                throw new RegistrationException(e);
             }
         }
         else
@@ -375,36 +380,36 @@ public class TransientRegistry extends AbstractRegistry
     }
 
     //@java.lang.Override
-    public void registerAgent(UMOAgent agent, UMOManagementContext managementContext) throws UMOException
+    public void registerAgent(UMOAgent agent) throws UMOException
     {
-        registerObject(agent.getName(), agent, UMOAgent.class, managementContext);
+        registerObject(agent.getName(), agent, UMOAgent.class);
     }
 
     //@java.lang.Override
-    public void registerConnector(UMOConnector connector, UMOManagementContext managementContext) throws UMOException
+    public void registerConnector(UMOConnector connector) throws UMOException
     {
-        registerObject(connector.getName(), connector, UMOConnector.class, managementContext);
+        registerObject(connector.getName(), connector, UMOConnector.class);
     }
 
     //@java.lang.Override
-    public void registerEndpoint(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext) throws UMOException
+    public void registerEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        registerObject(endpoint.getName(), endpoint, UMOImmutableEndpoint.class, managementContext);
+        registerObject(endpoint.getName(), endpoint, UMOImmutableEndpoint.class);
     }
 
-    public void registerEndpointBuilder(String name, UMOEndpointBuilder builder, UMOManagementContext managementContext) throws UMOException
+    public void registerEndpointBuilder(String name, UMOEndpointBuilder builder) throws UMOException
     {
-        registerObject(name, builder, UMOEndpointBuilder.class, managementContext);
-    }
-
-    //@java.lang.Override
-    public void registerModel(UMOModel model, UMOManagementContext managementContext) throws UMOException
-    {
-        registerObject(model.getName(), model, UMOModel.class, managementContext);
+        registerObject(name, builder, UMOEndpointBuilder.class);
     }
 
     //@java.lang.Override
-    protected void doRegisterTransformer(UMOTransformer transformer, UMOManagementContext managementContext) throws UMOException
+    public void registerModel(UMOModel model) throws UMOException
+    {
+        registerObject(model.getName(), model, UMOModel.class);
+    }
+
+    //@java.lang.Override
+    protected void doRegisterTransformer(UMOTransformer transformer) throws UMOException
     {
         //TODO should we always throw an exception if an object already exists
         if (lookupTransformer(transformer.getName()) != null)
@@ -412,13 +417,13 @@ public class TransientRegistry extends AbstractRegistry
             throw new RegistrationException(CoreMessages.objectAlreadyRegistered("transformer: " +
                     transformer.getName(), lookupTransformer(transformer.getName()), transformer).getMessage());
         }
-        registerObject(transformer.getName(), transformer, UMOTransformer.class, managementContext);
+        registerObject(transformer.getName(), transformer, UMOTransformer.class);
     }
 
     //@java.lang.Override
-    public void registerComponent(UMOComponent component, UMOManagementContext managementContext) throws UMOException
+    public void registerComponent(UMOComponent component) throws UMOException
     {
-        registerObject(component.getName(), component, UMOComponent.class, managementContext);
+        registerObject(component.getName(), component, UMOComponent.class);
     }
 
     protected void unregisterObject(String key, Object metadata) throws UMOException

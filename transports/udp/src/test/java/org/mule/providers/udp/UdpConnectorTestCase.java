@@ -72,7 +72,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
 
         UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("udp://localhost:3456", managementContext);
+            .getOutboundEndpoint("udp://localhost:3456");
 
         connector.registerListener(component, endpoint2);
         try

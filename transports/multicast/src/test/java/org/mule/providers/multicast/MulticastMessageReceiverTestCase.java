@@ -20,7 +20,6 @@ import com.mockobjects.dynamic.Mock;
 
 public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
-
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         Mock mockComponent = new Mock(UMOComponent.class);
@@ -32,8 +31,6 @@ public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTes
 
     public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "multicast://228.2.3.4:10100", managementContext);
+        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("multicast://228.2.3.4:10100");
     }
-
 }

@@ -45,7 +45,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     {
         UMOComponent component = getTestComponent("orange", Orange.class);
         UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            getTestEndpointURI(), managementContext);
+            getTestEndpointURI());
 
         try
         {

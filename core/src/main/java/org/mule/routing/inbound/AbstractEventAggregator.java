@@ -99,13 +99,11 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
                         try
                         {
                             UMOManagementContext managementContext = MuleServer.getManagementContext();
-                            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(event.getEndpoint(),
-                                managementContext);
+                            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(event.getEndpoint(), managementContext);
                             // TODO - is this correct? it stops other transformers from being used
                             builder.setTransformers(new LinkedList());
                             builder.setName(this.getClass().getName());
-                            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-                                builder, managementContext);
+                            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
                         }
                         catch (UMOException e)
                         {

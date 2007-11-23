@@ -51,7 +51,7 @@ public class Rfc822ByteArrayTestCase extends FunctionalTestCase
     {
         Rfc822ByteArraytoMimeMessage transformer = new Rfc822ByteArraytoMimeMessage();
         UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "smtp", managementContext);
+            "smtp");
         transformer.setEndpoint(endpoint);
         Object result = transformer.transform(bytes);
         assertTrue(result instanceof MimeMessage);

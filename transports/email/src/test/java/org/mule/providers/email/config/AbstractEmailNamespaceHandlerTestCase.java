@@ -19,7 +19,7 @@ public abstract class AbstractEmailNamespaceHandlerTestCase extends FunctionalTe
     protected void testEndpoint(String name, String protocolName) throws UMOException
     {
         UMOImmutableEndpoint endpoint =
-                managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name, managementContext);
+                managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name);
         assertNotNull(endpoint);
         String address = endpoint.getEndpointURI().getAddress();
         assertNotNull(address);

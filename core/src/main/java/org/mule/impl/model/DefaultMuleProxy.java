@@ -358,7 +358,7 @@ public class DefaultMuleProxy implements MuleProxy
             // get the endpointUri for this uri
             UMOImmutableEndpoint endpoint = managementContext.getRegistry()
                 .lookupEndpointFactory()
-                .getOutboundEndpoint(returnMessage.getReplyTo().toString(), managementContext);
+                .getOutboundEndpoint(returnMessage.getReplyTo().toString());
             // make sure remove the replyTo property as not cause a a forever
             // replyto loop
             returnMessage.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);

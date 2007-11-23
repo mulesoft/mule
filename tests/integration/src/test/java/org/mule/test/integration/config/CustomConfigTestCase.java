@@ -31,7 +31,7 @@ public class CustomConfigTestCase extends FunctionalTestCase
     public void testCustomEndpointConfig() throws Exception
     {
         UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            "fooEndpoint", managementContext);
+            "fooEndpoint");
         assertNotNull("fooEndpoint should not be null", ep);
         TestFilter tf = (TestFilter)ep.getFilter();
         assertNotNull("the filter on the endpoint should not be null", tf);

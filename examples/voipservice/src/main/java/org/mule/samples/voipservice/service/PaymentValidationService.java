@@ -10,7 +10,6 @@
 
 package org.mule.samples.voipservice.service;
 
-import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.samples.voipservice.interfaces.PaymentValidation;
 import org.mule.umo.UMOException;
@@ -41,8 +40,7 @@ public class PaymentValidationService implements PaymentValidation
 
     private UMOEndpointURI getEndpointUri(String endpointName) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            endpointName, MuleServer.getManagementContext());
+        UMOImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
         return endpoint.getEndpointURI();
     }
 

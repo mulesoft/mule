@@ -116,6 +116,10 @@ public class ManagementContext implements UMOManagementContext
      */
     protected TransactionManager transactionManager;
 
+    /**
+     * LifecycleManager for the ManagementContext.  Note: this is NOT the same lifecycle manager
+     * as the one in the Registry.
+     */
     protected UMOLifecycleManager lifecycleManager;
 
     protected Directories directories;
@@ -792,6 +796,10 @@ public class ManagementContext implements UMOManagementContext
         return RegistryContext.getRegistry();
     }
     
+    /**
+     * Apply current phase of the LifecycleManager.  Note: this is NOT the same lifecycle manager
+     * as the one in the Registry.
+     */
     public void applyLifecycle(Object object) throws UMOException
     {
         lifecycleManager.applyLifecycle(this, object);
