@@ -5,4 +5,6 @@
 # this test depends on external services which may not always be available
 org.mule.providers.http.components.RESTTestCase
 
+# MULE-1389
+org.mule.providers.http.issues.StreamingDownloadMule1389TestCase
 
