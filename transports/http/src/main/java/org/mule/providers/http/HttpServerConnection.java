@@ -27,9 +27,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * A connection to the SimpleHttpServer.
- */
+/** A connection to the SimpleHttpServer. */
 public class HttpServerConnection
 {
     private static final Log logger = LogFactory.getLog(HttpServerConnection.class);
@@ -66,8 +64,15 @@ public class HttpServerConnection
                 {
                     logger.debug("Closing: " + socket);
                 }
-                
-                socket.shutdownOutput();
+
+                try
+                {
+                    socket.shutdownOutput();
+                }
+                catch (UnsupportedOperationException e)
+                {
+                    //Can't shutdown in/output on SSL sockets
+                }
                 socket.close();
             }
         }
@@ -111,7 +116,7 @@ public class HttpServerConnection
 
     /**
      * Returns the ResponseWriter used to write the output to the socket.
-     * 
+     *
      * @return This connection's ResponseWriter
      */
     public ResponseWriter getWriter() throws UnsupportedEncodingException
