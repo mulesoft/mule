@@ -4,11 +4,13 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xmlns:xm="http://www.mulesource.org/schema/mule/xml/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
-       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
     <description>
         The StockQuote REST example uses the Mule RestServiceWrapper to invoke a remote .Net service
@@ -33,11 +35,9 @@
                     proxyPort="${proxyPort}"
                     proxyUsername="${proxyUsername}"/>
 
-    <custom-transformer name="XmlToObject" class="org.mule.transformers.xml.XmlToObject"/>
+    <xm:xml-to-object name="XmlToObject"/>
     <transformer-xml-entity-decoder name="XmlDecoder"/>
-    <custom-transformer name="Xslt" class="org.mule.transformers.xml.XsltTransformer">
-        <spring:property name="xslFile" value="xsl/rest-stock.xsl"/>
-    </custom-transformer>
+    <xm:xslt-transformer name="Xslt" xsl-file="xsl/rest-stock.xsl"/>
     <transformer-object-to-string name="ToString"/>
 
     <model name="Sample-Rest">
