@@ -105,14 +105,6 @@ org.mule.test.usecases.ReplyToTestCase
 # actually has any effect.
 org.mule.test.integration.client.MuleClientTestCase
 
-# Note: this test does not appear to be in very good shape, half the config is commented-out
-#
-# ObjectToString [getLaszloW10.2]: Could not close stream
-# java.net.SocketException: Socket closed
-# 	at org.apache.commons.httpclient.ContentLengthInputStream.close(ContentLengthInputStream.java:118)
-# 	at org.mule.transformers.simple.ObjectToString.doTransform(ObjectToString.java:60)
-org.mule.test.usecases.routing.response.ResponseAggregatorTestCase
-
 # JmsMessageAdapter [main]: Message access violation
 # java.lang.IllegalStateException: Only owner thread can write to message: Thread[jmsConnector.receiver
 org.mule.test.integration.routing.replyto.ReplytoChainIntegrationTestCase
