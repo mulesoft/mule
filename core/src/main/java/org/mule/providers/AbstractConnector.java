@@ -2041,13 +2041,28 @@ public abstract class AbstractConnector
             }
 
             UMOMessageDispatcherFactory df = serviceDescriptor.createDispatcherFactory();
-            if(df!=null)
+            if (df != null)
             {
                 this.setDispatcherFactory(df);
             }
             else if (logger.isDebugEnabled())
             {
                 logger.debug("Transport '" + getProtocol() + "' will not support outbound endpoints: ");
+            }
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Loading RequesterFactory for connector: " + getName() + " (" + getClass().getName() + ")");
+            }
+
+            UMOMessageRequesterFactory rf = serviceDescriptor.createRequesterFactory();
+            if (rf != null)
+            {
+                this.setRequesterFactory(rf);
+            }
+            else if (logger.isDebugEnabled())
+            {
+                logger.debug("Transport '" + getProtocol() + "' will not support requests: ");
             }
 
 

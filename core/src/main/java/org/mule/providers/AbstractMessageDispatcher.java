@@ -344,4 +344,8 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         return false;
     }
 
+    protected abstract void doDispatch(UMOEvent event) throws Exception;
+
+    protected abstract UMOMessage doSend(UMOEvent event) throws Exception;
+                                             
 }
