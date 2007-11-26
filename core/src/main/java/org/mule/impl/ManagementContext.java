@@ -57,63 +57,41 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * TODO document
- */
+/** TODO document */
 public class ManagementContext implements UMOManagementContext
 {
-    /**
-     * logger used by this class
-     */
+    /** logger used by this class */
     private static transient Log logger = LogFactory.getLog(ManagementContext.class);
 
-    /**
-     * Default configuration
-     */
+    /** Default configuration */
     private MuleConfiguration config;
 
-    /**
-     * the unique id for this manager
-     */
+    /** the unique id for this manager */
     private String id = null;
 
-    /**
-     * If this node is part of a cluster then this is the shared cluster Id
-     */
+    /** If this node is part of a cluster then this is the shared cluster Id */
     private String clusterId = null;
 
-    /**
-     * The domain name that this instance belongs to.
-     */
+    /** The domain name that this instance belongs to. */
     private String domain = null;
 
-    /**
-     * the date in milliseconds from when the server was started
-     */
+    /** the date in milliseconds from when the server was started */
     private long startDate = 0;
 
-    /**
-     * stats used for management
-     */
+    /** stats used for management */
     private AllStatistics stats = new AllStatistics();
 
-    /**
-     * Manages all Server event notificationManager
-     */
+    /** Manages all Server event notificationManager */
     private ServerNotificationManager notificationManager = null;
 
     private UMOSecurityManager securityManager;
 
     private UMOWorkManager workManager;
 
-    /**
-     * The queue manager to use for component queues and vm queues
-     */
+    /** The queue manager to use for component queues and vm queues */
     private QueueManager queueManager;
 
-    /**
-     * The transaction manager to use for this instance.
-     */
+    /** The transaction manager to use for this instance. */
     protected TransactionManager transactionManager;
 
     /**
@@ -133,7 +111,7 @@ public class ManagementContext implements UMOManagementContext
             throw new NullPointerException(CoreMessages.objectIsNull("lifecycleManager").getMessage());
         }
         this.lifecycleManager = lifecycleManager;
-        
+
         startDate = System.currentTimeMillis();
     }
 
@@ -259,7 +237,7 @@ public class ManagementContext implements UMOManagementContext
 
     public void dispose()
     {
-       //TODO lifecycleManager.checkPhase(Disposable.PHASE_NAME);
+        lifecycleManager.checkPhase(Disposable.PHASE_NAME);
 
         fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_DISPOSING));
 
@@ -447,10 +425,7 @@ public class ManagementContext implements UMOManagementContext
         return stats;
     }
 
-    /**
-     * Sets statistics on this instance
-     *
-     */
+    /** Sets statistics on this instance */
     public void setStatistics(AllStatistics stat)
     {
         this.stats = stat;
@@ -688,8 +663,8 @@ public class ManagementContext implements UMOManagementContext
         if (att.values().size() > 0)
         {
             message.add(StringUtils.defaultString(MuleManifest.getProductDescription(), notset));
-            message.add(CoreMessages.version().getMessage() + " Build: " 
-                + StringUtils.defaultString(MuleManifest.getBuildNumber(), notset));
+            message.add(CoreMessages.version().getMessage() + " Build: "
+                    + StringUtils.defaultString(MuleManifest.getBuildNumber(), notset));
 
             message.add(StringUtils.defaultString(MuleManifest.getVendorName(), notset));
             message.add(StringUtils.defaultString(MuleManifest.getProductMoreInfo(), notset));
@@ -726,7 +701,7 @@ public class ManagementContext implements UMOManagementContext
         if (agents.size() == 0)
         {
             message.add(CoreMessages.agentsRunning().getMessage() + " "
-                        + CoreMessages.none().getMessage());
+                    + CoreMessages.none().getMessage());
         }
         else
         {
@@ -734,7 +709,7 @@ public class ManagementContext implements UMOManagementContext
             UMOAgent umoAgent;
             for (Iterator iterator = agents.iterator(); iterator.hasNext();)
             {
-                umoAgent = (UMOAgent)iterator.next();
+                umoAgent = (UMOAgent) iterator.next();
                 message.add("  " + umoAgent.getDescription());
             }
         }
@@ -785,17 +760,17 @@ public class ManagementContext implements UMOManagementContext
     {
         this.lifecycleManager = lifecycleManager;
     }
-    
+
     /**
      * Resolve and return a handle to the registry.
-     * This should eventually be more intelligent (handle remote registries, clusters of Mule instances, etc.)  
+     * This should eventually be more intelligent (handle remote registries, clusters of Mule instances, etc.)
      * For now the registry is just a local singleton.
      */
     public Registry getRegistry()
     {
         return RegistryContext.getRegistry();
     }
-    
+
     /**
      * Apply current phase of the LifecycleManager.  Note: this is NOT the same lifecycle manager
      * as the one in the Registry.

@@ -44,10 +44,7 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
         // 4) org.mule.management.mbeans.MuleService@Mule.ConnectorServiceTest:type=org.mule.ManagementContext,name=MuleServerInfo
         // 5) org.mule.management.mbeans.ConnectorService@Mule.ConnectorServiceTest:type=org.mule.Connector,name="TEST.CONNECTOR"
         assertEquals("Unexpected number of components registered in the domain.", 5, mbeans.size());
-
         managementContext.dispose();
-        //TODO: remove next line when MULE-2275 will be fixed.
-        jmxAgent.dispose();
 
         mbeans = mBeanServer.queryMBeans(objectName, null);
         assertEquals("There should be no MBeans left in the domain", 0, mbeans.size());

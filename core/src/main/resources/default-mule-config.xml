@@ -59,20 +59,20 @@
 
     <mule:mule name="_muleSystemModel">
 
-     <bean name="_muleConfiguration" class="org.mule.config.MuleConfiguration" depends-on="_muleManagementContext"/>
+        <bean name="_muleConfiguration" class="org.mule.config.MuleConfiguration" depends-on="_muleManagementContext"/>
 
-    <!-- 
-        <mule:configuration
-                serverId="_defaultx"
-                defaultSynchronousEndpoints="false"
-                domainId="org.mule"
-                defaultRemoteSync="false"
-                defaultSynchronousEventTimeout="3000"
-                defaultEncoding="UTF-8"
-                defaultTransactionTimeout="5000"
-                workingDirectory=".mule"/>
-     -->
-     
+        <!--
+           <mule:configuration
+                   serverId="_defaultx"
+                   defaultSynchronousEndpoints="false"
+                   domainId="org.mule"
+                   defaultRemoteSync="false"
+                   defaultSynchronousEventTimeout="3000"
+                   defaultEncoding="UTF-8"
+                   defaultTransactionTimeout="5000"
+                   workingDirectory=".mule"/>
+        -->
+
         <mule:model name="_muleSystemModel"/>
 
     </mule:mule>
@@ -88,21 +88,15 @@
         </property>
     </bean>
 
-    <bean name="_muleInitLifecycle" class="org.mule.impl.lifecycle.ContainerManagedLifecyclePhase">
-        <constructor-arg value="initialise"/>
-        <constructor-arg value="org.mule.umo.lifecycle.Initialisable"/>
-        <constructor-arg value="dispose"/>
-    </bean>
+    <!-- MULE-2275: Init is always taken care of by the Registry -->
+    <bean name="_muleInitLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextInitialisePhase"/>
 
     <bean name="_muleStartLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextStartPhase"/>
 
     <bean name="_muleStopLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextStopPhase"/>
 
-    <bean name="_muleDisposeLifecycle" class="org.mule.impl.lifecycle.ContainerManagedLifecyclePhase">
-        <constructor-arg value="dispose"/>
-        <constructor-arg value="org.mule.umo.lifecycle.Disposable"/>
-        <constructor-arg value="initialise"/>
-    </bean>
+    <!-- MULE-2275Dispose can currently be called from the ManagmentContext to dispose the Registry -->
+    <bean name="_muleDisposeLifecycle" class="org.mule.impl.lifecycle.phases.ManagementContextDisposePhase"/>
 
     <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager">
         <property name="persistenceStrategy">

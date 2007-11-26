@@ -40,8 +40,9 @@ import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.internal.notifications.TransactionNotification;
 import org.mule.impl.internal.notifications.TransactionNotificationListener;
-import org.mule.impl.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
+import org.mule.impl.lifecycle.phases.ManagementContextDisposePhase;
+import org.mule.impl.lifecycle.phases.ManagementContextInitialisePhase;
 import org.mule.impl.lifecycle.phases.ManagementContextStartPhase;
 import org.mule.impl.lifecycle.phases.ManagementContextStopPhase;
 import org.mule.impl.lifecycle.phases.TransientRegistryDisposePhase;
@@ -60,8 +61,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
@@ -523,13 +522,14 @@ public class TransientRegistry extends AbstractRegistry
     public static TransientRegistry createNew() throws UMOException
     {
         //Use the default server lifecycleManager
-        //UMOLifecycleManager lifecycleManager = new DefaultLifecycleManager();
         UMOLifecycleManager lifecycleManager = new GenericLifecycleManager();
 
-        lifecycleManager.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME));
+        //MULE-2275: Init is always taken care of by the Registry
+        lifecycleManager.registerLifecycle(new ManagementContextInitialisePhase());
         lifecycleManager.registerLifecycle(new ManagementContextStartPhase());
         lifecycleManager.registerLifecycle(new ManagementContextStopPhase());
-        lifecycleManager.registerLifecycle(new ContainerManagedLifecyclePhase(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME));
+        //MULE-2275: Dispose can currently be called from the ManagmentContext to dispose the Registry
+        lifecycleManager.registerLifecycle(new ManagementContextDisposePhase());
 
         MuleConfiguration config = new MuleConfiguration();
 
