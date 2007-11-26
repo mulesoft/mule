@@ -39,7 +39,7 @@ public class AsynchMule1869TestCase extends FunctionalTestCase
         client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
         Thread.sleep(2000);
         logger.debug("----------------- receive now");
-        UMOMessage result =  client.receive("asyncClientEndpoint", 10000);
+        UMOMessage result =  client.request("asyncClientEndpoint", 10000);
         assertNotNull("No message received", result);
         assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
     }

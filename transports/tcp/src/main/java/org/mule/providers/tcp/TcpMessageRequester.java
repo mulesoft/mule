@@ -11,105 +11,28 @@
 package org.mule.providers.tcp;
 
 import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.umo.UMOEvent;
+import org.mule.providers.AbstractMessageRequester;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.transformer.TransformerException;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 /**
- * Send transformed Mule events over TCP.
+ * Request transformed Mule events from TCP.
  */
-public class TcpMessageDispatcher extends AbstractMessageDispatcher
+public class TcpMessageRequester extends AbstractMessageRequester
 {
 
     private final TcpConnector connector;
 
-    public TcpMessageDispatcher(UMOImmutableEndpoint endpoint)
+    public TcpMessageRequester(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (TcpConnector) endpoint.getConnector();
-    }
-
-    protected synchronized void doDispatch(UMOEvent event) throws Exception
-    {
-        Socket socket = connector.getSocket(event.getEndpoint());
-        try 
-        {
-            dispatchToSocket(socket, event);
-        }
-        finally 
-        {
-            connector.releaseSocket(socket, event.getEndpoint());
-        }
-    }
-
-    protected synchronized UMOMessage doSend(UMOEvent event) throws Exception
-    {
-        Socket socket = connector.getSocket(event.getEndpoint());
-        dispatchToSocket(socket, event);
-
-        try 
-        {
-            if (useRemoteSync(event))
-            {
-                try
-                {
-                    Object result = receiveFromSocket(socket, event.getTimeout());
-                    if (result == null)
-                    {
-                        return null;
-                    }
-                    
-                    if (result instanceof UMOMessage)
-                    {
-                    	return (UMOMessage) result;
-                    }
-                    
-                    return new MuleMessage(connector.getMessageAdapter(result));
-                }
-                catch (SocketTimeoutException e)
-                {
-                    // we don't necessarily expect to receive a response here
-                    logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
-                        + event.getEndpoint().getEndpointURI());
-                    return null;
-                }
-            }
-            else
-            {
-                return event.getMessage();
-            }
-        }
-        finally
-        {
-            if (!useRemoteSync(event))
-            {
-                connector.releaseSocket(socket, endpoint);
-            }
-        }
-        
-    }
-
-    // Socket management (get and release) is handled outside this method
-    private void dispatchToSocket(Socket socket, UMOEvent event) throws Exception
-    {
-        Object payload = event.getTransformedMessage();
-        write(socket, payload);
-    }
-
-    private void write(Socket socket, Object data) throws IOException, TransformerException
-    {
-        BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
-        connector.getTcpProtocol().write(bos, data);
-        bos.flush();
     }
 
     private Object receiveFromSocket(final Socket socket, int timeout) throws IOException
@@ -135,19 +58,19 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     throw e2;
                 }
             }
-            
+
         };
-        
+
         if (timeout >= 0)
         {
             socket.setSoTimeout(timeout);
         }
-        
+
         try
         {
             return connector.getTcpProtocol().read(tis);
         }
-        finally 
+        finally
         {
             if (!tis.isStreaming())
             {
@@ -158,7 +81,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     /**
      * Make a specific request to the underlying transport
-     * 
+     *
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
      *            no data becomes available before the timeout elapses, null will be
@@ -167,7 +90,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(long timeout) throws Exception
+    protected UMOMessage doRequest(long timeout) throws Exception
     {
         Socket socket = connector.getSocket(endpoint);
         try
@@ -189,7 +112,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
             }
             return null;
         }
-        
+
     }
 
     protected synchronized void doDispose()
@@ -218,5 +141,5 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     {
         //nothing to do
     }
-    
+
 }

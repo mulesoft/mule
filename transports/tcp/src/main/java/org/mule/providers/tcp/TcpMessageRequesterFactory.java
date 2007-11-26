@@ -10,17 +10,17 @@
 
 package org.mule.providers.tcp;
 
-import org.mule.providers.AbstractMessageDispatcherFactory;
+import org.mule.providers.AbstractMessageRequesterFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.UMOMessageRequester;
 
-public class TcpMessageDispatcherFactory extends AbstractMessageDispatcherFactory
+public class TcpMessageRequesterFactory extends AbstractMessageRequesterFactory
 {
 
-    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
+    public UMOMessageRequester create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new TcpMessageDispatcher(endpoint);
+        return new TcpMessageRequester(endpoint);
     }
 
 }

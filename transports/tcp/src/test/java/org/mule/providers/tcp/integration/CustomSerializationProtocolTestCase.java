@@ -34,7 +34,7 @@ public class CustomSerializationProtocolTestCase extends FunctionalTestCase
 
         for (int i = 0; i < messages; i++)
         {
-            UMOMessage msg = client.receive("vm://out", 30000);
+            UMOMessage msg = client.request("vm://out", 30000);
             assertTrue(msg.getPayload() instanceof NonSerializableMessageObject);
             NonSerializableMessageObject received = (NonSerializableMessageObject)msg.getPayload();
             assertEquals("Hello", received.s);
