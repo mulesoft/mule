@@ -17,11 +17,11 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
 import org.mule.umo.UMOEventContext;
 
+import java.util.HashMap;
+
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
-import java.util.HashMap;
 
 public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
 {
@@ -64,8 +64,8 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
     {
         MuleClient client = new MuleClient();
 
-        FunctionalStreamingTestComponent ftc =
-                (FunctionalStreamingTestComponent) lookupComponent("main", "testComponent");
+        Object ftc = getPojoServiceForComponent("testComponent");
+        assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
 
         assertNotNull(ftc);
 //        assertEquals(1, ftc.getNumber());
@@ -73,7 +73,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference message = new AtomicReference();
         EventCallback callback = newCallback(latch, message);
-        ftc.setEventCallback(callback, TEST_MESSAGE.length());
+        ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
 
         // send out to FTP server via streaming model
         client.dispatch("tcp://localhost:60196", TEST_MESSAGE, new HashMap());
@@ -97,7 +97,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
         CountDownLatch latch2 = new CountDownLatch(1);
         AtomicReference message2 = new AtomicReference();
         EventCallback callback2 = newCallback(latch2, message2);
-        ftc.setEventCallback(callback2, TEST_MESSAGE_2.length());
+        ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback2, TEST_MESSAGE_2.length());
 
         client.dispatch("tcp://localhost:60196", TEST_MESSAGE_2, new HashMap());
         NamedPayload payload2 = awaitUpload();

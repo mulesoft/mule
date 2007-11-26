@@ -16,7 +16,6 @@ import org.mule.providers.DefaultMessageAdapter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
@@ -74,11 +73,12 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
 
         MuleClient client = new MuleClient();
 
-        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent)lookupComponent("", "testComponent");
+        Object ftc = getPojoServiceForComponent("testComponent");
+        assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
         assertNotNull(ftc);
         //assertEquals(1, ftc.getNumber());
 
-        ftc.setEventCallback(callback, size);
+        ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, size);
 
         Runtime runtime = Runtime.getRuntime();
         runtime.gc(); // i know, i know...

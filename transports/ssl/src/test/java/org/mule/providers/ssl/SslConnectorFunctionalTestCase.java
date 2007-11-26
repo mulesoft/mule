@@ -95,8 +95,9 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
 
         final CountDownLatch callbackCount = new CountDownLatch(100);
 
-        FunctionalTestComponent ftc = lookupTestComponent("main", "testComponent");
-        ftc.setEventCallback(new EventCallback()
+        Object ftc = getPojoServiceForComponent("testComponent");
+        assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
+        ((FunctionalTestComponent) ftc).setEventCallback(new EventCallback()
         {
             public void eventReceived(UMOEventContext context, Object component)
             {
@@ -122,8 +123,9 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
         final AtomicBoolean nonNullOutputStream = new AtomicBoolean(false);
         final AtomicReference certificates = new AtomicReference();
 
-        FunctionalTestComponent ftc = lookupTestComponent("main", "testComponent");
-        ftc.setEventCallback(new EventCallback()
+        Object ftc = getPojoServiceForComponent("testComponent");
+        assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
+        ((FunctionalTestComponent) ftc).setEventCallback(new EventCallback()
         {
             public void eventReceived(UMOEventContext context, Object component) throws Exception
             {

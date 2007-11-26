@@ -14,15 +14,14 @@ import org.mule.extras.client.MuleClient;
 import org.mule.providers.ftp.server.NamedPayload;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
+
+import java.util.HashMap;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
-import java.util.HashMap;
 
 /**
  * We don't have an integrated ftp server (yet), and synchronous return doesn't work
@@ -75,11 +74,12 @@ public class FtpStreamingTestCase extends AbstractFtpServerTestCase
 
         MuleClient client = new MuleClient();
 
-        FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) lookupComponent("main", "testComponent");
+        Object ftc = getPojoServiceForComponent("testComponent");
+        assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
         assertNotNull(ftc);
         // assertEquals(1, ftc.getNumber());
 
-        ftc.setEventCallback(callback, TEST_MESSAGE.length());
+        ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
 
         // send out to FTP server via streaming model
         client.dispatch("tcp://localhost:60196", TEST_MESSAGE, new HashMap());

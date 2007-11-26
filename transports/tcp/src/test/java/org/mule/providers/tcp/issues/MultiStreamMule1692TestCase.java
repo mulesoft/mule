@@ -14,7 +14,6 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 
 import java.util.HashMap;
@@ -74,22 +73,22 @@ public class MultiStreamMule1692TestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        FunctionalStreamingTestComponent ftc =
-                (FunctionalStreamingTestComponent) lookupComponent("echoModel", "testComponent");
+        Object ftc = getPojoServiceForComponent("testComponent");
+        assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
 //        assertNotNull(ftc);
 //        assertEquals(1, ftc.getNumber());
 
 
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference message = new AtomicReference();
-        ftc.setEventCallback(newCallback(latch, message), TEST_MESSAGE.length());
+        ((FunctionalStreamingTestComponent) ftc).setEventCallback(newCallback(latch, message), TEST_MESSAGE.length());
         client.dispatch("tcp://localhost:65432", TEST_MESSAGE, new HashMap());
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT, message.get());
 
         final CountDownLatch latch2 = new CountDownLatch(1);
         final AtomicReference message2 = new AtomicReference();
-        ftc.setEventCallback(newCallback(latch2, message2), TEST_MESSAGE_2.length());
+        ((FunctionalStreamingTestComponent) ftc).setEventCallback(newCallback(latch2, message2), TEST_MESSAGE_2.length());
         client.dispatch("tcp://localhost:65432", TEST_MESSAGE_2, new HashMap());
         latch2.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT_2, message2.get());

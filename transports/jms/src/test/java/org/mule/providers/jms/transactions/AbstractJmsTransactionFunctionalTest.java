@@ -98,13 +98,14 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
             }
         };
 
-        FunctionalTestComponent ftc = lookupTestComponent("transactionTestModel", "component1");
-        ftc.setEventCallback(callback);
+        Object ftc = getPojoServiceForComponent("component1");
+        assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
+        ((FunctionalTestComponent) ftc).setEventCallback(callback);
 
         send(TEST_MESSAGE, "component1In");
 
         assertTrue(callbackCalled.await(LOCK_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(TEST_MESSAGE, ftc.getLastReceivedMessage());
+        assertEquals(TEST_MESSAGE, ((FunctionalTestComponent) ftc).getLastReceivedMessage());
 
         // Verify no transaction.
         assertNull(currentTx);
@@ -127,13 +128,14 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
             }
         };
 
-        FunctionalTestComponent ftc = lookupTestComponent("transactionTestModel", "component2");
-        ftc.setEventCallback(callback);
+        Object ftc = getPojoServiceForComponent("component2");
+        assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
+        ((FunctionalTestComponent) ftc).setEventCallback(callback);
 
         send(TEST_MESSAGE, "component2In");
 
         assertTrue(callbackCalled.await(LOCK_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(TEST_MESSAGE, ftc.getLastReceivedMessage());
+        assertEquals(TEST_MESSAGE, ((FunctionalTestComponent) ftc).getLastReceivedMessage());
 
         assertEquals(TEST_MESSAGE_RESPONSE, receiveTextMessage("component1Out"));
 
@@ -164,13 +166,14 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
             }
         };
 
-        FunctionalTestComponent ftc = lookupTestComponent("transactionTestModel", "component2");
-        ftc.setEventCallback(callback);
+        Object ftc = getPojoServiceForComponent("component2");
+        assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
+        ((FunctionalTestComponent) ftc).setEventCallback(callback);
 
         send(TEST_MESSAGE, "component2In");
 
         assertTrue(callbackCalled.await(LOCK_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(TEST_MESSAGE, ftc.getLastReceivedMessage());
+        assertEquals(TEST_MESSAGE, ((FunctionalTestComponent) ftc).getLastReceivedMessage());
 
         // Verify transaction has rolled back.
         assertTrue(currentTx.isBegun());
@@ -202,13 +205,14 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
             }
         };
 
-        FunctionalTestComponent ftc = lookupTestComponent("transactionTestModel", "component3");
-        ftc.setEventCallback(callback);
+        Object ftc = getPojoServiceForComponent("component3");
+        assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
+        ((FunctionalTestComponent) ftc).setEventCallback(callback);
 
         send(TEST_MESSAGE, "component3In");
 
         assertTrue(callbackCalled.await(LOCK_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertEquals(TEST_MESSAGE, ftc.getLastReceivedMessage());
+        assertEquals(TEST_MESSAGE, ((FunctionalTestComponent) ftc).getLastReceivedMessage());
 
         // Verify transaction has rolled back.
         assertTrue(currentTx.isBegun());

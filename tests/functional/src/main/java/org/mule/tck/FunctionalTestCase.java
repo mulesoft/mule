@@ -11,10 +11,9 @@
 package org.mule.tck;
 
 import org.mule.RegistryContext;
+import org.mule.registry.RegistrationException;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.testmodels.mule.TestSedaComponent;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 
 /**
@@ -29,7 +28,6 @@ import org.mule.umo.UMOManagementContext;
  */
 public abstract class FunctionalTestCase extends AbstractMuleTestCase
 {
-
     /** Expected response after the test message has passed through the FunctionalTestComponent. */
     public static final String TEST_MESSAGE_RESPONSE = FunctionalTestComponent.received(TEST_MESSAGE);
     
@@ -47,28 +45,6 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         return mc;
     }
 
-    protected FunctionalTestComponent lookupTestComponent(String modelName, String componentName) throws UMOException
-    {
-        UMOComponent c = managementContext.getRegistry().lookupComponent(componentName);
-        assertNotNull("Component " + componentName + " not found", c);
-        assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
-        Object pojoService = ((TestSedaComponent) c).getOrCreateService();
-        assertNotNull(pojoService);
-        assertTrue("Service should be a FunctionalTestComponent", pojoService instanceof FunctionalTestComponent);
-        return (FunctionalTestComponent) pojoService;
-    }
-
-    protected Object lookupComponent(String modelName, String componentName) throws Exception
-    {
-       UMOComponent c = managementContext.getRegistry().lookupComponent(componentName);
-        assertNotNull("Component " + c + " not found", c);
-        //TODO: What happened to TestSedaModel? assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
-        Object pojoService = c.getServiceFactory().getOrCreate();
-        assertNotNull(pojoService);
-        //assertTrue("Service should be a FunctionalTestComponent", pojoService instanceof FunctionalTestComponent);
-        return pojoService;
-    }
-
     //Delegate to an abstract method to ensure that FunctionalTestCases know they need to pass in config resources
     protected String getConfigurationResources()
     {
@@ -76,4 +52,17 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     }
 
     protected abstract String getConfigResources();
+    
+    protected Object getPojoServiceForComponent(String componentName) throws Exception
+    {
+        UMOComponent c = managementContext.getRegistry().lookupComponent(componentName);
+        if (c != null)
+        {
+            return c.getServiceFactory().getOrCreate();
+        }
+        else
+        {
+            throw new RegistrationException("Component " + componentName + " not found in Registry");
+        }
+    }
 }

@@ -12,7 +12,6 @@ package org.mule.providers.jms.functional;
 
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.umo.UMOException;
 
 public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunctionalTestCase
 {
@@ -86,15 +85,19 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
     {
         try
         {
+            Object ftc;
             if (useTopics())
             {
-                return lookupTestComponent("testModel", "topicComponent");
+                ftc = getPojoServiceForComponent("topicComponent");
             }
             else
             {
-                return lookupTestComponent("testModel", "queueComponent");
+                ftc = getPojoServiceForComponent("queueComponent");
             }
-        } catch (UMOException e)
+            assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
+            return (FunctionalTestComponent) ftc;
+        } 
+        catch (Exception e)
         {
             logger.error(e);
             return null;

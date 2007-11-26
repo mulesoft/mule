@@ -9,10 +9,11 @@
  */
 package org.mule.providers.http.functional;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 public class PollingReceiversRestartTestCase extends FunctionalTestCase
 {
@@ -33,10 +34,11 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
 
         managementContext.start();
 
-        FunctionalTestComponent ftc = lookupTestComponent("main","Test");
+        Object ftc = getPojoServiceForComponent("Test");
+        assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
 
         AtomicInteger pollCounter = new AtomicInteger(0);
-        ftc.setEventCallback(new CounterCallback(pollCounter));
+        ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
 
         // should be enough to poll for 2 messages
         Thread.sleep(WAIT_TIME);
@@ -49,7 +51,7 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
         managementContext.start();
 
         pollCounter.set(0);
-        ftc.setEventCallback(new CounterCallback(pollCounter));
+        ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
 
         Thread.sleep(WAIT_TIME);
         managementContext.dispose();
