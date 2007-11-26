@@ -41,9 +41,9 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import java.io.OutputStream;
-
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.io.OutputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -149,11 +149,12 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         connectionStrategy = this.endpoint.getConnectionStrategy();
         doInitialise();
     }
+
     /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageReceiver#getEndpointName()
-     */
+    * (non-Javadoc)
+    *
+    * @see org.mule.umo.provider.UMOMessageReceiver#getEndpointName()
+    */
     public UMOImmutableEndpoint getEndpoint()
     {
         return endpoint;
@@ -286,12 +287,18 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         if (connector.isEnableMessageEvents())
         {
             connector.fireNotification(
-                new MessageNotification(message, endpoint, component.getName(), MessageNotification.MESSAGE_RECEIVED));
+                    new MessageNotification(message, endpoint, component.getName(), MessageNotification.MESSAGE_RECEIVED));
         }
-        
+
+        //IF REMOTE_SYNCis set on the endpoint, we need to set it on the message
         if (endpoint.isRemoteSync())
         {
             message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
+        }
+        //Enforce a sync endpoint if remote sync is set
+        if (message.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false))
+        {
+            synchronous = true;
         }
 
         if (logger.isDebugEnabled())
@@ -633,7 +640,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         //review each receiver to move logic from the contstructor to the init method. The Connector will
         //call this method when the receiver is created. see MULE-2113 for more information about lifecycle clean up
     }
-    
+
     protected abstract void doStart() throws UMOException;
 
     protected abstract void doStop() throws UMOException;
