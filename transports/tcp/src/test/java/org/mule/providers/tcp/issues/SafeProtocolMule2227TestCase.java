@@ -35,7 +35,14 @@ public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
     {
         MuleClient client = new MuleClient();
         // this may fail, but should not crash
-        client.send("tcp://localhost:65433?connector=safe", TEST_MESSAGE, null);
+        try
+        {
+            client.send("tcp://localhost:65433?connector=safe", TEST_MESSAGE, null);
+        }
+        catch(Exception e)
+        {
+            // an error is ok - we were losing the JVM before
+        }
     }
 
 }
