@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
-       xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+      xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
+    <!-- need to use the Streaming protocol for this test -->
+    <!-- we need to keepSendSocketOpen when doing request response streaming since the clinet call will
+    complete before any data is actually read so we need to keep the socket open to avoid a broken pipe-->
+    <tcp:connector name="testStreaming" keepSendSocketOpen="true">
+        <tcp:streaming-protocol/>
+    </tcp:connector>
+
     <model name="main">
         <service name="testComponent">
             <inbound-router>
-                <tcp:inbound-endpoint host="localhost" port="65432"/>
+                <!-- We have to set the synchronicity explicitly here (in the http version of this we do not) Since
+                we can't send any headers with the TCP transport unless we use a customised protocol. In http the
+                REMOTE_SYNC header is set since the MuleClient.send(...) will automatically set it for us.
+                 (REMOTE_SYNC from the client implies 'synchronsous' on the server)-->
+                <tcp:inbound-endpoint host="localhost" port="65432" synchronous="true"/>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.providers.tcp.issues.InputStreamSource"/>

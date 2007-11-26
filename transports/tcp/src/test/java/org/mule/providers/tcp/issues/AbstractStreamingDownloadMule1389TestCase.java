@@ -11,9 +11,9 @@
 package org.mule.providers.tcp.issues;
 
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.tcp.integration.AbstractStreamingCapacityTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
-import org.mule.providers.tcp.integration.AbstractStreamingCapacityTestCase;
 
 public abstract class AbstractStreamingDownloadMule1389TestCase extends FunctionalTestCase
 {
@@ -35,7 +35,7 @@ public abstract class AbstractStreamingDownloadMule1389TestCase extends Function
         assertEquals(InputStreamSource.SIZE, result.getPayloadAsBytes().length);
         long then = System.currentTimeMillis();
         double speed = InputStreamSource.SIZE / (double) (then - now) * 1000 / AbstractStreamingCapacityTestCase.ONE_MB;
-        logger.info("Transfer speed " + speed + " MB/s (" + InputStreamSource.SIZE + " B in " + (then - now) + " ms)");
+        logger.error("Transfer speed " + speed + " MB/s (" + InputStreamSource.SIZE + " B in " + (then - now) + " ms)");
     }
 
 }
