@@ -143,6 +143,13 @@
     <xsd:complexType name="byteOrMessageProtocolType">
         <xsd:complexContent>
             <xsd:extension base="abstractProtocolType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Do not send the entire mule message object (including properties etc),
+                        just the payload (contents)?  This defaults to true when the protocol
+                        is not specified explicitly (when the safe protocol is used).
+                    </xsd:documentation>
+                </xsd:annotation>
                 <xsd:attribute name="payloadOnly" type="mule:substitutableBoolean" use="required"/>
             </xsd:extension>
         </xsd:complexContent>

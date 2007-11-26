@@ -29,10 +29,13 @@ public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase
     // the only way round this i can see is to allow a parameter on the protocol to specify a
     // maximum size.  see MULE-2449.
 
+    // update - we now do have a maximum size
+
     public void testSafeToUnsafe() throws UMOException
     {
         MuleClient client = new MuleClient();
-        assertResponseBad(client.send("tcp://localhost:65433?connector=safe", TEST_MESSAGE, null));
+        // this may fail, but should not crash
+        client.send("tcp://localhost:65433?connector=safe", TEST_MESSAGE, null);
     }
 
 }

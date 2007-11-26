@@ -8,7 +8,11 @@
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
-    <tcp:connector name="safe"/>
+    <tcp:connector name="safe">
+        <!-- we set a maximum length here because we are mixing protocols, which can cause
+             an error - see discussion in SafeProtocolMule2227TestCase -->  
+        <tcp:safe-protocol payloadOnly="true" maxMessageLength="200"/>
+    </tcp:connector>
     <tcp:connector name="unsafe">
         <tcp:direct-protocol payloadOnly="true"/>
     </tcp:connector>
