@@ -43,7 +43,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
     }
 
     public UMOMessage route(final UMOMessage message, final UMOSession session, final boolean synchronous)
-        throws MessagingException
+            throws MessagingException
     {
 
         UMOMessage result;
@@ -59,7 +59,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
                 final UMOOutboundRouter router = umoOutboundRouter;
                 UMOComponent component = session.getComponent();
                 TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig(),
-                    component.getExceptionListener(), managementContext);
+                        component.getExceptionListener(), managementContext);
 
                 TransactionCallback cb = new TransactionCallback()
                 {
@@ -89,16 +89,16 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
             if (logger.isDebugEnabled())
             {
                 logger.debug("Message did not match any routers on: "
-                             + session.getComponent().getName()
-                             + " invoking catch all strategy");
+                        + session.getComponent().getName()
+                        + " invoking catch all strategy");
             }
             return catchAll(message, session, synchronous);
         }
         else if (!matchfound)
         {
             logger.warn("Message did not match any routers on: "
-                        + session.getComponent().getName()
-                        + " and there is no catch all strategy configured on this router.  Disposing message.");
+                    + session.getComponent().getName()
+                    + " and there is no catch all strategy configured on this router.  Disposing message " + message);
         }
         return message;
     }
@@ -106,7 +106,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
     /**
      * A helper method for finding out which endpoints a message would be routed to
      * without actually routing the the message
-     * 
+     *
      * @param message the message to retrieve endpoints for
      * @return an array of UMOEndpoint objects or an empty array
      * @throws RoutingException
@@ -132,7 +132,7 @@ public class OutboundRouterCollection extends AbstractRouterCollection implement
     }
 
     protected UMOMessage catchAll(UMOMessage message, UMOSession session, boolean synchronous)
-        throws RoutingException
+            throws RoutingException
     {
         if (getStatistics().isEnabled())
         {
