@@ -2,5 +2,6 @@
 # Test cases listed in this file are not run.
 #
 
-# Currently fail because we get the soapString returned from XFire not the Object binding??
+# MULE-2721
 org.mule.examples.loanbroker.esn.XFireLoanBrokerSynchronousFunctionalTestCase
+org.mule.examples.loanbroker.esn.XFireLoanBrokerAsynchronousFunctionalTestCase
