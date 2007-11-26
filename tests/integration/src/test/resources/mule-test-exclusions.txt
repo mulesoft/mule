@@ -137,6 +137,8 @@ org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchUsingDelegati
 #	at org.springframework.beans.factory.config.PropertyPlaceholderConfigurer.processProperties(PropertyPlaceholderConfigurer.java:249)
 org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
 
+# MULE-2730
+# was (doesn't make much sense unless properties were broken at some point?):
 # java.lang.IllegalArgumentException: The endpoint "file://${mule.working.dir}/test-data/in" is malformed and cannot be parsed. If this is the name of a global endpoint, check the name is correct, that the endpoint exists, and that you are using the correct configuration (eg the "ref" attribute).
 #	at org.mule.config.spring.editors.EndpointURIPropertyEditor.setAsText(EndpointURIPropertyEditor.java:32)
 org.mule.test.integration.streaming.FileToTcpStreamingTestCase

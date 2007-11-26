@@ -19,9 +19,7 @@
             <inbound-router>
                 <tcp:inbound-endpoint address="tcp://localhost:65432?endpointName=myEndpoint"/>
             </inbound-router>
-            <component>
-                <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
-            </component>
+            <echo-component/>
         </service>
     </model>
 

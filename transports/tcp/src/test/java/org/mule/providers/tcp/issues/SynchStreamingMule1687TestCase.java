@@ -16,7 +16,6 @@ import org.mule.providers.DefaultMessageAdapter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
@@ -44,6 +43,7 @@ public class SynchStreamingMule1687TestCase extends FunctionalTestCase
 
         Object payload = message.getPayload();
         assertTrue(payload instanceof InputStream);
+        assertEquals("Some value - set to make test ok", message.getPayloadAsString());
     }
 
 }
