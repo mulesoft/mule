@@ -18,6 +18,9 @@
 
     <vm:endpoint name="xml-in" path="xml-in" connector-ref="default"/>
     <vm:endpoint name="object-in" address="vm://object-in" connector-ref="default"/>
+    <vm:endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue"/>
+    <vm:endpoint name="object-out" path="object-out" connector-ref="queue"/>
+    <vm:endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue"/>
 
     <model name="mule-2136">
 
@@ -27,8 +30,7 @@
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-                    <vm:outbound-endpoint name="xml-object-out" address="vm://xml-object-out"
-                                          connector-ref="queue" transformer-refs="xmlToObject"/>
+                    <vm:outbound-endpoint ref="xml-object-out" transformer-refs="xmlToObject"/>
                 </multicasting-router>
             </outbound-router>
         </service>
@@ -39,9 +41,8 @@
             </inbound-router>
             <outbound-router>
                 <multicasting-router>
-                    <vm:outbound-endpoint name="object-out" path="object-out" connector-ref="queue"/>
-                    <vm:outbound-endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue"
-                                          transformer-refs="objectToXml"/>
+                    <vm:outbound-endpoint ref="object-out"/>
+                    <vm:outbound-endpoint ref="object-xml-out" transformer-refs="objectToXml"/>
                     <vm:outbound-endpoint ref="xml-in" transformer-refs="objectToXml"/>
                 </multicasting-router>
             </outbound-router>
