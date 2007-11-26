@@ -11,6 +11,7 @@ package org.mule.providers;
 
 import org.mule.umo.provider.PropertyScope;
 import org.mule.util.MapUtils;
+import org.mule.util.ObjectUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
@@ -39,7 +40,7 @@ public class MessagePropertiesContext implements Serializable
     {
         keySet = new TreeSet();
         scopedMap = new TreeMap(new PropertyScope.ScopeComarator());
-        
+
         scopedMap.put(PropertyScope.INVOCATION, new HashMap(6));
         scopedMap.put(PropertyScope.INBOUND, new HashMap(6));
         scopedMap.put(PropertyScope.OUTBOUND, new HashMap(6));
@@ -168,7 +169,7 @@ public class MessagePropertiesContext implements Serializable
         {
             value = getScopedProperties(PropertyScope.SESSION).remove(key);
         }
-        if(value!=null)
+        if (value != null)
         {
             keySet.remove(key);
         }
@@ -202,17 +203,13 @@ public class MessagePropertiesContext implements Serializable
         keySet.add(key);
     }
 
-    /**
-     * @return all property keys on this message
-     */
+    /** @return all property keys on this message */
     public Set getPropertyNames()
     {
         return Collections.unmodifiableSet(keySet);
     }
 
-    /**
-     * @return all property keys on this message for the given scope
-     */
+    /** @return all property keys on this message for the given scope */
     public Set getPropertyNames(PropertyScope scope)
     {
         return Collections.unmodifiableSet(getScopedProperties(scope).keySet());
@@ -230,41 +227,51 @@ public class MessagePropertiesContext implements Serializable
     public Object getProperty(String key, Object defaultValue)
     {
         Object value = getProperty(key);
-        if(value==null)
+        if (value == null)
         {
             value = defaultValue;
         }
         return value;
     }
 
+    public byte getByteProperty(String name, byte defaultValue)
+    {
+        return ObjectUtils.getByte(getProperty(name), defaultValue);
+    }
+
+    public short getShortProperty(String name, short defaultValue)
+    {
+        return ObjectUtils.getShort(getProperty(name), defaultValue);
+    }
+
     public int getIntProperty(String name, int defaultValue)
     {
-        return MapUtils.getIntValue(getScopedProperties(defaultScope), name, defaultValue);
+        return ObjectUtils.getInt(getProperty(name), defaultValue);
     }
 
     public long getLongProperty(String name, long defaultValue)
     {
-        return MapUtils.getLongValue(getScopedProperties(defaultScope), name, defaultValue);
+        return ObjectUtils.getLong(getProperty(name), defaultValue);
+    }
+
+    public float getFloatProperty(String name, float defaultValue)
+    {
+        return ObjectUtils.getFloat(getProperty(name), defaultValue);
     }
 
     public double getDoubleProperty(String name, double defaultValue)
     {
-        return MapUtils.getDoubleValue(getScopedProperties(defaultScope), name, defaultValue);
+        return ObjectUtils.getDouble(getProperty(name), defaultValue);
     }
 
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
-        return MapUtils.getBooleanValue(getScopedProperties(defaultScope), name, defaultValue);
+        return ObjectUtils.getBoolean(getProperty(name), defaultValue);
     }
 
     public String getStringProperty(String name, String defaultValue)
     {
-        Object value = getProperty(name);
-        if(value==null)
-        {
-            return defaultValue;
-        }
-        return value.toString();
+        return ObjectUtils.getString(getProperty(name), defaultValue);
     }
 
     public String toString()
@@ -275,7 +282,7 @@ public class MessagePropertiesContext implements Serializable
         {
             Map.Entry entry = (Map.Entry) iterator.next();
             buf.append(entry.getKey()).append(":");
-            buf.append(MapUtils.toString((Map)entry.getValue(), false));
+            buf.append(MapUtils.toString((Map) entry.getValue(), false));
             buf.append(", ");
         }
         buf.append("}");
