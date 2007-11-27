@@ -63,6 +63,7 @@ org.mule.test.integration.routing.AggregatorIntegrationTestCase
 # Message chunking router not working?
 org.mule.test.integration.routing.MessageChunkingTestCase
 
+# MULE-2745
 # How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
 org.mule.test.integration.persistence.FilePersistenceTestCase
 
