@@ -114,6 +114,7 @@ org.mule.test.integration.routing.replyto.ReplytoChainIntegrationTestCase
 # OutputHandler has to do with StreamMessageAdapter, could this be a streaming issue?
 org.mule.test.usecases.sync.HttpTransformTestCase
 
+# MULE-2736
 # Hangs for a long, long time
 org.mule.test.integration.transaction.XAJdbcMule1479TestCase
 
