@@ -125,6 +125,7 @@ org.mule.test.integration.providers.file.FileFunctionalTestCase
 org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchJobTestCase
 org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchUsingDelegatingJobTestCase
 	
+# MULE-2734
 # Error registering bean with name 'jdbcConnector' defined in null: Could not resolve placeholder 'function:NOW'
 #	at org.springframework.beans.factory.config.PropertyPlaceholderConfigurer.processProperties(PropertyPlaceholderConfigurer.java:249)
 org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
@@ -134,7 +135,8 @@ org.mule.test.integration.transaction.XABridgeJmsJdbcTestCase
 # java.lang.IllegalArgumentException: The endpoint "file://${mule.working.dir}/test-data/in" is malformed and cannot be parsed. If this is the name of a global endpoint, check the name is correct, that the endpoint exists, and that you are using the correct configuration (eg the "ref" attribute).
 #	at org.mule.config.spring.editors.EndpointURIPropertyEditor.setAsText(EndpointURIPropertyEditor.java:32)
 org.mule.test.integration.streaming.FileToTcpStreamingTestCase
-	
+
+# MULE-2733
 # @ in URI is not getting replaced (1 of 3 tests fails)
 org.mule.test.integration.util.ObjectNameHelperTestCase
 
