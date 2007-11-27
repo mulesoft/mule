@@ -34,10 +34,12 @@
             <inbound-router>
                 <inbound-endpoint address="vm://remote.endpoint" connector-ref="vmRemoteConnector" remoteSync="true"/>
             </inbound-router>
-            <component class="org.mule.components.simple.StaticComponent">
-                <properties>
-                    <spring:entry key="data" value="received from remote"/>
-                </properties>
+            <component>
+                <singleton-object class="org.mule.components.simple.StaticComponent">
+                    <properties>
+                        <spring:entry key="data" value="received from remote"/>
+                    </properties>
+                </singleton-object>
             </component>
         </service>
     </model>

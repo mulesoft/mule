@@ -69,7 +69,7 @@ org.mule.test.integration.persistence.FilePersistenceTestCase
 # Tests the transport "wsdl:http://"  Is that working yet for 2.x?
 org.mule.test.integration.client.MuleClientWSDLExternalTestCase
 
-# Remoting does not seem to be working yet in 2.x?
+# MULE-2743 - Remoting does not seem to be working yet in 2.x?
 org.mule.test.integration.client.MuleClientRemotingTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 org.mule.test.integration.spring.MuleAdminTestCase
