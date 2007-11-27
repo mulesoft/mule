@@ -60,7 +60,6 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # Need to finish implementation of <static-recipient-list-router>
 org.mule.test.integration.routing.AggregatorIntegrationTestCase
 
-
 # Message chunking router not working?
 org.mule.test.integration.routing.MessageChunkingTestCase
 
@@ -90,6 +89,7 @@ org.mule.test.integration.MuleEndpointConfigurationTestCase
 # TODO MULE-1789
 org.mule.test.integration.config.MultiContainerTestCase
 
+# MULE-2739
 # Does this still need to work for 2.x?
 org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 
