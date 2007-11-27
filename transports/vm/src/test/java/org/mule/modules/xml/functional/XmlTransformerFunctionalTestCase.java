@@ -43,11 +43,6 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         return sendObject("object-in");
     }
 
-    protected MuleClient sendObject2() throws UMOException
-    {
-        return sendObject("object-in-2");
-    }
-
     protected MuleClient sendObject(String endpoint) throws UMOException
     {
         MuleClient client = new MuleClient();
@@ -93,7 +88,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 
     public void testXmlObjectOut() throws UMOException
     {
-        receive(sendObject2(), "xml-object-out", Parent.class);
+        receive(sendObject(), "xml-object-out", Parent.class);
     }
 
     public void testXmlJxpathOut() throws Exception

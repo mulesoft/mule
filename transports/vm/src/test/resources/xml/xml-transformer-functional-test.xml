@@ -11,11 +11,11 @@
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <vm:connector name="default">
-        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+        <custom-exception-strategy class="org.mule.modules.xml.functional.HideExceptions"/>
     </vm:connector>
 
     <vm:connector name="queue" queueEvents="true">
-        <custom-exception-strategy class="org.mule.tck.functional.QuietExceptionStrategy"/>
+        <custom-exception-strategy class="org.mule.modules.xml.functional.HideExceptions"/>
     </vm:connector>
 
     <mxml:dom-to-xml name="domToXml"/>
@@ -96,23 +96,6 @@
                 <multicasting-router>
                     <outbound-endpoint ref="object-out"/>
                     <vm:outbound-endpoint ref="object-xml-out" transformer-refs="objectToXml"/>
-                    <!-- MULE-2136 -->
-                    <!-- mule:endpoint ref="xml-in" transformers="objectToXml"/ -->
-                </multicasting-router>
-            </outbound-router>
-        </service>
-
-        <!-- Need to split this across two service to avoid MULE-2136 -->
-        <service name="object to xml 2">
-            <inbound-router>
-                <inbound-endpoint ref="object-in-2"/>
-                <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
-                <multicasting-router>
-                    <!-- MULE-2136 -->
-                    <!-- mule:endpoint name="object-out" address="vm://object-out" connector-ref="queue"/ -->
-                    <!-- mule:endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue" transformers="objectToXml"/ -->
                     <outbound-endpoint ref="xml-in" transformer-refs="objectToXml"/>
                 </multicasting-router>
             </outbound-router>
