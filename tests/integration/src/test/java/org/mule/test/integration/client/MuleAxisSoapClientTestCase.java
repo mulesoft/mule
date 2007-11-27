@@ -20,7 +20,7 @@ public class MuleAxisSoapClientTestCase extends FunctionalTestCase
 
     public MuleAxisSoapClientTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeManagerPerSuite(false);
     }
 
     public String getSoapProvider()
@@ -38,8 +38,8 @@ public class MuleAxisSoapClientTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         UMOMessage result = client.send(getSoapProvider()
-                                        + ":http://localhost:38104/mule/services/mycomponent2?method=echo",
-            "test", null);
+                + ":http://localhost:38104/mule/services/mycomponent2?method=echo",
+                "test", null);
         assertNotNull(result);
         assertEquals("test", result.getPayloadAsString());
     }
@@ -49,13 +49,13 @@ public class MuleAxisSoapClientTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         UMOMessage result = client.send(
-            getSoapProvider() + ":http://localhost:38104/mule/services/mycomponent3?method=getPerson",
-            "Fred", null);
+                getSoapProvider() + ":http://localhost:38104/mule/services/mycomponent3?method=getPerson",
+                "Fred", null);
         assertNotNull(result);
         logger.debug(result.getPayload());
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Fred", ((Person)result.getPayload()).getFirstName());
-        assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
+        assertEquals("Fred", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Flintstone", ((Person) result.getPayload()).getLastName());
     }
 
     public void testRequestResponseComplex2() throws Exception
@@ -64,21 +64,21 @@ public class MuleAxisSoapClientTestCase extends FunctionalTestCase
 
         String[] args = new String[]{"Betty", "Rubble"};
         UMOMessage result = client.send(
-            getSoapProvider() + ":http://localhost:38104/mule/services/mycomponent3?method=addPerson", args,
-            null);
+                getSoapProvider() + ":http://localhost:38104/mule/services/mycomponent3?method=addPerson", args,
+                null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Betty", ((Person)result.getPayload()).getFirstName());
-        assertEquals("Rubble", ((Person)result.getPayload()).getLastName());
+        assertEquals("Betty", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Rubble", ((Person) result.getPayload()).getLastName());
 
         // do a receive
         result = client.send(getSoapProvider()
-                             + ":http://localhost:38104/mule/services/mycomponent3?method=getPerson",
-            "Betty", null);
+                + ":http://localhost:38104/mule/services/mycomponent3?method=getPerson",
+                "Betty", null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Betty", ((Person)result.getPayload()).getFirstName());
-        assertEquals("Rubble", ((Person)result.getPayload()).getLastName());
+        assertEquals("Betty", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Rubble", ((Person) result.getPayload()).getLastName());
 
     }
 }
