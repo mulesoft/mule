@@ -21,24 +21,10 @@ import javax.servlet.ServletContext;
 
 public class MockTestCase extends AbstractWebappTestCase
 {
-    //UMOManager manager = null;
-    
-    protected final void doSetUp() throws Exception
+    //@Override
+    protected String getConfigurationResources()
     {
-        super.doSetUp();
-
-        //if (manager == null)
-        //{
-            // TODO TC MERGE No such API anymore
-            // MuleManager.getConfiguration().setWorkListener(new TestingWorkListener());
-            ConfigurationBuilder builder = getBuilder();
-        //    manager = builder.configure(getConfigResources(), null);
-        //}
-    }
-
-    protected String getConfigResources()
-    {
-        return "jmx-config.xml," +
+        return //"jmx-config.xml," +
                 "echo-config.xml," +
                 "hello-http-config.xml," +
                 "servlet-config.xml," +

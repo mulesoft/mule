@@ -23,6 +23,7 @@
         Xslt transformer and then using the XmlToObject transformer.
     </description>
 
+    <!-- TODO MULE-2731 -->
     <spring:bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <spring:property name="locations">

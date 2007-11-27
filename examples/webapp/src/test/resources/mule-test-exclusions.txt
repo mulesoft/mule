@@ -2,5 +2,5 @@
 # Test cases listed in this file are not run.
 #
 
+# This test is simply unfinished
 org.mule.examples.webapp.JettyTestCase
-org.mule.examples.webapp.MockTestCase

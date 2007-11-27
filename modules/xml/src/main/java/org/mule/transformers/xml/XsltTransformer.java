@@ -227,6 +227,10 @@ public class XsltTransformer extends AbstractXmlTransformer
         try
         {
             is = IOUtils.getResourceAsStream(xslFile, getClass());
+            //if (logger.isDebugEnabled())
+            //{
+            //    logger.debug("XSLT = " + IOUtils.getResourceAsString(xslFile, getClass()));
+            //}
         }
         catch (IOException e)
         {

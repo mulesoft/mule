@@ -19,7 +19,7 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
 */
 public class JettyTestCase extends AbstractWebappTestCase
 {
-    public static final String WEBAPP_WAR_FILE = "/home/travis/mule/examples/webapp/target/mule-examples.war";
+    public static final String WEBAPP_WAR_FILE = "/path/to/mule/examples/webapp/target/mule-examples.war";
     public static final String WEBAPP_CONTEXT_PATH = "/mule-examples";
     public static final int JETTY_PORT = 8090;
     

@@ -54,27 +54,26 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
     }
 
     /**
-     * TODO TC MERGE THIS DOES NOT OVERRIDE SUPER NOW! Recheck.
      * Attempt to load any resource from the Servlet Context first, then from FS and the classpath.
      */
-    protected InputStream loadResource(String resource) throws ConfigurationException
+    protected InputStream loadConfig(String configResource) throws ConfigurationException
     {
-        String resourcePath = resource;
+        String resourcePath = configResource;
         InputStream is = null;
         if (webappClasspath != null)
         {
-            resourcePath = new File(webappClasspath, resource).getPath();
+            resourcePath = new File(webappClasspath, configResource).getPath();
             is = context.getResourceAsStream(resourcePath);
         }
         if (is == null)
         {
-            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(configResource);
         }
         if (logger.isDebugEnabled())
         {
             if (is != null)
             {
-                logger.debug("Resource " + resource + " is found in Servlet Context.");
+                logger.debug("Resource " + configResource + " is found in Servlet Context.");
             }
             else
             {
@@ -83,7 +82,7 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
         }
         if (is == null && webappClasspath != null)
         {
-            resourcePath = FileUtils.newFile(webappClasspath, resource).getPath();
+            resourcePath = FileUtils.newFile(webappClasspath, configResource).getPath();
             try
             {
                 is = IOUtils.getResourceAsStream(resourcePath,getClass());
@@ -98,11 +97,11 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
             try
             {
                 logger.debug("Resource " + resourcePath + " not found in Servlet Context, loading from classpath");
-                is = IOUtils.getResourceAsStream(resource, getClass());
+                is = IOUtils.getResourceAsStream(configResource, getClass());
             }
             catch (IOException ioex)
             {
-                throw new ConfigurationException(CoreMessages.cannotLoadFromClasspath(resource), ioex);
+                throw new ConfigurationException(CoreMessages.cannotLoadFromClasspath(configResource), ioex);
             }
         }
         return is;

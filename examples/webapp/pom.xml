@@ -87,6 +87,11 @@
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-file</artifactId>
+            <version>${version}</version>
+        </dependency>
 
         <!-- For Jetty unit test 
         <dependency>

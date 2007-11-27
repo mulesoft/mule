@@ -16,13 +16,12 @@
         <!--<param-name>contextConfigLocation</param-name>-->
         <param-name>org.mule.config</param-name>
         <param-value>
-            jmx-config.xml,
             echo-config.xml,
             hello-http-config.xml,
             servlet-config.xml,
             stockquote-rest-config.xml,
             loan-broker-sync-config.xml,
-            loan-broker-vm-endpoints-config.xml
+            loan-broker-axis-endpoints-config.xml
         </param-value>
     </context-param>
 
