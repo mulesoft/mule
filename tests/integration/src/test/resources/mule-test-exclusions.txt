@@ -74,10 +74,11 @@ org.mule.test.integration.client.MuleClientRemotingTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 org.mule.test.integration.spring.MuleAdminTestCase
 
-# These need <model-direct>, <model-pipeline>, etc. (or <direct:model>, <pipeline:model>?) elements configured.  
-# BTW, Is anyone actually using these?
-org.mule.test.integration.models.ConfigureModelTestCase
+# MULE-2742
 org.mule.test.integration.models.DirectPipelineTestCase
+org.mule.test.integration.models.ConfigureModelTestCase
+
+# MULE-2741
 org.mule.test.integration.models.OptimisedSedaPipelineTestCase
 org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
 org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
