@@ -10,8 +10,6 @@
 
 package org.mule.util;
 
-import java.util.Comparator;
-
 import org.safehaus.uuid.UUIDGenerator;
 
 /**
@@ -21,17 +19,6 @@ import org.safehaus.uuid.UUIDGenerator;
 public final class UUID
 {
     private static final UUIDGenerator generator = UUIDGenerator.getInstance();
-    private static final Comparator comparator = new UUIDComparator();
-
-    private static class UUIDComparator implements Comparator
-    {
-        public int compare(Object uuid, Object other)
-        {
-            // silly temporary implementation until I have re-implemented the original :(
-            return new org.safehaus.uuid.UUID((String) uuid).compareTo(new org.safehaus.uuid.UUID(
-                (String) other));
-        }
-    }
 
     private UUID()
     {
@@ -41,11 +28,6 @@ public final class UUID
     public static String getUUID()
     {
         return generator.generateTimeBasedUUID().toString();
-    }
-
-    public static Comparator getComparator()
-    {
-        return comparator;
     }
 
 }
