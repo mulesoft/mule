@@ -83,10 +83,10 @@ org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
 org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
 org.mule.test.integration.models.SedaPipelineTestCase
 
-# Not sure what to do about the "test:" namespace in 2.x
+# MULE-2740
 org.mule.test.integration.MuleEndpointConfigurationTestCase
 
-# TODO MULE-1789
+# MULE-1789
 org.mule.test.integration.config.MultiContainerTestCase
 
 # MULE-2739

@@ -3,12 +3,14 @@
     xmlns:spring="http://www.springframework.org/schema/beans" 
     xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
     xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
+    xmlns:test="http://www.mulesource.org/schema/mule/test/2.0"
     xmlns:xm="http://www.mulesource.org/schema/mule/xml/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
+       http://www.mulesource.org/schema/mule/test/2.0 http://www.mulesource.org/schema/mule/test/2.0/mule-test.xsd
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
     <configuration serverId="server" defaultSynchronousEventTimeout="1001" />
@@ -74,10 +76,12 @@
         </service>
 
         <!-- test Uri receiver endpoint specifying a provider with endpoint overrriden and
-            test outbound router config combining endpoints -->
+             test outbound router config combining endpoints -->
         <service name="TestComponent4">
             <inbound-router>
-                <inbound-endpoint address="vm://queue4" connector-ref="testConnector1" />
+                <!-- this didn't make sense? -->
+                <!-- inbound-endpoint address="vm://queue4" connector-ref="testConnector1" / -->
+                <inbound-endpoint address="vm://queue4"  connector-ref="vmConnector2"/>
             </inbound-router>
             <component class="org.mule.test.integration.service.TestComponent"/>
             <outbound-router>
