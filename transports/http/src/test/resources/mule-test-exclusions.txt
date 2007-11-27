@@ -8,3 +8,5 @@ org.mule.providers.http.components.RESTTestCase
 # MULE-1389
 org.mule.providers.http.issues.StreamingDownloadMule1389TestCase
 
+# MULE-2208
+org.mule.providers.http.functional.HttpsFunctionalTestCase
