@@ -117,6 +117,7 @@ org.mule.test.usecases.sync.HttpTransformTestCase
 # Hangs for a long, long time
 org.mule.test.integration.transaction.XAJdbcMule1479TestCase
 
+# MULE-2735
 # Config uses an internal class "FileFunctionalTestCase$FileTestComponent" and the schema
 # rejects it because it is not a valid NMTOKEN.
 org.mule.test.integration.providers.file.FileFunctionalTestCase
