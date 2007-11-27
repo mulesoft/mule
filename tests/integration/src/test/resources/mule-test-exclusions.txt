@@ -57,7 +57,7 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # Unfinished 2.x implementation
 ##########################################################################
 
-# Need to finish implementation of <static-recipient-list-router>
+# MULE-2746 - Need to finish implementation of <static-recipient-list-router>
 org.mule.test.integration.routing.AggregatorIntegrationTestCase
 
 # MULE-2192, 2474
