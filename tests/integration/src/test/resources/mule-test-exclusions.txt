@@ -109,6 +109,7 @@ org.mule.test.integration.client.MuleClientTestCase
 # java.lang.IllegalStateException: Only owner thread can write to message: Thread[jmsConnector.receiver
 org.mule.test.integration.routing.replyto.ReplytoChainIntegrationTestCase
 
+# MULE-2737
 # When sending to http://localhost:18081/RemoteService, throws:
 # org.mule.umo.transformer.TransformerException: Could not find a transformer to transform "java.util.Arrays$ArrayList" to "org.mule.umo.provider.OutputHandler".
 # OutputHandler has to do with StreamMessageAdapter, could this be a streaming issue?
