@@ -2,3 +2,7 @@
 # Test cases listed in this file are not run.
 #
 
+# MULE-2701
+org.mule.examples.loanbroker.esn.XFireLoanBrokerSynchronousFunctionalTestCase
+# MULE-2702
+org.mule.examples.loanbroker.esn.XFireLoanBrokerAsynchronousFunctionalTestCase
