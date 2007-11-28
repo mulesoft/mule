@@ -12,10 +12,8 @@ package org.mule.providers.soap.xfire;
 
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.NullPayload;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
