@@ -525,7 +525,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         return createMessage(result, call);
     }
 
-    protected UMOMessage createMessage(Object result, Call call)
+    protected static UMOMessage createMessage(Object result, Call call)
     {
         if (result == null)
         {
