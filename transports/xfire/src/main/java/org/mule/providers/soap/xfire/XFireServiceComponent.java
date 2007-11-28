@@ -66,7 +66,6 @@ public class XFireServiceComponent implements Callable, Lifecycle
    
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
-        System.out.println("Xfireservicecomponent.onCall");
         if(logger.isDebugEnabled())
         {
             logger.debug(eventContext);
