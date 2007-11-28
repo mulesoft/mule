@@ -64,12 +64,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         registerSourceType(OutputHandler.class);
     }
 
-    private int addParameters(String queryString, PostMethod postMethod)
+    protected int addParameters(String queryString, PostMethod postMethod)
     {
         // Parse the HTTP argument list and convert to a NameValuePair
         // collection
 
-        if (StringUtils.isEmpty(queryString))
+        if (StringUtils.isBlank(queryString))
         {
             return 0;
         }
@@ -207,7 +207,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             }
             else
             {
-                // TODO we should propbably set other propserties here
+                // TODO we should probably set other properties here
                 String httpVersion = msg.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY,
                         HttpConstants.HTTP11);
                 if (HttpConstants.HTTP10.equals(httpVersion))
@@ -230,7 +230,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
         }
     }
 
-    private void setupEntityMethod(Object src,
+    protected void setupEntityMethod(Object src,
                                    String encoding,
                                    UMOMessage msg,
                                    URI uri,
@@ -273,11 +273,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                 mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
             }
             
-            if (encoding != null 
-                    && !encoding.toUpperCase().equals("UTF-8") 
-                    && mimeType.indexOf("charset", 0) == -1)
+            if (encoding != null
+                    && !"UTF-8".equals(encoding.toUpperCase())
+                    && mimeType.indexOf("charset") == -1)
             {
-                mimeType = mimeType += "; charset=" + encoding;
+                mimeType += "; charset=" + encoding;
             }
             
             if (src instanceof InputStream)
