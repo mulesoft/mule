@@ -96,6 +96,7 @@ public class HttpConstants
     public static final String HEADER_REFERER = "Referer"; // [Request]
     public static final String HEADER_RETRY_AFTER = "Retry-After"; // [Response]
     public static final String HEADER_SERVER = "Server"; // [Response]
+    public static final String HEADER_SLUG = "Slug"; // [Response]
     public static final String HEADER_TE = "TE"; // [Request]
     public static final String HEADER_TRAILER = "Trailer"; // [General]
     public static final String HEADER_TRANSFER_ENCODING = "Transfer-Encoding"; // [General]
@@ -178,7 +179,7 @@ public class HttpConstants
             HEADER_IF_MODIFIED_SINCE, HEADER_IF_NONE_MATCH, HEADER_IF_RANGE, HEADER_IF_UNMODIFIED_SINCE,
             HEADER_MAX_FORWARDS, HEADER_PRAGMA, HEADER_PROXY_AUTHORIZATION, HEADER_RANGE, HEADER_REFERER,
             HEADER_TE, HEADER_TRAILER, HEADER_TRANSFER_ENCODING, HEADER_UPGRADE, HEADER_USER_AGENT,
-            HEADER_VIA, HEADER_WARNING, HEADER_CONTENT_LENGTH};
+            HEADER_VIA, HEADER_WARNING, HEADER_CONTENT_LENGTH, HEADER_SLUG};
 
         REQUEST_HEADER_NAMES = Collections.unmodifiableMap(MapUtils.mapWithKeysAndValues(
             CaseInsensitiveMap.class, strings, strings));

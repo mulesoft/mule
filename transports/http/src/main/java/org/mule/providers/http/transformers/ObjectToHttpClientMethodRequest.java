@@ -219,6 +219,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
                     httpMethod.getParams().setVersion(HttpVersion.HTTP_1_1);
                 }
             }
+            
             setHeaders(httpMethod, msg);
 
             return httpMethod;
@@ -263,8 +264,23 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
 
                 postMethod.setRequestEntity(new StringRequestEntity(src.toString(), mimeType,
                         encoding));
+                return;
             }
-            else if (src instanceof InputStream)
+            
+
+            if (mimeType == null)
+            {
+                mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+            }
+            
+            if (encoding != null 
+                    && !encoding.toUpperCase().equals("UTF-8") 
+                    && mimeType.indexOf("charset", 0) == -1)
+            {
+                mimeType = mimeType += "; charset=" + encoding;
+            }
+            
+            if (src instanceof InputStream)
             {
                 // TODO Danger here! We don't know if the content is
                 // really text or not

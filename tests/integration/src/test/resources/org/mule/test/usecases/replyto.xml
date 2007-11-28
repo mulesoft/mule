@@ -23,12 +23,12 @@
     
     <model name="ReplyToTestCase">
         <service name="EchoService">
-            <echo-component/>
             <inbound-router>
                 <inbound-endpoint ref="EchoVm"/>
                 <inbound-endpoint ref="EchoAxisReceive"/>
                 <inbound-endpoint ref="EchoXFireReceive"/>
             </inbound-router>
+            <echo-component/>
         </service>
     </model>
 </mule>

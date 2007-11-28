@@ -28,6 +28,7 @@ import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -42,14 +43,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
-import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.HeadMethod;
-import org.apache.commons.httpclient.methods.OptionsMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 
@@ -65,12 +60,14 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     private final HttpConnector connector;
     private volatile HttpClient client = null;
     private final UMOTransformer receiveTransformer;
+    private final UMOTransformer sendTransformer;
 
     public HttpClientMessageDispatcher(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (HttpConnector) endpoint.getConnector();
         this.receiveTransformer = new HttpClientMethodResponseToObject();
+        this.sendTransformer = new ObjectToHttpClientMethodRequest();
     }
     
     protected void doConnect() throws Exception
@@ -133,17 +130,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected UMOMessage doReceive(long timeout) throws Exception
     {
         HttpMethod httpMethod = new GetMethod(endpoint.getEndpointURI().getAddress());
-        httpMethod.setDoAuthentication(true);
-        if (endpoint.getEndpointURI().getUserInfo() != null
-            && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
-        {
-            // Add User Creds
-            StringBuffer header = new StringBuffer(128);
-            header.append("Basic ");
-            header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
-                endpoint.getEncoding()))));
-            httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
-        }
+        setupAuthorization(null, httpMethod);
         
         boolean releaseConn = false;
         try
@@ -185,6 +172,40 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 httpMethod.releaseConnection();
             }
         }
+    }
+
+    private void setupAuthorization(UMOEvent event, HttpMethod httpMethod) throws UnsupportedEncodingException
+    {
+        httpMethod.setDoAuthentication(true);
+        if (event != null && event.getCredentials() != null)
+        {
+            UMOMessage msg = event.getMessage();
+            String authScopeHost = msg.getStringProperty("http.auth.scope.host", null);
+            int authScopePort = msg.getIntProperty("http.auth.scope.port", -1);
+            String authScopeRealm = msg.getStringProperty("http.auth.scope.realm", null);
+            String authScopeScheme = msg.getStringProperty("http.auth.scope.scheme", null);
+            client.getState().setCredentials(
+                new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
+                new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
+                    event.getCredentials().getPassword())));
+            client.getParams().setAuthenticationPreemptive(true);
+        }
+        else if (endpoint.getEndpointURI().getUserInfo() != null
+            && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
+        {
+            // Add User Creds
+            StringBuffer header = new StringBuffer(128);
+            header.append("Basic ");
+            header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
+                endpoint.getEncoding()))));
+            httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
+        }
+        else
+        {
+            // don't use preemptive if there are no credentials to send
+            client.getParams().setAuthenticationPreemptive(false);
+        }
+        
     }
 
     protected HttpMethod execute(UMOEvent event, HttpMethod httpMethod)
@@ -229,13 +250,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected HttpMethod getMethod(UMOEvent event) throws TransformerException
     {
         UMOMessage msg = event.getMessage();
-        String method = msg.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
-        String ifNoneMatch = msg.getStringProperty(HttpConstants.HEADER_IF_NONE_MATCH, null);
-        
-        setPropertyFromEndpoint(event, msg, HttpConstants.HEADER_CONTENT_TYPE);
         setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
         
-        URI uri = event.getEndpoint().getEndpointURI().getUri();
         HttpMethod httpMethod;
         Object body = event.getTransformedMessage();
 
@@ -243,66 +259,11 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             httpMethod = (HttpMethod)body;
         }
-        else if (HttpConstants.METHOD_GET.equalsIgnoreCase(method))
+        else 
         {
-            httpMethod = new GetMethod(uri.toString());
-        }
-        else if (HttpConstants.METHOD_PUT.equalsIgnoreCase(method))
-        {
-            PutMethod postMethod = new PutMethod(uri.toString());
-
-            httpMethod = createEntityMethod(event, body, postMethod);
-        }
-        else if (HttpConstants.METHOD_POST.equalsIgnoreCase(method))
-        {
-            PostMethod postMethod = new PostMethod(uri.toString());
-
-            httpMethod = createEntityMethod(event, body, postMethod);
-        }
-        else if (HttpConstants.METHOD_DELETE.equalsIgnoreCase(method))
-        {
-            httpMethod = new DeleteMethod(uri.toString());
-        }
-        else if (HttpConstants.METHOD_HEAD.equalsIgnoreCase(method))
-        {
-            httpMethod = new HeadMethod(uri.toString());
-        }
-        else if (HttpConstants.METHOD_OPTIONS.equalsIgnoreCase(method))
-        {
-            httpMethod = new OptionsMethod(uri.toString());
-        }
-        else if (HttpConstants.METHOD_TRACE.equalsIgnoreCase(method))
-        {
-            httpMethod = new TraceMethod(uri.toString());
-        }
-        else
-        {
-            throw new TransformerException(HttpMessages.unsupportedMethod(method));
+            httpMethod = (HttpMethod) sendTransformer.transform(msg);
         }
         
-        httpMethod.setDoAuthentication(true);
-        if (event.getCredentials() != null)
-        {
-            String authScopeHost = msg.getStringProperty("http.auth.scope.host", null);
-            int authScopePort = msg.getIntProperty("http.auth.scope.port", -1);
-            String authScopeRealm = msg.getStringProperty("http.auth.scope.realm", null);
-            String authScopeScheme = msg.getStringProperty("http.auth.scope.scheme", null);
-            client.getState().setCredentials(
-                new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
-                new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
-                    event.getCredentials().getPassword())));
-            client.getParams().setAuthenticationPreemptive(true);
-        }
-        else
-        {
-            // don't use preemptive if there are no credentials to send
-            client.getParams().setAuthenticationPreemptive(false);
-        }
-        
-        if (ifNoneMatch != null)
-        {
-            httpMethod.setRequestHeader(HttpConstants.HEADER_IF_NONE_MATCH, ifNoneMatch);
-        }
         
         return httpMethod;
     }
@@ -358,6 +319,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {        
         HttpMethod httpMethod = getMethod(event);
+        setupAuthorization(event, httpMethod);
+        
         httpMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new MuleHttpMethodRetryHandler());
 
         Object body = null;

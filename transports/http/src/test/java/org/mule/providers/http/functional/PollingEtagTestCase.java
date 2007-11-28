@@ -41,7 +41,5 @@ public class PollingEtagTestCase extends FunctionalTestCase
 
         assertEquals(1, pollCounter.get());
     }
-
-
 }
 

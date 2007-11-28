@@ -24,6 +24,9 @@ import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.MapUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /** Will poll an http URL and use the response as the input for a service request. */
 public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 {
@@ -66,7 +69,9 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         UMOMessage req = new MuleMessage(new DefaultMessageAdapter(""));
         if (etag != null && checkEtag) 
         {
-            req.setProperty(HttpConstants.HEADER_IF_NONE_MATCH, etag);
+            Map customHeaders = new HashMap();
+            customHeaders.put(HttpConstants.HEADER_IF_NONE_MATCH, etag);
+            req.setProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, customHeaders);
         }
         req.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         

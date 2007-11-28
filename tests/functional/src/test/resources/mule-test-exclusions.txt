@@ -1,3 +1,6 @@
 org.mule.test.spring.GlobalPropertiesMule2458TestCase
 
 org.mule.test.firewall.FirewallTestCase
+
+# does not work on Java 5
+org.mule.test.spring.SchemaValidationMule2225TestCase

@@ -16,7 +16,8 @@
             outputAppend="true"
             outputPattern="cde"
             pollingFrequency="2345"
-            serialiseObjects="true">
+            serialiseObjects="true"
+            streaming="false">
         <!-- not tested as they force directory creation -->
       <!-- readFromDirectory="efg"
            writeToDirectory="fgh" -->

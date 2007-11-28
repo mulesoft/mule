@@ -34,6 +34,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(false, c.isAutoDelete());
         assertEquals(true, c.isOutputAppend());
         assertEquals(true, c.isSerialiseObjects());
+        assertEquals(false, c.isStreaming());
 
         // Not implemented yet, see MULE-2671
         //assertNull(c.getComparator());

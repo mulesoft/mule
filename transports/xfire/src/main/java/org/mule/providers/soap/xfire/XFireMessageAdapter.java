@@ -119,11 +119,6 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
                 {
                     setCorrelationSequence(Integer.valueOf(child.getText()).intValue());
                 }
-                child = muleHeaders.getChild(MuleProperties.MULE_REPLY_TO_PROPERTY, ns);
-                if (child != null)
-                {
-                    setReplyTo(child.getText());
-                }
             }
         }
 

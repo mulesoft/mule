@@ -21,7 +21,6 @@ import org.mule.providers.ConnectException;
 import org.mule.providers.NullPayload;
 import org.mule.providers.http.i18n.HttpMessages;
 import org.mule.providers.tcp.TcpMessageReceiver;
-import org.mule.transformers.TransformerUtils;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
