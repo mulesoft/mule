@@ -46,7 +46,7 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
         int receivedPackets = 0;
         for (; receivedPackets < broadcastMessages; receivedPackets++)
         {
-            UMOMessage message = client.receive("vm://foo", 2000);
+            UMOMessage message = client.request("vm://foo", 2000);
             assertNotNull(message);
             receivedMessages.add(message.getPayloadAsString());
         }

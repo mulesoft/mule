@@ -8,21 +8,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.multicast;
+package org.mule.providers.ftp;
 
-import org.mule.providers.udp.UdpMessageDispatcher;
+import org.mule.providers.AbstractMessageRequesterFactory;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.UMOMessageRequester;
 
-/**
- * <code>MulticastMessageDispatcher</code> dispatches events to a multicast address
- */
-
-public class MulticastMessageDispatcher extends UdpMessageDispatcher
+public class FtpMessageRequesterFactory extends AbstractMessageRequesterFactory
 {
 
-    public MulticastMessageDispatcher(UMOImmutableEndpoint endpoint)
+    /** {@inheritDoc} */
+    public UMOMessageRequester create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        super(endpoint);
+        return new FtpMessageRequester(endpoint);
     }
 
 }

@@ -62,7 +62,7 @@ public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
                 }
                 MuleClient client = new MuleClient();
                 int dropped = 0;
-                while (null != client.receive("vm://foo", MAX_PAUSE_PERIOD))
+                while (null != client.request("vm://foo", MAX_PAUSE_PERIOD))
                 {
                     // discard old messages
                     dropped++;
@@ -106,7 +106,7 @@ public class UdpConnectorFunctionalTestCase extends FunctionalTestCase
                 long pause = MAX_PAUSE_PERIOD;
                 for (int i = 0; i < burstCount; i++)
                 {
-                    UMOMessage message = client.receive("vm://foo", pause);
+                    UMOMessage message = client.request("vm://foo", pause);
                     // reduce waiting time once we have a bunch of messages coming in
                     // (without this, we can end up waiting for very long times....)
                     pause = Math.max(MIN_PAUSE_PERIOD, pause / 2);

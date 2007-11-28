@@ -8,23 +8,21 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.xmpp;
+package org.mule.providers.soap.xfire;
 
-import org.mule.providers.AbstractMessageDispatcherFactory;
+import org.mule.providers.AbstractMessageRequesterFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.UMOMessageRequester;
 
 /**
- * Creates a dispatcher responsible for writing Xmpp packets to a an Jabber chat
+ * Creates an XFire Message requester used for making XFire soap requests using the
+ * XFire client.
  */
-
-public class XmppMessageDispatcherFactory extends AbstractMessageDispatcherFactory
+public class XFireMessageRequesterFactory extends AbstractMessageRequesterFactory
 {
-
-    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
+    public UMOMessageRequester create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new XmppMessageDispatcher(endpoint);
+        return new XFireMessageRequester(endpoint);
     }
-
 }

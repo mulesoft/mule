@@ -13,6 +13,8 @@ package org.mule.providers.http;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -22,10 +24,17 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.HttpState;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests
@@ -284,4 +293,59 @@ public class HttpConnector extends TcpConnector
     {
         this.clientConnectionManager = clientConnectionManager;
     }
+
+    protected HttpClient doClientConnect() throws Exception
+    {
+        HttpState state = new HttpState();
+
+        if (getProxyUsername() != null)
+        {
+            state.setProxyCredentials(
+                    new AuthScope(null, -1, null, null),
+                    new UsernamePasswordCredentials(getProxyUsername(), getProxyPassword()));
+        }
+
+        HttpClient client = new HttpClient();
+        client.setState(state);
+        client.setHttpConnectionManager(getClientConnectionManager());
+
+        return client;
+    }
+
+    protected void setupClientAuthorization(UMOEvent event, HttpMethod httpMethod,
+                                            HttpClient client, UMOImmutableEndpoint endpoint)
+            throws UnsupportedEncodingException
+    {
+        httpMethod.setDoAuthentication(true);
+        if (event != null && event.getCredentials() != null)
+        {
+            UMOMessage msg = event.getMessage();
+            String authScopeHost = msg.getStringProperty("http.auth.scope.host", null);
+            int authScopePort = msg.getIntProperty("http.auth.scope.port", -1);
+            String authScopeRealm = msg.getStringProperty("http.auth.scope.realm", null);
+            String authScopeScheme = msg.getStringProperty("http.auth.scope.scheme", null);
+            client.getState().setCredentials(
+                new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
+                new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
+                    event.getCredentials().getPassword())));
+            client.getParams().setAuthenticationPreemptive(true);
+        }
+        else if (endpoint.getEndpointURI().getUserInfo() != null
+            && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
+        {
+            // Add User Creds
+            StringBuffer header = new StringBuffer(128);
+            header.append("Basic ");
+            header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
+                endpoint.getEncoding()))));
+            httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
+        }
+        else
+        {
+            // don't use preemptive if there are no credentials to send
+            client.getParams().setAuthenticationPreemptive(false);
+        }
+
+    }
+
 }

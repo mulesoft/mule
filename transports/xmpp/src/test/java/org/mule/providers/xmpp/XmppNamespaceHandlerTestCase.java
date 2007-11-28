@@ -14,6 +14,7 @@ import org.mule.tck.FunctionalTestCase;
 
 public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     protected String getConfigResources()
     {
         return "xmpp-namespace-config.xml";
@@ -26,4 +27,5 @@ public class XmppNamespaceHandlerTestCase extends FunctionalTestCase
         
         assertNotNull(connector);
     }
+    
 }

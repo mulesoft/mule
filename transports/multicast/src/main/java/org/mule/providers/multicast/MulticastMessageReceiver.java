@@ -25,7 +25,6 @@ import java.net.URI;
 
 import javax.resource.spi.work.Work;
 
-/** <code>MulticastMessageReceiver</code> TODO (document class) */
 public class MulticastMessageReceiver extends UdpMessageReceiver
 {
 

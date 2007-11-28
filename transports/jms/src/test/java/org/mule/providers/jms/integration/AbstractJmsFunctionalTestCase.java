@@ -55,7 +55,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected UMOMessage recieveMessage() throws Exception
     {
-        UMOMessage result = client.receive(DEFUALT_OUTPUT_MULE_QUEUE_NAME, TIMEOUT);
+        UMOMessage result = client.request(DEFUALT_OUTPUT_MULE_QUEUE_NAME, TIMEOUT);
         assertNotNull(result);
         assertNotNull(result.getPayload());
         assertNull(result.getExceptionPayload());
@@ -68,7 +68,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     {
         dispatchMessage();
         recieveMessage();
-        UMOMessage result = client.receive(DEFUALT_OUTPUT_MULE_QUEUE_NAME, SMALL_TIMEOUT);
+        UMOMessage result = client.request(DEFUALT_OUTPUT_MULE_QUEUE_NAME, SMALL_TIMEOUT);
         assertNull(result);
     }
 

@@ -11,7 +11,7 @@
 package org.mule.providers.xmpp;
 
 import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.AbstractMessageRequester;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
@@ -19,22 +19,20 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.GroupChat;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Message;
 
 /**
- * Allows Mule events to be sent over Xmpp
+ * Allows Mule events to be received over Xmpp
  */
 
-public class XmppMessageDispatcher extends AbstractMessageDispatcher
+public class XmppMessageRequester extends AbstractMessageRequester
 {
+
     private final XmppConnector connector;
     private volatile XMPPConnection xmppConnection = null;
-    private volatile Chat chat;
-    private volatile GroupChat groupChat;
 
-    public XmppMessageDispatcher(UMOImmutableEndpoint endpoint)
+    public XmppMessageRequester(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (XmppConnector)endpoint.getConnector();
@@ -53,10 +51,6 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     {
         try
         {
-            if (groupChat != null)
-            {
-                groupChat.leave();
-            }
             if (xmppConnection != null)
             {
                 xmppConnection.close();
@@ -73,99 +67,9 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
         // template method
     }
 
-    protected void doDispatch(UMOEvent event) throws Exception
-    {
-        sendMessage(event);
-    }
-
-    protected UMOMessage doSend(UMOEvent event) throws Exception
-    {
-        sendMessage(event);
-
-        if (useRemoteSync(event))
-        {
-            Message response;
-
-            if (groupChat != null)
-            {
-                response = groupChat.nextMessage(event.getTimeout());
-            }
-            else
-            {
-                response = chat.nextMessage(event.getTimeout());
-            }
-
-            if (response != null)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Got a response from chat: " + chat);
-                }
-                return new MuleMessage(connector.getMessageAdapter(response));
-            }
-        }
-        return null;
-    }
-
-    protected void sendMessage(UMOEvent event) throws Exception
-    {
-        if (chat == null && groupChat == null)
-        {
-            UMOMessage msg = event.getMessage();
-            boolean group = msg.getBooleanProperty(XmppConnector.XMPP_GROUP_CHAT, false);
-            String nickname = msg.getStringProperty(XmppConnector.XMPP_NICKNAME, "mule");
-            String recipient = event.getEndpoint().getEndpointURI().getPath().substring(1);
-
-            if (group)
-            {
-                groupChat = new GroupChat(xmppConnection, recipient);
-                if (!groupChat.isJoined())
-                {
-                    groupChat.join(nickname);
-                }
-            }
-            else
-            {
-                chat = new Chat(xmppConnection, recipient);
-            }
-        }
-
-        Object msgObj = event.getMessage().getPayload();
-        Message message;
-        // avoid duplicate transformation
-        if (!(msgObj instanceof Message))
-        {
-            message = (Message)event.getTransformedMessage();
-        }
-        else
-        {
-            message = (Message)msgObj;
-        }
-
-        if (logger.isTraceEnabled())
-        {
-            logger.trace("Transformed packet: " + message.toXML());
-        }
-
-        if (chat != null)
-        {
-            chat.sendMessage(message);
-        }
-        else
-        {
-            groupChat.sendMessage(message);
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Packet successfully sent");
-        }
-    }
-
     /**
      * Make a specific request to the underlying transport
-     * 
-     * @param endpoint the endpoint to use when connecting to the resource
+     *
      * @param timeout the maximum time the operation should block before returning.
      *            The call should return immediately if there is data available. If
      *            no data becomes available before the timeout elapses, null will be
@@ -174,7 +78,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    protected UMOMessage doReceive(long timeout) throws Exception
+    protected UMOMessage doRequest(long timeout) throws Exception
     {
         // Should be in the form of xmpp://user:pass@host:[port]/folder
         String to = (String)endpoint.getProperty("folder");

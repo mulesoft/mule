@@ -120,7 +120,7 @@ public class XFireBasicTestCase extends FunctionalTestCase
     public void testEchoWsdl() throws Exception
     {
         MuleClient client = new MuleClient(managementContext);
-        UMOMessage result = client.receive("http://localhost:63081/services/echoService?wsdl", 5000);
+        UMOMessage result = client.request("http://localhost:63081/services/echoService?wsdl", 5000);
         assertNotNull(result.getPayload());
         XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());
     }
@@ -128,7 +128,7 @@ public class XFireBasicTestCase extends FunctionalTestCase
     public void testListServices() throws Exception
     {
         MuleClient client = new MuleClient(managementContext);
-        UMOMessage result = client.receive("http://localhost:63081/services/echoService?list", 5000);
+        UMOMessage result = client.request("http://localhost:63081/services/echoService?list", 5000);
         assertNotNull(result.getPayload());
         System.out.println(result.getPayloadAsString());
         //Note that Xfire wraps the HTML in Xml...

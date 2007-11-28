@@ -31,11 +31,11 @@ public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTe
         UMOMessage result = null;
         MuleClient client = new MuleClient();
         client.dispatch("vm://in", DEFAULT_INPUT_MESSAGE, null);
-        result = client.receive("vm://out", TIMEOUT);
+        result = client.request("vm://out", TIMEOUT);
         assertNotNull(result);
-        result = client.receive("vm://out", TIMEOUT);
+        result = client.request("vm://out", TIMEOUT);
         assertNotNull(result);
-        result = client.receive("vm://out", SMALL_TIMEOUT);
+        result = client.request("vm://out", SMALL_TIMEOUT);
         assertNull(result);
 
         managementContext.getRegistry().lookupConnector(CONNECTOR1_NAME).stop();
@@ -46,11 +46,11 @@ public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTe
         managementContext.getRegistry().lookupConnector(CONNECTOR1_NAME).start();
         Thread.sleep(1000);
         logger.info(CONNECTOR1_NAME + " is started");
-        result = client.receive("vm://out", TIMEOUT);
+        result = client.request("vm://out", TIMEOUT);
         assertNotNull(result);
-        result = client.receive("vm://out", TIMEOUT);
+        result = client.request("vm://out", TIMEOUT);
         assertNotNull(result);
-        result = client.receive("vm://out", SMALL_TIMEOUT);
+        result = client.request("vm://out", SMALL_TIMEOUT);
         assertNull(result);
 
     }

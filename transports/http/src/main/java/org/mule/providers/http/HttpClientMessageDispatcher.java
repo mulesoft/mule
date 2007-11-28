@@ -38,7 +38,6 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -74,20 +73,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         if (client == null)
         {
-            HttpState state = new HttpState();
-
-            if (connector.getProxyUsername() != null)
-            {
-                state.setProxyCredentials(new AuthScope(null, -1, null, null),
-                    new UsernamePasswordCredentials(connector.getProxyUsername(),
-                        connector.getProxyPassword()));
-            }
-
-            client = new HttpClient();
-            client.setState(state);
-            client.setHttpConnectionManager(connector.getClientConnectionManager());
+            client = connector.doClientConnect();
         }
-
     }
 
     protected void doDisconnect() throws Exception
@@ -130,7 +117,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected UMOMessage doReceive(long timeout) throws Exception
     {
         HttpMethod httpMethod = new GetMethod(endpoint.getEndpointURI().getAddress());
-        setupAuthorization(null, httpMethod);
+        connector.setupClientAuthorization(null, httpMethod, client, endpoint);
         
         boolean releaseConn = false;
         try
@@ -172,40 +159,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 httpMethod.releaseConnection();
             }
         }
-    }
-
-    protected void setupAuthorization(UMOEvent event, HttpMethod httpMethod) throws UnsupportedEncodingException
-    {
-        httpMethod.setDoAuthentication(true);
-        if (event != null && event.getCredentials() != null)
-        {
-            UMOMessage msg = event.getMessage();
-            String authScopeHost = msg.getStringProperty("http.auth.scope.host", null);
-            int authScopePort = msg.getIntProperty("http.auth.scope.port", -1);
-            String authScopeRealm = msg.getStringProperty("http.auth.scope.realm", null);
-            String authScopeScheme = msg.getStringProperty("http.auth.scope.scheme", null);
-            client.getState().setCredentials(
-                new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
-                new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(
-                    event.getCredentials().getPassword())));
-            client.getParams().setAuthenticationPreemptive(true);
-        }
-        else if (endpoint.getEndpointURI().getUserInfo() != null
-            && endpoint.getProperty(HttpConstants.HEADER_AUTHORIZATION) == null)
-        {
-            // Add User Creds
-            StringBuffer header = new StringBuffer(128);
-            header.append("Basic ");
-            header.append(new String(Base64.encodeBase64(endpoint.getEndpointURI().getUserInfo().getBytes(
-                endpoint.getEncoding()))));
-            httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
-        }
-        else
-        {
-            // don't use preemptive if there are no credentials to send
-            client.getParams().setAuthenticationPreemptive(false);
-        }
-        
     }
 
     protected HttpMethod execute(UMOEvent event, HttpMethod httpMethod)
@@ -319,7 +272,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected UMOMessage doSend(UMOEvent event) throws Exception
     {        
         HttpMethod httpMethod = getMethod(event);
-        setupAuthorization(event, httpMethod);
+        connector.setupClientAuthorization(event, httpMethod, client, endpoint);
         
         httpMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new MuleHttpMethodRetryHandler());
 

@@ -18,6 +18,8 @@ import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.FatalConnectException;
+import org.mule.providers.AbstractConnectable;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.xfire.i18n.XFireMessages;
@@ -40,12 +42,15 @@ import org.mule.util.SystemUtils;
 import org.mule.util.object.SingletonObjectFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
+import org.codehaus.xfire.handler.Handler;
+import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.aegis.AegisBindingProvider;
 import org.codehaus.xfire.aegis.type.TypeMappingRegistry;
 import org.codehaus.xfire.annotations.AnnotationServiceFactory;
@@ -629,6 +634,110 @@ public class XFireConnector extends AbstractConnector
         else
         {
             return super.isSyncEnabled(endpoint);
+        }
+    }
+
+    protected Client createXFireClient(UMOImmutableEndpoint endpoint, Service service, XFire xfire)
+            throws Exception
+    {
+        return createXFireClient(endpoint, service, xfire, null);
+    }
+
+    protected Client createXFireClient(UMOImmutableEndpoint endpoint, Service service,
+                                       XFire xfire, String transportClass) throws Exception
+    {
+        Class transportClazz = MuleUniversalTransport.class;
+
+        // TODO DO: this is suspicious: this method seems to be called by a subclass (couldn't find references to it) and still the config orverrides the transport class to use?
+        if (getClientTransport() == null)
+        {
+            if (!StringUtils.isBlank(transportClass))
+            {
+                transportClazz = ClassUtils.loadClass(transportClass, getClass());
+            }
+        }
+        else
+        {
+            transportClazz = ClassUtils.loadClass(getClientTransport(), getClass());
+        }
+
+        Transport transport = (Transport)transportClazz.getConstructor(null).newInstance(null);
+        Client client = new Client(transport, service, endpoint.getEndpointURI().getUri().toString());
+        client.setXFire(xfire);
+        client.setEndpointUri(endpoint.getEndpointURI().getUri().toString());
+        return configureXFireClient(client);
+    }
+
+    public Client configureXFireClient(Client client) throws Exception
+    {
+        client.addInHandler(new MuleHeadersInHandler());
+        client.addOutHandler(new MuleHeadersOutHandler());
+
+        List inList = getClientInHandlers();
+        if (inList != null)
+        {
+            for (int i = 0; i < inList.size(); i++)
+            {
+                Class clazz = ClassUtils.loadClass(inList.get(i).toString(), getClass());
+                Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                client.addInHandler(handler);
+            }
+        }
+
+        List outList = getClientOutHandlers();
+        if (outList != null)
+        {
+            for (int i = 0; i < outList.size(); i++)
+            {
+                Class clazz = ClassUtils.loadClass(outList.get(i).toString(), getClass());
+                Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                client.addOutHandler(handler);
+            }
+        }
+        return client;
+    }
+
+    protected Client doClientConnect(UMOImmutableEndpoint endpoint, AbstractConnectable connectable) throws Exception
+    {
+        final XFire xfire = getXfire();
+        final String serviceName = XFireMessageDispatcher.getServiceName(endpoint);
+        final Service service = xfire.getServiceRegistry().getService(serviceName);
+
+        if (service == null)
+        {
+            throw new FatalConnectException(XFireMessages.serviceIsNull(serviceName), this);
+        }
+
+        List inList = getServerInHandlers();
+        if (inList != null)
+        {
+            for (int i = 0; i < inList.size(); i++)
+            {
+                Handler handler = (Handler) ClassUtils.instanciateClass(
+                                    inList.get(i).toString(), ClassUtils.NO_ARGS, getClass());
+                service.addInHandler(handler);
+            }
+        }
+
+        List outList = getServerOutHandlers();
+        if (outList != null)
+        {
+            for (int i = 0; i < outList.size(); i++)
+            {
+                Handler handler = (Handler) ClassUtils.instanciateClass(
+                                    outList.get(i).toString(), ClassUtils.NO_ARGS, getClass());
+                service.addOutHandler(handler);
+            }
+        }
+
+        try
+        {
+            return createXFireClient(endpoint, service, xfire);
+        }
+        catch (Exception ex)
+        {
+            connectable.disconnect();
+            throw ex;
         }
     }
 

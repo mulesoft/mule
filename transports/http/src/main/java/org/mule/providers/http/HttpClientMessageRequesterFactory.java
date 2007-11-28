@@ -8,21 +8,21 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.soap.xfire.wsdl;
+package org.mule.providers.http;
 
-import org.mule.providers.AbstractMessageDispatcherFactory;
+import org.mule.providers.AbstractMessageRequesterFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.UMOMessageRequester;
 
 /**
- * Creates an XFire WSDL Message Dispatcher
+ * Creates a HttpClientMessageDispatcher to make client requests
  */
-public class XFireWsdlMessageDispatcherFactory extends AbstractMessageDispatcherFactory
+public class HttpClientMessageRequesterFactory extends AbstractMessageRequesterFactory
 {
-
-    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
+    /** {@inheritDoc} */
+    public UMOMessageRequester create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        return new XFireWsdlMessageDispatcher(endpoint);
+        return new HttpClientMessageRequester(endpoint);
     }
 }
