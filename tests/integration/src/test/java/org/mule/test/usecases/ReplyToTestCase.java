@@ -43,6 +43,7 @@ public class ReplyToTestCase extends FunctionalTestCase
         UMOMessage result = client.receive("ReplyTo", RECEIVE_DELAY);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
+        assertEquals("testing", result.getPayload());
 
         // Make sure there are no more responses
         result = client.receive("ReplyTo", RECEIVE_DELAY);
@@ -63,6 +64,7 @@ public class ReplyToTestCase extends FunctionalTestCase
         UMOMessage result = client.receive("ReplyTo", RECEIVE_DELAY);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
+        assertEquals("testing", result.getPayload());
 
         // Make sure there are no more responses
         result = client.receive("ReplyTo", RECEIVE_DELAY);
@@ -83,6 +85,7 @@ public class ReplyToTestCase extends FunctionalTestCase
         UMOMessage result = client.receive("ReplyTo", RECEIVE_DELAY);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
+        assertEquals("testing", result.getPayload());
 
         // Make sure there are no more responses
         result = client.receive("ReplyTo", RECEIVE_DELAY);
