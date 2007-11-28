@@ -174,7 +174,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    private void setupAuthorization(UMOEvent event, HttpMethod httpMethod) throws UnsupportedEncodingException
+    protected void setupAuthorization(UMOEvent event, HttpMethod httpMethod) throws UnsupportedEncodingException
     {
         httpMethod.setDoAuthentication(true);
         if (event != null && event.getCredentials() != null)
