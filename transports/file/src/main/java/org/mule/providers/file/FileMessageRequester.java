@@ -10,89 +10,38 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.InputStream;
-import java.net.URLDecoder;
-
 import org.mule.MuleException;
 import org.mule.RegistryContext;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.AbstractMessageRequester;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.providers.file.i18n.FileMessages;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.OutputHandler;
 import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.net.URLDecoder;
 
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the filesystem
  */
-public class FileMessageDispatcher extends AbstractMessageDispatcher
+public class FileMessageRequester extends AbstractMessageRequester
 {
     private final FileConnector connector;
 
-    public FileMessageDispatcher(UMOImmutableEndpoint endpoint)
+    public FileMessageRequester(UMOImmutableEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (FileConnector) endpoint.getConnector();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnectorSession#dispatch(org.mule.umo.UMOEvent)
-     */
-    protected void doDispatch(UMOEvent event) throws Exception
-    {
-        Object data = event.getTransformedMessage();
-        // Wrap the transformed message before passing it to the filename parser
-        UMOMessage message = new MuleMessage(data, event.getMessage());
-
-        FileOutputStream fos = (FileOutputStream) connector.getOutputStream(event.getEndpoint(), message);
-        try 
-        {
-            if (event.getMessage().getStringProperty(FileConnector.PROPERTY_FILENAME, null) == null)
-            {
-                event.getMessage().setStringProperty(FileConnector.PROPERTY_FILENAME,
-                    message.getStringProperty(FileConnector.PROPERTY_FILENAME, ""));
-            }
-            
-            if (data instanceof byte[])
-            {
-                fos.write((byte[]) data);
-            }
-            else if (data instanceof String)
-            {
-                fos.write(data.toString().getBytes(event.getEncoding()));
-            }
-            else if (data instanceof OutputHandler)
-            {
-                ((OutputHandler) data).write(event, fos);
-            }
-            else
-            {
-                InputStream is = (InputStream) event.getTransformedMessage(InputStream.class);
-                IOUtils.copyLarge(is, fos);
-                is.close();
-            }
-        }
-        finally
-        {
-            logger.debug("Closing file");
-            fos.close();
-        }
-    }
-    
     /**
      * There is no associated session for a file connector
-     * 
-     * @throws UMOException
+     *
+     * @throws org.mule.umo.UMOException
      */
     public Object getDelegateSession() throws UMOException
     {
@@ -109,7 +58,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
      * @throws Exception
      */
 
-    protected UMOMessage doReceive(long timeout) throws Exception
+    protected UMOMessage doRequest(long timeout) throws Exception
     {
         File file = FileUtils.newFile(endpoint.getEndpointURI().getAddress());
         File result = null;
@@ -128,7 +77,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             }
             else if (file.isDirectory())
             {
-                result = getNextFile(endpoint.getEndpointURI().getAddress(), filenameFilter);
+                result = FileMessageDispatcher.getNextFile(endpoint.getEndpointURI().getAddress(), filenameFilter);
             }
             if (result != null)
             {
@@ -163,7 +112,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                     }
                     else
                     {
-                        message = new MuleMessage(connector.getMessageAdapter(destinationFile));                                            
+                        message = new MuleMessage(connector.getMessageAdapter(destinationFile));
                     }
 
                 }
@@ -171,7 +120,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 {
                     message = new MuleMessage(connector.getMessageAdapter(result));
                 }
-                
+
                 if (connector.isAutoDelete())
                 {
                     // no moveTo directory
@@ -188,59 +137,11 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                     // nothing to do here since moveFile() should have deleted
                     // the source file for us
                 }
-                
+
                 return message;
             }
         }
         return null;
-    }
-
-    protected static File getNextFile(String dir, FilenameFilter filter) throws UMOException
-    {
-        File[] files;
-        File file = FileUtils.newFile(dir);
-        File result = null;
-        try
-        {
-            if (file.exists())
-            {
-                if (file.isFile())
-                {
-                    result = file;
-                }
-                else if (file.isDirectory())
-                {
-                    if (filter != null)
-                    {
-                        files = file.listFiles(filter);
-                    }
-                    else
-                    {
-                        files = file.listFiles();
-                    }
-                    if (files.length > 0)
-                    {
-                        result = files[0];
-                    }
-                }
-            }
-            return result;
-        }
-        catch (Exception e)
-        {
-            throw new MuleException(FileMessages.errorWhileListingFiles(), e);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnectorSession#send(org.mule.umo.UMOEvent)
-     */
-    protected UMOMessage doSend(UMOEvent event) throws Exception
-    {
-        doDispatch(event);
-        return event.getMessage();
     }
 
     protected void doDispose()
