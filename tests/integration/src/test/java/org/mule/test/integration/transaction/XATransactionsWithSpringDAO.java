@@ -101,7 +101,7 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Book book = new Book(1, "testBook", "testAuthor");
         client.sendNoReceive("jms://my.queue", book, null);
-        UMOMessage result = client.receive("vm://output", RECEIVE_TIMEOUT);
+        UMOMessage result = client.request("vm://output", RECEIVE_TIMEOUT);
         assertNotNull(result);
         assertNotNull(result.getPayload());
         assertTrue(((Boolean) result.getPayload()).booleanValue());
@@ -118,7 +118,7 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
 
         Book book = new Book(1, "testBook", "testAuthor");
         client.sendNoReceive("jms://my.queue", book, null);
-        UMOMessage result = client.receive("vm://output", RECEIVE_TIMEOUT);
+        UMOMessage result = client.request("vm://output", RECEIVE_TIMEOUT);
         assertNotNull(result);
         assertNotNull(result.getPayload());
         assertTrue(((Boolean) result.getPayload()).booleanValue());
@@ -129,7 +129,7 @@ public class XATransactionsWithSpringDAO extends FunctionalTestCase
         }
 
         client.sendNoReceive("jms://my.queue", book, null);
-        result = client.receive("vm://output", 5000);
+        result = client.request("vm://output", 5000);
         // need to test that the Spring transaction has really been rolled back... 
         // from log file, it is
         assertNull(result);

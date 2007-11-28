@@ -60,7 +60,7 @@ public class MuleClientReceiveJob implements Job
         {
             MuleClient client = new MuleClient();
             logger.debug("Attempting to receive event on: " + receiveEndpoint);
-            UMOMessage result = client.receive(receiveEndpoint, timeout);
+            UMOMessage result = client.request(receiveEndpoint, timeout);
             if (result != null)
             {
                 logger.debug("Received event on: " + receiveEndpoint);

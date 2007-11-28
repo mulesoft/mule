@@ -28,7 +28,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         client.dispatch("vm://in", "Marco", null);
-        UMOMessage response = client.receive("vm://out", WAIT);
+        UMOMessage response = client.request("vm://out", WAIT);
         assertNotNull("Response is null", response);
         assertEquals("Polo", response.getPayload());
     }
@@ -51,7 +51,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase
         UMOMessage response;
         for (int i = 0; i < 3; ++i)
         {
-            response = client.receive("vm://out", WAIT);
+            response = client.request("vm://out", WAIT);
             assertNotNull("Response is null", response);
             assertEquals("Polo", response.getPayload());
         }

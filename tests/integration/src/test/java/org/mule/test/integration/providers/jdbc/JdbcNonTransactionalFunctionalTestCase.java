@@ -64,12 +64,12 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
 
         UMOImmutableEndpoint muleEndpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "jdbc://?sql=SELECT * FROM TEST");
-        UMOMessage message = muleEndpoint.receive(1000);
+        UMOMessage message = muleEndpoint.request(1000);
         assertResultSetEmpty(message);
         
         execSqlUpdate("INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (1, '" + DEFAULT_MESSAGE
             + "', NULL, NULL)");
-        message = muleEndpoint.receive(1000);
+        message = muleEndpoint.request(1000);
         assertResultSetNotEmpty(message);
     }
 
@@ -100,14 +100,14 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         UMOImmutableEndpoint muleEndpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             DEFAULT_IN_URI);
         
-        UMOMessage message = muleEndpoint.receive(1000);
+        UMOMessage message = muleEndpoint.request(1000);
 
         assertResultSetEmpty(message);
 
         execSqlUpdate("INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (1, '" + DEFAULT_MESSAGE
             + "', NULL, NULL)");
 
-        message = muleEndpoint.receive(1000);
+        message = muleEndpoint.request(1000);
         assertResultSetNotEmpty(message);
     }
 

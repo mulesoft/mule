@@ -19,7 +19,7 @@ public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
     public void testPollingHttpConnectorSentCredentials() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage result = client.receive("vm://toclient", 5000);
+        UMOMessage result = client.request("vm://toclient", 5000);
         assertNotNull(result.getPayload());
     }
 

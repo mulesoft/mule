@@ -186,32 +186,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
     }
 
-    public final UMOMessage receive(long timeout) throws Exception
-    {
-        try
-        {
-            // Make sure we are connected
-            connectionStrategy.connect(this);
-            UMOMessage result = doReceive(timeout);
-            if (result != null && connector.isEnableMessageEvents())
-            {
-                connector.fireNotification(new MessageNotification(result, endpoint, null,
-                    MessageNotification.MESSAGE_RECEIVED));
-            }
-            return result;
-        }
-        catch (DispatchException e)
-        {
-            disposeAndLogException();
-            throw e;
-        }
-        catch (Exception e)
-        {
-            disposeAndLogException();
-            throw new ReceiveException(endpoint, timeout, e);
-        }
-    }
-
     /**
      * RemoteSync causes the message dispatch to wait for a response to an event on a
      * response channel after it sends the event. The following rules apply to
@@ -260,19 +234,6 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
         return remoteSync;
     }
-
-    /**
-     * Make a specific request to the underlying transport
-     * 
-     * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
-     */
-    protected abstract UMOMessage doReceive(long timeout) throws Exception;
 
     private class Worker implements Work
     {

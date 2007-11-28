@@ -74,10 +74,10 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    public void testReceive() throws Throwable
+    public void testRequest() throws Throwable
     {
         MuleClient client = new MuleClient();
-        UMOMessage result = client.receive(getReceiveEndpoint(), 0);
+        UMOMessage result = client.request(getReceiveEndpoint(), 0);
         assertNotNull(result);
         assertNotNull(result.getPayload());
         assertTrue(result.getPayload().toString().length() > 0);
@@ -86,13 +86,13 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     public void testReceiveComplex() throws Throwable
     {
         MuleClient client = new MuleClient();
-        UMOMessage result = client.receive(getReceiveComplexEndpoint(), 0);
+        UMOMessage result = client.request(getReceiveComplexEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Fred", ((Person)result.getPayload()).getFirstName());
         assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
 
-        result = client.receive(getReceiveComplexEndpoint(), 0);
+        result = client.request(getReceiveComplexEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Fred", ((Person)result.getPayload()).getFirstName());
@@ -106,7 +106,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
             null);
         assertEquals(NullPayload.getInstance(), result.getPayload());
 
-        result = client.receive(getSendReceiveComplexEndpoint2(), 0);
+        result = client.request(getSendReceiveComplexEndpoint2(), 0);
         assertNotNull(result);
         
         assertTrue(result.getPayload() instanceof Person);
@@ -117,7 +117,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     public void testReceiveComplexCollection() throws Throwable
     {
         MuleClient client = new MuleClient();
-        UMOMessage result = client.receive(getReceiveComplexCollectionEndpoint(), 0);
+        UMOMessage result = client.request(getReceiveComplexCollectionEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person[]);
         assertEquals(3, ((Person[])result.getPayload()).length);
@@ -131,7 +131,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         Thread.sleep(4500);
 
         // lets get our newly added person
-        UMOMessage result = client.receive(getDispatchAsyncComplexEndpoint2(), 0);
+        UMOMessage result = client.request(getDispatchAsyncComplexEndpoint2(), 0);
         assertNotNull(result);
         assertTrue("Did not receive a Person but: " + result.getPayload().getClass(),
             result.getPayload() instanceof Person);

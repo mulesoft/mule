@@ -116,7 +116,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
         start = System.currentTimeMillis();
         for (i = 0; i < INTERATIONS; i++)
         {
-            UMOMessage message = client.receive("jms://replyTo.queue", 5000);
+            UMOMessage message = client.request("jms://replyTo.queue", 5000);
             assertNotNull("message should not be null from Reply queue", message);
             logger.debug("Count is " + i);
             logger.debug("ReplyTo Message is: " + message.getPayloadAsString());

@@ -67,9 +67,9 @@ public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
         return client;
     }
 
-    protected String receive(MuleClient client, String endpoint) throws Exception
+    protected String request(MuleClient client, String endpoint) throws Exception
     {
-        UMOMessage message = client.receive(endpoint, TIMEOUT);
+        UMOMessage message = client.request(endpoint, TIMEOUT);
         assertNotNull("no response from " + endpoint, message);
         assertNotNull(message.getPayloadAsString());
         return message.getPayloadAsString();
@@ -77,13 +77,13 @@ public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
 
     protected void testTransformered(String endpoint, String response) throws Exception
     {
-        String message = receive(send("in-" + endpoint), "out-" + endpoint);
+        String message = request(send("in-" + endpoint), "out-" + endpoint);
         assertEquals("bad response (" + message + ")  for " + endpoint, response, message);
     }
 
     protected void testTransformeredAsync(String endpoint, String response) throws Exception
     {
-        String message = receive(dispatch("in-" + endpoint), "out-" + endpoint);
+        String message = request(dispatch("in-" + endpoint), "out-" + endpoint);
         assertEquals("bad response (" + message + ")  for " + endpoint, response, message);
     }
 

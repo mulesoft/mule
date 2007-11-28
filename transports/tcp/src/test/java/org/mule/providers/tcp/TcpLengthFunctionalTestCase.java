@@ -47,7 +47,7 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
 //        Map props = new HashMap();
 //        client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
 //
-//        UMOMessage result =  client.receive("asyncClientEndpoint", 10000);
+//        UMOMessage result =  client.request("asyncClientEndpoint", 10000);
 //        assertNotNull(result);
 //        assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
 //    }

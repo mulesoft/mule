@@ -18,9 +18,9 @@ public class Pop3FunctionalTestCase extends AbstractEmailFunctionalTestCase
         super(65435, STRING_MESSAGE, "pop3");
     }
 
-    public void testReceive() throws Exception
+    public void testRequest() throws Exception
     {
-        doReceive();
+        doRequest();
     }
 
 }

@@ -46,11 +46,6 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         return event.getMessage();
     }
 
-    public UMOMessage doReceive(long timeout) throws Exception
-    {
-        return null;
-    }
-
     protected void doConnect() throws Exception
     {
         // no op

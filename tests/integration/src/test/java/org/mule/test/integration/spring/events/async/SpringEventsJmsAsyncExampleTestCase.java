@@ -67,7 +67,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
         Thread.sleep(1000);
         assertTrue(eventCount == 1);
 
-        UMOMessage result = client.receive("jms://processed.queue", 10000);
+        UMOMessage result = client.request("jms://processed.queue", 10000);
         assertEquals(1, eventCount);
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", result.getPayloadAsString());
@@ -91,7 +91,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
         // Make an async call
         client.dispatch("axis:http://localhost:44444/mule/orderManager?method=processOrderAsync", order, null);
 
-        UMOMessage result = client.receive("jms://processed.queue", 10000);
+        UMOMessage result = client.request("jms://processed.queue", 10000);
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed Async", result.getPayload());
     }

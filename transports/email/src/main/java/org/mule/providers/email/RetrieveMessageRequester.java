@@ -198,12 +198,12 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
         message.setFlag(Flags.Flag.DELETED, true);
     }
 
-    protected Message getNextMessage(Folder folder) throws MessagingException
+    protected static Message getNextMessage(Folder folder) throws MessagingException
     {
         return folder.getMessage(1);
     }
 
-    protected int getMessageCount(Folder folder) throws MessagingException
+    protected static int getMessageCount(Folder folder) throws MessagingException
     {
         return folder.getMessageCount();
     }
@@ -217,7 +217,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
      * @return
      * @throws javax.mail.MessagingException
      */
-    protected boolean hasMessages(Folder folder) throws MessagingException
+    protected static boolean hasMessages(Folder folder) throws MessagingException
     {
         return getMessageCount(folder) > 0;
     }

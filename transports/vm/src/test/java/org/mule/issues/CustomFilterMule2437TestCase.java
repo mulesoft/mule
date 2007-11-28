@@ -39,7 +39,7 @@ public class CustomFilterMule2437TestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         client.dispatch("vm://in?connector=default", new MuleMessage(message));
-        UMOMessage response = client.receive(destination + "?connector=queue", TIMEOUT);
+        UMOMessage response = client.request(destination + "?connector=queue", TIMEOUT);
         assertNotNull(response);
         assertEquals(message, response.getPayloadAsString());
     }

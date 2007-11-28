@@ -167,7 +167,6 @@ public abstract class AbstractComponent implements UMOComponent
      * 
      * @throws org.mule.umo.lifecycle.InitialisationException if the component fails
      *             to initialise
-     * @see org.mule.umo.UMODescriptor
      */
     public final synchronized void initialise() throws InitialisationException
     {
@@ -451,7 +450,7 @@ public abstract class AbstractComponent implements UMOComponent
         // in the MuleSession#dispatchEvent
         UMOImmutableEndpoint endpoint = event.getEndpoint();
 
-        if (!endpoint.canReceive())
+        if (!endpoint.canRequest())
         {
             try
             {

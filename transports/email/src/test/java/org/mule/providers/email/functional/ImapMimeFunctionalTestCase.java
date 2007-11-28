@@ -18,9 +18,9 @@ public class ImapMimeFunctionalTestCase extends AbstractEmailFunctionalTestCase
         super(65443, MIME_MESSAGE, "imap", "imap-mime-functional-test.xml");
     }
 
-    public void testReceive() throws Exception
+    public void testRequest() throws Exception
     {
-        doReceive();
+        doRequest();
     }
 
 }

@@ -50,7 +50,7 @@ public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
         MuleClient client = new MuleClient();
         
         //check that db is still empty
-        UMOMessage reply = client.receive("jdbc://getTest", 1000);
+        UMOMessage reply = client.request("jdbc://getTest", 1000);
         assertTrue(reply.getPayload() instanceof Collection);
         assertTrue(((Collection)reply.getPayload()).isEmpty());
         
@@ -60,7 +60,7 @@ public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
         client.dispatch("jdbc://writeTest", new MuleMessage(NullPayload.getInstance()));
         
         //get the data which was written by the previous statement and test it
-        reply = client.receive("jdbc://getTest", 1000);
+        reply = client.request("jdbc://getTest", 1000);
         
         assertNotNull(reply);
         assertTrue(reply.getPayload() instanceof Collection);

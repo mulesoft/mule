@@ -48,7 +48,7 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
         
         UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "jdbc://select * from test");
-        ep.receive(0);
+        ep.request(0);
     }
 
     public static final class TestQueryRunner extends QueryRunner

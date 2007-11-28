@@ -212,7 +212,7 @@ public class MuleManagerComponent implements Callable, Initialisable
             long timeout = MapUtils.getLongValue(action.getProperties(),
                 MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, getSynchronousEventTimeout());
 
-            result = endpoint.getConnector().receive(action.getResourceIdentifier(), timeout);
+            result = endpoint.getConnector().request(action.getResourceIdentifier(), timeout);
             if (result != null)
             {
                 // See if there is a default transformer on the connector

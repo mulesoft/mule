@@ -36,7 +36,7 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 
     public void testDirect() throws Exception
     {
-        String response = receive(send(), "direct");
+        String response = request(send(), "direct");
         assertEquals(MESSAGE, response);
     }
 
@@ -62,13 +62,13 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 
     protected void doTestTransformed(String endpoint) throws Exception
     {
-        String response = receive(send(), endpoint);
+        String response = request(send(), endpoint);
         assertEquals(MESSAGE + StringAppendTestTransformer.DEFAULT_TEXT, response);
     }
 
-    protected String receive(MuleClient client, String endpoint) throws Exception
+    protected String request(MuleClient client, String endpoint) throws Exception
     {
-        UMOMessage message = client.receive(endpoint, TIMEOUT);
+        UMOMessage message = client.request(endpoint, TIMEOUT);
         assertNotNull(message);
         assertNotNull(message.getPayloadAsString());
         return message.getPayloadAsString();

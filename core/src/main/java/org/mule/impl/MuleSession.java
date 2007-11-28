@@ -406,7 +406,7 @@ public final class MuleSession implements UMOSession
     {
         try
         {
-            return endpoint.receive(timeout);
+            return endpoint.request(timeout);
         }
         catch (Exception e)
         {

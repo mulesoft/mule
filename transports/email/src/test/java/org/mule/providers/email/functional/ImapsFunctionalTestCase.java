@@ -18,9 +18,9 @@ public class ImapsFunctionalTestCase extends AbstractEmailFunctionalTestCase
         super(65444, STRING_MESSAGE, "imaps");
     }
 
-    public void testReceive() throws Exception
+    public void testRequest() throws Exception
     {
-        doReceive();
+        doRequest();
     }
 
 }

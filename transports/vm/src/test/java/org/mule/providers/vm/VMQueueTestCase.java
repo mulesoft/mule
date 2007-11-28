@@ -34,7 +34,7 @@ public class VMQueueTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         client.dispatch("queue", "Marco", null);
-        UMOMessage response = client.receive("queue", WAIT);
+        UMOMessage response = client.request("queue", WAIT);
         assertNotNull("Response is null", response);
         assertEquals("Marco", response.getPayload());
     }
@@ -51,7 +51,7 @@ public class VMQueueTestCase extends FunctionalTestCase
 
         for (int i = 0; i < 3; ++i)
         {
-            UMOMessage response = client.receive("queue", WAIT);
+            UMOMessage response = client.request("queue", WAIT);
             assertNotNull("Response is null", response);
             String person = (String) response.getPayload();
             assertTrue(person, polos.contains(person));
@@ -71,7 +71,7 @@ public class VMQueueTestCase extends FunctionalTestCase
 
         for (int i = 0; i < 3; ++i)
         {
-            UMOMessage response = client.receive("queue", WAIT);
+            UMOMessage response = client.request("queue", WAIT);
             assertNotNull("Response is null", response);
             String person = (String) response.getPayload();
             String name = new StringTokenizer(person).nextToken();
@@ -92,7 +92,7 @@ public class VMQueueTestCase extends FunctionalTestCase
 
         for (int i = 0; i < 3; ++i)
         {
-            UMOMessage response = client.receive("queue", WAIT);
+            UMOMessage response = client.request("queue", WAIT);
             assertNotNull("Response is null", response);
             String person = (String) response.getPayload();
             String name = new StringTokenizer(person).nextToken();

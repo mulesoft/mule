@@ -60,7 +60,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
         client.dispatch("CustomerRequests", request, null);
 
         // Wait for asynchronous response
-        UMOMessage result = client.receive("CustomerResponses", getDelay());
+        UMOMessage result = client.request("CustomerResponses", getDelay());
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertTrue("Result should be LoanQuote but is " + result.getPayload().getClass().getName(),
@@ -148,7 +148,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
                 {
                     try
                     {
-                        result = client.receive("CustomerResponses", 600);
+                        result = client.request("CustomerResponses", 600);
                     }
                     catch (UMOException e)
                     {

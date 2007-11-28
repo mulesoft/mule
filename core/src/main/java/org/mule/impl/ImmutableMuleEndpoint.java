@@ -48,6 +48,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 {
+    
     private static final long serialVersionUID = -1650380871293160973L;
 
     /**
@@ -253,7 +254,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return connector.getProtocol();
     }
 
-    public boolean canReceive()
+    public boolean canRequest()
     {
         return getType().equals(ENDPOINT_TYPE_RECEIVER);
     }
@@ -437,20 +438,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         if (connector != null)
         {
             connector.dispatch(this, event);
-        }
-        else
-        {
-            // TODO Either remove because this should never happen or i18n the message
-            throw new IllegalStateException("The connector on the endpoint: " + toString()
-                                            + " is null. Please contact " + MuleManifest.getDevListEmail());
-        }
-    }
-
-    public UMOMessage receive(long timeout) throws Exception
-    {
-        if (connector != null)
-        {
-            return connector.receive(this, timeout);
         }
         else
         {

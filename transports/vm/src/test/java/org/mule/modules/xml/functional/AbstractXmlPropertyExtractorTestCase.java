@@ -11,12 +11,9 @@
 package org.mule.modules.xml.functional;
 
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.NullPayload;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTestCase
 {
@@ -42,12 +39,12 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
         {
             MuleClient client = new MuleClient();
             client.dispatch("in", getMatchMessage(), null);
-            UMOMessage message = client.receive("vm://match1?connector=queue", WAIT_PERIOD);
+            UMOMessage message = client.request("vm://match1?connector=queue", WAIT_PERIOD);
             assertNotNull(message);
             assertFalse(message.getPayload() instanceof NullPayload);
             if(!matchSingle)
             {
-                message = client.receive("vm://match2?connector=queue", WAIT_PERIOD);
+                message = client.request("vm://match2?connector=queue", WAIT_PERIOD);
                 assertNotNull(message);
                 assertFalse(message.getPayload() instanceof NullPayload);
             }
@@ -58,7 +55,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
     {
         MuleClient client = new MuleClient();
         client.dispatch("in", getErrorMessage(), null);
-        UMOMessage message = client.receive("vm://error?connector=queue", WAIT_PERIOD);
+        UMOMessage message = client.request("vm://error?connector=queue", WAIT_PERIOD);
         assertNotNull(message);
         assertFalse(message.getPayload() instanceof NullPayload);
     }

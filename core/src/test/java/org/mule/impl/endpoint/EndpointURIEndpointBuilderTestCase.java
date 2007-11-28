@@ -36,7 +36,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
             assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
             assertFalse(ep.canSend());
-            assertTrue(ep.canReceive());
+            assertTrue(ep.canRequest());
             assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
             assertTrue(ep.getTransformers().get(0) instanceof TestInboundTransformer);
             assertTrue(TransformerUtils.isDefined(ep.getResponseTransformers()));
@@ -58,7 +58,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
             assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
             assertTrue(ep.canSend());
-            assertFalse(ep.canReceive());
+            assertFalse(ep.canRequest());
             assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
             assertTrue(ep.getTransformers().get(0) instanceof TestOutboundTransformer);
             assertTrue(TransformerUtils.isDefined(ep.getResponseTransformers()));
@@ -82,7 +82,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
             UMOImmutableEndpoint ep = endpointBuilder.buildResponseEndpoint();
             assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
             assertFalse(ep.canSend());
-            assertFalse(ep.canReceive());
+            assertFalse(ep.canRequest());
             assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
             assertTrue(ep.getTransformers().get(0) instanceof TestInboundTransformer);
             assertFalse(TransformerUtils.isDefined(ep.getResponseTransformers()));

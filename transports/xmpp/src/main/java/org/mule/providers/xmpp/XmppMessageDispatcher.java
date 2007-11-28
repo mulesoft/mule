@@ -162,48 +162,4 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /**
-     * Make a specific request to the underlying transport
-     * 
-     * @param endpoint the endpoint to use when connecting to the resource
-     * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
-     */
-    protected UMOMessage doReceive(long timeout) throws Exception
-    {
-        // Should be in the form of xmpp://user:pass@host:[port]/folder
-        String to = (String)endpoint.getProperty("folder");
-        if (to == null)
-        {
-            throw new MalformedEndpointException(endpoint.getEndpointURI().toString());
-        }
-        Chat chat = xmppConnection.createChat(to);
-        Message message = null;
-        if (timeout == UMOEvent.TIMEOUT_WAIT_FOREVER)
-        {
-            message = chat.nextMessage();
-        }
-        else if (timeout == UMOEvent.TIMEOUT_DO_NOT_WAIT)
-        {
-            message = chat.nextMessage(1);
-        }
-        else
-        {
-            message = chat.nextMessage(timeout);
-        }
-        if (message != null)
-        {
-            return new MuleMessage(connector.getMessageAdapter(message));
-        }
-        else
-        {
-            return null;
-        }
-    }
-
 }

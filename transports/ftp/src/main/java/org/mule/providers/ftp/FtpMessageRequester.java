@@ -123,7 +123,7 @@ public class FtpMessageRequester extends AbstractMessageRequester
         }
         finally
         {
-            logger.debug("leaving doReceive()");
+            logger.debug("leaving doRequest()");
             connector.releaseFtp(endpoint.getEndpointURI(), client);
         }
     }

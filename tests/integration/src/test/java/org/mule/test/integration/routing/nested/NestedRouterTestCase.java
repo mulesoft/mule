@@ -30,7 +30,7 @@ public class NestedRouterTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         String message = "Mule";
         client.dispatch(prefix + "invoker.in", message, null);
-        UMOMessage reply = client.receive(prefix + "invoker.out", RECEIVE_TIMEOUT);
+        UMOMessage reply = client.request(prefix + "invoker.out", RECEIVE_TIMEOUT);
         assertNotNull(reply);
         assertNull(reply.getExceptionPayload());
         assertEquals("Received: Hello " + message + " " + number, reply.getPayload());

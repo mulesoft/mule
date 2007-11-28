@@ -69,7 +69,7 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
         Thread.sleep(1000);
         assertTrue(eventCount.get() == 1);
 
-        UMOMessage result = client.receive("jms://processed.queue", 10000);
+        UMOMessage result = client.request("jms://processed.queue", 10000);
         assertEquals(1, eventCount.get());
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", result.getPayload());

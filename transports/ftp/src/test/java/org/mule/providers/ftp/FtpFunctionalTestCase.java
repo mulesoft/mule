@@ -32,7 +32,7 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         return "ftp-functional-test.xml";
     }
 
-    public void testSendAndReceive() throws Exception
+    public void testSendAndRequest() throws Exception
     {
         Map properties = new HashMap();
         MuleClient client = new MuleClient();

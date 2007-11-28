@@ -103,64 +103,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /**
-     * Make a specific request to the underlying transport
-     * 
-     * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
-     */
-    protected UMOMessage doReceive(long timeout) throws Exception
-    {
-        HttpMethod httpMethod = new GetMethod(endpoint.getEndpointURI().getAddress());
-        connector.setupClientAuthorization(null, httpMethod, client, endpoint);
-        
-        boolean releaseConn = false;
-        try
-        {
-            HttpClient client = new HttpClient();
-            client.executeMethod(httpMethod);
-
-            if (httpMethod.getStatusCode() == HttpStatus.SC_OK)
-            {
-                UMOMessage res = (UMOMessage) receiveTransformer.transform(httpMethod);
-                if (StringUtils.EMPTY.equals(res.getPayload()))
-                {
-                    releaseConn = true;
-                }
-                return res;
-            }
-            else
-            {
-                releaseConn = true;
-                throw new ReceiveException(
-                    HttpMessages.requestFailedWithStatus(httpMethod.getStatusLine().toString()),
-                    endpoint, timeout);
-            }
-        }
-        catch (ReceiveException e)
-        {
-            releaseConn = true;
-            throw e;
-        }
-        catch (Exception e)
-        {   
-            releaseConn = true;
-            throw new ReceiveException(endpoint, timeout, e);
-        }
-        finally
-        {
-            if (releaseConn)
-            {
-                httpMethod.releaseConnection();
-            }
-        }
-    }
-
     protected HttpMethod execute(UMOEvent event, HttpMethod httpMethod)
         throws Exception
     {

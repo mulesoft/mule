@@ -60,7 +60,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
         };
     }
 
-    public void testSendAndReceive() throws Exception
+    public void testSendAndRequest() throws Exception
     {
         MuleClient client = new MuleClient();
 

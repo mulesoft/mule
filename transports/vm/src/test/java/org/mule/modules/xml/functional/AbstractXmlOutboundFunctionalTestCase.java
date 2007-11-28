@@ -47,7 +47,7 @@ public abstract class AbstractXmlOutboundFunctionalTestCase extends AbstractXmlF
     protected void assertService(String prefix, int index, String service) throws UMOException, IOException
     {
         MuleClient client = new MuleClient();
-        UMOMessage response = client.receive(prefix + index, TIMEOUT);
+        UMOMessage response = client.request(prefix + index, TIMEOUT);
         assertNotNull(response);
         assertNotNull(response.getPayload());
         assertTrue(response.getPayload().getClass().getName(), response.getPayload() instanceof Document);
@@ -63,7 +63,7 @@ public abstract class AbstractXmlOutboundFunctionalTestCase extends AbstractXmlF
         while (remaining.size() > 0)
         {
             MuleClient client = new MuleClient();
-            UMOMessage response = client.receive(prefix + index, TIMEOUT);
+            UMOMessage response = client.request(prefix + index, TIMEOUT);
             assertNotNull(response);
             assertNotNull(response.getPayload());
             assertTrue(response.getPayload().getClass().getName(), response.getPayload() instanceof Document);

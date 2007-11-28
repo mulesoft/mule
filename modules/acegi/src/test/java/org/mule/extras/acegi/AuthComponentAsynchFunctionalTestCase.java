@@ -49,7 +49,7 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
         String header = MuleCredentials.createHeader("marie", "marie", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
         client.dispatch("vm://test", "Marie", props);
-        UMOMessage m = client.receive("vm://output", 3000);
+        UMOMessage m = client.request("vm://output", 3000);
         assertNotNull(m);
         assertEquals((String)m.getPayload(), "Marie");
     }
@@ -65,7 +65,7 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
         client.dispatch("vm://test", "Marie", props);
-        UMOMessage m = client.receive("vm://output", 3000);
+        UMOMessage m = client.request("vm://output", 3000);
         assertNull(m);
     }
 
@@ -80,7 +80,7 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
         String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
         client.dispatch("vm://test", "USD,MTL", props);
-        UMOMessage m = client.receive("vm://output", 3000);
+        UMOMessage m = client.request("vm://output", 3000);
         assertNull(m);
     }
 

@@ -17,7 +17,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
- * @see MULE-2721
+ * see MULE-2721
  */ 
 public class ReplyToTestCase extends FunctionalTestCase
 {
@@ -40,13 +40,13 @@ public class ReplyToTestCase extends FunctionalTestCase
         client.dispatch("EchoVm", msg, null);
 
         // Wait for asynchronous response
-        UMOMessage result = client.receive("ReplyTo", RECEIVE_DELAY);
+        UMOMessage result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertEquals("testing", result.getPayload());
 
         // Make sure there are no more responses
-        result = client.receive("ReplyTo", RECEIVE_DELAY);
+        result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNull("Extra message received at replyTo destination: " + result, result);        
     }
 
@@ -61,13 +61,13 @@ public class ReplyToTestCase extends FunctionalTestCase
         client.dispatch("EchoAxisSend", msg, null);
 
         // Wait for asynchronous response
-        UMOMessage result = client.receive("ReplyTo", RECEIVE_DELAY);
+        UMOMessage result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertEquals("testing", result.getPayload());
 
         // Make sure there are no more responses
-        result = client.receive("ReplyTo", RECEIVE_DELAY);
+        result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNull("Extra message received at replyTo destination: " + result, result);        
     }
 
@@ -82,13 +82,13 @@ public class ReplyToTestCase extends FunctionalTestCase
         client.dispatch("EchoXFireSend", msg, null);
 
         // Wait for asynchronous response
-        UMOMessage result = client.receive("ReplyTo", RECEIVE_DELAY);
+        UMOMessage result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertEquals("testing", result.getPayload());
 
         // Make sure there are no more responses
-        result = client.receive("ReplyTo", RECEIVE_DELAY);
+        result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNull("Extra message received at replyTo destination: " + result, result);        
     }
 }

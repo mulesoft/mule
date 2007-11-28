@@ -33,14 +33,14 @@ public class ForwardingMessageSplitterTestCase extends FunctionalTestCase
         payload.add(new Integer(3));
         payload.add(new Exception());
         client.send("vm://in.queue", payload, null);
-        UMOMessage m = client.receive("vm://component.1", 2000);
+        UMOMessage m = client.request("vm://component.1", 2000);
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
-        m = client.receive("vm://component.2", 2000);
+        m = client.request("vm://component.2", 2000);
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof Integer);
 
-        m = client.receive("vm://error.queue", 2000);
+        m = client.request("vm://error.queue", 2000);
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof Exception);
     }

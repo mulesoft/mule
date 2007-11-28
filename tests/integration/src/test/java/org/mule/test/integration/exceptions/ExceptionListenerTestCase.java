@@ -32,15 +32,15 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage message = client.receive("vm://error.queue", 2000);
+        UMOMessage message = client.request("vm://error.queue", 2000);
         assertNull(message);
 
         client.send("vm://component.in", "test", null);
 
-        message = client.receive("vm://component.out", 2000);
+        message = client.request("vm://component.out", 2000);
         assertNull(message);
 
-        message = client.receive("vm://error.queue", 2000);
+        message = client.request("vm://error.queue", 2000);
         assertNotNull(message);
         Object payload = message.getPayload();
         assertTrue(payload instanceof ExceptionMessage);
@@ -50,15 +50,15 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage message = client.receive("vm://error.queue", 2000);
+        UMOMessage message = client.request("vm://error.queue", 2000);
         assertNull(message);
 
         client.send("vm://component.in", "test", null);
 
-        message = client.receive("vm://component.out", 2000);
+        message = client.request("vm://component.out", 2000);
         assertNull(message);
 
-        message = client.receive("vm://error.queue", 2000);
+        message = client.request("vm://error.queue", 2000);
         assertNotNull(message);
         Object payload = message.getPayload();
         assertTrue(payload instanceof ExceptionMessage);
@@ -68,15 +68,15 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage message = client.receive("vm://error.queue", 2000);
+        UMOMessage message = client.request("vm://error.queue", 2000);
         assertNull(message);
 
         client.dispatch("vm://component.in", "test", null);
 
-        message = client.receive("vm://component.out", 2000);
+        message = client.request("vm://component.out", 2000);
         assertNull(message);
 
-        message = client.receive("vm://error.queue", 2000);
+        message = client.request("vm://error.queue", 2000);
         assertNotNull(message);
         Object payload = message.getPayload();
         assertTrue(payload instanceof ExceptionMessage);

@@ -8,19 +8,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.providers.oracle.jms;
+package org.mule.providers;
 
-import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.JmsMessageDispatcher;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.UMOMessageRequester;
 
-public class OracleJmsMessageDispatcher extends JmsMessageDispatcher
+public final class UnsupportedMessageRequesterFactory extends AbstractMessageRequesterFactory
 {
 
-    public OracleJmsMessageDispatcher(UMOImmutableEndpoint endpoint)
+    public UMOMessageRequester create(UMOImmutableEndpoint endpoint) throws UMOException
     {
-        super(endpoint);
+        return new UnsupportedMessageRequester(endpoint);
     }
 
 }

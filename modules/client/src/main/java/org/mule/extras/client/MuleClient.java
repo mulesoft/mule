@@ -306,7 +306,7 @@ public class MuleClient implements Disposable
     /**
      * sends an event synchronously to a components
      *
-     * @param component the name of the Mule components to send to
+     * @param componentName the name of the Mule components to send to
      * @param transformers a comma separated list of transformers to apply to the
      *            result message
      * @param message the message to send
@@ -376,7 +376,7 @@ public class MuleClient implements Disposable
     /**
      * dispatches an event asynchronously to the components
      *
-     * @param component the name of the Mule components to dispatch to
+     * @param componentName the name of the Mule components to dispatch to
      * @param message the message to send
      * @throws org.mule.umo.UMOException if the dispatch fails or the components or
      *             transfromers cannot be found
@@ -661,75 +661,6 @@ public class MuleClient implements Disposable
             throw new DispatchException(ClientMessages.failedToDispatchClientEvent(),
                 event.getMessage(), event.getEndpoint(), e);
         }
-    }
-
-    /**
-     * Will receive an event from an endpointUri determined by the url
-     *
-     * @param url the Mule url used to determine the destination and transport of the
-     *            message
-     * @param timeout how long to block waiting to receive the event, if set to 0 the
-     *            receive will not wait at all and if set to -1 the receive will wait
-     *            forever
-     * @return the message received or null if no message was received
-     * @throws org.mule.umo.UMOException
-     */
-    public UMOMessage receive(String url, long timeout) throws UMOException
-    {
-        UMOImmutableEndpoint endpoint = getInboundEndpoint(url);
-        try
-        {
-            UMOMessage message = endpoint.receive(timeout);
-            if (message != null && endpoint.getTransformers() != null)
-            {
-                message.applyTransformers(endpoint.getTransformers());
-            }
-            return message;
-        }
-        catch (Exception e)
-        {
-            throw new ReceiveException(endpoint, timeout, e);
-        }
-    }
-
-    /**
-     * Will receive an event from an endpointUri determined by the url
-     *
-     * @param url the Mule url used to determine the destination and transport of the
-     *            message
-     * @param transformers A comma separated list of transformers used to apply to
-     *            the result message
-     * @param timeout how long to block waiting to receive the event, if set to 0 the
-     *            receive will not wait at all and if set to -1 the receive will wait
-     *            forever
-     * @return the message received or null if no message was received
-     * @throws org.mule.umo.UMOException
-     */
-    public UMOMessage receive(String url, String transformers, long timeout) throws UMOException
-    {
-        return receive(url, MuleObjectHelper.getTransformers(transformers, ","), timeout);
-    }
-
-    /**
-     * Will receive an event from an endpointUri determined by the url
-     *
-     * @param url the Mule url used to determine the destination and transport of the
-     *            message
-     * @param transformers Transformers used to modify the result message
-     * @param timeout how long to block waiting to receive the event, if set to 0 the
-     *            receive will not wait at all and if set to -1 the receive will wait
-     *            forever
-     * @return the message received or null if no message was received
-     * @throws org.mule.umo.UMOException
-     */
-    public UMOMessage receive(String url, List transformers, long timeout) throws UMOException
-    {
-        UMOMessage message = receive(url, timeout);
-        if (message != null && transformers != null)
-        {
-             message.applyTransformers(transformers);
-        }
-        return message;
     }
 
     /**

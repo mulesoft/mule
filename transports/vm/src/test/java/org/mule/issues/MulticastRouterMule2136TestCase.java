@@ -42,18 +42,18 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
 
     public void testObjectOut() throws UMOException
     {
-        receive(sendObject(), "object-out", Parent.class);
+        request(sendObject(), "object-out", Parent.class);
     }
 
     public void testObjectXmlOut() throws UMOException
     {
-        String xml = (String) receive(sendObject(), "object-xml-out", String.class);
+        String xml = (String) request(sendObject(), "object-xml-out", String.class);
         assertEquals(SERIALIZED, xml);
     }
 
     public void testXmlObjectOut() throws UMOException
     {
-        receive(sendObject(), "xml-object-out", Parent.class);
+        request(sendObject(), "xml-object-out", Parent.class);
     }
 
     public void testStress() throws UMOException
@@ -70,9 +70,9 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
     }
 
 
-    protected Object receive(MuleClient client, String endpoint, Class clazz) throws UMOException
+    protected Object request(MuleClient client, String endpoint, Class clazz) throws UMOException
     {
-        UMOMessage message = client.receive(endpoint, TIMEOUT);
+        UMOMessage message = client.request(endpoint, TIMEOUT);
         assertNotNull(message);
         assertNotNull(message.getPayload());
         assertTrue(message.getPayload().getClass().getName(), clazz.isAssignableFrom(message.getPayload().getClass()));

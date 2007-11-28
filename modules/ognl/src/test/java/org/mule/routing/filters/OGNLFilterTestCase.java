@@ -80,7 +80,7 @@ public class OGNLFilterTestCase extends FunctionalTestCase
         try
         {
             client.dispatch(DEFAULT_INPUT_QUEUE, FIRST_MESSAGE, null);
-            UMOMessage message = client.receive(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
+            UMOMessage message = client.request(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
             assertNotNull(message);
             assertNotNull(message.getPayload());
             assertNull(message.getExceptionPayload());
@@ -89,14 +89,14 @@ public class OGNLFilterTestCase extends FunctionalTestCase
             Dummy payload = new Dummy();
             payload.setContent(SECOND_MESSAGE);
             client.dispatch(DEFAULT_INPUT_QUEUE, new MuleMessage(payload));
-            message = client.receive(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
+            message = client.request(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
             assertNotNull(message);
             assertNotNull(message.getPayload());
             assertNull(message.getExceptionPayload());
             assertEquals(SECOND_MESSAGE, ((Dummy) message.getPayload()).getContent());
 
             client.dispatch(DEFAULT_INPUT_QUEUE, THIRD_MESSAGE, null);
-            message = client.receive(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
+            message = client.request(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
             assertNull(message);
         }
         finally

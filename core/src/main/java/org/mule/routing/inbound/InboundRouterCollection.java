@@ -231,7 +231,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
     {
         if (endpoint != null)
         {
-            if (!endpoint.canReceive())
+            if (!endpoint.canRequest())
             {
                 throw new InvalidEndpointTypeException(CoreMessages.inboundRouterMustUseInboundEndpoints(
                     this, endpoint));
@@ -262,7 +262,7 @@ public class InboundRouterCollection extends AbstractRouterCollection implements
             for (Iterator it = endpoints.iterator(); it.hasNext();)
             {
                 UMOImmutableEndpoint endpoint=(UMOImmutableEndpoint) it.next();
-                if (!endpoint.canReceive())
+                if (!endpoint.canRequest())
                 {
                     throw new InvalidEndpointTypeException(CoreMessages.inboundRouterMustUseInboundEndpoints(
                         this, endpoint));

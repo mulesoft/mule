@@ -34,7 +34,7 @@ public class ExceptionsWithRouterMule2715TestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         client.dispatch("vm://" + path, MESSAGE, null);
-        UMOMessage response = client.receive("vm://error", TIMEOUT);
+        UMOMessage response = client.request("vm://error", TIMEOUT);
         assertNotNull("exception null", response.getExceptionPayload());
     }
 

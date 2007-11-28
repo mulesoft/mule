@@ -44,7 +44,7 @@ public class FtpStreamingTestCase extends AbstractFtpServerTestCase
         return "ftp-streaming-test.xml";
     }
 
-    public void testSendAndReceive() throws Exception
+    public void testSendAndRequest() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference message = new AtomicReference();

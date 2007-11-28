@@ -32,7 +32,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
         Map properties = new HashMap();
         properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "receive");
         client.dispatch("dispatch", "Message", properties);
-        UMOMessage response = client.receive("receive", 3000L);
+        UMOMessage response = client.request("receive", 3000L);
         assertNotNull("Response is null", response);
         assertEquals("Message Received", response.getPayload());
     }

@@ -42,18 +42,4 @@ public interface UMOMessageDispatching
      */
     UMOMessage send(UMOEvent event) throws DispatchException;
 
-    /**
-     * Make a specific request to the underlying transport
-     *
-     * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal causes an exception
-     * @deprecated
-     */
-    UMOMessage receive(long timeout) throws Exception;
-
 }

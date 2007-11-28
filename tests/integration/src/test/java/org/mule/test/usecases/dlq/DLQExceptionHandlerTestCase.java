@@ -30,12 +30,12 @@ public class DLQExceptionHandlerTestCase extends FunctionalTestCase
         client.getManagementContext().start();
         client.dispatch("jms://request.queue", "testing 1 2 3", null);
 
-        UMOMessage message = client.receive("jms://out.queue", 3000);
+        UMOMessage message = client.request("jms://out.queue", 3000);
         assertNull(message);
 
         try
         {
-            message = client.receive("jms://DLQ", 20000);
+            message = client.request("jms://DLQ", 20000);
         }
         catch (UMOException e)
         {

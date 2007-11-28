@@ -65,9 +65,9 @@ public class DynamicEndpointURIEndpoint implements UMOImmutableEndpoint
         this.dynamicEndpointURI = dynamicEndpointURI;
     }
 
-    public boolean canReceive()
+    public boolean canRequest()
     {
-        return endpoint.canReceive();
+        return endpoint.canRequest();
     }
 
     public boolean canSend()
@@ -188,11 +188,6 @@ public class DynamicEndpointURIEndpoint implements UMOImmutableEndpoint
     public boolean isSynchronous()
     {
         return endpoint.isSynchronous();
-    }
-
-    public UMOMessage receive(long timeout) throws Exception
-    {
-        return endpoint.receive(timeout);
     }
 
     public UMOMessage request(long timeout) throws Exception

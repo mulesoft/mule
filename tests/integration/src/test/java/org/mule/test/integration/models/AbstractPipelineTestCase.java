@@ -57,7 +57,7 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
 
         for (int i = 0; i < getNumberOfMessages(); i++)
         {
-            UMOMessage result = client.receive("results.endpoint", 1000);
+            UMOMessage result = client.request("results.endpoint", 1000);
             assertNotNull(result);
             results.add(result);
         }

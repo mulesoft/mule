@@ -132,7 +132,7 @@ public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
         assertEquals(message, receivedText.trim());
     }
 
-    protected void doReceive() throws Exception
+    protected void doRequest() throws Exception
     {
         assertEquals(1, server.getReceivedMessages().length);
 

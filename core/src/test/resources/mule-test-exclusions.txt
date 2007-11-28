@@ -2,6 +2,9 @@
 # Test cases listed in this file are not run.
 #
 
+# only works with network connection
+#org.mule.util.TimedSocketTestCase
+
 # MULE-2164
 org.mule.impl.endpoint.MuleCopiedEndpointURITestCase
 # MULE-2509

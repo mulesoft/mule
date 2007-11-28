@@ -225,12 +225,6 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         return process;
     }
 
-    protected UMOMessage doReceive(long timeout) throws Exception
-    {
-        throw new UnsupportedOperationException(
-            "doReceive() is not implemented by the ProcessMessageDispatcher");
-    }
-
     protected void doConnect() throws Exception
     {
         /* nop */

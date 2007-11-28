@@ -24,9 +24,9 @@ import java.io.File;
 public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestCase
 {
 
-    public void testIndirectReceive() throws Exception
+    public void testIndirectRequest() throws Exception
     {
-        File target = initForReceive();
+        File target = initForRequest();
 
         // add a receiver endpoint that will poll the readFromDirectory
         UMOComponent relay = managementContext.getRegistry().lookupComponent("relay");
@@ -42,7 +42,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
 
         // then read from the queue that the polling receiver will write to
         MuleClient client = new MuleClient();
-        UMOMessage message = client.receive("receive", 3000);
+        UMOMessage message = client.request("receive", 3000);
         checkReceivedMessage(message);
     }
 

@@ -30,7 +30,7 @@ public class BridgeMule2540TestCase extends FunctionalTestCase
         String[] output = {"Test", "message"};
         MuleClient client = new MuleClient();
         client.dispatch("vm://receiver", input, null);
-        UMOMessage result = client.receive("vm://out", RECEIVE_TIMEOUT);
+        UMOMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
         assertNotNull(result.getPayload());
         assertNull(result.getExceptionPayload());

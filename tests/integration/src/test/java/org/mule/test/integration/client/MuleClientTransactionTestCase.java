@@ -44,7 +44,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
 
         // Empty reply queue
-        while (client.receive("jms://replyTo.queue", 2000) != null)
+        while (client.request("jms://replyTo.queue", 2000) != null)
         {
             // slurp
         }
@@ -81,7 +81,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             }
         });
 
-        UMOMessage result = client.receive("jms://replyTo.queue", 2000);
+        UMOMessage result = client.request("jms://replyTo.queue", 2000);
         assertNull(result);
     }
 
@@ -93,7 +93,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
 
         // Empty reply queue
-        while (client.receive("jms://replyTo.queue", 2000) != null)
+        while (client.request("jms://replyTo.queue", 2000) != null)
         {
             // hmm..mesages
         }
@@ -134,7 +134,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             // this is ok
         }
 
-        UMOMessage result = client.receive("jms://replyTo.queue", 2000);
+        UMOMessage result = client.request("jms://replyTo.queue", 2000);
         assertNull(result);
     }
 
@@ -147,7 +147,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         props.put("transacted", "true");
 
         // Empty reply queue
-        while (client.receive("jms://replyTo.queue", 2000) != null)
+        while (client.request("jms://replyTo.queue", 2000) != null)
         {
             // yum!
         }
@@ -183,10 +183,10 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
 
         for (int i = 0; i < 100; i++)
         {
-            UMOMessage result = client.receive("jms://replyTo.queue", 2000);
+            UMOMessage result = client.request("jms://replyTo.queue", 2000);
             assertNotNull(result);
         }
-        UMOMessage result = client.receive("jms://replyTo.queue", 2000);
+        UMOMessage result = client.request("jms://replyTo.queue", 2000);
         assertNull(result);
     }
 
@@ -201,7 +201,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         {
             public Object doInTransaction() throws Exception
             {
-                while (client.receive("jms://replyTo.queue", 2000) != null)
+                while (client.request("jms://replyTo.queue", 2000) != null)
                 {
                     // munch..
                 }

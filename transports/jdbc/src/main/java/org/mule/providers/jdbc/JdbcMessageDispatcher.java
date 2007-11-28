@@ -24,12 +24,17 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * The Jdbc Message dispatcher is responsible for executing SQL queries against a
  * database.
  */
 public class JdbcMessageDispatcher extends AbstractMessageDispatcher
 {
+
+    private static Log staticLogger = LogFactory.getLog(AbstractMessageDispatcher.class);
 
     private JdbcConnector connector;
     private static final String STORED_PROCEDURE_PREFIX = "{ ";
@@ -162,43 +167,29 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             return event.getMessage();
         }
         
-        return doReceive(event.getTimeout(),event);
+        return executeRequest(event.getTimeout(),event, connector, endpoint);
         
     }
 
     /**
-     * Make a specific request to the underlying transport
-     * 
-     * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was available
-     * @throws Exception if the call to the underlying protocol causes an exception
+     * This does work for both dispatcher and requester
+     *
+     * @param timeout
+     * @param event
+     * @param connector
+     * @param endpoint
+     * @return
+     * @throws Exception
      */
-    protected UMOMessage doReceive(long timeout) throws Exception
+    protected static UMOMessage executeRequest(long timeout, UMOEvent event,
+                                               JdbcConnector connector, UMOImmutableEndpoint endpoint) throws Exception
     {
-        return doReceive(timeout, null);
-    }
-
-    /**
-     * Make a specific request to the underlying transport
-     * Special case: The event is need when doReceive was called from doSend
-     * @param timeout only for compatibility with doReceive(long timeout)
-     * @param event There is a need to get params from message
-     * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was available
-     * @throws Exception if the call to the underlying protocol causes an exception
-     */
-    protected UMOMessage doReceive(long timeout, UMOEvent event) throws Exception
-    {
-        if (logger.isDebugEnabled())
+        if (staticLogger.isDebugEnabled())
         {
-            logger.debug("Trying to receive a message with a timeout of " + timeout);
+            staticLogger.debug("Trying to receive a message with a timeout of " + timeout);
         }
 
-        String[] stmts = this.connector.getReadAndAckStatements(endpoint);
+        String[] stmts = connector.getReadAndAckStatements(endpoint);
         String readStmt = stmts[0];
         String ackStmt = stmts[1];
         List readParams = new ArrayList();
@@ -210,7 +201,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         long t0 = System.currentTimeMillis();
         try
         {
-            con = this.connector.getConnection();
+            con = connector.getConnection();
             if (timeout < 0)
             {
                 timeout = Long.MAX_VALUE;
@@ -222,29 +213,29 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
                                                              connector.getParams(endpoint,
                                                                                  readParams,
                                                                                  event!=null ? event.getMessage() : null,
-                                                                                 this.endpoint.getEndpointURI().getAddress()),
+                                                                                 endpoint.getEndpointURI().getAddress()),
                                                              connector.createResultSetHandler());
                 if (result != null)
                 {
-                    if (logger.isDebugEnabled())
+                    if (staticLogger.isDebugEnabled())
                     {
-                        logger.debug("Received: " + result);
+                        staticLogger.debug("Received: " + result);
                     }
                     break;
                 }
-                long sleep = Math.min(this.connector.getPollingFrequency(),
+                long sleep = Math.min(connector.getPollingFrequency(),
                                       timeout - (System.currentTimeMillis() - t0));
                 if (sleep > 0)
                 {
-                    if (logger.isDebugEnabled())
+                    if (staticLogger.isDebugEnabled())
                     {
-                        logger.debug("No results, sleeping for " + sleep);
+                        staticLogger.debug("No results, sleeping for " + sleep);
                     }
                     Thread.sleep(sleep);
                 }
                 else
                 {
-                    logger.debug("Timeout");
+                    staticLogger.debug("Timeout");
                     return null;
                 }
             }
@@ -255,10 +246,10 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
                                                                   connector.getParams(endpoint, ackParams, result, ackStmt));
                 if (nbRows != 1)
                 {
-                    logger.warn("Row count for ack should be 1 and not " + nbRows);
+                    staticLogger.warn("Row count for ack should be 1 and not " + nbRows);
                 }
             }
-            UMOMessageAdapter msgAdapter = this.connector.getMessageAdapter(result);
+            UMOMessageAdapter msgAdapter = connector.getMessageAdapter(result);
             UMOMessage message = new MuleMessage(msgAdapter);
             JdbcUtils.commitAndClose(con);
             return message;

@@ -16,7 +16,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
@@ -114,7 +113,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
             throw new InitialisationException(CoreMessages.objectIsNull("Endpoint"), this);
         }
 
-        if (endpoint.canReceive())
+        if (endpoint.canRequest())
         {
             inbound = true;
         }

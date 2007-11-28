@@ -52,7 +52,7 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    protected File initForReceive() throws Exception
+    protected File initForRequest() throws Exception
     {
         File tmpDir = File.createTempFile("mule-file-test-", "-dir");
         tmpDir.delete();

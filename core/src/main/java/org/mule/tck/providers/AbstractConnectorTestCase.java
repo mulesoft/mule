@@ -20,6 +20,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
+import org.mule.umo.provider.UMOMessageRequesterFactory;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -254,6 +255,15 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         assertNotNull(connector);
 
         UMOMessageDispatcherFactory factory = connector.getDispatcherFactory();
+        assertNotNull(factory);
+    }
+
+    public void testConnectorMessageRequesterFactory() throws Exception
+    {
+        UMOConnector connector = getConnector();
+        assertNotNull(connector);
+
+        UMOMessageRequesterFactory factory = connector.getRequesterFactory();
         assertNotNull(factory);
     }
 

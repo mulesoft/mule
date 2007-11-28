@@ -192,53 +192,6 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     }
 
     /**
-     * Make a specific request to the underlying transport
-     *
-     * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
-     */
-    protected UMOMessage doReceive(long timeout) throws Exception
-    {
-        String serviceName = getServiceName(endpoint);
-
-        XFire xfire = connector.getXfire();
-        Service service = xfire.getServiceRegistry().getService(serviceName);
-
-        Client client = new Client(new MuleUniversalTransport(), service, endpoint.getEndpointURI()
-            .toString());
-        client.setXFire(xfire);
-        client.setTimeout((int)timeout);
-        client.setEndpointUri(endpoint.getEndpointURI().toString());
-
-        String method = (String)endpoint.getProperty(MuleProperties.MULE_METHOD_PROPERTY);
-        OperationInfo op = service.getServiceInfo().getOperation(method);
-
-        Properties params = endpoint.getEndpointURI().getUserParams();
-        String args[] = new String[params.size()];
-        int i = 0;
-        for (Iterator iterator = params.values().iterator(); iterator.hasNext(); i++)
-        {
-            args[i] = iterator.next().toString();
-        }
-
-        Object[] response = client.invoke(op, args);
-
-        if (response != null && response.length == 1)
-        {
-            return new MuleMessage(response[0]);
-        }
-        else
-        {
-            return new MuleMessage(response);
-        }
-    }
-
-    /**
      * Get the service that is mapped to the specified request.
      */
     protected static String getServiceName(UMOImmutableEndpoint endpoint)

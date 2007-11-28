@@ -165,7 +165,7 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
      *
      * @return true if it has been configured to receive events, false otherwise
      */
-    boolean canReceive();
+    boolean canRequest();
 
     /**
      * Returns the transaction configuration for this endpoint

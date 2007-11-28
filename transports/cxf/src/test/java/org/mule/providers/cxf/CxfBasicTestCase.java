@@ -48,7 +48,7 @@ public class CxfBasicTestCase extends FunctionalTestCase
     public void testEchoWsdl() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage result = client.receive("http://localhost:63081/services/Echo?wsdl", 5000);
+        UMOMessage result = client.request("http://localhost:63081/services/Echo?wsdl", 5000);
         assertNotNull(result.getPayload());
         XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());
     }

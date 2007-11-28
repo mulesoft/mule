@@ -164,36 +164,6 @@ public interface UMOConnector extends Lifecycle, ManagementContextAware, NamedOb
 
     /**
      * Make a specific request to the underlying transport
-     * 
-     * @param uri the endpoint uri to use when connecting to the resource
-     * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
-     * @deprecated Use receive(UMOImmutableEndpoint endpoint, long timeout)
-     */
-    UMOMessage receive(String uri, long timeout) throws Exception;
-
-    /**
-     * Make a specific request to the underlying transport
-     * 
-     * @param endpoint the endpoint to use when connecting to the resource
-     * @param timeout the maximum time the operation should block before returning.
-     *            The call should return immediately if there is data available. If
-     *            no data becomes available before the timeout elapses, null will be
-     *            returned
-     * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
-     * @throws Exception if the call to the underlying protocal cuases an exception
-     * @deprecated
-     */
-    UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception;
-
-    /**
-     * Make a specific request to the underlying transport
      *
      * @param uri the endpoint uri to use when connecting to the resource
      * @param timeout the maximum time the operation should block before returning.
@@ -203,7 +173,7 @@ public interface UMOConnector extends Lifecycle, ManagementContextAware, NamedOb
      * @return the result of the request wrapped in a UMOMessage object. Null will be
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
-     * @deprecated Use receive(UMOImmutableEndpoint endpoint, long timeout)
+     * @deprecated Use request(UMOImmutableEndpoint endpoint, long timeout)
      */
     UMOMessage request(String uri, long timeout) throws Exception;
 

@@ -34,7 +34,7 @@ public class SynchStreamingMule1687TestCase extends FunctionalTestCase
         return "tcp-synch-streaming-test.xml";
     }
 
-    public void testSendAndReceive() throws Exception
+    public void testSendAndRequest() throws Exception
     {
         MuleClient client = new MuleClient();
         UMOMessage message = client.send("tcp://localhost:65432",

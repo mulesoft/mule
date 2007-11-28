@@ -73,7 +73,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
                                  + to);
                 }
 
-                UMOMessage returnMessage = endpoint.receive(to);
+                UMOMessage returnMessage = endpoint.request(to);
                 writeResponse(httpServletResponse, returnMessage);
             }
             else
@@ -154,7 +154,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
                 logger.debug("Making request using endpoint: " + endpoint.toString() + " timeout is: " + to);
             }
 
-            UMOMessage returnMessage = endpoint.receive(to);
+            UMOMessage returnMessage = endpoint.request(to);
             if (returnMessage != null)
             {
                 httpServletResponse.setStatus(HttpServletResponse.SC_OK);

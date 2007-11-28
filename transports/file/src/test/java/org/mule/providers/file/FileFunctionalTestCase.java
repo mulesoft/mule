@@ -47,13 +47,13 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         assertEquals(TEST_MESSAGE, result);
     }
 
-    public void testDirectReceive() throws Exception
+    public void testDirectRequest() throws Exception
     {
-        File target = initForReceive();
+        File target = initForRequest();
         MuleClient client = new MuleClient();
         String url = fileToUrl(target) + "?connector=receiveConnector";
         logger.debug(url);
-        UMOMessage message = client.receive(url, 100000);
+        UMOMessage message = client.request(url, 100000);
         checkReceivedMessage(message);
     }
 

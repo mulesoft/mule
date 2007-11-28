@@ -1822,27 +1822,6 @@ public abstract class AbstractConnector
         }
     }
 
-    public UMOMessage receive(String uri, long timeout) throws Exception
-    {
-        return receive(getManagementContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(uri), timeout);
-    }
-
-    public UMOMessage receive(UMOImmutableEndpoint endpoint, long timeout) throws Exception
-    {
-        UMOMessageDispatcher dispatcher = null;
-        UMOMessage result = null;
-        try
-        {
-            dispatcher = this.getDispatcher(endpoint);
-            result = dispatcher.receive(timeout);
-            return result;
-        }
-        finally
-        {
-            setupDispatchReturn(endpoint, dispatcher, result);
-        }
-    }
-
     /**
      * This method will return the dispatcher to the pool or, if the payload is an inputstream,
      * replace the payload with a new DelegatingInputStream which returns the dispatcher to

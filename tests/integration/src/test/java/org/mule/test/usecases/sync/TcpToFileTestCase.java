@@ -29,7 +29,7 @@ public class TcpToFileTestCase extends FunctionalTestCase
 
         client.sendNoReceive("tcp://localhost:4444", payload, null);
 
-        UMOMessage msg = client.receive("file://temp/tests/mule", 10000);
+        UMOMessage msg = client.request("file://temp/tests/mule", 10000);
         assertNotNull(msg);
         assertEquals(payload, msg.getPayloadAsString());
     }
