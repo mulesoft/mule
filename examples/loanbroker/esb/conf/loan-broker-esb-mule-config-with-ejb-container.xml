@@ -20,10 +20,8 @@
     </description>
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:openejb.properties</value>
-            </list>
+        <property name="location">
+            <value>classpath:openejb.properties</value>
         </property>
     </bean>
 
@@ -59,8 +57,7 @@
                                  class="org.mule.examples.loanbroker.transformers.CreditProfileXmlToCreditProfile" />
         <mule:custom-transformer name="SetLendersAsRecipients"
                                  class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients" />
-        <mule:custom-transformer name="ObjectToJMSMessage"
-                                 class="org.mule.providers.jms.transformers.ObjectToJMSMessage" />
+        <jms:transformer-object-to-jmsmessage name="ObjectToJMSMessage" />
 
         <mule:endpoint name="CustomerRequestsREST" address="jetty:rest://localhost:8888/loanbroker" />
         <mule:endpoint name="CustomerRequests" address="vm://customer.requests" />

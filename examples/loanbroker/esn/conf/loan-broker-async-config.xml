@@ -103,10 +103,10 @@
             </inbound-router>
             <outbound-router>
                 <logging-catch-all-strategy/>
-                <custom-outbound-router class="org.mule.routing.outbound.StaticRecipientList">
+                <static-recipient-list-router>
                     <reply-to address="LoanBrokerQuotes"/>
                     <message-property-filter pattern="recipients!=null"/>
-                </custom-outbound-router>
+                </static-recipient-list-router>
             </outbound-router>
         </service>
 
