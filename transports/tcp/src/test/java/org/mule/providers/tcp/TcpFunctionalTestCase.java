@@ -46,7 +46,7 @@ public class TcpFunctionalTestCase extends FunctionalTestCase
         Map props = new HashMap();
         client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
         // MULE-2754
-        Thread.sleep(2000);
+        Thread.sleep(100);
         UMOMessage result =  client.request("asyncClientEndpoint", 10000);
         assertNotNull(result);
         assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());

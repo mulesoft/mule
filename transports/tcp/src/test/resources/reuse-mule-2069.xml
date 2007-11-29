@@ -9,8 +9,9 @@
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
     <tcp:connector name="tcp" reuseAddress="true"/>
-    <tcp:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
-    <endpoint name="asyncClientEndpoint" address="tcp://localhost:60199" synchronous="false"/>
+    <tcp:connector name="tcpAsync" reuseAddress="true" keepSendSocketOpen="true"/>
+    <tcp:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true" connector-ref="tcp"/>
+    <endpoint name="asyncClientEndpoint" address="tcp://localhost:60199" synchronous="false" connector-ref="tcpAsync"/>
 
     <model name="main">
         <service name="testComponent1">

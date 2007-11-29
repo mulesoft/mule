@@ -20,3 +20,7 @@ org.mule.providers.tcp.issues.KeepSendSocketOpenMule1491TestCase
 
 # MULE-2730
 org.mule.providers.tcp.issues.SynchStreamingMule1687TestCase
+
+# MULE-2756
+org.mule.providers.tcp.TcpLengthFunctionalTestCase
+org.mule.providers.tcp.issues.ReuseMule2069TestCase

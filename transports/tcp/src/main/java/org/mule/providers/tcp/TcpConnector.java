@@ -67,9 +67,9 @@ public class TcpConnector extends AbstractConnector
     private boolean keepAlive = false;
     private AbstractTcpSocketFactory socketFactory;
     private SimpleServerSocketFactory serverSocketFactory;
-    private GenericKeyedObjectPool dispatcherSocketsPool = new GenericKeyedObjectPool();
+    private GenericKeyedObjectPool socketsPool = new GenericKeyedObjectPool();
 
-    //TODO MULE-2031 remove once fixed
+    //TODO MULE-2300 remove once fixed
     private TcpSocketKey lastSocketKey;
 
     public TcpConnector()
@@ -121,11 +121,12 @@ public class TcpConnector extends AbstractConnector
 
     protected void doInitialise() throws InitialisationException
     {
-        dispatcherSocketsPool.setFactory(getSocketFactory());
-        dispatcherSocketsPool.setTestOnBorrow(true);
-        dispatcherSocketsPool.setTestOnReturn(true);
+        socketsPool.setFactory(getSocketFactory());
+        socketsPool.setTestOnBorrow(true);
+        socketsPool.setTestOnReturn(true);
         //There should only be one pooled instance per socket (key)
-        dispatcherSocketsPool.setMaxActive(1);
+        socketsPool.setMaxActive(1);
+        socketsPool.setWhenExhaustedAction(GenericKeyedObjectPool.WHEN_EXHAUSTED_BLOCK);
     }
 
     protected void doDispose()
@@ -133,7 +134,7 @@ public class TcpConnector extends AbstractConnector
         logger.debug("Closing TCP connector");
         try
         {
-            dispatcherSocketsPool.close();
+            socketsPool.close();
         }
         catch (Exception e)
         {
@@ -148,7 +149,7 @@ public class TcpConnector extends AbstractConnector
     protected Socket getSocket(UMOImmutableEndpoint endpoint) throws Exception
     {
         TcpSocketKey socketKey = new TcpSocketKey(endpoint);
-        Socket socket = (Socket) dispatcherSocketsPool.borrowObject(socketKey);
+        Socket socket = (Socket) socketsPool.borrowObject(socketKey);
         if (logger.isDebugEnabled())
         {
             if (null != lastSocketKey)
@@ -156,7 +157,7 @@ public class TcpConnector extends AbstractConnector
                 logger.debug("same as " + lastSocketKey.hashCode() + "? " + lastSocketKey.equals(socketKey));
             }
             logger.debug("borrowing socket for " + socketKey.hashCode());
-            logger.debug("borrowing socket; debt " + dispatcherSocketsPool.getNumActive());
+            logger.debug("borrowing socket; debt " + socketsPool.getNumActive());
         }
         return socket;
     }
@@ -165,11 +166,11 @@ public class TcpConnector extends AbstractConnector
     {
         TcpSocketKey socketKey = new TcpSocketKey(endpoint);
         lastSocketKey = socketKey;
-        dispatcherSocketsPool.returnObject(socketKey, socket);
+        socketsPool.returnObject(socketKey, socket);
         if (logger.isDebugEnabled())
         {
             logger.debug("returning socket for " + socketKey.hashCode());
-            logger.debug("returned socket; debt " + dispatcherSocketsPool.getNumActive());
+            logger.debug("returned socket; debt " + socketsPool.getNumActive());
         }
     }
 
@@ -216,7 +217,7 @@ public class TcpConnector extends AbstractConnector
 
     protected void doDisconnect() throws Exception
     {
-        dispatcherSocketsPool.clear();
+        socketsPool.clear();
     }
 
     protected void doStart() throws UMOException
