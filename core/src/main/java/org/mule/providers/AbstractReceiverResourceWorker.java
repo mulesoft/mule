@@ -71,4 +71,5 @@ public abstract class AbstractReceiverResourceWorker extends AbstractReceiverWor
      * @throws Exception
      */
     protected abstract Object getNextMessage(Object resource) throws Exception;
+    
 }

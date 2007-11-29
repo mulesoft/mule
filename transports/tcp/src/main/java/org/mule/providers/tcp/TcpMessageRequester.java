@@ -35,50 +35,6 @@ public class TcpMessageRequester extends AbstractMessageRequester
         this.connector = (TcpConnector) endpoint.getConnector();
     }
 
-    private Object receiveFromSocket(final Socket socket, int timeout) throws IOException
-    {
-        final UMOImmutableEndpoint endpoint = getEndpoint();
-        DataInputStream underlyingIs = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-        TcpInputStream tis = new TcpInputStream(underlyingIs)
-        {
-            public void close() throws IOException
-            {
-                try
-                {
-                    connector.releaseSocket(socket, endpoint);
-                }
-                catch (IOException e)
-                {
-                   throw e;
-                }
-                catch (Exception e)
-                {
-                    IOException e2 = new IOException();
-                    e2.initCause(e);
-                    throw e2;
-                }
-            }
-
-        };
-
-        if (timeout >= 0)
-        {
-            socket.setSoTimeout(timeout);
-        }
-
-        try
-        {
-            return connector.getTcpProtocol().read(tis);
-        }
-        finally
-        {
-            if (!tis.isStreaming())
-            {
-                tis.close();
-            }
-        }
-    }
-
     /**
      * Make a specific request to the underlying transport
      *
@@ -87,15 +43,19 @@ public class TcpMessageRequester extends AbstractMessageRequester
      *            no data becomes available before the timeout elapses, null will be
      *            returned
      * @return the result of the request wrapped in a UMOMessage object. Null will be
-     *         returned if no data was avaialable
+     *         returned if no data was available
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
     protected UMOMessage doRequest(long timeout) throws Exception
     {
+        if (timeout > Integer.MAX_VALUE || timeout < 0)
+        {
+            throw new IllegalArgumentException("Timeout incorrect: " + timeout);
+        }
         Socket socket = connector.getSocket(endpoint);
         try
         {
-            Object result = receiveFromSocket(socket, (int)timeout);
+            Object result = TcpMessageDispatcher.receiveFromSocket(socket, (int)timeout, endpoint);
             if (result == null)
             {
                 return null;

@@ -51,6 +51,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
  */
 public class XmlMessageProtocol extends AbstractByteProtocol
 {
+    
     private static final String XML_PATTERN = "<?xml";
 
     private static final int READ_BUFFER_SIZE = 4096;

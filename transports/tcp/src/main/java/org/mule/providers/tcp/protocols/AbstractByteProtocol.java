@@ -10,6 +10,7 @@
 
 package org.mule.providers.tcp.protocols;
 
+import org.mule.impl.ResponseOutputStream;
 import org.mule.providers.tcp.TcpProtocol;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.ClassUtils;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
@@ -204,4 +206,10 @@ public abstract class AbstractByteProtocol implements TcpProtocol
             return data;
         }
     }
+
+    public ResponseOutputStream createResponse(Socket socket) throws IOException
+    {
+        return new ResponseOutputStream(socket, new ProtocolStream(this, streamOk, socket.getOutputStream()));
+    }
+
 }

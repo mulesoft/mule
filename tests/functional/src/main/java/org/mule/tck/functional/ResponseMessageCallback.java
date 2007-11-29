@@ -14,13 +14,13 @@ import org.mule.umo.UMOEventContext;
 /**
  * A test callback that writes the results of a service invocation to the response output stream
  * of the event
- * This should only be used when testing Asynchronous calls with the {@link FunctionalTestComponent} otherwise
- * you will get duplicate messages, since both this class and the {@link FunctionalTestComponent} will write
+ * This should only be used when testing Asynchronous calls with the {@link org.mule.tck.functional.FunctionalTestComponent} otherwise
+ * you will get duplicate messages, since both this class and the {@link org.mule.tck.functional.FunctionalTestComponent} will write
  * a return message back to the callee.
  *
- * @see org.mule.tck.functional.FunctionalTestComponent
+ * @see FunctionalTestComponent
  */
-public class ResponseWriterCallback extends CounterCallback
+public class ResponseMessageCallback extends CounterCallback
 {
 
     public void eventReceived(UMOEventContext context, Object component) throws Exception
@@ -32,13 +32,7 @@ public class ResponseWriterCallback extends CounterCallback
         super.eventReceived(context, component);
 
         String result = context.getMessageAsString() + " Received Async";
-        if (context.getOutputStream() == null)
-        {
-            throw new IllegalArgumentException("event context does not have an OutputStream associated");
-        }
-
-        context.getOutputStream().write(result.getBytes());
-        context.getOutputStream().flush();
+        context.dispatchEvent(result);
     }
-    
+
 }

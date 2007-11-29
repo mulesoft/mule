@@ -11,10 +11,12 @@
 package org.mule.providers.tcp.protocols;
 
 import org.mule.providers.tcp.TcpProtocol;
+import org.mule.impl.ResponseOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 
 /**
  * This precedes every message with a cookie.
@@ -52,6 +54,11 @@ public class SafeProtocol implements TcpProtocol
     {
         assureSibling(os);
         delegate.write(os, data);
+    }
+
+    public ResponseOutputStream createResponse(Socket socket) throws IOException
+    {
+        return new ResponseOutputStream(socket, new ProtocolStream(this, false, socket.getOutputStream()));
     }
 
     private void assureSibling(OutputStream os) throws IOException

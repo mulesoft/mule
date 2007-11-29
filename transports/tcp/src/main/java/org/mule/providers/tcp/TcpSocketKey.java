@@ -69,4 +69,9 @@ public class TcpSocketKey
         return address.getPort();
     }
 
+    public String toString()
+    {
+        return getInetAddress() + ":" + getPort();
+    }
+
 }

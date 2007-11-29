@@ -149,15 +149,20 @@ public class TcpConnector extends AbstractConnector
     protected Socket getSocket(UMOImmutableEndpoint endpoint) throws Exception
     {
         TcpSocketKey socketKey = new TcpSocketKey(endpoint);
-        Socket socket = (Socket) socketsPool.borrowObject(socketKey);
         if (logger.isDebugEnabled())
         {
+            logger.debug("borrowing socket for " + socketKey + "/" + socketKey.hashCode());
             if (null != lastSocketKey)
             {
                 logger.debug("same as " + lastSocketKey.hashCode() + "? " + lastSocketKey.equals(socketKey));
             }
-            logger.debug("borrowing socket for " + socketKey.hashCode());
-            logger.debug("borrowing socket; debt " + socketsPool.getNumActive());
+        }
+        Socket socket = (Socket) socketsPool.borrowObject(socketKey);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("borrowed socket, "
+                    + (socket.isClosed() ? "closed" : "open") 
+                    + "; debt " + socketsPool.getNumActive());
         }
         return socket;
     }

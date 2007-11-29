@@ -62,7 +62,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
             {
                 try
                 {
-                    Object result = receiveFromSocket(socket, event.getTimeout());
+                    Object result = receiveFromSocket(socket, event.getTimeout(), endpoint);
                     if (result == null)
                     {
                         return null;
@@ -112,9 +112,10 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         bos.flush();
     }
 
-    private Object receiveFromSocket(final Socket socket, int timeout) throws IOException
+    protected static Object receiveFromSocket(final Socket socket, int timeout, final UMOImmutableEndpoint endpoint)
+            throws IOException
     {
-        final UMOImmutableEndpoint endpoint = getEndpoint();
+        final TcpConnector connector = (TcpConnector) endpoint.getConnector();
         DataInputStream underlyingIs = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         TcpInputStream tis = new TcpInputStream(underlyingIs)
         {
@@ -135,19 +136,19 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     throw e2;
                 }
             }
-            
+
         };
-        
+
         if (timeout >= 0)
         {
             socket.setSoTimeout(timeout);
         }
-        
+
         try
         {
             return connector.getTcpProtocol().read(tis);
         }
-        finally 
+        finally
         {
             if (!tis.isStreaming())
             {

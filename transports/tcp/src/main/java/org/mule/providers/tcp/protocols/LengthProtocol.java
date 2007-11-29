@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class LengthProtocol extends DirectProtocol
 {
+    
     private static final Log logger = LogFactory.getLog(LengthProtocol.class);
     // TODO - can we not get this from the API somewhere?
     private static final int SIZE_INT = 4;

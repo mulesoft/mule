@@ -40,15 +40,28 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
+    public void testDispatchAndReplyViaStream() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Map props = new HashMap();
+        client.dispatch("asyncClientEndpoint1", TEST_MESSAGE, props);
+        // MULE-2754
+        Thread.sleep(200);
+        UMOMessage result =  client.request("asyncClientEndpoint1", 3000);
+        // expect failure - streaming not supported
+        assertNull(result);
+    }
+
     public void testDispatchAndReply() throws Exception
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
-
-        UMOMessage result =  client.request("asyncClientEndpoint", 10000);
-        assertNotNull(result);
-        assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
+        client.dispatch("asyncClientEndpoint2", TEST_MESSAGE, props);
+        // MULE-2754
+        Thread.sleep(200);
+        UMOMessage result =  client.request("asyncClientEndpoint2", 3000);
+        // expect failure - TCP simply can't work like this
+        assertNull(result);
     }
 
 }

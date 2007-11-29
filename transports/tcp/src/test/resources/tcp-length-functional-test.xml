@@ -14,10 +14,11 @@
     </tcp:connector>
 
     <tcp:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
-
-    <tcp:endpoint name="asyncClientEndpoint" host="localhost" port="60199" synchronous="false"/>
+    <tcp:endpoint name="asyncClientEndpoint1" host="localhost" port="60199" synchronous="false"/>
+    <tcp:endpoint name="asyncClientEndpoint2" host="localhost" port="60197" synchronous="false"/>
 
     <model name="main">
+
         <service name="testComponent1">
             <inbound-router>
                 <tcp:inbound-endpoint ref="clientEndpoint"/>
@@ -25,9 +26,11 @@
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 
+        <!-- this doesn't work because it uses the output stream and length encoding doesn't
+             support streams -->
         <service name="testComponent2">
             <inbound-router>
-                <tcp:inbound-endpoint ref="asyncClientEndpoint"/>
+                <tcp:inbound-endpoint ref="asyncClientEndpoint1"/>
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
@@ -39,6 +42,23 @@
                 </pooled-object>
             </component>
         </service>
+
+        <!-- this doesn't work because, in essence, the existing socket is opened in the wrong
+             direction.  so it keeps sending the reply to itself... -->
+        <service name="testComponent3">
+            <inbound-router>
+                <tcp:inbound-endpoint ref="asyncClientEndpoint2"/>
+            </inbound-router>
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <tcp:outbound-endpoint ref="asyncClientEndpoint2"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
     </model>
 
 </mule>

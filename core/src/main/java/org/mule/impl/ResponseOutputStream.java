@@ -26,6 +26,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 
 public class ResponseOutputStream extends BufferedOutputStream
 {
+
     private static ByteArrayOutputStream defaultStream = new ByteArrayOutputStream();
 
     private boolean used = false;
@@ -43,9 +44,9 @@ public class ResponseOutputStream extends BufferedOutputStream
         super(stream);
     }
 
-    public ResponseOutputStream(Socket socket) throws IOException
+    public ResponseOutputStream(Socket socket, OutputStream stream) throws IOException
     {
-        super(socket.getOutputStream());
+        super(stream);
         this.socket = socket;
     }
 
@@ -74,4 +75,5 @@ public class ResponseOutputStream extends BufferedOutputStream
     {
         return socket;
     }
+
 }
