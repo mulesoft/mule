@@ -228,16 +228,18 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         {
             super(resource, receiver, new ResponseOutputStream((Socket) resource));
 
-            this.socket = (Socket) resource;
+            socket = (Socket) resource;
 
             final TcpConnector tcpConnector = ((TcpConnector) connector);
-            this.protocol = tcpConnector.getTcpProtocol();
+            protocol = tcpConnector.getTcpProtocol();
 
             try
             {
                 tcpConnector.configureSocket(TcpConnector.SERVER, socket);
 
-                underlyingIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                // do we really need data input stream?
+//                underlyingIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                underlyingIn = new BufferedInputStream(socket.getInputStream());
                 dataIn = new TcpInputStream(underlyingIn)
                 {
                     public void close() throws IOException
@@ -254,7 +256,9 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                         }
                     }
                 };
-                dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+                // do we really need data output stream?
+//                dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+                dataOut = new BufferedOutputStream(socket.getOutputStream());
             }
             catch (IOException e)
             {
