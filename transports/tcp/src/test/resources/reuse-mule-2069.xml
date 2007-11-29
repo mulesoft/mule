@@ -10,13 +10,29 @@
 
     <tcp:connector name="tcp" reuseAddress="true"/>
     <tcp:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
+    <endpoint name="asyncClientEndpoint" address="tcp://localhost:60199" synchronous="false"/>
 
     <model name="main">
-        <service name="service">
+        <service name="testComponent1">
             <inbound-router>
-                <tcp:inbound-endpoint ref="clientEndpoint"/>
+                <inbound-endpoint ref="clientEndpoint"/>
             </inbound-router>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+        </service>
+
+        <service name="testComponent2">
+            <inbound-router>
+                <inbound-endpoint ref="asyncClientEndpoint"/>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="eventCallback">
+                            <spring:bean class="org.mule.tck.functional.ResponseWriterCallback"/>
+                        </spring:entry>
+                    </properties>
+                </singleton-object>
+            </component>
         </service>
     </model>
 

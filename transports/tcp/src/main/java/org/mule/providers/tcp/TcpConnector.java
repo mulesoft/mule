@@ -65,12 +65,12 @@ public class TcpConnector extends AbstractConnector
     private TcpProtocol tcpProtocol;
     private boolean keepSendSocketOpen = false;
     private boolean keepAlive = false;
-    private PooledSocketFactory socketFactory;
+    private AbstractTcpSocketFactory socketFactory;
     private SimpleServerSocketFactory serverSocketFactory;
     private GenericKeyedObjectPool dispatcherSocketsPool = new GenericKeyedObjectPool();
 
     //TODO MULE-2031 remove once fixed
-    private UMOImmutableEndpoint lastEndpoint;
+    private TcpSocketKey lastSocketKey;
 
     public TcpConnector()
     {
@@ -147,14 +147,15 @@ public class TcpConnector extends AbstractConnector
      */
     protected Socket getSocket(UMOImmutableEndpoint endpoint) throws Exception
     {
-        Socket socket = (Socket) dispatcherSocketsPool.borrowObject(endpoint);
+        TcpSocketKey socketKey = new TcpSocketKey(endpoint);
+        Socket socket = (Socket) dispatcherSocketsPool.borrowObject(socketKey);
         if (logger.isDebugEnabled())
         {
-            if (null != lastEndpoint)
+            if (null != lastSocketKey)
             {
-                logger.debug("same as " + lastEndpoint.hashCode() + "? " + lastEndpoint.equals(endpoint));
+                logger.debug("same as " + lastSocketKey.hashCode() + "? " + lastSocketKey.equals(socketKey));
             }
-            logger.debug("borrowing socket for " + endpoint.hashCode());
+            logger.debug("borrowing socket for " + socketKey.hashCode());
             logger.debug("borrowing socket; debt " + dispatcherSocketsPool.getNumActive());
         }
         return socket;
@@ -162,11 +163,12 @@ public class TcpConnector extends AbstractConnector
 
     void releaseSocket(Socket socket, UMOImmutableEndpoint endpoint) throws Exception
     {
-        lastEndpoint = endpoint;
-        dispatcherSocketsPool.returnObject(endpoint, socket);
+        TcpSocketKey socketKey = new TcpSocketKey(endpoint);
+        lastSocketKey = socketKey;
+        dispatcherSocketsPool.returnObject(socketKey, socket);
         if (logger.isDebugEnabled())
         {
-            logger.debug("returning socket for " + endpoint.hashCode());
+            logger.debug("returning socket for " + socketKey.hashCode());
             logger.debug("returned socket; debt " + dispatcherSocketsPool.getNumActive());
         }
     }
@@ -380,12 +382,12 @@ public class TcpConnector extends AbstractConnector
         this.sendTcpNoDelay = sendTcpNoDelay;
     }
 
-    protected void setSocketFactory(PooledSocketFactory socketFactory)
+    protected void setSocketFactory(AbstractTcpSocketFactory socketFactory)
     {
         this.socketFactory = socketFactory;
     }
 
-    protected PooledSocketFactory getSocketFactory()
+    protected AbstractTcpSocketFactory getSocketFactory()
     {
         return socketFactory;
     }

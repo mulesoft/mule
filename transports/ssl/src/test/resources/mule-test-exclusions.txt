@@ -2,5 +2,3 @@
 # Test cases listed in this file are not run.
 #
 
-org.mule.providers.ssl.issues.AsynchronousSslMule1854TestCase
-

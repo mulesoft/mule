@@ -40,16 +40,15 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
     }
 
-    // see AsynchMule1869TestCase
-//    public void testDispatchAndReply() throws Exception
-//    {
-//        MuleClient client = new MuleClient();
-//        Map props = new HashMap();
-//        client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
-//
-//        UMOMessage result =  client.request("asyncClientEndpoint", 10000);
-//        assertNotNull(result);
-//        assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
-//    }
+    public void testDispatchAndReply() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Map props = new HashMap();
+        client.dispatch("asyncClientEndpoint", TEST_MESSAGE, props);
+
+        UMOMessage result =  client.request("asyncClientEndpoint", 10000);
+        assertNotNull(result);
+        assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
+    }
 
 }

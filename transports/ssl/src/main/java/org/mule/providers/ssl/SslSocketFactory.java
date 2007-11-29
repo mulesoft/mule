@@ -10,16 +10,16 @@
 
 package org.mule.providers.ssl;
 
-import org.mule.providers.tcp.TcpSocketFactory;
+import org.mule.providers.tcp.AbstractTcpSocketFactory;
+import org.mule.providers.tcp.TcpSocketKey;
 import org.mule.umo.security.tls.TlsConfiguration;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
-public class SslSocketFactory extends TcpSocketFactory 
+public class SslSocketFactory extends AbstractTcpSocketFactory
 {
 
     private TlsConfiguration tls;
@@ -29,12 +29,11 @@ public class SslSocketFactory extends TcpSocketFactory
         this.tls = tls;
     }
 
-    // @Override
-    protected Socket createSocket(int port, InetAddress inetAddress) throws IOException
+    protected Socket createSocket(TcpSocketKey key) throws IOException
     {
         try
         {
-            return tls.getSocketFactory().createSocket(inetAddress, port);
+            return tls.getSocketFactory().createSocket(key.getInetAddress(), key.getPort());
         }
         catch (NoSuchAlgorithmException e)
         {
