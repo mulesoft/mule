@@ -46,7 +46,8 @@ public interface TcpProtocol
 
     /**
      * This lets protocols encode a response stream.  If the protocol does not support a
-     * response stream (ie does not support streaming) then it should return null.
+     * response stream (ie does not support streaming) then the stream should thrown an
+     * exception when used.
      *
      * @param socket The destination to write to
      * @return A stream whose output will be encoded
