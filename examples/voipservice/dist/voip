@@ -22,5 +22,5 @@ fi
 MULE_LIB=./conf
 export MULE_LIB
 
-exec "$MULE_BASE/bin/mule" -config voip-broker-sync-config.xml -main org.mule.samples.voipservice.client.VoipConsumer
+exec "$MULE_BASE/bin/mule" -main org.mule.samples.voipservice.client.VoipConsumer
 

@@ -10,20 +10,31 @@
 
 package org.mule.samples.voipservice;
 
-import org.mule.samples.voipservice.client.VoipConsumer;
+import org.mule.extras.client.MuleClient;
+import org.mule.impl.MuleMessage;
+import org.mule.samples.voipservice.to.CreditCardTO;
+import org.mule.samples.voipservice.to.CreditProfileTO;
+import org.mule.samples.voipservice.to.CustomerTO;
+import org.mule.samples.voipservice.to.ServiceParamTO;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.UMOMessage;
 
-import junit.framework.TestCase;
-
-public class VoipConsumerTestCase extends TestCase
+public class VoipConsumerTestCase extends FunctionalTestCase
 {
-
-    // this is just a direct call to the example.
-    // if we call this inside a typical FunctionalTestCase the ports
-    // are already bound by the test case's own mule instance
-    public void testConsumerMain() throws Exception
+    protected String getConfigResources()
     {
-        VoipConsumer voipConsumer = new VoipConsumer("voip-broker-sync-config.xml");
-        voipConsumer.requestSend("vm://VoipBrokerRequests");
+        return "voip-broker-sync-config.xml";
+    }
+
+    public void testRequestSend() throws Exception
+    {
+        UMOMessage result;
+        CustomerTO customerTO = CustomerTO.getRandomCustomer();
+        CreditCardTO creditCardTO = CreditCardTO.getRandomCreditCard();
+        MuleClient client = new MuleClient();
+        result = client.send("VoipBrokerRequests", new ServiceParamTO(customerTO, creditCardTO), null);
+        CreditProfileTO creditProfileTO = (CreditProfileTO)((MuleMessage)result).getPayload();
+        boolean valid = creditProfileTO.isValid();
     }
 
 }

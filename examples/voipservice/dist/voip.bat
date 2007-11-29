@@ -10,5 +10,5 @@ REM This extends the classpath to include the configuration directory
 REM Any changes to the files in .\conf will take precedence over those deployed to %MULE_HOME%\lib\user
 SET MULE_LIB=.\conf
 
-call "%MULE_BASE%\bin\mule.bat" -main org.mule.samples.voipservice.client.VoipConsumer -config voip-broker-sync-config.xml 
+call "%MULE_BASE%\bin\mule.bat" -main org.mule.samples.voipservice.client.VoipConsumer 
 
