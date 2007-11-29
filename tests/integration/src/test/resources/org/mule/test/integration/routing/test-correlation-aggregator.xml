@@ -20,8 +20,8 @@
                 <static-recipient-list-router>
                     <reply-to address="vm://Aggregator.queue"/>
                     <recipients>
-                        <outbound-endpoint address="vm://quoteprovider1.queue"/>
-                        <outbound-endpoint address="vm://quoteprovider2.queue"/>
+                        <spring:value>vm://quoteprovider1.queue</spring:value>
+                        <spring:value>vm://quoteprovider2.queue</spring:value>
                     </recipients>
                 </static-recipient-list-router>
             </outbound-router>

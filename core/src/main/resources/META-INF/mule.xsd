@@ -1441,6 +1441,9 @@
     <xsd:complexType name="staticRecipientListRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteringOutboundRouterType">
+                <xsd:sequence>
+                    <xsd:element name="recipients" type="listOrSetType" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
                 <xsd:attribute name="recipientsProperty" type="xsd:string"/>
                 <xsd:attribute name="recipientsDelimiter" type="xsd:string"/>
             </xsd:extension>

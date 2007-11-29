@@ -1,5 +1,6 @@
 #
 # Test cases listed in this file are not run.
 #
-#MULE-2557
+
+# MULE-2557 This is because the message format has changed since there are now property scopes. Need to fix test.
 org.mule.transformers.xml.XmlUMOMessageTransformersTestCase

@@ -57,9 +57,6 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # Unfinished 2.x implementation
 ##########################################################################
 
-# MULE-2746 - Need to finish implementation of <static-recipient-list-router>
-org.mule.test.integration.routing.AggregatorIntegrationTestCase
-
 # MULE-2192, 2474
 # probably a duplicate of MessageChunkingMule2192TestCase?
 org.mule.test.integration.routing.MessageChunkingTestCase
@@ -76,21 +73,8 @@ org.mule.test.integration.client.MuleClientRemotingTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 org.mule.test.integration.spring.MuleAdminTestCase
 
-# MULE-2742
-org.mule.test.integration.models.DirectPipelineTestCase
-org.mule.test.integration.models.ConfigureModelTestCase
-
-# MULE-2741
-org.mule.test.integration.models.OptimisedSedaPipelineTestCase
-org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
-org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
-org.mule.test.integration.models.SedaPipelineTestCase
-
 # MULE-2740
 org.mule.test.integration.MuleEndpointConfigurationTestCase
-
-# MULE-1789
-org.mule.test.integration.config.MultiContainerTestCase
 
 # MULE-2739
 # Does this still need to work for 2.x?
@@ -141,4 +125,21 @@ org.mule.test.integration.streaming.FileToTcpStreamingTestCase
 # MULE-2733
 # @ in URI is not getting replaced (1 of 3 tests fails)
 org.mule.test.integration.util.ObjectNameHelperTestCase
+
+##########################################################################
+# Low priority
+##########################################################################
+
+# MULE-2742
+org.mule.test.integration.models.DirectPipelineTestCase
+org.mule.test.integration.models.ConfigureModelTestCase
+
+# MULE-2741
+org.mule.test.integration.models.OptimisedSedaPipelineTestCase
+org.mule.test.integration.models.SedaPipelineComponentPerRequestTestCase
+org.mule.test.integration.models.SedaPipelineNoPoolingTestCase
+org.mule.test.integration.models.SedaPipelineTestCase
+
+# MULE-1789
+org.mule.test.integration.config.MultiContainerTestCase
 
