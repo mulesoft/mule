@@ -94,7 +94,6 @@ mule-transport-jbpm
 mule-transport-jdbc
 mule-transport-jms
 mule-transport-multicast
-mule-transport-oracleaq
 mule-transport-quartz
 mule-transport-rmi
 mule-transport-soap
