@@ -15,7 +15,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.i18n.SoapMessages;
-import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -31,19 +30,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 
-import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.aegis.AegisBindingProvider;
 import org.codehaus.xfire.aegis.type.TypeMapping;
 import org.codehaus.xfire.aegis.type.basic.BeanType;
 import org.codehaus.xfire.client.Client;
-import org.codehaus.xfire.service.OperationInfo;
-import org.codehaus.xfire.service.Service;
 
 /**
  * The XFireMessageDispatcher is used for making Soap client requests to remote

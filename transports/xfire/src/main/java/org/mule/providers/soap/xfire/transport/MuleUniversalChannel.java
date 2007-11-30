@@ -248,13 +248,22 @@ public class MuleUniversalChannel extends AbstractChannel
         sp.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
         writeHeaders(message, sp);
 
-        // set all properties on the message adapter
+        // Allow custom http headers when using xfire (MULE-923)
         UMOMessage msg = RequestContext.getEvent().getMessage();
         for (Iterator i = msg.getPropertyNames().iterator(); i.hasNext();)
         {
             String propertyName = (String) i.next();
-            sp.setProperty(propertyName, msg.getProperty(propertyName));
+            // But, don't copy mule message properties that should be on message but not on soap request
+            // (MULE-2721)
+            // Also see AxisMessageDispatcher.setCustomProperties()
+            if (!(propertyName.startsWith(MuleProperties.PROPERTY_PREFIX)))
+            {
+                sp.setProperty(propertyName, msg.getProperty(propertyName));
+            }
         }
+        
+        System.out.println(sp.getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY));
+        System.out.println(sp.getReplyTo());
 
         UMOMessage result = send(getUri(), sp);
         if (result != null)
