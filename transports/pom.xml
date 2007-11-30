@@ -26,7 +26,6 @@
         <module>jdbc</module>
         <module>jms</module>
         <module>multicast</module>
-        <module>oaq</module>
         <module>quartz</module>
         <module>rmi</module>
         <module>soap</module>

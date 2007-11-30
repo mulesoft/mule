@@ -166,7 +166,6 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-jdbc</include>
         <include>org.mule.transports:mule-transport-jms</include>
         <include>org.mule.transports:mule-transport-multicast</include>
-        <include>org.mule.transports:mule-transport-oracleaq</include>
         <include>org.mule.transports:mule-transport-quartz</include>
         <include>org.mule.transports:mule-transport-rmi</include>
         <include>org.mule.transports:mule-transport-soap</include>
