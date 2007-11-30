@@ -141,7 +141,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             }
             for (int i = 0; i < files.length; i++)
             {
-                this.processFile(files[i]);
+                // don't process directories
+                if (files[i].isFile())
+                {
+                    this.processFile(files[i]);
+                }
             }
         }
         catch (Exception e)

@@ -32,7 +32,7 @@ import javax.resource.spi.work.Work;
 public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeCompletedListener
 {
     private Certificate[] peerCertificateChain;
-    private Certificate[] localCertificateChain; 
+    private Certificate[] localCertificateChain;
 
     public SslMessageReceiver(UMOConnector connector, UMOComponent component, UMOImmutableEndpoint endpoint)
             throws CreateException
@@ -74,9 +74,11 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
 
         protected void preRouteMuleMessage(MuleMessage message) throws Exception
         {
+            super.preRouteMuleMessage(message);
+
             preRoute(message);
         }
-        
+
         protected void shutdownSocket() throws IOException
         {
             // SSL Sockets don't support shutdownSocket

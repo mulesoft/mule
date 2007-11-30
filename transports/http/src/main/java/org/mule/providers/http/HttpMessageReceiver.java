@@ -11,6 +11,7 @@
 package org.mule.providers.http;
 
 import org.mule.RegistryContext;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -38,6 +39,7 @@ import org.mule.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -116,9 +118,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
     protected class HttpWorker implements Work
     {
-        private HttpServerConnection conn = null;
+        private HttpServerConnection conn;
         private String cookieSpec;
-        private boolean enableCookies = false;
+        private boolean enableCookies;
+        private String remoteClientAddress;
 
         public HttpWorker(Socket socket) throws IOException
         {
@@ -136,6 +139,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             enableCookies =
                     MapUtils.getBooleanValue(endpoint.getProperties(), HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY,
                             ((HttpConnector) connector).isEnableCookies());
+
+            final SocketAddress clientAddress = socket.getRemoteSocketAddress();
+            if (clientAddress != null)
+            {
+                remoteClientAddress = clientAddress.toString();
+            }
         }
 
         public void run()
@@ -209,9 +218,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
             // TODO Mule 2.0 generic way to set stream message adapter
             UMOMessageAdapter adapter = buildStandardAdapter(request, headers);
-            
+
             UMOMessage message = new MuleMessage(adapter);
-            
+
             if (logger.isDebugEnabled())
             {
                 logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
@@ -278,19 +287,19 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             return transformResponse(response);
         }
 
-        protected UMOMessageAdapter buildStandardAdapter(final HttpRequest request, 
+        protected UMOMessageAdapter buildStandardAdapter(final HttpRequest request,
                                                          final Map headers) throws MessagingException, TransformerException, IOException
         {
             final RequestLine requestLine = request.getRequestLine();
-            
+
             sendExpect100(headers, requestLine);
-            
+
             Object body = request.getBody();
             if (body == null)
             {
                 body = requestLine.getUri();
             }
-            
+
             return connector.getMessageAdapter(new Object[]{body, headers});
         }
 
@@ -390,14 +399,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             return headers;
         }
 
-        /**
-         * Needed for setting connection specific properties (like ssl-certificates) in {@link HttpsMessageReceiver}
-         * @see HttpsMessageReceiver
-         * @param message
-         */
         protected void preRouteMessage(UMOMessage message)
         {
-            // no op
+            message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress);
         }
 
         public void release()
@@ -468,8 +472,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // try again
             String uriStr = requestUri.toString();
             receiver = connector.lookupReceiver(uriStr);
-            
-            if (receiver == null) 
+
+            if (receiver == null)
             {
 				receiver = findReceiverByStem(connector.getReceivers(), uriStr);
 			}
@@ -485,10 +489,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         return receiver;
     }
-    
+
     protected HttpResponse transformResponse(Object response) throws TransformerException
     {
-        UMOMessage message = null;
+        UMOMessage message;
         if(response instanceof UMOMessage)
         {
             message = (UMOMessage)response;
@@ -497,7 +501,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         {
             message = new MuleMessage(response);
         }
-        //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using MuleMessage (or another static utility 
+        //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using MuleMessage (or another static utility
         //class
         message.applyTransformers(connector.getDefaultResponseTransformers(), HttpResponse.class);
         return (HttpResponse) message.getPayload();
