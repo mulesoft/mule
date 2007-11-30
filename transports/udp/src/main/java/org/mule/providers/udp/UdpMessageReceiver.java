@@ -16,7 +16,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.providers.udp.i18n.UdpMessages;
-import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;

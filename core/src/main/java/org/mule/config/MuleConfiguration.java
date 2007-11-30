@@ -35,9 +35,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleConfiguration
 {
+
     /** logger used by this class */
     protected transient Log logger = LogFactory.getLog(getClass());
-
 
     /**
      * Specifies whether mule should process messages sysnchonously, i.e. that a

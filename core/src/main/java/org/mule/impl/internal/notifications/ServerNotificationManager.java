@@ -13,9 +13,7 @@ package org.mule.impl.internal.notifications;
 import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.ManagementContextAware;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
@@ -48,33 +46,39 @@ import org.apache.commons.logging.LogFactory;
  * <code>ServerNotificationManager</code> manages all server listeners for a Mule
  * instance.
  */
-public class ServerNotificationManager implements Work, Disposable, ManagementContextAware
+public class ServerNotificationManager implements Work, Disposable
 {
-    /**
-     * logger used by this class
-     */
+
     protected static final Log logger = LogFactory.getLog(ServerNotificationManager.class);
 
     public static final String NULL_SUBSCRIPTION = "NULL";
 
+    /**
+     * This defines which event is associated with a particular listener interface.
+     * Only a single event is associated with any particular listener interface,
+     * and it is the first type registers (subsequent registrations are discarded)
+     */
     private ConcurrentMap eventsMap;
+
+    /**
+     * This is used to allow asynchronous dispatching of events
+     */
     private BlockingDeque eventQueue;
+
+    /**
+     * This is the set of listeners that may receive an event.
+     * When a listener is registered {@link eventsMap} is checked to see what events it will receive
+     * (it can receive more than one if it implements more than one interface).
+     */
     private Set listeners;
     private WorkListener workListener;
     private volatile boolean disposed = false;
-    private UMOManagementContext managementContext;
 
     public ServerNotificationManager()
     {
         eventsMap = new ConcurrentHashMap();
         eventQueue = new LinkedBlockingDeque();
         listeners = new ConcurrentHashSet();
-    }
-
-
-    public void setManagementContext(UMOManagementContext context)
-    {
-        this.managementContext = context;
     }
 
     public void start(UMOWorkManager workManager) throws LifecycleException
@@ -127,12 +131,7 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
     {
         if (UMOServerNotification.class.isAssignableFrom(eventType))
         {
-            Class previousEventType = (Class) eventsMap.putIfAbsent(listenerType, eventType);
-            if (previousEventType != null)
-            {
-                eventType = previousEventType;
-            }
-            else
+            if (null == eventsMap.putIfAbsent(listenerType, eventType))
             {
                 if (logger.isDebugEnabled())
                 {
@@ -144,14 +143,14 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
         else
         {
             throw new IllegalArgumentException(
-                CoreMessages.propertyIsNotSupportedType("eventType",
-                UMOServerNotification.class, eventType).getMessage());
+                    CoreMessages.propertyIsNotSupportedType("eventType",
+                            UMOServerNotification.class, eventType).getMessage());
         }
     }
 
     public void registerListener(UMOServerNotificationListener listener) throws NotificationException
     {
-        this.registerListener(listener, null);
+        registerListener(listener, null);
     }
 
     public void registerListener(UMOServerNotificationListener listener, String subscription)
@@ -237,15 +236,6 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
         this.dispose();
     }
 
-    /**
-     * When an object implementing interface <code>Runnable</code> is used to
-     * create a thread, starting the thread causes the object's <code>run</code>
-     * method to be called in that separately executing thread. <p/> The general
-     * contract of the method <code>run</code> is that it may take any action
-     * whatsoever.
-     * 
-     * @see Thread#run()
-     */
     public void run()
     {
         while (!disposed)
@@ -313,7 +303,7 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
 
         public boolean matches(UMOServerNotification notification)
         {
-            if (this.subscriptionMatches(notification))
+            if (subscriptionMatches(notification))
             {
                 for (Iterator iterator = notificationClasses.iterator(); iterator.hasNext();)
                 {
@@ -324,21 +314,13 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
                     }
                 }
             }
-
             return false;
         }
 
         public boolean subscriptionMatches(UMOServerNotification notification)
         {
             String resourceId = notification.getResourceIdentifier();
-            if (NULL_SUBSCRIPTION.equals(subscription) || subscriptionFilter.accept(resourceId))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return NULL_SUBSCRIPTION.equals(subscription) || subscriptionFilter.accept(resourceId);
         }
     }
 
@@ -363,4 +345,5 @@ public class ServerNotificationManager implements Work, Disposable, ManagementCo
         }
         this.workListener = workListener;
     }
+
 }

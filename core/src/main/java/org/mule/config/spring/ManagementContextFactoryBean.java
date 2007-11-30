@@ -130,7 +130,8 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
     {
         super.afterPropertiesSet();
         init();
-        managementContext.setNotificationManager(notificationManager);
+        // now set directly in registry
+//        managementContext.setNotificationManager(notificationManager);
         managementContext.setQueueManager(queueManager);
         managementContext.setSecurityManager(securityManager);
         managementContext.setWorkManager(workManager);
@@ -280,10 +281,10 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
         return notificationManager;
     }
 
-    public void setNotificationManager(ServerNotificationManager notificationManager)
-    {
-        this.notificationManager = notificationManager;
-    }
+//    public void setNotificationManager(ServerNotificationManager notificationManager)
+//    {
+//        this.notificationManager = notificationManager;
+//    }
 
     public QueueManager getQueueManager()
     {

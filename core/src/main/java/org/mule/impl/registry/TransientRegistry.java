@@ -539,6 +539,7 @@ public class TransientRegistry extends AbstractRegistry
         ThreadingProfile tp = config.getDefaultThreadingProfile();
         UMOWorkManager workManager = new MuleWorkManager(tp, "MuleServer");
 
+        // is this necessary?  it's also created in spring
         ServerNotificationManager notificationManager = new ServerNotificationManager();
         notificationManager.registerEventType(ManagerNotificationListener.class, ManagerNotification.class);
         notificationManager.registerEventType(ModelNotificationListener.class, ModelNotification.class);
@@ -567,7 +568,7 @@ public class TransientRegistry extends AbstractRegistry
 
         context.setId(UUID.getUUID());
 
-//      // TODO MULE-2161
+        // TODO MULE-2161
         MuleServer.setManagementContext(context);
         registry.registerObject(MuleProperties.OBJECT_MANAGEMENT_CONTEXT, context, context);
 

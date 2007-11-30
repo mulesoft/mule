@@ -14,6 +14,7 @@ import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.Registry;
+import org.mule.registry.RegistrationException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
@@ -61,7 +62,7 @@ public interface UMOManagementContext extends Lifecycle
 
     ServerNotificationManager getNotificationManager();
 
-    void setNotificationManager(ServerNotificationManager notificationManager);
+    void setNotificationManager(ServerNotificationManager notificationManager) throws RegistrationException;
     
     /**
      * Determines if the server has been started
