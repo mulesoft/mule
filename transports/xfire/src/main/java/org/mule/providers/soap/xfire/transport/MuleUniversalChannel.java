@@ -261,9 +261,6 @@ public class MuleUniversalChannel extends AbstractChannel
                 sp.setProperty(propertyName, msg.getProperty(propertyName));
             }
         }
-        
-        System.out.println(sp.getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY));
-        System.out.println(sp.getReplyTo());
 
         UMOMessage result = send(getUri(), sp);
         if (result != null)
