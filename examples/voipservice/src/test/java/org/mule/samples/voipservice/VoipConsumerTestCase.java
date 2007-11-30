@@ -26,6 +26,11 @@ public class VoipConsumerTestCase extends FunctionalTestCase
         return "voip-broker-sync-config.xml";
     }
 
+    public void testConfigSanity()
+    {
+        // no-op
+    }
+    
     public void testRequestSend() throws Exception
     {
         UMOMessage result;
