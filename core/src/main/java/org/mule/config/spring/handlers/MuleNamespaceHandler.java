@@ -23,7 +23,6 @@ import org.mule.config.spring.factories.ResponseEndpointFactoryBean;
 import org.mule.config.spring.parsers.collection.AttributeMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;

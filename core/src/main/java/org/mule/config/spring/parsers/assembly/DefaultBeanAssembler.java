@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
+import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -154,26 +155,16 @@ public class DefaultBeanAssembler implements BeanAssembler
         PropertyValue pv = target.getPropertyValues().getPropertyValue(newName);
         if (! targetConfig.isIgnored(oldName))
         {
-            // this handles ChildMapEntryDefinitionParser
-            if (source instanceof ChildMapEntryDefinitionParser.KeyValuePair)
+            if (ChildMapEntryDefinitionParser.KeyValuePair.class.getName().equals(bean.getBeanDefinition().getBeanClassName()))
             {
                 if (pv == null)
                 {
                     pv = new PropertyValue(newName, new ManagedMap());
                 }
-                ChildMapEntryDefinitionParser.KeyValuePair pair = (ChildMapEntryDefinitionParser.KeyValuePair) source;
-                ((Map) pv.getValue()).put(pair.getKey(), pair.getValue());
-            }
-            // this handles SimpleChildMapEntryDefinitionParser
-            else if (ChildMapEntryDefinitionParser.KeyValuePair.class.getName().equals(bean.getBeanDefinition().getBeanClassName()))
-            {
-                if (pv == null)
-                {
-                    pv = new PropertyValue(newName, new ManagedMap());
-                }
+                PropertyValues pvs = bean.getRawBeanDefinition().getPropertyValues();
                 ((Map) pv.getValue()).put(
-                        bean.getRawBeanDefinition().getPropertyValues().getPropertyValue("key").getValue(),
-                        bean.getRawBeanDefinition().getPropertyValues().getPropertyValue("value").getValue());
+                        pvs.getPropertyValue(ChildMapEntryDefinitionParser.KEY).getValue(),
+                        pvs.getPropertyValue(ChildMapEntryDefinitionParser.VALUE).getValue());
             }
             else if (targetConfig.isCollection(oldName) ||
                     source instanceof ChildListEntryDefinitionParser.ListEntry)

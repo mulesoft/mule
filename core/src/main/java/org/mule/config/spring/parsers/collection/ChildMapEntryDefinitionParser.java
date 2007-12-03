@@ -7,59 +7,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.spring.parsers.collection;
 
-import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
-
-/**
- * Allows a series of key value pair elements to be set on the parent object (the enclosing XML element).
- * There is no need to define a surrounding 'map' element to contain the map entries.
- * This is useful for key value pair mappings for example -
- *
- * <code>
- *   <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
- *       <xm:jxpath-filter expectedValue="bar" expression="name">
- *           <xm:namespace prefix="foo" uri="http://foo.com"/>
- *           <xm:namespace prefix="bar" uri="http://bar.com"/>
- *       </xm:jxpath-filter>
- *   </mule:endpoint>
- * </code>
- *
- * Here <xm:namespace> refers to a Map of prefix/uri values.
- */
-public class ChildMapEntryDefinitionParser extends AbstractChildDefinitionParser
+public class ChildMapEntryDefinitionParser extends ChildDefinitionParser
 {
-    private String propertyName;
-    private String keyName;
-    private String valueName;
+
+    public static final String KEY = "key";
+    public static final String VALUE = "value";
 
     public ChildMapEntryDefinitionParser(String mapName, String keyName, String valueName)
     {
-        this.propertyName = mapName;
-        this.keyName = keyName;
-        this.valueName = valueName;
-    }
-
-    public String getPropertyName(Element e)
-    {
-        return propertyName;
-    }
-
-    protected Class getBeanClass(Element element)
-    {
-        return ChildMapEntryDefinitionParser.KeyValuePair.class;
-    }
-
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        String key = element.getAttribute(keyName);
-        String value = element.getAttribute(valueName);
-        builder.setSource(new ChildMapEntryDefinitionParser.KeyValuePair(key, value));
-        postProcess(getBeanAssembler(element, builder), element);
+        super(mapName, KeyValuePair.class);
+        addAlias(keyName, KEY);
+        addAlias(valueName, VALUE);
     }
 
     public static class KeyValuePair
@@ -87,7 +50,6 @@ public class ChildMapEntryDefinitionParser extends AbstractChildDefinitionParser
             return value;
         }
 
-
         public void setKey(String key)
         {
             this.key = key;
@@ -99,5 +61,4 @@ public class ChildMapEntryDefinitionParser extends AbstractChildDefinitionParser
         }
 
     }
-
 }

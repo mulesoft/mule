@@ -10,7 +10,7 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.collection.SimpleChildMapEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class NotificationRouteDefinitionParser extends SimpleChildMapEntryDefinitionParser
+public class NotificationRouteDefinitionParser extends ChildMapEntryDefinitionParser
 {
 
     public static final Map EVENT_MAP;
