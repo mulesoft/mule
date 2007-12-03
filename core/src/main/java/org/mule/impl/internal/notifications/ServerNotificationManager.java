@@ -22,12 +22,8 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.ClassUtils;
 import org.mule.util.concurrent.ConcurrentHashSet;
 
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -39,12 +35,15 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkManager;
 
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>ServerNotificationManager</code> manages all server listeners for a Mule
- * instance.
+ * Manage all server listeners for a Mule instance.
  */
 public class ServerNotificationManager implements Work, Disposable
 {
@@ -67,11 +66,17 @@ public class ServerNotificationManager implements Work, Disposable
 
     /**
      * This is the set of listeners that may receive an event.
-     * When a listener is registered {@link eventsMap} is checked to see what events it will receive
+     * When a listener is registered {@link #eventsMap} is checked to see what events it will receive
      * (it can receive more than one if it implements more than one interface).
      */
     private Set listeners;
+
+    /**
+     * This is a doohickey needed by the work manager which seems to be what manages the thread
+     * that does the asynchronous notifications.
+     */
     private WorkListener workListener;
+    
     private volatile boolean disposed = false;
 
     public ServerNotificationManager()
@@ -93,10 +98,9 @@ public class ServerNotificationManager implements Work, Disposable
         }
     }
 
+    // this appends, since we configure a single instance multiple times
     public void setEventTypes(Map eventTypes) throws ClassNotFoundException
     {
-        eventsMap = new ConcurrentHashMap(eventTypes.size());
-
         for (Iterator iterator = eventTypes.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry) iterator.next();
@@ -157,6 +161,20 @@ public class ServerNotificationManager implements Work, Disposable
         throws NotificationException
     {
         listeners.add(new Listener(listener, subscription));
+    }
+
+    public void setListeners(Collection listeners) throws NotificationException
+    {
+        Iterator iterator = listeners.iterator();
+        while (iterator.hasNext())
+        {
+            registerListener((UMOServerNotificationListener) iterator.next());
+        }
+    }
+
+    public Collection getListeners()
+    {
+        return Collections.unmodifiableCollection(listeners);
     }
 
     public void unregisterListener(UMOServerNotificationListener listener)
@@ -261,6 +279,7 @@ public class ServerNotificationManager implements Work, Disposable
 
     protected class Listener
     {
+
         private final UMOServerNotificationListener listener;
         private final List notificationClasses;
         private final String subscription;

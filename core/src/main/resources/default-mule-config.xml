@@ -108,7 +108,9 @@
         </property>
     </bean>
 
-    <bean name="_muleNotificationManager" class="org.mule.impl.internal.notifications.ServerNotificationManager">
+    <!-- don't use the notifications element here as that is a reference to a named bean (this one!) -->
+    <bean name="_muleNotificationManager"
+          class="org.mule.impl.internal.notifications.ServerNotificationManager">
         <property name="eventTypes">
             <map>
                 <!-- we'll probably want to encapsulate these in to boolean switches -->

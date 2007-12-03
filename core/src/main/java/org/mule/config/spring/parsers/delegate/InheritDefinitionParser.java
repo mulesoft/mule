@@ -27,7 +27,12 @@ public class InheritDefinitionParser extends BooleanAttributeSelectionDefinition
 
     public InheritDefinitionParser(OrphanDefinitionParser orphan, NamedDefinitionParser named)
     {
-        super(INHERIT, false, named, orphan);
+        this(false, orphan, named);
+    }
+
+    public InheritDefinitionParser(boolean deflt, OrphanDefinitionParser orphan, NamedDefinitionParser named)
+    {
+        super(INHERIT, deflt, named, orphan);
     }
 
 }
