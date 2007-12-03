@@ -165,7 +165,7 @@ public class DefaultBeanAssembler implements BeanAssembler
                 ((Map) pv.getValue()).put(pair.getKey(), pair.getValue());
             }
             // this handles SimpleChildMapEntryDefinitionParser
-            else if (ChildMapEntryDefinitionParser.KeyValuePair.class.isAssignableFrom(bean.getBeanDefinition().getBeanClass()))
+            else if (ChildMapEntryDefinitionParser.KeyValuePair.class.getName().equals(bean.getBeanDefinition().getBeanClassName()))
             {
                 if (pv == null)
                 {
