@@ -154,6 +154,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         PropertyValue pv = target.getPropertyValues().getPropertyValue(newName);
         if (! targetConfig.isIgnored(oldName))
         {
+            // this handles ChildMapEntryDefinitionParser
             if (source instanceof ChildMapEntryDefinitionParser.KeyValuePair)
             {
                 if (pv == null)
@@ -162,6 +163,17 @@ public class DefaultBeanAssembler implements BeanAssembler
                 }
                 ChildMapEntryDefinitionParser.KeyValuePair pair = (ChildMapEntryDefinitionParser.KeyValuePair) source;
                 ((Map) pv.getValue()).put(pair.getKey(), pair.getValue());
+            }
+            // this handles SimpleChildMapEntryDefinitionParser
+            else if (ChildMapEntryDefinitionParser.KeyValuePair.class.isAssignableFrom(bean.getBeanDefinition().getBeanClass()))
+            {
+                if (pv == null)
+                {
+                    pv = new PropertyValue(newName, new ManagedMap());
+                }
+                ((Map) pv.getValue()).put(
+                        bean.getRawBeanDefinition().getPropertyValues().getPropertyValue("key").getValue(),
+                        bean.getRawBeanDefinition().getPropertyValues().getPropertyValue("value").getValue());
             }
             else if (targetConfig.isCollection(oldName) ||
                     source instanceof ChildListEntryDefinitionParser.ListEntry)

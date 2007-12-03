@@ -25,11 +25,28 @@ public class ChildListEntryDefinitionParser extends AbstractChildDefinitionParse
 {
 
     private String propertyName;
+    private String attributeName = null;
 
+    /**
+     * Takes value from enclosed text
+     *
+     * @param propertyName
+     */
     public ChildListEntryDefinitionParser(String propertyName)
     {
-        super();
         this.propertyName = propertyName;
+    }
+
+    /**
+     * Takes value from attribute
+     *
+     * @param propertyName
+     * @param attributeName
+     */
+    public ChildListEntryDefinitionParser(String propertyName, String attributeName)
+    {
+        this(propertyName);
+        this.attributeName = attributeName;
     }
 
     public String getPropertyName(Element element)
@@ -43,9 +60,17 @@ public class ChildListEntryDefinitionParser extends AbstractChildDefinitionParse
     }
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {   
-        String beanType = element.getChildNodes().item(0).getNodeValue();
-        builder.setSource(new ListEntry(beanType));
+    {
+        String value;
+        if (null == attributeName)
+        {
+            value = element.getChildNodes().item(0).getNodeValue();
+        }
+        else
+        {
+            value = element.getAttribute(attributeName);
+        }
+        builder.setSource(new ListEntry(value));
         postProcess(getBeanAssembler(element, builder), element);
     }
     

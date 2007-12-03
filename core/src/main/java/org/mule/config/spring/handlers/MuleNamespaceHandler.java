@@ -24,6 +24,7 @@ import org.mule.config.spring.parsers.collection.AttributeMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
@@ -52,6 +53,7 @@ import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParse
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
+import org.mule.config.spring.parsers.specific.NotificationRouteDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.impl.DefaultComponentExceptionStrategy;
@@ -162,7 +164,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
         registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
         registerBeanDefinitionParser("notifications", new NamedDefinitionParser(ManagementContext.NOTIFICATION_MANAGER));
-        registerBeanDefinitionParser("route", new ChildMapEntryDefinitionParser("eventType", "interface", "event"));
+        registerBeanDefinitionParser("route", new NotificationRouteDefinitionParser());
+        registerBeanDefinitionParser("disable", new ChildListEntryDefinitionParser("disableInterface", "interface"));
         registerBeanDefinitionParser("listener", new ParentDefinitionParser().addAlias("ref", "listener").addReference("listener"));
 
         //Connector elements

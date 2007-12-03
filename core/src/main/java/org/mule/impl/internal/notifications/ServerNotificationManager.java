@@ -99,12 +99,26 @@ public class ServerNotificationManager implements Work, Disposable
     }
 
     // this appends, since we configure a single instance multiple times
-    public void setEventTypes(Map eventTypes) throws ClassNotFoundException
+    public void setAppendEventTypes(Map eventTypes) throws ClassNotFoundException
     {
         for (Iterator iterator = eventTypes.entrySet().iterator(); iterator.hasNext();)
         {
             Map.Entry entry = (Map.Entry) iterator.next();
             registerEventType(getClassFromValue(entry.getKey()), getClassFromValue(entry.getValue()));
+        }
+    }
+
+    public void setEventTypes(Map eventTypes) throws ClassNotFoundException
+    {
+        eventsMap = new ConcurrentHashMap(eventTypes.size());
+        setAppendEventTypes(eventTypes);
+    }
+
+    public void setDisableInterface(Collection interfaces) throws ClassNotFoundException
+    {
+        for (Iterator iterator = interfaces.iterator(); iterator.hasNext();)
+        {
+            eventsMap.remove(getClassFromValue(iterator.next()));
         }
     }
 

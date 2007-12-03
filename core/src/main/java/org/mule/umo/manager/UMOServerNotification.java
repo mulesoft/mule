@@ -74,7 +74,7 @@ public abstract class UMOServerNotification extends EventObject
     {
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
-        if (RegistryContext.getRegistry() != null)
+        if (RegistryContext.getRegistry() != null && null != message)
         {
             serverId = message.toString();
         }

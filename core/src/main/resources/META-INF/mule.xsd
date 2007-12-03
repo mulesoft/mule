@@ -260,13 +260,50 @@
                 <xsd:element name="route" type="notificationRouterType"/>
             </xsd:sequence>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="disable" type="notificationDisableType"/>
+            </xsd:sequence>
+            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                 <xsd:element name="listener" type="notificationListenerType"/>
             </xsd:sequence>
         </xsd:sequence>
     </xsd:complexType>
 
     <xsd:complexType name="notificationRouterType">
-        <xsd:attribute name="event" type="substitutableClass"/>
+        <xsd:attribute name="event-class" type="substitutableClass">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The class associated with an event.
+                    This can be used instead of the event attribute to specify a custom class.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="event">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The class associated with an event.
+                    This can be used instead of the event attribute to specify a custom class.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="MANAGER"/>
+                    <xsd:enumeration value="MODEL"/>
+                    <xsd:enumeration value="COMPONENT"/>
+                    <xsd:enumeration value="SECURITY"/>
+                    <xsd:enumeration value="MANAGEMENT"/>
+                    <xsd:enumeration value="ADMIN"/>
+                    <xsd:enumeration value="CONNECTION"/>
+                    <xsd:enumeration value="REGISTRY"/>
+                    <xsd:enumeration value="CUSTOM"/>
+                    <xsd:enumeration value="EXCEPTION"/>
+                    <xsd:enumeration value="TRANSACTION"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="interface" type="substitutableClass"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="notificationDisableType">
         <xsd:attribute name="interface" type="substitutableClass"/>
     </xsd:complexType>
 
