@@ -10,6 +10,9 @@
 
 package org.mule.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.CharUtils;
 
 /**
@@ -35,16 +38,21 @@ public class StringUtils extends org.apache.commons.lang.StringUtils
             return ArrayUtils.EMPTY_STRING_ARRAY;
         }
 
-        String[] tokens = split(string, delim);
-        if (tokens != null)
+        String[] rawTokens = split(string, delim);
+        List tokens = new ArrayList();
+        String token;
+        if (rawTokens != null)
         {
-            for (int i = 0; i < tokens.length; i++)
+            for (int i = 0; i < rawTokens.length; i++)
             {
-                tokens[i] = trim(tokens[i]);
+                token = trim(rawTokens[i]);
+                if (isNotEmpty(token))
+                {
+                    tokens.add(token);
+                }
             }
         }
-
-        return tokens;
+        return (String[]) ArrayUtils.toArrayOfComponentType(tokens.toArray(), String.class);
     }
 
     /**

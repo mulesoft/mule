@@ -17,7 +17,7 @@ import java.util.Arrays;
 public class StringUtilsTestCase extends AbstractMuleTestCase
 {
 
-    public void testSplitWithTrimming()
+    public void testSplitAndTrim1()
     {
         String[] result = StringUtils.splitAndTrim(null, ",,");
         assertNull(result);
@@ -28,8 +28,11 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
 
         result = StringUtils.splitAndTrim(" ", ",");
         assertNotNull(result);
-        assertTrue(Arrays.equals(new String[]{""}, result));
+        assertTrue(Arrays.equals(ArrayUtils.EMPTY_STRING_ARRAY, result));
+    }
 
+    public void testSplitAndTrim2()
+    {
         String[] inputValues = new String[]{"foo", "bar", "baz", "kaboom"};
         String inputString = new StringBuffer(40)
             .append(inputValues[0])
@@ -43,6 +46,13 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
             .append(" ")
             .toString();
 
+        assertTrue(Arrays.equals(inputValues, StringUtils.splitAndTrim(inputString, ",")));
+    }
+
+    public void testSplitAndTrim3()
+    {
+        String[] inputValues = new String[]{"foo", "bar", "baz", "kaboom"};
+        String inputString = "foo,  bar,\nbaz,  \nkaboom";
         assertTrue(Arrays.equals(inputValues, StringUtils.splitAndTrim(inputString, ",")));
     }
 
