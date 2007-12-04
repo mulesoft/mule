@@ -50,8 +50,6 @@ import org.mule.util.concurrent.WaitableBoolean;
 import org.mule.util.object.ObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,42 +57,61 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** A base implementation for all UMOComponents in Mule */
+/**
+ * A base implementation for all UMOComponents in Mule
+ */
 public abstract class AbstractComponent implements UMOComponent
 {
-    /** logger used by this class */
+    /**
+     * logger used by this class
+     */
     protected transient Log logger = LogFactory.getLog(getClass());
 
     protected ComponentStatistics stats = null;
 
-    /** Determines if the component has been stopped */
+    /**
+     * Determines if the component has been stopped
+     */
     protected AtomicBoolean stopped = new AtomicBoolean(true);
 
-    /** Determines whether stop has been called and is still in progress */
+    /**
+     * Determines whether stop has been called and is still in progress
+     */
     protected WaitableBoolean stopping = new WaitableBoolean(false);
 
-    /** Determines if the component has been initilised */
+    /**
+     * Determines if the component has been initilised
+     */
     protected AtomicBoolean initialised = new AtomicBoolean(false);
 
-    /** The model in which this component is registered */
+    /**
+     * The model in which this component is registered
+     */
     protected UMOModel model;
 
-    /** Determines if the component has been paused */
+    /**
+     * Determines if the component has been paused
+     */
     protected WaitableBoolean paused = new WaitableBoolean(false);
 
     protected UMOManagementContext managementContext;
 
     protected UMOEntryPointResolverSet entryPointResolverSet;
 
-    /** The initial states that the component can be started in */
+    /**
+     * The initial states that the component can be started in
+     */
     public static final String INITIAL_STATE_STOPPED = "stopped";
     public static final String INITIAL_STATE_STARTED = "started";
     public static final String INITIAL_STATE_PAUSED = "paused";
 
-    /** The exception strategy used by the component. */
+    /**
+     * The exception strategy used by the component.
+     */
     protected ExceptionListener exceptionListener;
 
     /**
@@ -103,7 +120,9 @@ public abstract class AbstractComponent implements UMOComponent
      */
     protected ObjectFactory serviceFactory = new SingletonObjectFactory(PassThroughComponent.class);
 
-    /** The component's name */
+    /**
+     * The component's name
+     */
     protected String name;
 
     protected UMOInboundRouterCollection inboundRouter = new InboundRouterCollection();
@@ -122,7 +141,9 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected List initialisationCallbacks = new ArrayList();
 
-    /** Indicates whether a component has passed its initial startup state. */
+    /**
+     * Indicates whether a component has passed its initial startup state.
+     */
     private AtomicBoolean beyondInitialState = new AtomicBoolean(false);
 
     /**
@@ -132,7 +153,9 @@ public abstract class AbstractComponent implements UMOComponent
      */
     protected Map properties = new HashMap();
 
-    /** For Spring only */
+    /**
+     * For Spring only
+     */
     public AbstractComponent()
     {
         // nop
@@ -507,7 +530,9 @@ public abstract class AbstractComponent implements UMOComponent
         paused.whenFalse(null);
     }
 
-    /** @return the Mule descriptor name which is associated with the component */
+    /**
+     * @return the Mule descriptor name which is associated with the component
+     */
     public String getName()
     {
         return name;
@@ -716,7 +741,9 @@ public abstract class AbstractComponent implements UMOComponent
         }
     }
 
-    /** Returns a list of all incoming endpoints on a component. */
+    /**
+     * Returns a list of all incoming endpoints on a component.
+     */
     protected List getIncomingEndpoints()
     {
         List endpoints = new ArrayList();
