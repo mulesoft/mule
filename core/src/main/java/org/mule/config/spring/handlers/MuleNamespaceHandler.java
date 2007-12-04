@@ -52,7 +52,8 @@ import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParse
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
-import org.mule.config.spring.parsers.specific.NotificationRouteDefinitionParser;
+import org.mule.config.spring.parsers.specific.NotificationEnableDefinitionParser;
+import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.impl.DefaultComponentExceptionStrategy;
@@ -163,9 +164,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
         registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
         registerBeanDefinitionParser("notifications", new NamedDefinitionParser(ManagementContext.NOTIFICATION_MANAGER));
-        registerBeanDefinitionParser("route", new NotificationRouteDefinitionParser());
-        registerBeanDefinitionParser("disable", new ChildListEntryDefinitionParser("disableInterface", "interface"));
-        registerBeanDefinitionParser("listener", new ParentDefinitionParser().addAlias("ref", "listener").addReference("listener"));
+        registerBeanDefinitionParser("enable-notification", new NotificationEnableDefinitionParser());
+        registerBeanDefinitionParser("disable-notification", new NotificationDisableDefinitionParser());
+        registerBeanDefinitionParser("notification-listener", new ParentDefinitionParser().addAlias("ref", "listener").addReference("listener"));
 
         //Connector elements
         registerBeanDefinitionParser("dispatcher-threading-profile", new ThreadingProfileDefinitionParser("dispatcherThreadingProfile", MuleConfiguration.DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));

@@ -9,21 +9,24 @@
                http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <notifications>
+
         <!-- the test event is routed to the test interface -->
-        <route event-class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestEvent"
-               interface="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface"/>
+        <enable-notification
+                event-class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestEvent"
+                interface-class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface"/>
 
         <!-- adming events are routed to the test interface 2, but disabled for the usual admin listener -->
-        <route event="ADMIN"
-               interface="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface2"/>
-        <disable interface="org.mule.impl.internal.notifications.AdminNotificationListener"/>
+        <enable-notification event="ADMIN"
+                interface-class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface2"/>
+        <disable-notification interface="ADMIN"/>
 
         <!-- this receives the simple test event -->
-        <listener ref="listener"/>
+        <notification-listener ref="listener"/>
 
         <!-- the admin event should go to the test interface 2, but not to the disabled adming interface -->
-        <listener ref="listener2"/>
-        <listener ref="adminListener"/>
+        <notification-listener ref="listener2"/>
+        <notification-listener ref="adminListener"/>
+
     </notifications>
 
     <spring:bean name="listener"

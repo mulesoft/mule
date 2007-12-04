@@ -16,6 +16,7 @@ import org.mule.util.CoreXMLUtils;
 
 import org.w3c.dom.Element;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 
 
@@ -54,11 +55,6 @@ public class ChildListEntryDefinitionParser extends ChildDefinitionParser
         fromText = false;
     }
 
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
-    {
-        return super.parseDelegate(element, parserContext);    //To change body of overridden methods use File | Settings | File Templates.
-    }
-
     protected void postProcess(BeanAssembler assembler, Element element)
     {
         if (fromText)
@@ -66,6 +62,11 @@ public class ChildListEntryDefinitionParser extends ChildDefinitionParser
             assembler.extendBean(VALUE, CoreXMLUtils.getTextChild(element), false);
         }
         super.postProcess(assembler, element);
+    }
+
+    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
+    {
+        super.parseChild(element, parserContext, builder);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     public static class ListEntry
