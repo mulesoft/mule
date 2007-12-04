@@ -26,10 +26,8 @@
     <!-- TODO MULE-2731 -->
     <spring:bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <spring:property name="locations">
-            <spring:list>
-                <spring:value>proxy.properties</spring:value>
-            </spring:list>
+        <spring:property name="location">
+            <spring:value>proxy.properties</spring:value>
         </spring:property>
     </spring:bean>
 

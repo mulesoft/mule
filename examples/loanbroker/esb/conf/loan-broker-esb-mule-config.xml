@@ -19,7 +19,7 @@
 
     <spring:bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <spring:property name="location">
-            <spring:value>classpath:openejb.properties</spring:value>
+            <spring:value>openejb.properties</spring:value>
         </spring:property>
     </spring:bean>
 

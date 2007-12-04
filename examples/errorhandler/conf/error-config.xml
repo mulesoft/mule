@@ -50,10 +50,8 @@
     
     <spring:bean id="propertyPlaceholderConfigurer"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <spring:property name="locations">
-            <spring:list>
-                <spring:value>email.properties</spring:value>
-            </spring:list>
+        <spring:property name="location">
+            <spring:value>email.properties</spring:value>
         </spring:property>
     </spring:bean>
 

@@ -137,7 +137,7 @@
          *************************************************** -->
     <spring:bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <spring:property name="location">
-            <spring:value>classpath:derby.properties</spring:value>
+            <spring:value>derby.properties</spring:value>
         </spring:property>
     </spring:bean>
     <!-- BPMS object for Mule's BPM Connector -->
