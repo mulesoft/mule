@@ -150,34 +150,33 @@ public class DefaultBeanAssembler implements BeanAssembler
     {
         logger.debug("insert " + bean.getBeanDefinition().getBeanClassName() + " -> " + target.getBeanClassName());
         assertTargetPresent();
+        String beanClass = bean.getBeanDefinition().getBeanClassName();
+        PropertyValues pvs = bean.getRawBeanDefinition().getPropertyValues();
         String newName = bestGuessName(targetConfig, oldName, target.getBeanClassName());
-        Object source = bean.getBeanDefinition().getSource();
         PropertyValue pv = target.getPropertyValues().getPropertyValue(newName);
         if (! targetConfig.isIgnored(oldName))
         {
-            if (ChildMapEntryDefinitionParser.KeyValuePair.class.getName().equals(bean.getBeanDefinition().getBeanClassName()))
+            if (ChildMapEntryDefinitionParser.KeyValuePair.class.getName().equals(beanClass))
             {
                 if (pv == null)
                 {
                     pv = new PropertyValue(newName, new ManagedMap());
                 }
-                PropertyValues pvs = bean.getRawBeanDefinition().getPropertyValues();
                 ((Map) pv.getValue()).put(
                         pvs.getPropertyValue(ChildMapEntryDefinitionParser.KEY).getValue(),
                         pvs.getPropertyValue(ChildMapEntryDefinitionParser.VALUE).getValue());
             }
             else if (targetConfig.isCollection(oldName) ||
-                    source instanceof ChildListEntryDefinitionParser.ListEntry)
+                    ChildListEntryDefinitionParser.ListEntry.class.getName().equals(beanClass))
             {
                 if (pv == null)
                 {
                     pv = new PropertyValue(newName, new ManagedList());
                 }
                 List list = (List) pv.getValue();
-                if (source instanceof ChildListEntryDefinitionParser.ListEntry)
+                if (ChildListEntryDefinitionParser.ListEntry.class.getName().equals(beanClass))
                 {
-                    ChildListEntryDefinitionParser.ListEntry entry = (ChildListEntryDefinitionParser.ListEntry) source;
-                    list.add(entry.getProxiedObject());
+                    list.add(pvs.getPropertyValue(ChildListEntryDefinitionParser.VALUE).getValue());
                 }
                 else
                 {

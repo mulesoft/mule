@@ -39,14 +39,15 @@ public class ListElementTestCase extends AbstractNamespaceTestCase
         assertTrue(orphan.getKids().contains("kid2"));
     }
 
-    public void testListElement3()
-    {
-        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan3", OrphanBean.class);
-        assertNotNull(orphan.getKids());
-        assertTrue(orphan.getKids().size() == 3);
-        assertTrue(orphan.getKids().contains("kid1"));
-        assertTrue(orphan.getKids().contains("kid2"));
-        assertTrue(orphan.getKids().contains("kid3"));
-    }
+    // simpler list element parser doesn't support dynamic attribute
+//    public void testListElement3()
+//    {
+//        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan3", OrphanBean.class);
+//        assertNotNull(orphan.getKids());
+//        assertTrue(orphan.getKids().size() == 3);
+//        assertTrue(orphan.getKids().contains("kid1"));
+//        assertTrue(orphan.getKids().contains("kid2"));
+//        assertTrue(orphan.getKids().contains("kid3"));
+//    }
 
 }

@@ -10,10 +10,11 @@
 
 package org.mule.util;
 
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.Attr;
-import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
+import org.w3c.dom.NodeList;
 
 /**
  * These only depend on standard (JSE) XML classes and are used by Spring config code.
@@ -67,6 +68,29 @@ public class CoreXMLUtils
             name = attribute.getName();
         }
         return name;
+    }
+
+    public static String getTextChild(Element element)
+    {
+        NodeList children = element.getChildNodes();
+        String value = null;
+        for (int i = 0; i < children.getLength(); ++i)
+        {
+            Node child = children.item(i);
+            if (child.getNodeType() == Node.TEXT_NODE)
+            {
+                if (null != value)
+                {
+                    throw new IllegalStateException(
+                            "Element " + elementToString(element) + " has more than one text child.");
+                }
+                else
+                {
+                    value = child.getNodeValue();
+                }
+            }
+        }
+        return value;
     }
 
 }

@@ -70,13 +70,14 @@ public class ParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("addressed-orphan-endpoint", new AddressedEndpointDefinitionParser("test", AddressedEndpointDefinitionParser.PROTOCOL, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class), new String[]{}, new String[]{"path"}));
         registerBeanDefinitionParser("addressed-child-endpoint", new TransportEndpointDefinitionParser("test", InboundEndpointFactoryBean.class, new String[]{}));
 
-        registerBeanDefinitionParser("list-element-test-1", new AttributeListEntryDefinitionParser("kids", "listAttribute"));
+        registerBeanDefinitionParser("list-element-test-1", new ChildListEntryDefinitionParser("kids", "listAttribute"));
         registerBeanDefinitionParser("list-element-test-2",
                 new SingleParentFamilyDefinitionParser(
                         new OrphanDefinitionParser(OrphanBean.class, true))
-                        .addChildDelegate("kid1", new AttributeListEntryDefinitionParser("kids", "kid1"))
-                        .addChildDelegate("kid2", new AttributeListEntryDefinitionParser("kids", "kid2")));
-        registerBeanDefinitionParser("list-element-test-3", new AllAttributeChildDefinitionParser(new AttributeListEntryDefinitionParser("kids")));
+                        .addChildDelegate("kid1", new ChildListEntryDefinitionParser("kids", "kid1"))
+                        .addChildDelegate("kid2", new ChildListEntryDefinitionParser("kids", "kid2")));
+        // simpler list element parser doesn't support dynamic attribute
+//        registerBeanDefinitionParser("list-element-test-3", new AllAttributeChildDefinitionParser(new ChildListEntryDefinitionParser("kids")));
 
         registerBeanDefinitionParser("factory",
                 new ComplexComponentDefinitionParser(

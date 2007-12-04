@@ -15,9 +15,10 @@
 
     <parsers-test:list-element-test-2 name="orphan2" kid1="kid1" kid2="kid2"/>
 
-    <parsers-test:orphan name="orphan3">
+    <!-- simpler list element parser doesn't support dynamic attribute -->
+    <!-- parsers-test:orphan name="orphan3">
         <parsers-test:list-element-test-3 attr1="kid1" attr2="kid2"/>
         <parsers-test:list-element-test-3 attr1="kid3"/>
-    </parsers-test:orphan>
+    </parsers-test:orphan -->
     
 </beans>
