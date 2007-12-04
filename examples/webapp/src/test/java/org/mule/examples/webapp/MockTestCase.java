@@ -19,6 +19,10 @@ import com.mockobjects.dynamic.Mock;
 
 import javax.servlet.ServletContext;
 
+/**
+ * This test just basically checks that all the config files used in the webapp example 
+ * are valid and can co-exist without any conflicts.
+ */
 public class MockTestCase extends AbstractWebappTestCase
 {
     //@Override
@@ -32,7 +36,7 @@ public class MockTestCase extends AbstractWebappTestCase
                 "loan-broker-sync-config.xml," +
                 "loan-broker-axis-endpoints-config.xml";
     }
-    
+
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         Mock context = new Mock(ServletContext.class);

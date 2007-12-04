@@ -15,6 +15,7 @@
 
     <properties>
         <webappName>mule-examples</webappName>
+        <jettyVersion>6.1.6</jettyVersion>
     </properties>
 
     <build>
@@ -57,6 +58,26 @@
                  </configuration>
             </plugin>
 
+            <!-- skip unit test run, tests to be executed during integration-test phase -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>surefire-it</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                          <goal>test</goal>
+                        </goals>
+                        <configuration>
+                          <skip>false</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -65,27 +86,57 @@
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-echo</artifactId>
             <version>${version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-hello</artifactId>
             <version>${version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-stockquote</artifactId>
             <version>${version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-esn</artifactId>
             <version>${version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- For REST Servlet example -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -93,34 +144,12 @@
             <version>${version}</version>
         </dependency>
 
-        <!-- For Jetty unit test 
+        <!-- For Jetty unit test --> 
         <dependency>
-            <groupId>jetty</groupId>
-            <artifactId>org.mortbay.jetty</artifactId>
-            <version>5.1.12</version>
-            <!- Jetty 6.x see MULE-1821
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-            <version>6.1.3</version>
-            ->
-            <scope>test</scope>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>jetty</artifactId>
+          <version>${jettyVersion}</version>
+          <scope>test</scope>
         </dependency>
-        -->
-        
-        <!-- For Tomcat unit test -->
-        <!-- JDK 5 only
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>catalina</artifactId>
-            <version>6.0.13</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>jasper</artifactId>
-            <version>6.0.13</version>
-            <scope>test</scope>
-        </dependency>
-        -->
     </dependencies>
 </project>

@@ -10,49 +10,53 @@
 
 package org.mule.examples.webapp;
 
+import junit.framework.TestCase;
+
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 /**
-* This is a work in progress.  We may be better off using the maven-jetty-plugin in the "integration-tests"
-* phase of the m2 lifecycle to test the WAR. 
+ * This tests runs in Maven's "integration-test" phase, after the .war has been built.  
+ * It starts up the .war inside Jetty and runs tests against the Mule instance.
+ * Note that the MuleClient does not work in this case because we have no access to the
+ * ManagementContext (which is inside the Jetty container).
 */
-public class JettyTestCase extends AbstractWebappTestCase
+public class JettyTestCase extends TestCase
 {
-    public static final String WEBAPP_WAR_FILE = "/path/to/mule/examples/webapp/target/mule-examples.war";
+    public static final String WEBAPP_WAR_FILE = "./target/mule-examples.war";
     public static final String WEBAPP_CONTEXT_PATH = "/mule-examples";
     public static final int JETTY_PORT = 8090;
     
     private Server jetty = null;
     
     // @Override
-    protected void doSetUp() throws Exception
+    protected void setUp() throws Exception 
     {
-        super.doSetUp();
+        super.setUp();
 
         if (jetty == null)
         {
-            // Jetty 5.x
-            jetty = new Server();
-            WebApplicationContext wc = new WebApplicationContext(WEBAPP_WAR_FILE);
-            wc.setContextPath(WEBAPP_CONTEXT_PATH);
-            wc.setWAR(WEBAPP_WAR_FILE);
-            jetty.addContext(wc);
-            
-            // Jetty 6.x 
-            //jetty = new Server(JETTY_PORT);
-            //jetty.addHandler(new WebAppContext(WEBAPP_WAR_FILE, WEBAPP_CONTEXT_PATH));
+            jetty = new Server(JETTY_PORT);
+            jetty.addHandler(new WebAppContext(WEBAPP_WAR_FILE, WEBAPP_CONTEXT_PATH));
     
             jetty.start();
         }
     }
 
     // @Override
-    protected void doTearDown() throws Exception
+    protected void tearDown() throws Exception 
     {
         if (jetty != null)
         {
             jetty.stop();
         }
+        super.tearDown();
     }
+
+    public void testSanity() throws Exception
+    {
+        // empty
+    }
+    
+    // TODO Add the tests from AbstractWebappTestCase, but without using the MuleClient.
 }
