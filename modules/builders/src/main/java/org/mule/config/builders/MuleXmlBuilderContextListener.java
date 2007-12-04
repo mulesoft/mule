@@ -20,6 +20,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>MuleXmlBuilderContextListener</code> is a bootstrap listener used to
  * construct a MuleManager instance. This listener delegates to the
@@ -48,7 +51,9 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
     public static final String INIT_PARAMETER_WEBAPP_CLASSPATH = "org.mule.webapp.classpath";
 
     private UMOManagementContext managementContext;
-
+    
+    protected transient final Log logger = LogFactory.getLog(MuleXmlBuilderContextListener.class);
+    
     public void contextInitialized(ServletContextEvent event)
     {
         initialize(event.getServletContext());
@@ -60,6 +65,11 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
         if (config == null)
         {
             config = getDefaultConfigResource();
+            System.out.println("No Mule config file(s) specified, using default: " + config);
+        }
+        else
+        {
+            System.out.println("Mule config file(s): " + config);
         }
 
         String webappClasspath = context.getInitParameter(INIT_PARAMETER_WEBAPP_CLASSPATH);
@@ -121,10 +131,12 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
 
     public void destroy()
     {
-        if (!managementContext.isDisposing() || !managementContext.isDisposed())
+        if (managementContext != null)
         {
-            managementContext.dispose();
+            if (!managementContext.isDisposing() || !managementContext.isDisposed())
+            {
+                managementContext.dispose();
+            }
         }
     }
-
 }
