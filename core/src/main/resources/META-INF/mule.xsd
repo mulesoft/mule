@@ -257,10 +257,10 @@
     <xsd:complexType name="notificationManagerType">
         <xsd:sequence>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                <xsd:element name="enable-notification" type="notificationEnableType"/>
+                <xsd:element ref="abstract-enable-notification"/>
             </xsd:sequence>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                <xsd:element name="disable-notification" type="notificationDisableType"/>
+                <xsd:element ref="abstract-disable-notification"/>
             </xsd:sequence>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                 <xsd:element name="notification-listener" type="notificationListenerType"/>
@@ -268,98 +268,114 @@
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:complexType name="notificationEnableType">
-        <xsd:attribute name="event-class" type="substitutableClass">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The class associated with an event that will be delivered to the interface.
-                    This can be used instead of the event attribute to specify a custom class.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="event">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The event to deliver.
-                </xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="MANAGER"/>
-                    <xsd:enumeration value="MODEL"/>
-                    <xsd:enumeration value="COMPONENT"/>
-                    <xsd:enumeration value="SECURITY"/>
-                    <xsd:enumeration value="MANAGEMENT"/>
-                    <xsd:enumeration value="ADMIN"/>
-                    <xsd:enumeration value="CONNECTION"/>
-                    <xsd:enumeration value="REGISTRY"/>
-                    <xsd:enumeration value="CUSTOM"/>
-                    <xsd:enumeration value="EXCEPTION"/>
-                    <xsd:enumeration value="TRANSACTION"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
-        <xsd:attribute name="interface-class" type="substitutableClass">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The interface (class name) that will receive the event.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="interface">
-            <xsd:annotation>
-                 <xsd:documentation>
-                     The interface that will receive the event.
-                 </xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="MANAGER"/>
-                    <xsd:enumeration value="MODEL"/>
-                    <xsd:enumeration value="COMPONENT"/>
-                    <xsd:enumeration value="SECURITY"/>
-                    <xsd:enumeration value="MANAGEMENT"/>
-                    <xsd:enumeration value="ADMIN"/>
-                    <xsd:enumeration value="CONNECTION"/>
-                    <xsd:enumeration value="REGISTRY"/>
-                    <xsd:enumeration value="CUSTOM"/>
-                    <xsd:enumeration value="EXCEPTION"/>
-                    <xsd:enumeration value="TRANSACTION"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
+    <xsd:element name="abstract-enable-notification" abstract="true" type="abstractEnableNotificationType"/>
+    <xsd:complexType name="abstractEnableNotificationType"/>
+
+    <xsd:element name="abstract-disable-notification" abstract="true" type="abstractDisableNotificationType"/>
+    <xsd:complexType name="abstractDisableNotificationType"/>
+
+    <xsd:element name="enable-notification" substitutionGroup="abstract-enable-notification" type="enableNotificationType"/>
+    <xsd:complexType name="enableNotificationType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractEnableNotificationType">
+                <xsd:attribute name="event-class" type="substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The class associated with an event that will be delivered to the interface.
+                            This can be used instead of the event attribute to specify a custom class.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="event">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The event to deliver.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="MANAGER"/>
+                            <xsd:enumeration value="MODEL"/>
+                            <xsd:enumeration value="COMPONENT"/>
+                            <xsd:enumeration value="SECURITY"/>
+                            <xsd:enumeration value="MANAGEMENT"/>
+                            <xsd:enumeration value="ADMIN"/>
+                            <xsd:enumeration value="CONNECTION"/>
+                            <xsd:enumeration value="REGISTRY"/>
+                            <xsd:enumeration value="CUSTOM"/>
+                            <xsd:enumeration value="EXCEPTION"/>
+                            <xsd:enumeration value="TRANSACTION"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="interface-class" type="substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The interface (class name) that will receive the event.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="interface">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The interface that will receive the event.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="MANAGER"/>
+                            <xsd:enumeration value="MODEL"/>
+                            <xsd:enumeration value="COMPONENT"/>
+                            <xsd:enumeration value="SECURITY"/>
+                            <xsd:enumeration value="MANAGEMENT"/>
+                            <xsd:enumeration value="ADMIN"/>
+                            <xsd:enumeration value="CONNECTION"/>
+                            <xsd:enumeration value="REGISTRY"/>
+                            <xsd:enumeration value="CUSTOM"/>
+                            <xsd:enumeration value="EXCEPTION"/>
+                            <xsd:enumeration value="TRANSACTION"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="notificationDisableType">
-        <xsd:attribute name="interface-class" type="substitutableClass">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The interface (class name) that will no longer receive an event.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="interface">
-            <xsd:annotation>
-                 <xsd:documentation>
-                     The interface that will no longer receive an event.
-                 </xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="MANAGER"/>
-                    <xsd:enumeration value="MODEL"/>
-                    <xsd:enumeration value="COMPONENT"/>
-                    <xsd:enumeration value="SECURITY"/>
-                    <xsd:enumeration value="MANAGEMENT"/>
-                    <xsd:enumeration value="ADMIN"/>
-                    <xsd:enumeration value="CONNECTION"/>
-                    <xsd:enumeration value="REGISTRY"/>
-                    <xsd:enumeration value="CUSTOM"/>
-                    <xsd:enumeration value="EXCEPTION"/>
-                    <xsd:enumeration value="TRANSACTION"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
+    <xsd:element name="disable-notification" substitutionGroup="abstract-disable-notification" type="disableNotificationType"/>
+    <xsd:complexType name="disableNotificationType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractDisableNotificationType">
+                <xsd:attribute name="interface-class" type="substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The interface (class name) that will no longer receive an event.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="interface">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The interface that will no longer receive an event.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="MANAGER"/>
+                            <xsd:enumeration value="MODEL"/>
+                            <xsd:enumeration value="COMPONENT"/>
+                            <xsd:enumeration value="SECURITY"/>
+                            <xsd:enumeration value="MANAGEMENT"/>
+                            <xsd:enumeration value="ADMIN"/>
+                            <xsd:enumeration value="CONNECTION"/>
+                            <xsd:enumeration value="REGISTRY"/>
+                            <xsd:enumeration value="CUSTOM"/>
+                            <xsd:enumeration value="EXCEPTION"/>
+                            <xsd:enumeration value="TRANSACTION"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="notificationListenerType">
