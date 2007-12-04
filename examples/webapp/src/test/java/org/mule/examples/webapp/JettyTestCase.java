@@ -10,6 +10,9 @@
 
 package org.mule.examples.webapp;
 
+import org.mule.extras.client.MuleClient;
+import org.mule.umo.UMOMessage;
+
 import junit.framework.TestCase;
 
 import org.mortbay.jetty.Server;
@@ -21,7 +24,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
  * Note that the MuleClient does not work in this case because we have no access to the
  * ManagementContext (which is inside the Jetty container).
 */
-public class JettyTestCase extends TestCase
+public class JettyTestCase extends TestCase // TODO MULE-2768
 {
     public static final String WEBAPP_WAR_FILE = "./target/mule-examples.war";
     public static final String WEBAPP_CONTEXT_PATH = "/mule-examples";
