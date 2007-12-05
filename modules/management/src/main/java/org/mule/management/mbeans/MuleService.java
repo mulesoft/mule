@@ -10,6 +10,7 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.MuleServer;
 import org.mule.config.MuleManifest;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -209,5 +210,10 @@ public class MuleService implements MuleServiceMBean
     public String getInstanceId()
     {
         return managementContext.getId();
+    }
+
+    public String getConfigBuilderClassName()
+    {
+        return MuleServer.getConfigBuilderClassName();
     }
 }

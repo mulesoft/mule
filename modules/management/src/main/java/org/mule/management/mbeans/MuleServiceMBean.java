@@ -59,4 +59,11 @@ public interface MuleServiceMBean
     String getBuildDate();
 
     String getInstanceId();
+
+    /**
+     * Contains value of option -builder
+     *
+     * @return builder class name
+     */
+    String getConfigBuilderClassName();
 }
