@@ -17,7 +17,7 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.NotificationException;
-import org.mule.impl.internal.notifications.ServerNotificationManager;
+import org.mule.impl.internal.notifications.manager.ServiceNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
@@ -237,7 +237,7 @@ public class ManagementContext implements UMOManagementContext
 
     public void dispose()
     {
-        ServerNotificationManager notificationManager = getNotificationManager();
+        ServiceNotificationManager notificationManager = getNotificationManager();
         lifecycleManager.checkPhase(Disposable.PHASE_NAME);
         fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_DISPOSING));
 
@@ -442,20 +442,20 @@ public class ManagementContext implements UMOManagementContext
 
     public void registerListener(UMOServerNotificationListener l, String resourceIdentifier) throws NotificationException
     {
-        ServerNotificationManager notificationManager = getNotificationManager();
+        ServiceNotificationManager notificationManager = getNotificationManager();
         if (notificationManager == null)
         {
             throw new MuleRuntimeException(CoreMessages.serverNotificationManagerNotEnabled());
         }
-        notificationManager.registerListener(l, resourceIdentifier);
+        notificationManager.addListenerSubscription(l, resourceIdentifier);
     }
 
     public void unregisterListener(UMOServerNotificationListener l)
     {
-        ServerNotificationManager notificationManager = getNotificationManager();
+        ServiceNotificationManager notificationManager = getNotificationManager();
         if (notificationManager != null)
         {
-            notificationManager.unregisterListener(l);
+            notificationManager.removeListener(l);
         }
     }
 
@@ -471,7 +471,7 @@ public class ManagementContext implements UMOManagementContext
      */
     public void fireNotification(UMOServerNotification notification)
     {
-        ServerNotificationManager notificationManager = getNotificationManager();
+        ServiceNotificationManager notificationManager = getNotificationManager();
         if (notificationManager != null)
         {
             notificationManager.fireEvent(notification);
@@ -606,12 +606,12 @@ public class ManagementContext implements UMOManagementContext
         this.queueManager = queueManager;
     }
 
-    public ServerNotificationManager getNotificationManager()
+    public ServiceNotificationManager getNotificationManager()
     {
-        return (ServerNotificationManager) getRegistry().lookupObject(NOTIFICATION_MANAGER);
+        return (ServiceNotificationManager) getRegistry().lookupObject(NOTIFICATION_MANAGER);
     }
 
-    public void setNotificationManager(ServerNotificationManager notificationManager)
+    public void setNotificationManager(ServiceNotificationManager notificationManager)
             throws RegistrationException
     {
         checkLifecycleForPropertySet(NOTIFICATION_MANAGER, Initialisable.PHASE_NAME);

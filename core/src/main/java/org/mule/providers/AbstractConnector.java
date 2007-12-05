@@ -269,7 +269,6 @@ public abstract class AbstractConnector
 
     public AbstractConnector()
     {
-        //Todo RM*
         //enableMessageEvents = RegistryContext.getConfiguration().isEnableMessageEvents();
 
         // always add at least the default protocol

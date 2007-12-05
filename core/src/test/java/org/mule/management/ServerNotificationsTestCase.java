@@ -10,7 +10,6 @@
 
 package org.mule.management;
 
-import org.mule.RegistryContext;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.impl.internal.notifications.ComponentNotificationListener;
 import org.mule.impl.internal.notifications.CustomNotification;
@@ -22,7 +21,6 @@ import org.mule.impl.internal.notifications.ModelNotificationListener;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.manager.UMOServerNotification;
-import org.mule.umo.model.UMOModel;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -38,19 +36,12 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     private final AtomicBoolean modelStopped = new AtomicBoolean(false);
     private final AtomicInteger componentStartedCount = new AtomicInteger(0);
     private final AtomicInteger customNotificationCount = new AtomicInteger(0);
-    private UMOModel model;
 
     public ServerNotificationsTestCase()
     {
         setStartContext(true);
     }
     
-    // @Override
-    protected void doSetUp() throws Exception
-    {
-        model = RegistryContext.getRegistry().lookupSystemModel();
-    }
-
     // @Override
     protected void doTearDown() throws Exception
     {

@@ -37,9 +37,9 @@ import org.mule.impl.internal.notifications.RegistryNotification;
 import org.mule.impl.internal.notifications.RegistryNotificationListener;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
-import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.internal.notifications.TransactionNotification;
 import org.mule.impl.internal.notifications.TransactionNotificationListener;
+import org.mule.impl.internal.notifications.manager.ServiceNotificationManager;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
 import org.mule.impl.lifecycle.phases.ManagementContextDisposePhase;
 import org.mule.impl.lifecycle.phases.ManagementContextInitialisePhase;
@@ -289,7 +289,7 @@ public class TransientRegistry extends AbstractRegistry
         Object key;
         if (o instanceof Class)
         {
-            key = (Class) o;
+            key = o;
         }
         else if (o instanceof String)
         {
@@ -540,18 +540,18 @@ public class TransientRegistry extends AbstractRegistry
         UMOWorkManager workManager = new MuleWorkManager(tp, "MuleServer");
 
         // is this necessary?  it's also created in spring
-        ServerNotificationManager notificationManager = new ServerNotificationManager();
-        notificationManager.registerEventType(ManagerNotificationListener.class, ManagerNotification.class);
-        notificationManager.registerEventType(ModelNotificationListener.class, ModelNotification.class);
-        notificationManager.registerEventType(ComponentNotificationListener.class, ComponentNotification.class);
-        notificationManager.registerEventType(SecurityNotificationListener.class, SecurityNotification.class);
-        notificationManager.registerEventType(ManagementNotificationListener.class, ManagementNotification.class);
-        notificationManager.registerEventType(AdminNotificationListener.class, AdminNotification.class);
-        notificationManager.registerEventType(CustomNotificationListener.class, CustomNotification.class);
-        notificationManager.registerEventType(ConnectionNotificationListener.class, ConnectionNotification.class);
-        notificationManager.registerEventType(RegistryNotificationListener.class, RegistryNotification.class);
-        notificationManager.registerEventType(ExceptionNotificationListener.class, ExceptionNotification.class);
-        notificationManager.registerEventType(TransactionNotificationListener.class, TransactionNotification.class);
+        ServiceNotificationManager notificationManager = new ServiceNotificationManager();
+        notificationManager.addInterfaceToEvent(ManagerNotificationListener.class, ManagerNotification.class);
+        notificationManager.addInterfaceToEvent(ModelNotificationListener.class, ModelNotification.class);
+        notificationManager.addInterfaceToEvent(ComponentNotificationListener.class, ComponentNotification.class);
+        notificationManager.addInterfaceToEvent(SecurityNotificationListener.class, SecurityNotification.class);
+        notificationManager.addInterfaceToEvent(ManagementNotificationListener.class, ManagementNotification.class);
+        notificationManager.addInterfaceToEvent(AdminNotificationListener.class, AdminNotification.class);
+        notificationManager.addInterfaceToEvent(CustomNotificationListener.class, CustomNotification.class);
+        notificationManager.addInterfaceToEvent(ConnectionNotificationListener.class, ConnectionNotification.class);
+        notificationManager.addInterfaceToEvent(RegistryNotificationListener.class, RegistryNotification.class);
+        notificationManager.addInterfaceToEvent(ExceptionNotificationListener.class, ExceptionNotification.class);
+        notificationManager.addInterfaceToEvent(TransactionNotificationListener.class, TransactionNotification.class);
 
         UMOSecurityManager securityManager = new MuleSecurityManager();
 

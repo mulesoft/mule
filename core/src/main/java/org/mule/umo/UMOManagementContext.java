@@ -11,7 +11,7 @@ package org.mule.umo;
 
 import org.mule.impl.Directories;
 import org.mule.impl.internal.notifications.NotificationException;
-import org.mule.impl.internal.notifications.ServerNotificationManager;
+import org.mule.impl.internal.notifications.manager.ServiceNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.Registry;
 import org.mule.registry.RegistrationException;
@@ -27,11 +27,9 @@ import org.mule.util.queue.QueueManager;
 
 import javax.transaction.TransactionManager;
 
-/**
- * TODO document
- */
 public interface UMOManagementContext extends Lifecycle
 {
+
     String getSystemName();
 
     UMOStore getStore(String name) throws UMOException;
@@ -60,9 +58,9 @@ public interface UMOManagementContext extends Lifecycle
     TransactionManager getTransactionManager();
 
 
-    ServerNotificationManager getNotificationManager();
+    ServiceNotificationManager getNotificationManager();
 
-    void setNotificationManager(ServerNotificationManager notificationManager) throws RegistrationException;
+    void setNotificationManager(ServiceNotificationManager notificationManager) throws RegistrationException;
     
     /**
      * Determines if the server has been started

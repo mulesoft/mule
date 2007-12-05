@@ -329,7 +329,6 @@ public class MuleConfiguration
         this.workListener = workListener;
     }
 
-
     public String getId()
     {
         return id;
@@ -392,4 +391,5 @@ public class MuleConfiguration
     {
         this.systemModelType = systemModelType;
     }
+
 }

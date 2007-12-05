@@ -10,9 +10,9 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.internal.notifications.AdminNotificationListener;
+import org.mule.impl.internal.notifications.manager.ServiceNotificationManager;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
@@ -27,21 +27,29 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         return "org/mule/config/spring/parsers/specific/server-notification-manager-test.xml";
     }
 
+    public void testDynamicAttribute()
+    {
+        ServiceNotificationManager manager = managementContext.getNotificationManager();
+        assertTrue(manager.isDynamic());
+    }
+
     public void testRoutingConfiguration()
     {
-        ServerNotificationManager manager = managementContext.getNotificationManager();
-        assertTrue(manager.getEventTypes().size() > 2);
-        Object iface = manager.getEventTypes().get(TestInterface.class);
-        assertNotNull(iface);
-        assertEquals(iface, TestEvent.class);
-        iface = manager.getEventTypes().get(TestInterface2.class);
-        assertNotNull(iface);
-        assertEquals(iface, AdminNotification.class);        
+        ServiceNotificationManager manager = managementContext.getNotificationManager();
+        assertTrue(manager.getInterfaceToEvents().size() > 2);
+        Object ifaces = manager.getInterfaceToEvents().get(TestInterface.class);
+        assertNotNull(ifaces);
+        assertTrue(ifaces instanceof Collection);
+        assertTrue(((Collection) ifaces).contains(TestEvent.class));
+        ifaces = manager.getInterfaceToEvents().get(TestInterface2.class);
+        assertNotNull(ifaces);
+        assertTrue(ifaces instanceof Collection);
+        assertTrue(((Collection) ifaces).contains(AdminNotification.class));        
     }
 
     public void testSimpleNotification() throws InterruptedException
     {
-        ServerNotificationManager manager = managementContext.getNotificationManager();
+        ServiceNotificationManager manager = managementContext.getNotificationManager();
         Collection listeners = manager.getListeners();
         assertEquals(3, listeners.size());
         TestListener listener = (TestListener) managementContext.getRegistry().lookupObject("listener");
@@ -54,7 +62,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
 
     public void testDisabledNotification() throws InterruptedException
     {
-        ServerNotificationManager manager = managementContext.getNotificationManager();
+        ServiceNotificationManager manager = managementContext.getNotificationManager();
         Collection listeners = manager.getListeners();
         assertEquals(3, listeners.size());
         TestListener2 listener2 =

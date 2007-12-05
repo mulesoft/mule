@@ -21,7 +21,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class NotificationEnableDefinitionParser extends ChildMapEntryDefinitionParser
+public class NotificationDefinitionDefinitionParser extends ChildMapEntryDefinitionParser
 {
 
     public static final Map EVENT_MAP;
@@ -34,6 +34,10 @@ public class NotificationEnableDefinitionParser extends ChildMapEntryDefinitionP
             new String[][]{new String[]{INTERFACE}, new String[]{INTERFACE_CLASS}};
     public static final String[][] EVENT_ATTRIBUTES =
             new String[][]{new String[]{EVENT}, new String[]{EVENT_CLASS}};
+    public static final String[][] ALL_ATTRIBUTES =
+            new String[][]{
+                    new String[]{EVENT}, new String[]{EVENT_CLASS},
+                    new String[]{INTERFACE}, new String[]{INTERFACE_CLASS}};
 
     static
     {
@@ -66,9 +70,9 @@ public class NotificationEnableDefinitionParser extends ChildMapEntryDefinitionP
         INTERFACE_MAP.put("TRANSACTION", org.mule.impl.internal.notifications.TransactionNotificationListener.class.getName());
     }
 
-    public NotificationEnableDefinitionParser()
+    public NotificationDefinitionDefinitionParser()
     {
-        super("appendEventType", INTERFACE_CLASS, EVENT_CLASS);
+        super("interfaceToEvent", INTERFACE_CLASS, EVENT_CLASS);
         addMapping(EVENT, EVENT_MAP);
         addAlias(EVENT, VALUE);
         addMapping(INTERFACE, INTERFACE_MAP);
@@ -77,11 +81,6 @@ public class NotificationEnableDefinitionParser extends ChildMapEntryDefinitionP
         registerPreProcessor(new CheckExclusiveAttributes(EVENT_ATTRIBUTES));
         registerPreProcessor(new CheckRequiredAttributes(INTERFACE_ATTRIBUTES));
         registerPreProcessor(new CheckRequiredAttributes(EVENT_ATTRIBUTES));
-    }
-
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        super.parseChild(element, parserContext, builder);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
 }
