@@ -27,22 +27,20 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
 {
     private static final String[] VALID_AUTH_TOKEN = {"mule", "mulepassword"};
     private static final String DOMAIN = "JmxAgentTest";
-
+    
+    private JMXServiceURL serviceUrl;
     private JmxAgent jmxAgent;
 
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         
-        RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
-        rmiRegistryAgent.setManagementContext(managementContext);
-        rmiRegistryAgent.initialise();
-        managementContext.getRegistry().registerAgent(rmiRegistryAgent);
+        serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
+        
+        managementContext.getRegistry().registerAgent(new RmiRegistryAgent());
 
         jmxAgent = new JmxAgent();
         jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
-        jmxAgent.setManagementContext(managementContext);
-        jmxAgent.initialise();
         
         managementContext.setId(DOMAIN);
     }
@@ -67,10 +65,8 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         managementContext.start();
 
         JMXConnector connector = null;
-
         try
         {
-            JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
             Map props = Collections.singletonMap(JMXConnector.CREDENTIALS, VALID_AUTH_TOKEN);
             connector = JMXConnectorFactory.connect(serviceUrl, props);
             MBeanServerConnection connection = connector.getMBeanServerConnection();
@@ -94,10 +90,8 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         managementContext.start();
 
         JMXConnector connector = null;
-
         try
         {
-            JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
             connector = JMXConnectorFactory.connect(serviceUrl);
             fail("expected SecurityException");
         }
@@ -122,10 +116,8 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         managementContext.start();
 
         JMXConnector connector = null;
-
         try
         {
-            JMXServiceURL serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
             connector = JMXConnectorFactory.connect(serviceUrl);
             MBeanServerConnection connection = connector.getMBeanServerConnection();
             // is it the right server?
