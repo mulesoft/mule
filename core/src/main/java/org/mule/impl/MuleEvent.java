@@ -212,13 +212,13 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
                         message.setProperty(prop, value);
                     }
 
-                    if (logger.isDebugEnabled())
+                    Object currentValue = message.getProperty(prop);
+                    if (!value.equals(currentValue))
                     {
-                        Object currentValue = message.getProperty(prop);
-                        if (!value.equals(currentValue))
+                        if (logger.isWarnEnabled())
                         {
                             logger.warn("Property on the current message " + prop + "=" + currentValue
-                                        + " overrides property on the previous event: " + prop + "=" + value);
+                                + " overrides property on the previous event: " + prop + "=" + value);
                         }
                     }
                 }
@@ -237,13 +237,13 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
                     message.setProperty(prop, value, PropertyScope.INVOCATION);
                 }
 
-                if (logger.isDebugEnabled())
+                Object currentValue = message.getProperty(prop);
+                if (!value.equals(currentValue))
                 {
-                    Object currentValue = message.getProperty(prop);
-                    if (!value.equals(currentValue))
+                    if (logger.isWarnEnabled())
                     {
                         logger.warn("Property on the current message " + prop + "=" + currentValue
-                                    + " overrides property on the endpoint: " + prop + "=" + value);
+                            + " overrides property on the endpoint: " + prop + "=" + value);
                     }
                 }
             }
