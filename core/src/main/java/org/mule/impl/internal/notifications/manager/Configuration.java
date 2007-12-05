@@ -71,7 +71,7 @@ class Configuration
         for (Iterator ifaces = interfaceToEvents.keySet().iterator(); ifaces.hasNext();)
         {
             Object iface = ifaces.next();
-            addInterfaceToEvent(ServiceNotificationManager.toClass(iface), ServiceNotificationManager.toClass(interfaceToEvents.get(iface)));
+            addInterfaceToEvent(ServerNotificationManager.toClass(iface), ServerNotificationManager.toClass(interfaceToEvents.get(iface)));
         }
     }
 
@@ -130,7 +130,7 @@ class Configuration
         dirty = true;
         for (Iterator iface = interfaces.iterator(); iface.hasNext();)
         {
-            disableInterface(ServiceNotificationManager.toClass(iface.next()));
+            disableInterface(ServerNotificationManager.toClass(iface.next()));
         }
     }
 
@@ -145,7 +145,7 @@ class Configuration
         dirty = true;
         for (Iterator event = events.iterator(); event.hasNext();)
         {
-            disableEvent(ServiceNotificationManager.toClass(event.next()));
+            disableEvent(ServerNotificationManager.toClass(event.next()));
         }
     }
 

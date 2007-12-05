@@ -13,7 +13,7 @@ package org.mule.impl.internal.notifications.manager;
 public class EventDecision
 {
 
-    private ServiceNotificationManager manager;
+    private ServerNotificationManager manager;
     private Class event;
     private boolean dynamic = false;
     private boolean enabled = false;
@@ -21,7 +21,7 @@ public class EventDecision
     /**
      * Dynamic decision - check with manager before each use
      */
-    public EventDecision(ServiceNotificationManager manager, Class event)
+    public EventDecision(ServerNotificationManager manager, Class event)
     {
         this.manager = manager;
         this.event = event;

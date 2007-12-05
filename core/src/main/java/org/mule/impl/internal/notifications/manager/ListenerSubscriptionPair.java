@@ -19,7 +19,7 @@ public class ListenerSubscriptionPair
 {
 
     private UMOServerNotificationListener listener;
-    private String subscription = ServiceNotificationManager.NULL_SUBSCRIPTION;
+    private String subscription = ServerNotificationManager.NULL_SUBSCRIPTION;
     private boolean nullSubscription = true;
 
     /**

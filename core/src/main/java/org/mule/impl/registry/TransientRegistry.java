@@ -39,7 +39,7 @@ import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.TransactionNotification;
 import org.mule.impl.internal.notifications.TransactionNotificationListener;
-import org.mule.impl.internal.notifications.manager.ServiceNotificationManager;
+import org.mule.impl.internal.notifications.manager.ServerNotificationManager;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
 import org.mule.impl.lifecycle.phases.ManagementContextDisposePhase;
 import org.mule.impl.lifecycle.phases.ManagementContextInitialisePhase;
@@ -540,7 +540,7 @@ public class TransientRegistry extends AbstractRegistry
         UMOWorkManager workManager = new MuleWorkManager(tp, "MuleServer");
 
         // is this necessary?  it's also created in spring
-        ServiceNotificationManager notificationManager = new ServiceNotificationManager();
+        ServerNotificationManager notificationManager = new ServerNotificationManager();
         notificationManager.addInterfaceToEvent(ManagerNotificationListener.class, ManagerNotification.class);
         notificationManager.addInterfaceToEvent(ModelNotificationListener.class, ModelNotification.class);
         notificationManager.addInterfaceToEvent(ComponentNotificationListener.class, ComponentNotification.class);

@@ -17,13 +17,13 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
 
     protected Listener1 listener1;
     protected Listener2 listener2;
-    protected ServiceNotificationManager manager;
+    protected ServerNotificationManager manager;
 
     protected void doSetUp() throws Exception
     {
         listener1 = new Listener1();
         listener2 = new Listener2();
-        manager = new ServiceNotificationManager();
+        manager = new ServerNotificationManager();
     }
 
     protected void registerDefaultEvents() throws ClassNotFoundException

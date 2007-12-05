@@ -13,7 +13,7 @@ import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.ManagementContext;
-import org.mule.impl.internal.notifications.manager.ServiceNotificationManager;
+import org.mule.impl.internal.notifications.manager.ServerNotificationManager;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOManagementContext;
@@ -82,7 +82,7 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
 
     private UMOLifecycleManager lifecycleManager;
 
-    private ServiceNotificationManager notificationManager;
+    private ServerNotificationManager notificationManager;
 
     private UMOSecurityManager securityManager;
 
@@ -204,10 +204,10 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
             }
 
             // set notification manager
-            temp = context.getBeansOfType(ServiceNotificationManager.class, true, false);
+            temp = context.getBeansOfType(ServerNotificationManager.class, true, false);
             if (temp.size() > 0)
             {
-                notificationManager = ((ServiceNotificationManager) temp.values().iterator().next());
+                notificationManager = ((ServerNotificationManager) temp.values().iterator().next());
             }
 
             // set notification manager
@@ -276,7 +276,7 @@ public class ManagementContextFactoryBean extends AbstractFactoryBean
         this.context = context;
     }
 
-    public ServiceNotificationManager getNotificationManager()
+    public ServerNotificationManager getNotificationManager()
     {
         return notificationManager;
     }
