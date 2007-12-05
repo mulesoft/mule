@@ -118,10 +118,11 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
     protected Collection doLookupObjects(Class type)
     {
         Map map = applicationContext.getBeansOfType(type);
-        if (logger.isDebugEnabled())
-        {
-            MapUtils.debugPrint(System.out, "Beans of type " + type, map);
-        }
+        // MULE-2762
+        //if (logger.isDebugEnabled())
+        //{
+        //    MapUtils.debugPrint(System.out, "Beans of type " + type, map);
+        //}
         return map.values();
     }
 
