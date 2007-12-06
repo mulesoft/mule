@@ -67,7 +67,6 @@ mule-example-loanbroker-esb
 mule-example-loanbroker-esn
 mule-example-scripting
 mule-example-stockquote
-mule-example-voipservice
 mule-module-acegi
 mule-module-boot
 mule-module-builders

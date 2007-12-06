@@ -251,25 +251,6 @@ Assembly descriptor for the full Mule distribution.
     </fileSet>
 
     <!--
-    ================================
-        Mule Examples: VoIP Service
-    ================================
-    -->
-    <fileSet>
-        <directory>../../../examples/voipservice/dist</directory>
-        <outputDirectory>examples/voipservice</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../../examples/voipservice/dist</directory>
-        <outputDirectory>examples/voipservice</outputDirectory>
-        <fileMode>755</fileMode>
-        <includes>
-            <include>voip</include>
-            <include>voip.bat</include>
-        </includes>
-    </fileSet>
-
-    <!--
     ============================
         Mule Examples: Webapp
     ============================
@@ -481,7 +462,6 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
         <exclude>org.mule.examples:mule-example-scripting</exclude>
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
-        <exclude>org.mule.examples:mule-example-voipservice</exclude>
         <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
         <exclude>org.mule.distributions:mule-full</exclude>
         <!-- TODO The following exclusions shouldn't be necessary here if they are kept 
@@ -523,7 +503,6 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.examples:mule-example-loanbroker-credit-agency</include>
         <include>org.mule.examples:mule-example-scripting</include>
         <include>org.mule.examples:mule-example-stockquote</include>
-        <include>org.mule.examples:mule-example-voipservice</include>
       </includes>
     </dependencySet>
 
