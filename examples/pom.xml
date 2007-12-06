@@ -23,7 +23,6 @@
         <module>loanbroker</module>
         <module>scripting</module>
         <module>stockquote</module>
-        <module>voipservice</module>
         <module>webapp</module>
     </modules>
 

@@ -74,11 +74,6 @@
             <artifactId>mule-example-stockquote</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-voipservice</artifactId>
-            <version>${version}</version>
-        </dependency>
         <!-- <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-webapp</artifactId>
