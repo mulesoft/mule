@@ -12,7 +12,9 @@ package org.mule.management.agents;
 
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.AbstractAgent;
+import org.mule.management.mbeans.MBeanServerFactory;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
@@ -31,7 +33,6 @@ import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
@@ -42,6 +43,7 @@ import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactory;
 import mx4j.tools.adaptor.ssl.SSLAdaptorServerSocketFactoryMBean;
+
 import org.apache.commons.logging.LogFactory;
 
 /**
@@ -155,7 +157,7 @@ public class Mx4jAgent extends AbstractAgent
         try
         {
             jmxSupport = jmxSupportFactory.getJmxSupport();
-            mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+            mBeanServer = MBeanServerFactory.getOrCreateMBeanServer();
 
             if (StringUtils.isBlank(jmxAdaptorUrl))
             {
@@ -184,6 +186,11 @@ public class Mx4jAgent extends AbstractAgent
     /* @see org.mule.umo.lifecycle.Startable#start() */
     public void start() throws UMOException
     {
+        if (mBeanServer == null)
+        {
+            throw new InitialisationException(MessageFactory.createStaticMessage("mBeanServer has not yet been created"), this);
+        }
+        
         try
         {
             mBeanServer.invoke(adaptorName, "start", null, null);

@@ -59,19 +59,15 @@
 
     <mule:mule name="_muleSystemModel">
 
-        <bean name="_muleConfiguration" class="org.mule.config.MuleConfiguration" depends-on="_muleManagementContext"/>
-
-        <!--
-           <mule:configuration
-                   serverId="_defaultx"
-                   defaultSynchronousEndpoints="false"
-                   domainId="org.mule"
-                   defaultRemoteSync="false"
-                   defaultSynchronousEventTimeout="3000"
-                   defaultEncoding="UTF-8"
-                   defaultTransactionTimeout="5000"
-                   workingDirectory=".mule"/>
-        -->
+       <mule:configuration
+               serverId="_defaultx"
+               defaultSynchronousEndpoints="false"
+               domainId="org.mule"
+               defaultRemoteSync="false"
+               defaultSynchronousEventTimeout="3000"
+               defaultEncoding="UTF-8"
+               defaultTransactionTimeout="5000"
+               workingDirectory=".mule"/>
 
         <mule:model name="_muleSystemModel"/>
 

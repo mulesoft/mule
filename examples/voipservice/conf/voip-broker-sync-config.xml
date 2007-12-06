@@ -15,8 +15,6 @@
         http://today.java.net/pub/a/today/2005/10/18/service-provisioning-through-esb.html.
     </description>
 
-    <configuration serverId="" defaultSynchronousEndpoints="true"/>
-
     <vm:endpoint name="VoipBrokerRequests" path="VoipBrokerRequests"/>
 
     <endpoint name="AddressValidation" address="axis:http://localhost:18080/mule/AddressValidationService?method=validateAddress"/>

@@ -28,13 +28,13 @@ public class MockTestCase extends AbstractWebappTestCase
     //@Override
     protected String getConfigurationResources()
     {
-        return //"jmx-config.xml," +
-                "echo-config.xml," +
-                "hello-http-config.xml," +
-                "servlet-config.xml," +
-                "stockquote-rest-config.xml," +
-                "loan-broker-sync-config.xml," +
-                "loan-broker-axis-endpoints-config.xml";
+        return "jmx-config.xml," +
+               "echo-config.xml," +
+               "hello-http-config.xml," +
+               "servlet-config.xml," +
+               "stockquote-rest-config.xml," +
+               "loan-broker-sync-config.xml," +
+               "loan-broker-axis-endpoints-config.xml";
     }
 
     protected ConfigurationBuilder getBuilder() throws Exception

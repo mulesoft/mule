@@ -14,8 +14,6 @@
      each component is invoked from the LoanBroker component.
      </description>
 
-     <configuration serverId="" defaultSynchronousEndpoints="true"/>
-
      <!-- Synchronous VM connector (messages are processed in the same execution thread) -->
      <vm:connector name="syncVm"/>
 

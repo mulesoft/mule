@@ -2,12 +2,14 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-    xsi:schemaLocation="
+       xmlns:management="http://www.mulesource.org/schema/mule/management/2.0"
+       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/management/2.0 http://www.mulesource.org/schema/mule/management/2.0/mule-management.xsd">
 
-    <spring:bean name="JmxAgent" class="org.mule.management.agents.JmxAgent"/>
-    <spring:bean name="mx4jAgent" class="org.mule.management.agents.Mx4jAgent"/>
+    <management:jmx-server name="simpleJmxServer"/>
 
-</mule>
-        
+    <management:jmx-mx4j-adaptor name="jmx-mx4j" jmxAdaptorUrl="http://localhost:9999"/>
+
+ </mule>
