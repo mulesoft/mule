@@ -29,6 +29,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This object will load objects defined in a file called <code>registry-bootstrap.properties</code> into the local registry.
  * This allows modules and transports to make certain objects available by default.  The most common use case is for a
@@ -83,6 +86,8 @@ public class SimpleRegistryBootstrap implements Initialisable, ManagementContext
 
     protected UMOManagementContext context;
 
+    private static final Log logger = LogFactory.getLog(SimpleRegistryBootstrap.class);
+    
     /** {@inheritDoc} */
     public void setManagementContext(UMOManagementContext context)
     {
@@ -93,19 +98,25 @@ public class SimpleRegistryBootstrap implements Initialisable, ManagementContext
     public void initialise() throws InitialisationException
     {
         Enumeration e = ClassUtils.getResources(SERVICE_PATH + REGISTRY_PROPERTIES, getClass());
-        while (e.hasMoreElements())
+        try
         {
-            try
+            Properties props = new Properties();
+            while (e.hasMoreElements())
             {
                 URL url = (URL) e.nextElement();
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Loading properties from resource: " + url.toExternalForm());
+                }
                 Properties p = new Properties();
                 p.load(url.openStream());
-                process(p);
+                props.putAll(p);
             }
-            catch (Exception e1)
-            {
-                throw new InitialisationException(e1, this);
-            }
+            process(props);        
+        }
+        catch (Exception e1)
+        {
+            throw new InitialisationException(e1, this);
         }
     }
 
