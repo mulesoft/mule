@@ -18,12 +18,6 @@ import org.mule.umo.manager.UMOAgent;
 
 public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCase
 {
-    public ManagementDefaultNamespaceHandlerTestCase()
-    {
-        super();
-        setStartContext(false);
-    }
-
     protected String getConfigResources()
     {
         return "management-default-namespace-config.xml";

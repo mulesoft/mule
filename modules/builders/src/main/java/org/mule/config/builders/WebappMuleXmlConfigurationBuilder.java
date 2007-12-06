@@ -56,6 +56,7 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
     /**
      * Attempt to load any resource from the Servlet Context first, then from FS and the classpath.
      */
+    //@Override
     protected InputStream loadConfig(String configResource) throws ConfigurationException
     {
         String resourcePath = configResource;
