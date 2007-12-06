@@ -11,12 +11,12 @@
     <notifications dynamic="true">
 
         <!-- the test event is routed to the test interface -->
-        <define-notification
+        <notification
                 event-class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestEvent"
                 interface-class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface"/>
 
         <!-- adming events are routed to the test interface 2, but disabled for the usual admin listener -->
-        <define-notification event="ADMIN"
+        <notification event="ADMIN"
                 interface-class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface2"/>
         <disable-notification interface="ADMIN"/>
 

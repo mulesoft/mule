@@ -57,6 +57,9 @@
     <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"
           depends-on="_muleRegistry,_muleManagementContext"/>
 
+    <bean name="_muleNotificationManager"
+          class="org.mule.impl.internal.notifications.manager.ServerNotificationManager"/>
+
     <mule:mule name="_muleSystemModel">
 
        <mule:configuration
@@ -68,6 +71,21 @@
                defaultEncoding="UTF-8"
                defaultTransactionTimeout="5000"
                workingDirectory=".mule"/>
+
+        <mule:notifications>
+            <mule:notification event="MANAGER"/>
+            <mule:notification event="MODEL"/>
+            <mule:notification event="COMPONENT"/>
+            <mule:notification event="SECURITY"/>
+            <mule:notification event="MANAGEMENT"/>
+            <mule:notification event="ADMIN"/>
+            <mule:notification event="CONNECTION"/>
+            <mule:notification event="REGISTRY"/>
+            <mule:notification event="CUSTOM"/>
+            <mule:notification event="MESSAGE"/>
+            <mule:notification event="EXCEPTION"/>
+            <mule:notification event="TRANSACTION"/>
+        </mule:notifications>
 
         <mule:model name="_muleSystemModel"/>
 
@@ -101,39 +119,6 @@
                     <bean class="org.mule.util.queue.MemoryPersistenceStrategy"/>
                 </constructor-arg>
             </bean>
-        </property>
-    </bean>
-
-    <!-- don't use the mule notifications element here as that is a reference to a named bean (this one!) -->
-    <bean name="_muleNotificationManager"
-          class="org.mule.impl.internal.notifications.manager.ServerNotificationManager">
-        <property name="interfaceToTypes">
-            <map>
-                <entry key="org.mule.impl.internal.notifications.ManagerNotificationListener"
-                       value="org.mule.impl.internal.notifications.ManagerNotification"/>
-                <entry key="org.mule.impl.internal.notifications.ModelNotificationListener"
-                       value="org.mule.impl.internal.notifications.ModelNotification"/>
-                <entry key="org.mule.impl.internal.notifications.ComponentNotificationListener"
-                       value="org.mule.impl.internal.notifications.ComponentNotification"/>
-                <entry key="org.mule.impl.internal.notifications.SecurityNotificationListener"
-                       value="org.mule.impl.internal.notifications.SecurityNotification"/>
-                <entry key="org.mule.impl.internal.notifications.ManagementNotificationListener"
-                       value="org.mule.impl.internal.notifications.ManagementNotification"/>
-                <entry key="org.mule.impl.internal.notifications.AdminNotificationListener"
-                       value="org.mule.impl.internal.notifications.AdminNotification"/>
-                <entry key="org.mule.impl.internal.notifications.ConnectionNotificationListener"
-                       value="org.mule.impl.internal.notifications.ConnectionNotification"/>
-                <entry key="org.mule.impl.internal.notifications.RegistryNotificationListener"
-                       value="org.mule.impl.internal.notifications.RegistryNotification"/>
-                <entry key="org.mule.impl.internal.notifications.CustomNotificationListener"
-                       value="org.mule.impl.internal.notifications.CustomNotification"/>
-                <entry key="org.mule.impl.internal.notifications.MessageNotificationListener"
-                       value="org.mule.impl.internal.notifications.MessageNotification"/>
-                <entry key="org.mule.impl.internal.notifications.ExceptionNotificationListener"
-                       value="org.mule.impl.internal.notifications.ExceptionNotification"/>
-                <entry key="org.mule.impl.internal.notifications.TransactionNotificationListener"
-                       value="org.mule.impl.internal.notifications.TransactionNotification"/>
-            </map>
         </property>
     </bean>
 

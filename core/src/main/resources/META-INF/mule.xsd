@@ -284,7 +284,7 @@
     <xsd:element name="abstract-disable-notification" abstract="true" type="abstractDisableNotificationType"/>
     <xsd:complexType name="abstractDisableNotificationType"/>
 
-    <xsd:element name="define-notification" substitutionGroup="abstract-define-notification" type="defineNotificationType"/>
+    <xsd:element name="notification" substitutionGroup="abstract-define-notification" type="defineNotificationType"/>
     <xsd:complexType name="defineNotificationType">
         <xsd:complexContent>
             <xsd:extension base="abstractDefineNotificationType">
@@ -313,6 +313,7 @@
                             <xsd:enumeration value="CONNECTION"/>
                             <xsd:enumeration value="REGISTRY"/>
                             <xsd:enumeration value="CUSTOM"/>
+                            <xsd:enumeration value="MESSAGE"/>
                             <xsd:enumeration value="EXCEPTION"/>
                             <xsd:enumeration value="TRANSACTION"/>
                         </xsd:restriction>
@@ -342,6 +343,7 @@
                             <xsd:enumeration value="CONNECTION"/>
                             <xsd:enumeration value="REGISTRY"/>
                             <xsd:enumeration value="CUSTOM"/>
+                            <xsd:enumeration value="MESSAGE"/>
                             <xsd:enumeration value="EXCEPTION"/>
                             <xsd:enumeration value="TRANSACTION"/>
                         </xsd:restriction>
