@@ -16,6 +16,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
 import org.mule.umo.manager.DefaultWorkListener;
 import org.mule.util.FileUtils;
@@ -179,7 +180,14 @@ public class MuleConfiguration
 
     private ThreadingProfile getThreadingProfile(String name)
     {
-        ThreadingProfile tp = (ThreadingProfile) RegistryContext.getRegistry().lookupObject(name);
+        ThreadingProfile tp = null;
+    
+        Registry registry = RegistryContext.getRegistry();
+        if (registry != null)
+        {
+            tp = (ThreadingProfile) RegistryContext.getRegistry().lookupObject(name);
+        }
+
         if (null != tp)
         {
             return tp;
