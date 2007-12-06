@@ -88,6 +88,19 @@ class Policy
         return true;
     }
 
+    protected static boolean notASuperclassOfAnyClassInSet(Set set, Class clazz)
+    {
+        for (Iterator iterator = set.iterator(); iterator.hasNext();)
+        {
+            Class disabled = (Class) iterator.next();
+            if (clazz.isAssignableFrom(disabled))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     void dispatch(UMOServerNotification notification)
     {
         if (null != notification)

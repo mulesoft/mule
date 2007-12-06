@@ -78,12 +78,14 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
     public void testMismatchingUnregistrations() throws Exception
     {
+        // this has changed in 2.x.  now, unregistering removes all related entries
         managementContext.registerListener(this);
-        managementContext.registerListener(this);
-        managementContext.unregisterListener(this);
+        DummyListener dummy = new DummyListener();
+        managementContext.registerListener(dummy);
+        managementContext.registerListener(dummy);
+        managementContext.unregisterListener(dummy);
         managementContext.stop();
 
-        // we registered twice but unregistered only once, so this should be true
         assertTrue(managerStopped.get());
         assertEquals(1, managerStoppedEvents.get());
     }

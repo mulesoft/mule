@@ -90,10 +90,6 @@ class Configuration
         }
     }
 
-    /**
-     * We only remove one listener, event though several may be registered
-     * - this is historical behaviour, tested elsewhere.
-     */
     synchronized void removeListener(UMOServerNotificationListener listener)
     {
         dirty = true;
@@ -104,7 +100,6 @@ class Configuration
             if (pair.getListener().equals(listener))
             {
                 toRemove.add(pair);
-                break; // see above - remove just one listener
             }
         }
         listenerSubscriptionPairs.removeAll(toRemove);

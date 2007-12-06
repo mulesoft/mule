@@ -58,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
  * <ul>
  * <li>Disabling an event or interface disables all uses of that class or any subclass.</li>
  * <li>Enquiring whether an event is enabled returns true if any subclass is enabled.</li>
- * </ul></p>
+ * </ul>
  */
 public class ServerNotificationManager implements Work, Disposable, ServerNotificationHandler
 {
@@ -123,6 +123,9 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
         configuration.addAllListenerSubscriptionPairs(pairs);
     }
 
+    /**
+     * This removes *all* registrations that reference this listener
+     */
     public void removeListener(UMOServerNotificationListener listener)
     {
         configuration.removeListener(listener);
