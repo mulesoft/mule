@@ -29,7 +29,6 @@ import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
 import org.mule.registry.RegistrationException;
-import org.mule.registry.Registry;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.MessagingException;
@@ -57,7 +56,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,12 +100,6 @@ public class MuleClient implements Disposable
      */
     private UMOManagementContext managementContext;
 
-    /**
-     * an Executor for async messages (optional), currently always delegated to
-     * MuleManager's default WorkManager
-     */
-    private Executor asyncExecutor = null;
-
     private List dispatchers = new ArrayList();
 
     private MuleCredentials user;
@@ -120,7 +112,12 @@ public class MuleClient implements Disposable
      */
     public MuleClient() throws UMOException
     {
-        init(true);
+        this(true);
+    }
+
+    public MuleClient(boolean startContext) throws UMOException
+    {
+        init(startContext);
     }
 
     public MuleClient(UMOManagementContext context) throws UMOException
@@ -209,32 +206,24 @@ public class MuleClient implements Disposable
         // if we are creating a server for this client then set client mode
         // this will disable Admin connections by default;
         // If there is no local managementContext present create a default managementContext
-        if (managementContext!=null)
+        if (managementContext == null)
         {
-            if (logger.isInfoEnabled())
-            {
-                logger.info("There is already a managementContext locally available to this client, no need to create a new one");
-            }
+            managementContext = MuleServer.getManagementContext();
         }
-        else if (MuleServer.getManagementContext() != null)
+        if (managementContext == null)
         {
+            logger.info("No existing ManagementContext found, creating a new Mule instance");
+            TransientRegistry.createNew();
             managementContext = MuleServer.getManagementContext();
         }
         else
         {
-            if (logger.isInfoEnabled())
-            {
-                logger.info("There is no managementContext instance locally available for this client, creating a new Manager");
-            }
-            Registry registry = TransientRegistry.createNew();
-            managementContext = MuleServer.getManagementContext();
+            logger.info("Using existing ManagementContext");
         }
-
-        asyncExecutor = managementContext.getWorkManager();
 
         if (!managementContext.isStarted() && startManager == true)
         {
-            if (logger.isInfoEnabled()) logger.info("Starting Mule Manager for this client");
+            logger.info("Starting ManagementContext");
             managementContext.start();
         }
     }
@@ -480,9 +469,9 @@ public class MuleClient implements Disposable
 
         FutureMessageResult result = new FutureMessageResult(call);
 
-        if (asyncExecutor != null)
+        if (managementContext.getWorkManager() != null)
         {
-            result.setExecutor(asyncExecutor);
+            result.setExecutor(managementContext.getWorkManager());
         }
 
         result.execute();
@@ -545,9 +534,9 @@ public class MuleClient implements Disposable
 
         FutureMessageResult result = new FutureMessageResult(call);
 
-        if (asyncExecutor != null)
+        if (managementContext.getWorkManager() != null)
         {
-            result.setExecutor(asyncExecutor);
+            result.setExecutor(managementContext.getWorkManager());
         }
 
         if (StringUtils.isNotBlank(transformers))
@@ -949,7 +938,7 @@ public class MuleClient implements Disposable
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws UMOException
     {
         RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint);
-        rd.setExecutor(asyncExecutor);
+        rd.setExecutor(managementContext.getWorkManager());
         dispatchers.add(rd);
         return rd;
     }
@@ -959,7 +948,7 @@ public class MuleClient implements Disposable
     {
         RemoteDispatcher rd = new RemoteDispatcher(serverEndpoint, new MuleCredentials(user,
             password.toCharArray()));
-        rd.setExecutor(asyncExecutor);
+        rd.setExecutor(managementContext.getWorkManager());
         dispatchers.add(rd);
         return rd;
     }

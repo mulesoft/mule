@@ -57,6 +57,13 @@ public class JettyTestCase extends TestCase // TODO MULE-2768
     {
         // empty
     }
+
+    // This test fails, I'm not sure how we could get the ManagementContext from the Web Container.
+    //public void testManagementContextAvailable() throws Exception
+    //{
+    //    assertNotNull("ManagementContext should have been set by MuleXmlConfigurationBuilder", MuleServer.getManagementContext());
+    //}
     
-    // TODO Add the tests from AbstractWebappTestCase, but without using the MuleClient.
+    // TODO Add the tests from AbstractWebappTestCase, but without using the MuleClient because
+    // MuleClient needs the ManagementContext (at least for sending to vm endpoints).
 }
