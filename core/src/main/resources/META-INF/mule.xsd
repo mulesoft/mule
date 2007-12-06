@@ -249,7 +249,7 @@
         <xsd:attribute name="defaultEncoding" type="xsd:string"/>
         <xsd:attribute name="defaultTransactionTimeout" type="xsd:string"/>
         <xsd:attribute name="defaultRemoteSync" type="substitutableBoolean" default="false"/>
-        <xsd:attribute name="serverId" type="xsd:string" use="required"/>
+        <xsd:attribute name="serverId" type="nonBlankString" use="required"/>
         <xsd:attribute name="clusterId" type="xsd:string" use="optional"/>
         <xsd:attribute name="domainId" type="xsd:string" use="optional"/>
     </xsd:complexType>
@@ -2078,6 +2078,22 @@
             <xsd:simpleType>
                 <xsd:restriction base="xsd:string">
                     <xsd:pattern value="\[?[A-Za-z0-9\.$]+"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="nonBlankString">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom xsd:string-like type that cannot be empty
+                (is there a better way?)
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:pattern value=".+"/>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:union>
