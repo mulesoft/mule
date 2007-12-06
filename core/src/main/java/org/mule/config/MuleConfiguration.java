@@ -336,10 +336,10 @@ public class MuleConfiguration
 
     public void setId(String id)
     {
-        //if (StringUtils.isBlank(id))
-        //{
-        //    throw new RuntimeException("Cannot set server id to null/blank");
-        //}
+        if (StringUtils.isBlank(id))
+        {
+            throw new RuntimeException("Cannot set server id to null/blank");
+        }
         this.id = id;
     }
 
