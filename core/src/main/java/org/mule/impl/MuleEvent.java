@@ -211,16 +211,6 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
                     {
                         message.setProperty(prop, value);
                     }
-
-                    Object currentValue = message.getProperty(prop);
-                    if (!value.equals(currentValue))
-                    {
-                        if (logger.isWarnEnabled())
-                        {
-                            logger.warn("Property on the current message " + prop + "=" + currentValue
-                                + " overrides property on the previous event: " + prop + "=" + value);
-                        }
-                    }
                 }
             }
         }
@@ -236,16 +226,6 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
                 {
                     message.setProperty(prop, value, PropertyScope.INVOCATION);
                 }
-
-                Object currentValue = message.getProperty(prop);
-                if (!value.equals(currentValue))
-                {
-                    if (logger.isWarnEnabled())
-                    {
-                        logger.warn("Property on the current message " + prop + "=" + currentValue
-                            + " overrides property on the endpoint: " + prop + "=" + value);
-                    }
-                }
             }
         }
 
@@ -255,10 +235,11 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
     /**
      * This method is used to determine if a property on the previous event should be
      * ignorred for the next event. This method is here because we don't have proper
-     * scoped handlng of meta data yet The rules are - 1. If a property is already
-     * set on the currect event don't verwrite with the previous event value 2. If
-     * the propery name appears in the ignorredPropertyOverrides list, then we always
-     * set it on the new event
+     * scoped handlng of meta data yet The rules are
+     * <ol>
+     * <li>If a property is already set on the currect event don't overwrite with the previous event value 
+     * <li>If the propery name appears in the ignorredPropertyOverrides list, then we always set it on the new event
+     * </ol>
      *
      * @param key
      * @return
