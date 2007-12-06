@@ -19,7 +19,7 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 public class NotificationDisableDefinitionParser extends AttributeSelectionDefinitionParser
 {
 
-    public static final String DISABLED_EVENT = "disabledEvent";
+    public static final String DISABLED_EVENT = "disabledType";
     public static final String DISABLED_INTERFACE = "disabledInterface";
 
     public NotificationDisableDefinitionParser()

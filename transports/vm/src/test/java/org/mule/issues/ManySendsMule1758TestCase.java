@@ -16,7 +16,7 @@ import org.mule.umo.UMOMessage;
 
 public class ManySendsMule1758TestCase extends FunctionalTestCase
 {
-    private static int NUM_MESSAGES = 100;
+    private static int NUM_MESSAGES = 3000;
 
     protected String getConfigResources()
     {
@@ -33,6 +33,7 @@ public class ManySendsMule1758TestCase extends FunctionalTestCase
 
     public void testManySends() throws Exception
     {
+        long then = System.currentTimeMillis();
         MuleClient client = new MuleClient();
         for (int i = 0; i < NUM_MESSAGES; ++i)
         {
@@ -41,6 +42,8 @@ public class ManySendsMule1758TestCase extends FunctionalTestCase
             assertNotNull("Response is null", response);
             assertEquals("Polo", response.getPayload());
         }
+        long now = System.currentTimeMillis();
+        logger.info("Total time " + ((now - then) / 1000.0) + "s; per message " + ((now - then) / (1.0 * NUM_MESSAGES)) + "ms");
     }
 
 }

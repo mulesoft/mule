@@ -10,7 +10,7 @@
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
        http://www.mulesource.org/schema/mule/jaas/2.0 http://www.mulesource.org/schema/mule/jaas/2.0/mule-jaas.xsd">
 
-    <configuration serverId="" defaultSynchronousEndpoints="true"/>
+    <configuration serverId="someId" defaultSynchronousEndpoints="true"/>
     <!--mule-environment-properties synchronous="true"/-->
 
     <jaas:security-manager>

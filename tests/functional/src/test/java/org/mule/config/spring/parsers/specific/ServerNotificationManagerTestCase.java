@@ -30,18 +30,18 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
     public void testDynamicAttribute()
     {
         ServerNotificationManager manager = managementContext.getNotificationManager();
-        assertTrue(manager.isDynamic());
+        assertTrue(manager.isNotificationDynamic());
     }
 
     public void testRoutingConfiguration()
     {
         ServerNotificationManager manager = managementContext.getNotificationManager();
-        assertTrue(manager.getInterfaceToEvents().size() > 2);
-        Object ifaces = manager.getInterfaceToEvents().get(TestInterface.class);
+        assertTrue(manager.getInterfaceToTypes().size() > 2);
+        Object ifaces = manager.getInterfaceToTypes().get(TestInterface.class);
         assertNotNull(ifaces);
         assertTrue(ifaces instanceof Collection);
         assertTrue(((Collection) ifaces).contains(TestEvent.class));
-        ifaces = manager.getInterfaceToEvents().get(TestInterface2.class);
+        ifaces = manager.getInterfaceToTypes().get(TestInterface2.class);
         assertNotNull(ifaces);
         assertTrue(ifaces instanceof Collection);
         assertTrue(((Collection) ifaces).contains(AdminNotification.class));        
@@ -55,7 +55,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         TestListener listener = (TestListener) managementContext.getRegistry().lookupObject("listener");
         assertNotNull(listener);
         assertFalse(listener.isCalled());
-        manager.fireEvent(new TestEvent());
+        manager.fireNotification(new TestEvent());
         Thread.sleep(1000); // asynch events
         assertTrue(listener.isCalled());
     }
@@ -73,7 +73,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
                 (TestAdminListener) managementContext.getRegistry().lookupObject("adminListener");
         assertNotNull(adminListener);
         assertFalse(adminListener.isCalled());
-        manager.fireEvent(new TestAdminEvent());
+        manager.fireNotification(new TestAdminEvent());
         Thread.sleep(1000); // asynch events
         assertTrue(listener2.isCalled());
         assertFalse(adminListener.isCalled());

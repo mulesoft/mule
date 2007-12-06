@@ -72,7 +72,7 @@ public class NotificationDefinitionDefinitionParser extends ChildMapEntryDefinit
 
     public NotificationDefinitionDefinitionParser()
     {
-        super("interfaceToEvent", INTERFACE_CLASS, EVENT_CLASS);
+        super("interfaceToType", INTERFACE_CLASS, EVENT_CLASS);
         addMapping(EVENT, EVENT_MAP);
         addAlias(EVENT, VALUE);
         addMapping(INTERFACE, INTERFACE_MAP);

@@ -55,6 +55,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     private boolean throwException = false;
     private boolean enableMessageHistory = true;
     private boolean addReceived = true;
+    private boolean asString = true;
 
     /**
      * Keeps a list of any messages received on this component. Note that only references
@@ -103,8 +104,15 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         }
         else
         {
-            replyMessage = (addReceived ? received(contents) : contents)
-                    + (appendComponentName ? " " + context.getComponent().getName() : "");
+            if (isAsString())
+            {
+                replyMessage = (addReceived ? received(contents) : contents)
+                        + (appendComponentName ? " " + context.getComponent().getName() : "");
+            }
+            else
+            {
+                replyMessage = context.getMessage().getPayload();
+            }
         }
 
         UMOManagementContext managementContext = context.getManagementContext();
@@ -368,5 +376,16 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     {
         this.addReceived = addReceived;
     }
+
+    public boolean isAsString()
+    {
+        return asString;
+    }
+
+    public void setAsString(boolean asString)
+    {
+        this.asString = asString;
+    }
+    
 }
 

@@ -3,7 +3,7 @@
 #
 
 # MULE-2474
-org.mule.issues.MessageChunkingMule2192TestCase
+#org.mule.issues.MessageChunkingMule2192TestCase
 
 # MULE-2131
 org.mule.issues.EndpointTransformerMule2131TestCase

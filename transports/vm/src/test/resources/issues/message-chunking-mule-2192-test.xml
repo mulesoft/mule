@@ -10,13 +10,16 @@
 
     <configuration serverId="server id" defaultSynchronousEndpoints="true"/>
 
+    <!-- the test registers notifications via java that we want the connector to respond to,
+         so disable caching -->
+    <notifications dynamic="true"/>
+
     <model name="main">
 
         <service name="Receiver">
             <inbound-router>
                 <vm:inbound-endpoint path="inbound.channel"/>
             </inbound-router>
-            <bridge-component/>
             <outbound-router>
                 <message-chunking-router messageSize="2">
                     <vm:outbound-endpoint path="chunking.channel"/>
@@ -27,10 +30,37 @@
         <service name="ChunkingReceiver">
             <inbound-router>
                 <vm:inbound-endpoint path="chunking.channel"/>
-                <!-- message-chunking-aggregator-router/ -->
-                <correlation-aggregator-router class="org.mule.routing.inbound.MessageChunkingAggregator"/>
+                <message-chunking-aggregator-router/>
             </inbound-router>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+        </service>
+
+        <!-- this has changed slightly from 1.x; we need to stop the functional test component from
+             converting response to a string -->
+
+        <service name="ObjectReceiver">
+            <inbound-router>
+                <vm:inbound-endpoint path="inbound.object.channel"/>
+            </inbound-router>
+            <outbound-router>
+                <message-chunking-router messageSize="2">
+                    <vm:outbound-endpoint path="chunking.object.channel"/>
+                </message-chunking-router>
+            </outbound-router>
+        </service>
+
+        <service name="ChunkingObjectReceiver">
+            <inbound-router>
+                <vm:inbound-endpoint path="chunking.object.channel"/>
+                <message-chunking-aggregator-router/>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="asString" value="false"/>
+                    </properties>
+                </singleton-object>
+            </component>
         </service>
 
     </model>

@@ -291,7 +291,7 @@
                 <xsd:attribute name="event-class" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The class associated with an event that will be delivered to the interface.
+                            The class associated with a notification event that will be delivered to the interface.
                             This can be used instead of the event attribute to specify a custom class.
                         </xsd:documentation>
                     </xsd:annotation>
@@ -299,7 +299,7 @@
                 <xsd:attribute name="event">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The event to deliver.
+                            The notification event to deliver.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
@@ -321,14 +321,14 @@
                 <xsd:attribute name="interface-class" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The interface (class name) that will receive the event.
+                            The interface (class name) that will receive the notification event.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="interface">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The interface that will receive the event.
+                            The interface that will receive the notification event.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>

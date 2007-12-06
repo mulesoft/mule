@@ -12,6 +12,7 @@ package org.mule.umo;
 import org.mule.impl.Directories;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.manager.ServerNotificationManager;
+import org.mule.impl.internal.notifications.manager.ServerNotificationHandler;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.Registry;
 import org.mule.registry.RegistrationException;

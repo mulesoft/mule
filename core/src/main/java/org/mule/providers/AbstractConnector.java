@@ -18,6 +18,9 @@ import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.internal.notifications.ConnectionNotification;
+import org.mule.impl.internal.notifications.MessageNotification;
+import org.mule.impl.internal.notifications.manager.ServerNotificationHandler;
+import org.mule.impl.internal.notifications.manager.OptimisedNotificationHandler;
 import org.mule.impl.model.streaming.DelegatingInputStream;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
@@ -221,10 +224,11 @@ public abstract class AbstractConnector
     protected final WaitableBoolean startOnConnect = new WaitableBoolean(false);
 
     /**
-     * Whether to fire message notifications for every message that is sent or
-     * received from this connector
+     * Optimise the handling of message notifications.  If dynamic is set to false then the
+     * cached notification handler implements a shortcut for message notifications.
      */
-    private volatile boolean enableMessageEvents;
+    private boolean dynamicNotification = false;
+    private ServerNotificationHandler cachedNotificationHandler;
 
     private final List supportedProtocols;
 
@@ -269,7 +273,7 @@ public abstract class AbstractConnector
 
     public AbstractConnector()
     {
-        //enableMessageEvents = RegistryContext.getConfiguration().isEnableMessageEvents();
+        setDynamicNotification(false);
 
         // always add at least the default protocol
         supportedProtocols = new ArrayList();
@@ -1253,19 +1257,13 @@ public abstract class AbstractConnector
     }
 
     /**
-     * Fires a server notification to all registered
-     * {@link org.mule.impl.internal.notifications.CustomNotificationListener}
-     * eventManager.
+     * Fires a server notification to all registered listeners
      *
-     * @param notification the notification to fire. This must be of type
-     *            {@link org.mule.impl.internal.notifications.CustomNotification}
-     *            otherwise an exception will be thrown.
-     * @throws UnsupportedOperationException if the notification fired is not a
-     *             {@link org.mule.impl.internal.notifications.CustomNotification}
+     * @param notification the notification to fire.
      */
     public void fireNotification(UMOServerNotification notification)
     {
-        managementContext.fireNotification(notification);
+        cachedNotificationHandler.fireNotification(notification);
     }
 
     /**
@@ -1564,24 +1562,30 @@ public abstract class AbstractConnector
         numberOfConcurrentTransactedReceivers = count;
     }
 
-    /**
-     * Whether to fire message notifications for every message that is sent or
-     * received from this connector
-     */
-    public boolean isEnableMessageEvents()
+    public void setDynamicNotification(boolean dynamic)
     {
-        return enableMessageEvents;
+        dynamicNotification = dynamic;
     }
 
-    /**
-     * Whether to fire message notifications for every message that is sent or
-     * received from this connector
-     *
-     * @param enableMessageEvents
-     */
-    public void setEnableMessageEvents(boolean enableMessageEvents)
+    protected void updateCachedNotificationHandler()
     {
-        this.enableMessageEvents = enableMessageEvents;
+        if (null != managementContext)
+        {
+            if (dynamicNotification)
+            {
+                cachedNotificationHandler = managementContext.getNotificationManager();
+            }
+            else
+            {
+                cachedNotificationHandler =
+                        new OptimisedNotificationHandler(managementContext.getNotificationManager(), MessageNotification.class);
+            }
+        }
+    }
+
+    public boolean isEnableMessageEvents()
+    {
+        return cachedNotificationHandler.isNotificationEnabled(MessageNotification.class);
     }
 
     /**
@@ -2175,6 +2179,7 @@ public abstract class AbstractConnector
     public void setManagementContext(UMOManagementContext context)
     {
         this.managementContext = context;
+        updateCachedNotificationHandler();
     }
 
     // @Override

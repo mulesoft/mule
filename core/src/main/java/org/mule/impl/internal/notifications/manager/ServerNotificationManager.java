@@ -37,8 +37,30 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A reworking of the event manager that allows efficient behaviour without global on/off
  * switches in the config.
+ *
+ * <p>The configuration and resulting policy are separate; the policy
+ * is a summary of the configuration that contains information to decide whether a particular
+ * message can be handled, and which updates that with experience gained handling messages.
+ * When the configuration is changed the policy is rebuilt.  In this way we get a fairly
+ * efficient system without needing controls elsewhere.
+ *
+ * <p>However, measurements showed that there was still a small impact on speed in some
+ * cases.  To improve behaviour further the
+ * {@link org.mule.impl.internal.notifications.manager.OptimisedNotificationHandler} was
+ * added.  This allows a service that generates notifications to cache locally a handler
+ * optimised for a particular class.
+ *
+ * <p>The dynamic flag stops this caching from occurring.  This reduces efficiency slightly
+ * (about 15% cost on simple VM messages, less on other transports)</p>
+ *
+ * <p>Note that, because of subclass relationships, we need to be very careful about exactly
+ * what is enabled and disabled:
+ * <ul>
+ * <li>Disabling an event or interface disables all uses of that class or any subclass.</li>
+ * <li>Enquiring whether an event is enabled returns true if any subclass is enabled.</li>
+ * </ul></p>
  */
-public class ServerNotificationManager implements Work, Disposable
+public class ServerNotificationManager implements Work, Disposable, ServerNotificationHandler
 {
 
     public static final String NULL_SUBSCRIPTION = "NULL";
@@ -49,12 +71,12 @@ public class ServerNotificationManager implements Work, Disposable
     private WorkListener workListener = null;
     private BlockingDeque eventQueue = new LinkedBlockingDeque();
 
-    public boolean isDynamic()
+    public boolean isNotificationDynamic()
     {
         return dynamic;
     }
 
-    public void setDynamic(boolean dynamic)
+    public void setNotificationDynamic(boolean dynamic)
     {
         this.dynamic = dynamic;
     }
@@ -71,14 +93,14 @@ public class ServerNotificationManager implements Work, Disposable
         }
     }
 
-    public void addInterfaceToEvent(Class iface, Class event)
+    public void addInterfaceToType(Class iface, Class event)
     {
-        configuration.addInterfaceToEvent(iface, event);
+        configuration.addInterfaceToType(iface, event);
     }
 
-    public void setInterfaceToEvents(Map interfaceToEvents) throws ClassNotFoundException
+    public void setInterfaceToTypes(Map interfaceToEvents) throws ClassNotFoundException
     {
-        configuration.addAllInterfaceToEvents(interfaceToEvents);
+        configuration.addAllInterfaceToTypes(interfaceToEvents);
     }
 
     public void addListenerSubscriptionPair(ListenerSubscriptionPair pair)
@@ -121,17 +143,17 @@ public class ServerNotificationManager implements Work, Disposable
         configuration.disabledAllInterfaces(interfaces);
     }
 
-    public void disableEvent(Class event) throws ClassNotFoundException
+    public void disableType(Class type) throws ClassNotFoundException
     {
-        configuration.disableEvent(event);
+        configuration.disableType(type);
     }
 
-    public void setDisabledEvents(Collection events) throws ClassNotFoundException
+    public void setDisabledTypes(Collection types) throws ClassNotFoundException
     {
-        configuration.disableAllEvents(events);
+        configuration.disableAllTypes(types);
     }
 
-    public void fireEvent(UMOServerNotification notification)
+    public void fireNotification(UMOServerNotification notification)
     {
         if (!disposed.get())
         {
@@ -156,29 +178,9 @@ public class ServerNotificationManager implements Work, Disposable
         }
     }
 
-    public boolean isEventEnabled(Class event)
+    public boolean isNotificationEnabled(Class type)
     {
-        return configuration.getPolicy().isEventEnabled(event);
-    }
-
-    /**
-     * Provide a cacheable decision for connectors and the like, so that they can be
-     * as efficient as possible (in the non-dynamic case; when dynamic we still try to
-     * be relatively efficient using the descision cache in the policy).
-     *
-     * @param event
-     * @return An oracle that controls whether or not the event should be dispatched
-     */
-    public EventDecision getEventDecision(Class event)
-    {
-        if (dynamic)
-        {
-            return new EventDecision(this, event);
-        }
-        else
-        {
-            return new EventDecision(isEventEnabled(event));
-        }
+        return configuration.getPolicy().isNotificationEnabled(type);
     }
 
     public void dispose()
@@ -268,9 +270,9 @@ public class ServerNotificationManager implements Work, Disposable
         return configuration.getPolicy();
     }
 
-    public Map getInterfaceToEvents()
+    public Map getInterfaceToTypes()
     {
-        return configuration.getInterfaceToEvents();
+        return configuration.getInterfaceToTypes();
     }
 
     public Collection getListeners()

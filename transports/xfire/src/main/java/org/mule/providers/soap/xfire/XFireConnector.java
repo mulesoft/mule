@@ -42,7 +42,6 @@ import org.mule.util.SystemUtils;
 import org.mule.util.object.SingletonObjectFactory;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -105,9 +104,8 @@ public class XFireConnector extends AbstractConnector
     public XFireConnector()
     {
         super();
-        this.registerProtocols();
-        // TODO RM: we should ditch the whole connector-knows-if-to-send-notifications thing
-        this.setEnableMessageEvents(true);
+        registerProtocols();
+        setDynamicNotification(true);
     }
 
     protected void registerProtocols()

@@ -163,7 +163,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("default-connector-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultExceptionStrategy.class));
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
         registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
-        registerBeanDefinitionParser("notifications", new NamedDefinitionParser(ManagementContext.NOTIFICATION_MANAGER));
+        registerBeanDefinitionParser("notifications", new NamedDefinitionParser(ManagementContext.NOTIFICATION_MANAGER).addAlias("dynamic", "notificationDynamic"));
         registerBeanDefinitionParser("define-notification", new NotificationDefinitionDefinitionParser());
         registerBeanDefinitionParser("disable-notification", new NotificationDisableDefinitionParser());
         registerBeanDefinitionParser("notification-listener", new ChildDefinitionParser("allListenerSubscriptionPair", ListenerSubscriptionPair.class).addAlias("ref", "listener").addReference("listener"));

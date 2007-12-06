@@ -28,8 +28,8 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
 
     protected void registerDefaultEvents() throws ClassNotFoundException
     {
-        manager.addInterfaceToEvent(Listener1.class, SubEvent1.class);
-        manager.addInterfaceToEvent(Listener2.class, Event2.class);
+        manager.addInterfaceToType(Listener1.class, SubEvent1.class);
+        manager.addInterfaceToType(Listener2.class, Event2.class);
     }
 
     public void testNoListenersMeansNoEvents() throws ClassNotFoundException
@@ -40,11 +40,11 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
 
     protected void assertNoEventsEnabled()
     {
-        assertFalse(manager.isEventEnabled(Event1.class));
-        assertFalse(manager.isEventEnabled(SubEvent1.class));
-        assertFalse(manager.isEventEnabled(Event2.class));
-        assertFalse(manager.isEventEnabled(SubEvent2.class));
-        assertFalse(manager.isEventEnabled(Event3.class));
+        assertFalse(manager.isNotificationEnabled(Event1.class));
+        assertFalse(manager.isNotificationEnabled(SubEvent1.class));
+        assertFalse(manager.isNotificationEnabled(Event2.class));
+        assertFalse(manager.isNotificationEnabled(SubEvent2.class));
+        assertFalse(manager.isNotificationEnabled(Event3.class));
     }
 
     protected void registerDefaultListeners()
@@ -62,11 +62,11 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
 
     protected void assertStandardEventsEnabled()
     {
-        assertFalse("only subclass accepted", manager.isEventEnabled(Event1.class));
-        assertTrue("direct", manager.isEventEnabled(SubEvent1.class));
-        assertTrue("direct", manager.isEventEnabled(Event2.class));
-        assertTrue("via subclass", manager.isEventEnabled(SubEvent2.class));
-        assertFalse("not specified at all", manager.isEventEnabled(Event3.class));
+        assertTrue("via subclass", manager.isNotificationEnabled(Event1.class));
+        assertTrue("direct", manager.isNotificationEnabled(SubEvent1.class));
+        assertTrue("direct", manager.isNotificationEnabled(Event2.class));
+        assertFalse("not directly", manager.isNotificationEnabled(SubEvent2.class));
+        assertFalse("not specified at all", manager.isNotificationEnabled(Event3.class));
     }
 
     public void testDynamicResponseToDisablingEvents() throws ClassNotFoundException
@@ -75,19 +75,19 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
         registerDefaultListeners();
         assertStandardEventsEnabled();
         // now disable event 2
-        manager.disableEvent(Event2.class);
-        assertFalse("only subclass accepted", manager.isEventEnabled(Event1.class));
-        assertTrue("direct", manager.isEventEnabled(SubEvent1.class));
-        assertFalse("disabled", manager.isEventEnabled(Event2.class));
-        assertFalse("no listener", manager.isEventEnabled(SubEvent2.class));
-        assertFalse("not specified at all", manager.isEventEnabled(Event3.class));
+        manager.disableType(Event2.class);
+        assertTrue("via subclass", manager.isNotificationEnabled(Event1.class));
+        assertTrue("direct", manager.isNotificationEnabled(SubEvent1.class));
+        assertFalse("disabled", manager.isNotificationEnabled(Event2.class));
+        assertFalse("no listener", manager.isNotificationEnabled(SubEvent2.class));
+        assertFalse("not specified at all", manager.isNotificationEnabled(Event3.class));
         // the subclass should be blocked too
-        manager.addInterfaceToEvent(Listener2.class, SubEvent2.class);
-        assertFalse("only subclass accepted", manager.isEventEnabled(Event1.class));
-        assertTrue("direct", manager.isEventEnabled(SubEvent1.class));
-        assertFalse("disabled", manager.isEventEnabled(Event2.class));
-        assertFalse("disabled", manager.isEventEnabled(SubEvent2.class));
-        assertFalse("not specified at all", manager.isEventEnabled(Event3.class));
+        manager.addInterfaceToType(Listener2.class, SubEvent2.class);
+        assertTrue("via subclass", manager.isNotificationEnabled(Event1.class));
+        assertTrue("direct", manager.isNotificationEnabled(SubEvent1.class));
+        assertFalse("disabled", manager.isNotificationEnabled(Event2.class));
+        assertFalse("disabled", manager.isNotificationEnabled(SubEvent2.class));
+        assertFalse("not specified at all", manager.isNotificationEnabled(Event3.class));
     }
 
     public void testDynamicResponseToDisablingInterfaces() throws ClassNotFoundException
@@ -97,11 +97,11 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
         assertStandardEventsEnabled();
         // now disable listener 1
         manager.disableInterface(Listener1.class);
-        assertFalse("only subclass accepted", manager.isEventEnabled(Event1.class));
-        assertFalse("disabled", manager.isEventEnabled(SubEvent1.class));
-        assertTrue("direct", manager.isEventEnabled(Event2.class));
-        assertTrue("via subclass", manager.isEventEnabled(SubEvent2.class));
-        assertFalse("not specified at all", manager.isEventEnabled(Event3.class));
+        assertFalse("via subclass, but no listener", manager.isNotificationEnabled(Event1.class));
+        assertFalse("disabled", manager.isNotificationEnabled(SubEvent1.class));
+        assertTrue("direct", manager.isNotificationEnabled(Event2.class));
+        assertFalse("not directly", manager.isNotificationEnabled(SubEvent2.class));
+        assertFalse("not specified at all", manager.isNotificationEnabled(Event3.class));
     }
 
     /**
@@ -114,7 +114,7 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
         Policy policy = manager.getPolicy();
         assertStandardEventsEnabled();
         assertSame(policy, manager.getPolicy());
-        manager.disableEvent(Event2.class);
+        manager.disableType(Event2.class);
         assertNotSame(policy, manager.getPolicy());
     }
 
@@ -122,11 +122,11 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
     {
         registerDefaultEvents();
         registerDefaultListeners();
-        manager.setDynamic(true);
-        EventDecision decision = manager.getEventDecision(Event2.class);
-        assertTrue(decision.isEnabled());
-        manager.disableEvent(Event2.class);
-        assertFalse(decision.isEnabled());
+        manager.setNotificationDynamic(true);
+        OptimisedNotificationHandler decision = new OptimisedNotificationHandler(manager, Event2.class);
+        assertTrue(decision.isNotificationEnabled(Event2.class));
+        manager.disableType(Event2.class);
+        assertFalse(decision.isNotificationEnabled(Event2.class));
     }
 
     /**
@@ -136,10 +136,10 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
     {
         registerDefaultEvents();
         registerDefaultListeners();
-        EventDecision decision = manager.getEventDecision(Event2.class);
-        assertTrue(decision.isEnabled());
-        manager.disableEvent(Event2.class);
-        assertTrue(decision.isEnabled());
+        OptimisedNotificationHandler decision = new OptimisedNotificationHandler(manager, Event2.class);
+        assertTrue(decision.isNotificationEnabled(Event2.class));
+        manager.disableType(Event2.class);
+        assertTrue(decision.isNotificationEnabled(Event2.class));
     }
 
     public void testNotification() throws ClassNotFoundException

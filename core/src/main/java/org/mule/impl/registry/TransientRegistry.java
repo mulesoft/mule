@@ -541,17 +541,17 @@ public class TransientRegistry extends AbstractRegistry
 
         // is this necessary?  it's also created in spring
         ServerNotificationManager notificationManager = new ServerNotificationManager();
-        notificationManager.addInterfaceToEvent(ManagerNotificationListener.class, ManagerNotification.class);
-        notificationManager.addInterfaceToEvent(ModelNotificationListener.class, ModelNotification.class);
-        notificationManager.addInterfaceToEvent(ComponentNotificationListener.class, ComponentNotification.class);
-        notificationManager.addInterfaceToEvent(SecurityNotificationListener.class, SecurityNotification.class);
-        notificationManager.addInterfaceToEvent(ManagementNotificationListener.class, ManagementNotification.class);
-        notificationManager.addInterfaceToEvent(AdminNotificationListener.class, AdminNotification.class);
-        notificationManager.addInterfaceToEvent(CustomNotificationListener.class, CustomNotification.class);
-        notificationManager.addInterfaceToEvent(ConnectionNotificationListener.class, ConnectionNotification.class);
-        notificationManager.addInterfaceToEvent(RegistryNotificationListener.class, RegistryNotification.class);
-        notificationManager.addInterfaceToEvent(ExceptionNotificationListener.class, ExceptionNotification.class);
-        notificationManager.addInterfaceToEvent(TransactionNotificationListener.class, TransactionNotification.class);
+        notificationManager.addInterfaceToType(ManagerNotificationListener.class, ManagerNotification.class);
+        notificationManager.addInterfaceToType(ModelNotificationListener.class, ModelNotification.class);
+        notificationManager.addInterfaceToType(ComponentNotificationListener.class, ComponentNotification.class);
+        notificationManager.addInterfaceToType(SecurityNotificationListener.class, SecurityNotification.class);
+        notificationManager.addInterfaceToType(ManagementNotificationListener.class, ManagementNotification.class);
+        notificationManager.addInterfaceToType(AdminNotificationListener.class, AdminNotification.class);
+        notificationManager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
+        notificationManager.addInterfaceToType(ConnectionNotificationListener.class, ConnectionNotification.class);
+        notificationManager.addInterfaceToType(RegistryNotificationListener.class, RegistryNotification.class);
+        notificationManager.addInterfaceToType(ExceptionNotificationListener.class, ExceptionNotification.class);
+        notificationManager.addInterfaceToType(TransactionNotificationListener.class, TransactionNotification.class);
 
         UMOSecurityManager securityManager = new MuleSecurityManager();
 
