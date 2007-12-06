@@ -10,7 +10,7 @@
 
     <cxf:connector name="cxf" defaultFrontend="simple"/>
     
-    <configuration serverId="" defaultSynchronousEndpoints="true"/>
+    <configuration serverId="someId" defaultSynchronousEndpoints="true"/>
 
      <model name="TestCxfHeaders">
         <service name="TestComponent">

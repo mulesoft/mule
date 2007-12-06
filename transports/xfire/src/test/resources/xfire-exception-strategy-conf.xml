@@ -13,7 +13,7 @@
     <!-- 
         Testing XFire Exception Strategy
      -->
-    <configuration serverId="" defaultSynchronousEndpoints="true"/>
+    <configuration serverId="someId" defaultSynchronousEndpoints="true"/>
 
     <http:connector name="default" socketSoLinger="1000" clientSoTimeout="1000"/>
 

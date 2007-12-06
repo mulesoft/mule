@@ -15,7 +15,7 @@
     <!-- 
         Testing XFire http headers
      -->
-    <configuration serverId="" defaultSynchronousEndpoints="true"/>
+    <configuration serverId="someId" defaultSynchronousEndpoints="true"/>
 
     <model name="TestXfireHeaders">
         <service name="TestComponent">

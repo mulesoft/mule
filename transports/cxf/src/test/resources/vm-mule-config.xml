@@ -8,7 +8,7 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
 
-    <configuration serverId="" defaultSynchronousEndpoints="true"/>
+    <configuration serverId="someId" defaultSynchronousEndpoints="true"/>
 
     <cxf:connector name="cxf" defaultFrontend="simple"/>
     
