@@ -39,9 +39,19 @@ public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
-        UMOMessage result = client.send("vm://pojo1", message, null);
+        UMOMessage result = client.send("vm://pojo1", message, props);
         assertNotNull(result);
         assertEquals("Received: " + message, ((ActiveMQTextMessage)result.getPayload()).getText());
     }
     
+    public void testReplyToChainWithoutProps() throws Exception
+    {
+        String message = "test";
+
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.send("vm://pojo1", message, null);
+        assertNotNull(result);
+        assertEquals("Received: " + message, ((ActiveMQTextMessage)result.getPayload()).getText());
+    }
+
 }

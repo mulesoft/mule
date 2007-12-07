@@ -60,7 +60,6 @@ public final class OptimizedRequestContext
      */
     public static UMOEvent criticalSetEvent(UMOEvent event)
     {
-        //return RequestContext.internalSetEvent(event);
         return RequestContext.internalSetEvent(RequestContext.newEvent(event, RequestContext.SAFE));
     }
 
@@ -85,4 +84,5 @@ public final class OptimizedRequestContext
             logger.debug(message, new Exception(message));
         }
     }
+    
 }
