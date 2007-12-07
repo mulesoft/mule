@@ -244,14 +244,14 @@
             <xsd:element name="default-connection-strategy" type="connectionStrategyType" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="defaultSynchronousEndpoints" type="substitutableBoolean" default="false"/>
-        <xsd:attribute name="workingDirectory" type="xsd:string" default="./.mule"/>
-        <xsd:attribute name="defaultSynchronousEventTimeout" type="xsd:string"/>
-        <xsd:attribute name="defaultEncoding" type="xsd:string"/>
-        <xsd:attribute name="defaultTransactionTimeout" type="xsd:string"/>
+        <xsd:attribute name="workingDirectory" type="xsd:string" default=".mule"/>
+        <xsd:attribute name="defaultSynchronousEventTimeout" type="xsd:string" default="3000"/>
+        <xsd:attribute name="defaultEncoding" type="xsd:string" default="UTF-8"/>
+        <xsd:attribute name="defaultTransactionTimeout" type="xsd:string" default="5000"/>
         <xsd:attribute name="defaultRemoteSync" type="substitutableBoolean" default="false"/>
-        <xsd:attribute name="serverId" type="nonBlankString" use="required"/>
-        <xsd:attribute name="clusterId" type="xsd:string" use="optional"/>
-        <xsd:attribute name="domainId" type="xsd:string" use="optional"/>
+        <xsd:attribute name="serverId" type="nonBlankString"/>
+        <xsd:attribute name="clusterId" type="xsd:string"/>
+        <xsd:attribute name="domainId" type="xsd:string" default="org.mule"/>
     </xsd:complexType>
 
     <xsd:complexType name="notificationManagerType">

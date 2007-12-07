@@ -11,7 +11,7 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -24,13 +24,13 @@ import org.w3c.dom.Element;
  *
  * @see MuleConfiguration
  */
-public class ConfigurationDefinitionParser extends AbstractMuleBeanDefinitionParser
+public class ConfigurationDefinitionParser extends NamedDefinitionParser
 {
-
     public static final String ATTRIBUTE_SERVER_ID = "serverId";
 
     public ConfigurationDefinitionParser()
     {
+        super(MuleProperties.OBJECT_MULE_CONFIGURATION);
         addAlias(ATTRIBUTE_SERVER_ID, ATTRIBUTE_ID);
         singleton=true;
     }

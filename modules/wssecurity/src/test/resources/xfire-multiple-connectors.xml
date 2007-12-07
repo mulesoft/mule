@@ -14,7 +14,7 @@
 	   http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
   	   http://www.mulesource.org/schema/mule/wssecurity/2.0 http://www.mulesource.org/schema/mule/wssecurity/2.0/mule-wssecurity.xsd">
 
-    <configuration serverId="someId" defaultSynchronousEndpoints="false"/>
+    <configuration defaultSynchronousEndpoints="false"/>
 
     <spring:bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
         <spring:constructor-arg>

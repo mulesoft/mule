@@ -10,7 +10,7 @@
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
        http://www.mulesource.org/schema/mule/jaas/2.0 http://www.mulesource.org/schema/mule/jaas/2.0/mule-jaas.xsd">
 
-    <configuration serverId="someId" defaultSynchronousEndpoints="true"/>
+    <configuration defaultSynchronousEndpoints="true"/>
 
     <jaas:security-manager>
         <jaas:security-provider name="jaasSecurityProvider" loginContextName="jaasTest" loginConfig="jaas.conf"/>

@@ -10,7 +10,7 @@
 
   <cxf:connector name="cxf" defaultFrontend="simple"/>
     
-  <configuration serverId="someId" defaultSynchronousEndpoints="true"/>
+  <configuration defaultSynchronousEndpoints="true"/>
 
   <model name="BasicCxfTest">
     <service name="CxfWithExceptionStrategy">

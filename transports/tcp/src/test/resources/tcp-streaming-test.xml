@@ -8,7 +8,7 @@
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd">
 
-    <configuration serverId="someId" defaultSynchronousEndpoints="false"/>
+    <configuration defaultSynchronousEndpoints="false"/>
 
     <tcp:connector name="default" validateConnections="false">
         <tcp:streaming-protocol/>

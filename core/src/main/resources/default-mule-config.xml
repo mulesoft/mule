@@ -60,17 +60,16 @@
     <bean name="_muleNotificationManager"
           class="org.mule.impl.internal.notifications.manager.ServerNotificationManager"/>
 
+    <bean name="_muleConfiguration" class="org.mule.config.MuleConfiguration"/>
+
     <mule:mule name="_muleSystemModel">
 
-       <mule:configuration
-               serverId="_defaultx"
-               defaultSynchronousEndpoints="false"
-               domainId="org.mule"
-               defaultRemoteSync="false"
-               defaultSynchronousEventTimeout="3000"
-               defaultEncoding="UTF-8"
-               defaultTransactionTimeout="5000"
-               workingDirectory=".mule"/>
+
+        <!-- Default configuration attributes are configured via default values in mule-core schema mule.xsd.
+             Configuration element is required here so that spring creates a MuleConfiguration instance and
+       	     populates it with defaults from schema 
+        -->
+        <mule:configuration/>
 
         <mule:notifications>
             <mule:notification event="MANAGER"/>

@@ -11,7 +11,7 @@
     <!-- as tcp-streaming-test.xml but with synchronous set to true in
          environment (no longer possible on connector) -->
 
-    <configuration serverId="someId" defaultSynchronousEndpoints="true"/>
+    <configuration defaultSynchronousEndpoints="true"/>
 
     <tcp:connector name="default" validateConnections="false">
         <tcp:streaming-protocol/>
