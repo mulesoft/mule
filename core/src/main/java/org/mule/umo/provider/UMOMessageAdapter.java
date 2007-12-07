@@ -273,9 +273,9 @@ public interface UMOMessageAdapter extends Serializable
     /**
      * If an error occurs while processing this message, a ErrorPayload is attached
      * which contains the root exception and Mule error code, plus any other releated
-     * info.
+     * info
      *
-     * @param payload The exception payload to attach to this message
+     * @param payload The exception payloaad to attach to this message
      */
     void setExceptionPayload(UMOExceptionPayload payload);
 

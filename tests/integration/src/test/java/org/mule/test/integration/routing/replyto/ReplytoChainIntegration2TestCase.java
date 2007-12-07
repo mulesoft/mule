@@ -39,6 +39,7 @@ public class ReplytoChainIntegration2TestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         UMOMessage result = client.send("vm://pojo1", message, props);
         assertNotNull(result);
+        // Te
         assertEquals("Received: " + message, result.getPayload());
     }
 }

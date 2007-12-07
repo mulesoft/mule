@@ -10,10 +10,16 @@
 
 package org.mule.impl;
 
+import org.mule.config.MuleProperties;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
+
+import java.util.Iterator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>RequestContext</code> is a thread context where components can get the
@@ -34,6 +40,7 @@ public final class RequestContext
     // setting this to false gives old (mutable) semantics in non-critical cases
     private static boolean DEFAULT_ACTION = SAFE;
 
+    private static final Log logger = LogFactory.getLog(RequestContext.class);
     private static final ThreadLocal currentEvent = new ThreadLocal();
 
     /** Do not instanciate. */
@@ -97,6 +104,62 @@ public final class RequestContext
         return message;
     }
 
+    private static UMOMessage writeResponse(UMOMessage message)
+    {
+        return internalWriteResponse(message, DEFAULT_ACTION);
+    }
+
+    protected static UMOMessage internalWriteResponse(UMOMessage message, boolean safe)
+    {
+        if (message != null)
+        {
+            UMOEvent event = getEvent();
+            if (event != null)
+            {
+                UMOMessage copy = newMessage(message, safe);
+                combineProperties(event, copy);
+                MuleEvent newEvent = new MuleEvent(copy, event.getEndpoint(), event.getSession(), event.isSynchronous());
+                if (safe)
+                {
+                    resetAccessControl(copy);
+                }
+                internalSetEvent(newEvent);
+                return copy;
+            }
+        }
+        return message;
+    }
+
+    private static void combineProperties(UMOEvent event, UMOMessage message)
+    {
+        for (Iterator iterator = event.getMessage().getPropertyNames().iterator(); iterator.hasNext();)
+        {
+            String key = (String) iterator.next();
+            if (key == null)
+            {
+                logger.warn("Message property key is null: please report the following stack trace to dev@mule.codehaus.org.",
+                        new IllegalArgumentException());
+            }
+            else
+            {
+                if (key.startsWith(MuleProperties.PROPERTY_PREFIX))
+                {
+                    Object newValue = message.getProperty(key);
+                    Object oldValue = event.getMessage().getProperty(key);
+                    if (newValue == null)
+                    {
+                        message.setProperty(key, oldValue);
+                    }
+                    else if (logger.isInfoEnabled() && !newValue.equals(oldValue))
+                    {
+                        logger.info("Message already contains property " + key + "=" + newValue
+                                + " not replacing old value: " + oldValue);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Resets the current request context (clears all information).
      */
@@ -105,16 +168,9 @@ public final class RequestContext
         setEvent(null);
     }
 
-    /**
-     * There is no unsafe version of this because it shouldn't be performance critical
-     *
-     * @param exceptionPayload
-     */
     public static void setExceptionPayload(UMOExceptionPayload exceptionPayload)
     {
-        UMOEvent newEvent = newEvent(getEvent(), SAFE);
-        newEvent.getMessage().setExceptionPayload(exceptionPayload);
-        internalSetEvent(newEvent);
+        getEvent().getMessage().setExceptionPayload(exceptionPayload);
     }
 
     public static UMOExceptionPayload getExceptionPayload()
@@ -122,10 +178,6 @@ public final class RequestContext
         return getEvent().getMessage().getExceptionPayload();
     }
 
-    public static UMOMessage safeMessageCopy(UMOMessage message)
-    {
-        return newMessage(message, SAFE);
-    }
 
     protected static UMOEvent newEvent(UMOEvent event, boolean safe)
     {
