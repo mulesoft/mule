@@ -96,6 +96,9 @@ Assembly descriptor for the full Mule distribution.
             <exclude>**/*.iml</exclude>
             <exclude>**/*.ipr</exclude>
             <exclude>**/*.iws</exclude>
+            <!-- Exclude the webapp tests because Ant is not smart enough to deal 
+                with multiple Jetty versions. -->
+            <exclude>webapp/src/test/**</exclude>
         </excludes>
     </fileSet>
 
