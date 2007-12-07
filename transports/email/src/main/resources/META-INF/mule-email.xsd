@@ -61,4 +61,9 @@
         <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
     </xsd:attributeGroup>
 
+    <xsd:element name="transformer-email-to-string" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="transformer-string-to-email" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="transformer-object-to-mime" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="transformer-mime-to-bytes" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="transformer-bytes-to-mime" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
 </xsd:schema>
