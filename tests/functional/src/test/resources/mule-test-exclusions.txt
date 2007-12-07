@@ -8,3 +8,6 @@
 org.mule.test.spring.GlobalPropertiesMule2458TestCase
 
 org.mule.test.firewall.FirewallTestCase
+
+# MULE-2779
+org.mule.test.config.StartupPropertiesTestCase
