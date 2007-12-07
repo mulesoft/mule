@@ -22,7 +22,11 @@ useful for splitting up your Mule configuration to make it more manageable).
 
 Your configuration file(s) need to be on the classpath prior to startup.  A convenient
 way to achieve this is by placing them in the "conf" or "lib/user" directory.
-Alternatively, you can specify an explicit path to their location on the file system.
+
+Alternatively, you can specify an explicit path to their location on the file system 
+as follows:
+
+mule -config file:/path/to/my-config.xml
 
 +---------------------+
 | CLASSES & LIBRARIES |
@@ -43,7 +47,7 @@ to interpret your configuration file(s).  If you wish to use a different configu
 builder, you can specify it using the "-builder" option.  For example, to use the Scripting
 configuration builder you could specify:
 
-mule -config my-config.xml -builder org.mule.config.builders.ScriptConfigurationBuilder
+mule -config my-scripted-config.xml -builder org.mule.config.builders.ScriptConfigurationBuilder
 
 +------------------+
 | ADVANCED OPTIONS |
@@ -53,3 +57,4 @@ Mule uses the Java Service Wrapper (http://wrapper.tanukisoftware.org) to contro
 JVM from your native OS.  The wrapper provides many advanced options and features,
 for more information, see http://wrapper.tanukisoftware.org/doc/english/launch.html
 and http://wrapper.tanukisoftware.org/doc/english/properties.html
+

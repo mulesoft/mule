@@ -50,14 +50,14 @@ The distribution you have downloaded contains the following:
 ./examples     - Example applications you can run and try building yourself
 ./lib/boot     - Libraries used by the Java Service Wrapper to boot up the server
 ./lib/mule     - Mule libraries
+./lib/native   - Platform-specific (non-Java) libraries
 ./lib/opt      - Non-Mule libraries
 ./lib/user     - This is where you should place your custom classes/libraries.
                  This directory comes before ./lib/mule on the classpath and can
                  therefore be used to patch the distributed Mule classes if necessary.
 ./licences     - License information for all libraries shipped with Mule
 ./logs         - Output will be sent here by default when running in background mode
-./sbin         - Internal scripts which are not to be run by the user
-./src          - The source code for all Mule modules, you can import this into your IDE
+./src          - An export of the Mule source code, useful for importing into your IDE
 ./INSTALL.txt  - erm... this file!
 ./LICENSE.txt  - License agreement for Mule
 ./USAGE.txt    - Basic usage of Mule from the command-line
@@ -79,8 +79,9 @@ http://www.muledocs.org/Examples
 +----------+
 We hope you enjoy using Mule. To help us make it a better product please tell
 us about any issues (no matter how small), suggestions or other comments you have.
-You can post on the mailing list - user@mule.codehaus.org or raise
-issues at http://mule.mulesource.org/jira, or drop in to our IRC channel on irc.codehaus.org#mule
+You can post on the Mule User's mailing list - user@mule.codehaus.org or raise
+issues at http://mule.mulesource.org/jira
 
 Enjoy!
 The Mule Team
+
