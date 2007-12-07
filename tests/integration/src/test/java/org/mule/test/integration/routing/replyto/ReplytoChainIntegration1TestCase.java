@@ -10,20 +10,26 @@
 
 package org.mule.test.integration.routing.replyto;
 
+import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
-public class ReplytoChainIntegration4TestCase extends FunctionalTestCase
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.activemq.command.ActiveMQTextMessage;
+
+public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
 {
-    public ReplytoChainIntegration4TestCase()
+    public ReplytoChainIntegration1TestCase()
     {
         setDisposeManagerPerSuite(true);
     }
 
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-4.xml";
+        return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-1.xml";
     }
 
     public void testReplyToChain() throws Exception
@@ -31,8 +37,11 @@ public class ReplytoChainIntegration4TestCase extends FunctionalTestCase
         String message = "test";
 
         MuleClient client = new MuleClient();
+        Map props = new HashMap();
+        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         UMOMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
-        assertEquals("Received: " + message, result.getPayload());
+        assertEquals("Received: " + message, ((ActiveMQTextMessage)result.getPayload()).getText());
     }
+    
 }

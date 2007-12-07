@@ -13,6 +13,7 @@ package org.mule.providers;
 import org.mule.config.MuleProperties;
 import org.mule.impl.OptimizedRequestContext;
 import org.mule.impl.RequestContext;
+import org.mule.impl.ThreadSafeAccess;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
@@ -23,7 +24,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.routing.UMOResponseRouterCollection;
 
@@ -168,8 +168,10 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
 
             // Once a dispatcher has done its work we need to remove this property
             // so that it is not propagated to the next request
-            if (result != null)
+            if (result != null
+                    && result.getPropertyNames().contains(MuleProperties.MULE_REMOTE_SYNC_PROPERTY))
             {
+//                result = RequestContext.safeMessageCopy(result);
                 result.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
             }
             return result;

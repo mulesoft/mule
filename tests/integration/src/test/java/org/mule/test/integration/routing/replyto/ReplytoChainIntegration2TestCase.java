@@ -27,7 +27,7 @@ public class ReplytoChainIntegration2TestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/routing/replyto/injection2-test.xml";
+        return "org/mule/test/integration/routing/replyto/replyto-chain-integration-test-2.xml";
     }
 
     public void testReplyToChain() throws Exception
