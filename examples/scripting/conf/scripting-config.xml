@@ -20,21 +20,22 @@
         return ["Hello", ":-)"];
     </scripting:script>
     
+    <stdio:connector name="SystemStreamConnector"
+                     promptMessage="Please enter a message: "
+                     messageDelayTime="1000"/>
+
     <model name="main">
         <service name="ScriptService">
             <inbound-router>
-                <stdio:inbound-endpoint system="IN">
-                    <properties>
-                        <spring:entry key="promptMessage" value="Please enter a message: "/>
-                        <spring:entry key="messageDelayTime" value="1000"/>
-                    </properties>
-                </stdio:inbound-endpoint>
+                <stdio:inbound-endpoint system="IN"/>
+                <!-- For unit testing -->
+                <inbound-endpoint address="vm://scripting"/>
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
                     <properties>
                         <spring:entry key="scriptEngineName" value="groovy"/>
-                        <spring:entry key="scriptText" value-ref="scriptText2"/>
+                        <spring:entry key="scriptText" value-ref="scriptText"/>
                     </properties>
                 </pooled-object>
             </component>

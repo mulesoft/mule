@@ -17,6 +17,11 @@ import org.mule.umo.UMOMessage;
 
 public class ScriptingExampleTestCase extends FunctionalTestCase
 {    
+    protected String getConfigResources()
+    {
+        return "scripting-config.xml";
+    }
+
     public void testScriptingExample() throws Exception
     {
         MuleClient client = new MuleClient();
@@ -24,15 +29,8 @@ public class ScriptingExampleTestCase extends FunctionalTestCase
         
         assertNotNull(reply);
         assertNotNull(reply.getPayload());
-        //TODO RM* assertEquals("Hello|:-)", reply.getPayloadAsString()); // MULE-2556
-        assertEquals("[Hello, :-)]", reply.getPayloadAsString());
+        assertEquals("[Hello, :-)]", reply.getPayloadAsString()); 
     }
-
-    protected String getConfigResources()
-    {
-        return "test-scripting-config.xml";
-    }
-
 }
 
 
