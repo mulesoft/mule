@@ -42,6 +42,7 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
     {
         assertFalse(manager.isNotificationEnabled(Event1.class));
         assertFalse(manager.isNotificationEnabled(SubEvent1.class));
+        assertFalse(manager.isNotificationEnabled(SubSubEvent1.class));
         assertFalse(manager.isNotificationEnabled(Event2.class));
         assertFalse(manager.isNotificationEnabled(SubEvent2.class));
         assertFalse(manager.isNotificationEnabled(Event3.class));
@@ -64,8 +65,9 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
     {
         assertTrue("via subclass", manager.isNotificationEnabled(Event1.class));
         assertTrue("direct", manager.isNotificationEnabled(SubEvent1.class));
+        assertTrue("via superclass", manager.isNotificationEnabled(SubSubEvent1.class));
         assertTrue("direct", manager.isNotificationEnabled(Event2.class));
-        assertFalse("not directly", manager.isNotificationEnabled(SubEvent2.class));
+        assertTrue("via superclass", manager.isNotificationEnabled(SubEvent2.class));
         assertFalse("not specified at all", manager.isNotificationEnabled(Event3.class));
     }
 
@@ -99,8 +101,9 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
         manager.disableInterface(Listener1.class);
         assertFalse("via subclass, but no listener", manager.isNotificationEnabled(Event1.class));
         assertFalse("disabled", manager.isNotificationEnabled(SubEvent1.class));
+        assertFalse("via superclass, but no listener", manager.isNotificationEnabled(SubSubEvent1.class));
         assertTrue("direct", manager.isNotificationEnabled(Event2.class));
-        assertFalse("not directly", manager.isNotificationEnabled(SubEvent2.class));
+        assertTrue("via superclass", manager.isNotificationEnabled(SubEvent2.class));
         assertFalse("not specified at all", manager.isNotificationEnabled(Event3.class));
     }
 
@@ -153,10 +156,10 @@ public class ServerNotificationManagerTestCase extends AbstractMuleTestCase
         assertNoListenersNotified();
         manager.notifyListeners(new Event1("id1"));
         assertNoListenersNotified();
-        manager.notifyListeners(new SubEvent1("id1"));
+        manager.notifyListeners(new SubSubEvent1("id1"));
         assertTrue(listener1.isNotified());
         assertFalse(listener2.isNotified());
-        manager.notifyListeners(new SubEvent2());
+        manager.notifyListeners(new Event2());
         assertTrue(listener1.isNotified());
         assertTrue(listener2.isNotified());
     }

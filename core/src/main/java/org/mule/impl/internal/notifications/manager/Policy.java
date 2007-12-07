@@ -33,8 +33,11 @@ class Policy
 
     // map from event to set of senders
     private Map eventToSenders = new HashMap();
-    // this is cumulative - it should never change, it's just a cache of known info
-    private ConcurrentMap knownEvents = new ConcurrentHashMap();
+
+    // these are cumulative - set values should never change, they are just a cache of known info
+    // they are co and contra-variant wrt to exact event type (see code below).
+    private ConcurrentMap knownEventsExact = new ConcurrentHashMap();
+    private ConcurrentMap knownEventsSuper = new ConcurrentHashMap();
 
     /**
      * For each listener, we check each interface and see what events can be delivered.
@@ -62,6 +65,8 @@ class Policy
                             Class event = (Class) events.next();
                             if (notASubclassOfAnyClassInSet(disabledEvents, event))
                             {
+                                knownEventsExact.put(event, Boolean.TRUE);
+                                knownEventsSuper.put(event, Boolean.TRUE);
                                 if (!eventToSenders.containsKey(event))
                                 {
                                     eventToSenders.put(event, new HashSet());
@@ -105,54 +110,64 @@ class Policy
     {
         if (null != notification)
         {
-            boolean dispatched = false;
-            Class clazz = notification.getClass();
-            if (!knownEvents.containsKey(clazz) || ((Boolean) knownEvents.get(clazz)).booleanValue())
+            Class notfnClass = notification.getClass();
+            // search if we don't know about this event, or if we do know it is used
+            if ((!knownEventsExact.containsKey(notfnClass))
+                    || ((Boolean) knownEventsExact.get(notfnClass)).booleanValue())
             {
+                boolean found = false;
                 for (Iterator events = eventToSenders.keySet().iterator(); events.hasNext();)
                 {
                     Class event = (Class) events.next();
-                    if (event.isAssignableFrom(clazz))
+                    if (event.isAssignableFrom(notfnClass))
                     {
+                        found = true;
                         for (Iterator senders = ((Collection) eventToSenders.get(event)).iterator(); senders.hasNext();)
                         {
                             ((Sender) senders.next()).dispatch(notification);
                         }
-                        dispatched = true;
                     }
                 }
-                knownEvents.put(clazz, Boolean.valueOf(dispatched));
+                knownEventsExact.put(notfnClass, Boolean.valueOf(found));
             }
         }
     }
 
     /**
-     * This returns true if the given type or any subclass is accepted.  In this way a user can
-     * ask for a whole set of classes at once.
+     * This returns a very "conservative" value - it is true if the notification or any subclass would be
+     * accepted.  So if it returns false then you can be sure that there is no need to send the
+     * notification.  On the other hand, if it returns true there is no guarantee that the notification
+     * "really" will be dispatched to any listener.
      *
-     * @param type
-     * @return
+     * @param notfnClass Either the notification class being generated or some superclass
+     * @return false if there is no need to dispatch the notification
      */
-    boolean isNotificationEnabled(Class type)
+    boolean isNotificationEnabled(Class notfnClass)
     {
-        if (knownEvents.containsKey(type))
+        if (!knownEventsSuper.containsKey(notfnClass))
         {
-            return ((Boolean) knownEvents.get(type)).booleanValue();
-        }
-        else
-        {
-            for (Iterator events = eventToSenders.keySet().iterator(); events.hasNext();)
+            boolean found = false;
+            // this is exhaustive because we initialise to include all events handled.
+            for (Iterator events = knownEventsSuper.keySet().iterator(); events.hasNext() && !found;)
             {
                 Class event = (Class) events.next();
-                if (type.isAssignableFrom(event))
-                {
-                    knownEvents.put(type, Boolean.TRUE);
-                    return true;
-                }
+                found = ((Boolean) knownEventsSuper.get(event)).booleanValue() && notfnClass.isAssignableFrom(event);
             }
-            knownEvents.put(type, Boolean.FALSE);
-            return false;
+            knownEventsSuper.put(notfnClass, Boolean.valueOf(found));
         }
+        if (!knownEventsExact.containsKey(notfnClass))
+        {
+            boolean found = false;
+            for (Iterator events = eventToSenders.keySet().iterator(); events.hasNext() && !found;)
+            {
+                Class event = (Class) events.next();
+                found = event.isAssignableFrom(notfnClass);
+            }
+            knownEventsExact.put(notfnClass, Boolean.valueOf(found));
+
+        }
+        return ((Boolean) knownEventsSuper.get(notfnClass)).booleanValue()
+                || ((Boolean) knownEventsExact.get(notfnClass)).booleanValue();
     }
 
 }

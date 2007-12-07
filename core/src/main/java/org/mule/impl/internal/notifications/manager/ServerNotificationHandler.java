@@ -19,6 +19,15 @@ public interface ServerNotificationHandler
 
     public boolean isNotificationDynamic();
 
-    public boolean isNotificationEnabled(Class type);
+    /**
+     * This returns a very "conservative" value - it is true if the notification or any subclass would be
+     * accepted.  So if it returns false then you can be sure that there is no need to send the
+     * notification.  On the other hand, if it returns true there is no guarantee that the notification
+     * "really" will be dispatched to any listener.
+     *
+     * @param notfnClass Either the notification class being generated or some superclass
+     * @return false if there is no need to dispatch the notification
+     */
+    public boolean isNotificationEnabled(Class notfnClass);
 
 }
