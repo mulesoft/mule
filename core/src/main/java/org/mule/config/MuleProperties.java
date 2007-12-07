@@ -120,7 +120,7 @@ public interface MuleProperties
     // End Connector Service descriptor properties
 
     String MULE_WORKING_DIRECTORY_PROPERTY = "mule.working.dir";
-
+    String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
 
     //Object Name Keys
 
