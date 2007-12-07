@@ -81,8 +81,7 @@ public class ErrorManager
         }
         catch (Exception e)
         {
-
-            logger.error(LocaleMessage.handlerFailure(eh));
+            logger.error(e);
 
             if (eh instanceof DefaultHandler)
             {

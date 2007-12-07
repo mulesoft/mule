@@ -4,13 +4,13 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
-       xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
+       xmlns:email="http://www.mulesource.org/schema/mule/email/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
-       http://www.mulesource.org/schema/mule/smtp/2.0 http://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd">
+       http://www.mulesource.org/schema/mule/email/2.0 http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd">
        
     <description>
         This example demonstrates how to publish events to multiple outbound endpoints. 
@@ -55,12 +55,7 @@
         </spring:property>
     </spring:bean>
 
-    <jms:activemq-connector name="JMSConnector">
-        <!-- there used to be a comment here asking how to configure the property below,
-             using the old syntax - i have left this commented out since presumably it is
-             not needed, but in general you would use spring:property -->
-        <!-- spring:property name="brokerURL" value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/ -->
-    </jms:activemq-connector>
+    <jms:activemq-connector name="JMSConnector"/>
     
     <file:connector name="FileConnector" 
                     pollingFrequency="1000" 
@@ -71,6 +66,9 @@
         All transformers must be declared here to be referenced by their names in the 
         endpoint definitions 
     -->
+    <email:transformer-string-to-email name="StringToEmailMessage"/>
+    <jms:transformer-object-to-jmsmessage name="ObjectToJMSMessage"/>
+    <jms:transformer-jmsmessage-to-object name="JMSMessageToObject"/>
     <custom-transformer name="XMLToExceptionBean"
                              class="org.mule.transformers.xml.XmlToObject"
                              returnClass="org.mule.samples.errorhandler.ExceptionBean"/>
@@ -86,22 +84,7 @@
     <custom-transformer name="ErrorMessageToExceptionBean" 
                              class="org.mule.samples.errorhandler.ErrorMessageToExceptionBean"
                              returnClass="org.mule.samples.errorhandler.ExceptionBean"/>
-    <custom-transformer name="StringToEmailMessage" 
-                             class="org.mule.providers.email.transformers.StringToEmailMessage"
-                             returnClass="javax.mail.Message"/>
-    <custom-transformer name="ObjectToJMSMessage"
-                             class="org.mule.providers.jms.transformers.ObjectToJMSMessage"
-                             returnClass="javax.jms.TextMessage"/>
-    <custom-transformer name="JMSMessageToObject" 
-                             class="org.mule.providers.jms.transformers.JMSMessageToObject"
-                             returnClass="java.lang.String"/>
 
-    <!-- TODO how to handle this? The whole interceptor block is commented out in mule.xsd -->    
-<!--    <interceptor-stack name="default">-->
-<!--        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>-->
-<!--        <interceptor className="org.mule.interceptors.TimerInterceptor"/>-->
-<!--    </interceptor-stack>-->
-    
     <model name="errorhandler-test">
         <!-- 
             This uses an URL endpointUri instead of a provider config.  Note that this specifies 
@@ -116,22 +99,22 @@
                          a svn checkout the file connector would try to process subversion's meta
                          dirs which is not what we want.
                     -->
-                    <custom-filter class="org.mule.providers.file.filters.FilenameWildcardFilter">
-                        <spring:property name="pattern" value="*.xml"/>
-                    </custom-filter>
+                    <file:filter-filename-wildcard pattern="*.xml"/>
                 </inbound-endpoint>
             </inbound-router>
             
-            <component class="org.mule.samples.errorhandler.ErrorManager">
-                <properties>
-                    <spring:entry key="handlers">
-                        <spring:list>
-                            <spring:ref local="fatalHandler"/>
-                            <spring:ref local="defaultHandler"/>
-                            <spring:ref local="businessHandler"/>
-                        </spring:list>
-                    </spring:entry>
-                </properties>
+            <component>
+                <pooled-object class="org.mule.samples.errorhandler.ErrorManager">
+                    <properties>
+                        <spring:entry key="handlers">
+                            <spring:list>
+                                <spring:ref local="fatalHandler"/>
+                                <spring:ref local="defaultHandler"/>
+                                <spring:ref local="businessHandler"/>
+                            </spring:list>
+                        </spring:entry>
+                    </properties>
+                 </pooled-object>
             </component>
 
             <outbound-router>
@@ -162,9 +145,6 @@
                                    transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
                     <payload-type-filter expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
                 </filtering-router>
-
-                <!-- TODO how to handle this? The whole interceptor block is commented out in mule.xsd -->
-<!--                <interceptor name="default"/>-->
             </outbound-router>
         </service>
         
