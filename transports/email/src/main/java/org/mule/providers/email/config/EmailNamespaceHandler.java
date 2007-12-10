@@ -1,5 +1,5 @@
 /*
- * $Id: SmtpNamespaceHandler.java 9967 2007-12-03 19:38:44Z acooke $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
