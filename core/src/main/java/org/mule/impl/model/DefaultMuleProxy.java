@@ -278,7 +278,7 @@ public class DefaultMuleProxy implements MuleProxy
             if (returnMessage == null)
             {
                 // important that we pull event from request context here as it may have been modified
-                // (necessary to avoid scribbling between threads)
+                // (necessary to avoid scribbling between thrreads)
                 returnMessage = new MuleMessage(NullPayload.getInstance(), RequestContext.getEvent().getMessage());
             }
             UMOExceptionPayload exceptionPayload = returnMessage.getExceptionPayload();
