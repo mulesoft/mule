@@ -148,7 +148,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
                 {
                     try
                     {
-                        result = client.request("CustomerResponses", 600);
+                        result = client.request("CustomerResponses", 2000);
                     }
                     catch (UMOException e)
                     {
