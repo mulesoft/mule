@@ -568,13 +568,11 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
                 }
                 catch (SecurityException e)
                 {
-                    // TODO MULE-863: Do we need to warn?
                     logger.warn("Request was made but was not authenticated: " + e.getMessage(), e);
                     connector.fireNotification(new SecurityNotification(e,
                             SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                     handleException(e);
-                    resultMessage = message;
-                    // setExceptionDetails(resultMessage, e);
+                    resultMessage = RequestContext.getEvent().getMessage();
                 }
             }
             else

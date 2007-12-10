@@ -23,16 +23,17 @@ import org.mule.util.ObjectUtils;
 
 public class DefaultExceptionStrategy extends AbstractExceptionListener
 {
+
     public void handleMessagingException(UMOMessage message, Throwable t)
     {
         defaultHandler(t);
-        routeException(message, null, t);
+        routeException(RequestContext.getEvent().getMessage(), null, t);
     }
 
     public void handleRoutingException(UMOMessage message, UMOImmutableEndpoint endpoint, Throwable t)
     {
         defaultHandler(t);
-        routeException(message, endpoint, t);
+        routeException(RequestContext.getEvent().getMessage(), endpoint, t);
     }
 
     public void handleLifecycleException(Object component, Throwable t)
