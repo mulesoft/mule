@@ -11,7 +11,6 @@
 package org.mule.providers.vm;
 
 import org.mule.providers.AbstractMessageRequester;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.queue.Queue;
@@ -65,26 +64,26 @@ public class VMMessageRequester extends AbstractMessageRequester
             }
             else
             {
-                UMOEvent event = null;
+                UMOMessage message = null;
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Waiting for a message on " + endpoint.getEndpointURI().getAddress());
                 }
                 try
                 {
-                    event = (UMOEvent) queue.poll(timeout);
+                    message = (UMOMessage) queue.poll(timeout);
                 }
                 catch (InterruptedException e)
                 {
-                    logger.error("Failed to receive event from queue: " + endpoint.getEndpointURI());
+                    logger.error("Failed to receive message from queue: " + endpoint.getEndpointURI());
                 }
-                if (event != null)
+                if (message != null)
                 {
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Event received: " + event);
+                        logger.debug("Message received: " + message);
                     }
-                    return event.getMessage();
+                    return message;
                 }
                 else
                 {
@@ -113,7 +112,7 @@ public class VMMessageRequester extends AbstractMessageRequester
         {
             // use the default queue profile to configure this queue.
             connector.getQueueProfile().configureQueue(
-                    endpoint.getEndpointURI().getAddress(), connector.getManagementContext().getQueueManager());
+                    endpoint.getEndpointURI().getAddress(), connector.getQueueManager());
         }
     }
 

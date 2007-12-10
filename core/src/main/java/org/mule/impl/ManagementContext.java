@@ -88,7 +88,7 @@ public class ManagementContext implements UMOManagementContext
 
     private UMOWorkManager workManager;
 
-    /** The queue manager to use for component queues and vm queues */
+    /** The queue manager to use for component queues */
     private QueueManager queueManager;
 
     /** The transaction manager to use for this instance. */

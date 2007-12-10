@@ -31,7 +31,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
  * inside an app server using JCA. In the future we might want to use one of the
  * existing models.
  */
-public class JcaComponent extends AbstractComponent //implements UMOComponent, ManagementContextAware
+public class JcaComponent extends AbstractComponent implements UMOComponent
 {
     /**
      * Serial version

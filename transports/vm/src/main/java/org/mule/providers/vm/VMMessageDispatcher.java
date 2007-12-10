@@ -51,7 +51,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         {
             QueueSession session = connector.getQueueSession();
             Queue queue = session.getQueue(endpointUri.getAddress());
-            queue.put(event);
+            queue.put(event.getMessage());
         }
         else
         {
@@ -61,8 +61,9 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
                 logger.warn("No receiver for endpointUri: " + event.getEndpoint().getEndpointURI());
                 return;
             }
-
-            receiver.onEvent(event);
+            UMOMessage message = event.getMessage(); 
+            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
+            receiver.onMessage(message);
         }
         if (logger.isDebugEnabled())
         {
@@ -98,7 +99,9 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             }
         }
 
-        retMessage = (UMOMessage) receiver.onCall(event);
+        UMOMessage message = event.getMessage(); 
+        connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), message);
+        retMessage = (UMOMessage) receiver.onCall(message, event.isSynchronous());
 
         if (logger.isDebugEnabled())
         {
@@ -118,7 +121,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         {
             // use the default queue profile to configure this queue.
             connector.getQueueProfile().configureQueue(
-                    endpoint.getEndpointURI().getAddress(), connector.getManagementContext().getQueueManager());
+                    endpoint.getEndpointURI().getAddress(), connector.getQueueManager());
         }
     }
 

@@ -10,30 +10,24 @@
 
 package org.mule.providers.vm;
 
-import org.mule.MuleException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.TransactedPollingMessageReceiver;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import java.util.List;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 /**
- * <code>VMMessageReceiver</code> is a listener for events from a Mule component
- * which then simply passes the events on to the target component.
+ * <code>VMMessageReceiver</code> is a listener for events from a Mule component which then simply passes
+ * the events on to the target component.
  */
 public class VMMessageReceiver extends TransactedPollingMessageReceiver
 {
@@ -78,68 +72,41 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         // template method
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.UMOEventListener#onEvent(org.mule.umo.UMOEvent)
-     */
-    public void onEvent(UMOEvent event) throws UMOException
+    public void onMessage(UMOMessage message) throws UMOException
     {
-        //Rewrite the event to treat it as a new event        
-        event = new MuleEvent(new MuleMessage(event.getMessage().getPayload(), event.getMessage()),
-                endpoint, component, event);
+        // Rewrite the message to treat it as a new message
+        UMOMessage newMessage = new MuleMessage(message.getPayload(), message);
 
-        if (connector.isQueueEvents())
+        // Is this lock required? (Leaving it in just in case)
+        synchronized (lock)
         {
-            QueueSession queueSession = connector.getQueueSession();
-            Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
-            try
-            {
-                queue.put(event);
-            }
-            catch (InterruptedException e)
-            {
-                throw new MuleException(CoreMessages.interruptedQueuingEventFor(this.endpoint
-                        .getEndpointURI()), e);
-            }
-        }
-        else
-        {
-            UMOMessage msg = event.getMessage();
-            synchronized (lock)
-            {
-                routeMessage(msg);
-            }
+            routeMessage(newMessage);
         }
     }
 
-    public Object onCall(UMOEvent event) throws UMOException
+    public Object onCall(UMOMessage message, boolean synchronous) throws UMOException
     {
-        //Rewrite the event to treat it as a new event
-        event = new MuleEvent(new MuleMessage(event.getMessage().getPayload(), event.getMessage()),
-                endpoint, component, event);
-
-        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx == null)
-        {
-            return routeMessage(event.getMessage(), event.isSynchronous());
-        }
-        else
-        {
-            return routeMessage(event.getMessage(), tx, true);
-        }
+        // Rewrite the message to treat it as a new message
+        UMOMessage newMessage = new MuleMessage(message.getPayload(), message);
+        return routeMessage(newMessage, synchronous);
     }
 
     protected List getMessages() throws Exception
     {
-        QueueSession qs = connector.getQueueSession();
-        Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
-        UMOEvent event = (UMOEvent) queue.poll(connector.getQueueTimeout());
-        if (event != null)
+        // This "if" is required because polling takes place regardless of if queueEvents is true or not.
+        // If queueEvents is false there is no queue for this endpoint and a NullPointerException would occur
+        // See MULE-2781
+        if (connector.isQueueEvents())
         {
-            //Rewrite the message to treat it as a new message
-            UMOMessage msg = new MuleMessage(new MuleMessage(event.getMessage().getPayload(), event.getMessage()));
-            routeMessage(msg);
+            QueueSession qs = connector.getQueueSession();
+            Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
+            Object obj = queue.poll(connector.getQueueTimeout());
+            UMOMessage message = (UMOMessage) obj;// queue.poll(connector.getQueueTimeout());
+            if (message != null)
+            {
+                // Rewrite the message to treat it as a new message
+                routeMessage(new MuleMessage(message.getPayload(), message));
+            }
         }
         return null;
     }

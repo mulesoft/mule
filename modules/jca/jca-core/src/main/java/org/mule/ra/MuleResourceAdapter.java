@@ -68,7 +68,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
     public MuleResourceAdapter()
     {
-        RegistryContext.getConfiguration().setSystemModelType(JcaModel.JCA_MODEL_TYPE);
+        RegistryContext.getOrCreateRegistry().getConfiguration().setSystemModelType(JcaModel.JCA_MODEL_TYPE);
     }
 
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException

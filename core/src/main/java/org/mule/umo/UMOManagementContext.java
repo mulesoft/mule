@@ -211,8 +211,8 @@ public interface UMOManagementContext extends Lifecycle
     void setWorkManager(UMOWorkManager workManager);
 
     /**
-     * Sets the queue manager used by mule for queuing events. This is used by
-     * both components and vm provider.
+     * Sets the queue manager used by mule for queuing events. This is used for
+     * component queues
      *
      * @param queueManager
      * 
@@ -220,8 +220,8 @@ public interface UMOManagementContext extends Lifecycle
     void setQueueManager(QueueManager queueManager);
 
     /**
-     * Gets the queue manager used by mule for queuing events. This is used by
-     * both components and vm provider.
+     * Gets the queue manager used by mule for queuing events. This is used for
+     * component queues.
      *
      * @return
      *

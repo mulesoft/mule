@@ -29,8 +29,11 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.queue.CachingPersistenceStrategy;
+import org.mule.util.queue.MemoryPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueueSession;
+import org.mule.util.queue.TransactionalQueueManager;
 
 import java.util.Iterator;
 
@@ -46,11 +49,18 @@ public class VMConnector extends AbstractConnector
     private boolean queueEvents = false;
     private QueueProfile queueProfile;
     private int queueTimeout = 1000;
+    /** The queue manager to use for vm queues only */
+    private QueueManager queueManager;
 
     protected void doInitialise() throws InitialisationException
     {
         if (queueEvents)
         {
+            if (queueManager == null)
+            {
+                queueManager = new TransactionalQueueManager();
+                queueManager.setPersistenceStrategy(new CachingPersistenceStrategy(new MemoryPersistenceStrategy()));
+            }
             if (queueProfile == null)
             {
                 //create a default QueueProfile
@@ -93,7 +103,7 @@ public class VMConnector extends AbstractConnector
     {
         if (queueEvents)
         {
-            queueProfile.configureQueue(endpoint.getEndpointURI().getAddress(), managementContext.getQueueManager());
+            queueProfile.configureQueue(endpoint.getEndpointURI().getAddress(), queueManager);
         }
         return serviceDescriptor.createMessageReceiver(this, component, endpoint);
     }
@@ -150,13 +160,12 @@ public class VMConnector extends AbstractConnector
 
     QueueSession getQueueSession() throws InitialisationException
     {
-        QueueManager qm = managementContext.getQueueManager();
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null)
         {
-            if (tx.hasResource(qm))
+            if (tx.hasResource(queueManager))
             {
-                final QueueSession queueSession = (QueueSession) tx.getResource(qm);
+                final QueueSession queueSession = (QueueSession) tx.getResource(queueManager);
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Retrieved VM queue session " + queueSession + " from current transaction " + tx);
@@ -170,7 +179,7 @@ public class VMConnector extends AbstractConnector
             logger.debug("Retrieving new VM queue session from queue manager");
         }
 
-        QueueSession session = qm.getQueueSession();
+        QueueSession session = queueManager.getQueueSession();
         if (tx != null)
         {
             if (logger.isDebugEnabled())
@@ -179,7 +188,7 @@ public class VMConnector extends AbstractConnector
             }
             try
             {
-                tx.bindResource(qm, session);
+                tx.bindResource(queueManager, session);
             }
             catch (TransactionException e)
             {
@@ -249,6 +258,11 @@ public class VMConnector extends AbstractConnector
     public void setQueueTimeout(int queueTimeout)
     {
         this.queueTimeout = queueTimeout;
+    }
+
+    public QueueManager getQueueManager()
+    {
+        return queueManager;
     }
 
 }
