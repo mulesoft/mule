@@ -236,7 +236,7 @@
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
                 <mule:response-router>
                     <mule:single-response-router>
-                        <mxml:jxpath-property-extractor/>
+                        <mule:custom-property-extractor class="org.mule.xml.util.properties.JXPathPropertyExtractor"/>
                     </mule:single-response-router>
                 </mule:response-router>
             </mule:service>
