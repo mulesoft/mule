@@ -22,6 +22,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.emory.mathcs.backport.java.util.concurrent.Future;
+import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
+import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledFuture;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
@@ -55,24 +58,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
     {
         try
         {
-            synchronized (schedules)
-            {
-                // we use scheduleWithFixedDelay to prevent queue-up of tasks when
-                // polling takes longer than the specified frequency, e.g. when the
-                // polled database or network is slow or returns large amounts of
-                // data.
-                ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(
-                    new PollingReceiverWorkerSchedule(this.createWork()), DEFAULT_STARTUP_DELAY,
-                    this.getFrequency(), this.getTimeUnit());
-                schedules.add(schedule);
-
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug(ObjectUtils.identityToShortString(this) + " scheduled "
-                                 + ObjectUtils.identityToShortString(schedule) + " with " + frequency
-                                 + " " + getTimeUnit() + " polling frequency");
-                }
-            }
+            this.schedule();
         }
         catch (Exception ex)
         {
@@ -83,10 +69,52 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
 
     protected void doStop() throws UMOException
     {
+        this.unschedule();
+    }
+
+    /**
+     * This method registers this receiver for periodic polling ticks with the connectors
+     * scheduler. Subclasses can override this in case they want to handle their polling
+     * differently.
+     * 
+     * @throws RejectedExecutionException
+     * @throws NullPointerException
+     * @throws IllegalArgumentException
+     * @see {@link ScheduledExecutorService#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)}
+     */
+    protected void schedule()
+        throws RejectedExecutionException, NullPointerException, IllegalArgumentException
+    {
         synchronized (schedules)
         {
-            // cancel our schedules gently: do not interrupt when polling is in
-            // progress
+            // we use scheduleWithFixedDelay to prevent queue-up of tasks when
+            // polling takes longer than the specified frequency, e.g. when the
+            // polled database or network is slow or returns large amounts of
+            // data.
+            ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(
+                new PollingReceiverWorkerSchedule(this.createWork()), DEFAULT_STARTUP_DELAY,
+                this.getFrequency(), this.getTimeUnit());
+            schedules.add(schedule);
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(ObjectUtils.identityToShortString(this) + " scheduled "
+                             + ObjectUtils.identityToShortString(schedule) + " with " + frequency
+                             + " " + getTimeUnit() + " polling frequency");
+            }
+        }
+    }
+
+    /**
+     * This method cancels the schedules which were created in {@link #schedule()}.
+     * 
+     * @see {@link Future#cancel(boolean)}
+     */
+    protected void unschedule()
+    {
+        synchronized (schedules)
+        {
+            // cancel our schedules gently: do not interrupt when polling is in progress
             for (Iterator i = schedules.iterator(); i.hasNext();)
             {
                 ScheduledFuture schedule = (ScheduledFuture)i.next();
