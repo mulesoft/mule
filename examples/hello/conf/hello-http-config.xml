@@ -42,6 +42,7 @@
     <custom-transformer name="ChatStringToString" class="org.mule.samples.hello.ChatStringToString"/>
     <custom-transformer name="HttpRequestToNameString" class="org.mule.samples.hello.HttpRequestToNameString"/>
     <custom-transformer name="ExceptionToString" class="org.mule.samples.hello.ExceptionToString"/>
+    <custom-transformer name="HttpRequestToParameter" class="org.mule.providers.http.servlet.HttpRequestToParameter"/>
 
     <!-- workaround for http://mule.mulesource.org/jira/browse/MULE-1827 -->
     <transformer-message-properties name="PlainTextResponseTransformer">
@@ -65,7 +66,7 @@
                 </inbound-endpoint>
                 
                 <!-- Incoming Servlet requests -->
-                <inbound-endpoint address="servlet://rest" transformer-refs="StringToNameString" responseTransformer-refs="PlainTextResponseTransformer" synchronous="true"/>
+                <inbound-endpoint address="servlet://rest" transformer-refs="HttpRequestToParameter StringToNameString" responseTransformer-refs="PlainTextResponseTransformer" synchronous="true"/>
 
                 <!-- Incoming VM requests -->
                 <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" synchronous="true"/>

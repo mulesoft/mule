@@ -203,15 +203,6 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         return session.getId();
     }
 
-    protected boolean isText(String contentType)
-    {
-        if (contentType == null)
-        {
-            return true;
-        }
-        return (contentType.startsWith("text/"));
-    }
-
     /**
      * Sets a replyTo address for this message. This is useful in an asynchronous
      * environment where the caller doesn't wait for a response and the response

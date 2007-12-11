@@ -21,16 +21,19 @@
         </add-properties>
     </transformer-message-properties>
 
+    <!-- avoid name clash when used with hello-http-config.xml -->
+    <custom-transformer name="HttpRequestToParameter2" class="org.mule.providers.http.servlet.HttpRequestToParameter"/>
+
     <model name="samples">
 
         <service name="restTest">
             <inbound-router>
-                <inbound-endpoint address="servlet://restPUTTest"/>
+                <inbound-endpoint transformer-refs="HttpRequestToParameter2" address="servlet://restPUTTest"/>
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.samples.rest.RestTester">
                     <properties>
-                        <spring:entry key="prefix" value="Received"/>
+                        <spring:entry key="prefix" value="Received "/>
                     </properties>
                 </pooled-object>
             </component>

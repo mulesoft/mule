@@ -9,8 +9,7 @@
  */
 package org.mule.providers.http.servlet;
 
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.DiscoverableTransformer;
+import org.mule.transformers.AbstractDiscoverableTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import java.io.IOException;
@@ -24,9 +23,8 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
  * Converts an {@link javax.servlet.http.HttpServletRequest} into an array of bytes by extracting the payload of
  * the request.
  */
-public class HttpRequestToByteArray extends AbstractTransformer implements DiscoverableTransformer
+public class HttpRequestToByteArray extends AbstractDiscoverableTransformer
 {
-    private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public HttpRequestToByteArray()
     {
@@ -48,13 +46,4 @@ public class HttpRequestToByteArray extends AbstractTransformer implements Disco
         return baos.toByteArray();
     }
 
-    public int getPriorityWeighting()
-    {
-        return priorityWeighting;
-    }
-
-    public void setPriorityWeighting(int priorityWeighting)
-    {
-        this.priorityWeighting = priorityWeighting;
-    }
 }
