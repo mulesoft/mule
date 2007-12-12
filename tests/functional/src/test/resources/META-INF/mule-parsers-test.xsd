@@ -107,7 +107,6 @@
         <xsd:attribute name="value" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
-    <xsd:element name="string-endpoint" type="stringEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:element name="orphan-endpoint" type="stringEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="stringEndpointType">
         <xsd:complexContent>
@@ -128,7 +127,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="addressed-endpoint" type="addressedEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:element name="addressed-orphan-endpoint" type="addressedEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="addressedEndpointType">
         <xsd:complexContent>
@@ -207,6 +205,18 @@
         <xsd:complexType>
             <xsd:attribute name="attr1" type="xsd:string"/>
             <xsd:attribute name="attr2" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="no-name">
+        <xsd:complexType>
+            <xsd:attribute name="id" type="xsd:NMTOKEN"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="no-name-2">
+        <xsd:complexType>
+            <xsd:attribute name="id" type="xsd:NMTOKEN"/>
         </xsd:complexType>
     </xsd:element>
 

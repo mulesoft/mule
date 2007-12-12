@@ -61,4 +61,6 @@ public interface MuleDefinitionParser extends BeanDefinitionParser
 
     MuleDefinitionParser setIgnoredDefault(boolean ignoreAll);
 
+    String getBeanName(Element element);
+
 }

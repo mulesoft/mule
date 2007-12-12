@@ -10,9 +10,10 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.CoreXMLUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -43,8 +44,6 @@ public abstract class AbstractChildDefinitionParser
         implements MuleChildDefinitionParser
 {
 
-    private static AtomicInteger idCounter = new AtomicInteger(0);
-
     protected final void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         setRegistry(parserContext.getRegistry());
@@ -59,9 +58,6 @@ public abstract class AbstractChildDefinitionParser
 
     protected void postProcess(BeanAssembler assembler, Element element)
     {
-        String name = generateChildBeanName(element);
-        element.setAttribute(ATTRIBUTE_NAME, name);
-
         // legacy handling of orphan beans - avoid setting parent
         if (null != getPropertyName(element))
         {
@@ -71,28 +67,22 @@ public abstract class AbstractChildDefinitionParser
         super.postProcess(assembler, element);
     }
 
-    protected String generateChildBeanName(Element e)
+    public String getBeanName(Element e)
     {
-        String parentId = getParentBeanName(e);
-        String id = e.getAttribute(ATTRIBUTE_NAME);
-        if (StringUtils.isBlank(id))
+        String name = CoreXMLUtils.getNameOrId(e);
+        if (StringUtils.isBlank(name))
         {
+            String parentId = getParentBeanName(e);
             if (!parentId.startsWith("."))
             {
                 parentId = "." + parentId;
             }
-            return parentId + ":" + getBeanName(e);
+            return AutoIdUtils.uniqueValue(parentId + ":" + e.getLocalName());
         }
         else
         {
-            return id;
+            return name;
         }
-    }
-
-    // guarantee a unique value
-    protected String getBeanName(Element e)
-    {
-        return e.getLocalName() + "/" + idCounter.incrementAndGet();
     }
 
     public abstract String getPropertyName(Element element);

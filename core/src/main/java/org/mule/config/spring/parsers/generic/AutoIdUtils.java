@@ -11,6 +11,7 @@
 package org.mule.config.spring.parsers.generic;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.util.StringUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.w3c.dom.Element;
@@ -23,13 +24,18 @@ public class AutoIdUtils
     private static final AtomicInteger counter = new AtomicInteger(0);
     public static final String PREFIX = "org.mule.autogen.";
 
+    public static boolean blankAttribute(Element element, String attribute)
+    {
+        return StringUtils.isBlank(element.getAttribute(attribute));
+    }
+
     public static void ensureUniqueId(Element element, String type)
     {
-        if (null != element && !element.hasAttribute(ATTRIBUTE_ID))
+        if (null != element && blankAttribute(element, ATTRIBUTE_ID))
         {
-            if (!element.hasAttribute(ATTRIBUTE_NAME))
+            if (blankAttribute(element, ATTRIBUTE_NAME))
             {
-                element.setAttribute(ATTRIBUTE_ID, PREFIX + type + "." + counter.incrementAndGet());
+                element.setAttribute(ATTRIBUTE_ID, uniqueValue(PREFIX + type));
             }
             else
             {
@@ -38,19 +44,32 @@ public class AutoIdUtils
         }
     }
 
-    public static void ensureUniqueName(Element element, String type)
+    public static String getUniqueName(Element element, String type)
     {
-        if (null != element && !element.hasAttribute(ATTRIBUTE_NAME))
+        if (!blankAttribute(element, ATTRIBUTE_NAME))
         {
-            element.setAttribute(ATTRIBUTE_NAME, PREFIX + type + "." + counter.incrementAndGet());
+            return element.getAttribute(ATTRIBUTE_NAME);
         }
+        else if (!blankAttribute(element, ATTRIBUTE_ID))
+        {
+            return element.getAttribute(ATTRIBUTE_ID);
+        }
+        else
+        {
+            return uniqueValue(PREFIX + type);
+        }
+    }
+
+    public static String uniqueValue(String value)
+    {
+        return value + "." + counter.incrementAndGet();
     }
 
     public static void forceUniqueId(Element element, String type)
     {
         if (null != element)
         {
-            String id = PREFIX + type + "." + counter.incrementAndGet();
+            String id = uniqueValue(PREFIX + type);
             element.setAttribute(ATTRIBUTE_ID, id);
             element.setAttribute(ATTRIBUTE_NAME, id);
         }

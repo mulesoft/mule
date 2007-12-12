@@ -14,10 +14,8 @@ import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.beans.ChildBean;
 import org.mule.config.spring.parsers.beans.OrphanBean;
-import org.mule.config.spring.parsers.collection.AttributeListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.config.spring.parsers.delegate.AllAttributeChildDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
 import org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator;
 import org.mule.config.spring.parsers.delegate.SingleParentFamilyDefinitionParser;
@@ -27,10 +25,8 @@ import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComplexComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimplePojoServiceDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.StringAddressEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.UnaddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildAddressDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
@@ -60,10 +56,7 @@ public class ParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler
                 new OrphanDefinitionParser(OrphanBean.class, true),
                 new NamedDefinitionParser()).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
 
-        registerBeanDefinitionParser("string-endpoint", new StringAddressEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
-        registerBeanDefinitionParser("unaddressed-endpoint", new UnaddressedEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
         registerBeanDefinitionParser("address", new ChildAddressDefinitionParser("test").addAlias("address", "host"));
-        registerBeanDefinitionParser("addressed-endpoint", new AddressedEndpointDefinitionParser("test", AddressedEndpointDefinitionParser.PROTOCOL, new UnaddressedEndpointDefinitionParser(EndpointURIEndpointBuilder.class), new String[]{}, new String[]{"path"}));
         registerBeanDefinitionParser("orphan-endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
         registerBeanDefinitionParser("child-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("unaddressed-orphan-endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
@@ -88,6 +81,9 @@ public class ParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler
                 new TransportGlobalEndpointDefinitionParser(
                         "test", TransportGlobalEndpointDefinitionParser.PROTOCOL,
                         new String[]{"string", "bar"}, new String[]{"path"}).addAlias("bar", "foo"));
+
+        registerBeanDefinitionParser("no-name", new OrphanDefinitionParser(OrphanBean.class, true));
+        registerBeanDefinitionParser("no-name-2", new IndependentDefinitionParser());
     }
 
 }

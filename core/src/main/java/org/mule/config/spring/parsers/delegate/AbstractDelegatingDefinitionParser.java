@@ -14,6 +14,7 @@ import org.mule.util.ArrayUtils;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.PostProcessor;
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 
 import java.util.Map;
 
@@ -154,6 +155,11 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
             delegates[i].setIgnoredDefault(ignoreAll);
         }
         return this;
+    }
+
+    public String getBeanName(Element element)
+    {
+        return AutoIdUtils.getUniqueName(element, "delegate");
     }
 
 }

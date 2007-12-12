@@ -46,7 +46,8 @@ public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
     protected void preProcess(Element element)
     {
         super.preProcess(element);
-        AutoIdUtils.ensureUniqueId(element, "orphan");
+        // top level beans need an ID element
+        AutoIdUtils.ensureUniqueId(element, "bean");
         if (dynamicClass)
         {
             beanClass = null;

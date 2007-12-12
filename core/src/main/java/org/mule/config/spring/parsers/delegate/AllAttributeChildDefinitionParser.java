@@ -15,6 +15,7 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.PostProcessor;
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.SimplePropertyConfiguration;
 import org.mule.util.CoreXMLUtils;
@@ -152,6 +153,11 @@ public class AllAttributeChildDefinitionParser
     public String translateValue(String name, String value)
     {
         return configuration.translateValue(name, value);
+    }
+
+    public String getBeanName(Element element)
+    {
+        return AutoIdUtils.getUniqueName(element, "all-attribute");
     }
 
 }

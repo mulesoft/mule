@@ -210,12 +210,11 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
     protected String generateChildBeanName(Element e)
     {
-        String id = e.getAttribute("name");
+        String id = CoreXMLUtils.getNameOrId(e);
         if (StringUtils.isBlank(id))
         {
-            String parentId = ((Element) e.getParentNode()).getAttribute("name");
-            id = e.getLocalName();
-            return "." + parentId + ":" + id;
+            String parentId = CoreXMLUtils.getNameOrId((Element) e.getParentNode());
+            return "." + parentId + ":" + e.getLocalName();
         }
         else
         {

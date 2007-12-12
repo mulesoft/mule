@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+<beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:parsers-test="http://www.mulesource.org/schema/mule/parsers-test/2.0"
     xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/parsers-test/2.0 http://www.mulesource.org/schema/mule/parsers-test/2.0/mule-parsers-test.xsd">
 
-    <parsers-test:unaddressed-endpoint name="unaddressed">
-        <parsers-test:address address="foo"/>
-    </parsers-test:unaddressed-endpoint>
+    <parsers-test:no-name id="id"/>
+    <parsers-test:no-name-2 id="id2"/>
 
-    <parsers-test:unaddressed-orphan-endpoint name="unaddressed-orphan">
-        <parsers-test:address address="foo"/>
-    </parsers-test:unaddressed-orphan-endpoint>
-
-</mule>
+</beans>

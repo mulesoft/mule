@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers.specific.endpoint.support;
 
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -58,18 +59,15 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     }
 
     // @Override
-    protected String generateChildBeanName(Element element)
+    public String getBeanName(Element element)
     {
         if (null != element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF))
         {
-            // why do we do this?  it doesn't seem to be used anwhere else
-            // is it to avoid having to specify a name?  if so, we should
-            // perhaps check to see if a name is given?  TODO
-            return "ref:" + element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
+            return AutoIdUtils.uniqueValue("ref:" + element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
         }
         else
         {
-            return super.generateChildBeanName(element);
+            return super.getBeanName(element);
         }
     }
     

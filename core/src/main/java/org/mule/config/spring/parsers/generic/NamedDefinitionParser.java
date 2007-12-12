@@ -10,6 +10,8 @@
 
 package org.mule.config.spring.parsers.generic;
 
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
+
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -67,4 +69,10 @@ public class NamedDefinitionParser extends ParentDefinitionParser
         return super.parseInternal(element, parserContext);
     }
 
+    protected void postProcess(BeanAssembler assembler, Element element)
+    {
+        super.postProcess(assembler, element);
+        // may be used as top level element, so set ID from name
+        AutoIdUtils.ensureUniqueId(element, "named");
+    }
 }
