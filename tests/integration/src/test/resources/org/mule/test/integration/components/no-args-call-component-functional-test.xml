@@ -19,7 +19,7 @@
                 <inbound-endpoint address="vm://in" connector-ref="VmConnector"/>
             </inbound-router>
             <no-args-call-component>
-                <delegateClass delegateClass="org.mule.tck.testmodels.fruit.Apple" delegateMethod="toString"/>
+                <delegateClass class="org.mule.tck.testmodels.fruit.Apple" method="toString"/>
             </no-args-call-component>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -33,7 +33,7 @@
                 <inbound-endpoint address="vm://invokeWithInjected" connector-ref="VmConnector"/>
             </inbound-router>
             <no-args-call-component>
-                <delegateInstance delegateInstance-ref="containerDelegate" delegateMethod="wash"/>
+                <delegateInstance ref="containerDelegate" method="wash"/>
             </no-args-call-component>
             <outbound-router>
                 <outbound-pass-through-router>

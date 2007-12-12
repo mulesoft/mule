@@ -272,8 +272,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("response-router", new ChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
 
         //NoArgsCallWrapper
-        registerBeanDefinitionParser("delegateClass", new AttributeMapDefinitionParser("properties"));
-        registerBeanDefinitionParser("delegateInstance", new AttributeMapDefinitionParser("properties"));
+        registerBeanDefinitionParser("delegateClass", new AttributeMapDefinitionParser("properties").addAlias("class", "delegateClass").addAlias("method", "delegateMethod"));
+        registerBeanDefinitionParser("delegateInstance", new AttributeMapDefinitionParser("properties").addAlias("ref", "delegateInstance").addAlias("method", "delegateMethod"));
 
         //Inbound Routers
         registerBeanDefinitionParser("forwarding-router", new ForwardingRouterDefinitionParser());

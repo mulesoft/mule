@@ -102,7 +102,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
             Throwable t = ExceptionUtils.getRootCause(e);
             assertNotNull(t);
             assertTrue(t instanceof InitialisationException);
-            assertTrue("Wrong exception?", t.getMessage().indexOf("Both \"delegateClass\" and") > -1);
+            assertTrue("Wrong exception?", t.getMessage().indexOf("Both \"class\" and") > -1);
         }
     }
 
@@ -120,7 +120,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
             Throwable t = ExceptionUtils.getRootCause(e);
             assertNotNull(t);
             assertTrue(t instanceof InitialisationException);
-            assertTrue("Wrong exception?", t.getMessage().indexOf("Both \"delegateClass\" and") > -1);
+            assertTrue("Wrong exception?", t.getMessage().indexOf("Both \"class\" and") > -1);
         }
     }
 
@@ -138,7 +138,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
             Throwable t = ExceptionUtils.getRootCause(e);
             assertNotNull(t);
             assertTrue(t instanceof InitialisationException);
-            assertTrue("Wrong exception?", t.getMessage().indexOf("Both \"delegateClass\" and") > -1);
+            assertTrue("Wrong exception?", t.getMessage().indexOf("Both \"class\" and") > -1);
         }
     }
 
@@ -157,7 +157,7 @@ public class NoArgsCallWrapperTestCase extends AbstractMuleTestCase
             Throwable t = ExceptionUtils.getRootCause(e);
             assertNotNull(t);
             assertTrue(t instanceof InitialisationException);
-            assertTrue("Wrong exception?", t.getMessage().indexOf("No \"delegateClass\" must be specified") > -1);
+            assertTrue("Wrong exception?", t.getMessage().indexOf("No \"class\" must be specified") > -1);
         }
     }
 

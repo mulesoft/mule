@@ -51,6 +51,7 @@ org.mule.test.integration.providers.jdbc.JdbcNonTransactionalFunctionalTestCase
 org.mule.test.integration.providers.jdbc.JdbcNullParamsTestCase
 org.mule.test.integration.providers.jdbc.JdbcTransactionalJdbcFunctionalTestCase
 org.mule.test.integration.providers.jdbc.JdbcTransactionalXaFunctionalTestCase
+org.mule.test.integration.transaction.XATransactionsWithSpringDAO
 # Convert transacted endpoint to XML config
 org.mule.test.integration.client.MuleClientTransactionTestCase
 

@@ -615,13 +615,13 @@
     </xsd:complexType>
 
     <xsd:complexType name="noArgsCallDelegateClassType">
-        <xsd:attribute name="delegateClass" type="xsd:string" use="required"/>
-        <xsd:attribute name="delegateMethod" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="method" type="xsd:string" use="required"/>
     </xsd:complexType>
 
     <xsd:complexType name="noArgsCallDelegateInstanceType">
-        <xsd:attribute name="delegateInstance-ref" type="xsd:NMTOKEN" use="required"/>
-        <xsd:attribute name="delegateMethod" type="xsd:string" use="required"/>
+        <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required"/>
+        <xsd:attribute name="method" type="xsd:string" use="required"/>
     </xsd:complexType>
 
 
