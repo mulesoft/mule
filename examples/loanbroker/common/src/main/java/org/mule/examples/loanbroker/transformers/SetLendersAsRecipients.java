@@ -26,9 +26,8 @@ public class SetLendersAsRecipients extends AbstractMessageAwareTransformer
 
     public SetLendersAsRecipients()
     {
-        registerSourceType(LoanBrokerQuoteRequest.class);
-        // this makes no sense - the code below doesn't change any classes at all...
-        //setReturnClass(CustomerQuoteRequest.class);
+        this.registerSourceType(LoanBrokerQuoteRequest.class);
+        this.setReturnClass(UMOMessage.class);
     }
 
     public Object transform(UMOMessage message, String outputEncoding) throws TransformerException

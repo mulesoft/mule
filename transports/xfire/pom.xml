@@ -84,6 +84,11 @@
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>xfire-core</artifactId>
             <exclusions>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
                 <exclusion>
                     <!-- we want the newer version below -->
                     <groupId>woodstox</groupId>

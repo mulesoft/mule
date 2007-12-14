@@ -49,7 +49,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      * The return type that will be returned by the {@link #transform} method is
      * called
      */
-    protected Class returnClass = null;
+    protected Class returnClass = Object.class;
 
     /**
      * The name that identifies this transformer. If none is set the class name of

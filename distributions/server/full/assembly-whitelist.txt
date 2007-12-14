@@ -43,6 +43,7 @@ groovy-all-1.0
 groovy-engine-1.1-jdk14
 hibernate-3.2.2.ga
 howl-logger-0.1.11
+javassist-3.6.ga
 jaxen-1.1.1
 jbossts-common-4.2.3-SP5
 jbossts-jta-4.2.3-SP5-patched
@@ -107,7 +108,7 @@ mx4j-impl-2.1.1
 mx4j-jmx-2.1.1
 mx4j-remote-2.1.1
 mx4j-tools-2.1.1
-ognl-2.6.9
+ognl-2.7.1
 opensaml-1.0.1
 org.mortbay.jetty-5.1.12
 oro-2.0.7

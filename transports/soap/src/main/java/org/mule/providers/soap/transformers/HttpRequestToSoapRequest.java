@@ -43,6 +43,7 @@ public class HttpRequestToSoapRequest extends AbstractMessageAwareTransformer
         registerSourceType(String.class);
         registerSourceType(InputStream.class);
         registerSourceType(byte[].class);
+        setReturnClass(String.class);
     }
 
     public Object transform(UMOMessage message, String outputEncoding) throws TransformerException

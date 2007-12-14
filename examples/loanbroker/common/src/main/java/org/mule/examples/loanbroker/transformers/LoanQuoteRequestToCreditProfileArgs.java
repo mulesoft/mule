@@ -24,6 +24,7 @@ public class LoanQuoteRequestToCreditProfileArgs extends AbstractTransformer
     public LoanQuoteRequestToCreditProfileArgs()
     {
         registerSourceType(LoanBrokerQuoteRequest.class);
+        setReturnClass(Object[].class);
     }
 
     public Object doTransform(Object src, String encoding) throws TransformerException

@@ -43,8 +43,8 @@
              dest="${dir.user.lib}/openejb-core-1.0.jar"
              verbose="true"
              usetimestamp="true"/>
-        <get src="${url.maven.repo}/castor/castor/0.9.9/castor-0.9.9.jar"
-             dest="${dir.user.lib}/castor-0.9.9.jar"
+        <get src="${url.maven.repo}/castor/castor/1.0/castor-1.0.jar"
+             dest="${dir.user.lib}/castor-1.0.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>
