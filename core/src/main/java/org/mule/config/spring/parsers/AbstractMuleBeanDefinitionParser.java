@@ -239,7 +239,6 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         BeanDefinitionBuilder builder = createBeanDefinitionBuilder(element, beanClass);
         builder.setSource(parserContext.extractSource(element));
         builder.setSingleton(isSingleton());
-        builder.addDependsOn("_muleRegistry");
 
         List interfaces = ClassUtils.getAllInterfaces(beanClass);
         if(interfaces!=null)

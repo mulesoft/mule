@@ -236,15 +236,16 @@ public class ManagementContext implements UMOManagementContext
     }
 
     public void dispose()
-    {
+    {        
+        if (isDisposing())
+        {
+            return;
+        }
+             
         ServerNotificationManager notificationManager = getNotificationManager();
         lifecycleManager.checkPhase(Disposable.PHASE_NAME);
         fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_DISPOSING));
 
-        if (isDisposed())
-        {
-            return;
-        }
         try
         {
             if (isStarted())

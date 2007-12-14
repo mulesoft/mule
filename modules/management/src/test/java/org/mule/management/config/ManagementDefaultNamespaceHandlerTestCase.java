@@ -16,6 +16,9 @@ import org.mule.management.agents.Log4jAgent;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.manager.UMOAgent;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
@@ -29,9 +32,14 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
         assertNotNull(agent);
         assertEquals(JmxAgent.class, agent.getClass());
         JmxAgent jmxAgent = (JmxAgent) agent;
+        
         assertEquals(true, jmxAgent.isCreateServer());
         assertEquals(true, jmxAgent.isLocateServer());
         assertEquals(true, jmxAgent.isEnableStatistics());
+
+        MBeanServer mBeanServer = jmxAgent.getMBeanServer();
+        String domainName = jmxAgent.getJmxSupportFactory().getJmxSupport().getDomainName(managementContext);
+        assertEquals(6, mBeanServer.queryMBeans(ObjectName.getInstance(domainName + ":*"), null).size());
 
         agent = managementContext.getRegistry().lookupAgent("Log4j JMX Agent");
         assertNotNull(agent);
@@ -43,6 +51,11 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
 
         agent = managementContext.getRegistry().lookupAgent("Default Jmx Agent Support");
         assertNull(agent);
+        
+        //Assertion to check that all Mule MBeans were unregistered during disposal phase.
+        managementContext.dispose();
+        assertEquals(0, mBeanServer.queryMBeans(ObjectName.getInstance(domainName + ":*"), null).size());
+    
     }
 
 }

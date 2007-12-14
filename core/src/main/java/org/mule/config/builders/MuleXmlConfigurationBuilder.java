@@ -97,16 +97,16 @@ public class MuleXmlConfigurationBuilder extends AbstractConfigurationBuilder
         MuleApplicationContext context;
         if (parentContext != null)
         {
-            context = new MuleApplicationContext(all, parentContext);
+            context = new MuleApplicationContext(registry, all, parentContext);
         }
         else
         {
-            context = new MuleApplicationContext(all);
+            context = new MuleApplicationContext(registry, all);
         }
-
+        
         try
         {
-            // TODO MULE-2163 It doesn't make sense for Spring to create the Registry, it should have already been created.
+            // TODO MULE-2161 It doesn't make sense for Spring to create the managementContext, it should have already been created.
             UMOManagementContext mc = context.getManagementContext();
             MuleServer.setManagementContext(mc);
             // TODO MULE-1988

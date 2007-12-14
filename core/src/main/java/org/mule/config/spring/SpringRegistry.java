@@ -42,17 +42,15 @@ import java.util.Properties;
 
 import javax.transaction.TransactionManager;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /** TODO */
-public class SpringRegistry extends AbstractRegistry implements ApplicationContextAware
+public class SpringRegistry extends AbstractRegistry
 {
     public static final String REGISTRY_ID = "org.mule.Registry.Spring";
 
-    protected ApplicationContext applicationContext;
+    protected ConfigurableApplicationContext applicationContext;
 
     /**
      * TODO MULE-1908
@@ -71,16 +69,16 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         super(id);
     }
 
-    public SpringRegistry(ApplicationContext applicationContext)
+    public SpringRegistry(ConfigurableApplicationContext applicationContext)
     {
         super(REGISTRY_ID);
-        setApplicationContext(applicationContext);
+        this.applicationContext = applicationContext;
     }
 
-    public SpringRegistry(String id, ApplicationContext applicationContext)
+    public SpringRegistry(String id, ConfigurableApplicationContext applicationContext)
     {
         super(id);
-        setApplicationContext(applicationContext);
+        this.applicationContext = applicationContext;
     }
 
     protected UMOLifecycleManager createLifecycleManager()
@@ -123,11 +121,6 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
         //    MapUtils.debugPrint(System.out, "Beans of type " + type, map);
         //}
         return map.values();
-    }
-
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
-    {
-        this.applicationContext = applicationContext;
     }
 
     public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
@@ -291,5 +284,11 @@ public class SpringRegistry extends AbstractRegistry implements ApplicationConte
                                         UMOEndpointBuilder builder) throws UMOException
     {
         unsupportedOperation("registerEndpointBuilder", builder);
+    }
+    
+    protected void doDispose()
+    {
+        super.doDispose();
+        applicationContext.close();
     }
 }

@@ -128,7 +128,6 @@ public interface MuleProperties
     String OBJECT_SYSTEM_MODEL = "_muleSystemModel";
     String OBJECT_MANAGMENT_CONTEXT_PROCESSOR = "_muleManagementContextProcessor";
     String OBJECT_PROPERTY_PLACEHOLDER_PROCESSOR = "_mulePropertyPlaceholderProcessor";
-    String OBJECT_REGISTRY = "_muleRegistry";
     String OBJECT_OBJECT_NAME_PROCESSOR = "_muleObjectNameProcessor";
     String OBJECT_LIFECYCLE_MANAGER = "_muleLifecycleManager";
     String OBJECT_SECURITY_MANAGER = "_muleSecurityManager";

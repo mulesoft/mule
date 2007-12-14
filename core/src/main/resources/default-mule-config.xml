@@ -33,13 +33,12 @@
         </property>
     </bean>
 
-    <bean name="_muleManagementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor"
-          depends-on="_muleRegistry"/>
+    <bean name="_muleManagementContextProcessor" class="org.mule.config.spring.ManagementContextPostProcessor"/>
 
     <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.processors.MuleObjectNameProcessor"/>
 
     <bean name="_mulePropertyPlaceholderProcessor"
-          class="org.mule.config.spring.processors.PropertyPlaceholderProcessor" depends-on="_muleRegistry">
+          class="org.mule.config.spring.processors.PropertyPlaceholderProcessor">
         <property name="factories">
             <map>
                 <entry key="hostname">
@@ -51,11 +50,8 @@
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
 
-    <bean name="_muleRegistry" class="org.mule.config.spring.factories.SpringRegistryFactoryBean">
-    </bean>
-
     <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"
-          depends-on="_muleRegistry,_muleManagementContext"/>
+          depends-on="_muleManagementContext"/>
 
     <bean name="_muleNotificationManager"
           class="org.mule.impl.internal.notifications.manager.ServerNotificationManager"/>
@@ -130,9 +126,7 @@
 
     <bean name="_muleProperties" class="java.util.HashMap"/>
 
-    <bean name="_muleEndpointFactory" class="org.mule.impl.endpoint.EndpointFactory" depends-on="_muleRegistry">
-        <!--        <property name="defaultEndpointBuilder" ref="_muleDefaultEndpointBuilder"/>-->
-    </bean>
+    <bean name="_muleEndpointFactory" class="org.mule.impl.endpoint.EndpointFactory"/>
 
     <bean name="defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
         <property name="threadWaitTimeout" value="30"/>
@@ -158,9 +152,6 @@
     <bean name="defaultComponentThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
         <constructor-arg ref="defaultThreadingProfile"/>
     </bean>
-
-    <!--    <bean name="_muleDefaultEndpointBuilder" class="org.mule.impl.endpoint.EndpointBuilder"/>-->
-
 
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
     the transformers will be available even when using the the TransientRegistry only -->
