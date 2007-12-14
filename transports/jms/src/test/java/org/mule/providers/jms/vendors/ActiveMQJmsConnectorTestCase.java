@@ -38,7 +38,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         
         ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory().getOrCreate();
         assertTrue(cf instanceof ActiveMQConnectionFactory);
-        assertEquals(ActiveMQJmsConnector.BROKER_URL, ((ActiveMQConnectionFactory) cf).getBrokerURL());
+        assertEquals(ActiveMQJmsConnector.DEFAULT_BROKER_URL, ((ActiveMQConnectionFactory) cf).getBrokerURL());
         
         assertNotNull(c.getTopicResolver());
         assertTrue("Wrong topic resolver configured on the connector.",

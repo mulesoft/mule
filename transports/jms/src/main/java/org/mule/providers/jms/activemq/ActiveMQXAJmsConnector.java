@@ -12,17 +12,17 @@ package org.mule.providers.jms.activemq;
 import org.mule.util.object.ObjectFactory;
 import org.mule.util.object.SimpleObjectFactory;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ActiveMQXAJmsConnector extends ActiveMQJmsConnector
 {
-    public static final String ACTIVEMQ_XA_CONNECTION_FACTORY = "org.apache.activemq.ActiveMQXAConnectionFactory";
+    public static final String ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS = "org.apache.activemq.ActiveMQXAConnectionFactory";
 
     protected ObjectFactory/*<ConnectionFactory>*/ getDefaultConnectionFactory()
     {
         Map props = new HashMap();
-        props.put("brokerURL", BROKER_URL);
-        return new SimpleObjectFactory(ACTIVEMQ_XA_CONNECTION_FACTORY, props);
+        props.put("brokerURL", getBrokerURL());
+        return new SimpleObjectFactory(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, props);
     }
 }

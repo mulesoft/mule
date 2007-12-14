@@ -28,8 +28,10 @@ import javax.jms.Connection;
  */
 public class ActiveMQJmsConnector extends JmsConnector
 {
-    public static final String ACTIVEMQ_CONNECTION_FACTORY = "org.apache.activemq.ActiveMQConnectionFactory";
-    public static final String BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
+    public static final String ACTIVEMQ_CONNECTION_FACTORY_CLASS = "org.apache.activemq.ActiveMQConnectionFactory";
+    public static final String DEFAULT_BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
+    
+    private String brokerURL = DEFAULT_BROKER_URL;
 
     /**
      * Constructs a new ActiveMQJmsConnector.
@@ -43,8 +45,8 @@ public class ActiveMQJmsConnector extends JmsConnector
     protected ObjectFactory/*<ConnectionFactory>*/ getDefaultConnectionFactory()
     {
         Map props = new HashMap();
-        props.put("brokerURL", BROKER_URL);
-        return new SimpleObjectFactory(ACTIVEMQ_CONNECTION_FACTORY, props);
+        props.put("brokerURL", getBrokerURL());
+        return new SimpleObjectFactory(ACTIVEMQ_CONNECTION_FACTORY_CLASS, props);
     }
 
     /**
@@ -99,5 +101,15 @@ public class ActiveMQJmsConnector extends JmsConnector
         {
             setConnection(null);
         }
+    }
+
+    public String getBrokerURL()
+    {
+        return brokerURL;
+    }
+
+    public void setBrokerURL(String brokerURL)
+    {
+        this.brokerURL = brokerURL;
     }
 }
