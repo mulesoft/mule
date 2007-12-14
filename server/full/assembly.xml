@@ -202,6 +202,7 @@ Assembly descriptor for the full Mule distribution.
         <outputDirectory>lib/user</outputDirectory>
         <includes>
             <include>openejb.conf</include>
+            <include>castor.properties</include>
         </includes>
     </fileSet>
     <!-- LoanBroker ESN -->      
