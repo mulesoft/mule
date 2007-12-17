@@ -352,36 +352,4 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>java14</id>
-            <activation>
-                <jdk>1.4</jdk>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <!--
-                    Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
-                    Unfortunately it is very buggy and does not support validation
-                    against an XML Schema, so we have to unconditionally include
-                    both xml-apis and xerces (in matching versions!) for JDK 1.4.
-                    -->
-                <dependency>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>java5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-        </profile>
-    </profiles>
 </project>

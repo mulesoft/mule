@@ -15,71 +15,6 @@
 
     <profiles>
         <profile>
-            <id>java14</id>
-            <activation>
-                <jdk>1.4</jdk>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <!--
-                Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
-                Unfortunately it is very buggy and does not support validation
-                against an XML Schema, so we have to unconditionally include
-                both xml-apis and xerces (in matching versions!) for JDK 1.4.
-                -->
-                <dependency>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </dependency>
-                <!-- XFire -->
-                <dependency>
-                    <groupId>org.codehaus.xfire</groupId>
-                    <artifactId>xfire-ws-security</artifactId>
-                    <exclusions>
-                        <!-- this is JDK5 only - see below for JDK14 version -->
-                        <exclusion>
-                            <groupId>org.codehaus.xfire</groupId>
-                            <artifactId>bcprov-jdk15</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <!-- re-add BouncyCastle provider for JDK 1.4 -->
-                <dependency>
-                    <groupId>org.codehaus.xfire</groupId>
-                    <artifactId>bcprov-jdk14</artifactId>
-                    <version>133</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>java5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                <!-- XFire -->
-                <dependency>
-                    <groupId>org.codehaus.xfire</groupId>
-                    <artifactId>xfire-ws-security</artifactId>
-                    <exclusions>
-                        <!-- IMPORTANT for JDK5 -->
-                        <exclusion>
-                            <groupId>xml-apis</groupId>
-                            <artifactId>xml-apis</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>xerces</groupId>
-                            <artifactId>xercesImpl</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>osgi</id>
             <build>
                 <plugins>
@@ -101,6 +36,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-axis</artifactId>
             <version>${version}</version>
@@ -110,26 +50,22 @@
             <artifactId>mule-transport-xfire</artifactId>
             <version>${version}</version>
         </dependency>
-
-        <!-- other profile-independent dependencies -->
-
-        <!-- common -->
         <dependency>
             <groupId>wss4j</groupId>
             <artifactId>wss4j</artifactId>
             <version>1.5.0</version>
         </dependency>
-
-        <!-- Axis: none -->
-
         <!-- XFire -->
-        <!-- need to bump the Xalan version -->
         <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>2.7.0</version>
+            <groupId>org.codehaus.xfire</groupId>
+            <artifactId>xfire-ws-security</artifactId>
             <exclusions>
-                <!-- XML was taken care of in the profiles -->
+                <!-- this is JDK5 only - see below for JDK14 version -->
+                <exclusion>
+                    <groupId>org.codehaus.xfire</groupId>
+                    <artifactId>bcprov-jdk15</artifactId>
+                </exclusion>
+                <!-- no XML -->
                 <exclusion>
                     <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
@@ -140,7 +76,29 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        <!-- re-add BouncyCastle provider for JDK 1.4 -->
+        <dependency>
+            <groupId>org.codehaus.xfire</groupId>
+            <artifactId>bcprov-jdk14</artifactId>
+            <version>133</version>
+        </dependency>
+        <!-- need to bump the Xalan version -->
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.0</version>
+            <exclusions>
+                <!-- no XML -->
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!-- For unit tests only -->
         <dependency>
             <groupId>org.mule.modules</groupId>

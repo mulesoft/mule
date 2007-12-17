@@ -53,6 +53,7 @@ import java.util.Map;
 import java.util.jar.Manifest;
 
 import javax.transaction.TransactionManager;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -151,6 +152,8 @@ public class ManagementContext implements UMOManagementContext
             setupIds();
             validateEncoding();
             validateOSEncoding();
+            validateXML();
+
             directories = new Directories(FileUtils.newFile(config.getWorkingDirectory()));
 
             //We need to start the work manager straight away since we need it to fire notifications
@@ -371,6 +374,25 @@ public class ManagementContext implements UMOManagementContext
         }
     }
 
+    /**
+     * Mule needs a proper JAXP implementation and will complain when run with a plain JDK
+     * 1.4. Use the supplied launcher or specify a proper JAXP implementation via
+     * <code>-Djava.endorsed.dirs</code>. See the following URLs for more information:
+     * <ul>
+     * <li> {@link http://xerces.apache.org/xerces2-j/faq-general.html#faq-4}
+     * <li> {@link http://xml.apache.org/xalan-j/faq.html#faq-N100D6}
+     * <li> {@link http://java.sun.com/j2se/1.4.2/docs/guide/standards/}
+     * </ul>
+     */
+    protected void validateXML() throws FatalException
+    {
+        SAXParserFactory f = SAXParserFactory.newInstance();
+        if (f == null || f.getClass().getName().indexOf("crimson") != -1)
+        {
+            throw new FatalException(CoreMessages.valueIsInvalidFor(f.getClass().getName(),
+                "javax.xml.parsers.SAXParserFactory"), this);
+        }
+    }
 
     public UMOLifecycleManager getLifecycleManager()
     {

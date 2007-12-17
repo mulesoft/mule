@@ -161,6 +161,16 @@
                     <groupId>regexp</groupId>
                     <artifactId>regexp</artifactId>
                 </exclusion>
+                <!-- no XML -->
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <!-- totally outdated and wrong too -->
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xerces</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>xpp3</groupId>
                     <artifactId>xpp3</artifactId>

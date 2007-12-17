@@ -15,192 +15,6 @@
 
     <profiles>
         <profile>
-            <id>java14</id>
-            <activation>
-                <jdk>1.4</jdk>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <!--
-                Sun's 1.4.x JVMs come with a bundled Crimson XML parser.
-                Unfortunately it is very buggy and does not support validation
-                against an XML Schema, so we have to unconditionally include
-                both xml-apis and xerces (in matching versions!) for JDK 1.4.
-                -->
-                <dependency>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </dependency>
-                <!-- Used by Xml based filters and transformers -->
-                <dependency>
-                    <groupId>dom4j</groupId>
-                    <artifactId>dom4j</artifactId>
-                    <version>1.4</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>jaxen</groupId>
-                            <artifactId>jaxen</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>relaxngDatatype</groupId>
-                            <artifactId>relaxngDatatype</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>isorelax</groupId>
-                            <artifactId>isorelax</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>saxpath</groupId>
-                            <artifactId>saxpath</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>msv</groupId>
-                            <artifactId>msv</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <!-- JXPath filtering of events -->
-                <dependency>
-                    <groupId>commons-jxpath</groupId>
-                    <artifactId>commons-jxpath</artifactId>
-                    <version>1.2</version>
-                    <exclusions>
-                        <!-- we want newer collections via core -->
-                        <exclusion>
-                            <groupId>commons-collections</groupId>
-                            <artifactId>commons-collections</artifactId>
-                        </exclusion>
-                        <!-- we want newer beanutils via core -->
-                        <exclusion>
-                            <groupId>commons-beanutils</groupId>
-                            <artifactId>commons-beanutils</artifactId>
-                        </exclusion>
-                        <!-- we like slf4j -->
-                        <exclusion>
-                            <groupId>commons-logging</groupId>
-                            <artifactId>commons-logging</artifactId>
-                        </exclusion>
-                        <!-- totally outdated -->
-                        <exclusion>
-                            <groupId>xerces</groupId>
-                            <artifactId>xerces</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <!-- not required; likely a m1 POM conversion bug -->
-                            <groupId>ant</groupId>
-                            <artifactId>ant-optional</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <!-- exclude older jdom-b9 -->
-                            <groupId>jdom</groupId>
-                            <artifactId>jdom</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <!-- exclude older Servlet 2.2 spec jar -->
-                            <groupId>javax.servlet</groupId>
-                            <artifactId>servlet-api</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>junit</groupId>
-                            <artifactId>junit</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>java5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>dom4j</groupId>
-                    <artifactId>dom4j</artifactId>
-                    <version>1.4</version>
-                    <exclusions>
-                        <!-- IMPORTANT for JDK5 -->
-                        <exclusion>
-                            <groupId>xml-apis</groupId>
-                            <artifactId>xml-apis</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>jaxen</groupId>
-                            <artifactId>jaxen</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>relaxngDatatype</groupId>
-                            <artifactId>relaxngDatatype</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>isorelax</groupId>
-                            <artifactId>isorelax</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>saxpath</groupId>
-                            <artifactId>saxpath</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>msv</groupId>
-                            <artifactId>msv</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <!-- JXPath filtering of events -->
-                <dependency>
-                    <groupId>commons-jxpath</groupId>
-                    <artifactId>commons-jxpath</artifactId>
-                    <version>1.2</version>
-                    <exclusions>
-                        <!-- we want newer collections via core -->
-                        <exclusion>
-                            <groupId>commons-collections</groupId>
-                            <artifactId>commons-collections</artifactId>
-                        </exclusion>
-                        <!-- we want newer beanutils via core -->
-                        <exclusion>
-                            <groupId>commons-beanutils</groupId>
-                            <artifactId>commons-beanutils</artifactId>
-                        </exclusion>
-                        <!-- we like slf4j -->
-                        <exclusion>
-                            <groupId>commons-logging</groupId>
-                            <artifactId>commons-logging</artifactId>
-                        </exclusion>
-                        <!-- IMPORTANT for JDK5 -->
-                        <exclusion>
-                            <groupId>xml-apis</groupId>
-                            <artifactId>xml-apis</artifactId>
-                        </exclusion>
-                        <!-- totally outdated -->
-                        <exclusion>
-                            <groupId>xerces</groupId>
-                            <artifactId>xerces</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <!-- not required; likely a m1 POM conversion bug -->
-                            <groupId>ant</groupId>
-                            <artifactId>ant-optional</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <!-- exclude older jdom-b9 -->
-                            <groupId>jdom</groupId>
-                            <artifactId>jdom</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <!-- exclude older Servlet 2.2 spec jar -->
-                            <groupId>javax.servlet</groupId>
-                            <artifactId>servlet-api</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>osgi</id>
             <build>
                 <plugins>
@@ -228,6 +42,95 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
+
+        <dependency>
+            <!-- Used by Xml based filters and transformers -->
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.4</version>
+            <exclusions>
+                <!-- no XML -->
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jaxen</groupId>
+                    <artifactId>jaxen</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>relaxngDatatype</groupId>
+                    <artifactId>relaxngDatatype</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>isorelax</groupId>
+                    <artifactId>isorelax</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>saxpath</groupId>
+                    <artifactId>saxpath</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>msv</groupId>
+                    <artifactId>msv</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- JXPath filtering of events -->
+        <dependency>
+            <groupId>commons-jxpath</groupId>
+            <artifactId>commons-jxpath</artifactId>
+            <version>1.2</version>
+            <exclusions>
+                <!-- we want newer collections via core -->
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+                <!-- we want newer beanutils via core -->
+                <exclusion>
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
+                </exclusion>
+                <!-- we like slf4j -->
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <!-- no XML -->
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <!-- totally outdated and wrong too -->
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xerces</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!-- not required; likely a m1 POM conversion bug -->
+                    <groupId>ant</groupId>
+                    <artifactId>ant-optional</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!-- exclude older jdom-b9 -->
+                    <groupId>jdom</groupId>
+                    <artifactId>jdom</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!-- exclude older Servlet 2.2 spec jar -->
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <!-- not required either -->
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <!-- Used for de/serialising objects -->
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
@@ -239,6 +142,7 @@
             <artifactId>xpp3_min</artifactId>
             <version>1.1.3.4.O</version>
         </dependency>
+
         <!-- StAX rocks! (keep in sync with XFire) -->
         <dependency>
             <groupId>stax</groupId>
@@ -267,4 +171,5 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
 </project>

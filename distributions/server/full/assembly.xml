@@ -350,6 +350,12 @@ Assembly descriptor for the full Mule distribution.
         <include>commons-cli:commons-cli</include>
         <include>tanukisoft:wrapper</include>
       </includes>
+      <!-- no XML -->
+      <excludes>
+          <exclude>xml-apis:xml-apis</exclude>
+          <exclude>xerces:xercesImpl</exclude>
+          <exclude>xerces:xml-serializer</exclude>
+      </excludes>
     </dependencySet>
 
     <!-- Mule libraries -->
@@ -404,6 +410,12 @@ Assembly descriptor for the full Mule distribution.
         <!-- Tools -->
         <include>org.mule.tools:mule-tools-visualizer</include>
       </includes>
+      <!-- no XML -->
+      <excludes>
+          <exclude>xml-apis:xml-apis</exclude>
+          <exclude>xerces:xercesImpl</exclude>
+          <exclude>xerces:xml-serializer</exclude>
+      </excludes>
     </dependencySet>
 
     <!-- Non-Mule libraries -->
@@ -487,6 +499,11 @@ Assembly descriptor for the full Mule distribution.
 
         <!-- Tools -->
         <exclude>org.mule.tools:mule-tools-visualizer</exclude>
+
+        <!-- no XML -->
+        <exclude>xml-apis:xml-apis</exclude>
+        <exclude>xerces:xercesImpl</exclude>
+        <exclude>xerces:xml-serializer</exclude>
       </excludes>
     </dependencySet>
 
@@ -508,6 +525,12 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.examples:mule-example-scripting</include>
         <include>org.mule.examples:mule-example-stockquote</include>
       </includes>
+      <!-- no XML -->
+      <excludes>
+          <exclude>xml-apis:xml-apis</exclude>
+          <exclude>xerces:xercesImpl</exclude>
+          <exclude>xerces:xml-serializer</exclude>
+      </excludes>
     </dependencySet>
 
     <dependencySet>
@@ -517,6 +540,30 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.tests:mule-tests-core</include>
         <include>org.mule.tests:mule-tests-functional</include>
       </includes>
+      <!-- no XML -->
+      <excludes>
+          <exclude>xml-apis:xml-apis</exclude>
+          <exclude>xerces:xercesImpl</exclude>
+          <exclude>xerces:xml-serializer</exclude>
+      </excludes>
     </dependencySet>
+
+    <!--
+        These XML dependencies end up in the "endorsed" directory
+        and must be excluded from other dependencySets, otherwise
+        the inclusions here will cause other artifacts to pull them
+        in as well. If that happens, the MAVP blacklisting mechanism
+        should kick in, since only jars in the endorsed directory are
+        explicitly blacklisted by full path.
+    -->
+    <dependencySet>
+      <outputDirectory>lib/endorsed</outputDirectory>
+      <includes>
+          <include>xml-apis:xml-apis</include>
+          <include>xerces:xercesImpl</include>
+          <include>xerces:xml-serializer</include>
+      </includes>
+   </dependencySet>
+
   </dependencySets>
 </assembly>

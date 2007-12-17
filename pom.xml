@@ -258,21 +258,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!--
-                 The JDK version is fixed to 1.4 for now (see maven-enforcer-plugin config).
-                 This means that we can hard-code the xml parser versions here to shield
-                 us from all kinds of bad dependencies coming in transitively.
-            -->
-            <dependency>
-                <groupId>xml-apis</groupId>
-                <artifactId>xml-apis</artifactId>
-                <version>1.3.03</version>
-            </dependency>
-            <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>2.8.1</version>
-            </dependency>
             <dependency>
                 <groupId>mx4j</groupId>
                 <artifactId>mx4j-jmx</artifactId>
@@ -600,7 +585,7 @@
                 <plugin>
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
-                    <version>1.1</version>
+                    <version>1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
