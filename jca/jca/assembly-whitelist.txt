@@ -110,14 +110,12 @@ wsdl4j-1.6.1
 wss4j-1.5.0
 wstx-asl-3.2.2
 xapool-1.4
-xercesImpl-2.8.1
 xfire-aegis-1.2.6
 xfire-annotations-1.2.6
 xfire-core-1.2.6
 xfire-java5-1.2.6
 xfire-jsr181-api-1.0-M1
 xfire-ws-security-1.2.6
-xml-apis-1.3.03
 XmlSchema-1.1
 xmlsec-1.3.0
 xpp3_min-1.1.3.4.O

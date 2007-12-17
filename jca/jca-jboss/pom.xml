@@ -71,15 +71,5 @@
             <artifactId>log4j</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>
