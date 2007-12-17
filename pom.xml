@@ -400,6 +400,15 @@
                         <groupId>xalan</groupId>
                         <artifactId>xalan</artifactId>
                     </exclusion>
+                    <!-- no !"§$ XML parsers whatsoever -->
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xerces</groupId>
+                        <artifactId>xercesImpl</artifactId>
+                    </exclusion>
                     <exclusion>
                         <groupId>xerces</groupId>
                         <artifactId>xmlParserAPIs</artifactId>
