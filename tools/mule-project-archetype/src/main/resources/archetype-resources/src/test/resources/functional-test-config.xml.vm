@@ -16,15 +16,17 @@
     <model name="main">
 
         <service name="testService">
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="addReceived" value="true"/>
-                </properties>
-            </component>
-
             <inbound-router>
                 <inbound-endpoint address="vm://in" synchronous="true"/>
             </inbound-router>
+
+            <component>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="addReceived" value="true"/>
+                    </properties>
+                </pooled-object>
+            </component>
 
             <outbound-router>
                 <outbound-pass-through-router>

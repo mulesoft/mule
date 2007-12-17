@@ -25,7 +25,7 @@ public class ${TransportName}ConnectorFactoryTestCase extends AbstractMuleTestCa
     public void testCreateFromFactory() throws Exception
     {
         UMOImmutableEndpoint endpoint = managementContext.getRegistry()
-                .lookupEndpointFactory().getInboundEndpoint(getEndpointURI(), managementContext);
+                .lookupEndpointFactory().getInboundEndpoint(getEndpointURI());
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertTrue(endpoint.getConnector() instanceof ${TransportName}Connector);

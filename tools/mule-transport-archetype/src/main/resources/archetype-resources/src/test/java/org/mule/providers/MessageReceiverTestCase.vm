@@ -30,9 +30,7 @@ public class ${TransportName}MessageReceiverTestCase extends AbstractMessageRece
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         Mock mockComponent = new Mock(UMOComponent.class);
-        Mock mockDescriptor = new Mock(UMODescriptor.class);
-        mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
-        mockDescriptor.expectAndReturn("getResponseTransformer", null);
+        mockComponent.expectAndReturn("getResponseTransformer", null);
 #if( $isPollingReceiver == "y")
         return new ${TransportName}MessageReceiver(endpoint.getConnector(), (UMOComponent) mockComponent.proxy(), endpoint, 1000);
 #else
