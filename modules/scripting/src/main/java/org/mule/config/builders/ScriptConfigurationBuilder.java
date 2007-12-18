@@ -83,12 +83,14 @@ public class ScriptConfigurationBuilder extends MuleXmlConfigurationBuilder
     {
         try
         {
-            MuleApplicationContext context = new MuleApplicationContext(new String[]{getDefaultConfigResource()});
+
+            Registry registry = RegistryContext.getOrCreateRegistry();
+            
+            MuleApplicationContext context = new MuleApplicationContext(registry, new String[]{getDefaultConfigResource()});
             managementContext = context.getManagementContext();
             MuleServer.setManagementContext(managementContext);
 
             // Load startup properties.
-            Registry registry = RegistryContext.getOrCreateRegistry();
             try
             {
                 registry.registerObjects(startupProperties);

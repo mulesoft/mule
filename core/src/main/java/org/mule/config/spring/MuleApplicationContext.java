@@ -17,7 +17,6 @@ import org.mule.util.ClassUtils;
 
 import java.io.IOException;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.AbstractBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -39,9 +38,8 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
     private final String[] configLocations;
 
     /**
-     * Parses configuration files creating a spring ApplicationContext which is used
-     * as a parent registry using the SpringRegistry registry implementation to wraps
-     * the spring ApplicationContext
+     * Parses configuration files creating a spring ApplicationContext which is used as a parent registry
+     * using the SpringRegistry registry implementation to wraps the spring ApplicationContext
      * 
      * @param registry
      * @param configLocations
@@ -49,17 +47,19 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      */
     public MuleApplicationContext(Registry registry, String[] configLocations)
     {
-        this(registry, configLocations, true);
+        setupParentSpringRegistry(registry);
+        this.configLocations = configLocations;
+        this.configResources = null;
+        refresh();
     }
-    
+
     /**
-     * Parses configuration files creating a spring ApplicationContext which is used
-     * as a parent registry using the SpringRegistry registry implementation to wraps
-     * the spring ApplicationContext
+     * Parses configuration files creating a spring ApplicationContext which is used as a parent registry
+     * using the SpringRegistry registry implementation to wraps the spring ApplicationContext
      * 
      * @param registry
      * @param configLocations
-     * @param parent 
+     * @param parent
      * @see org.mule.config.spring.SpringRegistry
      */
     public MuleApplicationContext(Registry registry, String[] configLocations, ApplicationContext parent)
@@ -70,15 +70,24 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         this.configResources = null;
         refresh();
     }
-    
+
     /**
-     * Sets up TransientRegistry SpringRegistry parent relationship here. This is
-     * required here before "refresh()" rather than in the configuration builder
-     * after parsing the spring config because spring executes the initialize phase
-     * for objects it manages during "refresh()" and during intialization of mule
-     * artifacts need to be able to lookup other artifacts both in TransientRegistry
-     * and in spring (using SpringRegistry facade) by using the mule Registry
-     * interface
+     * @param configResources
+     * @deprecated
+     */
+    public MuleApplicationContext(Resource[] configResources)
+    {
+        this.configLocations = null;
+        this.configResources = configResources;
+        refresh();
+    }
+
+    /**
+     * Sets up TransientRegistry SpringRegistry parent relationship here. This is required here before
+     * "refresh()" rather than in the configuration builder after parsing the spring config because spring
+     * executes the initialize phase for objects it manages during "refresh()" and during intialization of
+     * mule artifacts need to be able to lookup other artifacts both in TransientRegistry and in spring (using
+     * SpringRegistry facade) by using the mule Registry interface
      * 
      * @param registry
      */
@@ -87,168 +96,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         registry.setParent(new SpringRegistry(this));
     }
     
-    /**
-     * @param configResources
-     * @deprecated Does it make any sense to create a MuleApplicationContext unless
-     *             we are using it for SpringRegistry parent registry? Do we need all
-     *             these constructors when only our SpringConfigurationBuilder
-     *             creates this?
-     */
-    public MuleApplicationContext(Resource[] configResources)
-    {
-        this(configResources, true);
-    }
-
-    /**
-     * @param configLocations
-     * @deprecated Does it make any sense to create a MuleApplicationContext unless
-     *             we are using it for SpringRegistry parent registry? Do we need all
-     *             these constructors when only our SpringConfigurationBuilder
-     *             creates this?
-     */
-    public MuleApplicationContext(String[] configLocations)
-    {
-        this(configLocations, true);
-    }
-
-    /**
-     * @param configResources
-     * @param parent
-     * @deprecated Does it make any sense to create a MuleApplicationContext unless
-     *             we are using it for SpringRegistry parent registry? Do we need all
-     *             these constructors when only our SpringConfigurationBuilder
-     *             creates this?
-     */
-    public MuleApplicationContext(Resource[] configResources, ApplicationContext parent)
-    {
-        super(parent);
-        this.configResources = configResources;
-        this.configLocations = null;
-        refresh();
-    }
-
-    /**
-     * @param configResources
-     * @param refresh
-     * @throws BeansException
-     * @deprecated Does it make any sense to create a MuleApplicationContext unless
-     *             we are using it for SpringRegistry parent registry? Do we need all
-     *             these constructors when only our SpringConfigurationBuilder
-     *             creates this?
-     */
-    public MuleApplicationContext(Resource[] configResources, boolean refresh) throws BeansException
-    {
-        this.configResources = configResources;
-        this.configLocations = null;
-        if (refresh)
-        {
-            refresh();
-        }
-    }
-
-    /**
-     * @param configLocations
-     * @param parent
-     * @deprecated Does it make any sense to create a MuleApplicationContext unless
-     *             we are using it for SpringRegistry parent registry? Do we need all
-     *             these constructors when only our SpringConfigurationBuilder
-     *             creates this?
-     */
-    public MuleApplicationContext(String[] configLocations, ApplicationContext parent)
-    {
-        super(parent);
-        this.configLocations = configLocations;
-        this.configResources = null;
-        refresh();
-    }
-
-    /**
-     * @param configLocations
-     * @param refresh
-     * @throws BeansException
-     * @deprecated Does it make any sense to create a MuleApplicationContext unless
-     *             we are using it for SpringRegistry parent registry? Do we need all
-     *             these constructors when only our SpringConfigurationBuilder
-     *             creates this?
-     */
-    public MuleApplicationContext(String[] configLocations, boolean refresh) throws BeansException
-    {
-        this.configLocations = configLocations;
-        this.configResources = null;
-        if (refresh)
-        {
-            refresh();
-        }
-    }
-
-    /**
-     * @param registry
-     * @param configLocations
-     * @deprecated Do we need all these constructors when only our
-     *             SpringConfigurationBuilder creates this?
-     */
-    public MuleApplicationContext(Registry registry, Resource[] configResources)
-    {
-        this(registry, configResources, true);
-    }
-
-    /**
-     * @param registry
-     * @param configLocations
-     * @param refresh
-     * @throws BeansException
-     * @deprecated Do we need all these constructors when only our
-     *             SpringConfigurationBuilder creates this?
-     */
-    public MuleApplicationContext(Registry registry, String[] configLocations, boolean refresh)
-        throws BeansException
-    {
-        setupParentSpringRegistry(registry);
-        this.configLocations = configLocations;
-        this.configResources = null;
-        if (refresh)
-        {
-            refresh();
-        }
-    }
-
-    /**
-     * @param registry
-     * @param configLocations
-     * @param parent 
-     * @deprecated Do we need all these constructors when only our
-     *             SpringConfigurationBuilder creates this?
-     */
-    public MuleApplicationContext(Registry registry, Resource[] configResources, ApplicationContext parent)
-    {
-        super(parent);
-        setupParentSpringRegistry(registry);
-        this.configLocations = null;
-        this.configResources = configResources;
-        refresh();
-    }
-
-    /**
-     * @param registry
-     * @param configLocations
-     * @param refresh
-     * @throws BeansException 
-     * @deprecated Do we need all these constructors when only our
-     *             SpringConfigurationBuilder creates this?
-     */
-    public MuleApplicationContext(Registry registry, Resource[] configResources, boolean refresh)
-        throws BeansException
-    {
-        setupParentSpringRegistry(registry);
-        this.configLocations = null;
-        this.configResources = configResources;
-        if (refresh)
-        {
-            refresh();
-        }
-    }
-
-    //@Override
+    // @Override
     protected Resource[] getConfigResources()
     {
         return configResources;
