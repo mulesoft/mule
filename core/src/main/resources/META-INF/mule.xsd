@@ -594,7 +594,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="no-args-call-component" type="noArgsCallWrapperType" substitutionGroup="abstract-component">
+    <xsd:element name="no-args-call-component" type="noArgsCallComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 Built-in NoArgsCallWrapper
@@ -603,7 +603,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="noArgsCallWrapperType">
+    <xsd:complexType name="noArgsCallComponentType">
         <xsd:complexContent>
             <xsd:extension base="defaultComponentType">
                 <xsd:choice minOccurs="1" maxOccurs="1">
