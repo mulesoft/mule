@@ -1453,7 +1453,7 @@
                     <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS"/>
-                <xsd:attribute name="transformerFirst" type="substitutableBoolean"/>
+                <xsd:attribute name="transformFirst" type="substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
