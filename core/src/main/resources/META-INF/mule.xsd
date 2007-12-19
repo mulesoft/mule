@@ -615,7 +615,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="noArgsCallDelegateClassType">
-        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="substitutableClass" use="required"/>
         <xsd:attribute name="method" type="xsd:string" use="required"/>
     </xsd:complexType>
 
@@ -918,7 +918,7 @@
     <xsd:complexType name="typeFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractFilterType">
-                <xsd:attribute name="expectedType" type="xsd:string" use="required"/>
+                <xsd:attribute name="expectedType" type="substitutableClass" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1475,7 +1475,7 @@
     <xsd:complexType name="correlationAggregatorRouterType">
         <xsd:complexContent>
             <xsd:extension base="correlationRouterType">
-                <xsd:attribute name="class" type="xsd:string" use="required"/>
+                <xsd:attribute name="class" type="substitutableClass" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1937,7 +1937,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="clientKeyStoreType" type="xsd:string">
+        <xsd:attribute name="clientKeyStoreType" type="substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
                     The type of keystore used (a Java class name).
@@ -1964,7 +1964,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="keyStoreType" type="xsd:string">
+        <xsd:attribute name="keyStoreType" type="substitutableClass">
             <xsd:annotation>
                 <xsd:documentation>
                     The type of keystore used (a Java class name).
@@ -2026,7 +2026,7 @@
     <xsd:complexType name="tlsServerTrustStoreType">
         <xsd:complexContent>
             <xsd:extension base="tlsTrustStoreType">
-                <xsd:attribute name="trustStoreType" type="xsd:string"/>
+                <xsd:attribute name="trustStoreType" type="substitutableClass"/>
                 <xsd:attribute name="trustManagerAlgorithm" type="xsd:string"/>
                 <!-- should be of type TrustManagerFactory -->
                 <xsd:attribute name="trustManagerFactory" type="xsd:NMTOKEN"/>
@@ -2274,7 +2274,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="jndiInitialFactory" type="xsd:string">
+                <xsd:attribute name="jndiInitialFactory" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>
                             The initial context factory to use. The value
