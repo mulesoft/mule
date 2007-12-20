@@ -132,15 +132,10 @@ public class RmiRegistryAgent extends AbstractAgent
             return;
         }
 
-        if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(port))
-        {
-            serverUri = PROTOCOL_PREFIX + host + ":" + port;
-        }
-        else
-        {
-            serverUri = DEFAULT_SERVER_URI;
-        }
+        String theHost = StringUtils.defaultIfEmpty(host, DEFAULT_HOSTNAME);
+        String thePort = StringUtils.defaultIfEmpty(port, String.valueOf(DEFAULT_PORT));
 
+        serverUri = PROTOCOL_PREFIX + theHost + ":" + thePort;
     }
 
     public Registry getRmiRegistry()

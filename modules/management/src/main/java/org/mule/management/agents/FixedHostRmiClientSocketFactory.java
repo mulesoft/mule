@@ -10,8 +10,6 @@
 
 package org.mule.management.agents;
 
-import org.mule.util.StringUtils;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
@@ -54,7 +52,11 @@ public class FixedHostRmiClientSocketFactory implements RMIClientSocketFactory, 
      */
     public Socket createSocket (String host, int port) throws IOException
     {
-        final String hostToUse = StringUtils.defaultString(overrideHost, host);
+        /* NOTE this is StringUtils.defaultIfEmpty(overrideHost, host)
+           This socket factory is required on the client, minimize the dependency graph
+        */
+        final String hostToUse = (overrideHost == null || overrideHost.trim().length() == 0) ? host : overrideHost;
+
         return new Socket(hostToUse, port);
     }
 
