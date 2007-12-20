@@ -43,4 +43,9 @@ public class MockKeyFactory extends Named implements ObjectFactory
     {
         // nothing to do
     }
+
+    public Class getObjectClass() throws Exception
+    {
+        return null;
+    }
 }

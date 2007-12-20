@@ -29,7 +29,7 @@ import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOServerNotification;
-import org.mule.util.object.SimpleObjectFactory;
+import org.mule.util.object.PrototypeObjectFactory;
 
 import java.util.HashMap;
 
@@ -107,7 +107,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         UMOComponent component = new SedaComponent();
         component.setExceptionListener(new DefaultExceptionStrategy());
         component.setName("testComponent");
-        component.setServiceFactory(new SimpleObjectFactory(JdbcFunctionalTestComponent.class));
+        component.setServiceFactory(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class));
 
         UMOTransactionFactory tf = getTransactionFactory();
         UMOTransactionConfig txConfig = new MuleTransactionConfig();

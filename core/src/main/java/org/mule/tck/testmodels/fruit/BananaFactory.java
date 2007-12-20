@@ -42,4 +42,9 @@ public class BananaFactory implements ObjectFactory
     {
         throw new UnsupportedOperationException();
     }
+    
+    public Class getObjectClass() throws Exception
+    {
+        return Banana.class;
+    }
 }

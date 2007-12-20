@@ -42,7 +42,7 @@ import org.mule.umo.routing.UMOInboundRouterCollection;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
-import org.mule.util.object.SimpleObjectFactory;
+import org.mule.util.object.PrototypeObjectFactory;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
@@ -821,7 +821,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
         // TODO RM: Need to put the actual instance here (not just the name reference), 
         // please review whether the following is correct?
-        component.setServiceFactory(new SimpleObjectFactory(MuleEventMulticaster.class));
+        component.setServiceFactory(new PrototypeObjectFactory(MuleEventMulticaster.class));
         return component;
     }
 

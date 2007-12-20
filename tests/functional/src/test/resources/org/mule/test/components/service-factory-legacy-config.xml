@@ -21,7 +21,7 @@
     <bean class="org.mule.impl.model.seda.SedaComponent" depends-on="main" name="orange1">
         <property name="name" value="orange1"/>
         <property name="serviceFactory">
-            <bean class="org.mule.util.object.SimpleObjectFactory">
+            <bean class="org.mule.util.object.PrototypeObjectFactory">
                 <property name="objectClassName" value="org.mule.tck.testmodels.fruit.Orange" />
             </bean>
         </property>

@@ -62,4 +62,9 @@ public class FloridaSunnyOrangeFactory implements ObjectFactory
     {
         throw new UnsupportedOperationException();
     }
+
+    public Class getObjectClass() throws Exception
+    {
+        return Orange.class;
+    }
 }

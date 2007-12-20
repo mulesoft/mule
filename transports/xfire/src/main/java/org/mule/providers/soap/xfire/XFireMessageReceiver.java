@@ -21,7 +21,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.StringUtils;
-import org.mule.util.object.SimpleObjectFactory;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -87,8 +86,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 // we have to retrieve the implementation classname and create a
                 // class for it
                 WebServiceAnnotation webServiceAnnotation = 
-                    wa.getWebServiceAnnotation(Class.forName(
-                        ((SimpleObjectFactory)component.getServiceFactory()).getObjectClassName()));
+                    wa.getWebServiceAnnotation(component.getServiceFactory().getObjectClass());
                 namespace = webServiceAnnotation.getTargetNamespace();
             }
 

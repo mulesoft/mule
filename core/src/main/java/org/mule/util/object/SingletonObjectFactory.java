@@ -44,6 +44,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
     
     public void initialise() throws InitialisationException
     {
+        super.initialise();
         if (instance == null)
         {
             try
@@ -108,6 +109,18 @@ public class SingletonObjectFactory extends AbstractObjectFactory
     public void release(Object object) throws Exception
     {
         // nothing to do for a singleton
+    }
+
+    public Class getObjectClass()
+    {
+        if (instance != null)
+        {
+            return instance.getClass();
+        }
+        else
+        {
+            return super.getObjectClass();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////

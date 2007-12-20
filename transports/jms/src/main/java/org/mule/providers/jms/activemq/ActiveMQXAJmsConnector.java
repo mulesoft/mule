@@ -10,7 +10,7 @@
 package org.mule.providers.jms.activemq;
 
 import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.SimpleObjectFactory;
+import org.mule.util.object.PrototypeObjectFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +23,6 @@ public class ActiveMQXAJmsConnector extends ActiveMQJmsConnector
     {
         Map props = new HashMap();
         props.put("brokerURL", getBrokerURL());
-        return new SimpleObjectFactory(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, props);
+        return new PrototypeObjectFactory(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, props);
     }
 }

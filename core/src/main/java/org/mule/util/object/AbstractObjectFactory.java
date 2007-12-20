@@ -13,6 +13,7 @@ import org.mule.config.ConfigurationException;
 import org.mule.impl.UMOComponentAware;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 
@@ -69,15 +70,26 @@ public abstract class AbstractObjectFactory implements ObjectFactory, UMOCompone
         this.properties = properties;
     }
 
+    public void initialise() throws InitialisationException
+    {
+        if (objectClass == null && objectClassName != null)
+        {
+            try
+            {   
+                objectClass = ClassUtils.getClass(objectClassName);
+            }
+            catch (ClassNotFoundException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
+    }
+
     /**
      * Creates an initialized object instance based on the class and sets any properties.
      */
     public Object getOrCreate() throws Exception
     {
-        if (objectClass == null)
-        {
-            objectClass = ClassUtils.getClass(objectClassName);
-        }
         Object object = ClassUtils.instanciateClass(objectClass, ClassUtils.NO_ARGS);
 
         if (properties != null)
@@ -122,7 +134,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, UMOCompone
         this.objectClass = objectClass;
     }
 
-    public String getObjectClassName()
+    protected String getObjectClassName()
     {
         return objectClassName;
     }
@@ -132,7 +144,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, UMOCompone
         this.objectClassName = objectClassName;
     }
 
-    public Map getProperties()
+    protected Map getProperties()
     {
         return properties;
     }

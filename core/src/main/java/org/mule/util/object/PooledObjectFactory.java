@@ -56,6 +56,7 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
     
     public void initialise() throws InitialisationException
     {
+        super.initialise();
         GenericKeyedObjectPool.Config config = new GenericKeyedObjectPool.Config();
         if (poolingProfile != null)
         {

@@ -14,7 +14,7 @@ import org.mule.providers.jdbc.test.TestDataSource;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.SimpleObjectFactory;
+import org.mule.util.object.PrototypeObjectFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -31,13 +31,13 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
         JdbcConnector connector = new JdbcConnector();
         
         ObjectFactory of;
-        of = new SimpleObjectFactory(TestQueryRunner.class);
+        of = new PrototypeObjectFactory(TestQueryRunner.class);
         of.initialise();
         connector.setQueryRunner(of);
-        of = new SimpleObjectFactory(TestResultSetHandler.class);
+        of = new PrototypeObjectFactory(TestResultSetHandler.class);
         of.initialise();
         connector.setResultSetHandler(of);
-        of = new SimpleObjectFactory(TestDataSource.class);
+        of = new PrototypeObjectFactory(TestDataSource.class);
         of.initialise();
         connector.setDataSourceFactory(of);
         

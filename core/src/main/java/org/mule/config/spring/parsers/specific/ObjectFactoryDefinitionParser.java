@@ -10,13 +10,13 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.util.StringUtils;
-import org.mule.util.object.PooledObjectFactory;
-import org.mule.util.object.SimpleObjectFactory;
-import org.mule.util.object.SingletonObjectFactory;
 import org.mule.util.object.AbstractObjectFactory;
+import org.mule.util.object.PooledObjectFactory;
+import org.mule.util.object.PrototypeObjectFactory;
+import org.mule.util.object.SingletonObjectFactory;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -59,7 +59,7 @@ public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
         
         if (scope.equals("prototype"))
         {
-            return SimpleObjectFactory.class;
+            return PrototypeObjectFactory.class;
         }
         else if (scope.equals("singleton"))
         {

@@ -14,7 +14,7 @@ import org.mule.providers.ConnectException;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.xa.ConnectionInvocationHandler;
 import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.SimpleObjectFactory;
+import org.mule.util.object.PrototypeObjectFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -46,7 +46,7 @@ public class ActiveMQJmsConnector extends JmsConnector
     {
         Map props = new HashMap();
         props.put("brokerURL", getBrokerURL());
-        return new SimpleObjectFactory(ACTIVEMQ_CONNECTION_FACTORY_CLASS, props);
+        return new PrototypeObjectFactory(ACTIVEMQ_CONNECTION_FACTORY_CLASS, props);
     }
 
     /**

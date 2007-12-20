@@ -11,7 +11,6 @@
 package org.mule.providers.jms.test;
 
 import org.mule.providers.jms.JmsConnector;
-import org.mule.util.object.SimpleObjectFactory;
 
 public class GenericTestJmsConnector extends JmsConnector
 {

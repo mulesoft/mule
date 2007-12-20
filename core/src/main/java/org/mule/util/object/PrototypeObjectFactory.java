@@ -44,6 +44,7 @@ public class PrototypeObjectFactory extends AbstractObjectFactory
     
     public void initialise() throws InitialisationException
     {
+        super.initialise();
         instances = new ConcurrentHashMap();        
     }
     

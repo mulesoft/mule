@@ -12,7 +12,7 @@ package org.mule.impl.model.seda;
 
 import org.mule.MuleRuntimeException;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.object.SimpleObjectFactory;
+import org.mule.util.object.PrototypeObjectFactory;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
@@ -25,7 +25,7 @@ public class SedaComponentTestCase extends AbstractMuleTestCase
     {
         SedaComponent component = new SedaComponent();
         component.setName("test");
-        component.setServiceFactory(new SimpleObjectFactory(Object.class));
+        component.setServiceFactory(new PrototypeObjectFactory(Object.class));
         component.setModel(new SedaModel());
         component.setManagementContext(managementContext);
         component.getModel().setManagementContext(managementContext);
@@ -45,7 +45,7 @@ public class SedaComponentTestCase extends AbstractMuleTestCase
             // here we are safe-guarding for any future changes
             SedaComponent component = new SedaComponent();
             component.setName("test");
-            component.setServiceFactory(new SimpleObjectFactory(Object.class));
+            component.setServiceFactory(new PrototypeObjectFactory(Object.class));
             component.setModel(new SedaModel());
 
             component.handleWorkException(getTestWorkEvent(), "workRejected");

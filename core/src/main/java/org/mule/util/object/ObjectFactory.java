@@ -27,6 +27,12 @@ public interface ObjectFactory extends Initialisable, Disposable
     Object getOrCreate() throws Exception;
     
     /**
+     * Returns the class of the object to be instantiated without actually creating an
+     * instance.  This may not be logical or even possible depending on the implementation.
+     */
+    Class getObjectClass() throws Exception;
+    
+    /**
      * Look up a previously created object instance by ID.
      */
     Object lookup(String id) throws Exception;

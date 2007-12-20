@@ -29,14 +29,13 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.StartException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.object.JndiObjectFactory;
 import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.SimpleObjectFactory;
+import org.mule.util.object.PrototypeObjectFactory;
 
 import java.text.MessageFormat;
 import java.util.Map;
@@ -204,7 +203,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         if (redeliveryHandler == null)
         {
-            redeliveryHandler = new SimpleObjectFactory(DefaultRedeliveryHandler.class);
+            redeliveryHandler = new PrototypeObjectFactory(DefaultRedeliveryHandler.class);
             redeliveryHandler.initialise();
         }
 

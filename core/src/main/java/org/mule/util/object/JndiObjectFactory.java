@@ -142,6 +142,12 @@ public class JndiObjectFactory implements ObjectFactory, Initialisable, Disposab
         throw new UnsupportedOperationException();
     }
     
+    /** {@inheritDoc} */
+    public Class getObjectClass() throws Exception
+    {
+        throw new UnsupportedOperationException();
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Getters and Setters
     ///////////////////////////////////////////////////////////////////////////////////////////    
