@@ -85,7 +85,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
                 processVariables.put(propertyName, event.getMessage().getProperty(propertyName));
             }
 
-            Object payload = event.getTransformedMessage();
+            Object payload = event.transformMessage();
             if (payload != null && !(payload instanceof NullPayload))
             {
                 // Store the message's payload as a process variable.

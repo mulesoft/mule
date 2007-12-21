@@ -36,7 +36,7 @@ public class InboundTransformingForwardingCatchAllStrategy extends AbstractCatch
         }
         try
         {
-            message = new MuleMessage(RequestContext.getEventContext().getTransformedMessage(), message);
+            message = new MuleMessage(RequestContext.getEventContext().transformMessage(), message);
             UMOEvent newEvent = new MuleEvent(message, endpoint, session, synchronous);
 
             if (synchronous)

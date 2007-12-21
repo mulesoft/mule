@@ -50,7 +50,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
      */
     protected void doDispatch(UMOEvent event) throws Exception
     {
-        Object data = event.getTransformedMessage();
+        Object data = event.transformMessage();
         // Wrap the transformed message before passing it to the filename parser
         UMOMessage message = new MuleMessage(data, event.getMessage());
 
@@ -77,7 +77,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             }
             else
             {
-                InputStream is = (InputStream) event.getTransformedMessage(InputStream.class);
+                InputStream is = (InputStream) event.transformMessage(InputStream.class);
                 IOUtils.copyLarge(is, fos);
                 is.close();
             }

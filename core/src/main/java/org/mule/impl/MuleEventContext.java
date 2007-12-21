@@ -88,9 +88,9 @@ public class MuleEventContext implements UMOEventContext
      *             the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
-    public Object getTransformedMessage() throws TransformerException
+    public Object transformMessage() throws TransformerException
     {
-        return event.getTransformedMessage();
+        return event.transformMessage();
     }
 
     /**
@@ -107,9 +107,9 @@ public class MuleEventContext implements UMOEventContext
      *             transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
-    public Object getTransformedMessage(Class expectedType) throws TransformerException
+    public Object transformMessage(Class expectedType) throws TransformerException
     {
-        return event.getTransformedMessage(expectedType);
+        return event.transformMessage(expectedType);
     }
 
     /**
@@ -123,25 +123,9 @@ public class MuleEventContext implements UMOEventContext
      *             the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
-    public byte[] getTransformedMessageAsBytes() throws TransformerException
+    public byte[] transformMessageToBytes() throws TransformerException
     {
-        return event.getTransformedMessageAsBytes();
-    }
-
-    /**
-     * Returns the message transformed into it's recognised or expected format and
-     * then into a String. The transformer used is the one configured on the endpoint
-     * through which this event was received.
-     * 
-     * @return the message transformed into it's recognised or expected format as a
-     *         Strings.
-     * @throws org.mule.umo.transformer.TransformerException if a failure occurs in
-     *             the transformer
-     * @see org.mule.umo.transformer.UMOTransformer
-     */
-    public String getTransformedMessageAsString(String encoding) throws TransformerException
-    {
-        return event.getTransformedMessageAsString(encoding);
+        return event.transformMessageToBytes();
     }
 
     /**
@@ -168,9 +152,9 @@ public class MuleEventContext implements UMOEventContext
      *             the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
-    public String getTransformedMessageAsString() throws TransformerException
+    public String transformMessageToString() throws TransformerException
     {
-        return event.getTransformedMessageAsString();
+        return event.transformMessageToString();
     }
 
     /**

@@ -303,12 +303,12 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         }
     }
 
-    public Object getTransformedMessage() throws TransformerException
+    public Object transformMessage() throws TransformerException
     {
-        return getTransformedMessage(null);
+        return transformMessage(null);
     }
 
-    public Object getTransformedMessage(Class outputType) throws TransformerException
+    public Object transformMessage(Class outputType) throws TransformerException
     {
         message.applyTransformers(endpoint.getTransformers());
         if(outputType==null)
@@ -331,9 +331,9 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
      * @throws TransformerException if an unsupported encoding is being used or if
      *             the result message is not a String byte[] or Seializable object
      */
-    public byte[] getTransformedMessageAsBytes() throws TransformerException
+    public byte[] transformMessageToBytes() throws TransformerException
     {
-        Object obj =  getTransformedMessage(byte[].class);
+        Object obj =  transformMessage(byte[].class);
         return (byte[])obj;
     }
 
@@ -348,38 +348,36 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
      *             the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
-    public String getTransformedMessageAsString() throws TransformerException
-    {
-        return getTransformedMessageAsString(getEncoding());
-    }
-
-    public String getMessageAsString() throws UMOException
-    {
-        return getMessageAsString(getEncoding());
-    }
-
-    /**
-     * Returns the message transformed into it's recognised or expected format and
-     * then into a String. The transformer used is the one configured on the endpoint
-     * through which this event was received.
-     *
-     * @param encoding the encoding to use when converting the message to string
-     * @return the message transformed into it's recognised or expected format as a
-     *         Strings.
-     * @throws org.mule.umo.transformer.TransformerException if a failure occurs in
-     *             the transformer
-     * @see org.mule.umo.transformer.UMOTransformer
-     */
-    public String getTransformedMessageAsString(String encoding) throws TransformerException
+    public String transformMessageToString() throws TransformerException
     {
         try
         {
-            return new String(getTransformedMessageAsBytes(), encoding);
+            return new String(transformMessageToBytes(), getEncoding());
         }
         catch (UnsupportedEncodingException e)
         {
             throw new TransformerException(endpoint.getTransformers(), e);
         }
+        
+        /* TODO MULE-2691 Note that the above code actually transforms the message 
+         * to byte[] instead of String.  The following code would transform the 
+         * message to a String but breaks some tests in transports/http:
+         * 
+        transformMessageToBytes();
+        
+        ByteArrayToObject t = new ByteArrayToObject();
+        t.setEncoding(getEncoding());
+        List list = new ArrayList();
+        list.add(t);
+        message.applyTransformers(list);
+
+        return (String) message.getPayload();
+        */
+    }
+
+    public String getMessageAsString() throws UMOException
+    {
+        return getMessageAsString(getEncoding());
     }
 
     /**

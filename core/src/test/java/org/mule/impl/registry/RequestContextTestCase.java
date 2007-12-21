@@ -111,22 +111,22 @@ public class RequestContextTestCase extends AbstractMuleTestCase
             return new byte[0];  //To change body of implemented methods use File | Settings | File Templates.
         }
 
-        public Object getTransformedMessage() throws TransformerException
+        public Object transformMessage() throws TransformerException
         {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
-        public Object getTransformedMessage(Class outputType) throws TransformerException
+        public Object transformMessage(Class outputType) throws TransformerException
         {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
-        public byte[] getTransformedMessageAsBytes() throws TransformerException
+        public byte[] transformMessageToBytes() throws TransformerException
         {
             return new byte[0];  //To change body of implemented methods use File | Settings | File Templates.
         }
 
-        public String getTransformedMessageAsString() throws TransformerException
+        public String transformMessageToString() throws TransformerException
         {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }

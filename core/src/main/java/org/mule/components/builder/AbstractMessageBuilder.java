@@ -51,7 +51,7 @@ public abstract class AbstractMessageBuilder implements UMOComponentAware, Calla
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
 
-        UMOMessage requestMessage = new MuleMessage(eventContext.getTransformedMessage(),
+        UMOMessage requestMessage = new MuleMessage(eventContext.transformMessage(),
             eventContext.getMessage());
 
         UMOMessage responseMessage = null;

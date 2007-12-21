@@ -64,7 +64,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
 
     private Object[] getArgs(UMOEvent event) throws TransformerException
     {
-        Object payload = event.getTransformedMessage();
+        Object payload = event.transformMessage();
         if (payload instanceof Object[])
         {
             return (Object[])payload;

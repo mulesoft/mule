@@ -62,7 +62,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         writeStmt = connector.parseStatement(writeStmt, paramNames);
 
         Object[] paramValues = connector.getParams(endpoint, paramNames, new MuleMessage(
-            event.getTransformedMessage()), this.endpoint.getEndpointURI().getAddress());
+            event.transformMessage()), this.endpoint.getEndpointURI().getAddress());
 
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         Connection con = null;

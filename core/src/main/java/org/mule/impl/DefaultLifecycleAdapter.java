@@ -200,7 +200,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         if (result instanceof VoidResult)
         {
             //This will rewire the current message
-            event.getTransformedMessage();
+            event.transformMessage();
             resultMessage = event.getMessage();
         }
         else if (result != null)

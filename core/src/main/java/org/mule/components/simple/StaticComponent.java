@@ -93,7 +93,7 @@ public class StaticComponent implements Callable, Initialisable
             return data;
         }
 
-        String eventData = eventContext.getTransformedMessageAsString();
+        String eventData = eventContext.transformMessageToString();
 
         if (prefix != null)
         {

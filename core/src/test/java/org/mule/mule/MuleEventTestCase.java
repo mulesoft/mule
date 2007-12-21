@@ -40,9 +40,9 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
         assertEquals("Event data should equal " + data, data, event.getMessageAsString());
-        assertEquals("Event data should equal " + data, data, event.getTransformedMessage());
+        assertEquals("Event data should equal " + data, data, event.transformMessage());
         assertEquals("Event data should be a byte array 9 bytes in length", 9, event
-            .getTransformedMessageAsBytes().length);
+            .transformMessageToBytes().length);
 
         assertEquals("Event data should be a byte array 9 bytes in length", 9,
             event.getMessageAsBytes().length);
@@ -70,9 +70,9 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
         assertEquals("Event data should equal " + data, data, event.getMessageAsString());
         assertEquals("Event data should equal 'Transformed Test Data'", "Transformed Test Data", event
-            .getTransformedMessage());
+            .transformMessage());
         assertEquals("Event data should be a byte array 28 bytes in length", 21, event
-            .getTransformedMessageAsBytes().length);
+            .transformMessageToBytes().length);
     }
 
     public void testEventRewrite() throws Exception

@@ -47,7 +47,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void doDispatch(UMOEvent event) throws Exception
     {
-        Object data = event.getTransformedMessage();
+        Object data = event.transformMessage();
         OutputStream out = connector.getOutputStream(event.getEndpoint(), event.getMessage());
 
         try

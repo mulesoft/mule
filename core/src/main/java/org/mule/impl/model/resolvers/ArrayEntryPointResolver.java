@@ -39,7 +39,7 @@ public class ArrayEntryPointResolver extends AbstractArgumentEntryPointResolver
         Object temp;
         if (isTransformFirst())
         {
-            temp = context.getTransformedMessage();
+            temp = context.transformMessage();
         }
         else
         {

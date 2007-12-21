@@ -59,7 +59,7 @@ public class SelectiveConsumer extends AbstractRouter implements UMOInboundRoute
         {
             try
             {
-                Object payload = event.getTransformedMessage();
+                Object payload = event.transformMessage();
                 message = new MuleMessage(payload, message);
             }
             catch (TransformerException e)

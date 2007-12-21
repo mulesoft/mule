@@ -46,7 +46,7 @@ public class ForwardingConsumer extends SelectiveConsumer
             {
                 try
                 {
-                    UMOMessage message = new MuleMessage(event.getTransformedMessage(), event.getMessage());
+                    UMOMessage message = new MuleMessage(event.transformMessage(), event.getMessage());
 
                     UMOMessage response = router.route(message, event.getSession(), event.isSynchronous());
                     // TODO What's the correct behaviour for async endpoints?

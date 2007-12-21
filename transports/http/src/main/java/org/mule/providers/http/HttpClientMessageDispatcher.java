@@ -148,7 +148,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
         
         HttpMethod httpMethod;
-        Object body = event.getTransformedMessage();
+        Object body = event.transformMessage();
 
         if (body instanceof HttpMethod)
         {
@@ -186,7 +186,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
         else if (body instanceof byte[])
         {
-            byte[] buffer = event.getTransformedMessageAsBytes();
+            byte[] buffer = event.transformMessageToBytes();
             postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getEncoding()));
             httpMethod = postMethod;
         }
@@ -194,7 +194,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         {
             if (!(body instanceof OutputHandler)) 
             {
-                body = event.getTransformedMessage(OutputHandler.class);
+                body = event.transformMessage(OutputHandler.class);
             }
             
             OutputHandler outputHandler = (OutputHandler)body;

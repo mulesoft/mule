@@ -50,7 +50,7 @@ public interface UMOEvent
     byte[] getMessageAsBytes() throws UMOException;
 
     /**
-     * Returns the message transformed into it's recognised or expected format. The
+     * Transforms the message into it's recognised or expected format. The
      * transformer used is the one configured on the endpoint through which this
      * event was received.
      * 
@@ -58,23 +58,22 @@ public interface UMOEvent
      * @throws TransformerException if a failure occurs in the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
-    Object getTransformedMessage() throws TransformerException;
+    Object transformMessage() throws TransformerException;
 
     /**
-     * Returns the message transformed into the reuqest format. The
-     * transformer used is the one configured on the endpoint through which this
-     * event was received.
+     * Transforms the message into the requested format. The transformer used is 
+     * the one configured on the endpoint through which this event was received.
      * 
      * @param outputType The requested output type.
      * @return the message transformed into it's recognised or expected format.
      * @throws TransformerException if a failure occurs in the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
-    Object getTransformedMessage(Class outputType) throws TransformerException;
+    Object transformMessage(Class outputType) throws TransformerException;
 
     /**
-     * Returns the message transformed into it's recognised or expected format and
-     * then into an array of bytes. The transformer used is the one configured on the
+     * Transforms the message into it's recognised or expected format and then 
+     * into an array of bytes. The transformer used is the one configured on the
      * endpoint through which this event was received.
      * 
      * @return the message transformed into it's recognised or expected format as an
@@ -82,7 +81,7 @@ public interface UMOEvent
      * @throws TransformerException if a failure occurs in the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
-    byte[] getTransformedMessageAsBytes() throws TransformerException;
+    byte[] transformMessageToBytes() throws TransformerException;
 
     /**
      * Returns the message transformed into it's recognised or expected format and
@@ -95,7 +94,7 @@ public interface UMOEvent
      * @throws TransformerException if a failure occurs in the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
-    String getTransformedMessageAsString() throws TransformerException;
+    String transformMessageToString() throws TransformerException;
 
     /**
      * Returns the message contents as a string If necessary this will use the
@@ -105,19 +104,6 @@ public interface UMOEvent
      * @throws UMOException if the message cannot be converted into a string
      */
     String getMessageAsString() throws UMOException;
-
-    /**
-     * Returns the message transformed into it's recognised or expected format and
-     * then into a String. The transformer used is the one configured on the endpoint
-     * through which this event was received.
-     * 
-     * @param encoding the encoding to use when converting the message to string
-     * @return the message transformed into it's recognised or expected format as a
-     *         Strings.
-     * @throws TransformerException if a failure occurs in the transformer
-     * @see org.mule.umo.transformer.UMOTransformer
-     */
-    String getTransformedMessageAsString(String encoding) throws TransformerException;
 
     /**
      * Returns the message contents as a string

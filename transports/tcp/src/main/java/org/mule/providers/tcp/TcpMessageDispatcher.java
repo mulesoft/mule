@@ -101,7 +101,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     // Socket management (get and release) is handled outside this method
     private void dispatchToSocket(Socket socket, UMOEvent event) throws Exception
     {
-        Object payload = event.getTransformedMessage();
+        Object payload = event.transformMessage();
         write(socket, payload);
     }
 

@@ -23,7 +23,7 @@ public class SimpleEchoComponent implements Callable
 
     public Object onCall(UMOEventContext context) throws Exception
     {
-        Object message = context.getTransformedMessage();
+        Object message = context.transformMessage();
         logger.debug("received " + message);
 
         return message;

@@ -151,7 +151,7 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
-        Object transformedMessage = eventContext.getTransformedMessage();
+        Object transformedMessage = eventContext.transformMessage();
         RemoteInvocation ri = (RemoteInvocation)transformedMessage;
         Object rval = delegate.execute(ri);
         return rval;

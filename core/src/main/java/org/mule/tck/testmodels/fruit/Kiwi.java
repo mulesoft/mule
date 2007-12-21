@@ -27,7 +27,7 @@ public class Kiwi implements Fruit
 
     public void handle(UMOEventContext eventContext) throws Exception
     {
-        final Object payload = eventContext.getTransformedMessage();
+        final Object payload = eventContext.transformMessage();
         if (payload instanceof FruitLover)
         {
             this.bite();

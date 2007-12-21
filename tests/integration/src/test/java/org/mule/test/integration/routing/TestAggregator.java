@@ -43,7 +43,7 @@ public class TestAggregator extends ResponseCorrelationAggregator
             UMOEvent event = (UMOEvent)iterator.next();
             try
             {
-                buffer.append(event.getTransformedMessageAsString());
+                buffer.append(event.transformMessageToString());
             }
             catch (TransformerException e)
             {

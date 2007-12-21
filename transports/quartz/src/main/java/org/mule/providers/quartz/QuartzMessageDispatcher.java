@@ -66,7 +66,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
         Job job;
         // work out what we're actually calling
-        Object payload = event.getTransformedMessage();
+        Object payload = event.transformMessage();
 
         String jobClass = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_CLASS);
         // If the payload is a Job instance, then we are going to save it in

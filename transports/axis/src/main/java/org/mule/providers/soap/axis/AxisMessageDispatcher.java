@@ -400,7 +400,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     private Object[] getArgs(UMOEvent event) throws TransformerException
     {
-        Object payload = event.getTransformedMessage();
+        Object payload = event.transformMessage();
         Object[] args;
         if (payload instanceof Object[])
         {

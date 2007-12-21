@@ -138,7 +138,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 topic);
             producer = connector.getJmsSupport().createProducer(session, dest, topic);
 
-            Object message = event.getTransformedMessage();
+            Object message = event.transformMessage();
             if (!(message instanceof Message))
             {
                 throw new DispatchException(

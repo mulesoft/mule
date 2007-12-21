@@ -455,7 +455,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      */
     public void onMuleEvent(UMOEventContext context) throws TransformerException, MalformedEndpointException
     {
-        multicastEvent(new MuleApplicationEvent(context.getTransformedMessage(), context, applicationContext));
+        multicastEvent(new MuleApplicationEvent(context.transformMessage(), context, applicationContext));
         context.setStopFurtherProcessing(true);
     }
 

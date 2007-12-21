@@ -33,7 +33,7 @@ public class BusinessErrorManager implements Callable
 
     public Object onCall(UMOEventContext context) throws UMOException
     {
-        ErrorMessage msg = (ErrorMessage)context.getTransformedMessage();
+        ErrorMessage msg = (ErrorMessage)context.transformMessage();
         // Do something with the error message
         List msgs = new ArrayList();
 

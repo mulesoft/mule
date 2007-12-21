@@ -88,7 +88,7 @@ public class MuleManagerComponent implements Callable, Initialisable
     {
         Object result;
         logger.debug("Message received by MuleManagerComponent");
-        ByteArrayInputStream in = new ByteArrayInputStream(context.getTransformedMessageAsBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(context.transformMessageToBytes());
         AdminNotification action = (AdminNotification) wireFormat.read(in);
         if (AdminNotification.ACTION_INVOKE == action.getAction())
         {

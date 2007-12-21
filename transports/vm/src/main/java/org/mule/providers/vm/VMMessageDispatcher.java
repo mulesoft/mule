@@ -40,7 +40,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         //Apply any outbound transformers on this event before we dispatch
-        event.getTransformedMessage();
+        event.transformMessage();
 
         if (endpointUri == null)
         {
@@ -77,7 +77,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         VMMessageReceiver receiver = connector.getReceiver(endpointUri);
         //Apply any outbound transformers on this event before we dispatch
-        event.getTransformedMessage();
+        event.transformMessage();
         if (receiver == null)
         {
             if (connector.isQueueEvents())

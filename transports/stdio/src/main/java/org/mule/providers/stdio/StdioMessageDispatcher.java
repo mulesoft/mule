@@ -71,7 +71,7 @@ public class StdioMessageDispatcher extends AbstractMessageDispatcher
             }
         }
 
-        Object data = event.getTransformedMessage();
+        Object data = event.transformMessage();
         if (data instanceof byte[])
         {
             out.write((byte[])data);

@@ -83,7 +83,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
     {
         try
         {
-            Object data = event.getTransformedMessage();
+            Object data = event.transformMessage();
 
             if (!(data instanceof Message))
             {

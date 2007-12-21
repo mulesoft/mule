@@ -38,7 +38,7 @@ public class BankQuotesAggregationLogic
         for (Iterator iterator = events.iterator(); iterator.hasNext();)
         {
             event = (UMOEvent)iterator.next();
-            Object o = event.getTransformedMessage();
+            Object o = event.transformMessage();
             if(o instanceof LoanQuote)
             {
                 quote = (LoanQuote)o;

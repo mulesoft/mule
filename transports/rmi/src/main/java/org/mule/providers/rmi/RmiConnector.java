@@ -256,7 +256,7 @@ public class RmiConnector extends AbstractJndiConnector
         }
         else
         {
-            argTypes = ClassUtils.getClassTypes(event.getTransformedMessage());
+            argTypes = ClassUtils.getClassTypes(event.transformMessage());
         }
 
         try

@@ -359,7 +359,7 @@ public class MuleLocalChannel extends AbstractChannel
             XMLStreamReader reader;
 
             // TODO isStreaming()?
-            Object payload = ctx.getTransformedMessage();
+            Object payload = ctx.transformMessage();
             if (payload instanceof InputStream)
             {
                 reader = STAXUtils.createXMLStreamReader((InputStream)payload, ctx.getEncoding(), context);
@@ -370,7 +370,7 @@ public class MuleLocalChannel extends AbstractChannel
             }
             else
             {
-                InputStream i = (InputStream) ctx.getTransformedMessage(InputStream.class);
+                InputStream i = (InputStream) ctx.transformMessage(InputStream.class);
                 reader = STAXUtils.createXMLStreamReader(i, ctx.getEncoding(), context);
             }
 

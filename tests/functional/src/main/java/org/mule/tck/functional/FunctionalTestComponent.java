@@ -82,10 +82,10 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     {
         if (enableMessageHistory)
         {
-            messageHistory.add(context.getTransformedMessage());
+            messageHistory.add(context.transformMessage());
         }
 
-        String contents = context.getTransformedMessageAsString();
+        String contents = context.transformMessageToString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
                 + context.getComponent().getName() + ". Content is: "
                 + StringMessageUtils.truncate(contents, 100, true), '*', 80);

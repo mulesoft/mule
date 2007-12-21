@@ -112,7 +112,7 @@ public abstract class AbstractEntryPointResolver implements UMOEntryPointResolve
         Object temp;
         if (isTransformFirst())
         {
-            temp = context.getTransformedMessage();
+            temp = context.transformMessage();
         }
         else
         {

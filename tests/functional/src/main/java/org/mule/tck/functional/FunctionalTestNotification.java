@@ -52,7 +52,7 @@ public class FunctionalTestNotification extends CustomNotification
     public FunctionalTestNotification(UMOEventContext context, Object replyMessage, int action)
             throws TransformerException
     {
-        super(context.getTransformedMessage(), action);
+        super(context.transformMessage(), action);
         resourceIdentifier = context.getComponent().getName();
         this.replyMessage = replyMessage;
         this.eventContext = context;

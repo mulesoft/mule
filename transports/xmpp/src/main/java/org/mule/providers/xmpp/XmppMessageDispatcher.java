@@ -135,7 +135,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
         // avoid duplicate transformation
         if (!(msgObj instanceof Message))
         {
-            message = (Message)event.getTransformedMessage();
+            message = (Message)event.transformMessage();
         }
         else
         {

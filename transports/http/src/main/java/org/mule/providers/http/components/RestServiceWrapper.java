@@ -180,7 +180,7 @@ public class RestServiceWrapper implements Callable, Initialisable
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
         String tempUrl;
-        Object request = eventContext.getTransformedMessage();
+        Object request = eventContext.transformMessage();
         Object requestBody;
         if (urlFromMessage)
         {

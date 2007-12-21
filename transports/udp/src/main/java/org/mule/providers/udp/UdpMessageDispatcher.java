@@ -57,7 +57,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         DatagramSocket socket = connector.getSocket(ep);
         try
         {
-            byte[] payload = event.getTransformedMessageAsBytes();
+            byte[] payload = event.transformMessageToBytes();
 
             int port = ep.getEndpointURI().getPort();
             InetAddress inetAddress = null;

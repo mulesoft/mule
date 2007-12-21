@@ -15,7 +15,7 @@
     </description>
     
     <scripting:script name="scriptText">
-        def msg = eventContext.transformedMessageAsString
+        def msg = eventContext.transformMessageToString()
         log.boilerPlate("Message Received: ${msg} - class: ${msg.class.name}")
         return ["Hello", ":-)"];
     </scripting:script>
