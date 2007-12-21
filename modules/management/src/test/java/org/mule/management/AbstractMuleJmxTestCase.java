@@ -10,12 +10,12 @@
 
 package org.mule.management;
 
+import org.mule.RegistryContext;
 import org.mule.management.agents.RmiRegistryAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.RegistryContext;
 
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectInstance;
-import javax.management.ObjectName;
 
 /**
  * This base test case will create a new <code>MBean Server</code> if necessary,
@@ -53,7 +52,7 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
         mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
     }
 
-    private void unregisterMBeansByMask(final String mask) throws Exception
+    protected void unregisterMBeansByMask(final String mask) throws Exception
     {
         Set objectInstances = mBeanServer.queryMBeans(jmxSupport.getObjectName(mask), null);
         for (Iterator it = objectInstances.iterator(); it.hasNext();)
@@ -65,8 +64,10 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
 
     protected void doTearDown() throws Exception
     {
-        unregisterMBeansByMask("*.*:*");
-        unregisterMBeansByMask("log4j:*");
+        // Don't unregister MBean's here as ManamagmentContext disposal disposes agents which unregister
+        // their MBeans and give errors if they can't find the MBeans they registered.
+        // Any MBean's that are registered manually in TestCase should be unregistered in the same test case.
+
         mBeanServer = null;
     }
 

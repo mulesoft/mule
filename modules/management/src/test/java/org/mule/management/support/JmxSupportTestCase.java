@@ -20,17 +20,17 @@ import javax.management.ObjectName;
 
 public class JmxSupportTestCase extends AbstractMuleJmxTestCase
 {
+    
+    private final String MANAGER_ID = "Test_Instance";
+    private final String TEST_DOMAIN = JmxModernSupport.DEFAULT_JMX_DOMAIN_PREFIX + "." + MANAGER_ID;
 
     public void testClashingDomains() throws Exception
     {
-        final String managerId = "Test_Instance";
-
         // pre-register the same domain to simulate a clashing domain
-        final String testDomain = JmxModernSupport.DEFAULT_JMX_DOMAIN_PREFIX + "." + managerId;
-        ObjectName name = ObjectName.getInstance(testDomain + ":name=TestDuplicates");
+        ObjectName name = ObjectName.getInstance(TEST_DOMAIN + ":name=TestDuplicates");
         mBeanServer.registerMBean(new StatisticsService(), name);
 
-        managementContext.setId(managerId);
+        managementContext.setId(MANAGER_ID);
         JmxAgent agent = new JmxAgent();
         agent.setManagementContext(managementContext);
         agent.initialise();
@@ -38,30 +38,28 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         managementContext.start();
 
         List domains = Arrays.asList(mBeanServer.getDomains());
-        assertTrue("Should have contained an original domain.", domains.contains(testDomain));
-        assertTrue("Should have contained a new domain.", domains.contains(testDomain + ".1"));
+        assertTrue("Should have contained an original domain.", domains.contains(TEST_DOMAIN));
+        assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".1"));
     }
 
     public void testClashingSuffixedDomains() throws Exception
     {
-        final String managerId = "Test_Instance";
 
         // get original, pre-test number of domains
         int numOriginalDomains = mBeanServer.getDomains().length;
 
         // pre-register the same domain to simulate a clashing domain
-        final String testDomain = JmxModernSupport.DEFAULT_JMX_DOMAIN_PREFIX + "." + managerId;
-        ObjectName name = ObjectName.getInstance(testDomain + ":name=TestDuplicates");
+        ObjectName name = ObjectName.getInstance(TEST_DOMAIN + ":name=TestDuplicates");
         mBeanServer.registerMBean(new StatisticsService(), name);
 
         // add another domain with suffix already applied
-        name = ObjectName.getInstance(testDomain + ".1" + ":name=TestDuplicates");
+        name = ObjectName.getInstance(TEST_DOMAIN + ".1" + ":name=TestDuplicates");
         mBeanServer.registerMBean(new StatisticsService(), name);
 
         assertEquals("Wrong number of domains created.",
                      numOriginalDomains + 2, mBeanServer.getDomains().length);
 
-        managementContext.setId(managerId);
+        managementContext.setId(MANAGER_ID);
         JmxAgent agent = new JmxAgent();
         agent.setManagementContext(managementContext);
         agent.initialise();
@@ -73,9 +71,9 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertEquals("Wrong number of domains created.",
                      numOriginalDomains + 3, domains.size());
 
-        assertTrue("Should have contained an original domain.", domains.contains(testDomain));
-        assertTrue("Should have contained an original suffixed domain.", domains.contains(testDomain + ".1"));
-        assertTrue("Should have contained a new domain.", domains.contains(testDomain + ".2"));
+        assertTrue("Should have contained an original domain.", domains.contains(TEST_DOMAIN));
+        assertTrue("Should have contained an original suffixed domain.", domains.contains(TEST_DOMAIN + ".1"));
+        assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".2"));
     }
 
     public void testDomainNoManagerIdAndJmxAgentMustFail() throws Exception
@@ -92,6 +90,13 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
             // this form makes code coverage happier
             assertTrue(true);
         }
+    }
+    
+    protected void doTearDown() throws Exception
+    {
+        // This MBean was registered manually so needs to be unregistered manually in tearDown()
+        unregisterMBeansByMask(TEST_DOMAIN + ":name=TestDuplicates");
+        super.doTearDown();
     }
 
 }

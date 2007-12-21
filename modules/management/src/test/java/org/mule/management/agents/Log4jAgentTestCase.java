@@ -26,4 +26,11 @@ public class Log4jAgentTestCase extends AbstractMuleJmxTestCase
         Log4jAgent agent = new Log4jAgent();
         agent.initialise();
     }
+    
+    protected void doTearDown() throws Exception
+    {
+        // This MBean was registered manually so needs to be unregistered manually in tearDown()
+        unregisterMBeansByMask(Log4jAgent.JMX_OBJECT_NAME);
+        super.doTearDown();
+    }
 }
