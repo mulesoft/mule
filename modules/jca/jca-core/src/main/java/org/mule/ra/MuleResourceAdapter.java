@@ -110,6 +110,15 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 throw new ResourceAdapterInternalException(
                     "Failed to load configurations: " + info.getConfigurations(), e);
             }
+            try
+            {
+                managementContext.start();
+            }
+            catch (UMOException e)
+            {
+                logger.error(e);
+                throw new ResourceAdapterInternalException("Failed to start management context", e);
+            }
         }
     }
 
