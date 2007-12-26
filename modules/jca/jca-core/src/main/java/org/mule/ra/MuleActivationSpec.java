@@ -42,6 +42,7 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
     private MuleResourceAdapter resourceAdapter;
     private String endpoint;
     private UMOEndpointURI endpointURI;
+    private String modelName;
 
     public Properties getPropertiesMap()
     {
@@ -165,4 +166,12 @@ public class MuleActivationSpec implements ActivationSpec, Serializable
         }
         this.resourceAdapter = (MuleResourceAdapter)resourceAdapter;
     }
+
+	public String getModelName() {
+		return modelName;
+	}
+
+	public void setModelName(String modelName) {
+		this.modelName = modelName;
+	}
 }

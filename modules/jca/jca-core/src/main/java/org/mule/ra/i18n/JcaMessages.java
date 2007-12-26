@@ -31,6 +31,11 @@ public class JcaMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 3, object);
     }
+    
+    public static Message cannotPauseResumeJcaComponent()
+    {
+        return createMessage(BUNDLE_PATH, 4);
+    }
 }
 
 

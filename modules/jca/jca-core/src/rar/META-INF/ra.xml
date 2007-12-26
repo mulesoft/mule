@@ -68,6 +68,13 @@
             <config-property-type>java.lang.String</config-property-type>
             <config-property-value></config-property-value>
         </config-property>
+        <config-property>
+            <description>The JCA model used for JcaComponent's.  The default value is set here, but this can 
+            be overridden in ActivationSpec configuration for a given MDB.</description>
+            <config-property-name>modelName</config-property-name>
+            <config-property-type>java.lang.String</config-property-type>
+            <config-property-value>jcaModel</config-property-value>
+        </config-property>
         <outbound-resourceadapter>
             <connection-definition>
                 <managedconnectionfactory-class>org.mule.ra.MuleManagedConnectionFactory</managedconnectionfactory-class>

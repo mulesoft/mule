@@ -10,20 +10,14 @@
  $Id$
 -->
 
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:management="http://www.mulesource.org/schema/mule/management/2.0"
+       xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/management/2.0 http://www.mulesource.org/schema/mule/management/2.0/mule-management.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <management:jmx-server name="jmxServer" createServer="false" locateServer="true"/>
 
-<mule-configuration id="DummyJCA" version="1.0">
+ </mule>
 
-    <description>A dummy Mule config, serves as a placeholder to make JCA deployable only.</description>
-
-    <agents>
-        <agent name="jmxAgent" className="org.mule.management.agents.JmxAgent"/>
-    </agents>
-
-    <model name="Dummy">
-
-    </model>
-
-</mule-configuration>
