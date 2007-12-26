@@ -28,9 +28,7 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
     {
         try
         {
-            ScriptConfigurationBuilder scb = new ScriptConfigurationBuilder("groovy");
-            scb.setStartContext(false);
-            return scb;
+            return new ScriptConfigurationBuilder("groovy");
         }
         catch (UMOException e)
         {

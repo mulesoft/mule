@@ -14,11 +14,10 @@ import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.ConfigurationException;
-import org.mule.config.MuleProperties;
 import org.mule.config.builders.i18n.BuildersMessages;
 import org.mule.config.spring.MuleApplicationContext;
-import org.mule.registry.Registry;
 import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 
@@ -115,15 +114,14 @@ public class ScriptConfigurationBuilder extends MuleXmlConfigurationBuilder
                 managementContext.initialise();
             }
 
-            if (System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true")
-                    .equalsIgnoreCase("true") && isStartContext())
-            {
-                if (!managementContext.isStarted())
-                {
-                    managementContext.start();
-                }
-            }
-
+//            if (System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true")
+//                    .equalsIgnoreCase("true") && isStartContext())
+//            {
+//                if (!managementContext.isStarted())
+//                {
+//                    managementContext.start();
+//                }
+//            }
         }
         catch (Exception e)
         {

@@ -44,12 +44,6 @@ public class MuleXmlConfigurationBuilder extends AbstractConfigurationBuilder
 
     private ApplicationContext parentContext;
 
-    /**
-     * Start the ManagementContext once it's configured (defaults to true).
-     * TODO MULE-1988
-     */
-    private boolean startContext = true;
-
     public MuleXmlConfigurationBuilder()
     {
     }
@@ -109,11 +103,6 @@ public class MuleXmlConfigurationBuilder extends AbstractConfigurationBuilder
             // TODO MULE-2161 It doesn't make sense for Spring to create the managementContext, it should have already been created.
             UMOManagementContext mc = context.getManagementContext();
             MuleServer.setManagementContext(mc);
-            // TODO MULE-1988
-            if (startContext)
-            {
-                mc.start();
-            }
 
             registry.getConfiguration().setConfigResources(configResources);
 
@@ -175,16 +164,6 @@ public class MuleXmlConfigurationBuilder extends AbstractConfigurationBuilder
     public void setDefaultConfigResource(String defaultConfigResource)
     {
         this.defaultConfigResource = defaultConfigResource;
-    }
-
-    public boolean isStartContext()
-    {
-        return startContext;
-    }
-
-    public void setStartContext(boolean startContext)
-    {
-        this.startContext = startContext;
     }
 
     public ApplicationContext getParentContext()
