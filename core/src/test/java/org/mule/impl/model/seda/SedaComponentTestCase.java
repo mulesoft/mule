@@ -18,8 +18,26 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
-public class SedaComponentTestCase extends AbstractMuleTestCase
+public class SedaComponentTestCase extends AbstractMuleTestCase // AbstractComponentTestCase
 {
+    // Cannot extend AbstractComponentTestCase because of inconsistent behaviour. See
+    // MULE-2843
+
+    // protected void doSetUp() throws Exception
+    // {
+    // component = new SedaComponent();
+    // component.setName("seda");
+    // component.setServiceFactory(new PrototypeObjectFactory(Object.class));
+    // component.setManagementContext(managementContext);
+    // component.setModel(new SedaModel());
+    // component.getModel().setManagementContext(managementContext);
+    // component.getModel().initialise();
+    // }
+    //
+    // protected void doTearDown() throws Exception
+    // {
+    // component = null;
+    //    }
 
     public void testSedaModelEventTimeoutDefault() throws Exception
     {
@@ -36,7 +54,7 @@ public class SedaComponentTestCase extends AbstractMuleTestCase
         assertNotNull(component.getQueueTimeout());
         assertTrue(component.getQueueTimeout().intValue() != 0);
     }
-    
+
     public void testSpiWorkThrowableHandling() throws Exception
     {
         try

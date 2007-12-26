@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -260,19 +261,6 @@ public abstract class AbstractComponent implements UMOComponent
 
             // Unregister Listeners for the component
             unregisterListeners();
-            if (managementContext.getQueueManager().getQueueSession().getQueue(
-                    name + ".component").size() > 0)
-            {
-                try
-                {
-                    stopping.whenFalse(null);
-                }
-                catch (InterruptedException e)
-                {
-                    // we can ignore this
-                    // TODO MULE-863: Why?
-                }
-            }
 
             doStop();
             stopped.set(true);
