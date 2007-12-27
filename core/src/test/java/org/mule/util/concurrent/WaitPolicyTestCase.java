@@ -158,12 +158,12 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         // create tasks
         List tasks = new ArrayList();
         // task 1 runs immediately
-        tasks.add(new SleepyTask("hans", 1000));
+        tasks.add(new SleepyTask("run", 1000));
         // task 2 is queued
-        tasks.add(new SleepyTask("franz", 1000));
+        tasks.add(new SleepyTask("queued", 1000));
         // task 3 is initially rejected but waits forever
-        Runnable t3 = new SleepyTask("beavis", 1000);
-        tasks.add(t3);
+        Runnable waiting = new SleepyTask("waitingForever", 1000);
+        tasks.add(waiting);
 
         // submit tasks
         LinkedList submitters = this.execute(tasks);
@@ -171,7 +171,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
 
         // the last task should have been queued
         assertFalse(executor.awaitTermination(4000, TimeUnit.MILLISECONDS));
-        assertSame(t3, policy.lastRejectedRunnable());
+        assertSame(waiting, policy.lastRejectedRunnable());
         assertEquals(0, SleepyTask.activeTasks.get());
     }
 
@@ -186,19 +186,19 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         // create tasks
         List tasks = new ArrayList();
         // task 1 runs immediately
-        tasks.add(new SleepyTask("hans", 1000));
+        tasks.add(new SleepyTask("run", 1000));
         // task 2 is queued
-        tasks.add(new SleepyTask("franz", 1000));
+        tasks.add(new SleepyTask("queued", 1000));
         // task 3 is initially rejected but will eventually succeed
-        Runnable t3 = new SleepyTask("tweety", 1000);
-        tasks.add(t3);
+        Runnable waiting = new SleepyTask("waiting", 1000);
+        tasks.add(waiting);
 
         // submit tasks
         LinkedList submitters = this.execute(tasks);
         assertFalse(submitters.isEmpty());
 
         assertFalse(executor.awaitTermination(5000, TimeUnit.MILLISECONDS));
-        assertSame(t3, policy.lastRejectedRunnable());
+        assertSame(waiting, policy.lastRejectedRunnable());
         assertEquals(0, SleepyTask.activeTasks.get());
     }
 
@@ -214,11 +214,11 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         // create tasks
         List tasks = new ArrayList();
         // task 1 runs immediately
-        tasks.add(new SleepyTask("hans", 1000));
+        tasks.add(new SleepyTask("run", 1000));
         // task 2 is queued
-        tasks.add(new SleepyTask("franz", 1000));
+        tasks.add(new SleepyTask("queued", 1000));
         // task 3 is initially rejected & will retry but should fail quickly
-        Runnable failedTask = new SleepyTask("tweety", 1000);
+        Runnable failedTask = new SleepyTask("waitAndFail", 1000);
         tasks.add(failedTask);
 
         // submit tasks
@@ -226,11 +226,13 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         assertFalse(submitters.isEmpty());
 
         // give failure a chance
-        Thread.sleep(failureInterval * 2);
+        Thread.sleep(failureInterval * 10);
 
+        // make sure there was one failure
         LinkedList exceptions = threadGroup.collectedExceptions();
         assertEquals(1, exceptions.size());
 
+        // make sure the failed task was the right one
         Map.Entry threadFailure = (Map.Entry)((Map)(exceptions.getFirst())).entrySet().iterator().next();
         assertEquals(submitters.getLast(), threadFailure.getKey());
         assertEquals(RejectedExecutionException.class, threadFailure.getValue().getClass());
