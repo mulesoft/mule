@@ -16,9 +16,9 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IOUtils;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.custommonkey.xmlunit.XMLAssert;
 
@@ -26,7 +26,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 {
     private String srcData;
     private String resultData;
-    private Collection actualResults = Collections.synchronizedCollection(new LinkedList());
+    private Collection actualResults = new ConcurrentLinkedQueue();
 
     // @Override
     protected void doSetUp() throws Exception
@@ -60,7 +60,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     public void testParallelTransformation() throws Exception
     {
         final UMOTransformer transformer = getTransformer();
-        
+
         long startTime = System.currentTimeMillis();
 
         for (int i = 0; i < getParallelThreadCount(); ++i)
@@ -86,29 +86,34 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
             }).start();
         }
 
-        checkResult();
+        synchronized (this)
+        {
+            this.wait();
+        }
 
         long endTime = System.currentTimeMillis();
+
+        checkResult();
 
         if (logger.isDebugEnabled())
         {
             logger.debug("Parallel transformations in " + getParallelThreadCount() + " threads with "
-                            + getCallsPerThread() + " calls/thread took " + (endTime - startTime) + " ms.");
+                         + getCallsPerThread() + " calls/thread took " + (endTime - startTime) + " ms.");
         }
     }
 
-    private synchronized void checkResult() throws Exception
+    protected void checkResult() throws Exception
     {
-        this.wait();
         Object expectedResult = resultData;
+
         for (Iterator it = actualResults.iterator(); it.hasNext();)
         {
             Object result = it.next();
-            if (result instanceof Exception) throw (Exception)result;
+            if (result instanceof Exception) throw (Exception) result;
 
             if (expectedResult instanceof String && result instanceof String)
             {
-                XMLAssert.assertXMLEqual((String)expectedResult, (String)result);
+                XMLAssert.assertXMLEqual((String) expectedResult, (String) result);
             }
             else
             {
@@ -119,12 +124,12 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 
     private int getParallelThreadCount()
     {
-        return 10;
+        return 20;
     }
 
     private int getCallsPerThread()
     {
-        return 50;
+        return 100;
     }
 
 }
