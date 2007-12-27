@@ -8,6 +8,7 @@
  * LICENSE.txt file.
  */
 
+
 package org.mule.impl.model;
 
 import org.mule.tck.AbstractMuleTestCase;
