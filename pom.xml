@@ -400,7 +400,7 @@
                         <groupId>xalan</groupId>
                         <artifactId>xalan</artifactId>
                     </exclusion>
-                    <!-- no !"§$ XML parsers whatsoever -->
+                    <!-- no !"ï¿½$ XML parsers whatsoever -->
                     <exclusion>
                         <groupId>xml-apis</groupId>
                         <artifactId>xml-apis</artifactId>
@@ -668,6 +668,7 @@
                             <!--Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date-->
                             <!-- include repository revision from buildnumber plugin -->
                             <Build-Revision>${buildNumber}</Build-Revision>
+                            <Build-Date>${timestamp}</Build-Date>
                             <Dev-List-Email>dev@mule.codehaus.org</Dev-List-Email>
                         </manifestEntries>
                     </archive>
@@ -710,9 +711,9 @@
                 </executions>
             </plugin>
 
-            <!-- 
+            <!--
                  Needed for checkstyle to find the license header file from the classpath.
-                 CAVEAT: you cannot build the site without mule-buildtools present in 
+                 CAVEAT: you cannot build the site without mule-buildtools present in
                  your local repository.
 
                  For plugin config see below in reporting section
@@ -813,9 +814,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <!-- 
-                     see 
-                        http://jira.codehaus.org/browse/MJAVADOC-145 
+                <!--
+                     see
+                        http://jira.codehaus.org/browse/MJAVADOC-145
                         http://jira.codehaus.org/browse/MJAVADOC-157
                      which are not yet fixed in a publicly available release.
                 -->
@@ -1050,6 +1051,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>buildnumber-maven-plugin</artifactId>
+                        <version>1.0-beta-2-MULE-5675</version>
                         <executions>
                             <execution>
                                 <phase>validate</phase>
@@ -1062,13 +1064,7 @@
                             <!-- never touch svn -->
                             <doCheck>false</doCheck>
                             <doUpdate>false</doUpdate>
-                            <!-- Keep the format and items commented out -->
-                            <!--
-                                <format>{0,date,yyyy-MMM-dd-HH:mm:ss}</format>
-                                <items>
-                                    <item>timestamp</item>
-                                </items>
-                            -->
+                            <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
                         </configuration>
                      </plugin>
                 </plugins>

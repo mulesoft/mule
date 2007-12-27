@@ -58,6 +58,8 @@ public interface MuleServiceMBean
 
     String getBuildDate();
 
+    String getBuildNumber();
+
     String getInstanceId();
 
     /**

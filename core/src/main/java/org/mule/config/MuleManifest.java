@@ -82,6 +82,11 @@ public class MuleManifest
     {
         return getManifestProperty("Build-Revision");
     }
+    
+    public static String getBuildDate()
+    {
+        return getManifestProperty("Build-Date");
+    }
 
     public static String getDevListEmail()
     {
@@ -157,5 +162,4 @@ public class MuleManifest
     {
         return getManifest().getMainAttributes().getValue(new Attributes.Name(name));
     }
-
 }
