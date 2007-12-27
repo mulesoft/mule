@@ -17,12 +17,10 @@ public class GuiInstallerLicenseHandler
      * object and then seeks to save the license by calling the method
      * saveLicenseAck.
      * 
-     * @param args
-     * @throws Exception
      */
     public static void main(String args[]) throws Exception
     {
-        System.setProperty("mule.home", args[0].toString());
+        System.setProperty("mule.home", args[0]);
         LicenseHandler.saveLicenseInfo(new LicenseHandler.LicenseInfo());
     }
 }

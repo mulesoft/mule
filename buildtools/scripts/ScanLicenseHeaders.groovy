@@ -7,6 +7,7 @@ def ant = new AntBuilder()
 def scanner = ant.fileScanner {
     fileset (dir: muleRoot) {
         include(name: "**/*.java")
+        exclude(name: "**/target/**")
     }
 }
 

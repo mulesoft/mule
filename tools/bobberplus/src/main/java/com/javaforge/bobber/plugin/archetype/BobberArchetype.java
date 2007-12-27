@@ -1,5 +1,3 @@
-package com.javaforge.bobber.plugin.archetype;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -16,6 +14,7 @@ package com.javaforge.bobber.plugin.archetype;
  * limitations under the License.
  */
 
+package com.javaforge.bobber.plugin.archetype;
 
 import com.javaforge.bobber.archetype.model.Template;
 import com.javaforge.bobber.archetype.model.Variable;

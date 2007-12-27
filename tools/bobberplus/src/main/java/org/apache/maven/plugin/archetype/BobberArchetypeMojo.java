@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.archetype;
-
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
  *
@@ -15,6 +13,8 @@ package org.apache.maven.plugin.archetype;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.apache.maven.plugin.archetype;
 
 import java.util.HashMap;
 import java.util.List;

@@ -13,6 +13,7 @@ package org.mule.modules.boot;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.JarUtils;
+import org.mule.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,7 +69,7 @@ public final class LicenseHandler
      */
     public static boolean getAcceptance()
     {
-        boolean hasAccepted = false;
+        boolean hasAccepted;
         
         try
         {
@@ -122,7 +122,7 @@ public final class LicenseHandler
         String licenseType = null;
         String licenseVersion = null;
         
-        BufferedReader stdin = null;
+        BufferedReader stdin;
         BufferedReader fileReader = null;
 
         try
@@ -154,10 +154,6 @@ public final class LicenseHandler
                 row++;
             }
         }
-        catch (IOException ioe)
-        {
-            throw ioe;
-        }
         finally
         {
             if (fileReader != null)
@@ -182,7 +178,9 @@ public final class LicenseHandler
         
         System.out.print("\n\nDo you accept the terms and conditions of this license agreement [y/n]?");
 
-        boolean hasAcccepted = stdin.readLine().toLowerCase().startsWith("y");
+        final String input = StringUtils.defaultString(stdin.readLine());
+
+        boolean hasAcccepted = input.toLowerCase().startsWith("y");
         
         if (!hasAcccepted)
         {

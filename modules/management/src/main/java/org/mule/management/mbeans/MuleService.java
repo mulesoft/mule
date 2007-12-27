@@ -192,7 +192,7 @@ public class MuleService implements MuleServiceMBean
             }
             catch (IOException e)
             {
-                logger.warn("Failed to load LICENSE.txt", e);
+                logger.warn("Failed to load MULE_LICENSE.txt", e);
             }
             if (license == null)
             {

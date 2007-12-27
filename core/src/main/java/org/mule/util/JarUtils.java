@@ -142,10 +142,6 @@ public final class JarUtils
                 jarStream.flush();
                 fileStream.getFD().sync();
             }
-            catch (Exception jarCreationFailure)
-            {
-                throw jarCreationFailure;
-            }
             finally
             {
                 if (jarStream != null)
@@ -186,10 +182,6 @@ public final class JarUtils
         {
             fileContentStream = new FileInputStream(entry);
             IOUtils.copy(fileContentStream, stream);         
-        }
-        catch (IOException fileContentFailure)
-        {
-            throw fileContentFailure;
         }
         finally
         {
