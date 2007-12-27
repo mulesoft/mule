@@ -13,6 +13,11 @@ package org.mule.transformers.xml;
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.dom4j.io.OutputFormat;
+
 public class XmlPrettyPrinterTransformerTestCase extends AbstractTransformerTestCase
 {
 
@@ -42,6 +47,23 @@ public class XmlPrettyPrinterTransformerTestCase extends AbstractTransformerTest
     public UMOTransformer getTransformer() throws Exception
     {
         return new XmlPrettyPrinterTransformer();
+    }
+    
+    public void testOutputOptions()
+    {
+        XmlPrettyPrinterTransformer t = new XmlPrettyPrinterTransformer();
+        OutputFormat f = t.getOutputFormat();
+        assertEquals(2, f.getIndent().length());
+        assertFalse(f.isPadText());
+
+        Map properties = new HashMap();
+        properties.put("indentSize", new Integer(4));
+        properties.put("padText", Boolean.TRUE);
+        properties.put("noSuchProperty", null);
+
+        t.setOutputFormatProperties(properties);
+        assertEquals(4, f.getIndent().length());
+        assertTrue(f.isPadText());        
     }
 
 }
