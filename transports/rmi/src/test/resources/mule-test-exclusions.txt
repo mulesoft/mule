@@ -3,4 +3,4 @@
 #
 
 # temporary - adding rmi config
-#org.mule.providers.issues.RmiMethodTypeMule1857TestCase
+org.mule.providers.issues.RmiMethodTypeMule1857TestCase
