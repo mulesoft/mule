@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <spring:bean name="bean" class="org.mule.config.spring.DummyManagementContextAware"/>
+
+    <model name="main">
+
+        <service name="service">
+            <inbound-router>
+                <inbound-endpoint address="test://foo" transformer-refs="bean"/>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.config.spring.DummyComponent">
+                    <properties>
+                        <spring:entry key="property" value-ref="bean"/>
+                    </properties>
+                </singleton-object>
+            </component>
+        </service>
+
+    </model>
+
+</mule>

@@ -47,12 +47,11 @@ import org.apache.commons.collections.MapUtils;
  */
 public class RmiConnector extends AbstractJndiConnector
 {
+
+    public static final String RMI = "rmi";
     public static final int DEFAULT_RMI_muleRegistry_PORT = 1099;
-
     public static final String PROPERTY_RMI_SECURITY_POLICY = "securityPolicy";
-
     public static final String PROPERTY_RMI_SERVER_CODEBASE = "serverCodebase";
-
     public static final String PROPERTY_SERVER_CLASS_NAME = "serverClassName";
 
     /**
@@ -124,7 +123,7 @@ public class RmiConnector extends AbstractJndiConnector
 
     public String getProtocol()
     {
-        return "rmi";
+        return RMI;
     }
 
     /**

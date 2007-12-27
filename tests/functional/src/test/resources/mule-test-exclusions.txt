@@ -5,8 +5,6 @@
 # only works with network connection
 #org.mule.test.spring.SchemaValidationMule2225TestCase
 
-org.mule.test.spring.GlobalPropertiesMule2458TestCase
-
 org.mule.test.firewall.FirewallTestCase
 
 # MULE-2779

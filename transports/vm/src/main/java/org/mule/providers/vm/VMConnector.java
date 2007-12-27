@@ -248,7 +248,7 @@ public class VMConnector extends AbstractConnector
     public boolean isRemoteSyncEnabled()
     {
         return true;
-    }
+    }                                                      
 
     public int getQueueTimeout()
     {

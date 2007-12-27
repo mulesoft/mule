@@ -11,6 +11,10 @@
 package org.mule.util;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.HashSet;
 
 // @ThreadSafe
 public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
@@ -111,4 +115,20 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
         return result;
     }
 
+    public static Object[] setDifference(Object[] a, Object[] b)
+    {
+        Collection aCollecn = new HashSet(Arrays.asList(a));
+        Collection bCollecn = Arrays.asList(b);
+        aCollecn.removeAll(bCollecn);
+        return aCollecn.toArray();
+    }
+
+    public static String[] setDifference(String[] a, String[] b)
+    {
+        Object[] ugly = setDifference((Object[])a, b);
+        String[] copy = new String[ugly.length];
+        System.arraycopy(ugly, 0, copy, 0, ugly.length);
+        return copy;
+    }
+    
 }

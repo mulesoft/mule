@@ -39,6 +39,7 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.StringUtils;
+import org.mule.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,9 +81,11 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     protected String initialState = UMOImmutableEndpoint.INITIAL_STATE_STARTED;
     protected String encoding;
     protected Integer createConnector;
+    protected ConnectionStrategy connectionStrategy;
+
+    // not included in equality/hash
     protected String registryId = null;
     protected UMOManagementContext managementContext;
-    protected ConnectionStrategy connectionStrategy;
 
     public UMOImmutableEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
     {
@@ -247,14 +250,16 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     {
         // Add properties from builder, endpointURI and then seal (make unmodifiable)
         Map props = new HashMap();
-        if (properties != null)
-        {
-            props.putAll(properties);
-        }
+        // properties from url come first
         if (null != uriBuilder)
         {
             UMOEndpointURI endpointURI = uriBuilder.getEndpoint();
             props.putAll(endpointURI.getParams());
+        }
+        // properties on builder may override url
+        if (properties != null)
+        {
+            props.putAll(properties);
         }
         props = Collections.unmodifiableMap(props);
         return props;
@@ -559,19 +564,23 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     public void setResponseTransformers(List responseTransformers)
     {
         this.responseTransformers = responseTransformers;
-
     }
 
     public void setName(String name)
     {
         this.name = name;
-
     }
 
+    /**
+     * NOTE - this appends properties.
+     */
     public void setProperties(Map properties)
     {
-        this.properties = properties;
-
+        if (null == this.properties)
+        {
+            this.properties = new HashMap();
+        }
+        this.properties.putAll(properties);
     }
 
     /**
@@ -708,101 +717,32 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
         final AbstractEndpointBuilder other = (AbstractEndpointBuilder) obj;
-        if (connectionStrategy == null)
-        {
-            if (other.connectionStrategy != null) return false;
-        }
-        else if (!connectionStrategy.equals(other.connectionStrategy)) return false;
-        if (connector == null)
-        {
-            if (other.connector != null) return false;
-        }
-        else if (!connector.equals(other.connector)) return false;
-        if (createConnector == null)
-        {
-            if (other.createConnector != null) return false;
-        }
-        else if (!createConnector.equals(other.createConnector)) return false;
-        if (deleteUnacceptedMessages == null)
-        {
-            if (other.deleteUnacceptedMessages != null) return false;
-        }
-        else if (!deleteUnacceptedMessages.equals(other.deleteUnacceptedMessages)) return false;
-        if (encoding == null)
-        {
-            if (other.encoding != null) return false;
-        }
-        else if (!encoding.equals(other.encoding)) return false;
-        if (uriBuilder == null)
-        {
-            if (other.uriBuilder != null) return false;
-        }
-        else if (null == other.uriBuilder) return false;
-        else if (!uriBuilder.getEndpoint().equals(other.uriBuilder.getEndpoint())) return false;
-        if (filter == null)
-        {
-            if (other.filter != null) return false;
-        }
-        else if (!filter.equals(other.filter)) return false;
-        if (initialState == null)
-        {
-            if (other.initialState != null) return false;
-        }
-        else if (!initialState.equals(other.initialState)) return false;
-        if (name == null)
-        {
-            if (other.name != null) return false;
-        }
-        else if (!name.equals(other.name)) return false;
-        if (properties == null)
-        {
-            if (other.properties != null) return false;
-        }
-        else if (!properties.equals(other.properties)) return false;
-        if (remoteSync == null)
-        {
-            if (other.remoteSync != null) return false;
-        }
-        else if (!remoteSync.equals(other.remoteSync)) return false;
-        if (remoteSyncTimeout == null)
-        {
-            if (other.remoteSyncTimeout != null) return false;
-        }
-        else if (!remoteSyncTimeout.equals(other.remoteSyncTimeout)) return false;
-        if (responseTransformers == null)
-        {
-            if (other.responseTransformers != null) return false;
-        }
-        else if (!responseTransformers.equals(other.responseTransformers)) return false;
-        if (securityFilter == null)
-        {
-            if (other.securityFilter != null) return false;
-        }
-        else if (!securityFilter.equals(other.securityFilter)) return false;
-        if (streaming == null)
-        {
-            if (other.streaming != null) return false;
-        }
-        else if (!streaming.equals(other.streaming)) return false;
-        if (synchronous == null)
-        {
-            if (other.synchronous != null) return false;
-        }
-        else if (!synchronous.equals(other.synchronous)) return false;
-        if (transactionConfig == null)
-        {
-            if (other.transactionConfig != null) return false;
-        }
-        else if (!transactionConfig.equals(other.transactionConfig)) return false;
-        if (transformers == null)
-        {
-            if (other.transformers != null) return false;
-        }
-        else if (!transformers.equals(other.transformers)) return false;
-        return true;
+        return equal(connectionStrategy, other.connectionStrategy)
+                && equal(connector, other.connector)
+                && equal(createConnector, other.createConnector)
+                && equal(deleteUnacceptedMessages, other.deleteUnacceptedMessages)
+                && equal(encoding, other.encoding)
+                && equal(uriBuilder, other.uriBuilder)
+                && equal(filter, other.filter)
+                && equal(initialState, other.initialState)
+                && equal(name, other.name)
+                && equal(properties, other.properties)
+                && equal(remoteSync, other.remoteSync)
+                && equal(remoteSyncTimeout, other.remoteSyncTimeout)
+                && equal(responseTransformers, other.responseTransformers)
+                && equal(securityFilter, other.securityFilter)
+                && equal(streaming, other.streaming)
+                && equal(synchronous, other.synchronous)
+                && equal(transactionConfig, other.transactionConfig)
+                && equal(transformers, other.transformers);
+    }
+
+    protected static boolean equal(Object a, Object b)
+    {
+        return ClassUtils.equal(a, b);
     }
 
     public Object clone() throws CloneNotSupportedException

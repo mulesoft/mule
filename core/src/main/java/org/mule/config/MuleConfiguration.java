@@ -37,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleConfiguration
 {
+
     private static final String DEFAULT_LOG_DIRECTORY = "logs";
 
     /** logger used by this class */
@@ -107,9 +108,6 @@ public class MuleConfiguration
      */
     private boolean remoteSync = false;
 
-    /** Where mule will store any runtime files to disk */
-    private String workingDirectory;
-
     /** The configuration resources used to configure the MuleManager instance */
     private String[] configResources = new String[]{};
 
@@ -138,8 +136,6 @@ public class MuleConfiguration
 
     public MuleConfiguration()
     {
-        super();
-        setWorkingDirectory(DEFAULT_WORKING_DIRECTORY);
         setId(UUID.getUUID());
         setDomainId("org.mule");
     }
@@ -223,7 +219,7 @@ public class MuleConfiguration
 
     public String getWorkingDirectory()
     {
-        return workingDirectory;
+        return RegistryContext.getRegistry().lookupObject(MuleProperties.MULE_WORKING_DIRECTORY_PROPERTY).toString();
     }
     
     public String getMuleHomeDirectory()
@@ -239,8 +235,8 @@ public class MuleConfiguration
     public void setWorkingDirectory(String workingDirectory)
     {
         // fix windows backslashes in absolute paths, convert them to forward ones
-        this.workingDirectory = FileUtils.newFile(workingDirectory).getAbsolutePath().replaceAll("\\\\", "/");
-        updateApplicationProperty(MuleProperties.MULE_WORKING_DIRECTORY_PROPERTY, this.workingDirectory);
+        workingDirectory = FileUtils.newFile(workingDirectory).getAbsolutePath().replaceAll("\\\\", "/");
+        updateApplicationProperty(MuleProperties.MULE_WORKING_DIRECTORY_PROPERTY, workingDirectory);
     }
 
     public String[] getConfigResources()

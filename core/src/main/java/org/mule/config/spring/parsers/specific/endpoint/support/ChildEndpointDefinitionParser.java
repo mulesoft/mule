@@ -13,6 +13,8 @@ package org.mule.config.spring.parsers.specific.endpoint.support;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.util.CoreXMLUtils;
+import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -45,17 +47,14 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     // @Override
     public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class beanClass)
     {
-        if (null == element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF))
+        BeanDefinitionBuilder builder = super.createBeanDefinitionBuilder(element, beanClass);
+        String global = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
+        if (StringUtils.isNotBlank(global))
         {
-            return super.createBeanDefinitionBuilder(element, beanClass);
+            builder.addConstructorArgReference(global);
+            builder.addDependsOn(global);
         }
-        else
-        {
-            String parent = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
-            BeanDefinitionBuilder bdb = BeanDefinitionBuilder.childBeanDefinition(parent);
-            bdb.getBeanDefinition().setBeanClassName(beanClass.getName());
-            return bdb;
-        }
+        return builder;
     }
 
     // @Override

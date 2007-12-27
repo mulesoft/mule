@@ -7,7 +7,7 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"
        default-init-method="initialise">
 
-    <!-- Default ue configuration - the Muleconfiguration object should provide access to these values -->
+    <!-- Default mule configuration - the Muleconfiguration object should provide access to these values -->
     <bean name="mule.working.dir" class="java.lang.String">
         <constructor-arg value="./.mule"/>
     </bean>

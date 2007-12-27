@@ -1,0 +1,6 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# temporary - adding rmi config
+#org.mule.providers.issues.RmiMethodTypeMule1857TestCase

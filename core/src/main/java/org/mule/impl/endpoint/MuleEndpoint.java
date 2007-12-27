@@ -56,7 +56,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
                 CoreMessages.connectorSchemeIncompatibleWithEndpointScheme(connector.getProtocol(),
                 endpointUri).getMessage());
         }
-        if(endpointUri==null)
+        if (endpointUri==null)
         {
             throw new NullPointerException(CoreMessages.objectIsNull("endpointURI").getMessage());
         }

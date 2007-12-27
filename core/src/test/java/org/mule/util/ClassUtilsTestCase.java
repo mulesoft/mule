@@ -180,6 +180,32 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         simpleNameHelper("null", null);
     }
 
+    public void testEqual()
+    {
+        Object a1 = new HashBlob(1);
+        Object a2 = new HashBlob(1);
+        Object b = new HashBlob(2);
+        assertTrue(ClassUtils.equal(a1, a2));
+        assertTrue(ClassUtils.equal(b, b));
+        assertTrue(ClassUtils.equal(null, null));
+        assertFalse(ClassUtils.equal(a1, b));
+        assertFalse(ClassUtils.equal(a2, b));
+        assertFalse(ClassUtils.equal(null, b));
+        assertFalse(ClassUtils.equal(b, a1));
+        assertFalse(ClassUtils.equal(b, a2));
+        assertFalse(ClassUtils.equal(b, null));
+    }
+
+    public void testHash()
+    {
+        Object a = new HashBlob(1);
+        Object b = new HashBlob(2);
+        assertTrue(ClassUtils.hash(new Object[]{a, b, a, b}) == ClassUtils.hash(new Object[]{a, b, a, b}));
+        assertFalse(ClassUtils.hash(new Object[]{a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
+        assertFalse(ClassUtils.hash(new Object[]{a, b, a, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
+        assertFalse(ClassUtils.hash(new Object[]{b, a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
+    }
+
     private void simpleNameHelper(String target, Class clazz)
     {
         assertEquals(target, ClassUtils.getSimpleName(clazz));
@@ -196,6 +222,29 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         {
             return object;
         }
+    }
+
+    private static class HashBlob
+    {
+
+        private int hash;
+
+        public HashBlob(int hash)
+        {
+            this.hash = hash;
+        }
+
+        public int hashCode()
+        {
+            return hash;
+        }
+
+        public boolean equals(Object other)
+        {
+            if (null == other || !getClass().equals(other.getClass())) return false;
+            return hash == ((HashBlob) other).hash;
+        }
+
     }
 
 }

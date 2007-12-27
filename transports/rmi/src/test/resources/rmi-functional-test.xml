@@ -18,20 +18,21 @@
 
     <vm:connector name="vmQueue" queueEvents="true"/>
 
-    <endpoint name="Sender" address="rmi://localhost:1099/SimpleMathsUMO?method=addTen"/>
+    <rmi:endpoint name="Sender" host="localhost" port="1099" object="SimpleMathsUMO" method="addTen"/>
     <endpoint name="Sender2" address="rmi://localhost:1099/MatchingUMO?method=reverseString"/>
 
-    <endpoint name="GoodType" address="rmi://localhost:1099/MatchingUMO?method=reverseString">
+    <!-- rmi:endpoint name="GoodType" address="rmi://localhost:1099/MatchingUMO?method=reverseString" -->
+    <rmi:endpoint name="GoodType" host="localhost" port="1099" object="MatchingUMO" method="reverseString">
         <properties>
             <spring:entry key="methodArgumentTypes" value="java.lang.String"/>
         </properties>
-    </endpoint>
+    </rmi:endpoint>
 
-    <endpoint name="BadType" address="rmi://localhost:1099/MatchingUMO?method=reverseString">
+    <rmi:endpoint name="BadType" host="localhost" port="1099" object="MatchingUMO" method="reverseString">
         <properties>
             <spring:entry key="methodArgumentTypes" value="java.lang.StringBuffer"/>
         </properties>
-    </endpoint>
+    </rmi:endpoint>
 
     <model name="sample">
 
@@ -46,7 +47,7 @@
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </filtering-router>
                 <filtering-router>
-                    <outbound-endpoint ref="Sender2"/>
+                    <rmi:outbound-endpoint ref="Sender2"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
             </outbound-router>

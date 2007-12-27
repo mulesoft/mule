@@ -13,6 +13,7 @@ package org.mule.config.spring.parsers.specific;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.util.ClassUtils;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -319,6 +320,33 @@ public class URIBuilder
     public String toString()
     {
         return getConstructor();
+    }
+
+    public boolean equals(Object other)
+    {
+        if (null == other || !getClass().equals(other.getClass())) return false;
+        if (this == other) return true;
+
+        URIBuilder builder = (URIBuilder) other;
+        return equal(address, builder.address)
+                && equal(meta, builder.meta)
+                && equal(protocol, builder.protocol)
+                && equal(user, builder.user)
+                && equal(password, builder.password)
+                && equal(host, builder.host)
+                && equal(port, builder.port)
+                && equal(path, builder.path)
+                && equal(queryMap, builder.queryMap);
+    }
+
+    protected static boolean equal(Object a, Object b)
+    {
+        return ClassUtils.equal(a, b);
+    }
+
+    public int hashCode()
+    {
+        return ClassUtils.hash(new Object[]{address, meta, protocol, user, password, host, port, path, queryMap});
     }
 
 }

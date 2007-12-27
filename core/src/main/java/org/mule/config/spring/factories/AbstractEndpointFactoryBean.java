@@ -10,9 +10,9 @@
 
 package org.mule.config.spring.factories;
 
-import org.mule.impl.ManagementContextAware;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 
@@ -24,10 +24,15 @@ import org.springframework.beans.factory.FactoryBean;
  * Abstract spring FactoryBean used to creating endpoints via spring.
  */
 public abstract class AbstractEndpointFactoryBean extends EndpointURIEndpointBuilder
-    implements FactoryBean, ManagementContextAware, Initialisable
+    implements FactoryBean, Initialisable
 {
 
     protected final Log logger = LogFactory.getLog(getClass());
+
+    public AbstractEndpointFactoryBean(EndpointURIEndpointBuilder global) throws EndpointException
+    {
+        super(global);
+    }
 
     public AbstractEndpointFactoryBean()
     {

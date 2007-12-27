@@ -237,7 +237,7 @@ public class MuleEndpointURI implements UMOEndpointURI
     public Properties getUserParams()
     {
         Properties p = new Properties();
-        p.putAll(params);
+        p.putAll(getParams());
         p.remove(PROPERTY_ENDPOINT_NAME);
         p.remove(PROPERTY_ENDPOINT_URI);
         p.remove(PROPERTY_CREATE_CONNECTOR);

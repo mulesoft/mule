@@ -79,7 +79,7 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
             this.service = service;
         }
 
-        // //@Override
+        //@Override
         public boolean equals(Object o)
         {
             if (this == o)
@@ -105,11 +105,17 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
             return true;
         }
 
-        // //@Override
+        //@Override
         public int hashCode()
         {
-            return 29 * (overrides != null ? overrides.hashCode() : 0) + (service!=null ? service.hashCode(): 0);
+            return 29 * (overrides != null ? overrides.hashCode() : 0) + (service != null ? service.hashCode(): 0);
         }
+
+        public String getKey()
+        {
+            return service + ":" + Integer.toString(hashCode()); 
+        }
+
     }
 
 }

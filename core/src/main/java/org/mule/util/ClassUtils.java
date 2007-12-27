@@ -737,4 +737,30 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
         return clazz;
     }
+
+    /**
+     * Is there a better place for this?  Simple helper for writing object equalities.
+     */
+    public static boolean equal(Object a, Object b)
+    {
+        if (null == a)
+        {
+            return null == b;
+        }
+        else
+        {
+            return null != b && a.equals(b);
+        }
+    }
+
+    public static int hash(Object[] state)
+    {
+        int hash = 0;
+        for (int i = 0; i < state.length; ++i)
+        {
+            hash = hash * 31 + (null == state[i] ? 0 : state[i].hashCode());
+        }
+        return hash;
+    }
+
 }

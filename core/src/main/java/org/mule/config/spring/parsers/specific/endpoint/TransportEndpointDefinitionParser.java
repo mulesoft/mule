@@ -13,6 +13,10 @@ package org.mule.config.spring.parsers.specific.endpoint;
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
+
 /**
  * This is intended for use by endpoint-specific parsers for non-global endpoint
  * elements.  It will not allow the "ref" attribute with any of the

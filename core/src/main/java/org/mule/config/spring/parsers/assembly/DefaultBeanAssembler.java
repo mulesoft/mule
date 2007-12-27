@@ -240,9 +240,14 @@ public class DefaultBeanAssembler implements BeanAssembler
                     {
                         config.setCollection();
                     }
-                    for (StringTokenizer ref = new StringTokenizer((String) value); ref.hasMoreTokens();)
+                    for (StringTokenizer refs = new StringTokenizer((String) value); refs.hasMoreTokens();)
                     {
-                        addPropertyWithoutReference(properties, config, name, new RuntimeBeanReference(ref.nextToken()));
+                        String ref = refs.nextToken();
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("possible non-dependent reference: " + name + "/" + ref);
+                        }
+                        addPropertyWithoutReference(properties, config, name, new RuntimeBeanReference(ref));
                     }
                 }
                 else

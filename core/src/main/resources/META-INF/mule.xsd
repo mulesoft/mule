@@ -198,7 +198,7 @@
             <xsd:element ref="abstract-response-router" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="transformer-ref" type="xsd:NMTOKENS"/>
+        <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS"/>
         <xsd:attribute name="timeout" type="xsd:string"/>
     </xsd:complexType>
 
@@ -244,7 +244,7 @@
             <xsd:element name="default-connection-strategy" type="connectionStrategyType" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="defaultSynchronousEndpoints" type="substitutableBoolean" default="false"/>
-        <xsd:attribute name="workingDirectory" type="xsd:string" default=".mule"/>
+        <xsd:attribute name="workingDirectory" type="xsd:string"/>
         <xsd:attribute name="defaultSynchronousEventTimeout" type="xsd:string" default="3000"/>
         <xsd:attribute name="defaultEncoding" type="xsd:string" default="UTF-8"/>
         <xsd:attribute name="defaultTransactionTimeout" type="xsd:string" default="5000"/>

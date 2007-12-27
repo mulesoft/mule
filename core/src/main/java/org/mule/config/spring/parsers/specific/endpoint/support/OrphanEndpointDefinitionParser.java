@@ -20,7 +20,7 @@ import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
  * {@link ChildAddressDefinitionParser},
  * or embedded in
  * {@link AddressedEndpointDefinitionParser}
- * for a more compact single-eleent approach.
+ * for a more compact single-element approach.
  *
  * <p>This class does not support references to other endpoints.</p>
  */

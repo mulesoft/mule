@@ -29,6 +29,7 @@ import java.util.Properties;
  */
 public interface UMOEndpointURI extends Serializable, Initialisable
 {
+
     String PROPERTY_ENDPOINT_NAME = "endpointName";
     String PROPERTY_ENDPOINT_URI = "address";
     String PROPERTY_CREATE_CONNECTOR = "createConnector";
@@ -52,6 +53,9 @@ public interface UMOEndpointURI extends Serializable, Initialisable
 
     Properties getParams();
 
+    /**
+     * A reduced version of getParams() - drops some system parameters
+     */
     Properties getUserParams();
 
     String getScheme();
