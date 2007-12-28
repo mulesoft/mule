@@ -101,6 +101,7 @@
         <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
         <xsd:attribute name="object" type="xsd:string"/>
         <xsd:attribute name="method" type="xsd:string"/>
+        <xsd:attribute name="methodArgumentTypes" type="xsd:string"/>
     </xsd:attributeGroup>
 
 </xsd:schema>

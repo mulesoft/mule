@@ -21,11 +21,21 @@
     <rmi:endpoint name="Sender" host="localhost" port="1099" object="SimpleMathsUMO" method="addTen"/>
     <endpoint name="Sender2" address="rmi://localhost:1099/MatchingUMO?method=reverseString"/>
 
-    <rmi:endpoint name="GoodType" host="localhost" port="1099" object="MatchingUMO"
-                  method="reverseString" methodArgumentTypes="java.lang.String"/>
+    <!-- note that this sets proeprties both from the endpoint (method) and directly
+         DO NOT update this to use a more succinct config - this is what is being tested! -->
+    <rmi:endpoint name="GoodType" host="localhost" port="1099" object="MatchingUMO" method="reverseString">
+        <properties>
+            <spring:entry key="methodArgumentTypes" value="java.lang.String"/>
+        </properties>
+    </rmi:endpoint>
 
-    <rmi:endpoint name="BadType" host="localhost" port="1099" object="MatchingUMO"
-                  method="reverseString" methodArgumentTypes="java.lang.StringBuffer"/>
+    <!-- note that this sets proeprties both from the endpoint (method) and directly
+         DO NOT update this to use a more succinct config - this is what is being tested! -->
+    <rmi:endpoint name="BadType" host="localhost" port="1099" object="MatchingUMO" method="reverseString">
+        <properties>
+            <spring:entry key="methodArgumentTypes" value="java.lang.StringBuffer"/>
+        </properties>
+    </rmi:endpoint>
 
     <model name="sample">
 

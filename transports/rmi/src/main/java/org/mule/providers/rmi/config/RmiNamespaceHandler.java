@@ -29,14 +29,15 @@ public class RmiNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public static final String METHOD = MuleProperties.MULE_METHOD_PROPERTY;
     public static final String OBJECT = "object";
+    public static final String[] PROPERTIES = new String[]{METHOD, RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES};
     public static final String[] REQUIRED = new String[]{METHOD, OBJECT, URIBuilder.HOST, URIBuilder.PORT};
 
     public void init()
     {
-        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, new String[]{METHOD}, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, InboundEndpointFactoryBean.class, new String[]{METHOD}, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
-        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, OutboundEndpointFactoryBean.class, new String[]{METHOD}, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
-        registerBeanDefinitionParser("response-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, ResponseEndpointFactoryBean.class, new String[]{METHOD}, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
+        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, PROPERTIES, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
+        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, InboundEndpointFactoryBean.class, PROPERTIES, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
+        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, OutboundEndpointFactoryBean.class, PROPERTIES, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
+        registerBeanDefinitionParser("response-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, ResponseEndpointFactoryBean.class, PROPERTIES, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(RmiConnector.class, true));
     }
 

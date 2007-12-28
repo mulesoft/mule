@@ -21,11 +21,8 @@
     <endpoint name="Sender" address="jnp://localhost:1099/SimpleMathsUMO?method=addTen"/>
     <endpoint name="Sender2" address="jnp://localhost:1099/MatchingUMO?method=reverseString"/>
 
-    <endpoint name="GoodType" address="jnp://localhost:1099/MatchingUMO?method=reverseString">
-        <properties>
-            <spring:entry key="methodArgumentTypes" value="java.lang.String"/>
-        </properties>
-    </endpoint>
+    <endpoint name="GoodType"
+              address="jnp://localhost:1099/MatchingUMO?method=reverseString&amp;methodArgumentTypes=java.lang.String"/>
 
     <endpoint name="BadType" address="jnp://localhost:1099/MatchingUMO?method=reverseString">
         <properties>

@@ -10,12 +10,14 @@
 
 package org.mule.providers.issues;
 
-public class RmiMethodTypeMule1857TestCase extends AbstractMethodTypeMule1857TestCase
+import org.mule.providers.AbstractFunctionalTestCase;
+
+public class RmiMethodTypeMule1857TestCase extends AbstractFunctionalTestCase
 {
 
     public RmiMethodTypeMule1857TestCase()
     {
-        super("rmi", "rmi-functional-test.xml");
+        super("rmi", "rmi-method-type-1857-test.xml");
     }
 
 }
