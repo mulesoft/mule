@@ -42,12 +42,17 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
         assertEquals("foo://bar?aname=avalue&bname=bvalue", uri.toString());
     }
 
+    // note that explicit properties over-rule those in the uri when duplicated
     public void testLiteralQueries()
     {
-        URIBuilder uri = new URIBuilder();
-        uri.setAddress("foo://bar?cname=cvalue");
-        uri.setQueryMap(queries);
-        assertEquals("foo://bar?cname=cvalue&aname=avalue&bname=bvalue", uri.toString());
+        URIBuilder uri1 = new URIBuilder();
+        uri1.setAddress("foo://bar?cname=cvalue&aname=anothervalue");
+        uri1.setQueryMap(queries);
+        assertEquals("foo://bar?aname=avalue&bname=bvalue&cname=cvalue", uri1.toString());
+        URIBuilder uri2 = new URIBuilder();
+        uri2.setQueryMap(queries);
+        uri2.setAddress("foo://bar?cname=cvalue&aname=anothervalue");
+        assertEquals("foo://bar?aname=avalue&bname=bvalue&cname=cvalue", uri2.toString());
     }
 
     public void testFromString()

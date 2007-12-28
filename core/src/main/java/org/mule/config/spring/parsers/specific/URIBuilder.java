@@ -18,6 +18,9 @@ import org.mule.util.ClassUtils;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.Collections;
+import java.util.StringTokenizer;
+import java.util.HashMap;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
@@ -177,8 +180,8 @@ public class URIBuilder
     {
         StringBuffer buffer = new StringBuffer();
         appendMeta(buffer);
-        appendAddress(buffer);
-        appendQueries(buffer);
+        Map uriQueries = appendAddress(buffer);
+        appendQueries(buffer, uriQueries);
         return buffer.toString();
     }
 
@@ -191,16 +194,45 @@ public class URIBuilder
         }
     }
 
-    private void appendAddress(StringBuffer buffer)
+    private Map appendAddress(StringBuffer buffer)
     {
         if (null != address)
         {
-            buffer.append(address);
+            int index = address.indexOf(QUERY);
+            if (index > -1)
+            {
+                buffer.append(address.substring(0, index));
+                return parseQueries(address.substring(index + 1));
+            }
+            else
+            {
+                buffer.append(address);
+                return Collections.EMPTY_MAP;
+            }
         }
         else
         {
             constructAddress(buffer);
+            return Collections.EMPTY_MAP;
         }
+    }
+
+    private static Map parseQueries(String queries)
+    {
+        Map map = new HashMap();
+        StringTokenizer query = new StringTokenizer(queries, AND);
+        while (query.hasMoreTokens())
+        {
+            StringTokenizer nameValue = new StringTokenizer(query.nextToken(), EQUALS);
+            String name = nameValue.nextToken();
+            String value = Boolean.TRUE.toString();
+            if (nameValue.hasMoreTokens())
+            {
+                value = nameValue.nextToken();
+            }
+            map.put(name, value);
+        }
+        return map;
     }
 
     private void constructAddress(StringBuffer buffer)
@@ -239,14 +271,20 @@ public class URIBuilder
         }
     }
 
-    private void appendQueries(StringBuffer buffer)
+    private void appendQueries(StringBuffer buffer, Map uriQueries)
     {
+        // priority to explicit properties
+        Map properties = new HashMap();
+        properties.putAll(uriQueries);
         if (null != queryMap)
         {
-            // crude, but probably sufficient to allow literal values in path
-            boolean first = buffer.indexOf(QUERY) == -1;
+            properties.putAll(queryMap);
+        }
+        if (properties.size() > 0)
+        {
+            boolean first = true;
             // order so that testing is simpler
-            Iterator keys = new TreeSet(queryMap.keySet()).iterator();
+            Iterator keys = new TreeSet(properties.keySet()).iterator();
             while (keys.hasNext())
             {
                 if (first)
@@ -261,7 +299,7 @@ public class URIBuilder
                 String key = (String)keys.next();
                 buffer.append(key);
                 buffer.append(EQUALS);
-                buffer.append((String) queryMap.get(key));
+                buffer.append((String) properties.get(key));
             }
         }
     }

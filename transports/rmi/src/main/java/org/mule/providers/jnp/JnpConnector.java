@@ -19,9 +19,11 @@ import org.mule.providers.rmi.RmiConnector;
 public class JnpConnector extends RmiConnector
 {
 
+    public static final String JNP = "jnp";
+
     public String getProtocol()
     {
-        return "jnp";
+        return JNP;
     }
 
 }

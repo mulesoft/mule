@@ -19,16 +19,16 @@
     <vm:connector name="vmQueue" queueEvents="true"/>
 
     <endpoint name="Sender" address="jnp://localhost:1099/SimpleMathsUMO?method=addTen"/>
-    <endpoint name="Sender2" address="jnp://localhost:1099/MatchingUMO?method=reverseString"/>
+    <jnp:endpoint name="Sender2" host="localhost" port="1099" object="MatchingUMO" method="reverseString"/>
 
     <endpoint name="GoodType"
               address="jnp://localhost:1099/MatchingUMO?method=reverseString&amp;methodArgumentTypes=java.lang.String"/>
 
-    <endpoint name="BadType" address="jnp://localhost:1099/MatchingUMO?method=reverseString">
+    <jnp:endpoint name="BadType" address="jnp://localhost:1099/MatchingUMO" method="reverseString">
         <properties>
             <spring:entry key="methodArgumentTypes" value="java.lang.StringBuffer"/>
         </properties>
-    </endpoint>
+    </jnp:endpoint>
 
     <model name="sample">
 
@@ -39,7 +39,7 @@
             </inbound-router>
             <outbound-router>
                 <filtering-router>
-                    <outbound-endpoint ref="Sender"/>
+                    <jnp:outbound-endpoint ref="Sender"/>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </filtering-router>
                 <filtering-router>

@@ -44,7 +44,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     public static final String QUERY_MAP = "queryMap";
 
     // this is an example of parsing a single element with several parsers.  in this case
-    // (because we extend SingleParentFamilyDefinitionParser) the first parser is expected to
+    // (because we extend AbstractSingleParentFamilyDefinitionParser) the first parser is expected to
     // create the "parent".  then subsequent parsers will be called as children.
 
     // because all are generated from one element we need to be careful to block attributes
@@ -124,10 +124,11 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
             enableAttributes(addressParser, URIBuilder.ALL_ATTRIBUTES);
             enableAttributes(addressParser, ArrayUtils.setDifference(requiredAddressAttributes, propertyAttributes));
             // we require either a reference, an address, or the attributes specified
+            // (but we exclude properties from the attributes because they can be used in parallel with address)
             String[][] addressAttributeSets = new String[][]{
                     new String[]{URIBuilder.ADDRESS},
                     new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},
-                    requiredAddressAttributes};
+                    ArrayUtils.setDifference(requiredAddressAttributes, propertyAttributes)};
             addressParser.registerPreProcessor(new CheckRequiredAttributes(addressAttributeSets));
             // and they must be exclusive
             addressParser.registerPreProcessor(new CheckExclusiveAttributes(addressAttributeSets));
