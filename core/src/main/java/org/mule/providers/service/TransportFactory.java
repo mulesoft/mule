@@ -42,11 +42,6 @@ public class TransportFactory
      */
     protected static final Log logger = LogFactory.getLog(TransportFactory.class);
 
-    public static final int GET_OR_CREATE_CONNECTOR = 0;
-    public static final int ALWAYS_CREATE_CONNECTOR = 1;
-    public static final int NEVER_CREATE_CONNECTOR = 2;
-    public static final int USE_CONNECTOR = 3;
-
     /**
      * Creates an uninitialied connector from the provided MuleEndpointURI. The
      * scheme is used to determine what kind of connector to create. Any params set
@@ -113,22 +108,16 @@ public class TransportFactory
         }
     }
 
-    public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, UMOManagementContext managementContext)
-        throws TransportFactoryException
-    {
-        return getOrCreateConnectorByProtocol(uri, uri.getCreateConnector(), managementContext);
-    }
-
     public static UMOConnector getOrCreateConnectorByProtocol(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
         throws TransportFactoryException
     {
-        return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), endpoint.getCreateConnector(), managementContext);
+        return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), managementContext);
     }
 
     /**
      * Returns an initialized connector.
      */
-    private static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, int create, UMOManagementContext managementContext)
+    public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, UMOManagementContext managementContext)
         throws TransportFactoryException
     {
         String connectorName = uri.getConnectorName();
@@ -143,8 +132,7 @@ public class TransportFactory
         }
 
         UMOConnector connector = getConnectorByProtocol(uri.getFullScheme());
-        if (ALWAYS_CREATE_CONNECTOR == create
-            || (connector == null && create == GET_OR_CREATE_CONNECTOR))
+        if (connector == null)
         {
             connector = createConnector(uri, managementContext);
             try
@@ -157,11 +145,6 @@ public class TransportFactory
             {
                 throw new TransportFactoryException(e);
             }
-        }
-        else if (create == NEVER_CREATE_CONNECTOR && connector == null)
-        {
-            logger.warn("There is no connector for protocol: " + uri.getScheme()
-                        + " and 'createConnector' is set to NEVER.  Returning null");
         }
         return connector;
     }

@@ -10,7 +10,6 @@
 
 package org.mule.impl.endpoint;
 
-import org.mule.providers.service.TransportFactory;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.PropertiesUtils;
@@ -34,8 +33,6 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
     protected String responseTransformers;
     protected String userInfo;
 
-    protected int createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
-
     public UMOEndpointURI build(URI uri) throws MalformedEndpointException
     {
         Properties props = getPropertiesForURI(uri);
@@ -55,13 +52,12 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
         }
 
         UMOEndpointURI ep = new MuleEndpointURI(address, endpointName, connectorName, transformers,
-            responseTransformers, createConnector, props, uri, userInfo);
+            responseTransformers, props, uri, userInfo);
         address = null;
         endpointName = null;
         connectorName = null;
         transformers = null;
         responseTransformers = null;
-        createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
         return ep;
     }
 
@@ -88,41 +84,6 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
         if (cnnName != null)
         {
             this.connectorName = cnnName;
-        }
-
-        String create = (String) properties.get(UMOEndpointURI.PROPERTY_CREATE_CONNECTOR);
-        if (create != null)
-        {
-            if ("0".equals(create))
-            {
-                this.createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
-            }
-            else if ("1".equals(create))
-            {
-                this.createConnector = TransportFactory.ALWAYS_CREATE_CONNECTOR;
-            }
-            else if ("2".equals(create))
-            {
-                this.createConnector = TransportFactory.NEVER_CREATE_CONNECTOR;
-            }
-            else if ("IF_NEEDED".equals(create))
-            {
-                this.createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
-            }
-            else if ("ALWAYS".equals(create))
-            {
-                this.createConnector = TransportFactory.ALWAYS_CREATE_CONNECTOR;
-            }
-            else if ("NEVER".equals(create))
-            {
-                this.createConnector = TransportFactory.NEVER_CREATE_CONNECTOR;
-            }
-            else if (connectorName == null)
-            {
-                this.createConnector = TransportFactory.USE_CONNECTOR;
-                connectorName = create;
-            }
-
         }
 
         transformers = (String) properties.get(UMOEndpointURI.PROPERTY_TRANSFORMERS);

@@ -17,7 +17,6 @@ import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.service.TransportFactory;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.logic.AndFilter;
@@ -330,7 +329,6 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         MuleEndpoint inEndpoint = (MuleEndpoint) component.getInboundRouter().getEndpoint(
                 "transactedInboundEndpoint");
         assertNotNull(inEndpoint);
-        assertEquals(TransportFactory.NEVER_CREATE_CONNECTOR, inEndpoint.getCreateConnector());
         assertNotNull(inEndpoint.getProperties());
         assertEquals("Prop1", inEndpoint.getProperties().get("testEndpointProperty"));
     }

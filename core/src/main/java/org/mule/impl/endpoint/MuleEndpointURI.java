@@ -12,7 +12,6 @@ package org.mule.impl.endpoint;
 
 import org.mule.RegistryContext;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
@@ -64,7 +63,6 @@ public class MuleEndpointURI implements UMOEndpointURI
     private String connectorName;
     private String transformers;
     private String responseTransformers;
-    private int createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
     private Properties params = new Properties();
     private URI uri;
     private String userInfo;
@@ -76,12 +74,11 @@ public class MuleEndpointURI implements UMOEndpointURI
                     String connectorName,
                     String transformers,
                     String responseTransformers,
-                    int createConnector,
                     Properties properties,
                     URI uri,
                     String userInfo)
     {
-        this(address, endpointName, connectorName, transformers, responseTransformers, createConnector,
+        this(address, endpointName, connectorName, transformers, responseTransformers, 
             properties, uri);
         if (userInfo != null)
         {
@@ -94,7 +91,6 @@ public class MuleEndpointURI implements UMOEndpointURI
                            String connectorName,
                            String transformers,
                            String responseTransformers,
-                           int createConnector,
                            Properties properties,
                            URI uri)
     {
@@ -103,7 +99,6 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.connectorName = connectorName;
         this.transformers = transformers;
         this.responseTransformers = responseTransformers;
-        this.createConnector = createConnector;
         this.params = properties;
         this.uri = uri;
         this.userInfo = uri.getUserInfo();
@@ -206,7 +201,6 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.connectorName = endpointUri.getConnectorName();
         this.transformers = endpointUri.getTransformers();
         this.responseTransformers = endpointUri.getResponseTransformers();
-        this.createConnector = endpointUri.getCreateConnector();
         this.params = endpointUri.getParams();
         this.uri = endpointUri.getUri();
         this.resourceInfo = endpointUri.getResourceInfo();
@@ -371,11 +365,6 @@ public class MuleEndpointURI implements UMOEndpointURI
         return transformers;
     }
 
-    public int getCreateConnector()
-    {
-        return createConnector;
-    }
-
     public URI getUri()
     {
         return uri;
@@ -454,10 +443,6 @@ public class MuleEndpointURI implements UMOEndpointURI
 
         final MuleEndpointURI muleEndpointURI = (MuleEndpointURI) o;
 
-        if (createConnector != muleEndpointURI.createConnector)
-        {
-            return false;
-        }
         if (address != null ? !address.equals(muleEndpointURI.address) : muleEndpointURI.address != null)
         {
             return false;
@@ -524,7 +509,6 @@ public class MuleEndpointURI implements UMOEndpointURI
         result = 29 * result + (connectorName != null ? connectorName.hashCode() : 0);
         result = 29 * result + (transformers != null ? transformers.hashCode() : 0);
         result = 29 * result + (responseTransformers != null ? responseTransformers.hashCode() : 0);
-        result = 29 * result + createConnector;
         result = 29 * result + (params != null ? params.hashCode() : 0);
         result = 29 * result + (uri != null ? uri.hashCode() : 0);
         result = 29 * result + (schemeMetaInfo != null ? schemeMetaInfo.hashCode() : 0);

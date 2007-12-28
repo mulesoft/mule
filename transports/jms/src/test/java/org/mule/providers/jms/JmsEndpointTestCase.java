@@ -11,7 +11,6 @@
 package org.mule.providers.jms;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.service.TransportFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
@@ -111,27 +110,25 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
 
     public void testJmsDestWithSlashesAndUserInfoUsingAddressParam() throws Exception
     {
-        UMOEndpointURI url = new MuleEndpointURI("jms://user:password@?address=/myQueues/myQueue&createConnector=ALWAYS");
+        UMOEndpointURI url = new MuleEndpointURI("jms://user:password@?address=/myQueues/myQueue");
         url.initialise();
         assertEquals("jms", url.getScheme());
         assertEquals("/myQueues/myQueue", url.getAddress());
         assertEquals("user:password", url.getUserInfo());
         assertEquals("user", url.getUser());
         assertEquals("password", url.getPassword());
-        assertEquals(TransportFactory.ALWAYS_CREATE_CONNECTOR, url.getCreateConnector());
-        assertEquals("jms://user:password@?address=/myQueues/myQueue&createConnector=ALWAYS", url.toString());
+        assertEquals("jms://user:password@?address=/myQueues/myQueue", url.toString());
     }
 
     public void testJmsDestWithSlashesAndUserInfo() throws Exception
     {
-        UMOEndpointURI url = new MuleEndpointURI("jms://user:password@myQueues/myQueue?createConnector=ALWAYS");
+        UMOEndpointURI url = new MuleEndpointURI("jms://user:password@myQueues/myQueue");
         url.initialise();
         assertEquals("jms", url.getScheme());
         assertEquals("myQueues/myQueue", url.getAddress());
         assertEquals("user:password", url.getUserInfo());
         assertEquals("user", url.getUser());
         assertEquals("password", url.getPassword());
-        assertEquals(TransportFactory.ALWAYS_CREATE_CONNECTOR, url.getCreateConnector());
-        assertEquals("jms://user:password@myQueues/myQueue?createConnector=ALWAYS", url.toString());
+        assertEquals("jms://user:password@myQueues/myQueue", url.toString());
     }
 }

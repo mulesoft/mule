@@ -80,8 +80,6 @@ public interface UMOEndpointURI extends Serializable, Initialisable
 
     String getResponseTransformers();
 
-    int getCreateConnector();
-
     URI getUri();
 
     String getConnectorName();

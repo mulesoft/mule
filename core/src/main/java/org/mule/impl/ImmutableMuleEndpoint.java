@@ -12,7 +12,6 @@ package org.mule.impl;
 
 import org.mule.config.MuleManifest;
 import org.mule.providers.ConnectionStrategy;
-import org.mule.providers.service.TransportFactory;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOFilter;
@@ -144,11 +143,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     protected String endpointEncoding;
 
-    /**
-     * determines if a new connector should be created for this endpoint
-     */
-    protected int createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
-
     protected String registryId = null;
 
     protected UMOManagementContext managementContext;
@@ -245,7 +239,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                + ", properties=" + properties + ", transactionConfig=" + transactionConfig + ", filter=" + filter
                + ", deleteUnacceptedMessages=" + deleteUnacceptedMessages + ", initialised=" + initialised
                + ", securityFilter=" + securityFilter + ", synchronous=" + synchronous + ", initialState="
-               + initialState + ", createConnector=" + createConnector + ", remoteSync=" + remoteSync
+               + initialState + ", remoteSync=" + remoteSync
                + ", remoteSyncTimeout=" + remoteSyncTimeout + ", endpointEncoding=" + endpointEncoding + "}";
     }
 
@@ -373,11 +367,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public boolean isSynchronous()
     {
         return synchronous;
-    }
-
-    public int getCreateConnector()
-    {
-        return createConnector;
     }
 
     /**

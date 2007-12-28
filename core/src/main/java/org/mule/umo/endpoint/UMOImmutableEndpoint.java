@@ -228,13 +228,6 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
     int getRemoteSyncTimeout();
 
     /**
-     * Determines if a new connector is created for this endpoint or an exising one
-     * must already be present
-     *
-     */
-    int getCreateConnector();
-
-    /**
      * Sets the state the endpoint will be loaded in. The States are 'stopped' and
      * 'started' (default)
      *

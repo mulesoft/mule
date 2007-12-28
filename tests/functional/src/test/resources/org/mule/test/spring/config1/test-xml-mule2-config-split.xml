@@ -16,8 +16,7 @@
         <service name="appleComponent2">
             <inbound-router>
                 <inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
-                <inbound-endpoint name="transactedInboundEndpoint" createConnector="NEVER_CREATE"
-                                  address="test://endpoint.in2">
+                <inbound-endpoint name="transactedInboundEndpoint" address="test://endpoint.in2">
                     <!-- Transactions not quite working yet  
                     <transaction action="ALWAYS_BEGIN">
                         <transaction-factory class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>

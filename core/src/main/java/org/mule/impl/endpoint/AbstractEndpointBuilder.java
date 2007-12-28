@@ -36,10 +36,10 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.StringUtils;
-import org.mule.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,7 +108,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         UMOEndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
         ep.setEndpointURI(endpointURI);
-        ep.setCreateConnector(getCreateConnector());
         UMOConnector connector = getConnector();
         ep.setConnector(connector);
 
@@ -220,23 +219,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     protected UMOConnector getDefaultConnector() throws EndpointException
     {
         return getConnector(uriBuilder.getEndpoint(), managementContext);
-    }
-
-    protected int getCreateConnector()
-    {
-        if (createConnector != null)
-        {
-            return createConnector.intValue();
-        }
-        else
-        {
-            return uriBuilder.getEndpoint().getCreateConnector();
-        }
-    }
-
-    protected int getDefaultCreateConnector()
-    {
-        return GET_OR_CREATE_CONNECTOR;
     }
 
     protected String getName(UMOImmutableEndpoint endpoint)
@@ -495,17 +477,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         UMOConnector connector;
         try
         {
-            if (getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
-            {
-                connector = TransportFactory.createConnector(endpointURI, managementContext);
-                connector.setManagementContext(managementContext);
-                managementContext.getRegistry().registerConnector(connector);
-            }
-            else if (getCreateConnector() == NEVER_CREATE_CONNECTOR)
-            {
-                connector = TransportFactory.getConnectorByProtocol(scheme);
-            }
-            else if (uriBuilder.getEndpoint().getConnectorName() != null)
+            if (uriBuilder.getEndpoint().getConnectorName() != null)
             {
                 connector = managementContext.getRegistry().lookupConnector(uriBuilder.getEndpoint().getConnectorName());
                 if (connector == null)
@@ -766,10 +738,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         if (deleteUnacceptedMessages != null)
         {
             builder.setDeleteUnacceptedMessages(deleteUnacceptedMessages.booleanValue());
-        }
-        if (createConnector != null)
-        {
-            builder.setCreateConnector(createConnector.intValue());
         }
         if (synchronous != null)
         {

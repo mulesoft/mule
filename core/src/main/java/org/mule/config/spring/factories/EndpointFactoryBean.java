@@ -12,7 +12,6 @@ package org.mule.config.spring.factories;
 
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
-import org.mule.providers.service.TransportFactory;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -89,21 +88,4 @@ public class EndpointFactoryBean extends EndpointURIEndpointBuilder
     {
         this.createConnectorAsString = createConnectorAsString;
     }
-
-    protected int getCreateConnector()
-    {
-        if (ALWAYS_CREATE_STRING.equals(createConnectorAsString))
-        {
-            return TransportFactory.ALWAYS_CREATE_CONNECTOR;
-        }
-        else if (NEVER_CREATE_STRING.equals(createConnectorAsString))
-        {
-            return TransportFactory.NEVER_CREATE_CONNECTOR;
-        }
-        else
-        {
-            return TransportFactory.GET_OR_CREATE_CONNECTOR;
-        }
-    }
-
 }

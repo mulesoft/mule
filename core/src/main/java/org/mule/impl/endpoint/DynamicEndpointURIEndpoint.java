@@ -90,11 +90,6 @@ public class DynamicEndpointURIEndpoint implements UMOImmutableEndpoint
         return endpoint.getConnector();
     }
 
-    public int getCreateConnector()
-    {
-        return endpoint.getCreateConnector();
-    }
-
     public String getEncoding()
     {
         return endpoint.getEncoding();

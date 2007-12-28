@@ -14,7 +14,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.ManagementContextAware;
 import org.mule.providers.ConnectionStrategy;
-import org.mule.providers.service.TransportFactory;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;
@@ -176,27 +175,6 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
     public void setSynchronous(boolean synchronous)
     {
         this.synchronous = synchronous;
-    }
-
-    public void setCreateConnector(int action)
-    {
-        createConnector = action;
-    }
-
-    public void setCreateConnectorAsString(String action)
-    {
-        if (ALWAYS_CREATE_STRING.equals(action))
-        {
-            createConnector = TransportFactory.ALWAYS_CREATE_CONNECTOR;
-        }
-        else if (NEVER_CREATE_STRING.equals(action))
-        {
-            createConnector = TransportFactory.NEVER_CREATE_CONNECTOR;
-        }
-        else
-        {
-            createConnector = TransportFactory.GET_OR_CREATE_CONNECTOR;
-        }
     }
 
     /**
