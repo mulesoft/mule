@@ -17,19 +17,26 @@ import org.mule.util.ClassUtils;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeSet;
-import java.util.Collections;
 import java.util.StringTokenizer;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.TreeMap;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This has the following logic:
- * - if address is specified, it is used verbatim.  this is consistent with the generic case
+ * - if an address is specified, it is used verbatim (except for parameters); this is consistent with the generic case
  * - otherwise, we construct from components, omitting things that aren't specified as much as possible
  * (use required attributes to guarantee entries)
+ *
+ * In addition, parameters are handled as follows:
+ * - parameters can be given in the uri, thr queryMap, or both
+ * - queryMap values override uri values
+ * - the order of parameters in the uri remains the same (even if values change)
+ * - queryMap parameters are appended after uri parameters
+ * (I don't think ordering should matter, but XFire seems to require it) 
  *
  * TODO - check that we have sufficient control via XML (what about empty strings?)
  *
@@ -181,8 +188,9 @@ public class URIBuilder
     {
         StringBuffer buffer = new StringBuffer();
         appendMeta(buffer);
-        Map uriQueries = appendAddress(buffer);
-        appendQueries(buffer, uriQueries);
+        OrderedQueryParameters uriQueries = appendAddress(buffer);
+        uriQueries.override(queryMap);
+        buffer.append(uriQueries.toString());
         return buffer.toString();
     }
 
@@ -195,7 +203,7 @@ public class URIBuilder
         }
     }
 
-    private Map appendAddress(StringBuffer buffer)
+    private OrderedQueryParameters appendAddress(StringBuffer buffer)
     {
         if (null != address)
         {
@@ -208,19 +216,19 @@ public class URIBuilder
             else
             {
                 buffer.append(address);
-                return Collections.EMPTY_MAP;
+                return new OrderedQueryParameters();
             }
         }
         else
         {
             constructAddress(buffer);
-            return Collections.EMPTY_MAP;
+            return new OrderedQueryParameters();
         }
     }
 
-    private static Map parseQueries(String queries)
+    private OrderedQueryParameters parseQueries(String queries)
     {
-        Map map = new HashMap();
+        OrderedQueryParameters map = new OrderedQueryParameters();
         StringTokenizer query = new StringTokenizer(queries, AND);
         while (query.hasMoreTokens())
         {
@@ -269,53 +277,6 @@ public class URIBuilder
                 buffer.append("/");
             }
             buffer.append(path);
-        }
-    }
-
-    private void appendQueries(StringBuffer buffer, Map uriQueries)
-    {
-        // priority to explicit properties
-        Map properties = new HashMap();
-        properties.putAll(uriQueries);
-        if (null != queryMap)
-        {
-            properties.putAll(queryMap);
-        }
-        if (properties.size() > 0)
-        {
-            boolean first = true;
-            // order so that testing is simpler
-            Set keySet = new TreeSet(properties.keySet());
-
-            // humungous filthy hack to get xfire working temporarily until i fix it
-            if (keySet.contains("wsdl"))
-            {
-                buffer.append("?wsdl");
-                first = false;
-                keySet.remove("wsdl");
-            }
-            
-            Iterator keys = keySet.iterator();
-            while (keys.hasNext())
-            {
-                if (first)
-                {
-                    buffer.append(QUERY);
-                    first = false;
-                }
-                else
-                {
-                    buffer.append(AND);
-                }
-                String key = (String)keys.next();
-                buffer.append(key);
-                String value = (String)properties.get(key);
-                if (null != value)
-                {
-                    buffer.append(EQUALS);
-                    buffer.append(value);
-                }
-            }
         }
     }
 
@@ -400,6 +361,67 @@ public class URIBuilder
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{address, meta, protocol, user, password, host, port, path, queryMap});
+    }
+
+    private static class OrderedQueryParameters
+    {
+
+        private Map values = new HashMap();
+        private List orderedKeys = new LinkedList();
+
+        public void put(String name, String value)
+        {
+            values.put(name, value);
+            orderedKeys.add(name);
+        }
+
+        public void override(Map map)
+        {
+            if (null != map)
+            {
+                // order additional parameters
+                Iterator names = new TreeMap(map).keySet().iterator();
+                while (names.hasNext())
+                {
+                    String name = (String) names.next();
+                    String value  =(String) map.get(name);
+                    if (! values.keySet().contains(name))
+                    {
+                        orderedKeys.add(name);
+                    }
+                    values.put(name, value);
+                }
+            }
+        }
+
+        public String toString()
+        {
+            StringBuffer buffer = new StringBuffer();
+            Iterator keys = orderedKeys.iterator();
+            boolean first = true;
+            while (keys.hasNext())
+            {
+                if (first)
+                {
+                    buffer.append(QUERY);
+                    first = false;
+                }
+                else
+                {
+                    buffer.append(AND);
+                }
+                String key = (String)keys.next();
+                buffer.append(key);
+                String value = (String)values.get(key);
+                if (null != value)
+                {
+                    buffer.append(EQUALS);
+                    buffer.append(value);
+                }
+            }
+            return buffer.toString();
+        }
+
     }
 
 }
