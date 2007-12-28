@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import java.util.Collections;
 import java.util.StringTokenizer;
 import java.util.HashMap;
+import java.util.Set;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
@@ -225,7 +226,7 @@ public class URIBuilder
         {
             StringTokenizer nameValue = new StringTokenizer(query.nextToken(), EQUALS);
             String name = nameValue.nextToken();
-            String value = Boolean.TRUE.toString();
+            String value = null;
             if (nameValue.hasMoreTokens())
             {
                 value = nameValue.nextToken();
@@ -284,7 +285,17 @@ public class URIBuilder
         {
             boolean first = true;
             // order so that testing is simpler
-            Iterator keys = new TreeSet(properties.keySet()).iterator();
+            Set keySet = new TreeSet(properties.keySet());
+
+            // humungous filthy hack to get xfire working temporarily until i fix it
+            if (keySet.contains("wsdl"))
+            {
+                buffer.append("?wsdl");
+                first = false;
+                keySet.remove("wsdl");
+            }
+            
+            Iterator keys = keySet.iterator();
             while (keys.hasNext())
             {
                 if (first)
@@ -298,8 +309,12 @@ public class URIBuilder
                 }
                 String key = (String)keys.next();
                 buffer.append(key);
-                buffer.append(EQUALS);
-                buffer.append((String) properties.get(key));
+                String value = (String)properties.get(key);
+                if (null != value)
+                {
+                    buffer.append(EQUALS);
+                    buffer.append(value);
+                }
             }
         }
     }

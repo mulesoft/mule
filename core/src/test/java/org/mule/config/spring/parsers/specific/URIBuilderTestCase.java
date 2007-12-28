@@ -55,6 +55,14 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
         assertEquals("foo://bar?aname=avalue&bname=bvalue&cname=cvalue", uri2.toString());
     }
 
+    public void testNullQueries()
+    {
+        URIBuilder uri1 = new URIBuilder();
+        uri1.setAddress("foo://bar?cname&aname");
+        uri1.setQueryMap(queries);
+        assertEquals("foo://bar?aname=avalue&bname=bvalue&cname", uri1.toString());
+    }
+
     public void testFromString()
     {
         URIBuilder uri = new URIBuilder("test://bar");
