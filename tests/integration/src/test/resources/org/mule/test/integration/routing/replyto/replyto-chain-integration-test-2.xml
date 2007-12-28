@@ -58,10 +58,10 @@
                 </router>
             </outbound-router>
 
-            <response-router timeout="70000">
+            <async-reply-router timeout="70000">
                 <endpoint address="jms://response"/>
                 <router className="org.mule.routing.response.SingleResponseRouter"/>
-            </response-router>
+            </async-reply-router>
         </mule-descriptor>
 
         <mule-descriptor name="pojo3"

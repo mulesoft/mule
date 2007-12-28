@@ -52,11 +52,6 @@ public class EndpointFactoryBean extends EndpointURIEndpointBuilder
             logger.debug("Endpont type is \"sender\", building inbound endpoint");
             return buildOutboundEndpoint();
         }
-        else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
-        {
-            logger.debug("Endpont type is \"response\", building inbound endpoint");
-            return buildResponseEndpoint();
-        }
         else
         {
             throw new IllegalArgumentException("The endpoint type: " + type + "is not recognized.");

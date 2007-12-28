@@ -58,10 +58,10 @@
                     <!--                    </properties>-->
                 </multicasting-router>
             </outbound-router>
-            <response-router>
-                <response-endpoint address="vm://W10Response"/>
-                <custom-response-router class="org.mule.test.usecases.service.DummyResponseAggregator"/>
-            </response-router>
+            <async-reply-router>
+                <inbound-endpoint address="vm://W10Response"/>
+                <custom-async-reply-router class="org.mule.test.usecases.service.DummyResponseAggregator"/>
+            </async-reply-router>
         </service>
 
         <service name="W10Report">

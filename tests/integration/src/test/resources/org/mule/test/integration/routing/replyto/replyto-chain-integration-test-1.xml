@@ -22,10 +22,10 @@
                     <outbound-endpoint address="jms://pojo2"/>
                 </outbound-pass-through-router>
             </outbound-router>
-            <response-router timeout="7000">
-                <response-endpoint address="jms://response"/>
-                <single-response-router/>
-            </response-router>
+            <async-reply-router timeout="7000">
+                <inbound-endpoint address="jms://response"/>
+                <single-async-reply-router/>
+            </async-reply-router>
         </service>
 
         <service name="pojo2">

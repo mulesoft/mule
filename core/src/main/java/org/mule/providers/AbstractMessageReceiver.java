@@ -41,9 +41,9 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.concurrent.WaitableBoolean;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import java.io.OutputStream;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -95,6 +95,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
     protected ConnectionStrategy connectionStrategy;
 
+    protected boolean responseEndpoint = false;;
+
+    
     /**
      * Creates the Message Receiver
      *
@@ -116,6 +119,10 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         setConnector(connector);
         setComponent(component);
         setEndpoint(endpoint);
+        if (component.getResponseRouter() != null && component.getResponseRouter().getEndpoints().contains(endpoint))
+        {
+            responseEndpoint = true;
+        }
     }
 
     /**
@@ -583,7 +590,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             if (authorised)
             {
                 // This is a replyTo event for a current request
-                if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
+                if (responseEndpoint)
                 {
                     component.getResponseRouter().route(muleEvent);
                     return null;

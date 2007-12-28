@@ -24,8 +24,6 @@
 
     <xsd:element name="outbound-endpoint" type="rmi:outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
 
-    <xsd:element name="response-endpoint" type="rmi:responseEndpointType" substitutionGroup="mule:abstract-response-endpoint"/>
-
     <xsd:element name="endpoint" type="rmi:globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
 
 </xsd:schema>

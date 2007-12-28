@@ -12,7 +12,6 @@ package org.mule.routing.response;
 
 import org.mule.impl.endpoint.InboundEndpoint;
 import org.mule.impl.endpoint.OutboundEndpoint;
-import org.mule.impl.endpoint.ResponseEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.InvalidEndpointTypeException;
 
@@ -25,7 +24,7 @@ public class ResponseRouterCollectionTestCase extends AbstractMuleTestCase
     public void testAddGoodEndpoint()
     {
         ResponseRouterCollection router=new ResponseRouterCollection();
-        ResponseEndpoint endpoint=new ResponseEndpoint();
+        InboundEndpoint endpoint=new InboundEndpoint();
         router.addEndpoint(endpoint);
         assertNotNull(router.getEndpoints());
         assertTrue(router.getEndpoints().contains(endpoint));
@@ -46,12 +45,12 @@ public class ResponseRouterCollectionTestCase extends AbstractMuleTestCase
     public void testSetGoodEndpoints()
     {
         List list= new ArrayList();
-        list.add(new ResponseEndpoint());
-        list.add(new ResponseEndpoint());
+        list.add(new InboundEndpoint());
+        list.add(new InboundEndpoint());
         ResponseRouterCollection router=new ResponseRouterCollection();
         assertNotNull(router.getEndpoints());
         assertEquals(0, router.getEndpoints().size());
-        router.addEndpoint(new ResponseEndpoint());
+        router.addEndpoint(new InboundEndpoint());
         assertEquals(1, router.getEndpoints().size());
         router.setEndpoints(list);
         assertNotNull(router.getEndpoints());

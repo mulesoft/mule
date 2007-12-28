@@ -136,9 +136,9 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
     {
         if (endpoint != null)
         {
-            if (!UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
+            if (!UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
             {
-                throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseResponseEndpoints(
+                throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseInboundEndpoints(
                     this, endpoint));
             }
             endpoints.add(endpoint);
@@ -170,9 +170,9 @@ public class ResponseRouterCollection extends AbstractRouterCollection implement
             for (Iterator it = this.endpoints.iterator(); it.hasNext();)
             {
                 UMOImmutableEndpoint endpoint=(UMOImmutableEndpoint) it.next();
-                if (!UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType()))
+                if (!UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
                 {
-                    throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseResponseEndpoints(
+                    throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseInboundEndpoints(
                         this, endpoint));
                 }
             }

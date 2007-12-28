@@ -143,11 +143,11 @@
                 </outbound-pass-through-router>
             </outbound-router>
 
-            <response-router timeout="10001">
-                <response-endpoint address="test://response1"/>
-                <response-endpoint ref="appleResponseEndpoint"/>
-                <custom-response-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
-            </response-router>
+            <async-reply-router timeout="10001">
+                <inbound-endpoint address="test://response1"/>
+                <inbound-endpoint ref="appleResponseEndpoint"/>
+                <custom-async-reply-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
+            </async-reply-router>
 
             <default-service-exception-strategy>
                 <outbound-endpoint address="test://orange.exceptions"/>

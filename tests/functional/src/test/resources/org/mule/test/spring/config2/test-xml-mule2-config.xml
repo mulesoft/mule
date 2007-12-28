@@ -177,11 +177,11 @@
                     </mule:outbound-pass-through-router>
                 </mule:outbound-router>
 
-                <mule:response-router timeout="10001">
-                    <mule:response-endpoint address="test://response1"/>
-                    <mule:response-endpoint ref="appleResponseEndpoint"/>
-                    <mule:custom-response-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
-                </mule:response-router>
+                <mule:async-reply-router timeout="10001">
+                    <mule:inbound-endpoint address="test://response1"/>
+                    <mule:inbound-endpoint ref="appleResponseEndpoint"/>
+                    <mule:custom-async-reply-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
+                </mule:async-reply-router>
 
                 <mule:default-connector-exception-strategy>
                     <mule:outbound-endpoint address="test://orange.exceptions"/>
@@ -234,11 +234,11 @@
             <mule:service name="propertyExtractorResponseRouterTestComponent">
                 <mule:inbound-router/>
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
-                <mule:response-router>
-                    <mule:single-response-router>
+                <mule:async-reply-router>
+                    <mule:single-async-reply-router>
                         <mule:custom-property-extractor class="org.mule.xml.util.properties.JXPathPropertyExtractor"/>
-                    </mule:single-response-router>
-                </mule:response-router>
+                    </mule:single-async-reply-router>
+                </mule:async-reply-router>
             </mule:service>
 
         </mule:model>

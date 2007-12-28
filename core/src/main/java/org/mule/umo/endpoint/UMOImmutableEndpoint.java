@@ -44,9 +44,6 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
     /** The endpoit is a global endpoint */
     public static final String ENDPOINT_TYPE_GLOBAL = "global";
 
-    /** The endpoint is a receive endpoint set on a response router */
-    String ENDPOINT_TYPE_RESPONSE = "response";
-
     /**
      * This specifess the communication endpointUri. This will have a different format
      * depending on the transport protocol being used i.e.

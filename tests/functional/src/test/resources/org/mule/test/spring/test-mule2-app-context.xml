@@ -47,10 +47,10 @@
             <!--</router-static-recipient-list>-->
             <!--</outbound-router>-->
 
-            <!--<response-router timeout="10000" failOnTimeout="false">-->
+            <!--<async-reply-router timeout="10000" failOnTimeout="false">-->
             <!--<endpoint address="vm://LoanBrokerQuotes"/>-->
-            <!--<custom-response-router class="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>-->
-            <!--</response-router>-->
+            <!--<custom-async-reply-router class="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>-->
+            <!--</async-reply-router>-->
         </service>
 
 

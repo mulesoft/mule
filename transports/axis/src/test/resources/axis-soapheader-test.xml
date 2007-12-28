@@ -14,9 +14,9 @@
                 <inbound-endpoint address="axis:http://localhost:62181/services"/>
             </inbound-router>
             <component class="org.mule.components.simple.EchoComponent"/>
-            <response-router>
-                <response-endpoint address="http://localhost:62182/reply"/>
-            </response-router>
+            <async-reply-router>
+                <inbound-endpoint address="http://localhost:62182/reply"/>
+            </async-reply-router>
         </service>
     </model>
 </mule>

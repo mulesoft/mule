@@ -126,11 +126,6 @@
         <xsd:attribute name="name" type="xsd:NMTOKEN"/>
     </xsd:complexType>
 
-    <xsd:element name="abstract-response-endpoint" abstract="true" type="abstractResponseEndpointType"/>
-    <xsd:complexType name="abstractResponseEndpointType">
-        <xsd:attribute name="name" type="xsd:NMTOKEN"/>
-    </xsd:complexType>
-
     <xsd:element name="abstract-transformer" abstract="true" type="abstractTransformerType"/>
     <xsd:complexType name="abstractTransformerType">
         <xsd:attribute name="name" type="xsd:string"/>
@@ -192,18 +187,18 @@
     <xsd:element name="abstract-outbound-router" abstract="true" type="abstractOutboundRouterType"/>
     <xsd:complexType name="abstractOutboundRouterType"/>
 
-    <xsd:complexType name="responseRouterCollectionType">
+    <xsd:complexType name="asyncReplyRouterCollectionType">
         <xsd:sequence>
-            <xsd:element ref="abstract-response-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="abstract-response-router" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-async-reply-router" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS"/>
         <xsd:attribute name="timeout" type="xsd:string"/>
     </xsd:complexType>
 
-    <xsd:element name="abstract-response-router" abstract="true" type="abstractResponseRouterType"/>
-    <xsd:complexType name="abstractResponseRouterType"/>
+    <xsd:element name="abstract-async-reply-router" abstract="true" type="abstractAsyncReplyRouterType"/>
+    <xsd:complexType name="abstractAsyncReplyRouterType"/>
 
     <xsd:element name="abstract-component-threading-profile" abstract="true" type="abstractComponentThreadingProfileType"/>
     <xsd:complexType name="abstractComponentThreadingProfileType"/>
@@ -462,7 +457,7 @@
                     <!-- minOccurs="0" to allow for <forwarding-router/> and/or default component -->
                     <xsd:element ref="abstract-component" minOccurs="0"/>
                     <xsd:element name="outbound-router" type="outboundRouterCollectionType" minOccurs="0"/>
-                    <xsd:element name="response-router" type="responseRouterCollectionType" minOccurs="0"/>
+                    <xsd:element name="async-reply-router" type="asyncReplyRouterCollectionType" minOccurs="0"/>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="xsd:NMTOKEN"/>
@@ -707,16 +702,6 @@
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="abstractOutboundEndpointType">
-                <xsd:group ref="defaultEndpointElements"/>
-                <xsd:attributeGroup ref="defaultEndpointAttributes"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="response-endpoint" type="responseEndpointType" substitutionGroup="abstract-response-endpoint"/>
-    <xsd:complexType name="responseEndpointType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractResponseEndpointType">
                 <xsd:group ref="defaultEndpointElements"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
             </xsd:extension>
@@ -1487,12 +1472,12 @@
 
     <!-- ResponseRouters -->
 
-    <xsd:element name="single-response-router" type="responseRouterType" substitutionGroup="abstract-response-router"/>
-    <xsd:complexType name="responseRouterType">
+    <xsd:element name="single-async-reply-router" type="asyncReplyRouterType" substitutionGroup="abstract-async-reply-router"/>
+    <xsd:complexType name="asyncReplyRouterType">
         <xsd:complexContent>
-            <xsd:extension base="abstractResponseRouterType">
+            <xsd:extension base="abstractAsyncReplyRouterType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-response-endpoint" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:choice minOccurs="0">
                         <xsd:element ref="abstract-property-extractor"/>
                         <xsd:element ref="custom-property-extractor"/>
@@ -1502,11 +1487,11 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-response-router" type="customResponseRouterType"
-                 substitutionGroup="abstract-response-router"/>
-    <xsd:complexType name="customResponseRouterType">
+    <xsd:element name="custom-async-reply-router" type="customAsyncReplyRouterType"
+                 substitutionGroup="abstract-async-reply-router"/>
+    <xsd:complexType name="customAsyncReplyRouterType">
         <xsd:complexContent>
-            <xsd:extension base="responseRouterType">
+            <xsd:extension base="asyncReplyRouterType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>

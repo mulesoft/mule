@@ -54,19 +54,6 @@ public interface UMOEndpointFactory extends ManagementContextAware
     UMOImmutableEndpoint getOutboundEndpoint(String uri) throws UMOException;
 
     /**
-     * Creates an endpoint with the "RESPONSE" role. <br/><br/> The uri parameter can either be a uri, or a
-     * (global) endpoint identifier or name. <br/><br/> The {@link UMOImmutableEndpoint} interface is
-     * currently used as the return type but this will be replaces by and more specific interface. SEE
-     * MULE-2292<br/><br/> Also see MULE-2293.
-     * 
-     * @param uri endpoint identifier or uri.<br/><br/>
-     * @param managementContext
-     * @return
-     * @throws UMOException
-     */
-    UMOImmutableEndpoint getResponseEndpoint(String uri) throws UMOException;
-
-    /**
      * Creates an endpoint with the "INBOUND" role using the builder provided.
      * 
      * @param builder
@@ -85,16 +72,6 @@ public interface UMOEndpointFactory extends ManagementContextAware
      * @throws UMOException
      */
     UMOImmutableEndpoint getOutboundEndpoint(UMOEndpointBuilder builder) throws UMOException;
-
-    /**
-     * Creates an endpoint with the "RESPONSE" role using the builder provided.
-     * 
-     * @param builder
-     * @param managementContext
-     * @return
-     * @throws UMOException
-     */
-    UMOImmutableEndpoint getResponseEndpoint(UMOEndpointBuilder builder) throws UMOException;
 
     /**
      * @param endpointUri

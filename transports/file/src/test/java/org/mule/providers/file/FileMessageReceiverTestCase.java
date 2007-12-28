@@ -43,6 +43,7 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         endpoint.getConnector().start();
         Mock mockComponent = new Mock(UMOComponent.class);
+        mockComponent.expectAndReturn("getResponseRouter", null);
         read.deleteOnExit();
         move.deleteOnExit();
 

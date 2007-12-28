@@ -28,6 +28,7 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             "udp://localhost:10100");
         Mock mockComponent = new Mock(UMOComponent.class);
         mockComponent.expectAndReturn("getResponseTransformer", null);
+        mockComponent.expectAndReturn("getResponseRouter", null);
 
         return new UdpMessageReceiver(endpoint.getConnector(), (UMOComponent) mockComponent.proxy(), endpoint);
     }

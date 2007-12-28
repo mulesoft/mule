@@ -9,14 +9,13 @@
  */
 package org.mule.providers.stdio.config;
 
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.config.spring.factories.ResponseEndpointFactoryBean;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.providers.stdio.PromptStdioConnector;
 import org.mule.providers.stdio.StdioConnector;
 
@@ -39,7 +38,6 @@ public class StdioNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(StdioConnector.STDIO, URIBuilder.PATH_ATTRIBUTES).addMapping(SYSTEM_ATTRIBUTE, SYSTEM_MAP).addAlias(SYSTEM_ATTRIBUTE, URIBuilder.PATH));
         registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(StdioConnector.STDIO, InboundEndpointFactoryBean.class, SYSTEM_ATTRIBUTE_ARRAY).addMapping(SYSTEM_ATTRIBUTE, SYSTEM_MAP).addAlias(SYSTEM_ATTRIBUTE, URIBuilder.PATH));
         registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(StdioConnector.STDIO, OutboundEndpointFactoryBean.class, SYSTEM_ATTRIBUTE_ARRAY).addMapping(SYSTEM_ATTRIBUTE, SYSTEM_MAP).addAlias(SYSTEM_ATTRIBUTE, URIBuilder.PATH));
-        registerBeanDefinitionParser("response-endpoint", new TransportEndpointDefinitionParser(StdioConnector.STDIO, ResponseEndpointFactoryBean.class, SYSTEM_ATTRIBUTE_ARRAY).addMapping(SYSTEM_ATTRIBUTE, SYSTEM_MAP).addAlias(SYSTEM_ATTRIBUTE, URIBuilder.PATH));
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(PromptStdioConnector.class, true));
     }
 

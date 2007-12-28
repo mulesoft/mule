@@ -62,19 +62,6 @@ public class EndpointFactory implements UMOEndpointFactory
         return getOutboundEndpoint(endpointBuilder);
     }
 
-    public UMOImmutableEndpoint getResponseEndpoint(String uri)
-        throws UMOException
-    {
-        logger.debug("EndpointFactory request for response endpoint for uri: " + uri);
-        UMOEndpointBuilder endpointBuilder = lookupEndpointBuilder(uri);
-        if (endpointBuilder == null)
-        {
-            logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
-        }
-        return getResponseEndpoint(endpointBuilder);
-    }
-
     /** @deprecated */
     public UMOImmutableEndpoint getEndpoint(UMOEndpointURI uri, String type)
         throws UMOException
@@ -103,10 +90,6 @@ public class EndpointFactory implements UMOEndpointFactory
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
             return getOutboundEndpoint(endpointBuilder);
-        }
-        else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
-        {
-            return getResponseEndpoint(endpointBuilder);
         }
         else
         {
@@ -139,13 +122,6 @@ public class EndpointFactory implements UMOEndpointFactory
     {
         // TODO 1) Store in repo, 2) Register in registry, 3) Lifecycle ?
         return builder.buildOutboundEndpoint();
-    }
-
-    public UMOImmutableEndpoint getResponseEndpoint(UMOEndpointBuilder builder)
-        throws UMOException
-    {
-        // TODO 1) Store in repo, 2) Register in registry, 3) Lifecycle ?
-        return builder.buildResponseEndpoint();
     }
 
     public UMOEndpointBuilder getEndpointBuilder(String uri)

@@ -93,10 +93,10 @@
                 </outbound-pass-through-router>
             </outbound-router>
 
-            <response-router timeout="10000">
-                <response-endpoint ref="LoanQuotes" />
-                <custom-response-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator" />
-            </response-router>
+            <async-reply-router timeout="10000">
+                <inbound-endpoint ref="LoanQuotes" />
+                <custom-async-reply-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator" />
+            </async-reply-router>
         </service>
 
         <!--

@@ -900,7 +900,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 233, endpoint, router);
     }
 
-    public static Message responseRouterMustUseResponseEndpoints(UMOResponseRouterCollection router, UMOImmutableEndpoint endpoint)
+    public static Message responseRouterMustUseInboundEndpoints(UMOResponseRouterCollection router, UMOImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 234, endpoint, router);
     }

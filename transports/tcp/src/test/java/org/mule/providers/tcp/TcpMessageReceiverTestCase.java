@@ -25,6 +25,7 @@ public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         Mock mockComponent = new Mock(UMOComponent.class);
         mockComponent.expectAndReturn("getResponseTransformer", null);
+        mockComponent.expectAndReturn("getResponseRouter", null);
         return new TcpMessageReceiver((AbstractConnector)endpoint.getConnector(),
             (UMOComponent)mockComponent.proxy(), endpoint);
     }

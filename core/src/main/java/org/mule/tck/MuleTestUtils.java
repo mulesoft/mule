@@ -82,10 +82,6 @@ public final class MuleTestUtils
         {
             return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
         }
-        else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
-        {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getResponseEndpoint(endpointBuilder);
-        }
         else
         {
             throw new IllegalArgumentException("The endpoint type: " + type + "is not recognized.");
@@ -116,10 +112,6 @@ public final class MuleTestUtils
         else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
             return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
-        }
-        else if (UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE.equals(type))
-        {
-            return (UMOEndpoint) context.getRegistry().lookupEndpointFactory().getResponseEndpoint(endpointBuilder);
         }
         else
         {

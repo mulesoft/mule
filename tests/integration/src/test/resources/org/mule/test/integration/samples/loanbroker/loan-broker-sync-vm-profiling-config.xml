@@ -46,10 +46,10 @@
                 </router>
             </outbound-router>
 
-            <response-router>
+            <async-reply-router>
                 <endpoint address="LoanBrokerQuotes"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
-            </response-router>
+            </async-reply-router>
         </mule-descriptor>
 
         <mule-descriptor name="CreditAgencyService"

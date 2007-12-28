@@ -97,11 +97,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         return doBuildOutboundEndpoint();
     }
 
-    public UMOImmutableEndpoint buildResponseEndpoint() throws EndpointException, InitialisationException
-    {
-        return doBuildResponseEndpoint();
-    }
-
     protected void configureEndpoint(MuleEndpoint ep) throws InitialisationException, EndpointException
     {
         // protected String registryId = null; ??
@@ -153,14 +148,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         configureEndpoint(ep);
         ep.setTransformers(getOutboundTransformers(ep.getConnector(), ep.getEndpointURI()));
         ep.setResponseTransformers(getResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
-        return ep;
-    }
-
-    protected UMOImmutableEndpoint doBuildResponseEndpoint() throws InitialisationException, EndpointException
-    {
-        ResponseEndpoint ep = new ResponseEndpoint();
-        configureEndpoint(ep);
-        ep.setTransformers(getInboundTransformers(ep.getConnector(), ep.getEndpointURI()));
         return ep;
     }
 

@@ -26,6 +26,7 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         Mock mockComponent = new Mock(UMOComponent.class);
         mockComponent.expectAndReturn("getResponseTransformer", null);
+        mockComponent.expectAndReturn("getResponseRouter", null);
 
         return new HttpMessageReceiver(endpoint.getConnector(),
             (UMOComponent)mockComponent.proxy(), endpoint);

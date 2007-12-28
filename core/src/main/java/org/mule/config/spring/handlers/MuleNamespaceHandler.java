@@ -19,7 +19,6 @@ import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.config.spring.factories.ResponseEndpointFactoryBean;
 import org.mule.config.spring.parsers.collection.AttributeMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -39,6 +38,8 @@ import org.mule.config.spring.parsers.specific.EnvironmentPropertyDefinitionPars
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ForwardingRouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MuleAdminAgentDefinitionParser;
+import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
+import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.config.spring.parsers.specific.PojoComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
@@ -51,18 +52,16 @@ import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParse
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
-import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
-import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.ManagementContext;
-import org.mule.impl.internal.notifications.manager.ListenerSubscriptionPair;
 import org.mule.impl.container.JndiContainerContext;
 import org.mule.impl.container.PropertiesContainerContext;
 import org.mule.impl.container.RmiContainerContext;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
+import org.mule.impl.internal.notifications.manager.ListenerSubscriptionPair;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
@@ -221,7 +220,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
         registerBeanDefinitionParser("inbound-endpoint", new GenericEndpointDefinitionParser(InboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("outbound-endpoint", new GenericEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
-        registerBeanDefinitionParser("response-endpoint", new GenericEndpointDefinitionParser(ResponseEndpointFactoryBean.class));
         registerBeanDefinitionParser("transaction", new TransactionConfigDefinitionParser());
         registerBeanDefinitionParser("custom-transaction-factory", new TransactionFactoryDefinitionParser());
         registerBeanDefinitionParser("transaction-factory", new ParentDefinitionParser().addAlias("ref", "factory"));
@@ -269,7 +267,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //Routers
         registerBeanDefinitionParser("inbound-router", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
-        registerBeanDefinitionParser("response-router", new ChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
+        registerBeanDefinitionParser("async-reply-router", new ChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
 
         //NoArgsCallWrapper
         registerBeanDefinitionParser("delegateClass", new AttributeMapDefinitionParser("properties").addAlias("class", "delegateClass").addAlias("method", "delegateMethod"));
@@ -303,8 +301,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("reply-to", new ParentDefinitionParser().addAlias("address", "replyTo"));
 
         //Response Routers
-        registerBeanDefinitionParser("custom-response-router", new RouterDefinitionParser("router", null));
-        registerBeanDefinitionParser("single-response-router", new RouterDefinitionParser("router", SingleResponseRouter.class));
+        registerBeanDefinitionParser("custom-async-reply-router", new RouterDefinitionParser("router", null));
+        registerBeanDefinitionParser("single-async-reply-router", new RouterDefinitionParser("router", SingleResponseRouter.class));
 
         //Property Extractors
         registerBeanDefinitionParser("function-property-extractor", new ChildDefinitionParser("propertyExtractor", FunctionPropertyExtractor.class));

@@ -24,6 +24,7 @@ public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTes
     {
         Mock mockComponent = new Mock(UMOComponent.class);
         mockComponent.expectAndReturn("getResponseTransformer", null);
+        mockComponent.expectAndReturn("getResponseRouter", null);
 
         return new MulticastMessageReceiver((AbstractConnector)endpoint.getConnector(),
             (UMOComponent)mockComponent.proxy(), endpoint);

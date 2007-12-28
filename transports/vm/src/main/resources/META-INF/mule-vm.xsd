@@ -41,15 +41,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="response-endpoint" type="responseEndpointType" substitutionGroup="mule:abstract-response-endpoint"/>
-    <xsd:complexType name="responseEndpointType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:responseEndpointType">
-                <xsd:attributeGroup ref="addressAttributes"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>

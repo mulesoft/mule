@@ -49,7 +49,7 @@ public class MuleTag
 
     public static final String ELEMENT_INBOUND_ROUTER = "inbound-router";
     public static final String ELEMENT_OUTBOUND_ROUTER = "outbound-router";
-    public static final String ELEMENT_RESPONSE_ROUTER = "response-router";
+    public static final String ELEMENT_RESPONSE_ROUTER = "async-reply-router";
     public static final String ELEMENT_ROUTER = "router";
     public static final String ELEMENT_REPLY_TO = "reply-to";
 

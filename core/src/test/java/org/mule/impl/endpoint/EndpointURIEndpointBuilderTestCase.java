@@ -73,27 +73,6 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
 
     // TODO DF: Test more than defaults with tests using builder to set non-default values
 
-    public void testBuildResponseEndpoint() throws UMOException
-    {
-        String uri = "test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
-        try
-        {
-            UMOImmutableEndpoint ep = endpointBuilder.buildResponseEndpoint();
-            assertEquals(UMOImmutableEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
-            assertFalse(ep.canSend());
-            assertFalse(ep.canRequest());
-            assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
-            assertTrue(ep.getTransformers().get(0) instanceof TestInboundTransformer);
-            assertFalse(TransformerUtils.isDefined(ep.getResponseTransformers()));
-            testDefaultCommonEndpointAttributes(ep);
-        }
-        catch (Exception e)
-        {
-            fail("Unexpected exception: " + e.getStackTrace());
-        }
-    }
-
     public void testDefaultCommonEndpointAttributes(UMOImmutableEndpoint ep)
     {
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");

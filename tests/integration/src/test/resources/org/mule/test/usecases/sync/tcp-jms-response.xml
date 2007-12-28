@@ -46,10 +46,10 @@
                     <reply-to address="jms://queue_out"/>
                 </router>
             </outbound-router>
-            <response-router>
+            <async-reply-router>
                 <endpoint address="jms://queue_out"/>
                 <router className="org.mule.test.usecases.service.DummyResponseAggregator"/>
-            </response-router>
+            </async-reply-router>
         </mule-descriptor>
 
         <mule-descriptor name="JMSReplyProvider"

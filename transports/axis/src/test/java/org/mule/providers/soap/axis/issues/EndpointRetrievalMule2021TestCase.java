@@ -63,10 +63,10 @@ public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
 
     public void testGetResponseEndpoint() throws UMOException
     {
-        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry().lookupEndpointFactory().getResponseEndpoint(
+        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "Endpoint");
         assertEndpointOk(endpoint1);
-        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry().lookupEndpointFactory().getResponseEndpoint(
+        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "axis:http://localhost:18081/mule/Service?method=toString");
         assertEndpointOk(endpoint2);
     }

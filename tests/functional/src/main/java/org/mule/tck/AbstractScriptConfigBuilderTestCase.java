@@ -308,10 +308,10 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(2, messageRouter.getEndpoints().size());
         UMOEndpoint ep = (UMOEndpoint) messageRouter.getEndpoints().get(0);
         assertEquals("response1", ep.getEndpointURI().getAddress());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
+        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
         ep = (UMOEndpoint) messageRouter.getEndpoints().get(1);
         assertEquals("AppleResponseQueue", ep.getEndpointURI().getAddress());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
+        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
     }
 
     /* excluded - dep on management
