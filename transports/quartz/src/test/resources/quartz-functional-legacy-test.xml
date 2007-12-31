@@ -24,7 +24,7 @@
 
     <model name="quartz" type="seda">
 
-        <mule-descriptor name="quartzService1" implementation="org.mule.providers.quartz.TestComponent">
+        <mule-descriptor name="quartzService1" implementation="org.mule.providers.quartz.TestComponent1">
             <inbound-router>
                 <global-endpoint name="quartz.in.1"/>
             </inbound-router>
@@ -35,7 +35,7 @@
             -->
         </mule-descriptor>
 
-        <mule-descriptor name="quartzService2" implementation="org.mule.providers.quartz.TestComponent">
+        <mule-descriptor name="quartzService2" implementation="org.mule.providers.quartz.TestComponent1">
             <inbound-router>
                 <global-endpoint name="quartz.in.2"/>
             </inbound-router>

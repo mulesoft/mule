@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.quartz;
+package org.mule.providers.quartz;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.quartz.QuartzConnector;
@@ -27,7 +27,7 @@ public class QuartzReceiveAndDispatchUsingDelegatingJobTestCase extends Function
 
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/providers/quartz/quartz-receive-dispatch-delegating-job.xml";
+        return "quartz-receive-dispatch-delegating-job.xml";
     }
 
     public void testMuleClientReceiveAndDispatchUsingDelegatingJobAsPayload() throws Exception

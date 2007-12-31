@@ -78,13 +78,12 @@ public class EndpointSelector extends FilteringOutboundRouter implements Managem
         {
             throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSupportedType(
                     getSelectorProperty(), new Class[]{String.class, List.class}, property.getClass()), message, null);
-
         }
 
         UMOMessage result = null;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            endpointName =  iterator.next().toString();
+            endpointName = iterator.next().toString();
 
             if(StringUtils.isEmpty(endpointName))
             {

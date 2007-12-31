@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers.specific.endpoint;
 
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 
 /**
@@ -20,29 +21,28 @@ import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 public class TransportGlobalEndpointDefinitionParser extends AddressedEndpointDefinitionParser
 {
 
-    public TransportGlobalEndpointDefinitionParser(String protocol, String[] requiredAttributes)
+    public TransportGlobalEndpointDefinitionParser(String protocol, String[] requiredAddressAttributes)
     {
-        this(protocol, PROTOCOL, requiredAttributes);
+        this(protocol, PROTOCOL, requiredAddressAttributes);
     }
 
-    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, String[] requiredAttributes)
+    public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, String[] requiredAddressAttributes)
     {
-        this(metaOrProtocol, isMeta, new String[]{}, requiredAttributes);
+        this(metaOrProtocol, isMeta, requiredAddressAttributes, new String[]{});
     }
 
     /**
      * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
      * @param isMeta Whether transport is "meta" or not (eg cxf)
-     * @param properties A list of attribute names which will be set as properties on the
-     * endpointParser
-     * @param requiredAttributes These are the subset of the alternate address attributes that must be
-     * specified if "address" isn't defined.
+     * @param requiredAddressAttributes A list of attribute names that are required if "address"
+     * isn't present
+     * @param requiredProperties A list of property names that are required if "address" isn't present
      */
     public TransportGlobalEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
-                                                   String[] properties, String[] requiredAttributes)
+                                             String[] requiredAddressAttributes, String[] requiredProperties)
     {
         super(metaOrProtocol, isMeta, new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class),
-                properties, requiredAttributes);
+                requiredAddressAttributes, requiredProperties);
     }
 
 }

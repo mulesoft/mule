@@ -16,7 +16,7 @@ import org.mule.umo.lifecycle.Callable;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
-public class TestComponent implements Callable
+public class TestComponent1 implements Callable
 {
     protected static CountDownLatch QUARTZ_COUNTER = new CountDownLatch(4);
 

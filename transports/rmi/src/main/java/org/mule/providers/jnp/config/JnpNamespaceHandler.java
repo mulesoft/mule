@@ -9,16 +9,15 @@
  */
 package org.mule.providers.jnp.config;
 
-import org.mule.config.MuleProperties;
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.URIBuilder;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.factories.InboundEndpointFactoryBean;
+import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
+import org.mule.config.MuleProperties;
 import org.mule.providers.jnp.JnpConnector;
-import org.mule.providers.rmi.RmiConnector;
 
 /**
  * Registers a Bean Definition Parser for handling <code>&lt;jnp:connector&gt;</code> elements.
@@ -27,16 +26,15 @@ import org.mule.providers.rmi.RmiConnector;
 public class JnpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
-    public static final String METHOD = MuleProperties.MULE_METHOD_PROPERTY;
     public static final String OBJECT = "object";
-    public static final String[] PROPERTIES = new String[]{METHOD, RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES};
-    public static final String[] REQUIRED = new String[]{METHOD, OBJECT, URIBuilder.HOST, URIBuilder.PORT};
+    public static final String[] PROPERTIES = new String[]{MuleProperties.MULE_METHOD_PROPERTY}; // , RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES};
+    public static final String[] ADDRESS = new String[]{OBJECT, URIBuilder.HOST, URIBuilder.PORT};
 
     public void init()
     {
-        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(JnpConnector.JNP, TransportGlobalEndpointDefinitionParser.PROTOCOL, PROPERTIES, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(JnpConnector.JNP, TransportGlobalEndpointDefinitionParser.PROTOCOL, InboundEndpointFactoryBean.class, PROPERTIES, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
-        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(JnpConnector.JNP, TransportGlobalEndpointDefinitionParser.PROTOCOL, OutboundEndpointFactoryBean.class, PROPERTIES, REQUIRED).addAlias(OBJECT, URIBuilder.PATH));
+        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(JnpConnector.JNP, TransportGlobalEndpointDefinitionParser.PROTOCOL, ADDRESS, PROPERTIES).addAlias(OBJECT, URIBuilder.PATH));
+        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(JnpConnector.JNP, TransportGlobalEndpointDefinitionParser.PROTOCOL, InboundEndpointFactoryBean.class, ADDRESS, PROPERTIES).addAlias(OBJECT, URIBuilder.PATH));
+        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(JnpConnector.JNP, TransportGlobalEndpointDefinitionParser.PROTOCOL, OutboundEndpointFactoryBean.class, ADDRESS, PROPERTIES).addAlias(OBJECT, URIBuilder.PATH));
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(JnpConnector.class, true));
     }
 

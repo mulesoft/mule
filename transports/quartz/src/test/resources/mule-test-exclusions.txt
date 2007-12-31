@@ -4,3 +4,7 @@ org.mule.providers.quartz.QuartzFunctionalLegacyTestCase
 
 # MULE-1925
 org.mule.providers.quartz.QuartzFunctionalTestCase
+
+# MULE-2688
+org.mule.providers.quartz.QuartzReceiveAndDispatchJobTestCase
+org.mule.providers.quartz.QuartzReceiveAndDispatchUsingDelegatingJobTestCase

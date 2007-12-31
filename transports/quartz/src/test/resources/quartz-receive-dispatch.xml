@@ -13,6 +13,9 @@
     <endpoint name="schedulerEndpoint" address="quartz:/myService">
         <properties>
             <spring:entry key="repeatInterval" value="1000"/>
+            <spring:entry key="jobClass" value="org.mule.providers.quartz.jobs.MuleClientReceiveJob"/>
+            <spring:entry key="jobReceiveEndpoint" value="vm://event.queue"/>
+            <spring:entry key="jobDispatchEndpoint" value="vm://quartz.in"/>
         </properties>
     </endpoint>
 
@@ -33,7 +36,7 @@
             <inbound-router>
                 <inbound-endpoint address="vm://quartz.in"/>
             </inbound-router>
-            <component class="org.mule.test.integration.providers.quartz.TestComponent"/>
+            <component class="org.mule.providers.quartz.TestComponent2"/>
         </service>
     </model>
 </mule>

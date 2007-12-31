@@ -21,13 +21,13 @@ public class QuartzFunctionalTestCase extends FunctionalTestCase
     {
         //We need to reset the counter since we use this component for schema test
         //and legacy config test. Its a bit crude...
-        TestComponent.resetCounter();
+        TestComponent1.resetCounter();
         return "quartz-functional-test.xml";
     }
 
     public void testMuleReceiverJob() throws Exception
     {
-        CountDownLatch counter = TestComponent.QUARTZ_COUNTER;
+        CountDownLatch counter = TestComponent1.QUARTZ_COUNTER;
         assertEquals(4, counter.getCount());
 
         // we wait up to 60 seconds here which is WAY too long for three ticks with 1

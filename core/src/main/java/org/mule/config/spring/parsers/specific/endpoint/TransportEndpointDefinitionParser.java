@@ -32,31 +32,30 @@ import org.w3c.dom.Element;
 public class TransportEndpointDefinitionParser extends AddressedEndpointDefinitionParser
 {
 
-    public TransportEndpointDefinitionParser(String protocol, Class endpoint, String[] requiredAttributes)
+    public TransportEndpointDefinitionParser(String protocol, Class endpoint, String[] requiredAddressAttributes)
     {
-        this(protocol, PROTOCOL, endpoint, requiredAttributes);
+        this(protocol, PROTOCOL, endpoint, requiredAddressAttributes);
     }
 
     public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint,
-                                             String[] requiredAttributes)
+                                             String[] requiredAddressAttributes)
     {
-        this(metaOrProtocol, isMeta, endpoint, new String[]{}, requiredAttributes);
+        this(metaOrProtocol, isMeta, endpoint, requiredAddressAttributes, new String[]{});
     }
 
     /**
-     * @param metaOrProtocol The transport protocol ("tcp" etc)
+     * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
      * @param isMeta Whether transport is "meta" or not (eg cxf)
-     * @param endpoint The endpoint class
-     * @param properties A list of attribute names which will be set as properties on the
-     * endpointParser
-     * @param requiredAttributes These are the subset of the alternate address attributes that must be
-     * specified if "address" isn't defined.
+     * @param endpoint The endpoint class to construct
+     * @param requiredAddressAttributes A list of attribute names that are required if "address"
+     * isn't present
+     * @param requiredProperties A list of property names that are required if "address" isn't present
      */
     public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint,
-                                             String[] properties, String[] requiredAttributes)
+                                             String[] requiredAddressAttributes, String[] requiredProperties)
     {
         super(metaOrProtocol, isMeta, new ChildEndpointDefinitionParser(endpoint),
-                properties, requiredAttributes);
+                requiredAddressAttributes, requiredProperties);
     }
 
 }

@@ -96,10 +96,6 @@ org.mule.test.usecases.sync.HttpTransformTestCase
 # Hangs for a long, long time
 org.mule.test.integration.transaction.XAJdbcMule1479TestCase
 
-# MULE-2688
-org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchJobTestCase
-org.mule.test.integration.providers.quartz.QuartzReceiveAndDispatchUsingDelegatingJobTestCase
-	
 # MULE-2734
 # Error registering bean with name 'jdbcConnector' defined in null: Could not resolve placeholder 'function:NOW'
 #	at org.springframework.beans.factory.config.PropertyPlaceholderConfigurer.processProperties(PropertyPlaceholderConfigurer.java:249)

@@ -75,7 +75,6 @@ public class CheckRequiredAttributes implements PreProcessor
             String alias = CoreXMLUtils.attributeName((Attr) attributes.item(i));
             // don't translate to alias because the error message is in terms of the attributes
             // the user enters - we don't want to expose the details of translations
-//            String name = null == config ? alias : config.translateName(alias);
             if (knownAttributes.containsKey(alias))
             {
                 Integer index = (Integer) knownAttributes.get(alias);
@@ -89,7 +88,8 @@ public class CheckRequiredAttributes implements PreProcessor
             }
         }
 
-        boolean ok = false;
+        // if there are no attributes to check for, we are ok
+        boolean ok = knownAttributes.size() == 0;
         Iterator indices = foundAttributesCount.keySet().iterator();
         while (indices.hasNext() && !ok)
         {

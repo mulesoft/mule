@@ -19,12 +19,16 @@ import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParse
 import org.mule.config.spring.parsers.processors.BlockAttribute;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
+import org.mule.config.spring.parsers.processors.CheckExclusiveAttribute;
 import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.util.ArrayUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
 
 /**
  * Combine a
@@ -42,6 +46,9 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     public static final boolean META = ChildAddressDefinitionParser.META;
     public static final boolean PROTOCOL = ChildAddressDefinitionParser.PROTOCOL;
     public static final String QUERY_MAP = "queryMap";
+    public static final String[] RESTRICTED_ENDPOINT_ATTRIBUTES =
+            new String[]{"synchronous", "remoteSync", "remoteSyncTimeout", "encoding",
+                    "connector", "createConnector", "transformer", "responseTransformer"};
 
     // this is an example of parsing a single element with several parsers.  in this case
     // (because we extend AbstractSingleParentFamilyDefinitionParser) the first parser is expected to
@@ -60,31 +67,40 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         this(metaOrProtocol, isMeta, endpointParser, new String[]{}, new String[]{});
     }
 
+    public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
+                                             MuleDefinitionParser endpointParser,
+                                             String[] requiredAddressAttributes,
+                                             String[] requiredProperties)
+    {
+        this(metaOrProtocol, isMeta, endpointParser,
+                RESTRICTED_ENDPOINT_ATTRIBUTES, requiredAddressAttributes, requiredProperties);
+    }
+
     /**
      * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
      * @param isMeta Whether transport is "meta" or not (eg cxf)
      * @param endpointParser The parser for the endpoint
-     * @param propertyAttributes A list of attribute names which will be set as properties on the
-     * endpointParser
+     * @param endpointAttributes A list of attribute names which will be set as properties on the
+     * endpoint builder
      * @param requiredAddressAttributes A list of attribute names that are required if "address"
      * isn't present
+     * @param requiredProperties A list of property names that are required if "address" isn't present
      */
     public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
                                              MuleDefinitionParser endpointParser,
-                                             String[] propertyAttributes,
-                                             String[] requiredAddressAttributes)
+                                             String[] endpointAttributes,
+                                             String[] requiredAddressAttributes,
+                                             String[] requiredProperties)
     {
-        // the first delegate, the parent, is an endpoint; we block address and property
-        // related attributes
-        disableAttributes(endpointParser, URIBuilder.ALL_ATTRIBUTES);
-        disableAttributes(endpointParser, requiredAddressAttributes);
-        disableAttributes(endpointParser, propertyAttributes);
+        // the first delegate, the parent, is an endpoint; we block everything except the endpoint attributes
+        enableAttributes(endpointParser, endpointAttributes);
+        enableAttribute(endpointParser, AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
         addDelegate(endpointParser);
 
         // the next delegate parses the address.  it will see the endpoint as parent automatically.
         MuleChildDefinitionParser addressParser =
                 new CompositeAddressDefinitionParser(metaOrProtocol, isMeta,
-                        requiredAddressAttributes, propertyAttributes);
+                        endpointAttributes, requiredAddressAttributes, requiredProperties);
 
         // this handles the exception thrown if a ref is found in the address parser
         addHandledException(BlockAttribute.BlockAttributeException.class);
@@ -102,7 +118,8 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
         private MuleChildDefinitionParser addressParser;
 
-        public CompositeAddressDefinitionParser(String metaOrProtocol, boolean isMeta, String[] requiredAddressAttributes, String[] propertyAttributes)
+        public CompositeAddressDefinitionParser(String metaOrProtocol, boolean isMeta,
+                String[] endpointAttributes, String[] requiredAddressAttributes, String[] requiredProperties)
         {
             // this parses the address.  it will see the endpoint as parent automatically.
             addressParser = new ChildAddressDefinitionParser(metaOrProtocol, isMeta);
@@ -122,23 +139,27 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
             // the address parser see only the endpoint attributes
             enableAttributes(addressParser, URIBuilder.ALL_ATTRIBUTES);
-            enableAttributes(addressParser, ArrayUtils.setDifference(requiredAddressAttributes, propertyAttributes));
+            enableAttributes(addressParser, requiredAddressAttributes);
             // we require either a reference, an address, or the attributes specified
-            // (but we exclude properties from the attributes because they can be used in parallel with address)
+            // (properties can be used in parallel with "address")
             String[][] addressAttributeSets = new String[][]{
                     new String[]{URIBuilder.ADDRESS},
                     new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF},
-                    ArrayUtils.setDifference(requiredAddressAttributes, propertyAttributes)};
+                    requiredAddressAttributes};
             addressParser.registerPreProcessor(new CheckRequiredAttributes(addressAttributeSets));
             // and they must be exclusive
             addressParser.registerPreProcessor(new CheckExclusiveAttributes(addressAttributeSets));
 
-            // the properties parser should only see properties
-            enableAttributes(propertiesParser, propertyAttributes);
-            // we also enable "ref" so that we can throw an error if present
-            enableAttribute(propertiesParser, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
-            propertiesParser.registerPreProcessor(new CheckExclusiveAttributes(
-                    new String[][]{propertyAttributes, new String[]{AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF}}));
+            // the properties parser gets to see everything that the other parsers don't - if you
+            // don't want something, don't enable it in the schema!
+            // we leave "ref" enabled so that we can throw an error if present
+            disableAttributes(propertiesParser, endpointAttributes);
+            disableAttributes(propertiesParser, URIBuilder.ALL_ATTRIBUTES);
+            disableAttributes(propertiesParser, requiredAddressAttributes);
+            disableAttribute(propertiesParser, AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+            propertiesParser.registerPreProcessor(
+                    new CheckExclusiveAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
+            propertiesParser.registerPreProcessor(new CheckRequiredAttributes(new String[][]{requiredProperties}));
             addChildDelegate(propertiesParser);
         }
 

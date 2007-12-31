@@ -29,6 +29,8 @@ import org.quartz.impl.StdSchedulerFactory;
 public class QuartzConnector extends AbstractConnector
 {
 
+    public static final String QUARTZ = "quartz";
+
     public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
     public static final String PROPERTY_REPEAT_INTERVAL = "repeatInterval";
     public static final String PROPERTY_REPEAT_COUNT = "repeatCount";
@@ -37,10 +39,8 @@ public class QuartzConnector extends AbstractConnector
     public static final String PROPERTY_JOB_DISPATCH_ENDPOINT = "jobDispatchEndpoint";
     public static final String PROPERTY_JOB_RECEIVE_ENDPOINT = "jobReceiveEndpoint";
     public static final String PROPERTY_JOB_RECEIVE_TIMEOUT = "jobReceiveTimeout";
-
     /** deprecated: use PROPERTY_PAYLOAD_REFERENCE */
     public static final String PROPERTY_PAYLOAD_CLASS_NAME = "payloadClassName";
-
     public static final String PROPERTY_PAYLOAD_REFERENCE = "payloadRef";
     public static final String PROPERTY_GROUP_NAME = "groupName";
     public static final String PROPERTY_JOB_GROUP_NAME = "jobGroupName";
@@ -129,7 +129,7 @@ public class QuartzConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "quartz";
+        return QUARTZ;
     }
 
     public Scheduler getQuartzScheduler()

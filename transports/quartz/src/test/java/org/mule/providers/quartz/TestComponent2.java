@@ -8,21 +8,31 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.quartz;
+package org.mule.providers.quartz;
 
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 
-public class TestComponent implements Callable
+public class TestComponent2 implements Callable
 {
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
         if (eventContext.getMessageAsString().equals("quartz test"))
         {
-            QuartzDispatchJobTestCase.countDown.countDown();
-            QuartzReceiveAndDispatchJobTestCase.countDown.countDown();
-            QuartzReceiveAndDispatchUsingDelegatingJobTestCase.countDown.countDown();
+            // TODO - fix this lazy static mess
+            if (null != QuartzDispatchJobTestCase.countDown)
+            {
+                QuartzDispatchJobTestCase.countDown.countDown();
+            }
+            if (null != QuartzReceiveAndDispatchJobTestCase.countDown)
+            {
+                QuartzReceiveAndDispatchJobTestCase.countDown.countDown();
+            }
+            if (null != QuartzReceiveAndDispatchUsingDelegatingJobTestCase.countDown)
+            {
+                QuartzReceiveAndDispatchUsingDelegatingJobTestCase.countDown.countDown();
+            }
         }
         else
         {
