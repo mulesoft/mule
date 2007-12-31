@@ -355,6 +355,7 @@ Assembly descriptor for the full Mule distribution.
           <exclude>xml-apis:xml-apis</exclude>
           <exclude>xerces:xercesImpl</exclude>
           <exclude>xerces:xml-serializer</exclude>
+          <exclude>xalan:xalan</exclude>
       </excludes>
     </dependencySet>
 
@@ -415,6 +416,7 @@ Assembly descriptor for the full Mule distribution.
           <exclude>xml-apis:xml-apis</exclude>
           <exclude>xerces:xercesImpl</exclude>
           <exclude>xerces:xml-serializer</exclude>
+          <exclude>xalan:xalan</exclude>
       </excludes>
     </dependencySet>
 
@@ -504,6 +506,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>xml-apis:xml-apis</exclude>
         <exclude>xerces:xercesImpl</exclude>
         <exclude>xerces:xml-serializer</exclude>
+        <exclude>xalan:xalan</exclude>
       </excludes>
     </dependencySet>
 
@@ -530,6 +533,7 @@ Assembly descriptor for the full Mule distribution.
           <exclude>xml-apis:xml-apis</exclude>
           <exclude>xerces:xercesImpl</exclude>
           <exclude>xerces:xml-serializer</exclude>
+          <exclude>xalan:xalan</exclude>
       </excludes>
     </dependencySet>
 
@@ -545,6 +549,7 @@ Assembly descriptor for the full Mule distribution.
           <exclude>xml-apis:xml-apis</exclude>
           <exclude>xerces:xercesImpl</exclude>
           <exclude>xerces:xml-serializer</exclude>
+          <exclude>xalan:xalan</exclude>
       </excludes>
     </dependencySet>
 
@@ -562,6 +567,7 @@ Assembly descriptor for the full Mule distribution.
           <include>xml-apis:xml-apis</include>
           <include>xerces:xercesImpl</include>
           <include>xerces:xml-serializer</include>
+          <include>xalan:xalan</include>
       </includes>
    </dependencySet>
 
