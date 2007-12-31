@@ -74,6 +74,10 @@
                     <groupId>xerces</groupId>
                     <artifactId>xercesImpl</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <!-- re-add BouncyCastle provider for JDK 1.4 -->
@@ -81,23 +85,6 @@
             <groupId>org.codehaus.xfire</groupId>
             <artifactId>bcprov-jdk14</artifactId>
             <version>133</version>
-        </dependency>
-        <!-- need to bump the Xalan version -->
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>2.7.0</version>
-            <exclusions>
-                <!-- no XML -->
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- For unit tests only -->
         <dependency>
