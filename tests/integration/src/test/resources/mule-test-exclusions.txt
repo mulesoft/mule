@@ -67,9 +67,6 @@ org.mule.test.integration.routing.MessageChunkingTestCase
 # How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
 org.mule.test.integration.persistence.FilePersistenceTestCase
 
-# MULE-2744
-org.mule.test.integration.client.MuleClientWSDLExternalTestCase
-
 # MULE-2743 - Remoting does not seem to be working yet in 2.x?
 org.mule.test.integration.client.MuleClientRemotingTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase

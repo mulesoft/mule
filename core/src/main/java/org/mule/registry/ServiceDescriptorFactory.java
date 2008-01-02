@@ -39,12 +39,13 @@ public class ServiceDescriptorFactory
      */
     public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides, Registry registry) throws ServiceException
     {       
-        String serviceFinderClass = null;
-        if(overrides!=null)
+
+        if (overrides != null)
         {
-            serviceFinderClass = (String) props.remove(MuleProperties.SERVICE_FINDER);
             props.putAll(overrides);
         }
+
+        String serviceFinderClass = (String) props.remove(MuleProperties.SERVICE_FINDER);
         
         ServiceDescriptor sd = null;
         if (type.equals(PROVIDER_SERVICE_TYPE)) 
@@ -57,25 +58,25 @@ public class ServiceDescriptorFactory
             {
                 throw (IllegalStateException) new IllegalStateException("Cannot create transport " + name).initCause(e);
             }
-            props = SpiUtils.findServiceDescriptor(EXCEPTION_SERVICE_TYPE, name + "-exception-mappings");
-            ((TransportServiceDescriptor) sd).setExceptionMappings(props);
+            Properties exceptionMappingProps = SpiUtils.findServiceDescriptor(EXCEPTION_SERVICE_TYPE, name + "-exception-mappings");
+            ((TransportServiceDescriptor) sd).setExceptionMappings(exceptionMappingProps);
         }
         else if (type.equals(MODEL_SERVICE_TYPE))
         {
             sd = new DefaultModelServiceDescriptor(name, props);
         }
-        else 
+        else
         {
             throw new ServiceException(CoreMessages.unrecognisedServiceType(type));
         }
-        
+
         // If there is a finder service, use it to find the "real" service.
         if (StringUtils.isNotBlank(serviceFinderClass))
         {
             ServiceFinder finder;
             try
             {
-                finder = (ServiceFinder)ClassUtils.instanciateClass(serviceFinderClass, ClassUtils.NO_ARGS);
+                finder = (ServiceFinder) ClassUtils.instanciateClass(serviceFinderClass, ClassUtils.NO_ARGS);
             }
             catch (Exception e)
             {
@@ -85,15 +86,16 @@ public class ServiceDescriptorFactory
             if (realService != null)
             {
                 // Recursively look up the service descriptor for the real service.
-                return RegistryContext.getRegistry().lookupServiceDescriptor(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, realService, overrides);
+                return RegistryContext.getRegistry().lookupServiceDescriptor(
+                    ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, realService, overrides);
             }
-            else 
+            else
             {
                 throw new ServiceException(CoreMessages.serviceFinderCantFindService(name));
             }
         }
         return sd;
-    }        
+    }
 }
 
 
