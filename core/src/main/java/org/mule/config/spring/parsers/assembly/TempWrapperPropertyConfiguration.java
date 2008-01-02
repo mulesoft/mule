@@ -48,6 +48,11 @@ public class TempWrapperPropertyConfiguration implements PropertyConfiguration
         extra.addMapping(propertyName, mappings);
     }
 
+    public void addMapping(String propertyName, ValueMap mappings)
+    {
+        extra.addMapping(propertyName, mappings);
+    }
+
     public void addAlias(String alias, String propertyName)
     {
         extra.addAlias(alias, propertyName);

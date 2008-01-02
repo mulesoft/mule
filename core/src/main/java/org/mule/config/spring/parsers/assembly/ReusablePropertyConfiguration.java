@@ -56,6 +56,11 @@ public class ReusablePropertyConfiguration implements PropertyConfiguration
         delegate.addMapping(propertyName, mappings);
     }
 
+    public void addMapping(String propertyName, ValueMap mappings)
+    {
+        delegate.addMapping(propertyName, mappings);
+    }
+
     public void addAlias(String alias, String propertyName)
     {
         delegate.addAlias(alias, propertyName);

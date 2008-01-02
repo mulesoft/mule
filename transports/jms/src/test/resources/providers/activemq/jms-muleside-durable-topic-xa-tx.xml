@@ -48,8 +48,7 @@
             </component>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorTestDriver">
-                    </outbound-endpoint>
+                    <jms:outbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorTestDriver"/>
                     <!--
                         There's no inbound TX, so make sure XA is happy by starting it via router
                         on the outbound. Such problems are now nicely detected and reported via an error.
@@ -61,14 +60,13 @@
             </outbound-router>
         </service>
 
-
         <service name="Part1">
             <inbound-router>
-                <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC1">
+                <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC1">
                     <transaction action="BEGIN_OR_JOIN">
                         <transaction-factory ref="txFactory"/>
                     </transaction>
-                </inbound-endpoint>
+                </jms:inbound-endpoint>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
@@ -86,11 +84,11 @@
 
         <service name="Part3">
             <inbound-router>
-                <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC2">
+                <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC2">
                     <transaction action="BEGIN_OR_JOIN">
                         <transaction-factory ref="txFactory"/>
                     </transaction>
-                </inbound-endpoint>
+                </jms:inbound-endpoint>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">

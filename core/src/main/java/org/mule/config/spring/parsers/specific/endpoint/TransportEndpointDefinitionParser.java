@@ -58,4 +58,13 @@ public class TransportEndpointDefinitionParser extends AddressedEndpointDefiniti
                 requiredAddressAttributes, requiredProperties);
     }
 
+    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint,
+                                             String[] endpointAttributes,
+                                             String[][] requiredAddressAttributes,
+                                             String[][] requiredProperties)
+    {
+        super(metaOrProtocol, isMeta, new ChildEndpointDefinitionParser(endpoint),
+                endpointAttributes, requiredAddressAttributes, requiredProperties);
+    }
+
 }

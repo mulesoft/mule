@@ -151,4 +151,50 @@
     <xsd:element name="transformer-jmsmessage-to-object" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:element name="transformer-object-to-jmsmessage" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:inboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:outboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:globalEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="addressAttributes">
+        <xsd:attribute name="queue" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The queue name.
+                    This cannot be used with the topic attribute (the two are exclusive).
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="topic" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The topic name.  The "topic:" prefix will be added automatically.
+                    This cannot be used with the queue attribute (the two are exclusive).
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
 </xsd:schema>

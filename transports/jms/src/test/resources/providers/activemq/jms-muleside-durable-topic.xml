@@ -13,7 +13,7 @@
     <jms:activemq-connector name="jmsConnectorC1" specification="1.1" durable="true" clientId="C1"/>
     <jms:activemq-connector name="jmsConnectorC2" specification="1.1" durable="true" clientId="C2"/>
 
-    <endpoint name="out" address="jms://out" connector-ref="jmsConnector"/>
+    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
 
     <custom-transformer name="ObjectToJMSMessage"
                         class="org.mule.providers.jms.transformers.ObjectToJMSMessage"
@@ -23,7 +23,7 @@
 
         <service name="Part1">
             <inbound-router>
-                <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC1"/>
+                <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC1"/>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
@@ -41,7 +41,7 @@
 
         <service name="Part3">
             <inbound-router>
-                <inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC2"/>
+                <jms:inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC2"/>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">

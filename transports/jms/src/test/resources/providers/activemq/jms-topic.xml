@@ -11,9 +11,9 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <endpoint name="in" address="jms://in" connector-ref="jmsConnector"/>
-    <endpoint name="topic" address="jms://topic:broadcast" connector-ref="jmsConnector"/>
-    <endpoint name="out" address="jms://out" connector-ref="jmsConnector"/>
+    <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
+    <jms:endpoint name="topic" topic="broadcast" connector-ref="jmsConnector"/>
+    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
 
     <custom-transformer name="ObjectToJMSMessage"
                         class="org.mule.providers.jms.transformers.ObjectToJMSMessage"

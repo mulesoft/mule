@@ -43,12 +43,17 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
     public void addMapping(String propertyName, Map mappings)
     {
-        valueMappings.put(propertyName, new ValueMap(propertyName, mappings));
+        valueMappings.put(propertyName, new NamedValueMap(propertyName, mappings));
     }
 
     public void addMapping(String propertyName, String mappings)
     {
-        valueMappings.put(propertyName, new ValueMap(propertyName, mappings));
+        valueMappings.put(propertyName, new NamedValueMap(propertyName, mappings));
+    }
+
+    public void addMapping(String propertyName, ValueMap mappings)
+    {
+        valueMappings.put(propertyName, new NamedValueMap(propertyName, mappings));
     }
 
     public void addAlias(String alias, String propertyName)
@@ -158,18 +163,10 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
 
     public String translateValue(String name, String value)
     {
-        ValueMap vm = (ValueMap) valueMappings.get(name);
+        NamedValueMap vm = (NamedValueMap) valueMappings.get(name);
         if (vm != null)
         {
-            Object v = vm.getValue(value);
-            if (v != null)
-            {
-                return v.toString();
-            }
-            else
-            {
-                return value;
-            }
+            return vm.getValue(value);
         }
         else
         {
@@ -177,34 +174,28 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
         }
     }
 
-    public static class ValueMap
+
+    public static class NamedValueMap
     {
         private String propertyName;
-        private Map mappings;
+        private ValueMap valueMap;
 
-        public ValueMap(String propertyName, String mappingsString)
+        public NamedValueMap(String propertyName, String mappingsString)
         {
             this.propertyName = propertyName;
-            mappings = new HashMap();
-
-            String[] values = StringUtils.tokenizeToStringArray(mappingsString, ",");
-            for (int i = 0; i < values.length; i++)
-            {
-                String value = values[i];
-                int x = value.indexOf("=");
-                if(x==-1)
-                {
-                    throw new IllegalArgumentException("Mappings string not properly defined: " + mappingsString);
-                }
-                mappings.put(value.substring(0, x), value.substring(x+1));
-            }
-
+            valueMap = new MapValueMap(mappingsString);
         }
 
-        public ValueMap(String propertyName, Map mappings)
+        public NamedValueMap(String propertyName, Map valueMap)
         {
             this.propertyName = propertyName;
-            this.mappings = mappings;
+            this.valueMap = new MapValueMap(valueMap);
+        }
+
+        public NamedValueMap(String propertyName, ValueMap valueMap)
+        {
+            this.propertyName = propertyName;
+            this.valueMap = valueMap;
         }
 
         public String getPropertyName()
@@ -212,10 +203,53 @@ public class SimplePropertyConfiguration implements PropertyConfiguration
             return propertyName;
         }
 
-        public Object getValue(Object key)
+        public String getValue(String key)
         {
-            return mappings.get(key);
+            return valueMap.rewrite(key);
         }
+    }
+
+    public static class MapValueMap implements ValueMap
+    {
+
+        private Map map;
+
+        public MapValueMap(Map map)
+        {
+            this.map = map;
+        }
+
+        public MapValueMap(String definition)
+        {
+            map = new HashMap();
+
+            String[] values = StringUtils.tokenizeToStringArray(definition, ",");
+            for (int i = 0; i < values.length; i++)
+            {
+                String value = values[i];
+                int x = value.indexOf("=");
+                if (x == -1)
+                {
+                    throw new IllegalArgumentException("Mappings string not properly defined: " + definition);
+                }
+                map.put(value.substring(0, x), value.substring(x+1));
+            }
+
+        }
+
+        public String rewrite(String value)
+        {
+            Object result = map.get(value);
+            if (null == result)
+            {
+                return value;
+            }
+            else
+            {
+                return result.toString();
+            }
+        }
+
     }
 
 }

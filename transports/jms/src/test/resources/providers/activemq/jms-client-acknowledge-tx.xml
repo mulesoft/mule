@@ -13,8 +13,8 @@
                             acknowledgementMode="CLIENT_ACKNOWLEDGE">
     </jms:activemq-connector>
 
-    <endpoint name="in" address="jms://in" connector-ref="jmsConnector"/>
-    <endpoint name="middle" address="jms://middle" connector-ref="jmsConnector"/>
+    <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
+    <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector"/>
     <endpoint name="out" address="jms://out" connector-ref="jmsConnector"/>
 
     <custom-transformer name="ObjectToJMSMessage"

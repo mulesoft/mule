@@ -13,6 +13,7 @@ package org.mule.config.spring.parsers.delegate;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.PreProcessor;
+import org.mule.config.spring.parsers.assembly.ValueMap;
 
 import java.util.Map;
 
@@ -61,6 +62,11 @@ public abstract class AbstractPluggableDelegate implements MuleDefinitionParser
     }
 
     public MuleDefinitionParser addMapping(String propertyName, String mappings)
+    {
+        return delegate.addMapping(propertyName, mappings);
+    }
+
+    public MuleDefinitionParser addMapping(String propertyName, ValueMap mappings)
     {
         return delegate.addMapping(propertyName, mappings);
     }

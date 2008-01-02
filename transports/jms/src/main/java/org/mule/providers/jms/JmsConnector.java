@@ -63,6 +63,9 @@ import org.apache.commons.lang.UnhandledException;
 
 public class JmsConnector extends AbstractConnector implements ConnectionNotificationListener
 {
+
+    public static final String JMS = "jms";
+
     ////////////////////////////////////////////////////////////////////////
     // Properties
     ////////////////////////////////////////////////////////////////////////
@@ -173,7 +176,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     public String getProtocol()
     {
-        return "jms";
+        return JMS;
     }
 
     protected void doInitialise() throws InitialisationException

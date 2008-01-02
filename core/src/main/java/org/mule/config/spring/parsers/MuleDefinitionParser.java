@@ -10,6 +10,8 @@
 
 package org.mule.config.spring.parsers;
 
+import org.mule.config.spring.parsers.assembly.ValueMap;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -50,6 +52,8 @@ public interface MuleDefinitionParser extends BeanDefinitionParser
     MuleDefinitionParser addMapping(String propertyName, Map mappings);
 
     MuleDefinitionParser addMapping(String propertyName, String mappings);
+
+    MuleDefinitionParser addMapping(String propertyName, ValueMap mappings);
 
     MuleDefinitionParser addAlias(String alias, String propertyName);
 

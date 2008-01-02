@@ -18,6 +18,7 @@ import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.SimplePropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.ValueMap;
 import org.mule.util.CoreXMLUtils;
 
 import java.util.Map;
@@ -90,6 +91,12 @@ public class AllAttributeChildDefinitionParser
     }
 
     public MuleDefinitionParser addMapping(String propertyName, String mappings)
+    {
+        configuration.addMapping(propertyName, mappings);
+        return this;
+    }
+
+    public MuleDefinitionParser addMapping(String propertyName, ValueMap mappings)
     {
         configuration.addMapping(propertyName, mappings);
         return this;

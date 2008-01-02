@@ -29,6 +29,8 @@ public interface PropertyConfiguration
 
     void addMapping(String propertyName, String mappings);
 
+    void addMapping(String propertyName, ValueMap mappings);
+
     void addAlias(String alias, String propertyName);
 
     void addCollection(String propertyName);

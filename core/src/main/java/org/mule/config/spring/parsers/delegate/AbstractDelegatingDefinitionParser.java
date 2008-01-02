@@ -14,6 +14,7 @@ import org.mule.util.ArrayUtils;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.PostProcessor;
+import org.mule.config.spring.parsers.assembly.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 
 import java.util.Map;
@@ -104,6 +105,15 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
     }
 
     public MuleDefinitionParser addMapping(String propertyName, String mappings)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].addMapping(propertyName, mappings);
+        }
+        return this;
+    }
+
+    public MuleDefinitionParser addMapping(String propertyName, ValueMap mappings)
     {
         for (int i = 0; i < delegates.length; ++i)
         {

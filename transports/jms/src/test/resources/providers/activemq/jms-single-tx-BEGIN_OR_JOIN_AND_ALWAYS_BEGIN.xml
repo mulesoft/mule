@@ -12,8 +12,8 @@
     <jms:activemq-connector name="jmsConnector"/>
 
     <endpoint name="in" address="jms://in" connector-ref="jmsConnector"/>
-    <endpoint name="middle" address="jms://middle" connector-ref="jmsConnector"/>
-    <endpoint name="out" address="jms://out" connector-ref="jmsConnector"/>
+    <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector"/>
+    <jms:endpoint name="out" address="jms://out" connector-ref="jmsConnector"/>
 
     <spring:bean name="txFactory" class="org.mule.providers.jms.JmsTransactionFactory"/>
 

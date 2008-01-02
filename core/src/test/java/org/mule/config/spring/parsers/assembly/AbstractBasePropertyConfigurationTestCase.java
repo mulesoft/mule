@@ -25,11 +25,13 @@ public abstract class AbstractBasePropertyConfigurationTestCase extends TestCase
     public static final String NOT_IGNORED = "Not Ignored";
     public static final String MAP_CAPS = "MapCaps";
     public static final String MAP_DIGITS = "MapNumbers";
+    public static final String MAP_PREFIX = "MapPrefix";
     public static final String REFERENCE = "Reference";
     public static final String UNUSED = "Unused";
 
     public static final String TO_DIGITS = "one=1,two=2,three=3";
     public static final Map TO_CAPS;
+    public static final String PREFIX = "prefix";
 
     static {
         TO_CAPS = new HashMap();
@@ -49,6 +51,7 @@ public abstract class AbstractBasePropertyConfigurationTestCase extends TestCase
         config.removeIgnored(prefix + NOT_IGNORED);
         config.addMapping(prefix + MAP_CAPS, TO_CAPS);
         config.addMapping(prefix + MAP_DIGITS, TO_DIGITS);
+        config.addMapping(prefix + MAP_PREFIX, new PrefixValueMap(PREFIX));
         config.addReference(prefix + REFERENCE);
     }
 
@@ -72,6 +75,7 @@ public abstract class AbstractBasePropertyConfigurationTestCase extends TestCase
         assertEquals("3", config.translateValue(prefix + MAP_DIGITS, "three"));
         assertEquals("four", config.translateValue(prefix + MAP_DIGITS, "four"));
         assertEquals("one", config.translateValue(prefix + UNUSED, "one"));
+        assertEquals(PREFIX + "foo", config.translateValue(prefix + MAP_PREFIX, "foo"));
     }
 
     protected void verifyIgnored(String prefix, PropertyConfiguration config)
@@ -109,6 +113,7 @@ public abstract class AbstractBasePropertyConfigurationTestCase extends TestCase
         assertEquals("three", config.translateValue(prefix + MAP_DIGITS, "three"));
         assertEquals("four", config.translateValue(prefix + MAP_DIGITS, "four"));
         assertEquals("one", config.translateValue(prefix + UNUSED, "one"));
+        assertEquals("foo", config.translateValue(prefix + MAP_PREFIX, "foo"));
     }
 
 }

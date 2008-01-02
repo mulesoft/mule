@@ -13,6 +13,8 @@
         <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
     </jms:connector>
 
+    <!-- DON'T use jms:endpoints here as we are testing for resolution from uri
+         (all that the jms topic attribute does is make an address using "jms://topic:") -->
     <endpoint name="ep1" address="jms://queue.NotATopic"/>
     <endpoint name="ep2" address="jms://context.aTopic?topic=true"/>
     <endpoint name="ep3" address="jms://topic:context.ThisIsATopic"/>

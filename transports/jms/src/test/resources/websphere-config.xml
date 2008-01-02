@@ -11,4 +11,5 @@
     <jms:websphere-connector name="jmsConnector">
         <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
     </jms:websphere-connector>
+    
 </mule>

@@ -13,6 +13,7 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.ReusablePropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -81,6 +82,7 @@ import org.w3c.dom.NamedNodeMap;
 public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefinitionParser
     implements MuleDefinitionParser
 {
+
     public static final String ROOT_ELEMENT = "mule";
     public static final String ROOT_UNSAFE_ELEMENT = "mule-unsafe";
     public static final String ATTRIBUTE_ID = "id";
@@ -127,6 +129,12 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     }
 
     public MuleDefinitionParser addMapping(String propertyName, String mappings)
+    {
+        beanPropertyConfiguration.addMapping(propertyName, mappings);
+        return this;
+    }
+
+    public MuleDefinitionParser addMapping(String propertyName, ValueMap mappings)
     {
         beanPropertyConfiguration.addMapping(propertyName, mappings);
         return this;
