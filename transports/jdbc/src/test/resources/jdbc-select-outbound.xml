@@ -41,7 +41,11 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="jdbc://getTest?type=1"/>
+                    <jdbc:outbound-endpoint queryKey="getTest">
+                        <properties>
+                            <spring:entry key="type" value="1"/>
+                        </properties>
+                    </jdbc:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -53,7 +57,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="jdbc://getTestPayload"/>
+                    <jdbc:outbound-endpoint address="jdbc://getTestPayload"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

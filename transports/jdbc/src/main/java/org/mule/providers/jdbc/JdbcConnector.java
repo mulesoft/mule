@@ -50,6 +50,9 @@ import org.apache.commons.dbutils.ResultSetHandler;
 
 public class JdbcConnector extends AbstractConnector
 {
+
+    public static final String JDBC = "jdbc";
+
     // These are properties that can be overridden on the Receiver by the endpoint
     // declaration
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
@@ -153,7 +156,7 @@ public class JdbcConnector extends AbstractConnector
      */
     public String getProtocol()
     {
-        return "jdbc";
+        return JDBC;
     }
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
