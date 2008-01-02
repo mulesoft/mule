@@ -13,7 +13,7 @@
     <vm:connector name="vm-queue" queueEvents="true"/>
 
     <!-- 224.0.0.1 is all systems on this subnet -->
-    <endpoint address="multicast://224.0.0.1:60131" name="serverEndpoint"/>
+    <multicast:endpoint host="224.0.0.1" port="60131" name="serverEndpoint"/>
 
     <model name="main">
 
@@ -21,10 +21,12 @@
             <inbound-router>
                 <inbound-endpoint ref="serverEndpoint"/>
             </inbound-router>
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="appendComponentName" value="true"/>
-                </properties>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="appendComponentName" value="true"/>
+                    </properties>
+                </singleton-object>
             </component>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -37,10 +39,12 @@
             <inbound-router>
                 <inbound-endpoint ref="serverEndpoint"/>
             </inbound-router>
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="appendComponentName" value="true"/>
-                </properties>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="appendComponentName" value="true"/>
+                    </properties>
+                </singleton-object>
             </component>
             <outbound-router>
                 <outbound-pass-through-router>
@@ -53,10 +57,12 @@
             <inbound-router>
                 <inbound-endpoint ref="serverEndpoint"/>
             </inbound-router>
-            <component class="org.mule.tck.functional.FunctionalTestComponent">
-                <properties>
-                    <spring:entry key="appendComponentName" value="true"/>
-                </properties>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="appendComponentName" value="true"/>
+                    </properties>
+                </singleton-object>
             </component>
             <outbound-router>
                 <outbound-pass-through-router>

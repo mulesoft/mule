@@ -3,5 +3,5 @@
 #
 
 # Disable Multicast tests unless configured
-org.mule.providers.multicast.MulticastConnectorFunctionalTestCase
+#org.mule.providers.multicast.MulticastConnectorFunctionalTestCase
 

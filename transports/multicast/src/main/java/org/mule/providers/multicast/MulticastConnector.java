@@ -20,12 +20,14 @@ import org.mule.umo.lifecycle.InitialisationException;
  */
 public class MulticastConnector extends UdpConnector
 {
+
+    public static final String MULTICAST = "multicast";
     private boolean loopback = false;
     private int timeToLive = INT_VALUE_NOT_SET;
 
     public String getProtocol()
     {
-        return "multicast";
+        return MULTICAST;
     }
 
 
