@@ -173,6 +173,7 @@ public class MuleClient implements Disposable
                         + MuleXmlConfigurationBuilder.class.getName());
             builder = new MuleXmlConfigurationBuilder();
         }
+        logger.info("Initializing Mule...");
         managementContext = builder.configure(configResources);
     }
 
@@ -218,12 +219,12 @@ public class MuleClient implements Disposable
         }
         else
         {
-            logger.info("Using existing ManagementContext");
+            logger.info("Using existing ManagementContext: " + managementContext);
         }
 
         if (!managementContext.isStarted() && startManager == true)
         {
-            logger.info("Starting ManagementContext");
+            logger.info("Starting Mule...");
             managementContext.start();
         }
     }
@@ -972,7 +973,8 @@ public class MuleClient implements Disposable
         // Dispose the managementContext only if the managementContext was created for this client
         if (RegistryContext.getConfiguration().isClientMode())
         {
-           managementContext.dispose();
+            logger.info("Stopping Mule...");
+            managementContext.dispose();
         }
     }
 

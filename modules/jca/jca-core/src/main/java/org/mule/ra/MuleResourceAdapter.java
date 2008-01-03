@@ -86,13 +86,11 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         this.bootstrapContext = bootstrapContext;
         if (info.getConfigurations() != null)
         {
-
             ConfigurationBuilder builder = null;
             try
             {
                 builder = (ConfigurationBuilder) ClassUtils.instanciateClass(info.getConfigurationBuilder(),
                     ClassUtils.NO_ARGS);
-
             }
             catch (Exception e)
             {
@@ -102,6 +100,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
             try
             {
+                logger.info("Initializing Mule...");
                 managementContext = builder.configure(info.getConfigurations());
             }
             catch (ConfigurationException e)
@@ -112,6 +111,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             }
             try
             {
+                logger.info("Starting Mule...");
                 managementContext.start();
             }
             catch (UMOException e)
@@ -127,6 +127,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
      */
     public void stop()
     {
+        logger.info("Stopping Mule...");
         managementContext.dispose();
         managementContext = null;
         bootstrapContext = null;

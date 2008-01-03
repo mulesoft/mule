@@ -195,6 +195,7 @@ public class ConfigScannerAgent extends AbstractAgent
 
             if (!cfgBuilder.isConfigured())
             {
+                // TODO Update after MULE-1988
                 cfgBuilder.configure(configFile);
             }
         }
