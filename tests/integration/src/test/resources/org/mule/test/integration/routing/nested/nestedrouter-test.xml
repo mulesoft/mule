@@ -26,7 +26,7 @@
 
 		<service name="InvokerComponent">
 			<inbound-router>
-				<inbound-endpoint address="vm://invoker.in" synchronous="true" />
+				<inbound-endpoint address="vm://invoker.in" />
 			</inbound-router>
 			<component>
 				<singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
@@ -48,7 +48,7 @@
 			<component>
 				<singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
 				<binding interface="org.mule.test.integration.routing.nested.HelloInterface">
-					<outbound-endpoint address="vm://hello.in" remoteSync="true" />
+					<outbound-endpoint address="jms://hello.in" synchronous="true" />
 				</binding>
 			</component>
 			<outbound-router>
@@ -65,10 +65,9 @@
 			<component>
 				<singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
 				<binding interface="org.mule.test.integration.routing.nested.HelloInterface">
-					<outbound-endpoint address="jms://topic:thello.in" remoteSync="true" />
+					<outbound-endpoint address="jms://topic:thello.in" synchronous="true" />
 				</binding>
 			</component>
-
 			<outbound-router>
 				<outbound-pass-through-router>
 					<outbound-endpoint address="jms://topic:tinvoker.out" />
