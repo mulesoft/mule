@@ -78,8 +78,6 @@ public interface UMOEndpointBuilder extends ManagementContextAware, Cloneable
 
     void setRemoteSyncTimeout(int remoteSyncTimeout);
 
-    void setStreaming(boolean streaming);
-
     void setInitialState(String initialState);
 
     void setEncoding(String encoding);

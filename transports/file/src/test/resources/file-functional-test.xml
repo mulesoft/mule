@@ -18,7 +18,7 @@
 
     <vm:connector name="vmQueue" queueEvents="true"/>
 
-    <endpoint address="file://test" name="send" connector-ref="sendConnector"/>
+    <file:endpoint path="test" name="send" connector-ref="sendConnector"/>
     
     <endpoint address="vm://receive" name="receive"/>
 

@@ -42,7 +42,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
         synchronous = global.synchronous;
         remoteSync = global.remoteSync;
         remoteSyncTimeout = global.remoteSyncTimeout;
-        streaming = global.streaming;
         encoding = global.encoding;
         connectionStrategy = global.connectionStrategy;
     }

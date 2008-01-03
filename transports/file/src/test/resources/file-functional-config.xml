@@ -19,7 +19,7 @@
         <dispatcher-threading-profile doThreading="false"/>
     </file:connector>
 
-    <endpoint address="file://./.mule/in" name="get" connector-ref="fileConnector"/>
+    <file:endpoint path="./.mule/in" name="get" connector-ref="fileConnector"/>
 
     <custom-transformer class="org.mule.providers.file.transformers.FileToByteArray" name="FileToByteArray"/>
 

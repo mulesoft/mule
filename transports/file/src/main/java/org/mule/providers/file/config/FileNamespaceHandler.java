@@ -11,22 +11,24 @@ package org.mule.providers.file.config;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.FilenameParser;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.providers.file.transformers.FileToByteArray;
 import org.mule.providers.file.transformers.FileToString;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
-
 /**
  * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
  *
  */
-public class FileNamespaceHandler extends NamespaceHandlerSupport
+public class FileNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+
     public void init()
     {
+        registerStandardTransportEndpoints(FileConnector.FILE, URIBuilder.PATH_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(FileConnector.class, true));
         registerBeanDefinitionParser("filename-parser",
                     new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
@@ -34,4 +36,5 @@ public class FileNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("transformer-file-to-string", new MuleOrphanDefinitionParser(FileToString.class, false));
         registerBeanDefinitionParser("filter-filename-wildcard", new ChildDefinitionParser("filter", FilenameWildcardFilter.class));
     }
+
 }

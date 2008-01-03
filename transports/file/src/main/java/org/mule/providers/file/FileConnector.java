@@ -14,7 +14,6 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
-import org.mule.transformers.NoActionTransformer;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOComponent;
@@ -45,25 +44,28 @@ import org.apache.commons.logging.LogFactory;
 
 public class FileConnector extends AbstractConnector
 {
-    /**
-     * logger used by this class
-     */
+
+    public static final String FILE = "file";
     private static Log logger = LogFactory.getLog(FileConnector.class);
 
-    // These are properties that can be overridden on the Receiver by the endpoint
-    // declaration
+    // These are properties that can be overridden on the Receiver by the endpoint declaration
+    // inbound only
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final String PROPERTY_FILE_AGE = "fileAge";
-    public static final String PROPERTY_FILENAME = "filename";
-    public static final String PROPERTY_ORIGINAL_FILENAME = "originalFilename";
-    public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern";
     public static final String PROPERTY_MOVE_TO_PATTERN = "moveToPattern";
     public static final String PROPERTY_MOVE_TO_DIRECTORY = "moveToDirectory";
-    public static final String PROPERTY_DELETE_ON_READ = "autoDelete";
-    public static final String PROPERTY_DIRECTORY = "directory";
-    public static final String PROPERTY_SERVICE_OVERRIDE = "serviceOverrides";
-    public static final String PROPERTY_WRITE_TO_DIRECTORY = "writeToDirectoryName";
     public static final String PROPERTY_READ_FROM_DIRECTORY = "readFromDirectoryName";
+    // outbound only
+    public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern";
+    // apparently unused (once strange override code deleted)
+//    public static final String PROPERTY_DELETE_ON_READ = "autoDelete";
+//    public static final String PROPERTY_SERVICE_OVERRIDE = "serviceOverrides";
+
+    // message properties
+    public static final String PROPERTY_FILENAME = "filename";
+    public static final String PROPERTY_ORIGINAL_FILENAME = "originalFilename";
+    public static final String PROPERTY_DIRECTORY = "directory";
+    public static final String PROPERTY_WRITE_TO_DIRECTORY = "writeToDirectoryName";
     public static final String PROPERTY_FILE_SIZE = "fileSize";
 
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
@@ -194,18 +196,21 @@ public class FileConnector extends AbstractConnector
                     logger.error("Failed to set fileAge", ex1);
                 }
             }
-            Map srvOverride = (Map) props.get(PROPERTY_SERVICE_OVERRIDE);
-            if (srvOverride != null)
-            {
-                if (serviceOverrides == null)
-                {
-                    serviceOverrides = new Properties();
-                }
-                serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
-                    NoActionTransformer.class.getName());
-                serviceOverrides.setProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER,
-                    NoActionTransformer.class.getName());
-            }
+
+            // this is surreal!  what on earth was it useful for?
+//            Map srvOverride = (Map) props.get(PROPERTY_SERVICE_OVERRIDE);
+//            if (srvOverride != null)
+//            {
+//                if (serviceOverrides == null)
+//                {
+//                    serviceOverrides = new Properties();
+//                }
+//                serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
+//                    NoActionTransformer.class.getName());
+//                serviceOverrides.setProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER,
+//                    NoActionTransformer.class.getName());
+//            }
+
         }
 
         try
@@ -224,7 +229,7 @@ public class FileConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "file";
+        return FILE;
     }
 
     public FilenameParser getFilenameParser()
@@ -506,8 +511,7 @@ public class FileConnector extends AbstractConnector
         throws UMOException
     {
         String address = endpoint.getEndpointURI().getAddress();
-        String writeToDirectory = message.getStringProperty(
-            FileConnector.PROPERTY_WRITE_TO_DIRECTORY, null);
+        String writeToDirectory = message.getStringProperty(FileConnector.PROPERTY_WRITE_TO_DIRECTORY, null);
         if (writeToDirectory == null)
         {
             writeToDirectory = getWriteToDirectory();
@@ -580,6 +584,5 @@ public class FileConnector extends AbstractConnector
     {
         this.streaming = streaming;
     }
-    
-    
+
 }

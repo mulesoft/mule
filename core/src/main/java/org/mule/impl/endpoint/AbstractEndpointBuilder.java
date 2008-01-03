@@ -77,7 +77,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     protected Boolean synchronous;
     protected Boolean remoteSync;
     protected Integer remoteSyncTimeout;
-    protected Boolean streaming;
     protected String initialState = UMOImmutableEndpoint.INITIAL_STATE_STARTED;
     protected String encoding;
     protected Integer createConnector;
@@ -595,12 +594,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     }
 
-    public void setStreaming(boolean streaming)
-    {
-        this.streaming = new Boolean(streaming);
-
-    }
-
     public void setInitialState(String initialState)
     {
         this.initialState = initialState;
@@ -666,7 +659,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         result = prime * result + ((remoteSyncTimeout == null) ? 0 : remoteSyncTimeout.hashCode());
         result = prime * result + ((responseTransformers == null) ? 0 : responseTransformers.hashCode());
         result = prime * result + ((securityFilter == null) ? 0 : securityFilter.hashCode());
-        result = prime * result + ((streaming == null) ? 0 : streaming.hashCode());
         result = prime * result + ((synchronous == null) ? 0 : synchronous.hashCode());
         result = prime * result + ((transactionConfig == null) ? 0 : transactionConfig.hashCode());
         result = prime * result + ((transformers == null) ? 0 : transformers.hashCode());
@@ -693,7 +685,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
                 && equal(remoteSyncTimeout, other.remoteSyncTimeout)
                 && equal(responseTransformers, other.responseTransformers)
                 && equal(securityFilter, other.securityFilter)
-                && equal(streaming, other.streaming)
                 && equal(synchronous, other.synchronous)
                 && equal(transactionConfig, other.transactionConfig)
                 && equal(transformers, other.transformers);
@@ -737,11 +728,6 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         if (remoteSyncTimeout != null)
         {
             builder.setRemoteSyncTimeout(remoteSyncTimeout.intValue());
-        }
-        if (streaming != null)
-        {
-            builder.setStreaming(streaming.booleanValue());
-
         }
 
         return builder;

@@ -126,4 +126,52 @@
     <xsd:element name="transformer-file-to-string" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
 
     <xsd:element name="filter-filename-wildcard" type="mule:wildcardFilterType" substitutionGroup="mule:abstract-filter"/>
+
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:inboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="inboundAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:outboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="outboundAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:globalEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="inboundAttributes"/>
+                <xsd:attributeGroup ref="outboundAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="inboundAttributes">
+        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
+        <xsd:attribute name="fileAge" type="mule:substitutableLong"/>
+        <xsd:attribute name="moveToPattern" type="xsd:string"/>
+        <xsd:attribute name="moveToDirectory" type="xsd:string"/>
+        <xsd:attribute name="readFromDirectoryName" type="xsd:string"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="outboundAttributes">
+        <xsd:attribute name="outputPattern" type="xsd:string"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="addressAttributes">
+        <xsd:attribute name="path" type="xsd:string"/>
+    </xsd:attributeGroup>
+
 </xsd:schema>
