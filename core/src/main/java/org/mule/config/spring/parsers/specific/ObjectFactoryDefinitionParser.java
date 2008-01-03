@@ -18,15 +18,10 @@ import org.mule.util.object.PooledObjectFactory;
 import org.mule.util.object.PrototypeObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
 
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
 {
-    public static final String FACTORY_REF = "factory-ref";
-    
     protected Class beanClass = null;
 
     public ObjectFactoryDefinitionParser(Class beanClass, String setterMethod)
@@ -75,19 +70,4 @@ public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
             return null;
         }
     }
-
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        Attr factory = element.getAttributeNode(FACTORY_REF);
-        if (null != factory)
-        {
-            getBeanAssembler(element, builder).extendTarget(factory);
-            element.removeAttributeNode(factory);
-        }
-        else
-        {
-            super.parseChild(element, parserContext, builder);
-        }
-    }
-
 }
