@@ -18,7 +18,7 @@ import org.mule.umo.UMOMessage;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.activemq.command.ActiveMQTextMessage;
+import javax.jms.TextMessage;
 
 public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
 {
@@ -41,7 +41,7 @@ public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         UMOMessage result = client.send("vm://pojo1", message, props);
         assertNotNull(result);
-        assertEquals("Received: " + message, ((ActiveMQTextMessage)result.getPayload()).getText());
+        assertEquals("Received: " + message, ((TextMessage)result.getPayload()).getText());
     }
     
     public void testReplyToChainWithoutProps() throws Exception
@@ -51,7 +51,7 @@ public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         UMOMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
-        assertEquals("Received: " + message, ((ActiveMQTextMessage)result.getPayload()).getText());
+        assertEquals("Received: " + message, ((TextMessage)result.getPayload()).getText());
     }
 
 }
