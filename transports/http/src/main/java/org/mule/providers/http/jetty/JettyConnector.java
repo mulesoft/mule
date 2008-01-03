@@ -11,6 +11,7 @@
 package org.mule.providers.http.jetty;
 
 import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpsConnector;
 
 /**
  * <code>ServletConnector</code> is a channel adapter between Mule and a servlet
@@ -20,17 +21,20 @@ import org.mule.providers.http.HttpConnector;
 public class JettyConnector extends HttpConnector
 {
 
+    public static final String JETTY = "jetty";
+    public static final String REST = "rest";
+
     public JettyConnector()
     {
         super();
-        registerSupportedProtocol("http");
-        registerSupportedProtocol("https");
-        registerSupportedProtocol("rest");
+        registerSupportedProtocol(HttpConnector.HTTP);
+        registerSupportedProtocol(HttpsConnector.HTTPS);
+        registerSupportedProtocol(REST);
     }
 
     public String getProtocol()
     {
-        return "jetty";
+        return JETTY;
     }
 
 }

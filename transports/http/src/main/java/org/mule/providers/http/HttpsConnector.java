@@ -34,6 +34,8 @@ import javax.net.ssl.TrustManagerFactory;
 public class HttpsConnector extends HttpConnector
         implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
 {
+
+    public static final String HTTPS = "https";
     public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";
     public static final String LOCAL_CERTIFICATES = "LOCAL_CERTIFICATES";
 
@@ -70,7 +72,7 @@ public class HttpsConnector extends HttpConnector
 
     public String getProtocol()
     {
-        return "https";
+        return HTTPS;
     }
 
     public String getClientKeyStore()

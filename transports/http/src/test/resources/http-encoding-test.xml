@@ -16,12 +16,12 @@
         </add-properties>
     </transformer-message-properties>
 
-    <endpoint name="clientEndpoint" address="http://localhost:60198" synchronous="true"/>
+    <http:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
 
     <model name="main">
         <service name="testComponent">
             <inbound-router>
-                <inbound-endpoint ref="clientEndpoint" responseTransformer-refs="setResponseType"/>
+                <http:inbound-endpoint ref="clientEndpoint" responseTransformer-refs="setResponseType"/>
             </inbound-router>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>

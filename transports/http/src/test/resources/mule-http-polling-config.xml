@@ -22,11 +22,12 @@
 
         <service name="pollingUMO">
             <inbound-router>
-                <inbound-endpoint address="http://marie:marie@localhost:60205" connector-ref="PollingHttpConnector">
+                <http:inbound-endpoint user="marie" password="marie" host="localhost" port="60205"
+                                       connector-ref="PollingHttpConnector">
                     <properties>
                         <spring:entry key="pollingFrequency" value="30000"/>
                     </properties>
-                </inbound-endpoint>
+                </http:inbound-endpoint>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>

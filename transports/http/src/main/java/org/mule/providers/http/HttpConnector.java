@@ -57,23 +57,26 @@ import org.apache.commons.codec.binary.Base64;
 public class HttpConnector extends TcpConnector
 {
 
+    public static final String HTTP = "http";
+    public static final String HTTP_PREFIX = "http.";
+    
     /**
      * Event property to pass back the status for the response
      */
-    public static final String HTTP_STATUS_PROPERTY = "http.status";
-    public static final String HTTP_VERSION_PROPERTY = "http.version";
-    public static final String HTTP_CUSTOM_HEADERS_MAP_PROPERTY = "http.custom.headers";
-    public static final String HTTP_METHOD_PROPERTY = "http.method";
-    public static final String HTTP_REQUEST_PROPERTY = "http.request";
+    public static final String HTTP_STATUS_PROPERTY = HTTP_PREFIX + "status";
+    public static final String HTTP_VERSION_PROPERTY = HTTP_PREFIX + "version";
+    public static final String HTTP_CUSTOM_HEADERS_MAP_PROPERTY = HTTP_PREFIX + "custom.headers";
+    public static final String HTTP_METHOD_PROPERTY = HTTP_PREFIX + "method";
+    public static final String HTTP_REQUEST_PROPERTY = HTTP_PREFIX + "request";
 
     /**
      * Allows the user to set a {@link org.apache.commons.httpclient.params.HttpMethodParams} object in the client
      * request to be set on the HttpMethod request object
      */
-    public static final String HTTP_PARAMS_PROPERTY = "http.params";
-    public static final String HTTP_GET_BODY_PARAM_PROPERTY = "http.get.body.param";
+    public static final String HTTP_PARAMS_PROPERTY = HTTP_PREFIX + "params";
+    public static final String HTTP_GET_BODY_PARAM_PROPERTY = HTTP_PREFIX + "get.body.param";
     public static final String DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY = "body";
-    public static final String HTTP_POST_BODY_PARAM_PROPERTY = "http.post.body.param";
+    public static final String HTTP_POST_BODY_PARAM_PROPERTY = HTTP_PREFIX + "post.body.param";
 
     public static final String HTTP_COOKIE_SPEC_PROPERTY = "cookieSpec";
     public static final String HTTP_COOKIES_PROPERTY = "cookies";
@@ -186,7 +189,7 @@ public class HttpConnector extends TcpConnector
      */
     public String getProtocol()
     {
-        return "http";
+        return HTTP;
     }
 
     /**
@@ -320,10 +323,10 @@ public class HttpConnector extends TcpConnector
         if (event != null && event.getCredentials() != null)
         {
             UMOMessage msg = event.getMessage();
-            String authScopeHost = msg.getStringProperty("http.auth.scope.host", null);
-            int authScopePort = msg.getIntProperty("http.auth.scope.port", -1);
-            String authScopeRealm = msg.getStringProperty("http.auth.scope.realm", null);
-            String authScopeScheme = msg.getStringProperty("http.auth.scope.scheme", null);
+            String authScopeHost = msg.getStringProperty(HTTP_PREFIX + "auth.scope.host", null);
+            int authScopePort = msg.getIntProperty(HTTP_PREFIX + "auth.scope.port", -1);
+            String authScopeRealm = msg.getStringProperty(HTTP_PREFIX + "auth.scope.realm", null);
+            String authScopeScheme = msg.getStringProperty(HTTP_PREFIX + "auth.scope.scheme", null);
             client.getState().setCredentials(
                 new AuthScope(authScopeHost, authScopePort, authScopeRealm, authScopeScheme),
                 new UsernamePasswordCredentials(event.getCredentials().getUsername(), new String(

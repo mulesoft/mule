@@ -25,6 +25,16 @@ public class AbstractFirstResultSerialDefinitionParser extends AbstractSerialDel
 
     protected AbstractBeanDefinition firstDefinition;
 
+    public AbstractFirstResultSerialDefinitionParser()
+    {
+        super();
+    }
+
+    public AbstractFirstResultSerialDefinitionParser(boolean doReset)
+    {
+        super(doReset);
+    }
+
     protected AbstractBeanDefinition doSingleBean(int index, MuleDefinitionParser parser, Element element, ParserContext parserContext)
     {
         try

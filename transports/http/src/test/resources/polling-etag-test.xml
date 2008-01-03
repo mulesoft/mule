@@ -21,8 +21,8 @@
         <!-- singleton for easier testing only -->
         <service name="Test" class="org.mule.tck.testmodels.mule.TestSedaComponent">
             <inbound-router>
-                <inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
-                                  address="http://localhost:60206/TestServer"/>
+                <http:inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
+                                       address="http://localhost:60206/TestServer"/>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>

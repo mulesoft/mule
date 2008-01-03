@@ -119,4 +119,40 @@
     <xsd:element name="http-response-to-string" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:element name="object-to-http-client-request" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:element name="message-to-http-response" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:inboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:outboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:globalEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="addressAttributes">
+        <xsd:attribute name="user" type="xsd:string"/>
+        <xsd:attribute name="password" type="xsd:string"/>
+        <xsd:attribute name="host" type="xsd:string"/>
+        <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
+        <xsd:attribute name="path" type="xsd:string"/>
+    </xsd:attributeGroup>
+
 </xsd:schema>

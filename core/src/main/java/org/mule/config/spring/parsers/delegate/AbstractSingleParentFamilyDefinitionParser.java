@@ -28,6 +28,16 @@ public abstract class AbstractSingleParentFamilyDefinitionParser
         extends AbstractFirstResultSerialDefinitionParser
 {
 
+    public AbstractSingleParentFamilyDefinitionParser()
+    {
+        super();
+    }
+
+    public AbstractSingleParentFamilyDefinitionParser(boolean doReset)
+    {
+        super(doReset);
+    }
+
     protected MuleChildDefinitionParser addChildDelegate(MuleChildDefinitionParser delegate)
     {
         return (MuleChildDefinitionParser) super.addDelegate(delegate);

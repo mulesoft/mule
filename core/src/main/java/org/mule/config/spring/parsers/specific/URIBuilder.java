@@ -67,7 +67,8 @@ public class URIBuilder
     public static final String[] HOST_ATTRIBUTES = new String[]{HOST};
     public static final String[] SOCKET_ATTRIBUTES = new String[]{HOST, PORT};
     public static final String[] USERHOST_ATTRIBUTES = new String[]{USER, HOST};
-    public static final String[] ALL_TRANSPORT_ATTRIBUTES = new String[]{USER, PASSWORD, HOST, ADDRESS, PORT, PATH};
+    // this doesn't include address, since that is handled separately (and is exclusive with these)
+    public static final String[] ALL_TRANSPORT_ATTRIBUTES = new String[]{USER, PASSWORD, HOST, PORT, PATH};
 
     private String address;
     private String meta;

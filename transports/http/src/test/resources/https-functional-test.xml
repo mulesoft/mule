@@ -14,7 +14,7 @@
         <https:tls-server trustStore="trustStore" trustStorePassword="mulepassword"/>
     </https:connector>
 
-    <endpoint name="clientEndpoint" address="https://localhost:60202" synchronous="true" connector-ref="httpConnector"/>
+    <https:endpoint name="clientEndpoint" host="localhost" port="60202" synchronous="true" connector-ref="httpConnector"/>
 
     <model name="main">
         <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">

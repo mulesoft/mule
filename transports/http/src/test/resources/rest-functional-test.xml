@@ -16,17 +16,12 @@
             <inbound-router>
                 <inbound-endpoint address="vm://in1"/>
             </inbound-router>
-            <component class="org.mule.providers.http.components.RestServiceWrapper">
-                <properties>
-                    <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                    <spring:entry key="httpMethod" value="POST"/>
-                    <spring:entry key="payloadParameterNames">
-                        <spring:list>
-                            <spring:value>symbol</spring:value>
-                        </spring:list>
-                    </spring:entry>
-                </properties>
-            </component>
+            <http:rest-service-component serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
+                                         httpMethod="POST">
+                <http:payloadParameterNames>
+                    <spring:value>symbol</spring:value>
+                </http:payloadParameterNames>
+            </http:rest-service-component>
         </service>
 
         <service name="RESTServiceWrapper2">

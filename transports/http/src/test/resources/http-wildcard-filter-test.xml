@@ -12,11 +12,11 @@
 
         <service name="httpIn">
             <inbound-router>
-                <inbound-endpoint address="http://localhost:60201" synchronous="true">
+                <http:inbound-endpoint host="localhost" port="60201" synchronous="true">
                     <not-filter>
                         <wildcard-filter pattern="*xyz*"/>
                     </not-filter>
-                </inbound-endpoint>
+                </http:inbound-endpoint>
             </inbound-router>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>

@@ -10,9 +10,9 @@
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-    <endpoint name="base" address="http://localhost:60198" synchronous="true"/>
-    <endpoint name="adapted" address="http://localhost:60199" synchronous="true"/>
-    <endpoint name="ignored" address="http://localhost:60200" synchronous="true"/>
+    <http:endpoint name="base" host="localhost" port="60198" synchronous="true"/>
+    <http:endpoint name="adapted" host="localhost" port="60199" synchronous="true"/>
+    <http:endpoint name="ignored" address="http://localhost:60200" synchronous="true"/>
     <endpoint name="inbound" address="http://localhost:60201" synchronous="true"/>
 
     <custom-transformer name="appendString" class="org.mule.tck.functional.StringAppendTestTransformer"/>
@@ -28,7 +28,7 @@
 
         <service name="baseService1">
             <inbound-router>
-                <inbound-endpoint ref="base"/>
+                <http:inbound-endpoint ref="base"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
@@ -81,7 +81,7 @@
 
         <service name="ignoredService1">
             <inbound-router>
-                <inbound-endpoint ref="ignored" transformer-refs="appendString"/>
+                <http:inbound-endpoint ref="ignored" transformer-refs="appendString"/>
             </inbound-router>
             <component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
             <outbound-router>

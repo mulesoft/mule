@@ -11,8 +11,8 @@
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
     <endpoint name="base" address="http://localhost:60198" synchronous="true"/>
-    <endpoint name="response" address="http://localhost:60199" synchronous="true"/>
-    <endpoint name="both" address="http://localhost:60200" synchronous="true"/>
+    <http:endpoint name="response" address="http://localhost:60199" synchronous="true"/>
+    <http:endpoint name="both" host="localhost" port="60200" synchronous="true"/>
 
     <custom-transformer name="appendString" class="org.mule.tck.functional.StringAppendTestTransformer"/>
 
@@ -36,7 +36,7 @@
 
         <service name="baseService1">
             <inbound-router>
-                <inbound-endpoint ref="base"/>
+                <http:inbound-endpoint ref="base"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>
@@ -67,7 +67,7 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="vm://echo2" synchronous="true"/>
+                    <vm:outbound-endpoint path="echo2" synchronous="true"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -88,10 +88,10 @@
 
         <service name="bothService1">
             <inbound-router>
-                <inbound-endpoint ref="both" responseTransformer-refs="appendResponse">
+                <http:inbound-endpoint ref="both" responseTransformer-refs="appendResponse">
                    <transformer-object-to-string/>
                    <transformer ref="appendString" />
-                </inbound-endpoint>
+                </http:inbound-endpoint>
                 <forwarding-router/>
                 <forwarding-router/>
             </inbound-router>
@@ -104,11 +104,11 @@
 
         <service name="bothService2">
             <inbound-router>
-                <inbound-endpoint address="vm://echo3" synchronous="true"
+                <vm:inbound-endpoint address="vm://echo3" synchronous="true"
                 				  responseTransformer-refs="appendResponse2">
                   <transformer-object-to-string />
                   <transformer ref="appendString2" />
-                </inbound-endpoint>
+                </vm:inbound-endpoint>
             </inbound-router>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>

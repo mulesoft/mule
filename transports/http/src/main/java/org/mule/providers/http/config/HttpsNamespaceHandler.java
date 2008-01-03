@@ -11,6 +11,8 @@ package org.mule.providers.http.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.http.HttpsConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -18,10 +20,11 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 /**
  * Reigsters a Bean Definition Parser for handling <code><https:connector></code> elements.
  */
-public class HttpsNamespaceHandler extends NamespaceHandlerSupport
+public class HttpsNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
+        registerStandardTransportEndpoints(HttpsConnector.HTTPS, URIBuilder.SOCKET_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(HttpsConnector.class, true));
         registerBeanDefinitionParser("tls-key-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());

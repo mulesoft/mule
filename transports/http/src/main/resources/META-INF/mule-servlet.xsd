@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/servlet/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
             targetNamespace="http://www.mulesource.org/schema/mule/servlet/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -9,6 +10,8 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/http/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd"/>
 
     <xsd:element name="connector" type="servletConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
@@ -31,6 +34,27 @@
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="http:inboundEndpointType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="http:outboundEndpointType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="http:globalEndpointType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

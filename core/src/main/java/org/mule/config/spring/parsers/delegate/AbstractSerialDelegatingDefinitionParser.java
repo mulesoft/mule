@@ -44,9 +44,24 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
 
     private int index = 0;
     private boolean first;
+    private boolean doReset;
     private String originalId;
     private String originalName;
     private Set handledExceptions = new HashSet();
+
+    public AbstractSerialDelegatingDefinitionParser()
+    {
+        this(true); // by default, reset name
+    }
+
+    /**
+     * @param doReset Should the name be reset after called.  This is typically true (it protects the
+     * parent from changes made by children) unless this is itself nested.
+     */
+    public AbstractSerialDelegatingDefinitionParser(boolean doReset)
+    {
+        this.doReset = doReset;
+    }
 
     public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
     {
@@ -115,7 +130,7 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
                     originalId = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_ID);
                     originalName = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
                 }
-                else
+                else if (doReset)
                 {
                     resetNameAndId(element);
                 }

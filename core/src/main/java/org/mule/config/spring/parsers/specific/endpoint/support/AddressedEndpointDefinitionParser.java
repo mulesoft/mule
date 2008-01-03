@@ -118,6 +118,8 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         public CompositeAddressDefinitionParser(String metaOrProtocol, boolean isMeta,
                 String[] endpointAttributes, String[][] requiredAddressAttributes, String[][] requiredProperties)
         {
+            super(false); // don't reset name!
+
             // this parses the address.  it will see the endpoint as parent automatically.
             addressParser = new ChildAddressDefinitionParser(metaOrProtocol, isMeta);
             addDelegate(addressParser);

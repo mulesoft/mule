@@ -11,6 +11,8 @@
 package org.mule.providers.http.servlet;
 
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpsConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 
@@ -26,6 +28,9 @@ import java.util.Map;
 
 public class ServletConnector extends AbstractConnector
 {
+
+    public static final String SERVLET = "servlet";
+
     // The real URL that the servlet container is bound on.
     // If this is not set the wsdl may not be generated correctly
     protected String servletUrl;
@@ -33,8 +38,8 @@ public class ServletConnector extends AbstractConnector
     public ServletConnector()
     {
         super();
-        registerSupportedProtocol("http");
-        registerSupportedProtocol("https");
+        registerSupportedProtocol(HttpConnector.HTTP);
+        registerSupportedProtocol(HttpsConnector.HTTPS);
     }
 
 
@@ -70,7 +75,7 @@ public class ServletConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "servlet";
+        return SERVLET;
     }
 
     public Map getReceivers()

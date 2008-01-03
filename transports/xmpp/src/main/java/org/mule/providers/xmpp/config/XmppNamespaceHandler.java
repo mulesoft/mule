@@ -22,7 +22,7 @@ public class XmppNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerStandardTransportEndpoints(XmppConnector.XMPP, URIBuilder.ALL_TRANSPORT_ATTRIBUTES);
+        registerStandardTransportEndpoints(XmppConnector.XMPP, URIBuilder.USERHOST_ATTRIBUTES);
         this.registerBeanDefinitionParser("connector", 
             new MuleOrphanDefinitionParser(XmppConnector.class, true));
     }
