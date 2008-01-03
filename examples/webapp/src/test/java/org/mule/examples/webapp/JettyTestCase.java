@@ -10,6 +10,9 @@
 
 package org.mule.examples.webapp;
 
+import org.mule.MuleServer;
+import org.mule.umo.UMOManagementContext;
+
 import junit.framework.TestCase;
 
 import org.mortbay.jetty.Server;
@@ -61,7 +64,10 @@ public class JettyTestCase extends TestCase // TODO MULE-2768
     // This test fails, I'm not sure how we could get the ManagementContext from the Web Container.
     //public void testManagementContextAvailable() throws Exception
     //{
-    //    assertNotNull("ManagementContext should have been set by MuleXmlConfigurationBuilder", MuleServer.getManagementContext());
+    //    UMOManagementContext mc = MuleServer.getManagementContext();
+    //    assertNotNull("ManagementContext should have been set by MuleXmlConfigurationBuilder", mc);
+    //    assertTrue("ManagementContext not initialised", mc.isInitialised());
+    //    assertTrue("ManagementContext not started", mc.isStarted());
     //}
     
     // TODO Add the tests from AbstractWebappTestCase, but without using the MuleClient because
