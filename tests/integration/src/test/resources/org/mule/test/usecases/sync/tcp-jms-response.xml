@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
-	xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
-	xsi:schemaLocation="
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:tcp="http://www.mulesource.org/schema/mule/tcp/2.0"
+    xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+    xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
                http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
                http://www.mulesource.org/schema/mule/tcp/2.0 http://www.mulesource.org/schema/mule/tcp/2.0/mule-tcp.xsd
                http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-	<tcp:connector name="tcpConnector" keepSendSocketOpen="true">
-		<tcp:direct-protocol payloadOnly="true" />
-	</tcp:connector>
+    <tcp:connector name="tcpConnector" keepSendSocketOpen="true">
+        <tcp:direct-protocol payloadOnly="true" />
+    </tcp:connector>
 
-	<jms:activemq-connector name="jmsConnector" specification="1.1" />
+    <jms:activemq-connector name="jmsConnector" specification="1.1" />
 
-	<model name="model">
+    <jms:transformer-jmsmessage-to-object name="jmsmessage-to-object" />
+    <transformer-byte-array-to-object name="bytearray-to-object" />
 
-		<service name="TcpReceiver">
-			<inbound-router>
-				<inbound-endpoint address="tcp://localhost:4444"
-					remoteSync="true" />
-			</inbound-router>
-			<component class="org.mule.components.simple.EchoComponent" />
-			<outbound-router>
-				<outbound-pass-through-router>
-					<outbound-endpoint address="jms://queue_in" />
-					<reply-to address="jms://queue_out" />
-				</outbound-pass-through-router>
-			</outbound-router>
-			<async-reply-router>
-				<inbound-endpoint address="jms://queue_out">
-				</inbound-endpoint>
-				<custom-async-reply-router
-					class="org.mule.test.usecases.service.DummyResponseAggregator" />
-			</async-reply-router>
-		</service>
+    <model name="model">
 
-		<service name="JMSReplyProvider">
-			<inbound-router>
-				<inbound-endpoint address="jms://queue_in">
-					<jms:transformer-jmsmessage-to-object />
-					<transformer-byte-array-to-object />
-				</inbound-endpoint>
-			</inbound-router>
-			<component>
-				<singleton-object
-					class="org.mule.test.integration.service.TestReceiver" />
-			</component>
-		</service>
-	</model>
+        <service name="TcpReceiver">
+            <inbound-router>
+                <!-- Response transformer set here is a workaround because async-reply-router does not apply
+                     default inbound jms transformer  -->
+                <inbound-endpoint address="tcp://localhost:4444" remoteSync="true"
+                    responseTransformer-refs="jmsmessage-to-object" />
+            </inbound-router>
+            <component class="org.mule.components.simple.EchoComponent" />
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="jms://queue_in" />
+                    <reply-to address="jms://queue_out" />
+                </outbound-pass-through-router>
+            </outbound-router>
+            <async-reply-router>
+                <inbound-endpoint address="jms://queue_out" />
+                <custom-async-reply-router class="org.mule.test.usecases.service.DummyResponseAggregator" />
+            </async-reply-router>
+        </service>
+
+        <service name="JMSReplyProvider">
+            <inbound-router>
+                <inbound-endpoint address="jms://queue_in">
+                    <transformer ref="jmsmessage-to-object" />
+                    <transformer ref="bytearray-to-object" />
+                </inbound-endpoint>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.test.integration.service.TestReceiver" />
+            </component>
+        </service>
+    </model>
 
 </mule>
