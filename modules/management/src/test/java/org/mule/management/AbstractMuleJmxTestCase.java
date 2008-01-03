@@ -68,6 +68,9 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
         // their MBeans and give errors if they can't find the MBeans they registered.
         // Any MBean's that are registered manually in TestCase should be unregistered in the same test case.
 
+        // Release MBeanServer so MBeanServer instance can't get passed over from one
+        // test to another in same circumstances.
+        MBeanServerFactory.releaseMBeanServer(mBeanServer);
         mBeanServer = null;
     }
 
