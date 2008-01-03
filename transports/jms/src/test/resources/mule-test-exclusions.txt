@@ -16,3 +16,7 @@ org.mule.providers.jms.transactions.JmsClientAcknowledgeTransactionFunctionalTes
 # These fail intermittently too, but look different to the 2071 errors
 org.mule.providers.jms.functional.ActiveMQJmsTopicFunctionalTestCase
 org.mule.providers.jms.functional.ActiveMQJmsQueueFunctionalTestCase
+
+
+# MULE-2868
+org.mule.providers.jms.issues.JmsRemoteSyncMule2868TestCase
