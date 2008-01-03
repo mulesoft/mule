@@ -35,20 +35,25 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
 public class FtpConnector extends AbstractConnector
 {
-    public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
-    public static final String PROPERTY_FILENAME = "filename";
-    public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern";
+
+    public static final String FTP = "ftp";
+
+    // endpoint properties
+    public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency"; // inbound only
+    public static final int DEFAULT_POLLING_FREQUENCY = 1000;
+    public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern"; // outbound only
     public static final String PROPERTY_PASSIVE_MODE = "passive";
     public static final String PROPERTY_BINARY_TRANSFER = "binary";
 
-    public static final int DEFAULT_POLLING_FREQUENCY = 1000;
+    // message properties
+    public static final String PROPERTY_FILENAME = "filename";
+
 
     /**
      *  TODO it makes sense to have a type-safe adapter for FTP specifically, but without
@@ -80,7 +85,7 @@ public class FtpConnector extends AbstractConnector
 
     public String getProtocol()
     {
-        return "ftp";
+        return FTP;
     }
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
@@ -441,7 +446,7 @@ public class FtpConnector extends AbstractConnector
                 {
                     logger.trace("Using FTP BINARY type");
                 }
-                type = FTP.BINARY_FILE_TYPE;
+                type = org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
             }
             else
             {
@@ -449,7 +454,7 @@ public class FtpConnector extends AbstractConnector
                 {
                     logger.trace("Using FTP ASCII type");
                 }
-                type = FTP.ASCII_FILE_TYPE;
+                type = org.apache.commons.net.ftp.FTP.ASCII_FILE_TYPE;
             }
         }
         else
@@ -462,7 +467,7 @@ public class FtpConnector extends AbstractConnector
                 {
                     logger.trace("Using FTP BINARY type (endpoint override)");
                 }
-                type = FTP.BINARY_FILE_TYPE;
+                type = org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
             }
             else
             {
@@ -470,7 +475,7 @@ public class FtpConnector extends AbstractConnector
                 {
                     logger.trace("Using FTP ASCII type (endpoint override)");
                 }
-                type = FTP.ASCII_FILE_TYPE;
+                type = org.apache.commons.net.ftp.FTP.ASCII_FILE_TYPE;
             }
         }
 

@@ -31,18 +31,18 @@
             </component>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="ftp://anonymous:email@localhost:60197">
+                    <ftp:outbound-endpoint user="anonymous" password="email" host="localhost" port="60197">
                         <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
-                    </outbound-endpoint>
+                    </ftp:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
 
         <service name="testComponent">
             <inbound-router>
-                <inbound-endpoint address="ftp://anonymous:email@localhost:60197">
+                <ftp:inbound-endpoint address="ftp://anonymous:email@localhost:60197">
                     <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
-                </inbound-endpoint>
+                </ftp:inbound-endpoint>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
