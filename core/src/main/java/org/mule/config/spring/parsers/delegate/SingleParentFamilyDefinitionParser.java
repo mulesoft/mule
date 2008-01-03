@@ -12,6 +12,7 @@ package org.mule.config.spring.parsers.delegate;
 
 import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
+import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 
 public class SingleParentFamilyDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
 {
@@ -23,7 +24,7 @@ public class SingleParentFamilyDefinitionParser extends AbstractSingleParentFami
         parent.setIgnoredDefault(false);
     }
 
-    protected MuleDefinitionParser addDelegate(MuleDefinitionParser delegate)
+    protected MuleDefinitionParserConfiguration addDelegate(MuleDefinitionParser delegate)
     {
         throw new UnsupportedOperationException("Delegates must be associated with attribute names");
     }

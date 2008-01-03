@@ -21,22 +21,17 @@ import org.mule.providers.quartz.QuartzConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
-/** Registers Bean Definition Parsers for the "quartz" namespace. */
+/**
+ * Registers Bean Definition Parsers for the "quartz" namespace
+ */
 public class QuartzNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+
     public void init()
     {
         registerStandardTransportEndpoints(QuartzConnector.QUARTZ, URIBuilder.PATH_ATTRIBUTES);
-        registerBeanDefinitionParser("connector", new QuartzConnectorDefinitionParser());
+        registerMuleBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(QuartzConnector.class, true)).addAlias("scheduler", "quartzScheduler");
         registerBeanDefinitionParser("factory-properties", new ChildMapDefinitionParser("factoryProperties"));
     }
-}
 
-class QuartzConnectorDefinitionParser extends MuleOrphanDefinitionParser
-{
-    public QuartzConnectorDefinitionParser()
-    {
-        super(QuartzConnector.class, true);
-        addAlias("scheduler", "quartzScheduler");
-    }
 }

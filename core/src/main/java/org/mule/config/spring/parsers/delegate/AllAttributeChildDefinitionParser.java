@@ -15,6 +15,7 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.PostProcessor;
+import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.SimplePropertyConfiguration;
@@ -68,65 +69,67 @@ public class AllAttributeChildDefinitionParser
         return parseInternal(element, parserContext);
     }
 
-    public void registerPreProcessor(PreProcessor preProcessor)
+    public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)
     {
         delegate.registerPreProcessor(preProcessor);
+        return this;
     }
 
-    public void registerPostProcessor(PostProcessor postProcessor)
+    public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor)
     {
         delegate.registerPostProcessor(postProcessor);
+        return this;
     }
 
-    public MuleDefinitionParser addReference(String propertyName)
+    public MuleDefinitionParserConfiguration addReference(String propertyName)
     {
         configuration.addReference(propertyName);
         return this;
     }
 
-    public MuleDefinitionParser addMapping(String propertyName, Map mappings)
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings)
     {
         configuration.addMapping(propertyName, mappings);
         return this;
     }
 
-    public MuleDefinitionParser addMapping(String propertyName, String mappings)
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings)
     {
         configuration.addMapping(propertyName, mappings);
         return this;
     }
 
-    public MuleDefinitionParser addMapping(String propertyName, ValueMap mappings)
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings)
     {
         configuration.addMapping(propertyName, mappings);
         return this;
     }
 
-    public MuleDefinitionParser addAlias(String alias, String propertyName)
+    public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName)
     {
         configuration.addAlias(alias, propertyName);
         return this;
     }
 
-    public MuleDefinitionParser addCollection(String propertyName)
+    public MuleDefinitionParserConfiguration addCollection(String propertyName)
     {
         configuration.addCollection(propertyName);
         return this;
     }
 
-    public MuleDefinitionParser addIgnored(String propertyName)
+    public MuleDefinitionParserConfiguration addIgnored(String propertyName)
     {
         configuration.addIgnored(propertyName);
         return this;
     }
 
-    public MuleDefinitionParser removeIgnored(String propertyName)
+    public MuleDefinitionParserConfiguration removeIgnored(String propertyName)
     {
         configuration.removeIgnored(propertyName);
         return this;
     }
 
-    public MuleDefinitionParser setIgnoredDefault(boolean ignoreAll)
+    public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll)
     {
         configuration.setIgnoredDefault(ignoreAll);
         return this;

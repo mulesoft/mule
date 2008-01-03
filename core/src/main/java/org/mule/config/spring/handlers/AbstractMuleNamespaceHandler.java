@@ -13,6 +13,17 @@ import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
+import org.mule.config.spring.parsers.MuleDefinitionParser;
+import org.mule.config.spring.parsers.PreProcessor;
+import org.mule.config.spring.parsers.PostProcessor;
+import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.config.spring.parsers.assembly.ValueMap;
+
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Iterator;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -35,6 +46,23 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
     }
 
+    protected MuleDefinitionParserConfiguration registerMuleBeanDefinitionParser(String name, MuleDefinitionParser parser)
+    {
+        registerBeanDefinitionParser(name, parser);
+        return parser;
+    }
+
+    protected MuleDefinitionParserConfiguration registerStandardTransportEndpoints(String protocol, String[] requiredAttributes)
+    {
+        return new RegisteredMdps(AddressedEndpointDefinitionParser.PROTOCOL, protocol, requiredAttributes);
+    }
+
+    protected MuleDefinitionParserConfiguration registerMetaTransportEndpoints(String protocol)
+    {
+        return new RegisteredMdps(AddressedEndpointDefinitionParser.META, protocol, new String[]{});
+    }
+
+
     private class IgnoredDefinitionParser implements BeanDefinitionParser
     {
         public BeanDefinition parse(Element element, ParserContext parserContext)
@@ -43,18 +71,124 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         }
     }
 
-    protected void registerStandardTransportEndpoints(String protocol, String[] requiredAttributes)
+    private class RegisteredMdps implements MuleDefinitionParserConfiguration
     {
-        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(protocol, requiredAttributes));
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(protocol, InboundEndpointFactoryBean.class, requiredAttributes));
-        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(protocol, OutboundEndpointFactoryBean.class, requiredAttributes));
+
+        private Set bdps = new HashSet();
+
+        private RegisteredMdps(boolean isMeta, String protocol, String[] requiredAttributes)
+        {
+            registerBeanDefinitionParser("endpoint", add(new TransportGlobalEndpointDefinitionParser(protocol, isMeta, requiredAttributes)));
+            registerBeanDefinitionParser("inbound-endpoint", add(new TransportEndpointDefinitionParser(protocol, isMeta, InboundEndpointFactoryBean.class, requiredAttributes)));
+            registerBeanDefinitionParser("outbound-endpoint", add(new TransportEndpointDefinitionParser(protocol, isMeta, OutboundEndpointFactoryBean.class, requiredAttributes)));
+        }
+
+        private MuleDefinitionParser add(MuleDefinitionParser bdp)
+        {
+            bdps.add(bdp);
+            return bdp;
+        }
+
+        public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).registerPreProcessor(preProcessor);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).registerPostProcessor(postProcessor);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration addReference(String propertyName)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).addReference(propertyName);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).addMapping(propertyName, mappings);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).addMapping(propertyName, mappings);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).addMapping(propertyName, mappings);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).addAlias(alias, propertyName);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration addCollection(String propertyName)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).addCollection(propertyName);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration addIgnored(String propertyName)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).addIgnored(propertyName);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration removeIgnored(String propertyName)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).removeIgnored(propertyName);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).setIgnoredDefault(ignoreAll);
+            }
+            return this;
+        }
+
     }
 
-    protected void registerMetaTransportEndpoints(String protocol)
-    {
-        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(protocol, TransportGlobalEndpointDefinitionParser.META, new String[]{}));
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(protocol, TransportEndpointDefinitionParser.META, InboundEndpointFactoryBean.class, new String[]{}));
-        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(protocol, TransportEndpointDefinitionParser.META, OutboundEndpointFactoryBean.class, new String[]{}));
-    }
 
 }

@@ -19,6 +19,7 @@ import org.mule.providers.email.transformers.StringToEmailMessage;
 
 public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+
     public void init()
     {
         registerBeanDefinitionParser("transformer-email-to-string", new TransformerDefinitionParser(EmailMessageToString.class));   
@@ -27,4 +28,5 @@ public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("transformer-mime-to-bytes", new TransformerDefinitionParser(MimeMessageToRfc822ByteArray.class));   
         registerBeanDefinitionParser("transformer-bytes-to-mime", new TransformerDefinitionParser(Rfc822ByteArraytoMimeMessage.class));   
     }
+
 }

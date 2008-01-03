@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
 import org.mule.config.spring.parsers.delegate.AttributeSelectionDefinitionParser;
+import org.mule.config.spring.parsers.MuleDefinitionParser;
 
  public class NotificationDisableDefinitionParser extends AttributeSelectionDefinitionParser
 {
@@ -24,23 +25,31 @@ import org.mule.config.spring.parsers.delegate.AttributeSelectionDefinitionParse
     public NotificationDisableDefinitionParser()
     {
         super(NotificationDefinitionParser.EVENT,
-                new ChildListEntryDefinitionParser(DISABLED_EVENT,
-                        NotificationDefinitionParser.EVENT)
-                        .addMapping(NotificationDefinitionParser.EVENT,
-                        NotificationDefinitionParser.EVENT_MAP));
+                addMappingToConstructorArg(
+                        new ChildListEntryDefinitionParser(DISABLED_EVENT,
+                                NotificationDefinitionParser.EVENT)));
+
         addDelegate(NotificationDefinitionParser.EVENT_CLASS,
                 new ChildListEntryDefinitionParser(DISABLED_EVENT,
                         NotificationDefinitionParser.EVENT_CLASS));
-        addDelegate(NotificationDefinitionParser.INTERFACE,
-                new ChildListEntryDefinitionParser(DISABLED_INTERFACE,
-                        NotificationDefinitionParser.INTERFACE)
-                        .addMapping(NotificationDefinitionParser.INTERFACE,
-                        NotificationDefinitionParser.INTERFACE_MAP));
+
+        MuleDefinitionParser parser =
+                new ChildListEntryDefinitionParser(DISABLED_INTERFACE, NotificationDefinitionParser.INTERFACE);
+        parser.addMapping(NotificationDefinitionParser.INTERFACE, NotificationDefinitionParser.INTERFACE_MAP);
+        addDelegate(NotificationDefinitionParser.INTERFACE, parser);
+
         addDelegate(NotificationDefinitionParser.INTERFACE_CLASS,
                 new ChildListEntryDefinitionParser(DISABLED_INTERFACE,
                         NotificationDefinitionParser.INTERFACE_CLASS));
+
         registerPreProcessor(new CheckExclusiveAttributes(NotificationDefinitionParser.ALL_ATTRIBUTES));
         registerPreProcessor(new CheckRequiredAttributes(NotificationDefinitionParser.ALL_ATTRIBUTES));
+    }
+
+    private static MuleDefinitionParser addMappingToConstructorArg(MuleDefinitionParser parser)
+    {
+        parser.addMapping(NotificationDefinitionParser.EVENT, NotificationDefinitionParser.EVENT_MAP);
+        return parser;
     }
 
 }

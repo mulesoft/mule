@@ -88,6 +88,7 @@
     </xsd:complexType>
 
     <xsd:element name="dom-to-xml" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="dom-to-output-handler" type="xmlTransformerType" substitutionGroup="mule:abstract-transformer"/>
 
     <xsd:element name="jxpath-extractor" type="jxpathExtractorType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:complexType name="jxpathExtractorType">

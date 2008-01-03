@@ -35,9 +35,7 @@ public class StdioNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(StdioConnector.STDIO, URIBuilder.PATH_ATTRIBUTES).addMapping(SYSTEM_ATTRIBUTE, SYSTEM_MAP).addAlias(SYSTEM_ATTRIBUTE, URIBuilder.PATH));
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(StdioConnector.STDIO, InboundEndpointFactoryBean.class, SYSTEM_ATTRIBUTE_ARRAY).addMapping(SYSTEM_ATTRIBUTE, SYSTEM_MAP).addAlias(SYSTEM_ATTRIBUTE, URIBuilder.PATH));
-        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(StdioConnector.STDIO, OutboundEndpointFactoryBean.class, SYSTEM_ATTRIBUTE_ARRAY).addMapping(SYSTEM_ATTRIBUTE, SYSTEM_MAP).addAlias(SYSTEM_ATTRIBUTE, URIBuilder.PATH));
+        registerStandardTransportEndpoints(StdioConnector.STDIO, SYSTEM_ATTRIBUTE_ARRAY).addMapping(SYSTEM_ATTRIBUTE, SYSTEM_MAP).addAlias(SYSTEM_ATTRIBUTE, URIBuilder.PATH);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(PromptStdioConnector.class, true));
     }
 

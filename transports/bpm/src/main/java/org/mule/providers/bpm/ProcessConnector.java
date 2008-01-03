@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public class ProcessConnector extends AbstractConnector implements MessageService
 {
+
     /** The underlying BPMS */
     protected BPMS bpms;
 
@@ -63,14 +64,14 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
     public static final String PROCESS_VARIABLE_INCOMING_SOURCE = "incomingSource";
     public static final String PROCESS_VARIABLE_DATA = "data";
 
-    public static final String PROTOCOL = "bpm";
-    public static final String GLOBAL_RECEIVER = PROTOCOL + "://*";
+    public static final String BPM = "bpm";
+    public static final String GLOBAL_RECEIVER = BPM + "://*";
 
     private MuleClient muleClient = null;
 
     public String getProtocol()
     {
-        return PROTOCOL;
+        return BPM;
     }
 
     protected void doInitialise() throws InitialisationException

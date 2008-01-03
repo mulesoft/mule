@@ -30,40 +30,10 @@ import org.w3c.dom.Element;
  * {@link org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#parseInternal(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
  * and so can be delegated).
  */
-public interface MuleDefinitionParser extends BeanDefinitionParser
+public interface MuleDefinitionParser extends BeanDefinitionParser, MuleDefinitionParserConfiguration
 {
 
     AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext);
-
-    /**
-     * These are prepended to existing processors
-     * @param preProcessor
-     */
-    void registerPreProcessor(PreProcessor preProcessor);
-
-    /**
-     * These are appended to existing processors
-     * @param postProcessor
-     */
-    void registerPostProcessor(PostProcessor postProcessor);
-
-    MuleDefinitionParser addReference(String propertyName);
-
-    MuleDefinitionParser addMapping(String propertyName, Map mappings);
-
-    MuleDefinitionParser addMapping(String propertyName, String mappings);
-
-    MuleDefinitionParser addMapping(String propertyName, ValueMap mappings);
-
-    MuleDefinitionParser addAlias(String alias, String propertyName);
-
-    MuleDefinitionParser addCollection(String propertyName);
-
-    MuleDefinitionParser addIgnored(String propertyName);
-
-    MuleDefinitionParser removeIgnored(String propertyName);
-
-    MuleDefinitionParser setIgnoredDefault(boolean ignoreAll);
 
     String getBeanName(Element element);
 

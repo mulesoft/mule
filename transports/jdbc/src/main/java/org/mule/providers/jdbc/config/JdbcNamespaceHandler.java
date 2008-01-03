@@ -32,10 +32,7 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(JdbcConnector.JDBC, ADDRESS_ATTRIBUTES).addAlias(QUERY_KEY, URIBuilder.PATH));
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(JdbcConnector.JDBC, InboundEndpointFactoryBean.class, ADDRESS_ATTRIBUTES).addAlias(QUERY_KEY, URIBuilder.PATH));
-        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(JdbcConnector.JDBC, OutboundEndpointFactoryBean.class, ADDRESS_ATTRIBUTES).addAlias(QUERY_KEY, URIBuilder.PATH));
-
+        registerStandardTransportEndpoints(JdbcConnector.JDBC, ADDRESS_ATTRIBUTES).addAlias(QUERY_KEY, URIBuilder.PATH);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(JdbcConnector.class, true));
         registerBeanDefinitionParser("dataSource", new ObjectFactoryDefinitionParser("dataSourceFactory"));
         registerBeanDefinitionParser("queries", new ChildMapDefinitionParser("queries"));

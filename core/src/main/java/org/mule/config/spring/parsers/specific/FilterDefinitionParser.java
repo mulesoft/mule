@@ -26,9 +26,9 @@ public class FilterDefinitionParser extends ParentContextDefinitionParser
 
     public FilterDefinitionParser(Class filter)
     {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENTS,
-                new MuleOrphanDefinitionParser(filter, false).addIgnored(ATTRIBUTE_NAME));
-        otherwise(new ChildDefinitionParser(FILTER, filter, UMOFilter.class, false).addIgnored(ATTRIBUTE_NAME));
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENTS, new MuleOrphanDefinitionParser(filter, false));
+        otherwise(new ChildDefinitionParser(FILTER, filter, UMOFilter.class, false));
+        addIgnored(ATTRIBUTE_NAME);
     }
 
     /**
@@ -36,9 +36,9 @@ public class FilterDefinitionParser extends ParentContextDefinitionParser
      */
     public FilterDefinitionParser()
     {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENTS,
-                new MuleOrphanDefinitionParser(false).addIgnored(ATTRIBUTE_NAME));
-        otherwise(new ChildDefinitionParser(FILTER, null, UMOFilter.class, true).addIgnored(ATTRIBUTE_NAME));
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENTS, new MuleOrphanDefinitionParser(false));
+        otherwise(new ChildDefinitionParser(FILTER, null, UMOFilter.class, true));
+        addIgnored(ATTRIBUTE_NAME);
     }
 
 }

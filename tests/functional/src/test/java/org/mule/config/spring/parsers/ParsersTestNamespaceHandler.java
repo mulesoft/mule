@@ -42,21 +42,22 @@ public class ParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerBeanDefinitionParser("orphan", new OrphanDefinitionParser(OrphanBean.class, true).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
-        registerBeanDefinitionParser("child", new ChildDefinitionParser("child", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
-        registerBeanDefinitionParser("mapped-child", new MapDefinitionParserMutator("map", new ChildDefinitionParser("child", ChildBean.class)).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
-        registerBeanDefinitionParser("kid", new ChildDefinitionParser("kid", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored"));
-        registerBeanDefinitionParser("parent", new ParentDefinitionParser().addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
-        registerBeanDefinitionParser("orphan1", new NamedDefinitionParser("orphan1").addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
-        registerBeanDefinitionParser("orphan2", new NamedDefinitionParser("orphan2").addAlias("bar", "foo").addIgnored("ignored"));
+        registerMuleBeanDefinitionParser("orphan", new OrphanDefinitionParser(OrphanBean.class, true)).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
+        registerMuleBeanDefinitionParser("child", new ChildDefinitionParser("child", ChildBean.class)).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
+        registerMuleBeanDefinitionParser("mapped-child", new MapDefinitionParserMutator("map", new ChildDefinitionParser("child", ChildBean.class))).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
+        registerMuleBeanDefinitionParser("kid", new ChildDefinitionParser("kid", ChildBean.class)).addAlias("bar", "foo").addIgnored("ignored");
+        registerMuleBeanDefinitionParser("parent", new ParentDefinitionParser()).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
+        registerMuleBeanDefinitionParser("orphan1", new NamedDefinitionParser("orphan1")).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
+        registerMuleBeanDefinitionParser("orphan2", new NamedDefinitionParser("orphan2")).addAlias("bar", "foo").addIgnored("ignored");
         registerBeanDefinitionParser("map-entry", new ChildMapEntryDefinitionParser("map", "key", "value"));
         registerBeanDefinitionParser("list-entry", new ChildListEntryDefinitionParser("list"));
-        registerBeanDefinitionParser("named", new NamedDefinitionParser().addAlias("bar", "foo").addIgnored("ignored"));
-        registerBeanDefinitionParser("inherit", new InheritDefinitionParser(
-                new OrphanDefinitionParser(OrphanBean.class, true),
-                new NamedDefinitionParser()).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring"));
+        registerMuleBeanDefinitionParser("named", new NamedDefinitionParser()).addAlias("bar", "foo").addIgnored("ignored");
+        registerMuleBeanDefinitionParser("inherit",
+                new InheritDefinitionParser(
+                        new OrphanDefinitionParser(OrphanBean.class, true),
+                        new NamedDefinitionParser())).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring");
 
-        registerBeanDefinitionParser("address", new ChildAddressDefinitionParser("test").addAlias("address", "host"));
+        registerMuleBeanDefinitionParser("address", new ChildAddressDefinitionParser("test")).addAlias("address", "host");
         registerBeanDefinitionParser("orphan-endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
         registerBeanDefinitionParser("child-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("unaddressed-orphan-endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
@@ -77,10 +78,10 @@ public class ParsersTestNamespaceHandler extends AbstractMuleNamespaceHandler
                         new SimplePojoServiceDefinitionParser(ChildBean.class, "object"),
                         (ChildDefinitionParser) new ChildDefinitionParser("child", ChildBean.class).addAlias("bar", "foo").addIgnored("ignored").addCollection("offspring")));
 
-        registerBeanDefinitionParser("complex-endpoint",
+        registerMuleBeanDefinitionParser("complex-endpoint",
                 new TransportGlobalEndpointDefinitionParser(
                         "test", TransportGlobalEndpointDefinitionParser.PROTOCOL,
-                        new String[]{"path"}, new String[]{"string", "bar"}).addAlias("bar", "foo"));
+                        new String[]{"path"}, new String[]{"string", "bar"})).addAlias("bar", "foo");
 
         registerBeanDefinitionParser("no-name", new OrphanDefinitionParser(OrphanBean.class, true));
         registerBeanDefinitionParser("no-name-2", new IndependentDefinitionParser());

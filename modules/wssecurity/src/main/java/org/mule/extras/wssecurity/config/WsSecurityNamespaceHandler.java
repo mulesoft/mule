@@ -22,7 +22,7 @@ public class WsSecurityNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerBeanDefinitionParser("security-filter", new ChildDefinitionParser("securityFilter", WsSecurityFilter.class).addAlias("decryptionFile", "wsDecryptionFile").addAlias("signatureFile", "wsSignatureFile"));
+        registerMuleBeanDefinitionParser("security-filter", new ChildDefinitionParser("securityFilter", WsSecurityFilter.class)).addAlias("decryptionFile", "wsDecryptionFile").addAlias("signatureFile", "wsSignatureFile");
         registerBeanDefinitionParser("property", new ChildMapEntryDefinitionParser("addOutboundProperties", "key", "value"));
     }
 }

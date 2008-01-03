@@ -15,6 +15,7 @@ import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.MuleDefinitionParser;
 
 /**
  * Handle response transformers correctly
@@ -25,12 +26,18 @@ public class TransformerRefDefinitionParser extends ParentContextDefinitionParse
     public TransformerRefDefinitionParser()
     {
         super(TransformerDefinitionParser.RESPONSE_TRANSFORMERS,
-                new ParentDefinitionParser().addAlias(
+                addAlias(new ParentDefinitionParser(),
                         AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF,
                         TransformerDefinitionParser.RESPONSE_TRANSFORMER));
-        otherwise(new ParentDefinitionParser().addAlias(
-                        AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF,
-                        TransformerDefinitionParser.TRANSFORMER));
+        otherwise(addAlias(new ParentDefinitionParser(),
+                AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF,
+                TransformerDefinitionParser.TRANSFORMER));
+    }
+
+    private static MuleDefinitionParser addAlias(MuleDefinitionParser parser, String alias, String name)
+    {
+        parser.addAlias(alias, name);
+        return parser;
     }
 
 }

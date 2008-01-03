@@ -62,6 +62,9 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("transformer-object-to-jmsmessage", new TransformerDefinitionParser(ObjectToJMSMessage.class));   
     }
 
+    /**
+     * Need to use the most complex constructors as have mutually exclusive address aattributes
+     */
     protected void registerJmsTransportEndpoints()
     {
         registerJmsEndpointDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(JmsConnector.JMS, TransportGlobalEndpointDefinitionParser.PROTOCOL, TransportGlobalEndpointDefinitionParser.RESTRICTED_ENDPOINT_ATTRIBUTES, JMS_ATTRIBUTES, new String[][]{}));

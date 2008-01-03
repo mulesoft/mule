@@ -116,25 +116,25 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         addIgnored(ATTRIBUTE_ID);
     }
 
-    public MuleDefinitionParser addReference(String propertyName)
+    public MuleDefinitionParserConfiguration addReference(String propertyName)
     {
         beanPropertyConfiguration.addReference(propertyName);
         return this;
     }
 
-    public MuleDefinitionParser addMapping(String propertyName, Map mappings)
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, Map mappings)
     {
         beanPropertyConfiguration.addMapping(propertyName, mappings);
         return this;
     }
 
-    public MuleDefinitionParser addMapping(String propertyName, String mappings)
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, String mappings)
     {
         beanPropertyConfiguration.addMapping(propertyName, mappings);
         return this;
     }
 
-    public MuleDefinitionParser addMapping(String propertyName, ValueMap mappings)
+    public MuleDefinitionParserConfiguration addMapping(String propertyName, ValueMap mappings)
     {
         beanPropertyConfiguration.addMapping(propertyName, mappings);
         return this;
@@ -145,7 +145,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName The bean property name
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public MuleDefinitionParser addAlias(String alias, String propertyName)
+    public MuleDefinitionParserConfiguration addAlias(String alias, String propertyName)
     {
         beanPropertyConfiguration.addAlias(alias, propertyName);
         return this;
@@ -155,7 +155,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName Property that is a collection
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public MuleDefinitionParser addCollection(String propertyName)
+    public MuleDefinitionParserConfiguration addCollection(String propertyName)
     {
         beanPropertyConfiguration.addCollection(propertyName);
         return this;
@@ -165,19 +165,19 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param propertyName Property that is to be ignored
      * @return This instance, allowing chaining during use, avoiding subclasses
      */
-    public MuleDefinitionParser addIgnored(String propertyName)
+    public MuleDefinitionParserConfiguration addIgnored(String propertyName)
     {
         beanPropertyConfiguration.addIgnored(propertyName);
         return this;
     }
 
-    public MuleDefinitionParser removeIgnored(String propertyName)
+    public MuleDefinitionParserConfiguration removeIgnored(String propertyName)
     {
         beanPropertyConfiguration.removeIgnored(propertyName);
         return this;
     }
 
-    public MuleDefinitionParser setIgnoredDefault(boolean ignoreAll)
+    public MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll)
     {
         beanPropertyConfiguration.setIgnoredDefault(ignoreAll);
         return this;
@@ -456,14 +456,16 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         return parseInternal(element, parserContext);
     }
 
-    public void registerPreProcessor(PreProcessor preProcessor)
+    public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)
     {
         preProcessors.addFirst(preProcessor);
+        return this;
     }
 
-    public void registerPostProcessor(PostProcessor postProcessor)
+    public MuleDefinitionParserConfiguration registerPostProcessor(PostProcessor postProcessor)
     {
         postProcessors.add(postProcessor);
+        return this;
     }
 
     public BeanAssemblerFactory getBeanAssemblerFactory()

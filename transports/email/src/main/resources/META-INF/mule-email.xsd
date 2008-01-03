@@ -66,4 +66,5 @@
     <xsd:element name="transformer-object-to-mime" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:element name="transformer-mime-to-bytes" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:element name="transformer-bytes-to-mime" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+
 </xsd:schema>

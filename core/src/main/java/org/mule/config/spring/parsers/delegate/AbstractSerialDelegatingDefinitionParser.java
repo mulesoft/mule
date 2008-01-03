@@ -14,6 +14,7 @@ import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
+import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
 import org.mule.util.StringUtils;
 
@@ -103,7 +104,7 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
         return parser.parseDelegate(element, parserContext);
     }
 
-    protected MuleDefinitionParser addDelegate(MuleDefinitionParser delegate)
+    protected MuleDefinitionParserConfiguration addDelegate(MuleDefinitionParser delegate)
     {
         delegate.registerPreProcessor(new PreProcessor()
         {

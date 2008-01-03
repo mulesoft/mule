@@ -27,8 +27,8 @@ public class ConnectionFactoryDefinitionParser extends AbstractFirstResultSerial
 
     public ConnectionFactoryDefinitionParser()
     {
-        addDelegate(new ObjectFactoryDefinitionParser("connectionFactory").addIgnored(USERNAME).addIgnored(PASSWORD));
-        addDelegate(new ParentDefinitionParser().setIgnoredDefault(true).removeIgnored(USERNAME).removeIgnored(PASSWORD));
+        addDelegate(new ObjectFactoryDefinitionParser("connectionFactory")).addIgnored(USERNAME).addIgnored(PASSWORD);
+        addDelegate(new ParentDefinitionParser()).setIgnoredDefault(true).removeIgnored(USERNAME).removeIgnored(PASSWORD);
     }
 
     public ConnectionFactoryDefinitionParser(Class clazz)
