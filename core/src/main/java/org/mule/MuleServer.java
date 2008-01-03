@@ -248,8 +248,10 @@ public class MuleServer implements Runnable
     {
         try
         {
+            logger.info("Mule Server initializing...");
             initialize();
-
+            logger.info("Mule Server starting...");
+            managementContext.start();
         }
         catch (Throwable e)
         {
@@ -313,8 +315,6 @@ public class MuleServer implements Runnable
      */
     public void initialize() throws Exception
     {
-        logger.info("Mule Server starting...");
-
         Runtime.getRuntime().addShutdownHook(new ShutdownThread());
 
         // create a new ConfigurationBuilder that is disposed afterwards
@@ -328,10 +328,8 @@ public class MuleServer implements Runnable
                 logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
                 configurationResources = DEFAULT_CONFIGURATION;
             }
-            // TODO MULE-1988
             managementContext = cfgBuilder.configure(configurationResources, getStartupPropertiesFile());
         }
-        logger.info("Mule Server initialized.");
     }
 
     /**

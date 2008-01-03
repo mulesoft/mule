@@ -322,7 +322,6 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 //            }
             if (isStartContext() && managementContext.isStarted() == false)
             {
-                // TODO MULE-1988
                 managementContext.start();
             }
 
