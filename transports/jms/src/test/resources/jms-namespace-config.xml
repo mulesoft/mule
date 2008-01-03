@@ -62,4 +62,14 @@
         <spring:property name="value" value="foo"/>
     </custom-transaction-factory>
 
+    <jms:endpoint name="endpoint1" queue="blah" connector-ref="jmsConnectorDefaults">
+        <jms:selector expression="foo"/>
+    </jms:endpoint>
+
+    <jms:endpoint name="endpoint2" address="jms://blah" connector-ref="jmsConnectorDefaults">
+        <not-filter>
+            <jms:property-filter pattern="bar"/>
+        </not-filter>
+    </jms:endpoint>
+
 </mule>

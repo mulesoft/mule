@@ -11,10 +11,17 @@ package org.mule.providers.jms.config;
 
 import org.mule.providers.jms.DefaultRedeliveryHandler;
 import org.mule.providers.jms.JmsConnector;
+import org.mule.providers.jms.filters.JmsSelectorFilter;
+import org.mule.providers.jms.filters.JmsPropertyFilter;
 import org.mule.providers.jms.test.TestConnectionFactory;
 import org.mule.providers.jms.test.TestRedeliveryHandler;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.UMOFilter;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.routing.filters.logic.NotFilter;
 
 import javax.jms.Session;
 
@@ -143,6 +150,23 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         TestTransactionFactory factory = (TestTransactionFactory) managementContext.getRegistry().lookupObject("txFactory");
         assertNotNull(factory);
         assertEquals("foo", factory.getValue());
+    }
+
+    public void testEndpointConfig() throws EndpointException, InitialisationException
+    {
+        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry().lookupEndpointBuilder("endpoint1").buildInboundEndpoint();
+        assertNotNull(endpoint1);
+        UMOFilter filter1 = endpoint1.getFilter();
+        assertNotNull(filter1);
+        assertTrue(filter1 instanceof JmsSelectorFilter);
+        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry().lookupEndpointBuilder("endpoint2").buildOutboundEndpoint();
+        assertNotNull(endpoint2);
+        UMOFilter filter2 = endpoint2.getFilter();
+        assertNotNull(filter2);
+        assertTrue(filter2 instanceof NotFilter);
+        UMOFilter filter3 = ((NotFilter) filter2).getFilter();
+        assertNotNull(filter3);
+        assertTrue(filter3 instanceof JmsPropertyFilter);
     }
 
 }

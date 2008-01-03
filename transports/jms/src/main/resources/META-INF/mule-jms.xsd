@@ -154,7 +154,9 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
+            <xsd:extension base="mule:abstractInboundEndpointType">
+                <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -163,7 +165,9 @@
     <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointType">
+            <xsd:extension base="mule:abstractOutboundEndpointType">
+                <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -172,7 +176,9 @@
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:globalEndpointType">
+            <xsd:extension base="mule:abstractGlobalEndpointType">
+                <xsd:group ref="defaultEndpointElements"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -196,5 +202,47 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
+
+    <!-- these include option/repeats - should be embedded once -->
+    <!-- this is a modified version of what is in mule.xsd, allowing either a selector or a
+         normal filter to be set -->
+    <xsd:group name="defaultEndpointElements">
+        <xsd:sequence>
+            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:group ref="mule:endpointTransformers"/>
+                <xsd:element ref="mule:abstract-transaction" minOccurs="0"/>
+                <xsd:choice>
+                    <xsd:element ref="mule:abstract-filter" minOccurs="0"/>
+                    <xsd:element name="selector" type="jmsSelectorFilter" minOccurs="0"/>
+                </xsd:choice>
+                <xsd:element ref="mule:abstract-security-filter" minOccurs="0"/>
+                <xsd:element ref="mule:abstract-connection-strategy" minOccurs="0"/>
+                <xsd:element ref="mule:properties" minOccurs="0"/>
+            </xsd:sequence>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:complexType name="jmsSelectorFilter">
+        <xsd:annotation>
+            <xsd:documentation>
+                This sets a selector on the underlying JMS transport.
+                It is not a standard Mule filter - it cannot be combined with other filters.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="expression" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:element name="property-filter" substitutionGroup="mule:abstract-filter">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractFilterType">
+                    <xsd:attribute name="propertyName" type="xsd:string"/>
+                    <xsd:attribute name="propertyClass" type="xsd:string"/>
+                    <xsd:attribute name="expression" type="xsd:string"/>
+                    <xsd:attribute name="pattern" type="xsd:string"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
 
 </xsd:schema>

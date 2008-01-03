@@ -16,10 +16,11 @@ import org.mule.umo.UMOMessage;
 /**
  * <code>JmsSelectorFilter</code> is a wrapper for a JMS Selector. This filter
  * should not be called. Instead the JmsConnector sets the selector on the
- * destionation to the expression set on this filer.
+ * destination to the expression set on this filer.
  */
 public class JmsSelectorFilter implements UMOFilter
 {
+
     private String expression = null;
 
     public boolean accept(UMOMessage message)

@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class JmsPropertyFilter implements UMOFilter
 {
+
     /**
      * Logger used by this class
      */
