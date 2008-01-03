@@ -80,7 +80,8 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
 
         try
         {
-            createManager(config, webappClasspath, context);
+            managementContext = createManager(config, webappClasspath, context);
+            managementContext.start();
         }
         catch (UMOException ex)
         {
@@ -109,8 +110,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
         throws ConfigurationException
     {
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context, webappClasspath);
-        managementContext = builder.configure(configResource);
-        return managementContext;
+        return builder.configure(configResource);
     }
 
     /**
