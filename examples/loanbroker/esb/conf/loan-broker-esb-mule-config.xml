@@ -53,8 +53,8 @@
     <!-- here we're telling Mule to invoke a remote Ejb directly (not host a
     proxy service for the remote object as with the other example in mule-config-with-ejb-container.xml example)
     -->
-    <endpoint name="CreditAgency"
-                   address="ejb://localhost:1099/local/CreditAgency?method=getCreditProfile" />
+    <ejb:endpoint name="CreditAgency" host="localhost" port="1099" object="local/CreditAgency" method="getCreditProfile" />
+    <!-- endpoint name="CreditAgency" address="ejb://localhost:1099/local/CreditAgency?method=getCreditProfile" / -->
     <endpoint name="LenderGateway" address="jms://esb.lender.service" />
     <endpoint name="LenderService" address="vm://lender.service" />
     <endpoint name="BankingGateway" address="jms://esb.banks" />

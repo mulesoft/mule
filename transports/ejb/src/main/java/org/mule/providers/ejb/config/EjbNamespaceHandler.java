@@ -10,18 +10,24 @@
 package org.mule.providers.ejb.config;
 
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.config.spring.factories.InboundEndpointFactoryBean;
+import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.ejb.EjbConnector;
+import org.mule.providers.rmi.config.RmiNamespaceHandler;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
-
-/**
- * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
- *
- */
-public class EjbNamespaceHandler extends NamespaceHandlerSupport
+public class EjbNamespaceHandler extends AbstractMuleNamespaceHandler 
 {
+
     public void init()
     {
+        registerMuleBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(EjbConnector.EJB, TransportGlobalEndpointDefinitionParser.PROTOCOL, RmiNamespaceHandler.ADDRESS, RmiNamespaceHandler.PROPERTIES)).addAlias(RmiNamespaceHandler.OBJECT, URIBuilder.PATH);
+        registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(EjbConnector.EJB, TransportGlobalEndpointDefinitionParser.PROTOCOL, InboundEndpointFactoryBean.class, RmiNamespaceHandler.ADDRESS, RmiNamespaceHandler.PROPERTIES)).addAlias(RmiNamespaceHandler.OBJECT, URIBuilder.PATH);
+        registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(EjbConnector.EJB, TransportGlobalEndpointDefinitionParser.PROTOCOL, OutboundEndpointFactoryBean.class, RmiNamespaceHandler.ADDRESS, RmiNamespaceHandler.PROPERTIES)).addAlias(RmiNamespaceHandler.OBJECT, URIBuilder.PATH);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(EjbConnector.class, true));
     }
+
 }

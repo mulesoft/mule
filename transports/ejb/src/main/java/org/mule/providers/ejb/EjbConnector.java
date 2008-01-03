@@ -27,12 +27,14 @@ import javax.ejb.EJBObject;
 
 public class EjbConnector extends RmiConnector
 {
+    public static final String EJB = "ejb";
+
     // Errorcodes
     public static final int EJB_SERVICECLASS_INVOCATION_FAILED = 2;
 
     public String getProtocol()
     {
-        return "ejb";
+        return EJB;
     }
 
     public Remote getRemoteObject(UMOImmutableEndpoint endpoint) throws RemoteException, UnknownHostException
