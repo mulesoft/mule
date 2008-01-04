@@ -1,54 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+    xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
-
-<mule-configuration id="NestedRouter-Test" version="1.0">
-
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
-        <properties>
-            <text-property name="configuration">
-                <![CDATA[
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
-    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <constructor-arg>
-            <value>vm://localhost?broker.persistent=false&amp;broker.useJmx=false</value>
-        </constructor-arg>
-    </bean>
-</beans>
-                ]]>
-            </text-property>
-        </properties>
-    </container-context>
-
-    <connector name="JMSConnector" className="org.mule.providers.jms.JmsConnector">
-        <properties>
-            <property name="specification" value="1.1"/>
-            <container-property name="connectionFactory" reference="jmsConnectionFactory" container="spring"/>
-        </properties>
-    </connector>
+    <!-- Testing with ActiveMq -->
+    <jms:activemq-connector name="jmsConnector" />
 
     <model name="NestedRouter">
-        <mule-descriptor name="HelloComponent" implementation="org.mule.test.integration.routing.nested.HelloService">
+
+        <service name="HelloComponent">
             <inbound-router>
-                <endpoint address="jms://hello.in"/>
+                <inbound-endpoint address="jms://hello.in" />
             </inbound-router>
-        </mule-descriptor>
-        <mule-descriptor name="InvokerComponent" implementation="org.mule.test.integration.routing.nested.Invoker">
+            <component class="org.mule.test.integration.routing.nested.HelloService" />
+        </service>
+
+        <service name="InvokerComponent">
             <inbound-router>
-                <endpoint address="jms://invoker.in"/>
+                <inbound-endpoint address="jms://invoker.in" />
             </inbound-router>
-            <nested-router>
+            <component>
+                <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
                 <binding interface="org.mule.test.integration.routing.nested.HelloInterface">
-                    <endpoint address="jms://hello.in" remoteSync="true"/>
+                    <outbound-endpoint address="jms://hello.in" remoteSync="true" />
                 </binding>
-            </nested-router>
+            </component>
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://invoker.out"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="jms://invoker.out" />
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
+
     </model>
-</mule-configuration>
+</mule>

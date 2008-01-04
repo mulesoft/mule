@@ -28,7 +28,12 @@ org.mule.test.integration.transaction.OutboundTransactionsTestCase
 # These tests work when run from the IDE (IntelliJ)
 org.mule.test.usecases.dlq.DLQExceptionHandlerTestCase
 
+# MULE-2868
 org.mule.test.integration.providers.jms.NestedRouterTestCase
+# The following test is also affected but has 2/3 test methods commented out rather than excluding whole
+# test to ensure we have at least one nested-router functional test.
+#org.mule.test.integration.routing.nested.NestedRouterTestCase
+
 
 # MULE-2258: fails on the build server
 org.mule.test.usecases.sync.TcpToFileTestCase
