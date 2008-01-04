@@ -22,9 +22,9 @@
         <service name="TcpReceiver">
             <inbound-router>
                 <!-- Response transformer set here is a workaround because async-reply-router does not apply
-                     default inbound jms transformer  -->
+                     default inbound jms transformer.  See MULE-2869  -->
                 <inbound-endpoint address="tcp://localhost:4444" remoteSync="true"
-                    responseTransformer-refs="jmsmessage-to-object" />
+                     />
             </inbound-router>
             <component class="org.mule.components.simple.EchoComponent" />
             <outbound-router>

@@ -41,6 +41,8 @@ public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         UMOMessage result = client.send("vm://pojo1", message, props);
         assertNotNull(result);
+        // TODO This assertion is incorrect a "TextMessage" should not be received here but
+        // rather just a sting payload.  See MULE-2869
         assertEquals("Received: " + message, ((TextMessage)result.getPayload()).getText());
     }
     
@@ -51,6 +53,8 @@ public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         UMOMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
+        // TODO This assertion is incorrect a "TextMessage" should not be received here but
+        // rather just a sting payload.  See MULE-2869
         assertEquals("Received: " + message, ((TextMessage)result.getPayload()).getText());
     }
 
