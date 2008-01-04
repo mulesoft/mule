@@ -28,7 +28,6 @@ org.mule.test.integration.transaction.OutboundTransactionsTestCase
 # These tests work when run from the IDE (IntelliJ)
 org.mule.test.usecases.dlq.DLQExceptionHandlerTestCase
 
-org.mule.test.integration.routing.nested.NestedRouterTestCase
 org.mule.test.integration.providers.jms.NestedRouterTestCase
 
 # MULE-2258: fails on the build server

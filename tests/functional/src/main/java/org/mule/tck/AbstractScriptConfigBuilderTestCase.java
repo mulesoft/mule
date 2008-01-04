@@ -215,15 +215,12 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         UMONestedRouter route1 = (UMONestedRouter) router.getRouters().get(0);
         assertEquals(FruitCleaner.class, route1.getInterface());
         assertEquals("wash", route1.getMethod());
-        assertNotNull(route1.getOutboundRouter());
-        assertEquals(1, route1.getOutboundRouter().getEndpoints().size());
+        assertNotNull(route1.getEndpoint());
         // check second Router
         UMONestedRouter route2 = (UMONestedRouter) router.getRouters().get(1);
         assertEquals(FruitCleaner.class, route2.getInterface());
         assertEquals("polish", route2.getMethod());
-        assertNotNull(route2.getOutboundRouter());
-        assertEquals(1, route2.getOutboundRouter().getEndpoints().size());
-
+        assertNotNull(route1.getEndpoint());
     }
 
     public void testDescriptorEndpoints()

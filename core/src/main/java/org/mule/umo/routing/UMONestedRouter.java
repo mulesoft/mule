@@ -41,10 +41,8 @@ public interface UMONestedRouter extends UMORouter
     UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws MessagingException;
 
     void setEndpoint(UMOImmutableEndpoint endpoint);
-
-    UMOOutboundRouter getOutboundRouter();
-
-    void setOutboundRouter(UMOOutboundRouter router);
+    
+    UMOImmutableEndpoint getEndpoint();
 
     Class getInterface();
 

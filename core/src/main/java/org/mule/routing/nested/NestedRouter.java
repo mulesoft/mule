@@ -34,7 +34,7 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
 
     private String methodName;
 
-    //The router used to actually dispatch the message
+    // The router used to actually dispatch the message
     protected UMOOutboundRouter outboundRouter;
 
     public NestedRouter()
@@ -67,15 +67,18 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
         this.methodName = methodName;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.umo.routing.UMONestedRouter#createProxy(java.lang.Object, UMODescriptor descriptor java.lang.Class)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.routing.UMONestedRouter#createProxy(java.lang.Object,
+     *      UMODescriptor descriptor java.lang.Class)
      */
     public Object createProxy(Object target)
     {
         try
         {
-            Object proxy = Proxy.newProxyInstance(getInterface().getClassLoader(),
-                    new Class[]{getInterface()}, new NestedInvocationHandler(this));
+            Object proxy = Proxy.newProxyInstance(getInterface().getClassLoader(), new Class[]{getInterface()},
+                new NestedInvocationHandler(this));
             logger.debug("Have proxy?: " + (null != proxy));
             return proxy;
 
@@ -87,17 +90,6 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
         }
     }
 
-    public UMOOutboundRouter getOutboundRouter()
-    {
-        return outboundRouter;
-    }
-
-
-    public void setOutboundRouter(UMOOutboundRouter router)
-    {
-        this.outboundRouter = router;
-    }
-
     public void setEndpoint(UMOImmutableEndpoint e)
     {
         outboundRouter = new OutboundPassThroughRouter();
@@ -105,12 +97,10 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
         outboundRouter.setTransactionConfig(e.getTransactionConfig());
     }
 
-
     public Class getInterfaceClass()
     {
         return interfaceClass;
     }
-
 
     public String toString()
     {
@@ -120,5 +110,17 @@ public class NestedRouter extends AbstractRouter implements UMONestedRouter
         sb.append(", interface=").append(interfaceClass);
         sb.append('}');
         return sb.toString();
+    }
+
+    public UMOImmutableEndpoint getEndpoint()
+    {
+        if (outboundRouter != null)
+        {
+            return (UMOImmutableEndpoint) outboundRouter.getEndpoints().get(0);
+        }
+        else
+        {
+            return null;
+        }
     }
 }
