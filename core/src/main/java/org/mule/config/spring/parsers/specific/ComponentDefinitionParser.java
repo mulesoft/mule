@@ -13,7 +13,7 @@ package org.mule.config.spring.parsers.specific;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.util.CoreXMLUtils;

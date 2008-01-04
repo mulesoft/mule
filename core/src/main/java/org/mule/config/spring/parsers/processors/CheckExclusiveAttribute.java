@@ -11,7 +11,7 @@
 package org.mule.config.spring.parsers.processors;
 
 import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.util.CoreXMLUtils;
 
 import java.util.Iterator;

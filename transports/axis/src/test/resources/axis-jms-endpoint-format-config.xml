@@ -16,12 +16,12 @@
     <!-- this is needed also, but does not work now -->
     <!--                            brokerUrl="vm://localhost?broker.persistence=true"/> -->
 
-    <endpoint name="soapActionDefined" address="axis:jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true">
+    <axis:endpoint name="soapActionDefined" address="jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true">
         <properties>
             <spring:entry key="SOAPAction" value="jms://soap.my.queue/echoComponent"/>
         </properties>
-    </endpoint>
-    <endpoint name="componentName" address="axis:jms://myComponent?method=echo&amp;MULE_REMOTE_SYNC=true"/>
+    </axis:endpoint>
+    <axis:endpoint name="componentName" address="jms://myComponent?method=echo&amp;MULE_REMOTE_SYNC=true"/>
     <endpoint name="noSoapActionDefined" address="axis:jms://soap.my.queue?method=echo&amp;MULE_REMOTE_SYNC=true"/>
     <endpoint name="noMethodDefined" address="axis:jms://soap.my.queue"/>
 

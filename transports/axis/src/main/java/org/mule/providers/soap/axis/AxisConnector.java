@@ -249,8 +249,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     {
         // Register Transport handlers
         // By default these will all be handled by Mule, however some companies may
-        // have
-        // their own they wish to use
+        // have their own they wish to use
         for (Iterator iterator = getAxisTransportProtocols().keySet().iterator(); iterator.hasNext();)
         {
             String protocol = (String) iterator.next();

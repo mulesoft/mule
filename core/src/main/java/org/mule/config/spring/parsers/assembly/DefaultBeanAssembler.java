@@ -13,6 +13,9 @@ package org.mule.config.spring.parsers.assembly;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.SingleProperty;
+import org.mule.config.spring.parsers.assembly.configuration.SinglePropertyLiteral;
 import org.mule.util.ClassUtils;
 import org.mule.util.CoreXMLUtils;
 
@@ -80,7 +83,7 @@ public class DefaultBeanAssembler implements BeanAssembler
      * by explicit annotation or by the "-ref" at the end of an attribute name.  We do not
      * check the Spring repo to see if a name already exists since that could lead to
      * unpredictable behaviour.
-     * (see {@link org.mule.config.spring.parsers.assembly.PropertyConfiguration})
+     * (see {@link org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration})
      * @param attribute The attribute to add
      */
     public void extendBean(Attr attribute)
@@ -91,7 +94,7 @@ public class DefaultBeanAssembler implements BeanAssembler
             logger.debug(attribute + " for " + bean.getBeanDefinition().getBeanClassName());
             String oldValue = attribute.getNodeValue();
             String newName = bestGuessName(beanConfig, oldName, bean.getBeanDefinition().getBeanClassName());
-            String newValue = beanConfig.translateValue(oldName, oldValue);
+            Object newValue = beanConfig.translateValue(oldName, oldValue);
             addPropertyWithReference(bean.getBeanDefinition().getPropertyValues(),
                     beanConfig.getSingleProperty(oldName), newName, newValue);
         }
@@ -121,7 +124,7 @@ public class DefaultBeanAssembler implements BeanAssembler
         String oldName = CoreXMLUtils.attributeName(attribute);
         String oldValue = attribute.getNodeValue();
         String newName = bestGuessName(targetConfig, oldName, bean.getBeanDefinition().getBeanClassName());
-        String newValue = targetConfig.translateValue(oldName, oldValue);
+        Object newValue = targetConfig.translateValue(oldName, oldValue);
         addPropertyWithReference(target.getPropertyValues(),
                 targetConfig.getSingleProperty(oldName), newName, newValue);
     }

@@ -22,14 +22,14 @@
 
         <service name="mycomponent">
             <inbound-router>
-                <inbound-endpoint address="axis:jms://mycomponent"/>
+                <axis:inbound-endpoint address="jms://mycomponent"/>
             </inbound-router>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
         <service name="mycomponent2">
             <inbound-router>
-                <inbound-endpoint address="axis:jms://mycomponent2"/>
+                <axis:inbound-endpoint address="jms://mycomponent2"/>
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.testmodels.services.TestServiceComponent">

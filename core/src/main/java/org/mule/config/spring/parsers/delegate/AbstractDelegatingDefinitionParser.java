@@ -15,7 +15,7 @@ import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
-import org.mule.config.spring.parsers.assembly.ValueMap;
+import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 
 import java.util.Map;

@@ -10,7 +10,7 @@
 
 package org.mule.config.spring.parsers.assembly;
 
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 
 import java.util.Iterator;
 import java.util.Map;

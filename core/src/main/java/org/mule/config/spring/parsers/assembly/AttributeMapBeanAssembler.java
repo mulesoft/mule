@@ -10,9 +10,16 @@
 
 package org.mule.config.spring.parsers.assembly;
 
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
+/**
+ * This can be used inside a {@link org.mule.config.spring.parsers.generic.ChildDefinitionParser} - it
+ * takes named properties and, instead of inserting them individually on the target, it packages them as
+ * a Map and inserts that.
+ */
 public class AttributeMapBeanAssembler extends AbstractMapBeanAssembler
 {
 

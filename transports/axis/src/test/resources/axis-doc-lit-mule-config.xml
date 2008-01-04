@@ -16,16 +16,18 @@
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:62108/mule"/>
             </inbound-router>
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent">
-                <properties>
-                    <spring:entry key="style" value="wrapped"/>
-                    <spring:entry key="use" value="literal"/>
-                    <spring:entry key="beanTypes">
-                        <spring:list>
-                            <spring:value>java.lang.Exception</spring:value>
-                        </spring:list>
-                    </spring:entry>
-                </properties>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent">
+                    <properties>
+                        <spring:entry key="style" value="wrapped"/>
+                        <spring:entry key="use" value="literal"/>
+                        <spring:entry key="beanTypes">
+                            <spring:list>
+                                <spring:value>java.lang.Exception</spring:value>
+                            </spring:list>
+                        </spring:entry>
+                    </properties>
+                </singleton-object>
             </component>
         </service>
     </model>

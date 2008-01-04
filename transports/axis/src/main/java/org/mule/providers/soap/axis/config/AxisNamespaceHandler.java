@@ -12,21 +12,25 @@ package org.mule.providers.soap.axis.config;
 
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.assembly.configuration.ListValueMap;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.soap.axis.AxisConnector;
-
-import org.springframework.beans.factory.xml.UtilNamespaceHandler;
+import org.mule.providers.soap.ServiceProxy;
 
 /**
  * Registers a Bean Definition Parser for handling <code>&lt;axis:connector&gt;</code> elements.
  */
-public class AxisNamespaceHandler extends UtilNamespaceHandler // NamespaceHandlerSupport
+public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+
     public void init()
     {
-        this.registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(AxisConnector.class, true));
-        this.registerBeanDefinitionParser("bean-type", new ChildListEntryDefinitionParser("beanTypes"));
-        this.registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes"));
+        registerMetaTransportEndpoints(AxisConnector.AXIS);
+        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(AxisConnector.class, true));
+        registerBeanDefinitionParser("bean-type", new ChildListEntryDefinitionParser("beanTypes"));
+        registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes"));
     }
+
 }
 
 

@@ -10,6 +10,9 @@
 
 package org.mule.config.spring.parsers.assembly;
 
+import org.mule.config.spring.parsers.assembly.configuration.PrefixValueMap;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+
 import java.util.HashMap;
 import java.util.Map;
 

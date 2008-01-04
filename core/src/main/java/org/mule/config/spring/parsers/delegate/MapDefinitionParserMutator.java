@@ -14,7 +14,7 @@ import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.MuleChildDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.TwoStageMapBeanAssemblerFactory;
-import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 import java.util.HashMap;

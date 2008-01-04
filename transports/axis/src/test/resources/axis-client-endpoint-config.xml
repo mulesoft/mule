@@ -8,12 +8,12 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-    <endpoint name="calculatorAddEndpoint" address="axis:http://localhost:62080/mule-tests-external-axis/axis/Calculator.jws?method=add">
+    <axis:endpoint name="calculatorAddEndpoint" address="http://localhost:62080/mule-tests-external-axis/axis/Calculator.jws?method=add">
         <properties>
             <spring:entry key="style" value="wrapped"/>
             <spring:entry key="use" value="literal"/>
             <spring:entry key="soapMethods" value="Number1;int;in,Number2;int;in,return;int"/>
         </properties>
-    </endpoint>
+    </axis:endpoint>
 
 </mule>

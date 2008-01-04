@@ -18,7 +18,7 @@ import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointD
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.assembly.PrefixValueMap;
+import org.mule.config.spring.parsers.assembly.configuration.PrefixValueMap;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;

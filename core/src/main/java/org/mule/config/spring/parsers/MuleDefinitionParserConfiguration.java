@@ -10,12 +10,12 @@
 
 package org.mule.config.spring.parsers;
 
-import org.mule.config.spring.parsers.assembly.ValueMap;
+import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 
 import java.util.Map;
 
 /**
- * @see org.mule.config.spring.parsers.assembly.PropertyConfiguration
+ * @see org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration
  */
 public interface MuleDefinitionParserConfiguration
 {

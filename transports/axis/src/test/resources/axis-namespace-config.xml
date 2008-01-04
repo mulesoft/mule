@@ -25,4 +25,5 @@
 
     <axis:connector name="axisConnector2" axis-ref="axisServer" clientProvider-ref="mockProvider"
                     serverProvider-ref="mockProvider"/>
+    
 </mule>

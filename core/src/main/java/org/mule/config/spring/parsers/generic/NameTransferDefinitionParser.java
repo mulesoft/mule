@@ -13,8 +13,8 @@ package org.mule.config.spring.parsers.generic;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssembler;
-import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.SingleProperty;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.SingleProperty;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;

@@ -10,6 +10,10 @@
 
 package org.mule.config.spring.parsers.assembly;
 
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.TempWrapperPropertyConfiguration;
+
 public class TempWrapperPropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
 {
 

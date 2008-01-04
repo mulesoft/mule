@@ -11,11 +11,11 @@
     <model name="test">
         <service name="EchoService1">
             <inbound-router>
-                <inbound-endpoint address="axis:http://localhost:62081/services">
+                <axis:inbound-endpoint address="http://localhost:62081/services">
                     <properties>
                         <spring:entry key="serviceNamespace" value="http://foo"/>
                     </properties>
-                </inbound-endpoint>
+                </axis:inbound-endpoint>
             </inbound-router>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>

@@ -10,6 +10,9 @@
 
 package org.mule.config.spring.parsers.assembly;
 
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
+
 public class SimplePropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
 {
 

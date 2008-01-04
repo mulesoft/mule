@@ -31,11 +31,13 @@ import java.util.List;
 public class ServiceProxy
 {
 
+    public static final String SERVICE_INTERFACES = "serviceInterfaces";
+
     public static Class[] getInterfacesForComponent(UMOComponent component)
         throws UMOException, ClassNotFoundException
     {
         Class[] interfaces;
-        List ifaces = (List)component.getProperties().get("serviceInterfaces");
+        List ifaces = (List)component.getProperties().get(SERVICE_INTERFACES);
         if (ifaces == null || ifaces.size() == 0)
         {
             final Class implementationClass;

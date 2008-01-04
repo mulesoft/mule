@@ -11,7 +11,7 @@
     <model name="Axis_Headers_TestCase">
         <service name="component">
             <inbound-router>
-                <inbound-endpoint address="axis:http://localhost:62181/services"/>
+                <axis:inbound-endpoint address="http://localhost:62181/services"/>
             </inbound-router>
             <component class="org.mule.components.simple.EchoComponent"/>
             <async-reply-router>

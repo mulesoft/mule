@@ -17,14 +17,14 @@
     <model name="test">
         <service name="mycomponent">
             <inbound-router>
-                <inbound-endpoint address="axis:jms://topic:mycomponent"/>
+                <axis:inbound-endpoint address="jms://topic:mycomponent"/>
             </inbound-router>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
         <service name="mycomponent2">
             <inbound-router>
-                <inbound-endpoint address="axis:jms://topic:mycomponent2">
+                <axis:inbound-endpoint address="jms://topic:mycomponent2">
                     <properties>
                         <spring:entry key="serviceInterfaces">
                             <spring:list>
@@ -33,7 +33,7 @@
                             </spring:list>
                         </spring:entry>
                     </properties>
-                </inbound-endpoint>
+                </axis:inbound-endpoint>
             </inbound-router>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>

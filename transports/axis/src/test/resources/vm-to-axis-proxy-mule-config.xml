@@ -16,7 +16,7 @@
             <bridge-component/>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="axis:http://localhost:62080/mule-tests-external-xfire/services/TestService?method=getTest">
+                    <axis:outbound-endpoint address="http://localhost:62080/mule-tests-external-xfire/services/TestService?method=getTest">
                         <properties>
                             <spring:entry key="soapAction" value="[methodNamespace][method]"/>
                             <spring:entry key="soapMethods">
@@ -34,7 +34,7 @@
                                 </spring:list>
                             </spring:entry>
                         </properties>
-                    </outbound-endpoint>
+                    </axis:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

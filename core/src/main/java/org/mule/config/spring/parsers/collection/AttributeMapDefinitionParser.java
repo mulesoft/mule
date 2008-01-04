@@ -46,7 +46,7 @@ public class AttributeMapDefinitionParser extends ChildDefinitionParser
             String oldName = CoreXMLUtils.attributeName(attribute);
             //TODO How can I use bestGuessName
             String name = beanPropertyConfiguration.translateName(oldName);
-            String value = beanPropertyConfiguration.translateValue(oldName, attribute.getNodeValue());
+            Object value = beanPropertyConfiguration.translateValue(oldName, attribute.getNodeValue());
             if (beanPropertyConfiguration.isReference(oldName))
             {
                 values.put(name, new RuntimeBeanReference(attribute.getNodeValue()));

@@ -13,7 +13,7 @@ package org.mule.config.spring.parsers.processors;
 import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 
 import org.w3c.dom.Element;
 

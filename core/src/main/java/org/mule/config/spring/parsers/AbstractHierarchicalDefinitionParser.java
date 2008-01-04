@@ -10,9 +10,9 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.assembly.ReusablePropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
-import org.mule.config.spring.parsers.assembly.TempWrapperPropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.TempWrapperPropertyConfiguration;
 import org.mule.util.StringUtils;
 import org.mule.util.CoreXMLUtils;
 

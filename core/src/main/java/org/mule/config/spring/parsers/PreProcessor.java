@@ -10,7 +10,7 @@
 
 package org.mule.config.spring.parsers;
 
-import org.mule.config.spring.parsers.assembly.PropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 
 import org.w3c.dom.Element;
 

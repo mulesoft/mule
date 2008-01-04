@@ -37,7 +37,7 @@ public interface BeanAssembler
      * by explicit annotation or by the "-ref" at the end of an attribute name.  We do not
      * check the Spring repo to see if a name already exists since that could lead to
      * unpredictable behaviour.
-     * (see {@link PropertyConfiguration})
+     * (see {@link org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration})
      * @param attribute The attribute to add
      */
     void extendBean(Attr attribute);

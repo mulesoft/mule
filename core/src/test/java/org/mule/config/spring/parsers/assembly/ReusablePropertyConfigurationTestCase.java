@@ -10,6 +10,8 @@
 
 package org.mule.config.spring.parsers.assembly;
 
+import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
+
 public class ReusablePropertyConfigurationTestCase extends AbstractBasePropertyConfigurationTestCase
 {
 

@@ -10,10 +10,6 @@
 
 package org.mule.config.spring.parsers;
 
-import org.mule.config.spring.parsers.assembly.ValueMap;
-
-import java.util.Map;
-
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
