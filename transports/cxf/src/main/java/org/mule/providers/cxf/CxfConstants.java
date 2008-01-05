@@ -14,4 +14,5 @@ public interface CxfConstants {
     String CLIENT_PORT = "port";
     String OPERATION = "operation";
     String BRIDGE = "bridge";
+    String SERVICE_CLASS = "serviceClass";
 }

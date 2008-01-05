@@ -22,30 +22,18 @@ public class CxfNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        String[] endpointProps = new String[] { 
-            "frontend", 
-            "bindingUri",
-            "bridge",
-            "endpointName",
-            "serviceName",
-            "wsdlLocation" 
-        };
+
         
         registerBeanDefinitionParser("connector", new OrphanDefinitionParser(CxfConnector.class, true));
         registerBeanDefinitionParser("endpoint", 
             new TransportGlobalEndpointDefinitionParser(
                     "cxf",
-                    TransportGlobalEndpointDefinitionParser.META,
-                    endpointProps,
-                    new String[0][0],
-                    new String[0][0]));
+                    TransportGlobalEndpointDefinitionParser.META, new String[0]));
         registerBeanDefinitionParser("inbound-endpoint", 
             new TransportEndpointDefinitionParser(
                     "cxf",
                     TransportEndpointDefinitionParser.META,
                     InboundEndpointFactoryBean.class,
-                    endpointProps,
-                    new String[0][0],
-                    new String[0][0]));
+                    new String[0]));
     }
 }

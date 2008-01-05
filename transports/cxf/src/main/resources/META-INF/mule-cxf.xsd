@@ -53,6 +53,7 @@
         <xsd:attribute name="frontend" type="xsd:string"/>
         <xsd:attribute name="bindingUri" type="xsd:string"/>
         <xsd:attribute name="endpointName" type="xsd:string"/>
+        <xsd:attribute name="serviceClass" type="xsd:string"/>
         <xsd:attribute name="serviceName" type="xsd:string"/>
         <xsd:attribute name="wsdlLocation" type="xsd:string"/>
     </xsd:attributeGroup>

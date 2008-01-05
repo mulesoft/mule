@@ -165,7 +165,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         Service s = null;
         if (wsdlLocation != null)
         {
-            Constructor cons = clientCls.getConstructor(URL.class, QName.class);
+            Constructor<?> cons = clientCls.getConstructor(URL.class, QName.class);
             ResourceManager rr = bus.getExtension(ResourceManager.class);
             URL url = rr.resolveResource(wsdlLocation, URL.class);
             
@@ -319,11 +319,11 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         }
 
         UMOMessage message = event.getMessage();
-        Set attachmentNames = message.getAttachmentNames();
+        Set<?> attachmentNames = message.getAttachmentNames();
         if (attachmentNames != null && !attachmentNames.isEmpty())
         {
             List<DataHandler> attachments = new ArrayList<DataHandler>();
-            for (Iterator i = attachmentNames.iterator(); i.hasNext();)
+            for (Iterator<?> i = attachmentNames.iterator(); i.hasNext();)
             {
                 attachments.add(message.getAttachment((String)i.next()));
             }
@@ -475,7 +475,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
         Properties params = endpoint.getEndpointURI().getUserParams();
         Object args[] = new Object[params.size()];
         int i = 0;
-        for (Iterator iterator = params.values().iterator(); iterator.hasNext(); i++)
+        for (Iterator<Object> iterator = params.values().iterator(); iterator.hasNext(); i++)
         {
             args[i] = iterator.next().toString();
         }

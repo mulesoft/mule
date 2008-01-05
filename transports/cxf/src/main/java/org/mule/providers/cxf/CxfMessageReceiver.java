@@ -25,7 +25,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -66,18 +65,24 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            Class<?> exposedInterface = getInterface();
-
+            
             Map endpointProps = getEndpoint().getProperties();
             String wsdlUrl = (String) endpointProps.get(CxfConstants.WSDL_LOCATION);
             String databinding = (String) endpointProps.get(CxfConstants.DATA_BINDING);
             String bindingId = (String) endpointProps.get(CxfConstants.BINDING_ID);
             String frontend = (String) endpointProps.get(CxfConstants.FRONTEND);
             String bridge = (String) endpointProps.get(CxfConstants.BRIDGE);
-
+            String serviceClassName = (String) endpointProps.get(CxfConstants.SERVICE_CLASS);
+            Class<?> svcCls = null;
+            if (!StringUtils.isEmpty(serviceClassName)) {
+                svcCls = ClassUtils.loadClass(serviceClassName, getClass());
+            } else {
+                svcCls = getInterface();
+            }
+            
             if (BooleanUtils.toBoolean(bridge))
             {
-                exposedInterface = ProviderService.class;
+                svcCls = ProviderService.class;
                 frontend = "jaxws";
             }
 
@@ -114,8 +119,8 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
                 sfb.setDataBinding((DataBinding) c.newInstance());
             }
 
-            sfb.setServiceClass(exposedInterface);
-            sfb.setAddress(getEndpointURI().getAddress());
+            sfb.setServiceClass(svcCls);
+            sfb.setAddress(getAddressWithoutQuery());
 
             if (wsdlUrl != null)
             {
@@ -133,7 +138,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             String namespace = (String) endpointProps.get(CxfConstants.NAMESPACE);
 
             // HACK because CXF expects a QName for the service
-            initServiceName(exposedInterface, name, namespace, svcFac);
+            initServiceName(svcCls, name, namespace, svcFac);
 
             boolean sync = endpoint.isSynchronous();
             // default to synchronous if using http
@@ -173,6 +178,16 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
         }
     }
 
+    private String getAddressWithoutQuery()
+    {
+        String a = getEndpointURI().getAddress();
+        int idx = a.lastIndexOf('?');
+        if (idx > -1) {
+            a = a.substring(0, idx);
+        }
+        return a;
+    }
+
     /**
      * Gross hack to support getting the service namespace from CXF if one wasn't
      * supplied.
@@ -207,7 +222,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            Class c = ClassUtils.loadClass(className, getClass());
+            Class<?> c = ClassUtils.loadClass(className, getClass());
             for (int i = 0; i < c.getMethods().length; i++)
             {
                 svcFac.getIgnoredMethods().add(c.getMethods()[i]);
@@ -221,33 +236,14 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
 
     private Class<?> getInterface() throws UMOException, ClassNotFoundException
     {
-        Class<?> exposedInterface;
-        List serviceInterfaces = (List) component.getProperties().get("serviceInterfaces");
-
-        if (serviceInterfaces == null)
+        try
         {
-            try
-            {
-                exposedInterface = component.getServiceFactory().getOrCreate().getClass();
-            }
-            catch (Exception e)
-            {
-                throw new CreateException(e, this);
-            }
+            return component.getServiceFactory().getOrCreate().getClass();
         }
-
-        else
+        catch (Exception e)
         {
-            String className = (String) serviceInterfaces.get(0);
-            exposedInterface = ClassUtils.loadClass(className, this.getClass());
-            logger.info(className + " class was used to expose your service");
-
-            if (serviceInterfaces.size() > 1)
-            {
-                logger.info("Only the first class was used to expose your method");
-            }
+            throw new CreateException(e, this);
         }
-        return exposedInterface;
     }
 
     protected void doDispose()
