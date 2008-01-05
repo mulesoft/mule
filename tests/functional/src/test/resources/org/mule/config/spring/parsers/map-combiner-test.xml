@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:parsers-test="http://www.mulesource.org/schema/mule/parsers-test/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/parsers-test/2.0 http://www.mulesource.org/schema/mule/parsers-test/2.0/mule-parsers-test.xsd">
+
+    <parsers-test:orphan name="checkProps">
+        <parsers-test:properties>
+            <entry key="key0" value="0Map0"/>
+        </parsers-test:properties>
+    </parsers-test:orphan>
+
+    <parsers-test:orphan name="orphan">
+        <parsers-test:map-entry key="key1" value="1Map1"/>
+        <parsers-test:properties>
+            <entry key="key2" value="2Map2"/>
+        </parsers-test:properties>
+    </parsers-test:orphan>
+
+    <parsers-test:named name="orphan">
+        <parsers-test:map-entry key="key3" value="3Map3"/>
+        <parsers-test:properties>
+            <entry key="key4" value="4Map4"/>
+        </parsers-test:properties>
+    </parsers-test:named>
+
+</beans>

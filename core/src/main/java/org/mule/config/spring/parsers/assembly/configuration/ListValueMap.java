@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
+/**
+ * Be careful - this doesn't work with endpoint properties because they need to be converted to a URI.
+ */
 public class ListValueMap implements ValueMap
 {
 

@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/parsers-test/2.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            xmlns:spring="http://www.springframework.org/schema/beans"
             targetNamespace="http://www.mulesource.org/schema/mule/parsers-test/2.0"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
@@ -9,6 +10,8 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"/>
 
     <xsd:element name="orphan" type="orphanType"/>
     <xsd:element name="orphan1" type="namedType"/>
@@ -96,6 +99,7 @@
         <xsd:sequence>
             <xsd:element name="map-entry" type="mapEntry" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element name="list-entry" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="properties" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="string" type="xsd:string"/>
         <xsd:attribute name="bar" type="xsd:int"/>
@@ -219,5 +223,12 @@
             <xsd:attribute name="id" type="xsd:NMTOKEN"/>
         </xsd:complexType>
     </xsd:element>
+
+    <xsd:element name="properties" type="mapType"/>
+    <xsd:complexType name="mapType">
+        <xsd:complexContent>
+            <xsd:extension base="spring:mapType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>

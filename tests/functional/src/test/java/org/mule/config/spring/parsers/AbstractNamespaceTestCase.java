@@ -62,7 +62,7 @@ public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
     {
         String key = "key" + index;
         Object value = map.get(key);
-        assertNotNull(key + " in " + name, value);
+        assertNotNull(key + " returns null", value);
         assertTrue(value instanceof String);
         assertEquals(name + "Map" + index, value);
     }
