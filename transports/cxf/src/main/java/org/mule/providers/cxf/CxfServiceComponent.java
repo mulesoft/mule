@@ -167,7 +167,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         {
             MessageImpl m = new MessageImpl();
 
-            Object payload = ctx.getTransformedMessage();
+            Object payload = ctx.transformMessage();
 
             if (payload instanceof InputStream)
             {
@@ -184,7 +184,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
             }
             else
             {
-                InputStream is = (InputStream) ctx.getTransformedMessage(InputStream.class);
+                InputStream is = (InputStream) ctx.transformMessage(InputStream.class);
                 m.put(Message.ENCODING, ctx.getEncoding());
                 m.setContent(InputStream.class, is);
             }
@@ -245,7 +245,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
     protected InputStream getMessageStream(UMOEventContext context) throws UMOException
     {
         InputStream is;
-        Object eventMsgPayload = context.getTransformedMessage();
+        Object eventMsgPayload = context.transformMessage();
 
         if (eventMsgPayload instanceof InputStream)
         {
@@ -253,7 +253,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
         }
         else
         {
-            is = (InputStream) context.getTransformedMessage(InputStream.class);
+            is = (InputStream) context.transformMessage(InputStream.class);
         }
         return is;
     }

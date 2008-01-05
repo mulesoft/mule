@@ -55,8 +55,7 @@ public class CxfWsdlTestCase extends AbstractMuleTestCase
 
         Registry registry = managementContext.getRegistry();
 
-        UMOEndpoint endpoint = (UMOEndpoint) registry.lookupEndpointFactory().getOutboundEndpoint(TEST_URL_NOWSDL,
-            managementContext);
+        UMOEndpoint endpoint = (UMOEndpoint) registry.lookupEndpointFactory().getOutboundEndpoint(TEST_URL_NOWSDL);
         endpoint.setProperty("wsdlUrl", TEST_URL_WSDL);
 
         UMOMessage message = new MuleMessage("test1");

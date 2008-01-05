@@ -3,7 +3,6 @@ package org.mule.providers.cxf.transport;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 
-import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
@@ -240,8 +239,7 @@ public class MuleUniversalConduit extends AbstractConduit
         LOGGER.info("Sending message to " + uri);
         try
         {
-            UMOEndpoint ep = (UMOEndpoint) RegistryContext.getRegistry().lookupEndpointFactory()
-                .getOutboundEndpoint(uri, MuleServer.getManagementContext());
+            UMOEndpoint ep = (UMOEndpoint) RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
 
             result = sendStream(sp, ep);
 

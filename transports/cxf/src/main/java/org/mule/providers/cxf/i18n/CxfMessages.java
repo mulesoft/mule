@@ -37,33 +37,46 @@ public class CxfMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 11, bindingProvider);
     }
 
-    public static Message unableToLoadServiceClass(String classname)
-    {
-        return createMessage(BUNDLE_PATH, 12, classname);
+    public static Message unableToLoadServiceClass(String classname) {
+        return createMessage(BUNDLE_PATH,12,classname);
     }
 
-    public static Message unableToConstructAdapterForNullMessage()
-    {
-        return createMessage(BUNDLE_PATH, 13);
+    public static Message unableToConstructAdapterForNullMessage() {
+        return createMessage(BUNDLE_PATH,13);
     }
 
-    public static Message inappropriateMessageTypeForAttachments(String className)
-    {
-        return createMessage(BUNDLE_PATH, 14, className);
+    public static Message inappropriateMessageTypeForAttachments(String className) {
+        return createMessage(BUNDLE_PATH,14,className);
     }
 
-    public static Message bothServiceClassAndWsdlUrlAreRequired()
-    {
-        return createMessage(BUNDLE_PATH, 15);
+    public static Message bothServiceClassAndWsdlUrlAreRequired() {
+        return createMessage(BUNDLE_PATH,15);
     }
 
-    public static Message incorrectlyFormattedEndpointUri(String uri)
-    {
-        return createMessage(BUNDLE_PATH, 16, uri);
+    public static Message incorrectlyFormattedEndpointUri(String uri) {
+        return createMessage(BUNDLE_PATH,16,uri);
     }
 
-    public static Message invalidFrontend(String frontend)
+    public static Message invalidFrontend(String frontend) {
+        return createMessage(BUNDLE_PATH,17,frontend);
+    }
+
+    public static Message portNotFound(String port) {
+        return createMessage(BUNDLE_PATH,18,port);
+    }
+
+    public static Message mustSpecifyPort() {
+        return createMessage(BUNDLE_PATH,19);
+    }
+
+    public static Message wsdlNotFound(String loc) {
+        return createMessage(BUNDLE_PATH,20,loc);
+    }
+
+    public static Message noOperationWasFoundOrSpecified()
     {
-        return createMessage(BUNDLE_PATH, 17, frontend);
+        return createMessage(BUNDLE_PATH,21);
     }
 }
+
+

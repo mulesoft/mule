@@ -1,0 +1,55 @@
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.0"
+  xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/cxf/2.0 http://www.mulesource.org/schema/mule/cxf/2.0/mule-cxf.xsd">
+  
+  <endpoint name="quartz.in" address="quartz:/eventTimer">
+    <properties>
+     <spring:entry key="repeatInterval" value="1000" />
+     <spring:entry key="repeatCount" value="0" />
+     <spring:entry key="startDelay" value="1000" />
+     <spring:entry key="payloadClassName" value="" />
+    </properties>
+  </endpoint>
+  
+  <endpoint address="cxf:http://localhost:63081/services/greeter" name="clientEndpoint">
+     <properties>
+       <spring:entry key="clientClass" value="org.apache.hello_world_soap_http.SOAPService"/>
+       <spring:entry key="port" value="SoapPort"/>
+       <spring:entry key="wsdlLocation" value="classpath:/wsdl/hello_world.wsdl"/>
+     </properties>
+   </endpoint>
+   
+  <model name="TestCxfModel">
+  
+    <service name="greeterService">
+      <component class="org.apache.hello_world_soap_http.GreeterImpl"/>
+      <inbound-router>
+          <cxf:inbound-endpoint address="http://localhost:63081/services/greeter" />
+      </inbound-router>
+    </service>
+    
+    <service name="cxfClient">
+      <singleton-object class="org.mule.providers.cxf.jaxws.ClientMessageGenerator"/>
+      <inbound-router>
+        <inbound-endpoint ref="quartz.in"/>
+      </inbound-router>
+	  <outbound-router>
+	    <outbound-pass-through-router>
+	       <outbound-endpoint address="cxf:http://localhost:63081/services/greeter">
+	         <properties>
+	           <spring:entry key="clientClass" value="org.apache.hello_world_soap_http.SOAPService"/>
+	           <spring:entry key="port" value="SoapPort"/>
+	           <spring:entry key="wsdlLocation" value="classpath:/wsdl/hello_world.wsdl"/>
+	           <spring:entry key="operation" value="greetMe"/>
+	         </properties>
+	       </outbound-endpoint>
+	     </outbound-pass-through-router>
+	   </outbound-router>
+    </service>
+  </model>
+</mule>

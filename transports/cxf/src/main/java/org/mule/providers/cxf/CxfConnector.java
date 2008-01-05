@@ -11,7 +11,6 @@
 package org.mule.providers.cxf;
 
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.model.seda.SedaComponent;
@@ -32,7 +31,6 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -63,7 +61,6 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
     {
         super();
         registerProtocols();
-        this.setEnableMessageEvents(true);
     }
 
     protected void registerProtocols()
@@ -101,6 +98,15 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/soap/", transport);
         extension.registerConduitInitiator("http://schemas.xmlsoap.org/soap/http", transport);
         extension.registerConduitInitiator(MuleUniversalTransport.TRANSPORT_ID, transport);
+        
+        // Registers the listener
+        try{
+        	managementContext.registerListener(this);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     protected void doDispose()
@@ -223,11 +229,11 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
 
         UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint(serviceEndpointbuilder, managementContext);
+            .getInboundEndpoint(serviceEndpointbuilder);
 
         UMOImmutableEndpoint receiverEndpoint = managementContext.getRegistry()
             .lookupEndpointFactory()
-            .getInboundEndpoint(receiverEndpointBuilder, managementContext);
+            .getInboundEndpoint(receiverEndpointBuilder);
 
         receiver.setEndpoint(receiverEndpoint);
         
@@ -275,7 +281,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
             {
                 try
                 {
-                    managementContext.getRegistry().registerComponent(c, managementContext);
+                    managementContext.getRegistry().registerComponent(c);
                 }
                 catch (UMOException e)
                 {
