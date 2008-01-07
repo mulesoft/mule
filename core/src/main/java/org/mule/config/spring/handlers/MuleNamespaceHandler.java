@@ -22,6 +22,8 @@ import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.parsers.collection.AttributeMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
@@ -336,8 +338,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         //Utils / Standard Types
         registerBeanDefinitionParser("properties", new ChildMapDefinitionParser("properties"));
-        registerBeanDefinitionParser("add-properties", new ChildMapDefinitionParser("addProperties"));
-        registerBeanDefinitionParser("delete-properties", new ChildListDefinitionParser("deleteProperties"));
+        registerMuleBeanDefinitionParser("add-message-properties", new ChildMapDefinitionParser("addProperties")).addCollection("addProperties");
+        registerMuleBeanDefinitionParser("add-message-property", new ChildMapEntryDefinitionParser("addProperties", ChildMapEntryDefinitionParser.KEY, ChildMapEntryDefinitionParser.VALUE)).addCollection("addProperties");
+        registerBeanDefinitionParser("delete-message-property", new ChildListEntryDefinitionParser("deleteProperties", ChildMapEntryDefinitionParser.KEY));
         registerBeanDefinitionParser("jndi-provider-properties", new ChildMapDefinitionParser("jndiProviderProperties"));
         registerBeanDefinitionParser("environment", new ChildMapDefinitionParser("environment"));
 

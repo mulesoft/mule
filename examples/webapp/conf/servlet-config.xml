@@ -16,9 +16,7 @@
     <!-- does this work?  it's not named or applied anwhere!
          see hello-http-config.xml for a more likely correct use -->
     <transformer-message-properties>
-        <add-properties>
-            <spring:entry key="Content-Type" value="text/plain"/>
-        </add-properties>
+        <add-message-property key="Content-Type" value="text/plain"/>
     </transformer-message-properties>
 
     <!-- avoid name clash when used with hello-http-config.xml -->

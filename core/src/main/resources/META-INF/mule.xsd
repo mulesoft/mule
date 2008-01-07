@@ -961,8 +961,9 @@
         <xsd:complexContent>
             <xsd:extension base="abstractTransformerType">
                 <xsd:sequence>
-                    <xsd:element name="delete-properties" type="listOrSetType" minOccurs="0" maxOccurs="1"/>
-                    <xsd:element name="add-properties" type="mapType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="delete-message-property" type="keyType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="add-message-property" type="keyValueType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="add-message-properties" type="mapType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attribute name="overwrite" type="substitutableBoolean" use="optional" default="true"/>
             </xsd:extension>
@@ -2178,6 +2179,20 @@
     <xsd:complexType name="referenceType">
         <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
     </xsd:complexType>
+
+    <xsd:complexType name="keyType">
+        <xsd:attribute name="key" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="keyValueType">
+        <xsd:complexContent>
+            <xsd:extension base="keyType">
+                <xsd:attribute name="value" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
 
     <!--==============================================================-->
     <!--   Connector support                                          -->

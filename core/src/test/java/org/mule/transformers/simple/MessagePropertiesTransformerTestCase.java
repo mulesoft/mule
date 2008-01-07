@@ -91,12 +91,13 @@ public class MessagePropertiesTransformerTestCase extends AbstractMuleTestCase
         assertNotNull(transformer);
         assertNotNull(transformer.getAddProperties());
         assertNotNull(transformer.getDeleteProperties());
-        assertEquals(transformer.getAddProperties().size(), 1);
-        assertEquals(transformer.getDeleteProperties().size(), 2);
+        assertEquals(2, transformer.getAddProperties().size());
+        assertEquals(2, transformer.getDeleteProperties().size());
         assertTrue(transformer.isOverwrite());
-        assertEquals(transformer.getAddProperties().get("Content-Type"), "text/baz;charset=UTF-16BE");
-        assertEquals(transformer.getDeleteProperties().get(0), "test-property1");
-        assertEquals(transformer.getDeleteProperties().get(1), "test-property2");
+        assertEquals("text/baz;charset=UTF-16BE", transformer.getAddProperties().get("Content-Type"));
+        assertEquals("value", transformer.getAddProperties().get("key"));
+        assertEquals("test-property1", transformer.getDeleteProperties().get(0));
+        assertEquals("test-property2", transformer.getDeleteProperties().get(1));
     }
 
 }

@@ -11,9 +11,7 @@
     <http:connector name="httpConnector" reuseAddress="true"/>
 
     <transformer-message-properties name="setResponseType">
-        <add-properties>
-            <spring:entry key="Content-Type" value="text/baz;charset=UTF-16BE"/>
-        </add-properties>
+        <add-message-property key="Content-Type" value="text/baz;charset=UTF-16BE"/>
     </transformer-message-properties>
 
     <http:endpoint name="clientEndpoint" host="localhost" port="60198" synchronous="true"/>
