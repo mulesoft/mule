@@ -33,6 +33,10 @@ public interface PropertyConfiguration
 
     void addAlias(String alias, String propertyName);
 
+    /**
+     * This will automatically generate a list and accumulate values.
+     * If the value is a map then instead of generating a list of maps we combine map entries together.
+     */
     void addCollection(String propertyName);
 
     void addIgnored(String propertyName);

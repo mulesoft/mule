@@ -31,7 +31,21 @@ public class MapCombinerTestCase extends AbstractNamespaceTestCase
     {
         OrphanBean bean = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
         logger.info("Map size: " + bean.getMap().size());
-        assertMapEntryExists(bean.getMap(), "1", 1);
+        for (int i = 0; i < 6; ++i)
+        {
+            assertMapEntryExists(bean.getMap(), Integer.toString(i+1), i+1);
+        }
+    }
+
+    public void testReverersedOrder()
+    {
+        OrphanBean bean = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
+        logger.info("Map size: " + bean.getMap().size());
+        for (int i = 0; i < 2; ++i)
+        {
+            assertMapEntryExists(bean.getMap(), Integer.toString(i+1), i+1);
+        }
+
     }
 
 }

@@ -96,10 +96,10 @@
     </xsd:complexType>
 
     <xsd:complexType name="abstractBeanType">
-        <xsd:sequence>
-            <xsd:element name="map-entry" type="mapEntry" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element name="list-entry" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="properties" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="map-entry" type="mapEntry" minOccurs="0"/>
+            <xsd:element name="list-entry" type="xsd:string" minOccurs="0"/>
+            <xsd:element ref="properties" minOccurs="0"/>
         </xsd:sequence>
         <xsd:attribute name="string" type="xsd:string"/>
         <xsd:attribute name="bar" type="xsd:int"/>

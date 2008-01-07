@@ -17,26 +17,32 @@ import java.util.Set;
 import java.util.List;
 import java.util.Iterator;
 
+/**
+ * This is used internally by {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}.
+ * It allows a collection (list) of maps to be defined in Spring, via the "list" property, and
+ * then presents all the maps as a single combine map at run time.  For efficiency the combination
+ * of maps is done once and then cached.
+ */
 public class MapCombiner implements Map
 {
 
     public static final String LIST = "list"; // the setter/getter
 
     private List list;
-    private Map map = new HashMap();
-    private boolean merged = false;
+    private Map cachedMerge = new HashMap();
+    private boolean isMerged = false;
 
-    private synchronized Map getMap()
+    private synchronized Map getCachedMerge()
     {
-        if (!merged)
+        if (!isMerged)
         {
             for (Iterator maps = list.iterator(); maps.hasNext();)
             {
-                map.putAll((Map) maps.next());
+                cachedMerge.putAll((Map) maps.next());
             }
-            merged = true;
+            isMerged = true;
         }
-        return map;
+        return cachedMerge;
     }
 
     public void setList(List list)
@@ -53,7 +59,7 @@ public class MapCombiner implements Map
 
     private synchronized void assertNotMerged()
     {
-        if (merged)
+        if (isMerged)
         {
             throw new IllegalStateException("Maps have already been merged");
         }
@@ -63,62 +69,62 @@ public class MapCombiner implements Map
 
     public int size()
     {
-        return getMap().size();
+        return getCachedMerge().size();
     }
 
     public void clear()
     {
-        getMap().clear();
+        getCachedMerge().clear();
     }
 
     public boolean isEmpty()
     {
-        return getMap().isEmpty();
+        return getCachedMerge().isEmpty();
     }
 
     public boolean containsKey(Object key)
     {
-        return getMap().containsKey(key);
+        return getCachedMerge().containsKey(key);
     }
 
     public boolean containsValue(Object value)
     {
-        return getMap().containsValue(value);
+        return getCachedMerge().containsValue(value);
     }
 
     public Collection values()
     {
-        return getMap().values();
+        return getCachedMerge().values();
     }
 
     public void putAll(Map t)
     {
-        getMap().putAll(t);
+        getCachedMerge().putAll(t);
     }
 
     public Set entrySet()
     {
-        return getMap().entrySet();
+        return getCachedMerge().entrySet();
     }
 
     public Set keySet()
     {
-        return getMap().keySet();
+        return getCachedMerge().keySet();
     }
 
     public Object get(Object key)
     {
-        return getMap().get(key);
+        return getCachedMerge().get(key);
     }
 
     public Object remove(Object key)
     {
-        return getMap().remove(key);
+        return getCachedMerge().remove(key);
     }
 
     public Object put(Object key, Object value)
     {
-        return getMap().put(key, value);
+        return getCachedMerge().put(key, value);
     }
 
 }

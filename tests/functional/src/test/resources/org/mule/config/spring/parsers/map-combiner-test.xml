@@ -25,6 +25,17 @@
         <parsers-test:properties>
             <entry key="key4" value="4Map4"/>
         </parsers-test:properties>
+        <parsers-test:map-entry key="key5" value="5Map5"/>
+        <parsers-test:properties>
+            <entry key="key6" value="6Map6"/>
+        </parsers-test:properties>
     </parsers-test:named>
+
+    <parsers-test:orphan name="orphan2">
+        <parsers-test:properties>
+            <entry key="key2" value="2Map2"/>
+        </parsers-test:properties>
+        <parsers-test:map-entry key="key1" value="1Map1"/>
+    </parsers-test:orphan>
 
 </beans>

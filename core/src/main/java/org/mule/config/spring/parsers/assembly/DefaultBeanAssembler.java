@@ -162,11 +162,6 @@ public class DefaultBeanAssembler implements BeanAssembler
         PropertyValue pv = targetProperties.getPropertyValue(newName);
         Object oldValue = null == pv ? null : pv.getValue();
 
-        if (newName.equals("map"))
-        {
-            System.out.println("oops");
-        }
-
         if (! targetConfig.isIgnored(oldName))
         {
             if (targetConfig.isCollection(oldName) ||
@@ -193,43 +188,16 @@ public class DefaultBeanAssembler implements BeanAssembler
                         targetProperties.addPropertyValue(pv);
                     }
                 }
-                List list;
-                if (oldValue instanceof List)
-                {
-                    list = (List) oldValue;
-                }
-                else if (oldValue instanceof BeanDefinition &&
-                        ((BeanDefinition) oldValue).getBeanClassName().equals(MapCombiner.class.getName()))
-                {
-                    list = (List) ((BeanDefinition) oldValue).getPropertyValues().getPropertyValue(MapCombiner.LIST).getValue();
-                }
-                else
-                {
-                    throw new ClassCastException("Collection not of expected type: " + oldValue);
-                }
 
+                List list = retrieveList(oldValue);
                 if (ChildMapEntryDefinitionParser.KeyValuePair.class.getName().equals(beanClass))
                 {
                     if (list.isEmpty())
                     {
                         list.add(new ManagedMap());
                     }
-                    Object obfuscatedMap = list.get(list.size() - 1);
-                    Map map;
-                    if (obfuscatedMap instanceof ManagedMap)
-                    {
-                        map = (ManagedMap) obfuscatedMap;
-                    }
-                    else if (obfuscatedMap instanceof BeanDefinition &&
-                            ((BeanDefinition) obfuscatedMap).getBeanClassName().equals(MapFactoryBean.class.getName()))
-                    {
-                        map = (Map) ((BeanDefinition) obfuscatedMap).getPropertyValues().getPropertyValue("sourceMap").getValue();
-                    }
-                    else
-                    {
-                        throw new ClassCastException("Map not of expected type: " + obfuscatedMap);
-                    }
-                    map.put(sourceProperties.getPropertyValue(ChildMapEntryDefinitionParser.KEY).getValue(),
+                    retrieveMap(list.get(list.size() - 1)).put(
+                            sourceProperties.getPropertyValue(ChildMapEntryDefinitionParser.KEY).getValue(),
                             sourceProperties.getPropertyValue(ChildMapEntryDefinitionParser.VALUE).getValue());
                 }
                 else if (beanClass.equals(ChildListEntryDefinitionParser.ListEntry.class.getName()))
@@ -252,22 +220,8 @@ public class DefaultBeanAssembler implements BeanAssembler
                         pv = new PropertyValue(newName, new ManagedMap());
                         targetProperties.addPropertyValue(pv);
                     }
-                    Object obfuscatedMap = pv.getValue();
-                    Map map;
-                    if (obfuscatedMap instanceof ManagedMap)
-                    {
-                        map = (ManagedMap) obfuscatedMap;
-                    }
-                    else if (obfuscatedMap instanceof BeanDefinition &&
-                            ((BeanDefinition) obfuscatedMap).getBeanClassName().equals(MapFactoryBean.class.getName()))
-                    {
-                        map = (Map) ((BeanDefinition) obfuscatedMap).getPropertyValues().getPropertyValue("sourceMap").getValue();
-                    }
-                    else
-                    {
-                        throw new ClassCastException("Map not of expected type: " + obfuscatedMap);
-                    }
-                    map.put(sourceProperties.getPropertyValue(ChildMapEntryDefinitionParser.KEY).getValue(),
+                    retrieveMap(pv.getValue()).put(
+                            sourceProperties.getPropertyValue(ChildMapEntryDefinitionParser.KEY).getValue(),
                             sourceProperties.getPropertyValue(ChildMapEntryDefinitionParser.VALUE).getValue());
                 }
                 else
@@ -276,6 +230,49 @@ public class DefaultBeanAssembler implements BeanAssembler
                 }
             }
         }
+    }
+
+    private static List retrieveList(Object value)
+    {
+        if (value instanceof List)
+        {
+            return (List) value;
+        }
+        else if (isDefinitionOf(value, MapCombiner.class))
+        {
+            return (List) unpackDefinition(value, MapCombiner.LIST);
+        }
+        else
+        {
+            throw new ClassCastException("Collection not of expected type: " + value);
+        }
+    }
+
+    private static Map retrieveMap(Object value)
+    {
+        if (value instanceof Map)
+        {
+            return (Map) value;
+        }
+        else if (isDefinitionOf(value, MapFactoryBean.class))
+        {
+            return (Map) unpackDefinition(value, "sourceMap");
+        }
+        else
+        {
+            throw new ClassCastException("Map not of expected type: " + value);
+        }
+    }
+
+    private static boolean isDefinitionOf(Object value, Class clazz)
+    {
+        return value instanceof BeanDefinition &&
+                ((BeanDefinition) value).getBeanClassName().equals(clazz.getName());
+    }
+
+    private static Object unpackDefinition(Object definition, String name)
+    {
+        return ((BeanDefinition) definition).getPropertyValues().getPropertyValue(name).getValue();
     }
 
 
@@ -354,10 +351,9 @@ public class DefaultBeanAssembler implements BeanAssembler
     {
         if (!config.isIgnored())
         {
-            logger.debug(name + ": " + value);
-            if (name.equals("map"))
+            if (logger.isDebugEnabled())
             {
-                System.out.println("oops");
+                logger.debug(name + ": " + value);
             }
             Object oldValue = null;
             if (properties.contains(name))
