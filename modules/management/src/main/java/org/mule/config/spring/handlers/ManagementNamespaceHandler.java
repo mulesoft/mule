@@ -13,7 +13,7 @@ import org.mule.config.spring.parsers.JmxAgentDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
+import org.mule.config.spring.parsers.specific.ObjectFactoryWrapper;
 import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
 import org.mule.impl.internal.admin.Log4jNotificationLoggerAgent;
 import org.mule.management.agents.DefaultJmxSupportAgent;
@@ -31,7 +31,7 @@ public class ManagementNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerBeanDefinitionParser("jmx-server", new JmxAgentDefinitionParser());
-        registerBeanDefinitionParser("mBeanServer", new ObjectFactoryDefinitionParser("MBeanServerObjectFactory"));
+        registerBeanDefinitionParser("mBeanServer", new ObjectFactoryWrapper("MBeanServerObjectFactory"));
         registerBeanDefinitionParser("credentials", new ChildMapDefinitionParser("credentials"));
         registerBeanDefinitionParser("jmx-log4j", new MuleOrphanDefinitionParser(Log4jAgent.class, true));
         registerBeanDefinitionParser("jmx-mx4j-adaptor", new MuleOrphanDefinitionParser(Mx4jAgent.class, true));

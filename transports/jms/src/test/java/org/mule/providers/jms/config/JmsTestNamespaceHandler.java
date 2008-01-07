@@ -9,7 +9,6 @@
  */
 package org.mule.providers.jms.config;
 
-import org.mule.providers.jms.test.TestConnectionFactory;
 import org.mule.providers.jms.test.TestJmsConnector;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -21,7 +20,7 @@ public class JmsTestNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         registerBeanDefinitionParser("connector", new JmsConnectorDefinitionParser(TestJmsConnector.class));
-        registerBeanDefinitionParser("connection-factory", new ConnectionFactoryDefinitionParser(TestConnectionFactory.class));
+        registerBeanDefinitionParser("connection-factory", new ConnectionFactoryDefinitionParser());
     }
     
 }

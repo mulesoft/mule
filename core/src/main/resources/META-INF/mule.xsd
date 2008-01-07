@@ -1753,43 +1753,19 @@
         </xsd:sequence>
     </xsd:complexType>
 
-    <!-- Transitory, for backwards-compatibility only -->
     <xsd:complexType name="genericObjectFactoryType">
+        <xsd:sequence>
+            <xsd:element ref="abstract-object-factory"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="spring-factory-bean" type="springFactoryBeanType" substitutionGroup="abstract-object-factory"/>
+    <xsd:complexType name="springFactoryBeanType">
         <xsd:complexContent>
             <xsd:extension base="abstractObjectFactoryType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-pooling-profile" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>Pooling profile to use if scope="pooled"</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="scope" default="prototype">
+                <xsd:attribute name="ref" type="xsd:string">
                     <xsd:annotation>
-                        <xsd:documentation>Creation strategy</xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="singleton"/>
-                            <xsd:enumeration value="prototype"/>
-                            <xsd:enumeration value="pooled"/>
-                            <xsd:enumeration value="custom"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>Class name</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="instance-ref" type="xsd:NMTOKEN">
-                    <xsd:annotation>
-                        <xsd:documentation>Singleton object instance to use</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
-                    <xsd:annotation>
-                        <xsd:documentation>Custom factory bean</xsd:documentation>
+                        <xsd:documentation>Name of bean which implements the Spring FactoryBean interface</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
@@ -1834,7 +1810,7 @@
                 <xsd:sequence>
                     <xsd:element ref="abstract-pooling-profile" minOccurs="0">
                         <xsd:annotation>
-                            <xsd:documentation>Pooling profile to use if scope="pooled"</xsd:documentation>
+                            <xsd:documentation>Characteristics of the object pool</xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>

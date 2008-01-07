@@ -57,14 +57,13 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
         assertEquals(new Integer(10), ((Orange) service).getSegments());
     }
     
-      // TODO MULE-2060  
-//    public void testCustomFactory() throws Exception
-//    {
-//        UMOModel model = managementContext.getRegistry().lookupModel("main");
-//        UMOComponent c = model.getComponent("orange4");
-//        Object service = ComponentFactory.createService(c.getDescriptor());
-//        assertTrue("Service should be an Orange", service instanceof Orange);
-//        assertEquals(new Integer(8), ((Orange) service).getSegments());
-//        assertEquals("Florida Sunny", ((Orange) service).getBrand());
-//    }
+    public void testSpringFactoryBean() throws Exception
+    {
+        UMOComponent c = managementContext.getRegistry().lookupComponent("orange4");
+        Object service =  c.getServiceFactory().getOrCreate();
+        assertNotNull(service);
+        assertTrue("Service should be an Orange but is: " + service.getClass(), service instanceof Orange);
+        assertEquals(new Integer(8), ((Orange) service).getSegments());
+        assertEquals("Florida Sunny", ((Orange) service).getBrand());
+    }
 }

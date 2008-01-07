@@ -10,7 +10,9 @@
 
     <!-- Default config -->
     <jms:connector name="jmsConnector">
-        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        <jms:connection-factory>
+            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        </jms:connection-factory>
     </jms:connector>
 
     <!-- DON'T use jms:endpoints here as we are testing for resolution from uri

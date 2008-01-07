@@ -10,14 +10,18 @@
 
     <jms:custom-connector name="jmsConnector1" class="org.mule.providers.jms.test.GenericTestJmsConnector">
         <spring:property name="providerProperty" value="TEST_VALUE" />
-        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        <jms:connection-factory>
+            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        </jms:connection-factory>
     </jms:custom-connector>
 
     <jms:connector name="jmsConnector2">
-        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory">
-            <properties>
-                <spring:entry key="connectionFactoryProperty" value="TEST_VALUE"/>
-            </properties>
+        <jms:connection-factory>
+            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory">
+                <properties>
+                    <spring:entry key="connectionFactoryProperty" value="TEST_VALUE"/>
+                </properties>
+            </prototype-object>
         </jms:connection-factory>            
     </jms:connector>
 

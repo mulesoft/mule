@@ -9,7 +9,9 @@
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
     <jms:weblogic-connector name="jmsConnector">
-        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        <jms:connection-factory>
+            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        </jms:connection-factory>
     </jms:weblogic-connector>
     
 </mule>

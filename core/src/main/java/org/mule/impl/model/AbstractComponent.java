@@ -17,6 +17,7 @@ import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.InitialisationCallback;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.OptimizedRequestContext;
+import org.mule.impl.UMOComponentAware;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
@@ -771,6 +772,10 @@ public abstract class AbstractComponent implements UMOComponent
         try
         {
             component = serviceFactory.getOrCreate();
+            if (component instanceof UMOComponentAware)
+            {
+                ((UMOComponentAware) component).setComponent(this);
+            }
         }
         catch (Exception e)
         {

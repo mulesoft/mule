@@ -10,27 +10,27 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.object.ObjectFactory;
+import org.springframework.beans.factory.FactoryBean;
 
-public class FloridaSunnyOrangeFactory implements ObjectFactory
+
+public class FloridaSunnyOrangeFactory implements FactoryBean
 {
     Integer segments = new Integer(10);
     Double radius = new Double(4.34);
-
-    public void initialise() throws InitialisationException
-    {
-        // nothing to do
-    }
     
-    public void dispose()
-    {
-        // nothing to do
-    }
-
-    public Object getOrCreate() throws Exception
+    public Object getObject() throws Exception
     {
         return new Orange(segments, radius, "Florida Sunny");
+    }
+
+    public Class getObjectType()
+    {
+        return Orange.class;
+    }
+
+    public boolean isSingleton()
+    {
+        return false;
     }
 
     public Double getRadius()
@@ -51,20 +51,5 @@ public class FloridaSunnyOrangeFactory implements ObjectFactory
     public void setSegments(Integer segments)
     {
         this.segments = segments;
-    }
-    
-    public Object lookup(String id) throws Exception
-    {
-        throw new UnsupportedOperationException();
-    }
-    
-    public void release(Object object) throws Exception
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public Class getObjectClass() throws Exception
-    {
-        return Orange.class;
     }
 }

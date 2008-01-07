@@ -13,15 +13,21 @@
        http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd">
 
     <jdbc:connector name="jdbcConnector1">
-        <jdbc:dataSource instance-ref="testDS1" scope="singleton" />
+        <jdbc:dataSource>
+            <singleton-object instance-ref="testDS1"/>
+        </jdbc:dataSource>
     </jdbc:connector>
 
     <jdbc:connector name="jdbcConnector2">
-        <jdbc:dataSource instance-ref="testDS2" scope="singleton" />
+        <jdbc:dataSource>
+            <singleton-object instance-ref="testDS2"/>
+        </jdbc:dataSource>
     </jdbc:connector>
 
     <jdbc:connector name="jdbcConnector3">
-        <jdbc:dataSource instance-ref="testDS1" scope="singleton" />
+        <jdbc:dataSource>
+            <singleton-object instance-ref="testDS1"/>
+        </jdbc:dataSource>
         <jdbc:queries>
             <spring:entry key="getTest"
                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE =

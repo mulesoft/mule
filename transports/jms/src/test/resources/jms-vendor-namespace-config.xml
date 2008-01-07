@@ -14,11 +14,15 @@
     <jms:activemq-connector name="activeMqConnectorBroker" brokerURL="tcp://localhost:1234"/>
     
     <jms:weblogic-connector name="weblogicConnector">
-        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        <jms:connection-factory>
+            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        </jms:connection-factory>
     </jms:weblogic-connector>
 
     <jms:websphere-connector name="websphereConnector">
-        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        <jms:connection-factory>
+            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        </jms:connection-factory>
     </jms:websphere-connector>
 
 </mule>

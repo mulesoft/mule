@@ -10,64 +10,51 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.util.StringUtils;
 import org.mule.util.object.AbstractObjectFactory;
-import org.mule.util.object.PooledObjectFactory;
-import org.mule.util.object.PrototypeObjectFactory;
-import org.mule.util.object.SingletonObjectFactory;
+import org.mule.util.object.SpringFactoryBean;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.w3c.dom.Element;
 
-public class ObjectFactoryDefinitionParser extends ChildDefinitionParser
+public class ObjectFactoryDefinitionParser extends AbstractChildDefinitionParser
 {
     protected Class beanClass = null;
+    protected String setterMethod = null;
 
     public ObjectFactoryDefinitionParser(Class beanClass, String setterMethod)
     {
-        this(setterMethod);
-        this.beanClass = beanClass;
+        this(beanClass);
+        this.setterMethod = setterMethod;
     }                                                             
     
-    public ObjectFactoryDefinitionParser(String setterMethod)
+    public ObjectFactoryDefinitionParser(Class beanClass)
     {
-        super(setterMethod, null);
+        super();
+        this.beanClass = beanClass;
         setAllowClassAttribute(false);
         addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS, AbstractObjectFactory.ATTRIBUTE_OBJECT_CLASS_NAME);
+        addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "factoryBean");
     }                                                             
     
-    protected Class getBeanClass(Element element)
+    public String getPropertyName(Element element)
     {
-        if (beanClass != null)
+        if (setterMethod != null)
         {
-            return beanClass;
-        }
-        
-        String scope = element.getAttribute("scope");
-        // Default scope is "prototype"
-        if (StringUtils.isBlank(scope))
-        {
-            scope = "prototype";
-        }
-        element.removeAttribute("scope");
-        
-        if (scope.equals("prototype"))
-        {
-            return PrototypeObjectFactory.class;
-        }
-        else if (scope.equals("singleton"))
-        {
-            return SingletonObjectFactory.class;
-        }
-        else if (scope.equals("pooled"))
-        {
-            return PooledObjectFactory.class;
+            return setterMethod;
         }
         else
         {
-            logger.error("Scope " + scope + " not recognized.");
-            return null;
+            BeanDefinition parent = getParentBeanDefinition(element);
+            String nodeName = element.getNodeName();
+            String setter = (String) parent.getAttribute(ObjectFactoryWrapper.OBJECT_FACTORY_SETTER);
+            return setter;
         }
     }
+
+    protected Class getBeanClass(Element element)
+    {
+        return beanClass;
+    }                                                                 
 }

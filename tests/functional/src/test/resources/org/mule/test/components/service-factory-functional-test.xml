@@ -29,18 +29,18 @@
             </component>
         </service>
 
-        <!-- TODO MULE-2060  
         <service name="orange4">
-            <component factory-ref="myCustomFactory"/>
+            <component>
+                <spring-factory-bean ref="&amp;myCustomFactory"/>
+            </component>
         </service>
-        -->
     </model>
 
     <!-- Singleton instance -->
     <spring:bean name="myOnlyOrange" class="org.mule.tck.testmodels.fruit.Orange"/>
 
-    <!-- Custom factory -->
-    <spring:bean name="myCustomFactory" class="org.mule.tck.testmodels.fruit.FloridaSunnyOrangeFactory">
+    <!-- Spring FactoryBean -->
+    <spring:bean id="myCustomFactory" class="org.mule.tck.testmodels.fruit.FloridaSunnyOrangeFactory">
         <spring:property name="segments" value="8"/>
         <spring:property name="radius" value="15"/>
     </spring:bean>

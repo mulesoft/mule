@@ -27,23 +27,18 @@
 
     <xsd:element name="abstract-connection-factory" abstract="true" type="abstractConnectionFactoryType"/>
     <xsd:complexType name="abstractConnectionFactoryType">
-        <xsd:attribute name="username" type="xsd:string"/>
-        <xsd:attribute name="password" type="xsd:string"/>
+        <xsd:complexContent>
+            <xsd:extension base="mule:genericObjectFactoryType">
+                <xsd:attribute name="username" type="xsd:string"/>
+                <xsd:attribute name="password" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="connection-factory" type="genericConnectionFactoryType" substitutionGroup="abstract-connection-factory"/>
     <xsd:complexType name="genericConnectionFactoryType">
         <xsd:complexContent>
-            <xsd:extension base="abstractConnectionFactoryType">
-                <xsd:sequence>
-                    <xsd:element ref="mule:properties" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>Properties to be set on the connection factory</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="xsd:string"/>
-            </xsd:extension>
+            <xsd:extension base="abstractConnectionFactoryType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

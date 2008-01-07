@@ -15,7 +15,6 @@ import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.util.CoreXMLUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.object.PooledObjectFactory;
@@ -28,14 +27,13 @@ import org.w3c.dom.Node;
 
 public class ComponentDefinitionParser extends AbstractParallelDelegatingDefinitionParser
 {
-
-    private MuleDefinitionParser parent = new ParentDefinitionParser();
-    private MuleDefinitionParser pojoService = new PojoComponentDefinitionParser(PooledObjectFactory.class);
+    private MuleDefinitionParser normalConfig = new ObjectFactoryWrapper("serviceFactory");
+    private MuleDefinitionParser shortcutConfig = new ObjectFactoryDefinitionParser(PooledObjectFactory.class, "serviceFactory");
 
     public ComponentDefinitionParser()
     {
-        addDelegate(parent);
-        addDelegate(pojoService);
+        addDelegate(normalConfig);
+        addDelegate(shortcutConfig);
         registerPreProcessor(new CheckExclusiveClassAttributeObjectFactory());
     }
 
@@ -43,11 +41,11 @@ public class ComponentDefinitionParser extends AbstractParallelDelegatingDefinit
     {
         if (StringUtils.isEmpty(element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS)))
         {
-            return parent;
+            return normalConfig;
         }
         else
         {
-            return pojoService;
+            return shortcutConfig;
         }
     }
 

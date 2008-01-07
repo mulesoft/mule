@@ -3,16 +3,16 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
-       xmlns:test="http://www.mulesource.org/schema/mule/jms-test/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
-       http://www.mulesource.org/schema/mule/jms-test/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms-test.xsd">
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
     <!-- Default config -->
     <jms:connector name="jmsConnectorDefaults">
-        <jms:connection-factory class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        <jms:connection-factory>
+            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        </jms:connection-factory>
     </jms:connector>
 
     <jms:connector name="jmsConnector1"
@@ -29,20 +29,26 @@
                    forceJndiDestinations="true"
                    specification="1.1">
         <spring:property name="numberOfConcurrentTransactedReceivers" value="7"/>
-        <test:connection-factory username="myuser" password="mypass">
-            <properties>
-                <!-- just testing to see if this validates -->
-            </properties>
-        </test:connection-factory>
-        <jms:redelivery-handler class="org.mule.providers.jms.test.TestRedeliveryHandler" />
+        <jms:connection-factory username="myuser" password="mypass">
+            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory">
+                <properties>
+                    <!-- just testing to see if this validates -->
+                </properties>
+            </prototype-object>
+        </jms:connection-factory>
+        <jms:redelivery-handler>
+            <prototype-object class="org.mule.providers.jms.test.TestRedeliveryHandler"/>
+        </jms:redelivery-handler>
     </jms:connector>
 
     <jms:custom-connector name="jmsConnector2" class="org.mule.providers.jms.JmsConnector"
                           specification="1.1">
-        <test:connection-factory/>
+        <jms:connection-factory>
+            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        </jms:connection-factory>
     </jms:custom-connector>
 
-    <test:connector name="jmsConnector3"
+    <jms:connector name="jmsConnector3"
                     acknowledgementMode="DUPS_OK_ACKNOWLEDGE"
                     clientId="myClient"
                     durable="true"
@@ -55,8 +61,13 @@
                     jndiDestinations="true"
                     forceJndiDestinations="true"
                     specification="1.1">
-        <jms:redelivery-handler class="org.mule.providers.jms.test.TestRedeliveryHandler" />
-    </test:connector>
+        <jms:connection-factory>
+            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
+        </jms:connection-factory>
+        <jms:redelivery-handler>
+            <prototype-object class="org.mule.providers.jms.test.TestRedeliveryHandler"/>
+        </jms:redelivery-handler>
+    </jms:connector>
 
     <custom-transaction-factory name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory">
         <spring:property name="value" value="foo"/>

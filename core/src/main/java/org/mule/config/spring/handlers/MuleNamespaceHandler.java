@@ -42,12 +42,13 @@ import org.mule.config.spring.parsers.specific.ForwardingRouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MuleAdminAgentDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
-import org.mule.config.spring.parsers.specific.PojoComponentDefinitionParser;
+import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimplePojoServiceDefinitionParser;
+import org.mule.config.spring.parsers.specific.SpringFactoryBeanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionConfigDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParser;
@@ -262,9 +263,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("no-args-call-component", new SimplePojoServiceDefinitionParser(NoArgsCallWrapper.class));
 
         // Object Factories
-        registerBeanDefinitionParser("singleton-object", new PojoComponentDefinitionParser(SingletonObjectFactory.class));
-        registerBeanDefinitionParser("prototype-object", new PojoComponentDefinitionParser(PrototypeObjectFactory.class));
-        registerBeanDefinitionParser("pooled-object", new PojoComponentDefinitionParser(PooledObjectFactory.class));
+        registerBeanDefinitionParser("singleton-object", new ObjectFactoryDefinitionParser(SingletonObjectFactory.class));
+        registerBeanDefinitionParser("prototype-object", new ObjectFactoryDefinitionParser(PrototypeObjectFactory.class));
+        registerBeanDefinitionParser("pooled-object", new ObjectFactoryDefinitionParser(PooledObjectFactory.class));
+        registerBeanDefinitionParser("spring-factory-bean", new SpringFactoryBeanDefinitionParser());
 
         //Routers
         registerBeanDefinitionParser("inbound-router", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));

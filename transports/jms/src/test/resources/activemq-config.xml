@@ -29,7 +29,8 @@
                             jndiDestinations="true"
                             forceJndiDestinations="true"
                             specification="1.1">
-        <jms:redelivery-handler class="org.mule.providers.jms.test.TestRedeliveryHandler" />
-    </jms:activemq-connector>
-    
+        <jms:redelivery-handler>
+            <prototype-object class="org.mule.providers.jms.test.TestRedeliveryHandler"/>
+        </jms:redelivery-handler>
+    </jms:activemq-connector>    
 </mule>

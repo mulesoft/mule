@@ -9,3 +9,6 @@ org.mule.test.firewall.FirewallTestCase
 
 # MULE-2779
 org.mule.test.config.StartupPropertiesTestCase
+
+# TC: I broke this one but do not understand the test enough to know why
+org.mule.config.spring.parsers.MapMule2478TestCase

@@ -9,25 +9,25 @@
  */
 package org.mule.providers.jms.config;
 
-import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
-import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
-import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.assembly.configuration.PrefixValueMap;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.providers.jms.JmsTransactionFactory;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.MuleDefinitionParser;
+import org.mule.config.spring.parsers.assembly.configuration.PrefixValueMap;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.ObjectFactoryWrapper;
+import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParser;
+import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
+import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.filters.JmsPropertyFilter;
-import org.mule.providers.jms.filters.JmsSelectorFilter;
+import org.mule.providers.jms.JmsTransactionFactory;
 import org.mule.providers.jms.activemq.ActiveMQJmsConnector;
 import org.mule.providers.jms.activemq.ActiveMQXAJmsConnector;
+import org.mule.providers.jms.filters.JmsPropertyFilter;
+import org.mule.providers.jms.filters.JmsSelectorFilter;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.providers.jms.weblogic.WeblogicJmsConnector;
@@ -58,7 +58,7 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("websphere-connector", new JmsConnectorDefinitionParser(WebsphereJmsConnector.class));
 
         registerBeanDefinitionParser("connection-factory", new ConnectionFactoryDefinitionParser());
-        registerBeanDefinitionParser("redelivery-handler", new ObjectFactoryDefinitionParser("redeliveryHandler"));
+        registerBeanDefinitionParser("redelivery-handler", new ObjectFactoryWrapper("redeliveryHandler"));
 
         registerBeanDefinitionParser("transaction-factory", new TransactionFactoryDefinitionParser(JmsTransactionFactory.class));
 

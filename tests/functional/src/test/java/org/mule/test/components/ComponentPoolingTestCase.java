@@ -28,7 +28,7 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
         assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
         Object component = ((TestSedaComponent) c).getOrCreateService();
         assertNotNull(component);
-        assertTrue("Component should be of type UniqueComponent", component instanceof UniqueComponent);
+        assertTrue("Component should be of type UniqueComponent but is of type " + component.getClass(), component instanceof UniqueComponent);
         String id1 = ((UniqueComponent) component).getId();
         assertNotNull(id1);
     }

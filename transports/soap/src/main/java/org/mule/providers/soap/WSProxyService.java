@@ -68,6 +68,9 @@ public class WSProxyService implements Callable, UMOComponentAware, Initialisabl
     private static final String WSDL_PARAM_1 = "?wsdl";
     private static final String WSDL_PARAM_2 = "&wsdl";
 
+    /** This is an internal semaphore, not a property */
+    private boolean lazyInit = false;
+    
     protected static transient Log logger = LogFactory.getLog(WSProxyService.class);
 
     /**
@@ -105,6 +108,11 @@ public class WSProxyService implements Callable, UMOComponentAware, Initialisabl
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
+        if (wsdlEndpoint == null && lazyInit)
+        {
+            initialise();
+        }
+        
         // retrieve the message
         UMOMessage message = eventContext.getMessage();
 
@@ -165,59 +173,67 @@ public class WSProxyService implements Callable, UMOComponentAware, Initialisabl
 
     public void initialise() throws InitialisationException
     {
-        if (component == null)
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Component not set, this service has not been initialized properly."), this);
-        }
-        
-        UMOOutboundRouter router = (UMOOutboundRouter)component.getOutboundRouter().getRouters().get(0);
-        UMOEndpoint endpoint = (UMOEndpoint)router.getEndpoints().get(0);
-        this.urlWebservice = endpoint.getEndpointURI().getAddress();
-
-        // remove any params from the url
-        int paramIndex;
-        if ((paramIndex = this.urlWebservice.indexOf("?")) != -1)
-        {
-            this.urlWebservice = this.urlWebservice.substring(0, paramIndex);
-        }
-
-        // if the wsdlFile property is not empty, the onCall() will use this file for WSDL requests
-        if (StringUtils.isNotBlank(this.wsdlFile))
-        {
-            try
+        if (component != null)
+        {        
+            UMOOutboundRouter router = (UMOOutboundRouter)component.getOutboundRouter().getRouters().get(0);
+            UMOEndpoint endpoint = (UMOEndpoint)router.getEndpoints().get(0);
+            this.urlWebservice = endpoint.getEndpointURI().getAddress();
+    
+            // remove any params from the url
+            int paramIndex;
+            if ((paramIndex = this.urlWebservice.indexOf("?")) != -1)
             {
-                this.wsdlFileContents = IOUtils.getResourceAsString(this.wsdlFile, getClass());
-
-                if (StringUtils.isNotBlank(this.wsdlFileContents))
+                this.urlWebservice = this.urlWebservice.substring(0, paramIndex);
+            }
+    
+            // if the wsdlFile property is not empty, the onCall() will use this file for WSDL requests
+            if (StringUtils.isNotBlank(this.wsdlFile))
+            {
+                try
                 {
-                    this.useFile = true;
-                    logger.info("Using file " + this.wsdlFile + " as WSDL file");
+                    this.wsdlFileContents = IOUtils.getResourceAsString(this.wsdlFile, getClass());
+    
+                    if (StringUtils.isNotBlank(this.wsdlFileContents))
+                    {
+                        this.useFile = true;
+                        logger.info("Using file " + this.wsdlFile + " as WSDL file");
+                    }
+                }
+                catch (IOException fileError)
+                {
+                    throw new InitialisationException(CoreMessages.failedToLoad(this.wsdlFile), this);
                 }
             }
-            catch (IOException fileError)
+    
+            if (!this.useFile)
             {
-                throw new InitialisationException(CoreMessages.failedToLoad(this.wsdlFile), this);
-            }
-        }
-
-        if (!this.useFile)
-        {
-            // if no wsdl property is set, create one which will include the original
-            // url of the webservice followed by ?WSDL
-            if (StringUtils.isBlank(this.wsdlEndpoint))
-            {
-                if (urlWebservice == null)
+                // if no wsdl property is set, create one which will include the original
+                // url of the webservice followed by ?WSDL
+                if (StringUtils.isBlank(this.wsdlEndpoint))
                 {
-                    throw new InitialisationException(MessageFactory.createStaticMessage("urlWebservice has not been set, service has not been initialized properly"), this);
+                    if (urlWebservice == null)
+                    {
+                        throw new InitialisationException(MessageFactory.createStaticMessage("urlWebservice has not been set, service has not been initialized properly"), this);
+                    }
+                    this.wsdlEndpoint = this.urlWebservice.concat("?WSDL");
+                    logger.info("Defaulting to: " + this.wsdlEndpoint);
                 }
-                this.wsdlEndpoint = this.urlWebservice.concat("?WSDL");
-                logger.info("Defaulting to: " + this.wsdlEndpoint);
-            }
-            else
-            {
-                logger.info("Using url " + this.wsdlEndpoint + " as WSDL");
+                else
+                {
+                    logger.info("Using url " + this.wsdlEndpoint + " as WSDL");
+                }
             }
         }
-
+        else if (!lazyInit)
+        {
+            // Component not injected yet, try lazy init (i.e., upon onCall()).
+            logger.debug("Component has not yet been injected, lazy initialization will be used.");
+            lazyInit = true;
+        }
+        else
+        {
+            // We're already in lazy init and the component is still not set, so throw an exception.
+            throw new InitialisationException(MessageFactory.createStaticMessage("Component not set, this service has not been initialized properly."), this);                        
+        }
     }
 }

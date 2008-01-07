@@ -23,7 +23,9 @@
     </spring:beans>
 
     <jdbc:connector name="jdbcConnector" pollingFrequency="1000">
-        <jdbc:dataSource instance-ref="jdbcDataSource" scope="singleton"/>
+        <jdbc:dataSource>
+            <singleton-object instance-ref="jdbcDataSource"/>
+        </jdbc:dataSource>
         <jdbc:queries>
             <spring:entry key="getTest"
                           value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>

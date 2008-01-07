@@ -35,7 +35,7 @@
             </outbound-router>
         </service>
 
-        <service name="webServiceProxyWitWsdlFromFile">
+        <service name="webServiceProxyWithWsdlFromFile">
             <inbound-router>
                 <inbound-endpoint address="http://localhost:6075/webServiceProxy"/>
             </inbound-router>

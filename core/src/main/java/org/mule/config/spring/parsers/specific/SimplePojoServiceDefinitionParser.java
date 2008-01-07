@@ -10,8 +10,8 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.util.object.SingletonObjectFactory;
 import org.mule.util.object.AbstractObjectFactory;
+import org.mule.util.object.SingletonObjectFactory;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -29,19 +29,13 @@ import org.w3c.dom.Element;
  * In order to further customize components and use serviceFactory properties the
  * &lt;mule:component/&gt; element should be used.
  */
-public class SimplePojoServiceDefinitionParser extends PojoComponentDefinitionParser
+public class SimplePojoServiceDefinitionParser extends ObjectFactoryDefinitionParser
 {
     private Class clazz;
 
     public SimplePojoServiceDefinitionParser(Class clazz)
     {
-        super(SingletonObjectFactory.class);
-        this.clazz = clazz;
-    }
-
-    public SimplePojoServiceDefinitionParser(Class clazz, String setterMethod)
-    {
-        super(SingletonObjectFactory.class, setterMethod);
+        super(SingletonObjectFactory.class, "serviceFactory");
         this.clazz = clazz;
     }
 
