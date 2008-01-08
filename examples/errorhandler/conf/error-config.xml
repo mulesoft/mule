@@ -4,14 +4,16 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:file="http://www.mulesource.org/schema/mule/file/2.0"
        xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+       xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.0"
        xmlns:email="http://www.mulesource.org/schema/mule/email/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/file/2.0 http://www.mulesource.org/schema/mule/file/2.0/mule-file.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/smtp/2.0 http://www.mulesource.org/schema/mule/smtp/2.0/mule-smtp.xsd
        http://www.mulesource.org/schema/mule/email/2.0 http://www.mulesource.org/schema/mule/email/2.0/mule-email.xsd">
-       
+
     <description>
         This example demonstrates how to publish events to multiple outbound endpoints. 
         The example consists of two components: ExceptionManager and BusinessErrorManager.
@@ -121,22 +123,17 @@
                 <custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>
                 
                 <filtering-router transformer-refs="ErrorMessageToException">
-                    <outbound-endpoint address="file://./test-data/exceptions"
-                                   transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML">
-                        <properties>
-                            <spring:entry key="outputPattern" value="Exception-[UUID].xml"/>
-                        </properties>
-                    </outbound-endpoint>
+                    <file:outbound-endpoint path="test-data/exceptions"
+                                            outputPattern="Exception-[UUID].xml"
+                                            transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML"/>
                 </filtering-router>
                 
                 <filtering-router transformer-refs="ErrorMessageToException">
-                    <outbound-endpoint address="smtp://${smtp.username}:${smtp.password}@${smtp.host}:${smtp.port}?address=${email.toAddress}"
-                                   transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
-                        <properties>
-                            <spring:entry key="fromAddress" value="${email.fromAddress}"/>
-                            <spring:entry key="subject" value="${email.subject}"/>
-                        </properties>
-                    </outbound-endpoint>
+                    <smtp:outbound-endpoint user="${smtp.username}" password="${smtp.password}"
+                                            host="${smtp.host}" port="${smtp.port}"
+                                            to="${email.toAddress}" from="${email.fromAddress}"
+                                            subject="${email.subject}"
+                                            transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage"/>
                     <payload-type-filter expectedType="org.mule.umo.lifecycle.FatalException"/>
                 </filtering-router>
                 

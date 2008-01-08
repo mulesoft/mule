@@ -17,7 +17,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
 public class RESTTestCase extends FunctionalTestCase
-{    
+{
+    
     protected String getConfigResources()
     {
         return "rest-functional-test.xml";

@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.providers.email.SmtpConnector;
+import org.mule.providers.email.MailProperties;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
@@ -23,7 +24,7 @@ public class SmtpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerStandardTransportEndpoints(SmtpConnector.SMTP, URIBuilder.HOST_ATTRIBUTES);
+        registerStandardTransportEndpoints(SmtpConnector.SMTP, URIBuilder.HOST_ATTRIBUTES).addAlias("to", MailProperties.TO_ADDRESSES_PROPERTY).addAlias("from", MailProperties.FROM_ADDRESS_PROPERTY).addAlias("cc", MailProperties.CC_ADDRESSES_PROPERTY).addAlias("bcc", MailProperties.BCC_ADDRESSES_PROPERTY).addAlias("from", MailProperties.FROM_ADDRESS_PROPERTY).addAlias("replyTo", MailProperties.REPLY_TO_ADDRESSES_PROPERTY);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(SmtpConnector.class, true));
         registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "key", "value"));
     }

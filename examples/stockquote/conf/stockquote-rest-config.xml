@@ -45,23 +45,11 @@
                 <vm:inbound-endpoint path="stockquote"
                                      responseTransformer-refs="ToString XmlDecoder Xslt XmlToObject"/>
             </inbound-router>
-            <component>
-                <pooled-object class="org.mule.providers.http.components.RestServiceWrapper">
-                    <properties>
-                        <spring:entry key="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                        <spring:entry key="payloadParameterNames">
-                            <spring:bean class="org.springframework.beans.factory.config.ListFactoryBean">
-                                <spring:property name="sourceList">
-                                    <spring:list>
-                                        <spring:value>symbol</spring:value>
-                                    </spring:list>
-                                </spring:property>
-                            </spring:bean>
-                        </spring:entry>
-                        <spring:entry key="httpMethod" value="POST"/>
-                    </properties>
-                </pooled-object>
-            </component>
+            <http:rest-service-component
+                    serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
+                    httpMethod="POST">
+                <http:payloadParameterName value="symbol"/>
+            </http:rest-service-component>
         </service>
     </model>
 </mule>

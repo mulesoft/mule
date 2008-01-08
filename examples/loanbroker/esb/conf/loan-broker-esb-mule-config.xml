@@ -25,12 +25,10 @@
 
     <ejb:connector name="ejbConnector" securityPolicy="security.policy"
         jndiInitialFactory="org.openejb.client.LocalInitialContextFactory">
-        <jndi-provider-properties>
-            <spring:entry key="openejb.base" value="${openejb.base}" />
-            <spring:entry key="openejb.configuration" value="${openejb.configuration}" />
-            <spring:entry key="logging.conf" value="${logging.conf}" />
-            <spring:entry key="openejb.nobanner" value="${openejb.nobanner}" />
-        </jndi-provider-properties>
+        <jndi-provider-property key="openejb.base" value="${openejb.base}"/>
+        <jndi-provider-property key="openejb.configuration" value="${openejb.configuration}"/>
+        <jndi-provider-property key="logging.conf" value="${logging.conf}"/>
+        <jndi-provider-property key="openejb.nobanner" value="${openejb.nobanner}"/>
     </ejb:connector>
 
     <jms:activemq-connector name="jmsConnector" />

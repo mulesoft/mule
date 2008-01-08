@@ -76,19 +76,13 @@
 
                     <!-- Outgoing message = LoanQuoteRequest -->
                     <outbound-endpoint ref="BigBank" synchronous="true">
-                        <properties>
-                            <spring:entry key="method" value="getLoanQuote" />
-                        </properties>
+                        <property key="method" value="getLoanQuote"/>
                     </outbound-endpoint>
                     <outbound-endpoint ref="MediumBank" synchronous="true">
-                        <properties>
-                            <spring:entry key="method" value="getLoanQuote" />
-                        </properties>
+                        <property key="method" value="getLoanQuote"/>
                     </outbound-endpoint>
                     <outbound-endpoint ref="SmallBank" synchronous="true">
-                        <properties>
-                            <spring:entry key="method" value="getLoanQuote" />
-                        </properties>
+                        <property key="method" value="getLoanQuote"/>
                     </outbound-endpoint>
                 </endpoint-selector-router>
             </outbound-router>

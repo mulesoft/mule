@@ -717,7 +717,7 @@
                 <xsd:element ref="abstract-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-security-filter" minOccurs="0"/>
                 <xsd:element ref="abstract-connection-strategy" minOccurs="0"/>
-                <xsd:element ref="properties" minOccurs="0"/>
+                <xsd:group ref="propertiesGroup"/>
             </xsd:sequence>
         </xsd:sequence>
     </xsd:group>
@@ -1745,11 +1745,13 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
-            <xsd:element ref="properties" minOccurs="0">
+            <xsd:group ref="propertiesGroup">
                 <xsd:annotation>
-                    <xsd:documentation>Properties to be set on the created object</xsd:documentation>
+                    <xsd:documentation>
+                        Properties to be set on the created object
+                    </xsd:documentation>
                 </xsd:annotation>
-            </xsd:element>
+            </xsd:group>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -2139,12 +2141,25 @@
          spring elements like <entry...> are handled by
          MuleHierarchicalBeanDefinitionParserDelegate which punts them to
          the spring handler -->
-    <xsd:element name="properties" type="mapType"/>
+    <xsd:element name="properties" type="mapType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Set properties via Spring's entry attribute.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="mapType">
         <xsd:complexContent>
             <xsd:extension base="spring:mapType"/>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:group name="propertiesGroup">
+        <xsd:sequence>
+            <xsd:element name="property" type="keyValueType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="properties" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:group>
 
     <xsd:complexType name="listOrSetType">
         <xsd:complexContent>
@@ -2160,10 +2175,16 @@
         <xsd:attribute name="key" type="xsd:string"/>
     </xsd:complexType>
 
+    <xsd:complexType name="valueType">
+        <xsd:attribute name="value" type="xsd:string"/>
+        <xsd:attribute name="value-ref" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
+
     <xsd:complexType name="keyValueType">
         <xsd:complexContent>
             <xsd:extension base="keyType">
                 <xsd:attribute name="value" type="xsd:string"/>
+                <xsd:attribute name="value-ref" type="xsd:NMTOKEN"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2226,10 +2247,18 @@
         <xsd:complexContent>
             <xsd:extension base="connectorType">
                 <xsd:sequence>
+                    <xsd:element name="jndi-provider-property" type="keyValueType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Direct setting of a JNDI property.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element name="jndi-provider-properties" type="mapType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Direct setting of JNDI properties.
+                                Direct setting of JNDI properties
+                                (this allows access to the full Spring map entry).
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>

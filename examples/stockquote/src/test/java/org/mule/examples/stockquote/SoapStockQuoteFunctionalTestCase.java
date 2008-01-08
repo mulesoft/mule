@@ -13,8 +13,10 @@ package org.mule.examples.stockquote;
 
 public class SoapStockQuoteFunctionalTestCase extends AbstractStockQuoteFunctionalTestCase
 {
+
     protected String getConfigResources()
     {
-        return "stockquote-soap-config.xml";
+        return "stockquote-soap-config-new.xml";
     }
+    
 }

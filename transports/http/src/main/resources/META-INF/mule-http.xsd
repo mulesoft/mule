@@ -96,9 +96,9 @@
             <xsd:extension base="mule:defaultComponentType">
                 <xsd:sequence>
                     <xsd:element ref="mule:abstract-filter" minOccurs="0" maxOccurs="1"/>
-                    <xsd:element name="payloadParameterNames" type="mule:listOrSetType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="requiredParams" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="optionalParams" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="payloadParameterName" type="mule:valueType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="requiredParameter" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="optionalParameter" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="httpMethod" default="GET" use="optional">
                     <xsd:simpleType>

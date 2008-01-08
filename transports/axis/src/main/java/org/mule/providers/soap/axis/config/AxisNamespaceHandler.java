@@ -29,6 +29,7 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(AxisConnector.class, true));
         registerBeanDefinitionParser("bean-type", new ChildListEntryDefinitionParser("beanTypes"));
         registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes"));
+        registerMuleBeanDefinitionParser("soap-methods", new SoapMethodsDefinitionParser("properties")).addCollection("properties");
     }
 
 }

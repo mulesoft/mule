@@ -19,14 +19,12 @@
                 <not-filter>
                     <wildcard-filter pattern="*xyz*"/>
                 </not-filter>
-                <http:payloadParameterNames>
-                    <spring:value>test-property1</spring:value>
-                    <spring:value>test-property2</spring:value>
-                </http:payloadParameterNames>
-                <http:requiredParams key="r1" value="rv1"/>
-                <http:requiredParams key="r2" value="rv2"/>
-                <http:optionalParams key="o1" value="ov1"/>
-                <http:optionalParams key="o2" value="ov2"/>
+                <http:payloadParameterName value="test-property1"/>
+                <http:payloadParameterName value="test-property2"/>
+                <http:requiredParameter key="r1" value="rv1"/>
+                <http:requiredParameter key="r2" value="rv2"/>
+                <http:optionalParameter key="o1" value="ov1"/>
+                <http:optionalParameter key="o2" value="ov2"/>
             </http:rest-service-component>
         </service>
     </model>

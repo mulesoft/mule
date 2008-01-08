@@ -18,9 +18,14 @@ public class ChildMapEntryDefinitionParser extends ChildDefinitionParser
     public static final String KEY = "key";
     public static final String VALUE = "value";
 
-    public ChildMapEntryDefinitionParser(String mapName, String keyName, String valueName)
+    public ChildMapEntryDefinitionParser(String mapName)
     {
         super(mapName, KeyValuePair.class);
+    }
+
+    public ChildMapEntryDefinitionParser(String mapName, String keyName, String valueName)
+    {
+        this(mapName);
         addAlias(keyName, KEY);
         addAlias(valueName, VALUE);
     }

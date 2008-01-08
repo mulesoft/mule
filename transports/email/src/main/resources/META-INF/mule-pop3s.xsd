@@ -38,15 +38,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
-    <xsd:complexType name="outboundEndpointType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointType">
-                <xsd:attributeGroup ref="email:addressAttributes"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>

@@ -88,6 +88,7 @@
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:inboundEndpointType">
+                <xsd:group ref="propertyElements"/>
                 <xsd:attributeGroup ref="propertyAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -97,6 +98,7 @@
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
+                <xsd:group ref="propertyElements"/>
                 <xsd:attributeGroup ref="propertyAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -106,6 +108,7 @@
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
+                <xsd:group ref="propertyElements"/>
                 <xsd:attributeGroup ref="propertyAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -113,6 +116,13 @@
 
     <xsd:attributeGroup name="propertyAttributes">
         <xsd:attribute name="clientConfig" type="xsd:string"/>
+        <xsd:attribute name="soapAction" type="xsd:string"/>
     </xsd:attributeGroup>
+
+    <xsd:group name="propertyElements">
+        <xsd:sequence>
+            <xsd:element name="soap-methods" type="mule:mapType" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:group>
 
 </xsd:schema>
