@@ -25,5 +25,19 @@
 
     <axis:connector name="axisConnector2" axis-ref="axisServer" clientProvider-ref="mockProvider"
                     serverProvider-ref="mockProvider"/>
+
+    <axis:endpoint name="endpoint"
+                   address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
+                   connector-ref="axisConnector2">
+        <axis:soap-action value="[methodNamespace][method]"/>
+        <axis:soap-method method="method1">
+            <axis:soap-parameter parameter="symbol" type="string" mode="in"/>
+            <axis:soap-parameter parameter="GetQuoteResult" type="string" mode="out"/>
+            <axis:soap-return type="string"/>
+        </axis:soap-method>
+        <axis:soap-method method="method2">
+            <axis:soap-parameter parameter="param" type="string" mode="in"/>
+        </axis:soap-method>
+    </axis:endpoint>
     
 </mule>

@@ -17,6 +17,9 @@ import java.util.Set;
 import java.util.List;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This is used internally by {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}.
  * It allows a collection (list) of maps to be defined in Spring, via the "list" property, and
@@ -27,7 +30,10 @@ public class MapCombiner implements Map
 {
 
     public static final String LIST = "list"; // the setter/getter
+    public static final int UNLIMITED_DEPTH = -1;
 
+    private Log logger = LogFactory.getLog(getClass());
+    private int maxDepth = UNLIMITED_DEPTH;
     private List list;
     private Map cachedMerge = new HashMap();
     private boolean isMerged = false;
@@ -38,11 +44,45 @@ public class MapCombiner implements Map
         {
             for (Iterator maps = list.iterator(); maps.hasNext();)
             {
-                cachedMerge.putAll((Map) maps.next());
+                merge(maxDepth, cachedMerge, (Map) maps.next());
             }
             isMerged = true;
         }
         return cachedMerge;
+    }
+
+    public void setMaxDepth(int maxDepth)
+    {
+        this.maxDepth = maxDepth;
+    }
+
+    private void merge(int headroom, Map accumulator, Map extra)
+    {
+        for (Iterator keys = extra.keySet().iterator(); keys.hasNext();)
+        {
+            Object key = keys.next();
+            Object valueExtra = extra.get(key);
+            if (accumulator.containsKey(key))
+            {
+                Object valueOriginal = accumulator.get(key);
+                if (valueExtra instanceof Map && valueOriginal instanceof Map && headroom != 0)
+                {
+                    merge(headroom - 1, (Map) valueOriginal, (Map) valueExtra);
+                }
+                else
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Overwriting " + valueOriginal + " for " + key + " during map merge");
+                    }
+                    accumulator.put(key, valueExtra);
+                }
+            }
+            else
+            {
+                accumulator.put(key, valueExtra);
+            }
+        }
     }
 
     public void setList(List list)
@@ -65,7 +105,17 @@ public class MapCombiner implements Map
         }
     }
 
-    // map delegates (except hashCode and equals)
+    // hashcode and equals don't trigger merge
+
+    public int hashCode()
+    {
+        return cachedMerge.hashCode();
+    }
+
+    public boolean equals(Object o)
+    {
+        return cachedMerge.equals(o);
+    }
 
     public int size()
     {

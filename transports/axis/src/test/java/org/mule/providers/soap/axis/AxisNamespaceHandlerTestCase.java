@@ -13,6 +13,10 @@ package org.mule.providers.soap.axis;
 import org.mule.providers.soap.axis.mock.MockAxisServer;
 import org.mule.providers.soap.axis.mock.MockProvider;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+
+import java.util.Map;
+import java.util.List;
 
 public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
 {   
@@ -47,6 +51,32 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(MockAxisServer.class, connector.getAxis().getClass());
         assertEquals(MockProvider.class, connector.getClientProvider().getClass());
     }
+
+    public void testEndpointProperties() throws Exception
+    {
+        UMOImmutableEndpoint endpoint =
+                managementContext.getRegistry().lookupEndpointBuilder("endpoint").buildOutboundEndpoint();
+        Map props = endpoint.getProperties();
+        assertEquals("[methodNamespace][method]", assertKey(props, "soapAction", String.class));
+        Map methods = (Map) assertKey(props, "soapMethods", Map.class);
+        List method1 = (List) assertKey(methods, "method1", List.class);
+        assertEquals("symbol;string;in", method1.get(0));
+        assertEquals("GetQuoteResult;string;out", method1.get(1));
+        assertEquals("return;string", method1.get(2));
+        List method2 = (List) assertKey(methods, "method2", List.class);
+        assertEquals("param;string;in", method2.get(0));
+    }
+
+    protected Object assertKey(Map props, String name, Class clazz)
+    {
+        assertNotNull(props);
+        assertTrue(name + " not in properties", props.containsKey(name));
+        Object value = props.get(name);
+        assertNotNull(name + " value null", value);
+        assertTrue(value.getClass() + " not subclass of " + clazz, clazz.isAssignableFrom(value.getClass()));
+        return value; 
+    }
+
 }
 
 

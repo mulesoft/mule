@@ -121,7 +121,7 @@
     <xsd:group name="propertyElements">
         <xsd:sequence>
             <xsd:element name="soap-action" type="mule:valueType" minOccurs="0" maxOccurs="1"/>
-            <xsd:element name="soap-method" minOccurs="0">
+            <xsd:element name="soap-method" minOccurs="0" maxOccurs="unbounded">
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="soap-parameter" minOccurs="0" maxOccurs="unbounded">
@@ -129,6 +129,11 @@
                                 <xsd:attribute name="parameter" type="xsd:string" use="required"/>
                                 <xsd:attribute name="type" type="xsd:string" use="required"/>
                                 <xsd:attribute name="mode" type="xsd:string" use="required"/>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="soap-return" minOccurs="0">
+                            <xsd:complexType>
+                                <xsd:attribute name="type" type="xsd:string" use="required"/>
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:sequence>

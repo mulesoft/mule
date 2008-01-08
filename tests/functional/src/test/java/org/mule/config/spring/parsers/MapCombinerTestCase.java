@@ -11,6 +11,11 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.beans.OrphanBean;
+import org.mule.config.spring.parsers.assembly.MapCombiner;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class MapCombinerTestCase extends AbstractNamespaceTestCase
 {
@@ -45,7 +50,85 @@ public class MapCombinerTestCase extends AbstractNamespaceTestCase
         {
             assertMapEntryExists(bean.getMap(), Integer.toString(i+1), i+1);
         }
+    }
 
+    public void testBasicMerge()
+    {
+        doTestMerge(new MapCombiner(), "[a:[b:B,c:C]]", "[a:[d:D]]", "[a:[b:B,c:C,d:D]]");
+    }
+
+    public void testOverwrite()
+    {
+        MapCombiner combiner = new MapCombiner();
+        combiner.setMaxDepth(0);
+        doTestMerge(combiner, "[a:[b:B,c:C]]", "[a:[d:D]]", "[a:[d:D]]");
+    }
+
+    public void testDeepMerge()
+    {
+        doTestMerge(new MapCombiner(), "[a:[b:B,c:C,d:[e:E,f:F]]]", "[a:[d:[g:G]]]", "[a:[b:B,c:C,d:[e:E,f:F,g:G]]]");
+    }
+
+    public void testRestrictedMerge()
+    {
+        MapCombiner combiner = new MapCombiner();
+        combiner.setMaxDepth(1);
+        doTestMerge(combiner, "[a:[b:B,c:C,d:[e:E,f:F]]]", "[a:[d:[g:G]]]", "[a:[b:B,c:C,d:[g:G]]]");
+    }
+
+    protected void doTestMerge(MapCombiner combiner, String spec1, String spec2, String specResult)
+    {
+        Map map1 = buildMap(spec1);
+        Map map2 = buildMap(spec2);
+        Map map3 = buildMap(specResult);
+        combiner.setList(new LinkedList());
+        combiner.getList().add(map1);
+        combiner.getList().add(map2);
+        assertFalse(combiner.isEmpty()); // trigger merge
+        assertEquals(combiner, map3);
+    }
+
+    protected Map buildMap(String spec)
+    {
+        Map map = new HashMap();
+        String empty = fillMap(map, spec);
+        assertTrue("after parsing " + spec + " left with " + empty, empty.equals(""));
+        return map;
+    }
+
+    protected String fillMap(Map map, String spec)
+    {
+        spec = drop(spec, "[");
+        while (! spec.startsWith("]"))
+        {
+            assertTrue("spec finished early (missing ']'?)", spec.length() > 1);
+            String key = spec.substring(0, 1);
+            spec = drop(spec, key);
+            spec = drop(spec, ":");
+            if (spec.startsWith("["))
+            {
+                Map value = new HashMap();
+                spec = fillMap(value, spec);
+                map.put(key, value);
+            }
+            else
+            {
+                String value = spec.substring(0, 1);
+                spec = drop(spec, value);
+                map.put(key, value);
+            }
+            if (spec.startsWith(","))
+            {
+                spec = drop(spec, ",");
+            }
+        }
+        return drop(spec, "]");
+    }
+
+    protected String drop(String spec, String delim)
+    {
+        assertTrue("expected " + delim + " but spec is " + spec, spec.startsWith(delim));
+        return spec.substring(1);
     }
 
 }

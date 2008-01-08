@@ -15,10 +15,12 @@ import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionPars
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.processors.AddAttribute;
 import org.mule.config.spring.parsers.processors.AttributeConcatenation;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.soap.axis.AxisConnector;
 
@@ -39,18 +41,43 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("soap-action", new ChildSingletonMapDefinitionParser("properties")).registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "soapAction")).addCollection("properties");
         registerBeanDefinitionParser("soap-method", new SoapMethodDefinitionParser());
         registerBeanDefinitionParser("soap-parameter", new SoapParameterDefinitionParser());
+        registerBeanDefinitionParser("soap-return", new SoapReturnDefinitionParser());
     }
 
     private static final class SoapParameterDefinitionParser extends ParentDefinitionParser
     {
 
+        public static final String PARAMETER = "parameter";
+
         public SoapParameterDefinitionParser()
         {
             setIgnoredDefault(true);
-            removeIgnored("parameter");
-            addAlias("parameter", "value");
-            addCollection("parameter");
-            registerPreProcessor(new AttributeConcatenation("parameter", ";", new String[]{"parameter", "type", "mode"}));
+            removeIgnored(PARAMETER);
+            addAlias(PARAMETER, MapEntryCombiner.VALUE);
+            addCollection(PARAMETER);
+            registerPreProcessor(new AttributeConcatenation(PARAMETER, ";", new String[]{PARAMETER, "type", "mode"}));
+        }
+
+        protected Class getBeanClass(Element element)
+        {
+            return MapEntryCombiner.class;
+        }
+    }
+
+    private static final class SoapReturnDefinitionParser extends ParentDefinitionParser
+    {
+
+        public SoapReturnDefinitionParser()
+        {
+            addIgnored("type");
+            addCollection(MapEntryCombiner.VALUE);
+            registerPreProcessor(new PreProcessor()
+            {
+                public void preProcess(PropertyConfiguration config, Element element)
+                {
+                    element.setAttribute(MapEntryCombiner.VALUE, "return;" + element.getAttribute("type"));
+                }
+            });
         }
 
         protected Class getBeanClass(Element element)
