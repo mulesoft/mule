@@ -13,7 +13,7 @@ import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.email.SmtpsConnector;
 
 /**

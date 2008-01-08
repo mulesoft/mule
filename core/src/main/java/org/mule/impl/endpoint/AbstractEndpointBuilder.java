@@ -14,7 +14,6 @@ import org.mule.MuleException;
 import org.mule.RegistryContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.ConnectionStrategy;

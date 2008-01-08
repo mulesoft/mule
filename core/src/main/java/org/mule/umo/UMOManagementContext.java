@@ -9,13 +9,13 @@
  */
 package org.mule.umo;
 
+import org.mule.config.MuleConfiguration;
 import org.mule.impl.Directories;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.manager.ServerNotificationManager;
-import org.mule.impl.internal.notifications.manager.ServerNotificationHandler;
 import org.mule.management.stats.AllStatistics;
-import org.mule.registry.Registry;
 import org.mule.registry.RegistrationException;
+import org.mule.registry.Registry;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
@@ -61,7 +61,7 @@ public interface UMOManagementContext extends Lifecycle
 
     ServerNotificationManager getNotificationManager();
 
-    void setNotificationManager(ServerNotificationManager notificationManager) throws RegistrationException;
+    void setNotificationManager(ServerNotificationManager notificationManager); //throws RegistrationException;
     
     /**
      * Determines if the server has been started
@@ -174,8 +174,9 @@ public interface UMOManagementContext extends Lifecycle
      * @param securityManager the security manager used by this Mule instance to
      *                        authenticate and authorise incoming and outgoing event traffic
      *                        and service invocations
+     * @throws RegistrationException 
      */
-    void setSecurityManager(UMOSecurityManager securityManager) throws InitialisationException;
+    void setSecurityManager(UMOSecurityManager securityManager) throws InitialisationException, RegistrationException;
 
     /**
      * Gets the security manager used by this Mule instance to authenticate and
@@ -215,9 +216,10 @@ public interface UMOManagementContext extends Lifecycle
      * component queues
      *
      * @param queueManager
+     * @throws RegistrationException 
      * 
      */
-    void setQueueManager(QueueManager queueManager);
+    void setQueueManager(QueueManager queueManager) throws RegistrationException;
 
     /**
      * Gets the queue manager used by mule for queuing events. This is used for
@@ -239,4 +241,8 @@ public interface UMOManagementContext extends Lifecycle
     Registry getRegistry();
     
     void applyLifecycle(Object object) throws UMOException;
+    
+    void setConfiguration(MuleConfiguration config);
+    
+    MuleConfiguration getConfiguration();
 }

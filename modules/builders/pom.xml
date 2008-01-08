@@ -18,6 +18,11 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-spring-config</artifactId>
+			<version>${version}</version>
+		</dependency>
         <!-- Used by MuleXmlBuilderContextServlet -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>

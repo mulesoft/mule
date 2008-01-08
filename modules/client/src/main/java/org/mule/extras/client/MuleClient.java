@@ -16,15 +16,15 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.builders.DefaultConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.extras.client.i18n.ClientMessages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.registry.TransientRegistry;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.NullPayload;
@@ -139,7 +139,7 @@ public class MuleClient implements Disposable
      */
     public MuleClient(String configResources) throws UMOException
     {
-        this(configResources, new MuleXmlConfigurationBuilder());
+        this(configResources, new SpringXmlConfigurationBuilder());
     }
 
     /**
@@ -171,8 +171,8 @@ public class MuleClient implements Disposable
         if (builder == null)
         {
             logger.info("Builder passed in was null, using default builder: "
-                        + MuleXmlConfigurationBuilder.class.getName());
-            builder = new MuleXmlConfigurationBuilder();
+                        + SpringXmlConfigurationBuilder.class.getName());
+            builder = new SpringXmlConfigurationBuilder();
         }
         logger.info("Initializing Mule...");
         managementContext = builder.configure(configResources);
@@ -215,8 +215,9 @@ public class MuleClient implements Disposable
         if (managementContext == null)
         {
             logger.info("No existing ManagementContext found, creating a new Mule instance");
-            TransientRegistry.createNew();
-            managementContext = MuleServer.getManagementContext();
+            // Doing this for now, because we have no ManagementContextFactory
+            ConfigurationBuilder configurationBuilder = new DefaultConfigurationBuilder();
+            managementContext = configurationBuilder.configure(new String[]{});
         }
         else
         {

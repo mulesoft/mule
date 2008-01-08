@@ -10,15 +10,13 @@
 
 package org.mule.xml.util;
 
-import org.mule.util.CoreXMLUtils;
-
 import org.dom4j.io.DOMReader;
 import org.w3c.dom.Document;
 
 /**
  * General utility methods for working with XML.
  */
-public class XMLUtils extends CoreXMLUtils
+public class XMLUtils
 {
 
     /**
@@ -28,7 +26,5 @@ public class XMLUtils extends CoreXMLUtils
     {
         return new DOMReader().read(dom).asXML();
     }
-    
+
 }
-
-

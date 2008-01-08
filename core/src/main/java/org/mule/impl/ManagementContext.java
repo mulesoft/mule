@@ -33,6 +33,7 @@ import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
+import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.store.UMOStore;
@@ -64,9 +65,6 @@ public class ManagementContext implements UMOManagementContext
     /** logger used by this class */
     private static transient Log logger = LogFactory.getLog(ManagementContext.class);
 
-    /** Names of items in the registry **/
-    public static final String NOTIFICATION_MANAGER = "_muleNotificationManager";
-
     /** Default configuration */
     private MuleConfiguration config;
 
@@ -85,15 +83,7 @@ public class ManagementContext implements UMOManagementContext
     /** stats used for management */
     private AllStatistics stats = new AllStatistics();
 
-    private UMOSecurityManager securityManager;
-
     private UMOWorkManager workManager;
-
-    /** The queue manager to use for component queues */
-    private QueueManager queueManager;
-
-    /** The transaction manager to use for this instance. */
-    protected TransactionManager transactionManager;
 
     /**
      * LifecycleManager for the ManagementContext.  Note: this is NOT the same lifecycle manager
@@ -104,6 +94,8 @@ public class ManagementContext implements UMOManagementContext
     protected Directories directories;
 
     protected String systemName;
+    
+    protected ServerNotificationManager notificationManager;
 
     public ManagementContext(UMOLifecycleManager lifecycleManager)
     {
@@ -119,28 +111,16 @@ public class ManagementContext implements UMOManagementContext
     public void initialise() throws InitialisationException
     {
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
-        if (securityManager == null)
-        {
-            throw new NullPointerException(CoreMessages.objectIsNull("securityManager").getMessage());
-        }
 
         if (getNotificationManager() == null)
         {
-            throw new NullPointerException(CoreMessages.objectIsNull(NOTIFICATION_MANAGER).getMessage());
+            throw new NullPointerException(CoreMessages.objectIsNull(
+                MuleProperties.OBJECT_NOTIFICATION_MANAGER).getMessage());
         }
-
-        if (queueManager == null)
-        {
-            throw new NullPointerException(CoreMessages.objectIsNull("queueManager").getMessage());
-        }
-
         if (workManager == null)
         {
             throw new NullPointerException(CoreMessages.objectIsNull("workManager").getMessage());
         }
-
-        // TODO MULE-2162 MuleConfiguration belongs in the ManagementContext rather than the Registry
-        config = RegistryContext.getConfiguration();
         if (config == null)
         {
             logger.info("A mule configuration object was not registered. Using default configuration");
@@ -207,6 +187,15 @@ public class ManagementContext implements UMOManagementContext
         lifecycleManager.checkPhase(Startable.PHASE_NAME);
         if (!isStarted())
         {
+            if (getSecurityManager() == null)
+            {
+                throw new NullPointerException(CoreMessages.objectIsNull("securityManager").getMessage());
+            }
+            if (getQueueManager() == null)
+            {
+                throw new NullPointerException(CoreMessages.objectIsNull("queueManager").getMessage());
+            }
+
             fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_STARTING));
 
             directories.deleteMarkedDirectories();
@@ -551,10 +540,10 @@ public class ManagementContext implements UMOManagementContext
      *                        authenticate and authorise incoming and outgoing event traffic
      *                        and service invocations
      */
-    public void setSecurityManager(UMOSecurityManager securityManager) throws InitialisationException
+    public void setSecurityManager(UMOSecurityManager securityManager) throws RegistrationException
     {
-        checkLifecycleForPropertySet("securityManager", Initialisable.PHASE_NAME);
-        this.securityManager = securityManager;
+        checkLifecycleForPropertySet(MuleProperties.OBJECT_SECURITY_MANAGER, Initialisable.PHASE_NAME);
+        getRegistry().registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, securityManager);
     }
 
     /**
@@ -567,6 +556,16 @@ public class ManagementContext implements UMOManagementContext
      */
     public UMOSecurityManager getSecurityManager()
     {
+        UMOSecurityManager securityManager = (UMOSecurityManager) getRegistry().lookupObject(
+            MuleProperties.OBJECT_SECURITY_MANAGER);
+        if (securityManager == null)
+        {
+            Collection temp = getRegistry().lookupObjects(UMOSecurityManager.class);
+            if (temp.size() > 0)
+            {
+                securityManager = ((UMOSecurityManager) temp.iterator().next());
+            }
+        }
         return securityManager;
     }
 
@@ -620,25 +619,32 @@ public class ManagementContext implements UMOManagementContext
 
     public QueueManager getQueueManager()
     {
+        QueueManager queueManager = (QueueManager) getRegistry().lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
+        if (queueManager == null)
+        {
+            Collection temp = getRegistry().lookupObjects(QueueManager.class);
+            if (temp.size() > 0)
+            {
+                queueManager = ((QueueManager) temp.iterator().next());
+            }
+        }
         return queueManager;
     }
 
-    public void setQueueManager(QueueManager queueManager)
+    public void setQueueManager(QueueManager queueManager) throws RegistrationException
     {
-        checkLifecycleForPropertySet("queueManager", Initialisable.PHASE_NAME);
-        this.queueManager = queueManager;
+        checkLifecycleForPropertySet(MuleProperties.OBJECT_QUEUE_MANAGER, Initialisable.PHASE_NAME);
+        getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
     }
 
     public ServerNotificationManager getNotificationManager()
     {
-        return (ServerNotificationManager) getRegistry().lookupObject(NOTIFICATION_MANAGER);
+        return notificationManager;
     }
 
     public void setNotificationManager(ServerNotificationManager notificationManager)
-            throws RegistrationException
     {
-        checkLifecycleForPropertySet(NOTIFICATION_MANAGER, Initialisable.PHASE_NAME);
-        getRegistry().registerObject(NOTIFICATION_MANAGER, notificationManager);
+        this.notificationManager = notificationManager;
     }
 
     /**
@@ -647,10 +653,10 @@ public class ManagementContext implements UMOManagementContext
      * @param manager the manager to use
      * @throws Exception
      */
-    public void setTransactionManager(TransactionManager manager) throws Exception
+    public void setTransactionManager(TransactionManager manager) throws RegistrationException
     {
-        //checkLifecycleForPropertySet("transactionManager");
-        transactionManager = manager;
+        //checkLifecycleForPropertySet(MuleProperties.OBJECT_TRANSACTION_MANAGER, Initialisable.PHASE_NAME);
+        getRegistry().registerObject(MuleProperties.OBJECT_TRANSACTION_MANAGER, manager);
     }
 
     /**
@@ -662,6 +668,33 @@ public class ManagementContext implements UMOManagementContext
      */
     public TransactionManager getTransactionManager()
     {
+        TransactionManager transactionManager = (TransactionManager) getRegistry().lookupObject(
+            MuleProperties.OBJECT_TRANSACTION_MANAGER);
+        if (transactionManager == null)
+        {
+            Collection temp = getRegistry().lookupObjects(UMOTransactionManagerFactory.class);
+            if (temp.size() > 0)
+            {
+                try
+                {
+                    transactionManager = (((UMOTransactionManagerFactory) temp.iterator().next()).create());
+                }
+                catch (Exception e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    throw new MuleRuntimeException(CoreMessages.createStaticMessage("Unable to create transaction manager"));
+                }
+            }
+            else
+            {
+                temp = getRegistry().lookupObjects(TransactionManager.class);
+                if (temp.size() > 0)
+                {
+                    transactionManager = (((TransactionManager) temp.iterator().next()));
+                }
+            }
+        }
         return transactionManager;
     }
 
@@ -800,4 +833,15 @@ public class ManagementContext implements UMOManagementContext
     {
         lifecycleManager.applyLifecycle(this, object);
     }
+    
+    public MuleConfiguration getConfiguration()
+    {
+        return config;
+    }
+
+    public void setConfiguration(MuleConfiguration config)
+    {
+        this.config = config;
+    }
+
 }

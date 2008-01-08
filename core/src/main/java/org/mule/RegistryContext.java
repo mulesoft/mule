@@ -32,10 +32,10 @@ public class RegistryContext
         RegistryContext.registry = registry;
     }
 
-    // TODO MULE-2162 MuleConfiguration belongs in the ManagementContext rather than the Registry
     public static MuleConfiguration getConfiguration()
     {
-        return registry != null ? registry.getConfiguration() : null;
+        // TODO Migrate uses to obtain configuration from ManagementContext
+        return MuleServer.getManagementContext().getConfiguration();
     }
 
     public static Registry getOrCreateRegistry()

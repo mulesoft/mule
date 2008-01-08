@@ -10,8 +10,8 @@
 
 package org.mule.umo.endpoint;
 
-import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.impl.ManagementContextAware;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManagementContext;

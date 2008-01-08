@@ -9,7 +9,7 @@
  */
 package org.mule;
 
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.umo.UMOManagementContext;
 
 import junit.framework.TestCase;
@@ -18,7 +18,7 @@ public class EmbeddedMuleTestCase extends TestCase
 {
     public void testStartup() throws Exception
     {
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
+        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder();
         UMOManagementContext context = builder.configure("org/mule/test/spring/mule-root-test.xml");
         // ManagementContext must be started explicitly after MULE-1988
         assertFalse(context.isStarted());

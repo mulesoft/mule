@@ -12,8 +12,8 @@ package org.mule.examples.loanbroker.bpm;
 
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.examples.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
 import org.mule.providers.bpm.BPMS;
 import org.mule.providers.bpm.ProcessConnector;
@@ -37,7 +37,7 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
 
     protected ConfigurationBuilder getBuilder() throws Exception 
     {
-        return new MuleXmlConfigurationBuilder();
+        return new SpringXmlConfigurationBuilder();
     }
     
     // @Override

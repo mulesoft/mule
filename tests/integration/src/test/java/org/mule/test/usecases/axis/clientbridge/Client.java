@@ -10,7 +10,7 @@
 
 package org.mule.test.usecases.axis.clientbridge;
 
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
@@ -27,7 +27,7 @@ public class Client
 
         try
         {
-            MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
+            SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder();
             managementContext = builder.configure("clientbridge/conf/client-mule-config.xml");
 
             Client c = new Client();

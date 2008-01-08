@@ -11,9 +11,10 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 
 import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,7 +45,7 @@ public abstract class AbstractBadConfigTestCase extends TestCase
 
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return new MuleXmlConfigurationBuilder();
+        return new SpringXmlConfigurationBuilder();
     }
 
     protected abstract String getConfigResources();

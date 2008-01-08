@@ -12,6 +12,7 @@ package org.mule.config.builders;
 
 import org.mule.MuleServer;
 import org.mule.config.ConfigurationException;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.StringUtils;
@@ -34,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * <i>mule-config.xml</i> will be used.
  * </p>
  *
- * @see MuleXmlConfigurationBuilder
+ * @see SpringXmlConfigurationBuilder
  */
 
 public class MuleXmlBuilderContextListener implements ServletContextListener

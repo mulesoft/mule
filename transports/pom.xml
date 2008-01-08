@@ -44,6 +44,12 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Now that m2 dependency resolution works, activation
              should ONLY come via core or (in the future) core-api, but there is
              OF COURSE a bug with m2's handling of provided dependencies:

@@ -9,9 +9,9 @@
  */
 package org.mule.providers.email.config;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.email.Pop3Connector;
 
 /**

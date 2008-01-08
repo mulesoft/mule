@@ -405,7 +405,8 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
         <include>org.mule.modules:mule-module-scripting</include>
-        <include>org.mule.modules:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-spring-config</include>
+        <include>org.mule.modules:mule-module-spring-extras</include>
         <include>org.mule.modules:mule-module-wssecurity</include>
         <include>org.mule.modules:mule-module-xml</include>
         <!-- Tools -->

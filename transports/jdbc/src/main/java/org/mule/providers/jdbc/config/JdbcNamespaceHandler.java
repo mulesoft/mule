@@ -9,16 +9,12 @@
  */
 package org.mule.providers.jdbc.config;
 
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryWrapper;
-import org.mule.config.spring.parsers.specific.URIBuilder;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.jdbc.JdbcConnector;
 
 /** Registers Bean Definition Parsers for the "jdbc" namespace. */

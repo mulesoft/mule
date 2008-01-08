@@ -13,7 +13,7 @@ package org.mule.tck;
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.builders.DefaultConfigurationBuilder;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -352,7 +352,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return new MuleXmlConfigurationBuilder();
+        return new DefaultConfigurationBuilder();
     }
 
     protected String getConfigurationResources()

@@ -9,10 +9,10 @@
  */
 package org.mule.providers.tcp.config;
 
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.providers.tcp.TcpProtocol;
 import org.mule.providers.tcp.protocols.DirectProtocol;

@@ -10,7 +10,7 @@
 
 package org.mule.ra;
 
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.impl.ManagementContextAware;
 import org.mule.umo.UMOManagementContext;
 import org.mule.util.StringUtils;
@@ -32,7 +32,7 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
     private static final long serialVersionUID = 910828075890304726L;
 
 
-    private String configurationBuilder = MuleXmlConfigurationBuilder.class.getName();
+    private String configurationBuilder = SpringXmlConfigurationBuilder.class.getName();
     private String configurations;
     private String username;
     private String password;

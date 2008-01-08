@@ -11,6 +11,8 @@
 package org.mule.tck;
 
 import org.mule.RegistryContext;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.registry.RegistrationException;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOComponent;
@@ -38,6 +40,11 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
     
+    protected ConfigurationBuilder getBuilder() throws Exception
+    {
+        return new SpringXmlConfigurationBuilder();
+    }
+
     protected UMOManagementContext createManagementContext() throws Exception
     {
         UMOManagementContext mc = super.createManagementContext();

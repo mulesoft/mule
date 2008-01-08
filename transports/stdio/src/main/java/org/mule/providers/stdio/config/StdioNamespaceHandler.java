@@ -9,13 +9,9 @@
  */
 package org.mule.providers.stdio.config;
 
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.stdio.PromptStdioConnector;
 import org.mule.providers.stdio.StdioConnector;
 

@@ -28,7 +28,8 @@
         <module>ognl</module>
         <module>pgp</module>
         <module>scripting</module>
-        <module>spring</module>
+        <module>spring-extras</module>
+        <module>spring-config</module>
         <module>wssecurity</module>
         <module>xml</module>
         <!-- Mule 3.x

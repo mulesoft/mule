@@ -20,6 +20,12 @@
             <version>${version}</version>
         </dependency>
         <dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-spring-config</artifactId>
+			<version>${version}</version>
+			<scope>provided</scope>
+		</dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-support</artifactId>
             <!-- the springVersion property is defined in the toplevel pom -->

@@ -9,14 +9,12 @@
  */
 package org.mule.providers.ftp.config;
 
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.file.FilenameParser;
 import org.mule.providers.ftp.FtpConnector;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.

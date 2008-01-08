@@ -12,6 +12,9 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.components.simple.PassThroughComponent;
 import org.mule.components.simple.StaticComponent;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.ConfigurationException;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.config.spring.parsers.specific.CheckExclusiveClassAttributeObjectFactory.CheckExclusiveClassAttributeObjectFactoryException;
 import org.mule.routing.nested.NestedRouter;
 import org.mule.tck.AbstractMuleTestCase;
@@ -27,7 +30,8 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
 
     public void testObjectFactoryComponent() throws Exception
     {
-        managementContext = getBuilder().configure("org/mule/config/spring/parsers/specific/component-ok-test.xml");
+        managementContext = getBuilder().configure(
+            "org/mule/config/spring/parsers/specific/component-ok-test.xml");
         UMOComponent component = managementContext.getRegistry().lookupComponent("service");
         validateCorrectComponentCreation(component);
         assertEquals(SingletonObjectFactory.class, component.getServiceFactory().getClass());
@@ -36,7 +40,8 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
 
     public void testShortcutComponent() throws Exception
     {
-        managementContext = getBuilder().configure("org/mule/config/spring/parsers/specific/component-ok-test.xml");
+        managementContext = getBuilder().configure(
+            "org/mule/config/spring/parsers/specific/component-ok-test.xml");
         UMOComponent component = managementContext.getRegistry().lookupComponent("service2");
         validateCorrectComponentCreation(component);
         assertEquals(PooledObjectFactory.class, component.getServiceFactory().getClass());
@@ -47,13 +52,15 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
     {
         try
         {
-            managementContext = getBuilder().configure("org/mule/config/spring/parsers/specific/component-bad-test.xml");
+            managementContext = getBuilder().configure(
+                "org/mule/config/spring/parsers/specific/component-bad-test.xml");
             throw new IllegalStateException("Expected config to fail");
         }
         catch (Exception e)
         {
-            assertEquals(BeanDefinitionStoreException.class, e.getClass());
-            assertEquals(CheckExclusiveClassAttributeObjectFactoryException.class, e.getCause().getClass());
+            assertEquals(ConfigurationException.class, e.getClass());
+            assertEquals(BeanDefinitionStoreException.class, e.getCause().getClass());
+            assertEquals(CheckExclusiveClassAttributeObjectFactoryException.class, e.getCause().getCause().getClass());
         }
     }
 
@@ -70,6 +77,11 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
     protected UMOManagementContext createManagementContext() throws Exception
     {
         return null;
+    }
+
+    protected ConfigurationBuilder getBuilder() throws Exception
+    {
+        return new SpringXmlConfigurationBuilder();
     }
 
 }

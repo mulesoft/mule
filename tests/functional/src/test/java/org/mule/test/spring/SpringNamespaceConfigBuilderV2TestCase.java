@@ -11,7 +11,7 @@
 package org.mule.test.spring;
 
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
@@ -56,7 +56,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     // @Override
     public ConfigurationBuilder getBuilder()
     {
-        return new MuleXmlConfigurationBuilder();
+        return new SpringXmlConfigurationBuilder();
     }
 
     public void testPropertyExtractorConfig() throws Exception

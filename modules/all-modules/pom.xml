@@ -84,7 +84,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring</artifactId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

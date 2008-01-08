@@ -9,13 +9,11 @@
  */
 package org.mule.providers.http.config;
 
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.http.HttpsConnector;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><https:connector></code> elements.

@@ -14,6 +14,12 @@
     <description>A Mule implementation of PGP security using cryptix libraries.</description>
 
     <dependencies>
+        <dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-spring-config</artifactId>
+			<version>${version}</version>
+			<scope>provided</scope>
+		</dependency>
         <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency:
              mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
         <dependency>
@@ -60,7 +66,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring</artifactId>
+            <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
         </dependency>
 

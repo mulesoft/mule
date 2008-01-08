@@ -12,44 +12,10 @@ package org.mule.impl.registry;
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
-import org.mule.config.MuleProperties;
-import org.mule.config.ThreadingProfile;
-import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.ManagementContext;
-import org.mule.impl.internal.notifications.AdminNotification;
-import org.mule.impl.internal.notifications.AdminNotificationListener;
-import org.mule.impl.internal.notifications.ComponentNotification;
-import org.mule.impl.internal.notifications.ComponentNotificationListener;
-import org.mule.impl.internal.notifications.ConnectionNotification;
-import org.mule.impl.internal.notifications.ConnectionNotificationListener;
-import org.mule.impl.internal.notifications.CustomNotification;
-import org.mule.impl.internal.notifications.CustomNotificationListener;
-import org.mule.impl.internal.notifications.ExceptionNotification;
-import org.mule.impl.internal.notifications.ExceptionNotificationListener;
-import org.mule.impl.internal.notifications.ManagementNotification;
-import org.mule.impl.internal.notifications.ManagementNotificationListener;
-import org.mule.impl.internal.notifications.ManagerNotification;
-import org.mule.impl.internal.notifications.ManagerNotificationListener;
-import org.mule.impl.internal.notifications.ModelNotification;
-import org.mule.impl.internal.notifications.ModelNotificationListener;
-import org.mule.impl.internal.notifications.RegistryNotification;
-import org.mule.impl.internal.notifications.RegistryNotificationListener;
-import org.mule.impl.internal.notifications.SecurityNotification;
-import org.mule.impl.internal.notifications.SecurityNotificationListener;
-import org.mule.impl.internal.notifications.TransactionNotification;
-import org.mule.impl.internal.notifications.TransactionNotificationListener;
-import org.mule.impl.internal.notifications.manager.ServerNotificationManager;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
-import org.mule.impl.lifecycle.phases.ManagementContextDisposePhase;
-import org.mule.impl.lifecycle.phases.ManagementContextInitialisePhase;
-import org.mule.impl.lifecycle.phases.ManagementContextStartPhase;
-import org.mule.impl.lifecycle.phases.ManagementContextStopPhase;
 import org.mule.impl.lifecycle.phases.TransientRegistryDisposePhase;
 import org.mule.impl.lifecycle.phases.TransientRegistryInitialisePhase;
-import org.mule.impl.model.ModelServiceDescriptor;
-import org.mule.impl.security.MuleSecurityManager;
-import org.mule.impl.work.MuleWorkManager;
 import org.mule.registry.AbstractServiceDescriptor;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
@@ -66,20 +32,13 @@ import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.lifecycle.UMOLifecyclePhase;
 import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.DiscoverableTransformer;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.BeanUtils;
-import org.mule.util.SpiUtils;
-import org.mule.util.UUID;
 import org.mule.util.ClassUtils;
-import org.mule.util.queue.CachingPersistenceStrategy;
-import org.mule.util.queue.MemoryPersistenceStrategy;
-import org.mule.util.queue.QueueManager;
-import org.mule.util.queue.TransactionalQueueManager;
+import org.mule.util.SpiUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -529,81 +488,4 @@ public class TransientRegistry extends AbstractRegistry
         return false;
     }
 
-    public static TransientRegistry createNew() throws UMOException
-    {
-        //Use the default server lifecycleManager
-        UMOLifecycleManager lifecycleManager = new GenericLifecycleManager();
-
-        //MULE-2275: Init is always taken care of by the Registry
-        lifecycleManager.registerLifecycle(new ManagementContextInitialisePhase());
-        lifecycleManager.registerLifecycle(new ManagementContextStartPhase());
-        lifecycleManager.registerLifecycle(new ManagementContextStopPhase());
-        //MULE-2275: Dispose can currently be called from the ManagmentContext to dispose the Registry
-        lifecycleManager.registerLifecycle(new ManagementContextDisposePhase());
-
-        MuleConfiguration config = new MuleConfiguration();
-
-        QueueManager queueManager = new TransactionalQueueManager();
-        queueManager.setPersistenceStrategy(new CachingPersistenceStrategy(new MemoryPersistenceStrategy()));
-
-        ThreadingProfile tp = config.getDefaultThreadingProfile();
-        UMOWorkManager workManager = new MuleWorkManager(tp, "MuleServer");
-
-        // is this necessary?  it's also created in spring
-        ServerNotificationManager notificationManager = new ServerNotificationManager();
-        notificationManager.addInterfaceToType(ManagerNotificationListener.class, ManagerNotification.class);
-        notificationManager.addInterfaceToType(ModelNotificationListener.class, ModelNotification.class);
-        notificationManager.addInterfaceToType(ComponentNotificationListener.class, ComponentNotification.class);
-        notificationManager.addInterfaceToType(SecurityNotificationListener.class, SecurityNotification.class);
-        notificationManager.addInterfaceToType(ManagementNotificationListener.class, ManagementNotification.class);
-        notificationManager.addInterfaceToType(AdminNotificationListener.class, AdminNotification.class);
-        notificationManager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
-        notificationManager.addInterfaceToType(ConnectionNotificationListener.class, ConnectionNotification.class);
-        notificationManager.addInterfaceToType(RegistryNotificationListener.class, RegistryNotification.class);
-        notificationManager.addInterfaceToType(ExceptionNotificationListener.class, ExceptionNotification.class);
-        notificationManager.addInterfaceToType(TransactionNotificationListener.class, TransactionNotification.class);
-
-        UMOSecurityManager securityManager = new MuleSecurityManager();
-
-        UMOManagementContext context = new ManagementContext(lifecycleManager);
-
-        //Create the registry
-        TransientRegistry registry = new TransientRegistry();
-        registry.setConfiguration(config);
-
-        RegistryContext.setRegistry(registry);
-
-        registry.getObjectTypeMap(ObjectProcessor.class).put(MuleProperties.OBJECT_MANAGMENT_CONTEXT_PROCESSOR,
-                new ManagementContextDependencyProcessor(context));
-
-        context.setId(UUID.getUUID());
-
-        // TODO MULE-2161
-        MuleServer.setManagementContext(context);
-        registry.registerObject(MuleProperties.OBJECT_MANAGEMENT_CONTEXT, context, context);
-
-        //Register objects so we get lifecycle management
-        registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, securityManager, context);
-        registry.registerObject(MuleProperties.OBJECT_WORK_MANAGER, workManager, context);
-        registry.registerObject(MuleProperties.OBJECT_NOTIFICATION_MANAGER, notificationManager, context);
-        registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager, context);
-        registry.registerObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP, new SimpleRegistryBootstrap(), context);
-
-        //Set the object explicitly on the ManagementContext
-        context.setWorkManager(workManager);
-        context.setSecurityManager(securityManager);
-        context.setNotificationManager(notificationManager);
-        context.setQueueManager(queueManager);
-
-        //Register the system Model
-        ModelServiceDescriptor sd = (ModelServiceDescriptor)
-                registry.lookupServiceDescriptor(ServiceDescriptorFactory.MODEL_SERVICE_TYPE, config.getSystemModelType(), null);
-
-        UMOModel model = sd.createModel();
-        model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
-        registry.registerModel(model);
-        context.initialise();
-        registry.initialise();
-        return registry;
-    }
 }

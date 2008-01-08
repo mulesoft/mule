@@ -26,6 +26,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-axis</artifactId>
             <version>${muleVersion}</version>

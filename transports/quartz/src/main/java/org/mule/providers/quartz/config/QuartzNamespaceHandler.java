@@ -9,17 +9,11 @@
  */
 package org.mule.providers.quartz.config;
 
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
-import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.quartz.QuartzConnector;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Registers Bean Definition Parsers for the "quartz" namespace

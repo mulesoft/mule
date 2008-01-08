@@ -9,12 +9,14 @@
  */
 package org.mule.providers.http.config;
 
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
+
+
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComplexComponentDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
-import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.components.RestServiceWrapper;
 import org.mule.providers.http.transformers.HttpClientMethodResponseToObject;

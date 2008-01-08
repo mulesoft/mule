@@ -9,12 +9,10 @@
  */
 package org.mule.providers.udp.config;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.URIBuilder;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.udp.UdpConnector;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
  * Reigsters a Bean Definition Parser for handling UDP specific elements.

@@ -7,7 +7,7 @@
 <beans default-destroy-method="dispose" default-init-method="initialise">
 
     <bean class="org.mule.impl.model.ModelFactory"
-        depends-on="_muleManagementContext" factory-method="createModel"
+        factory-method="createModel"
         name="main">
         <constructor-arg index="0" type="java.lang.String">
             <value>seda</value>

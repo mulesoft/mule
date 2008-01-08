@@ -12,6 +12,7 @@ package org.mule.config.builders;
 
 import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
@@ -29,9 +30,9 @@ import org.apache.commons.logging.LogFactory;
  * resources from the Servlet context. If this fails it fails back to the methods
  * used by the MuleXmlConfigurationBuilder.
  *
- * @see org.mule.config.builders.MuleXmlConfigurationBuilder
+ * @see org.mule.config.builders.SpringXmlConfigurationBuilder
  */
-public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuilder
+public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBuilder
 {
     /**
      * Logger used by this class

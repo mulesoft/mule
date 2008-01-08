@@ -4,3 +4,5 @@
 
 # Andrew C local
 #org.mule.providers.udp.functional.UdpConnectorFunctionalTestCase
+
+org.mule.providers.udp.functional.UdpRoundTripTestCase

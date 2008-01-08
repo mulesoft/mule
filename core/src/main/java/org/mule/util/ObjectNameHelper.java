@@ -15,8 +15,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-
 /**
  * Generates consistent objects names for Mule components
  */
@@ -104,7 +102,7 @@ public final class ObjectNameHelper
                 tempName = name + SEPARATOR + i;
             }
         }
-        catch (NoSuchBeanDefinitionException e)
+        catch (Exception e)
         {
             //ignore
         }

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"
+       default-init-method="initialise">
+
+    <bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="org.mule.umo.provider.UMOConnector">
+                    <bean class="org.mule.config.spring.editors.ConnectorPropertyEditor"/>
+                </entry>
+                <!-- entry key="org.mule.umo.endpoint.UMOEndpointURI">
+                    <bean class="org.mule.config.spring.editors.EndpointURIPropertyEditor"/>
+                </entry -->
+                <entry key="org.mule.impl.endpoint.URIBuilder">
+                    <bean class="org.mule.config.spring.editors.URIBuilderPropertyEditor"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="_muleObjectNameProcessor" class="org.mule.config.spring.processors.MuleObjectNameProcessor"/>
+
+    <bean name="_mulePropertyPlaceholderProcessor"
+          class="org.mule.config.spring.processors.PropertyPlaceholderProcessor">
+        <property name="factories">
+            <map>
+                <entry key="hostname">
+                    <bean class="org.mule.config.factories.HostNameFactory"/>
+                </entry>
+            </map>
+        </property>
+        <!-- other processors may be applied later -->
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    </bean>
+
+    <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"/>
+
+    <!--  -->
+    <bean name="_muleNotificationManager"
+          class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
+
+    <bean name="_muleConfiguration" class="org.mule.config.spring.MuleConfigurationConfigurator"/>
+
+    <mule:mule name="_muleSystemModel">
+
+
+        <!-- Default configuration attributes are configured via default values in mule-core schema mule.xsd.
+             Configuration element is required here so that spring creates a MuleConfiguration instance and
+       	     populates it with defaults from schema 
+        -->
+        <mule:configuration/>
+
+        <mule:notifications>
+            <mule:notification event="MANAGER"/>
+            <mule:notification event="MODEL"/>
+            <mule:notification event="COMPONENT"/>
+            <mule:notification event="SECURITY"/>
+            <mule:notification event="MANAGEMENT"/>
+            <mule:notification event="ADMIN"/>
+            <mule:notification event="CONNECTION"/>
+            <mule:notification event="REGISTRY"/>
+            <mule:notification event="CUSTOM"/>
+            <mule:notification event="MESSAGE"/>
+            <mule:notification event="EXCEPTION"/>
+            <mule:notification event="TRANSACTION"/>
+        </mule:notifications>
+
+        <mule:model name="_muleSystemModel"/>
+
+    </mule:mule>
+
+    <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager">
+        <property name="persistenceStrategy">
+            <bean class="org.mule.util.queue.CachingPersistenceStrategy">
+                <constructor-arg>
+                    <bean class="org.mule.util.queue.MemoryPersistenceStrategy"/>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+
+    <bean name="_muleSecurityManager" class="org.mule.impl.security.MuleSecurityManager"/>
+
+    <bean name="_muleProperties" class="java.util.HashMap"/>
+
+    <bean name="_muleEndpointFactory" class="org.mule.impl.endpoint.EndpointFactory"/>
+
+    <bean name="defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <property name="threadWaitTimeout" value="30"/>
+        <property name="maxThreadsActive" value="10"/>
+        <property name="maxThreadsIdle" value="10"/>
+        <property name="maxBufferSize" value="0"/>
+        <property name="threadTTL" value="60000"/>
+        <property name="poolExhaustedAction" value="4"/>
+    </bean>
+
+    <bean name="defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="defaultMessageRequesterThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="defaultMessageReceiverThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="defaultThreadingProfile"/>
+    </bean>
+
+    <bean name="defaultComponentThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="defaultThreadingProfile"/>
+    </bean>
+
+    <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that
+    the transformers will be available even when using the the TransientRegistry only -->
+
+</beans>
