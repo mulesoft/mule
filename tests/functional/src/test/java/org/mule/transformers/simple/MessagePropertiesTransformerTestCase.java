@@ -10,19 +10,19 @@
 
 package org.mule.transformers.simple;
 
+import org.mule.RegistryContext;
 import org.mule.impl.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
-import org.mule.RegistryContext;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MessagePropertiesTransformerTestCase extends AbstractMuleTestCase
+public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 {
-    protected String getConfigurationResources()
+    protected String getConfigResources()
     {
         return "message-properties-transformer-config.xml";
     }
