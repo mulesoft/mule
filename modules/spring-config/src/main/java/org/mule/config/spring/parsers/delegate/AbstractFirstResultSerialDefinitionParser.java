@@ -24,6 +24,7 @@ public class AbstractFirstResultSerialDefinitionParser extends AbstractSerialDel
 {
 
     protected AbstractBeanDefinition firstDefinition;
+    private boolean returnFirstResult = true;
 
     public AbstractFirstResultSerialDefinitionParser()
     {
@@ -33,6 +34,11 @@ public class AbstractFirstResultSerialDefinitionParser extends AbstractSerialDel
     public AbstractFirstResultSerialDefinitionParser(boolean doReset)
     {
         super(doReset);
+    }
+
+    public void setReturnFirstResult(boolean returnFirstResult)
+    {
+        this.returnFirstResult = returnFirstResult;
     }
 
     protected AbstractBeanDefinition doSingleBean(int index, MuleDefinitionParser parser, Element element, ParserContext parserContext)
@@ -57,7 +63,14 @@ public class AbstractFirstResultSerialDefinitionParser extends AbstractSerialDel
             }
             if (size() == index + 1)
             {
-                return firstDefinition;
+                if (returnFirstResult)
+                {
+                    return firstDefinition;
+                }
+                else
+                {
+                    return result;
+                }
             }
             else
             {

@@ -16,7 +16,7 @@ public class SoapStockQuoteFunctionalTestCase extends AbstractStockQuoteFunction
 
     protected String getConfigResources()
     {
-        return "stockquote-soap-config-new.xml";
+        return "stockquote-soap-config.xml";
     }
     
 }

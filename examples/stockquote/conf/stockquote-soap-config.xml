@@ -3,12 +3,14 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
+       xmlns:axis="http://www.mulesource.org/schema/mule/axis/2.0"
        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
        xmlns:xm="http://www.mulesource.org/schema/mule/xml/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd
+       http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd">
 
@@ -58,22 +60,15 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote"
-                                       responseTransformer-refs="XmlDecoder Xslt XmlToObject">
-                        <properties>
-                            <spring:entry key="soapAction" value="[methodNamespace][method]"/>
-                            <spring:entry key="soapMethods">
-                                <spring:map>
-                                    <spring:entry key="qname{GetQuote:http://www.webserviceX.NET/}">
-                                        <spring:list>
-                                            <spring:value>symbol;string;in</spring:value>
-                                            <spring:value>GetQuoteResult;string;out</spring:value>
-                                        </spring:list>
-                                    </spring:entry>
-                                </spring:map>
-                            </spring:entry>
-                        </properties>
-                    </outbound-endpoint>
+                    <axis:outbound-endpoint
+                            address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
+                            responseTransformer-refs="XmlDecoder Xslt XmlToObject">
+                        <axis:soap-action value="[methodNamespace][method]"/>
+                        <axis:soap-method method="qname{GetQuote:http://www.webserviceX.NET/}">
+                            <axis:soap-parameter parameter="symbol" type="string" mode="in"/>
+                            <axis:soap-parameter parameter="GetQuoteResult" type="string" mode="out"/>
+                        </axis:soap-method>
+                    </axis:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

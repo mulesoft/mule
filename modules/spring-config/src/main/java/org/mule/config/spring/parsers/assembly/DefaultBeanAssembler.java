@@ -170,6 +170,7 @@ public class DefaultBeanAssembler implements BeanAssembler
                 if (null == oldValue)
                 {
                     if (beanClass.equals(ChildMapEntryDefinitionParser.KeyValuePair.class.getName()) ||
+                            beanClass.equals(MapEntryCombiner.class.getName()) ||
                             beanClass.equals(MapFactoryBean.class.getName()))
                     {
                         // a collection of maps requires an extra intermediate object that does the
