@@ -59,7 +59,11 @@ public abstract class UMOException extends Exception
     {
         super((cause instanceof InvocationTargetException
                         ? ((InvocationTargetException) cause).getTargetException() : cause));
-        setMessage(MessageFactory.createStaticMessage(cause.getMessage() + " (" + cause.getClass().getName() + ")"));
+        if (cause != null)
+        {
+            setMessage(MessageFactory.createStaticMessage(cause.getMessage() 
+                + " (" + cause.getClass().getName() + ")"));
+        }
         initialise();
     }
 
