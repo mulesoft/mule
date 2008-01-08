@@ -52,7 +52,8 @@ mule-module-management
 mule-module-ognl
 mule-module-pgp
 mule-module-scripting
-mule-module-spring
+mule-module-spring-config
+mule-module-spring-extras
 mule-module-wssecurity
 mule-module-xml
 mule-tests-functional
