@@ -78,9 +78,9 @@
         </dependency>
         <!-- This is the actual language implementation -->
         <dependency>
-            <groupId>groovy</groupId>
+            <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>1.0</version>
+            <version>1.5.1</version>
             <exclusions>
                 <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
                 <exclusion>
@@ -88,16 +88,20 @@
                     <artifactId>openejb-loader</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>ant</groupId>
+                    <groupId>org.apache.ant</groupId>
                     <artifactId>ant</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>ant</groupId>
+                    <groupId>org.apache.ant</groupId>
                     <artifactId>ant-junit</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>ant</groupId>
+                    <groupId>org.apache.ant</groupId>
                     <artifactId>ant-launcher</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jline</groupId>
+                    <artifactId>jline</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>axion</groupId>
