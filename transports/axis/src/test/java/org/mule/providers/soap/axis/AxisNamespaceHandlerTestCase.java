@@ -58,6 +58,8 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
                 managementContext.getRegistry().lookupEndpointBuilder("endpoint").buildOutboundEndpoint();
         Map props = endpoint.getProperties();
         assertEquals("[methodNamespace][method]", assertKey(props, "soapAction", String.class));
+        assertEquals("echo,getdate", assertKey(props, "allowedMethods", String.class));
+        assertEquals("true", assertKey(props, "treatMapAsNamedParams", String.class));
         Map methods = (Map) assertKey(props, "soapMethods", Map.class);
         List method1 = (List) assertKey(methods, "method1", List.class);
         assertEquals(3, method1.size());

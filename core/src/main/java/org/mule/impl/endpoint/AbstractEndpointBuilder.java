@@ -221,7 +221,10 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         if (null != uriBuilder)
         {
             UMOEndpointURI endpointURI = uriBuilder.getEndpoint();
+            // properties from the URI itself
             props.putAll(endpointURI.getParams());
+            // additional properties not added to the URI (sometimes needed for "meta" protocols like axis)
+            props.putAll(uriBuilder.getProperties());
         }
         // properties on builder may override url
         if (properties != null)

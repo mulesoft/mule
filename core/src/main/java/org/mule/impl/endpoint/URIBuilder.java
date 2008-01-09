@@ -31,7 +31,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
  * (use required attributes to guarantee entries)
  *
  * In addition, parameters are handled as follows:
- * - parameters can be given in the uri, thr queryMap, or both
+ * - parameters can be given in the uri, the queryMap, or both
  * - queryMap values override uri values
  * - the order of parameters in the uri remains the same (even if values change)
  * - queryMap parameters are appended after uri parameters
@@ -78,6 +78,7 @@ public class URIBuilder
     private Integer port;
     private String path;
     private Map queryMap;
+    private Map properties = new HashMap();
 
     private AtomicReference cache = new AtomicReference();
 
@@ -164,6 +165,12 @@ public class URIBuilder
         this.queryMap = queryMap;
     }
 
+    public void setProperties(Map properties)
+    {
+        assertNotUsed();
+        this.properties = properties;
+    }
+
     public UMOEndpointURI getEndpoint()
     {
         if (null == cache.get())
@@ -179,6 +186,11 @@ public class URIBuilder
             }
         }
         return (UMOEndpointURI)cache.get();
+    }
+
+    public Map getProperties()
+    {
+        return this.properties;
     }
 
     /**

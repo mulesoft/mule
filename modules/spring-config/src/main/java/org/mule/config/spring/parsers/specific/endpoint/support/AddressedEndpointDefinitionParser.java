@@ -42,6 +42,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     public static final boolean META = ChildAddressDefinitionParser.META;
     public static final boolean PROTOCOL = ChildAddressDefinitionParser.PROTOCOL;
     public static final String QUERY_MAP = "queryMap";
+    public static final String PROPERTIES = "properties";
     public static final String[] RESTRICTED_ENDPOINT_ATTRIBUTES =
             new String[]{"synchronous", "remoteSync", "remoteSyncTimeout", "encoding",
                     "connector", "createConnector", "transformer", "responseTransformer"};
@@ -60,15 +61,15 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
     public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, MuleDefinitionParser endpointParser)
     {
-        this(metaOrProtocol, isMeta, endpointParser, new String[]{}, new String[]{});
+        this(metaOrProtocol, isMeta, true, endpointParser, new String[]{}, new String[]{});
     }
 
-    public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
+    public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, boolean uriProperties,
                                              MuleDefinitionParser endpointParser,
                                              String[] requiredAddressAttributes,
                                              String[] requiredProperties)
     {
-        this(metaOrProtocol, isMeta, endpointParser,
+        this(metaOrProtocol, isMeta, uriProperties, endpointParser,
                 RESTRICTED_ENDPOINT_ATTRIBUTES,
                 new String[][]{requiredAddressAttributes}, new String[][]{requiredProperties});
     }
@@ -76,6 +77,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     /**
      * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
      * @param isMeta Whether transport is "meta" or not (eg cxf)
+     * @param uriProperties Whether to add properties to URI or not
      * @param endpointParser The parser for the endpoint
      * @param endpointAttributes A list of attribute names which will be set as properties on the
      * endpoint builder
@@ -83,7 +85,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
      * isn't present
      * @param requiredProperties A list of property names that are required if "address" isn't present
      */
-    public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta,
+    public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, boolean uriProperties,
                                              MuleDefinitionParser endpointParser,
                                              String[] endpointAttributes,
                                              String[][] requiredAddressAttributes,
@@ -96,7 +98,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
         // the next delegate parses the address.  it will see the endpoint as parent automatically.
         MuleChildDefinitionParser addressParser =
-                new CompositeAddressDefinitionParser(metaOrProtocol, isMeta,
+                new CompositeAddressDefinitionParser(metaOrProtocol, isMeta, uriProperties,
                         endpointAttributes, requiredAddressAttributes, requiredProperties);
 
         // this handles the exception thrown if a ref is found in the address parser
@@ -115,7 +117,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
         private MuleChildDefinitionParser addressParser;
 
-        public CompositeAddressDefinitionParser(String metaOrProtocol, boolean isMeta,
+        public CompositeAddressDefinitionParser(String metaOrProtocol, boolean isMeta, boolean uriProperties,
                 String[] endpointAttributes, String[][] requiredAddressAttributes, String[][] requiredProperties)
         {
             super(false); // don't reset name!
@@ -125,7 +127,8 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
             addDelegate(addressParser);
 
             // the next delegate parses property attributes
-            MuleChildDefinitionParser propertiesParser = new AttributePropertiesDefinitionParser(QUERY_MAP);
+            MuleChildDefinitionParser propertiesParser =
+                    new AttributePropertiesDefinitionParser(uriProperties ? QUERY_MAP : PROPERTIES);
             propertiesParser.addCollection(QUERY_MAP);
 
             // this handles the "ref problem" - we don't want this parsers to be used if a "ref"

@@ -21,7 +21,11 @@ import org.mule.config.spring.parsers.processors.AttributeConcatenation;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
+import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.factories.InboundEndpointFactoryBean;
+import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.providers.soap.axis.AxisConnector;
 
 import org.w3c.dom.Element;
@@ -34,11 +38,13 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerMetaTransportEndpoints(AxisConnector.AXIS);
+        // unusual propertires handling, so non-standard endpoint registration
+        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, new String[]{}, new String[]{}));
+        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, InboundEndpointFactoryBean.class, new String[]{}, new String[]{}));
+        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, OutboundEndpointFactoryBean.class, new String[]{}, new String[]{}));
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(AxisConnector.class, true));
         registerBeanDefinitionParser("bean-type", new ChildListEntryDefinitionParser("beanTypes"));
         registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes"));
-        registerMuleBeanDefinitionParser("soap-action", new ChildSingletonMapDefinitionParser("properties")).registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "soapAction")).addCollection("properties");
         registerBeanDefinitionParser("soap-method", new SoapMethodDefinitionParser());
         registerBeanDefinitionParser("soap-parameter", new SoapParameterDefinitionParser());
         registerBeanDefinitionParser("soap-return", new SoapReturnDefinitionParser());

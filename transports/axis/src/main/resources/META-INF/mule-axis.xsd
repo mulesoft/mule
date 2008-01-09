@@ -116,11 +116,13 @@
 
     <xsd:attributeGroup name="propertyAttributes">
         <xsd:attribute name="clientConfig" type="xsd:string"/>
+        <xsd:attribute name="soapAction" type="xsd:string"/>
+        <xsd:attribute name="allowedMethods" type="xsd:string"/>
+        <xsd:attribute name="treatMapAsNamedParams" type="mule:substitutableBoolean"/>
     </xsd:attributeGroup>
 
     <xsd:group name="propertyElements">
         <xsd:sequence>
-            <xsd:element name="soap-action" type="mule:valueType" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="soap-service" minOccurs="0" maxOccurs="unbounded">
                 <xsd:complexType>
                     <xsd:attribute name="interface" type="xsd:string"/>
