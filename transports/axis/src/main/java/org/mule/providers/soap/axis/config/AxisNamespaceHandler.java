@@ -11,20 +11,19 @@
 package org.mule.providers.soap.axis.config;
 
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
-import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParser;
 import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.config.spring.parsers.processors.AddAttribute;
 import org.mule.config.spring.parsers.processors.AttributeConcatenation;
-import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.properties.NestedMapWithAttributesDefinitionParser;
+import org.mule.config.spring.parsers.specific.properties.SimplePropertyDefinitionParser;
+import org.mule.config.spring.parsers.specific.properties.NestedListDefinitionParser;
+import org.mule.config.spring.parsers.specific.properties.ElementInNestedMapDefinitionParser;
+import org.mule.config.spring.parsers.specific.properties.ListPropertyDefinitionParser;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
@@ -41,6 +40,7 @@ import org.w3c.dom.Element;
 public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
+    public static final String PROPERTIES = "properties";
     public static final Map USE_MAP = new HashMap();
     public static final Map STYLE_MAP = new HashMap();
 
@@ -63,35 +63,18 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, OutboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping("use", USE_MAP).addMapping("style", STYLE_MAP);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(AxisConnector.class, true));
         registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes", "value"));
-        registerBeanDefinitionParser("soap-method", new SoapMethodDefinitionParser());
+        registerBeanDefinitionParser("soap-method", new ElementInNestedMapDefinitionParser(PROPERTIES, "soapMethods", "method"));
         registerBeanDefinitionParser("soap-parameter", new SoapParameterDefinitionParser());
         registerBeanDefinitionParser("soap-return", new SoapReturnDefinitionParser());
-        registerMuleBeanDefinitionParser("soap-service", new ListInMapPropertiesDefinitionParser("properties", "serviceInterfaces", "interface"));
-        registerMuleBeanDefinitionParser("options", new SoapOptionsDefinitionParser());
-        registerMuleBeanDefinitionParser("option", new SoapOptionDefinitionParser());
+        registerMuleBeanDefinitionParser("soap-service", new NestedListDefinitionParser(PROPERTIES, "serviceInterfaces", "interface"));
+        registerMuleBeanDefinitionParser("options", new NestedMapWithAttributesDefinitionParser(PROPERTIES, "axisOptions"));
+        registerMuleBeanDefinitionParser("option", new SimplePropertyDefinitionParser());
         registerMuleBeanDefinitionParser("bean-type",
                 new ParentContextDefinitionParser("connector", new ChildListEntryDefinitionParser("beanTypes", "interface"))
-                        .otherwise(new ListInMapPropertiesDefinitionParser("properties", "beanTypes", "interface")));
+                        .otherwise(new NestedListDefinitionParser(PROPERTIES, "beanTypes", "interface")));
     }
 
-    private static class MapEntryListDefinitionParser extends ParentDefinitionParser
-    {
-
-        public MapEntryListDefinitionParser(String attribute)
-        {
-            setIgnoredDefault(true);
-            removeIgnored(attribute);
-            addCollection(attribute);
-        }
-
-        protected Class getBeanClass(Element element)
-        {
-            return MapEntryCombiner.class;
-        }
-
-    }
-
-    private static class SoapParameterDefinitionParser extends MapEntryListDefinitionParser
+    private static class SoapParameterDefinitionParser extends ListPropertyDefinitionParser
     {
 
         public static final String PARAMETER = "parameter";
@@ -99,13 +82,12 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
         public SoapParameterDefinitionParser()
         {
             super(PARAMETER);
-            addAlias(PARAMETER, MapEntryCombiner.VALUE);
             registerPreProcessor(new AttributeConcatenation(PARAMETER, ";", new String[]{PARAMETER, "type", "mode"}));
         }
 
     }
 
-    private static class SoapReturnDefinitionParser extends MapEntryListDefinitionParser
+    private static class SoapReturnDefinitionParser extends ListPropertyDefinitionParser
     {
 
         public SoapReturnDefinitionParser()
@@ -118,79 +100,6 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
                     element.setAttribute(MapEntryCombiner.VALUE, "return;" + element.getAttribute("type"));
                 }
             });
-        }
-
-    }
-
-    private static class SoapMethodDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
-    {
-
-        public SoapMethodDefinitionParser()
-        {
-            // children (parameters) want to append to the inner map, not the outer one
-            setReturnFirstResult(false);
-            addDelegate(new ChildSingletonMapDefinitionParser("properties"))
-                    .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "soapMethods"))
-                    .addCollection("properties")
-                    .setIgnoredDefault(true)
-                    .removeIgnored(MapEntryCombiner.KEY)
-                    .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-            addChildDelegate(new ChildSingletonMapDefinitionParser(MapEntryCombiner.VALUE))
-                    .addAlias("method", MapEntryCombiner.KEY)
-                    .addCollection(MapEntryCombiner.VALUE)
-                    .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        }
-
-    }
-
-    private class ListInMapPropertiesDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
-    {
-
-        public ListInMapPropertiesDefinitionParser(String mapSetter, String mapKey, String attribute)
-        {
-            addDelegate(new ChildSingletonMapDefinitionParser(mapSetter))
-                    .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, mapKey))
-                    .addCollection(mapSetter)
-                    .setIgnoredDefault(true)
-                    .removeIgnored(MapEntryCombiner.KEY)
-                    .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-            addChildDelegate(new ChildListEntryDefinitionParser(MapEntryCombiner.VALUE, attribute))
-                    .addCollection(MapEntryCombiner.VALUE);
-        }
-
-    }
-
-    private static class SoapOptionDefinitionParser extends ChildSingletonMapDefinitionParser
-    {
-
-        public SoapOptionDefinitionParser()
-        {
-            super(MapEntryCombiner.VALUE);
-        }
-
-        protected void preProcess(Element element)
-        {
-            super.preProcess(element);
-            // this is crazy, but because we use a single property config for target and bean, and both
-            // are the same, and target properties are transient, and we only want target value to be
-            // a collection, we have to do this here!
-            getTargetPropertyConfiguration().addCollection(MapEntryCombiner.VALUE);
-        }
-    }
-
-    private static class SoapOptionsDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
-    {
-
-        public SoapOptionsDefinitionParser()
-        {
-            addDelegate(new ChildSingletonMapDefinitionParser("properties"))
-                    .addCollection("properties")
-                    .setIgnoredDefault(true)
-                    .removeIgnored(MapEntryCombiner.KEY)
-                    .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "axisOptions"));
-            addChildDelegate(new AttributePropertiesDefinitionParser(MapEntryCombiner.VALUE))
-                    .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME)
-                    .addIgnored(MapEntryCombiner.KEY);
         }
 
     }
