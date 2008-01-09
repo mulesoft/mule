@@ -14,11 +14,13 @@ import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParser;
 import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.processors.AddAttribute;
 import org.mule.config.spring.parsers.processors.AttributeConcatenation;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
+import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
@@ -60,16 +62,16 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, InboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping("use", USE_MAP).addMapping("style", STYLE_MAP);
         registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, OutboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping("use", USE_MAP).addMapping("style", STYLE_MAP);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(AxisConnector.class, true));
-        registerBeanDefinitionParser("bean-type", new ChildListEntryDefinitionParser("beanTypes"));
-        registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes"));
+        registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes", "value"));
         registerBeanDefinitionParser("soap-method", new SoapMethodDefinitionParser());
         registerBeanDefinitionParser("soap-parameter", new SoapParameterDefinitionParser());
         registerBeanDefinitionParser("soap-return", new SoapReturnDefinitionParser());
-        registerMuleBeanDefinitionParser("soap-service", new SoapServiceDefinitionParser());
-        registerMuleBeanDefinitionParser("options", new ChildSingletonMapDefinitionParser("properties")).addCollection("properties").registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "axisOptions"));
+        registerMuleBeanDefinitionParser("soap-service", new ListInMapPropertiesDefinitionParser("properties", "serviceInterfaces", "interface"));
+        registerMuleBeanDefinitionParser("options", new SoapOptionsDefinitionParser());
         registerMuleBeanDefinitionParser("option", new SoapOptionDefinitionParser());
-        registerMuleBeanDefinitionParser("allowed-methods", new SoapOptionDefinitionParser()).registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "allowedMethods"));
-        registerMuleBeanDefinitionParser("scope", new SoapOptionDefinitionParser()).registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "scope"));
+        registerMuleBeanDefinitionParser("bean-type",
+                new ParentContextDefinitionParser("connector", new ChildListEntryDefinitionParser("beanTypes", "interface"))
+                        .otherwise(new ListInMapPropertiesDefinitionParser("properties", "beanTypes", "interface")));
     }
 
     private static class MapEntryListDefinitionParser extends ParentDefinitionParser
@@ -141,20 +143,18 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
 
     }
 
-    private class SoapServiceDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
+    private class ListInMapPropertiesDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
     {
 
-        public static final String INTERFACE = "interface";
-
-        public SoapServiceDefinitionParser()
+        public ListInMapPropertiesDefinitionParser(String mapSetter, String mapKey, String attribute)
         {
-            addDelegate(new ChildSingletonMapDefinitionParser("properties"))
-                    .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "serviceInterfaces"))
-                    .addCollection("properties")
+            addDelegate(new ChildSingletonMapDefinitionParser(mapSetter))
+                    .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, mapKey))
+                    .addCollection(mapSetter)
                     .setIgnoredDefault(true)
                     .removeIgnored(MapEntryCombiner.KEY)
                     .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-            addChildDelegate(new ChildListEntryDefinitionParser(MapEntryCombiner.VALUE, INTERFACE))
+            addChildDelegate(new ChildListEntryDefinitionParser(MapEntryCombiner.VALUE, attribute))
                     .addCollection(MapEntryCombiner.VALUE);
         }
 
@@ -176,6 +176,23 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
             // a collection, we have to do this here!
             getTargetPropertyConfiguration().addCollection(MapEntryCombiner.VALUE);
         }
+    }
+
+    private static class SoapOptionsDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
+    {
+
+        public SoapOptionsDefinitionParser()
+        {
+            addDelegate(new ChildSingletonMapDefinitionParser("properties"))
+                    .addCollection("properties")
+                    .setIgnoredDefault(true)
+                    .removeIgnored(MapEntryCombiner.KEY)
+                    .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "axisOptions"));
+            addChildDelegate(new AttributePropertiesDefinitionParser(MapEntryCombiner.VALUE))
+                    .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME)
+                    .addIgnored(MapEntryCombiner.KEY);
+        }
+
     }
 
 }

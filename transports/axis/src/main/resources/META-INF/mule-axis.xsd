@@ -21,8 +21,8 @@
         <xsd:complexContent>        
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
-                    <xsd:element name="bean-type" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-                    <xsd:element name="supported-scheme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+                    <xsd:element ref="bean-type" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="supported-scheme" type="mule:valueType" minOccurs="0" maxOccurs="unbounded" />
                 </xsd:sequence>
                 <xsd:attribute name="axis-ref" type="xsd:string">
                     <xsd:annotation>
@@ -108,7 +108,10 @@
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
-                <xsd:group ref="propertyElements"/>
+                <xsd:sequence>
+                    <xsd:group ref="propertyElements"/>
+                    <xsd:group ref="mule:propertiesGroup"/>
+                </xsd:sequence>
                 <xsd:attributeGroup ref="propertyAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -118,6 +121,7 @@
         <xsd:attribute name="clientConfig" type="xsd:string"/>
         <xsd:attribute name="soapAction" type="xsd:string"/>
         <xsd:attribute name="allowedMethods" type="xsd:string"/>
+        <xsd:attribute name="serviceNamespace" type="xsd:string"/>
         <xsd:attribute name="treatMapAsNamedParams" type="mule:substitutableBoolean"/>
         <xsd:attribute name="style">
             <xsd:simpleType>
@@ -144,10 +148,16 @@
             <xsd:element name="options" minOccurs="0">
                 <xsd:complexType>
                     <xsd:sequence>
-                        <xsd:element name="allowed-methods" type="mule:valueType" minOccurs="0" maxOccurs="unbounded"/>
-                        <xsd:element name="scope" type="mule:valueType" minOccurs="0" maxOccurs="unbounded"/>
                         <xsd:element name="option" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded"/>
                     </xsd:sequence>
+                    <xsd:attribute name="allowedMethods" type="xsd:string"/>
+                    <xsd:attribute name="scope" type="xsd:string"/>
+                    <xsd:attribute name="wsdlPortType" type="xsd:string"/>
+                    <xsd:attribute name="wsdlServiceElement" type="xsd:string"/>
+                    <xsd:attribute name="wsdlTargetNamespace" type="xsd:string"/>
+                    <xsd:attribute name="wsdlInputSchema" type="xsd:string"/>
+                    <xsd:attribute name="wsdlSoapActionMode" type="xsd:string"/>
+                    <xsd:attribute name="extraClasses" type="xsd:string"/>
                 </xsd:complexType>
             </xsd:element>
             <xsd:element name="soap-service" minOccurs="0" maxOccurs="unbounded">
@@ -155,7 +165,8 @@
                     <xsd:attribute name="interface" type="xsd:string"/>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="soap-method" minOccurs="0" maxOccurs="unbounded">
+            <xsd:element ref="bean-type" minOccurs="0" maxOccurs="unbounded"/>
+             <xsd:element name="soap-method" minOccurs="0" maxOccurs="unbounded">
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="soap-parameter" minOccurs="0" maxOccurs="unbounded">
@@ -176,5 +187,11 @@
             </xsd:element>
         </xsd:sequence>
     </xsd:group>
+
+    <xsd:element name="bean-type">
+        <xsd:complexType>
+            <xsd:attribute name="interface" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
 
 </xsd:schema>

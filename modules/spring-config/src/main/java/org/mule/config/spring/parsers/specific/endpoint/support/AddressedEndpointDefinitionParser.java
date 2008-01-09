@@ -129,7 +129,6 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
             // the next delegate parses property attributes
             MuleChildDefinitionParser propertiesParser =
                     new AttributePropertiesDefinitionParser(uriProperties ? QUERY_MAP : PROPERTIES);
-            propertiesParser.addCollection(QUERY_MAP);
 
             // this handles the "ref problem" - we don't want this parsers to be used if a "ref"
             // defines the address so add a preprocessor to check for that and indicate that the
