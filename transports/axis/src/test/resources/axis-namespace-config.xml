@@ -30,6 +30,8 @@
                    address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
                    connector-ref="axisConnector2">
         <axis:soap-action value="[methodNamespace][method]"/>
+        <axis:soap-service interface="class1"/>
+        <axis:soap-service interface="class2"/>
         <axis:soap-method method="method1">
             <axis:soap-parameter parameter="symbol" type="string" mode="in"/>
             <axis:soap-parameter parameter="GetQuoteResult" type="string" mode="out"/>

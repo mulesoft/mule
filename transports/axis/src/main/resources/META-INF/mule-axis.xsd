@@ -121,6 +121,11 @@
     <xsd:group name="propertyElements">
         <xsd:sequence>
             <xsd:element name="soap-action" type="mule:valueType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="soap-service" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:attribute name="interface" type="xsd:string"/>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element name="soap-method" minOccurs="0" maxOccurs="unbounded">
                 <xsd:complexType>
                     <xsd:sequence>

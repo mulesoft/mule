@@ -44,7 +44,7 @@ public class MapCombiner implements Map
         {
             for (Iterator maps = list.iterator(); maps.hasNext();)
             {
-                merge(maxDepth, cachedMerge, (Map) maps.next());
+                mergeMaps(maxDepth, cachedMerge, (Map) maps.next());
             }
             isMerged = true;
         }
@@ -56,7 +56,7 @@ public class MapCombiner implements Map
         this.maxDepth = maxDepth;
     }
 
-    private void merge(int headroom, Map accumulator, Map extra)
+    private void mergeMaps(int headroom, Map accumulator, Map extra)
     {
         for (Iterator keys = extra.keySet().iterator(); keys.hasNext();)
         {
@@ -67,7 +67,11 @@ public class MapCombiner implements Map
                 Object valueOriginal = accumulator.get(key);
                 if (valueExtra instanceof Map && valueOriginal instanceof Map && headroom != 0)
                 {
-                    merge(headroom - 1, (Map) valueOriginal, (Map) valueExtra);
+                    mergeMaps(headroom - 1, (Map) valueOriginal, (Map) valueExtra);
+                }
+                else if (valueExtra instanceof Collection && valueOriginal instanceof Collection && headroom != 0)
+                {
+                    ((Collection) valueOriginal).addAll((Collection) valueExtra);
                 }
                 else
                 {
@@ -105,7 +109,7 @@ public class MapCombiner implements Map
         }
     }
 
-    // hashcode and equals don't trigger merge
+    // hashcode, equals and toString don't trigger merge
 
     public int hashCode()
     {
@@ -115,6 +119,18 @@ public class MapCombiner implements Map
     public boolean equals(Object o)
     {
         return cachedMerge.equals(o);
+    }
+
+    public String toString()
+    {
+        if (isMerged)
+        {
+            return "merged: " + cachedMerge.toString();
+        }
+        else
+        {
+            return "unmerged: " + (null == list ? null : list.toString());
+        }
     }
 
     public int size()

@@ -42,35 +42,46 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("soap-method", new SoapMethodDefinitionParser());
         registerBeanDefinitionParser("soap-parameter", new SoapParameterDefinitionParser());
         registerBeanDefinitionParser("soap-return", new SoapReturnDefinitionParser());
+        registerMuleBeanDefinitionParser("soap-service", new SoapServiceDefinitionParser());
     }
 
-    private static final class SoapParameterDefinitionParser extends ParentDefinitionParser
+    private static class MapEntryListDefinitionParser extends ParentDefinitionParser
     {
 
-        public static final String PARAMETER = "parameter";
-
-        public SoapParameterDefinitionParser()
+        public MapEntryListDefinitionParser(String attribute)
         {
             setIgnoredDefault(true);
-            removeIgnored(PARAMETER);
-            addAlias(PARAMETER, MapEntryCombiner.VALUE);
-            addCollection(PARAMETER);
-            registerPreProcessor(new AttributeConcatenation(PARAMETER, ";", new String[]{PARAMETER, "type", "mode"}));
+            removeIgnored(attribute);
+            addCollection(attribute);
         }
 
         protected Class getBeanClass(Element element)
         {
             return MapEntryCombiner.class;
         }
+
     }
 
-    private static final class SoapReturnDefinitionParser extends ParentDefinitionParser
+    private static class SoapParameterDefinitionParser extends MapEntryListDefinitionParser
+    {
+
+        public static final String PARAMETER = "parameter";
+
+        public SoapParameterDefinitionParser()
+        {
+            super(PARAMETER);
+            addAlias(PARAMETER, MapEntryCombiner.VALUE);
+            registerPreProcessor(new AttributeConcatenation(PARAMETER, ";", new String[]{PARAMETER, "type", "mode"}));
+        }
+
+    }
+
+    private static class SoapReturnDefinitionParser extends MapEntryListDefinitionParser
     {
 
         public SoapReturnDefinitionParser()
         {
-            addIgnored("type");
-            addCollection(MapEntryCombiner.VALUE);
+            super(MapEntryCombiner.VALUE);
             registerPreProcessor(new PreProcessor()
             {
                 public void preProcess(PropertyConfiguration config, Element element)
@@ -80,13 +91,9 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
             });
         }
 
-        protected Class getBeanClass(Element element)
-        {
-            return MapEntryCombiner.class;
-        }
     }
 
-    private static final class SoapMethodDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
+    private static class SoapMethodDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
     {
 
         public SoapMethodDefinitionParser()
@@ -103,6 +110,24 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
                     .addAlias("method", MapEntryCombiner.KEY)
                     .addCollection(MapEntryCombiner.VALUE)
                     .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+        }
+
+    }
+
+    private class SoapServiceDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
+    {
+
+        public static final String INTERFACE = "interface";
+
+        public SoapServiceDefinitionParser()
+        {
+            addDelegate(new ChildSingletonMapDefinitionParser("properties"))
+                    .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "serviceInterfaces"))
+                    .addCollection("properties")
+                    .setIgnoredDefault(true)
+                    .removeIgnored(MapEntryCombiner.KEY)
+                    .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
+            addChildDelegate(new ChildListEntryDefinitionParser(MapEntryCombiner.VALUE, INTERFACE)).addCollection(MapEntryCombiner.VALUE);
         }
 
     }
