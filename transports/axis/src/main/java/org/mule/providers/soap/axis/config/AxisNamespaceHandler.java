@@ -28,6 +28,9 @@ import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.providers.soap.axis.AxisConnector;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import org.w3c.dom.Element;
 
 /**
@@ -36,12 +39,26 @@ import org.w3c.dom.Element;
 public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
+    public static final Map USE_MAP = new HashMap();
+    public static final Map STYLE_MAP = new HashMap();
+
+    static
+    {
+        USE_MAP.put("RPC", "RPC");
+        USE_MAP.put("DOCUMENT", "Document");
+        USE_MAP.put("MESSAGE", "Message");
+        USE_MAP.put("WRAPPED", "Wrapped");
+        STYLE_MAP.put("ENCODED", "Encoded");
+        STYLE_MAP.put("LITERAL", "Literal");
+    }
+
+
     public void init()
     {
         // unusual propertires handling, so non-standard endpoint registration
-        registerBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, new String[]{}, new String[]{}));
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, InboundEndpointFactoryBean.class, new String[]{}, new String[]{}));
-        registerBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, OutboundEndpointFactoryBean.class, new String[]{}, new String[]{}));
+        registerMuleBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, new String[]{}, new String[]{})).addMapping("use", USE_MAP).addMapping("style", STYLE_MAP);
+        registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, InboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping("use", USE_MAP).addMapping("style", STYLE_MAP);
+        registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, OutboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping("use", USE_MAP).addMapping("style", STYLE_MAP);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(AxisConnector.class, true));
         registerBeanDefinitionParser("bean-type", new ChildListEntryDefinitionParser("beanTypes"));
         registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes"));
@@ -49,6 +66,10 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("soap-parameter", new SoapParameterDefinitionParser());
         registerBeanDefinitionParser("soap-return", new SoapReturnDefinitionParser());
         registerMuleBeanDefinitionParser("soap-service", new SoapServiceDefinitionParser());
+        registerMuleBeanDefinitionParser("options", new ChildSingletonMapDefinitionParser("properties")).addCollection("properties").registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "axisOptions"));
+        registerMuleBeanDefinitionParser("option", new SoapOptionDefinitionParser());
+        registerMuleBeanDefinitionParser("allowed-methods", new SoapOptionDefinitionParser()).registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "allowedMethods"));
+        registerMuleBeanDefinitionParser("scope", new SoapOptionDefinitionParser()).registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "scope"));
     }
 
     private static class MapEntryListDefinitionParser extends ParentDefinitionParser
@@ -133,9 +154,28 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
                     .setIgnoredDefault(true)
                     .removeIgnored(MapEntryCombiner.KEY)
                     .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-            addChildDelegate(new ChildListEntryDefinitionParser(MapEntryCombiner.VALUE, INTERFACE)).addCollection(MapEntryCombiner.VALUE);
+            addChildDelegate(new ChildListEntryDefinitionParser(MapEntryCombiner.VALUE, INTERFACE))
+                    .addCollection(MapEntryCombiner.VALUE);
         }
 
+    }
+
+    private static class SoapOptionDefinitionParser extends ChildSingletonMapDefinitionParser
+    {
+
+        public SoapOptionDefinitionParser()
+        {
+            super(MapEntryCombiner.VALUE);
+        }
+
+        protected void preProcess(Element element)
+        {
+            super.preProcess(element);
+            // this is crazy, but because we use a single property config for target and bean, and both
+            // are the same, and target properties are transient, and we only want target value to be
+            // a collection, we have to do this here!
+            getTargetPropertyConfiguration().addCollection(MapEntryCombiner.VALUE);
+        }
     }
 
 }

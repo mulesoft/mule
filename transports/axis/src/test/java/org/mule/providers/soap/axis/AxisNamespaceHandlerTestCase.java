@@ -60,6 +60,14 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("[methodNamespace][method]", assertKey(props, "soapAction", String.class));
         assertEquals("echo,getdate", assertKey(props, "allowedMethods", String.class));
         assertEquals("true", assertKey(props, "treatMapAsNamedParams", String.class));
+        assertEquals("ENCODED", assertKey(props, "use", String.class));
+        assertEquals("DOCUMENT", assertKey(props, "style", String.class));
+        Map options = (Map) assertKey(props, "axisOptions", Map.class);
+        assertEquals(4, options.size());
+        assertEquals("value1", assertKey(options, "key1", String.class));
+        assertEquals("value2", assertKey(options, "key2", String.class));
+        assertEquals("Application", assertKey(options, "scope", String.class));
+        assertEquals("echo,getdate", assertKey(options, "allowedMethods", String.class));
         Map methods = (Map) assertKey(props, "soapMethods", Map.class);
         List method1 = (List) assertKey(methods, "method1", List.class);
         assertEquals(3, method1.size());

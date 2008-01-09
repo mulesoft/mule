@@ -119,10 +119,37 @@
         <xsd:attribute name="soapAction" type="xsd:string"/>
         <xsd:attribute name="allowedMethods" type="xsd:string"/>
         <xsd:attribute name="treatMapAsNamedParams" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="style">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="RPC"/>
+                    <xsd:enumeration value="DOCUMENT"/>
+                    <xsd:enumeration value="MESSAGE"/>
+                    <xsd:enumeration value="WRAPPED"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="use">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="ENCODED"/>
+                    <xsd:enumeration value="LITERAL"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:group name="propertyElements">
         <xsd:sequence>
+            <xsd:element name="options" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="allowed-methods" type="mule:valueType" minOccurs="0" maxOccurs="unbounded"/>
+                        <xsd:element name="scope" type="mule:valueType" minOccurs="0" maxOccurs="unbounded"/>
+                        <xsd:element name="option" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
             <xsd:element name="soap-service" minOccurs="0" maxOccurs="unbounded">
                 <xsd:complexType>
                     <xsd:attribute name="interface" type="xsd:string"/>
