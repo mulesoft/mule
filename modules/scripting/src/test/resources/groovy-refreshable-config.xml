@@ -25,7 +25,7 @@
     </spring:beans>
 
     <!--
-        The script for this bean will always extend froom the Callable interface, therefore we do not need
+        The script for this bean will always extend from the Callable interface, therefore we do not need
         to set the attribute methodName. The GroovyRefreshableBeanBuilder will check for this interface
         and if the bean does inherit from this interface, it will execute the onCall() method 
     -->

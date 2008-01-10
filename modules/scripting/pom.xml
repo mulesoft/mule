@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
- <version>2.0.0-RC2-SNAPSHOT</version>
+        <version>2.0.0-RC2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-scripting</artifactId>
     <!--<packaging>bundle</packaging>-->
@@ -20,28 +20,14 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-spring-config</artifactId>
-			<version>${version}</version>
-			<scope>provided</scope>
-		</dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-support</artifactId>
-            <!-- the springVersion property is defined in the toplevel pom -->
-            <version>${springVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <!-- No, thank you. -->
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <version>${springVersion}</version>
         </dependency>
         <!-- need to explicitly mark javax.activation as provided -->
         <dependency>
@@ -196,7 +182,7 @@
             <groupId>backport-util-concurrent</groupId>
             <artifactId>backport-util-concurrent</artifactId>
             <version>3.1</version>
-        </dependency>        
+        </dependency>
         <!-- Mule dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -228,7 +214,6 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- spring dynamic scripting -->
     </dependencies>
 
     <profiles>

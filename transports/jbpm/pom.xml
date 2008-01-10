@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
- <version>2.0.0-RC2-SNAPSHOT</version>
+        <version>2.0.0-RC2-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-jbpm</artifactId>
     <packaging>jar</packaging>
@@ -47,7 +47,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-hibernate3</artifactId>
+            <artifactId>spring-orm</artifactId>
         </dependency>
         <!-- This is the same as spring-modules-jbpm31 but we override the pom in our local 
             dependencies repo because the one from Spring includes the kitchen sink. -->
