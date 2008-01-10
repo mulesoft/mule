@@ -18,12 +18,12 @@
     <!-- for some reason Axis auto typing doesn't always work and you need to define the top-level
          bean types for the objects you're passing around -->
     <axis:connector name="axisConnector">
-        <axis:bean-type>org.mule.examples.loanbroker.messages.CreditProfile</axis:bean-type>
-        <axis:bean-type>org.mule.examples.loanbroker.messages.CreditProfile</axis:bean-type>
-        <axis:bean-type>org.mule.examples.loanbroker.messages.Customer</axis:bean-type>
-        <axis:bean-type>org.mule.examples.loanbroker.messages.CustomerQuoteRequest</axis:bean-type>
-        <axis:bean-type>org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest</axis:bean-type>
-        <axis:bean-type>org.mule.examples.loanbroker.messages.LoanQuote</axis:bean-type>
+        <axis:bean-type interface="org.mule.examples.loanbroker.messages.CreditProfile"/>
+        <axis:bean-type interface="org.mule.examples.loanbroker.messages.CreditProfile"/>
+        <axis:bean-type interface="org.mule.examples.loanbroker.messages.Customer"/>
+        <axis:bean-type interface="org.mule.examples.loanbroker.messages.CustomerQuoteRequest"/>
+        <axis:bean-type interface="org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest"/>
+        <axis:bean-type interface="org.mule.examples.loanbroker.messages.LoanQuote"/>
     </axis:connector>
 
     <custom-transformer name="ExtractCustomer" class="org.mule.transformers.simple.GetBeanProperty">

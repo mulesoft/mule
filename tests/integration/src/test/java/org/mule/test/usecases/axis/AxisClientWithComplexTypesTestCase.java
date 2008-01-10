@@ -13,6 +13,7 @@ package org.mule.test.usecases.axis;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
+import org.mule.providers.soap.axis.AxisConnector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,8 +48,8 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
 
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        props.put("style", "Document");
-        props.put("use", "Literal");
+        props.put(AxisConnector.STYLE, "Document");
+        props.put(AxisConnector.USE, "Literal");
 
         SubmitTrade submittrade = new SubmitTrade();
         submittrade.setArg0(trade);

@@ -9,7 +9,7 @@
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
     <axis:connector name="axisConnector" doAutoTypes="false">
-        <axis:bean-type>org.mule.test.usecases.axis.clientbridge.ComplexData</axis:bean-type>
+        <axis:bean-type interface="org.mule.test.usecases.axis.clientbridge.ComplexData"/>
     </axis:connector>
 
     <model name="main">
