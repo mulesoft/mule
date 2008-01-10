@@ -1287,7 +1287,7 @@
             <xsd:extension base="abstractConnectorType">
                 <!-- MULE-2091, 2093 - cannot extend connectorType as need properties first -->
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:group ref="propertiesGroup"/>
                     <xsd:group ref="connectorElements"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required"/>

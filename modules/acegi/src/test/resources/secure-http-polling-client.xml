@@ -23,9 +23,7 @@
         <service name="pollingUMO">
             <inbound-router>
                 <inbound-endpoint address="http://marie:marie@localhost:4567" connector-ref="PollingHttpConnector">
-                    <properties>
-                        <spring:entry key="pollingFrequency" value="30000"/>
-                    </properties>
+                    <property key="pollingFrequency" value="30000"/>
                 </inbound-endpoint>
             </inbound-router>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>

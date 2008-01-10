@@ -21,6 +21,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -44,6 +45,7 @@ import java.util.Map;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.apache.axis.soap.SOAP11Constants;
 import org.apache.axis.client.Call;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -182,7 +184,7 @@ public class UniversalSender extends BasicHandler
                 {
                     uri = call.getSOAPActionURI();
                 }
-                props.put("SOAPAction", uri);
+                props.put(SoapConstants.SOAP_ACTION_PROPERTY, uri);
             }
             if (contentLength > 0)
             {

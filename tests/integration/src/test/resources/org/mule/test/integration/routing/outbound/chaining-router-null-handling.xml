@@ -61,9 +61,7 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="appendComponentName" value="true"/>
-                    </properties>
+                    <property key="appendComponentName" value="true"/>
                 </pooled-object>
             </component>
         </service>
@@ -74,10 +72,8 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                    <spring:entry key="throwException" value="true"/>
-                    <spring:entry key="appendComponentName" value="true"/>
-                    </properties>
+                    <property key="throwException" value="true"/>
+                    <property key="appendComponentName" value="true"/>
                 </pooled-object>
             </component>
         </service>
@@ -88,9 +84,7 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="appendComponentName" value="true"/>
-                    </properties>
+                    <property key="appendComponentName" value="true"/>
                 </pooled-object>
             </component>
         </service>
@@ -101,10 +95,8 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="throwException" value="true"/>
-                        <spring:entry key="appendComponentName" value="true"/>
-                    </properties>
+                    <property key="throwException" value="true"/>
+                    <property key="appendComponentName" value="true"/>
                 </pooled-object>
             </component>
         </service>

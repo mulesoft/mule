@@ -355,6 +355,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             AxisEngine engine = getAxis();
             Message msg = new Message(istream, false);
             msgContext.setRequestMessage(msg);
+            AxisServiceProxy.setProperties(RequestContext.getEvent().getEndpoint().getProperties());
             engine.invoke(msgContext);
             responseMsg = msgContext.getResponseMessage();
             response.setProperty(HTTPConstants.HEADER_CACHE_CONTROL, "no-cache");
@@ -575,6 +576,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             {
                 logger.debug("Invoking Axis Engine.");
             }
+            AxisServiceProxy.setProperties(RequestContext.getEvent().getEndpoint().getProperties());
             engine.invoke(msgContext);
             if (logger.isDebugEnabled())
             {
@@ -755,7 +757,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     private String getSoapAction(UMOEventContext context) throws AxisFault
     {
-        String soapAction = context.getMessage().getStringProperty("SOAPAction", null);
+        String soapAction = context.getMessage().getStringProperty(SoapConstants.SOAP_ACTION_PROPERTY, null);
         if (logger.isDebugEnabled())
         {
             logger.debug("Header Soap Action:" + soapAction);

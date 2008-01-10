@@ -15,10 +15,8 @@
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="file://myout">
-                        <properties>
-                            <spring:entry key="outputAppend" value="true"/>
-                            <spring:entry key="outputPattern" value="out.txt"/>
-                        </properties>
+                        <property key="outputAppend" value="true"/>
+                        <property key="outputPattern" value="out.txt"/>
                     </outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>

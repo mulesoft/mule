@@ -25,11 +25,10 @@
                     serverProvider-ref="mockProvider"/>
 
     <axis:endpoint name="endpoint"
+                   clientConfig="clientConfig"
                    address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
                    connector-ref="axisConnector2"
-                   allowedMethods="echo,getdate"
                    soapAction="[methodNamespace][method]"
-                   treatMapAsNamedParams="true"
                    style="DOCUMENT"
                    use="ENCODED"
                    serviceNamespace="http://foo.namespace">
@@ -44,10 +43,10 @@
             <axis:option key="key1" value="value1"/>
             <axis:option key="key2" value="value2"/>
         </axis:options>
-        <axis:soap-service interface="class1"/>
-        <axis:soap-service interface="class2"/>
         <axis:bean-type interface="bean1"/>
         <axis:bean-type interface="bean2"/>
+        <axis:soap-service interface="class1"/>
+        <axis:soap-service interface="class2"/>
         <axis:soap-method method="method1">
             <axis:soap-parameter parameter="symbol" type="string" mode="in"/>
             <axis:soap-parameter parameter="GetQuoteResult" type="string" mode="out"/>

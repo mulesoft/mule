@@ -28,11 +28,15 @@ import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.providers.soap.axis.AxisConnector;
+import org.mule.providers.soap.axis.AxisMessageReceiver;
+import org.mule.providers.soap.SoapConstants;
 
 import java.util.Map;
 import java.util.HashMap;
 
 import org.w3c.dom.Element;
+import org.apache.axis.constants.Style;
+import org.apache.axis.constants.Use;
 
 /**
  * Registers a Bean Definition Parser for handling <code>&lt;axis:connector&gt;</code> elements.
@@ -46,32 +50,32 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
 
     static
     {
-        USE_MAP.put("RPC", "RPC");
-        USE_MAP.put("DOCUMENT", "Document");
-        USE_MAP.put("MESSAGE", "Message");
-        USE_MAP.put("WRAPPED", "Wrapped");
-        STYLE_MAP.put("ENCODED", "Encoded");
-        STYLE_MAP.put("LITERAL", "Literal");
+        USE_MAP.put("LITERAL", Use.LITERAL_STR);
+        USE_MAP.put("ENCODED", Use.ENCODED_STR);
+        STYLE_MAP.put("DOCUMENT", Style.DOCUMENT_STR);
+        STYLE_MAP.put("MESSAGE", Style.MESSAGE_STR);
+        STYLE_MAP.put("RPC", Style.RPC_STR);
+        STYLE_MAP.put("WRAPPED", Style.WRAPPED_STR);
     }
 
 
     public void init()
     {
         // unusual propertires handling, so non-standard endpoint registration
-        registerMuleBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, new String[]{}, new String[]{})).addMapping("use", USE_MAP).addMapping("style", STYLE_MAP);
-        registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, InboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping("use", USE_MAP).addMapping("style", STYLE_MAP);
-        registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, OutboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping("use", USE_MAP).addMapping("style", STYLE_MAP);
+        registerMuleBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, new String[]{}, new String[]{})).addMapping(AxisConnector.USE, USE_MAP).addMapping(AxisConnector.STYLE, STYLE_MAP);
+        registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, InboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping(AxisConnector.USE, USE_MAP).addMapping(AxisConnector.STYLE, STYLE_MAP);
+        registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, OutboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping(AxisConnector.USE, USE_MAP).addMapping(AxisConnector.STYLE, STYLE_MAP);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(AxisConnector.class, true));
         registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes", "value"));
-        registerBeanDefinitionParser("soap-method", new ElementInNestedMapDefinitionParser(PROPERTIES, "soapMethods", "method"));
+        registerBeanDefinitionParser("soap-method", new ElementInNestedMapDefinitionParser(PROPERTIES, AxisConnector.SOAP_METHODS, "method"));
         registerBeanDefinitionParser("soap-parameter", new SoapParameterDefinitionParser());
         registerBeanDefinitionParser("soap-return", new SoapReturnDefinitionParser());
-        registerMuleBeanDefinitionParser("soap-service", new NestedListDefinitionParser(PROPERTIES, "serviceInterfaces", "interface"));
-        registerMuleBeanDefinitionParser("options", new NestedMapWithAttributesDefinitionParser(PROPERTIES, "axisOptions"));
+        registerMuleBeanDefinitionParser("soap-service", new NestedListDefinitionParser(PROPERTIES, SoapConstants.SERVICE_INTERFACES, "interface"));
+        registerMuleBeanDefinitionParser("options", new NestedMapWithAttributesDefinitionParser(PROPERTIES, AxisMessageReceiver.AXIS_OPTIONS));
         registerMuleBeanDefinitionParser("option", new SimplePropertyDefinitionParser());
         registerMuleBeanDefinitionParser("bean-type",
-                new ParentContextDefinitionParser("connector", new ChildListEntryDefinitionParser("beanTypes", "interface"))
-                        .otherwise(new NestedListDefinitionParser(PROPERTIES, "beanTypes", "interface")));
+                new ParentContextDefinitionParser("connector", new ChildListEntryDefinitionParser(AxisMessageReceiver.BEAN_TYPES, "interface"))
+                        .otherwise(new NestedListDefinitionParser(PROPERTIES, AxisMessageReceiver.BEAN_TYPES, "interface")));
     }
 
     private static class SoapParameterDefinitionParser extends ListPropertyDefinitionParser

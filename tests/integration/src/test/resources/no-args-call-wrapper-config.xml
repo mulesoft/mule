@@ -8,6 +8,8 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
+    <spring:bean name="containerDelegate" class="org.mule.tck.testmodels.fruit.Apple"/>
+
     <vm:connector name="VMConnector" queueEvents="true"/>
 
     <model name="NoArgsWrapperModel">
@@ -15,14 +17,9 @@
             <inbound-router>
                 <inbound-endpoint address="vm://invoke"/>
             </inbound-router>
-            <component>
-                <pooled-object class="org.mule.components.simple.NoArgsCallWrapper">
-                    <properties>
-                        <spring:entry key="delegateClass" value="org.mule.tck.testmodels.fruit.Apple"/>
-                        <spring:entry key="delegateMethod" value="toString"/>
-                    </properties>
-                </pooled-object>
-            </component>
+            <no-args-call-component>
+                <delegateClass class="org.mule.tck.testmodels.fruit.Apple" method="toString"/>
+            </no-args-call-component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out"/>
@@ -34,16 +31,9 @@
             <inbound-router>
                 <inbound-endpoint address="vm://invokeWithInjected"/>
             </inbound-router>
-            <component>
-                <pooled-object class="org.mule.components.simple.NoArgsCallWrapper">
-                    <properties>
-                        <spring:entry key="delegateInstance">
-                            <spring:bean name="containerDelegate" class="org.mule.tck.testmodels.fruit.Apple"/>
-                        </spring:entry>
-                        <spring:entry key="delegateMethod" value="wash"/>
-                    </properties>
-                    </pooled-object>
-            </component>
+            <no-args-call-component>
+                <delegateInstance ref="containerDelegate" method="wash"/>
+            </no-args-call-component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <!--

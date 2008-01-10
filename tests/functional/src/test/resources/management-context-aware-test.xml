@@ -16,9 +16,7 @@
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.config.spring.DummyComponent">
-                    <properties>
-                        <spring:entry key="property" value-ref="bean"/>
-                    </properties>
+                    <property key="property" value-ref="bean"/>
                 </singleton-object>
             </component>
         </service>

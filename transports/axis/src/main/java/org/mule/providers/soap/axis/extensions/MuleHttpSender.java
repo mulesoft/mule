@@ -12,6 +12,7 @@ package org.mule.providers.soap.axis.extensions;
 
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
+import org.mule.providers.soap.SoapConstants;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -131,7 +132,7 @@ public class MuleHttpSender extends BasicHandler
             {
                 uri = call.getSOAPActionURI();
             }
-            msgContext.setProperty("SOAPAction", uri);
+            msgContext.setProperty(SoapConstants.SOAP_ACTION_PROPERTY, uri);
 
             BooleanHolder useFullURL = new BooleanHolder(false);
             StringBuffer otherHeaders = new StringBuffer(64);

@@ -13,7 +13,6 @@ package org.mule.providers.soap.axis;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
 import org.mule.providers.soap.NamedParameter;
@@ -36,15 +35,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPEnvelope;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.EngineConfiguration;
-import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
 import org.apache.axis.attachments.AttachmentPart;
 import org.apache.axis.client.Call;
@@ -177,7 +173,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setTimeout(new Integer(event.getTimeout()));
         setUserCredentials(endpointUri, call);
 
-        Map methodCalls = (Map)event.getMessage().getProperty("soapMethods");
+        Map methodCalls = (Map)event.getMessage().getProperty(AxisConnector.SOAP_METHODS);
         if (methodCalls == null && !(method instanceof SoapMethod))
         {
             buildSoapMethods(event, call, method, methodNamespace, args);
@@ -275,7 +271,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
         HashMap map = new HashMap();
         map.put(method, params);
-        event.getMessage().setProperty("soapMethods", map);
+        event.getMessage().setProperty(AxisConnector.SOAP_METHODS, map);
     }
 
     protected void setUserCredentials(UMOEndpointURI endpointUri, Call call)
@@ -334,14 +330,14 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected void parseUse(UMOEvent event, Call call)
     {
         // Set use: Endcoded/Literal
-        String use = event.getMessage().getStringProperty("use", null);
+        String use = event.getMessage().getStringProperty(AxisConnector.USE, null);
         if (use != null)
         {
             Use u = Use.getUse(use);
             if (u == null)
             {
                 throw new IllegalArgumentException(
-                        CoreMessages.valueIsInvalidFor(use, "use").toString());
+                        CoreMessages.valueIsInvalidFor(use, AxisConnector.USE).toString());
             }
             else
             {
@@ -355,14 +351,14 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // Note that Axis has specific rules to how these two variables are
         // combined. This is handled for us
         // Set style: RPC/wrapped/Doc/Message
-        String style = event.getMessage().getStringProperty("style", null);
+        String style = event.getMessage().getStringProperty(AxisConnector.STYLE, null);
         if (style != null)
         {
             Style s = Style.getStyle(style);
             if (s == null)
             {
                 throw new IllegalArgumentException(
-                        CoreMessages.valueIsInvalidFor(style, "style").toString());
+                        CoreMessages.valueIsInvalidFor(style, AxisConnector.STYLE).toString());
             }
             else
             {
@@ -557,7 +553,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     private void loadCallParams(UMOEvent event, String namespace) throws ClassNotFoundException
     {
-        Map methodCalls = (Map)event.getMessage().getProperty("soapMethods");
+        Map methodCalls = (Map)event.getMessage().getProperty(AxisConnector.SOAP_METHODS);
         if (methodCalls == null)
         {
             return;

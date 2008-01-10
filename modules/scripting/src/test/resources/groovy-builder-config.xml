@@ -29,10 +29,8 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.components.script.jsr223.ScriptMessageBuilder">
-                    <properties>
-                        <spring:entry key="scriptEngineName" value="groovy"/>
-                        <spring:entry key="scriptText" value-ref="scriptText1"/>
-                    </properties>
+                    <property key="scriptEngineName" value="groovy"/>
+                    <property key="scriptText" value-ref="scriptText1"/>
                 </pooled-object>
             </component>
             <outbound-router>
@@ -49,10 +47,8 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
-                    <properties>
-                        <spring:entry key="scriptEngineName" value="groovy"/>
-                        <spring:entry key="scriptText" value-ref="scriptText2"/>
-                    </properties>
+                    <property key="scriptEngineName" value="groovy"/>
+                    <property key="scriptText" value-ref="scriptText2"/>
                 </pooled-object>
             </component>
         </service>
@@ -63,10 +59,8 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
-                    <properties>
-                        <spring:entry key="scriptEngineName" value="groovy"/>
-                        <spring:entry key="scriptText" value-ref="scriptText3"/>
-                    </properties>
+                    <property key="scriptEngineName" value="groovy"/>
+                    <property key="scriptText" value-ref="scriptText3"/>
                 </pooled-object>
             </component>
         </service>

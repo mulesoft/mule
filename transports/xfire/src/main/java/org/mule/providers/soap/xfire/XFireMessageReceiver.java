@@ -118,7 +118,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 rewriteProperty(props, "schemas");
             }
 
-            serviceInterfaces = (List)component.getProperties().get("serviceInterfaces");
+            serviceInterfaces = (List)component.getProperties().get(SoapConstants.SERVICE_INTERFACES);
             Class exposedInterface;
 
             if (serviceInterfaces == null)

@@ -27,9 +27,7 @@
                 <multicasting-router>
                     <!--<outbound-endpoint address="stdio://System.out" streaming="true"/>-->
                     <outbound-endpoint address="file://${mule.working.dir}/test-data/out" encoding="UTF8">
-                        <properties>
-                            <spring:entry key="outputPattern" value="foo.txt.processed"/>
-                        </properties>
+                        <property key="outputPattern" value="foo.txt.processed"/>
                     </outbound-endpoint>
                 </multicasting-router>
             </outbound-router>

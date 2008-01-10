@@ -22,9 +22,7 @@
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.test.integration.service.TestServiceComponent">
-                    <properties>
-                        <spring:entry key="serviceInterfaces" value="org.mule.components.simple.EchoService"/>
-                    </properties>
+                    <property key="serviceInterfaces" value="org.mule.components.simple.EchoService"/>
                 </singleton-object>
             </component>
         </service>

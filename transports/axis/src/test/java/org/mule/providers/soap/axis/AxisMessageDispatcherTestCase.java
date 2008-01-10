@@ -37,7 +37,7 @@ public class AxisMessageDispatcherTestCase extends AbstractMuleTestCase
 
         UMOMessage msg = event.getMessage();
         assertNotNull(msg);
-        final Map soapMethods = (Map)msg.getProperty("soapMethods");
+        final Map soapMethods = (Map)msg.getProperty(AxisConnector.SOAP_METHODS);
         assertEquals(1, soapMethods.size());
         final List values = (List)soapMethods.get("myTestMethod");
         assertNotNull(values);

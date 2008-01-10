@@ -30,9 +30,7 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.samples.rest.RestTester">
-                    <properties>
-                        <spring:entry key="prefix" value="Received "/>
-                    </properties>
+                    <property key="prefix" value="Received "/>
                 </pooled-object>
             </component>
             <outbound-router>

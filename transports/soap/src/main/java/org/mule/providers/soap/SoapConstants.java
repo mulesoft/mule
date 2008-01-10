@@ -15,6 +15,7 @@ package org.mule.providers.soap;
  */
 public interface SoapConstants
 {
+
     public static final String WSDL_PROPERTY = "wsdl";
     public static final String LIST_PROPERTY = "list";
     public static final String SOAP_ENDPOINT_PREFIX = "soap:";
@@ -22,4 +23,6 @@ public interface SoapConstants
     public static final String SOAP_ACTION_PROPERTY = "soapAction";
     public static final String WSDL_URL_PROPERTY = "WSDL_URL";
     public static final String SOAP_NAMESPACE_PROPERTY = "SOAP_NAMESPACE_PROPERTY";
+    public static final String SERVICE_INTERFACES = "serviceInterfaces";
+    
 }

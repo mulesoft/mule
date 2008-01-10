@@ -14,11 +14,9 @@
         <service name="orange2">
             <component>
                 <pooled-object class="org.mule.tck.testmodels.fruit.Orange">
-                    <properties>
-                        <spring:entry key="brand" value="Florida Sunny"/>
-                        <spring:entry key="segments" value="8"/>
-                        <spring:entry key="radius" value="15"/>
-                    </properties>
+                    <property key="brand" value="Florida Sunny"/>
+                    <property key="segments" value="8"/>
+                    <property key="radius" value="15"/>
                 </pooled-object>
             </component>
         </service>

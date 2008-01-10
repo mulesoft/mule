@@ -13,7 +13,6 @@ package org.mule.providers.soap.axis;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.NamedParameter;
-import org.mule.providers.soap.ServiceProxy;
 import org.mule.providers.soap.SoapMethod;
 import org.mule.providers.soap.axis.extensions.MuleMsgProvider;
 import org.mule.providers.soap.axis.extensions.MuleRPCProvider;
@@ -50,6 +49,11 @@ import org.apache.axis.wsdl.fromJava.Namespaces;
 
 public class AxisMessageReceiver extends AbstractMessageReceiver
 {
+
+    public static final String AXIS_OPTIONS = "axisOptions";
+    public static final String BEAN_TYPES = "beanTypes";
+    public static final String SERVICE_NAMESPACE = "serviceNamespace";
+
     protected AxisConnector connector;
     protected SOAPService service;
 
@@ -62,6 +66,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         this.connector = (AxisConnector) connector;
         try
         {
+            AxisServiceProxy.setProperties(endpoint.getProperties());
             create();
         }
         catch (Exception e)
@@ -77,8 +82,8 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 //        String style = (String)descriptor.getProperties().get("style");
 //        String use = (String)descriptor.getProperties().get("use");
 //        String doc = (String)descriptor.getProperties().get("documentation");
-        String style = (String) endpoint.getProperties().get("style");
-        String use = (String) endpoint.getProperties().get("use");
+        String style = (String) endpoint.getProperties().get(AxisConnector.STYLE);
+        String use = (String) endpoint.getProperties().get(AxisConnector.USE);
         String doc = (String) endpoint.getProperties().get("documentation");
 
         UMOEndpointURI uri = endpoint.getEndpointURI();
@@ -119,7 +124,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         service.setName(serviceName);
 
         // Add any custom options from the Descriptor config
-        Map options = (Map) endpoint.getProperties().get("axisOptions");
+        Map options = (Map) endpoint.getProperties().get(AXIS_OPTIONS);
 
         // IF wsdl service name is not set, default to service name
         if (options == null)
@@ -140,7 +145,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         }
 
         // set method names
-        Class[] interfaces = ServiceProxy.getInterfacesForComponent(component);
+        Class[] interfaces = AxisServiceProxy.getInterfacesForComponent(component);
         if (interfaces.length == 0)
         {
             throw new InitialisationException(
@@ -150,10 +155,10 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // or specify the 'allowedMethods' property in the axisOptions property
         String methodNames = "*";
 
-        Map methods = (Map) endpoint.getProperties().get("soapMethods");
+        Map methods = (Map) endpoint.getProperties().get(AxisConnector.SOAP_METHODS);
         if (methods == null)
         {
-            methods = (Map) component.getProperties().get("soapMethods");
+            methods = (Map) component.getProperties().get(AxisConnector.SOAP_METHODS);
         }
         if (methods != null)
         {
@@ -200,7 +205,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         }
         else
         {
-            String[] methodNamesArray = ServiceProxy.getMethodNames(interfaces);
+            String[] methodNamesArray = AxisServiceProxy.getMethodNames(interfaces);
             StringBuffer buf = new StringBuffer(64);
             for (int i = 0; i < methodNamesArray.length; i++)
             {
@@ -213,9 +218,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         String className = interfaces[0].getName();
         // The namespace of the service.
         // Todo use the service qname in Mule 2.0
-        // TODO RM: this is an endpoint property now
-        // String namespace = (String)descriptor.getProperties().get("serviceNamespace");
-        String namespace = (String) endpoint.getProperties().get("serviceNamespace");
+        String namespace = (String) endpoint.getProperties().get(SERVICE_NAMESPACE);
         if (namespace == null)
         {
             namespace = Namespaces.makeNamespace(className);
@@ -270,7 +273,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             if (s == null)
             {
                 throw new CreateException(
-                        CoreMessages.valueIsInvalidFor(style, "style"), this);
+                        CoreMessages.valueIsInvalidFor(style, AxisConnector.STYLE), this);
             }
             else
             {
@@ -283,7 +286,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             Use u = Use.getUse(use);
             if (u == null)
             {
-                throw new CreateException(CoreMessages.valueIsInvalidFor(use, "use"),
+                throw new CreateException(CoreMessages.valueIsInvalidFor(use, AxisConnector.USE),
                         this);
             }
             else
@@ -307,7 +310,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // String.valueOf(connector.isDoAutoTypes()));
 
         // TODO Load any explicitly defined bean types
-        // List types = (List) descriptor.getProperties().get("beanTypes");
+        // List types = (List) descriptor.getProperties().get(BEAN_TYPES);
         // connector.registerTypes(registry, types);
 
         service.setName(serviceName);

@@ -17,9 +17,7 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="throwException" value="true"/>
-                    </properties>
+                    <property key="throwException" value="true"/>
                 </pooled-object>
             </component>
             <outbound-router>

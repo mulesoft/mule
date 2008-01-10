@@ -36,9 +36,7 @@
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.components.simple.StaticComponent">
-                    <properties>
-                        <spring:entry key="data" value="received from remote"/>
-                    </properties>
+                    <property key="data" value="received from remote"/>
                 </singleton-object>
             </component>
         </service>

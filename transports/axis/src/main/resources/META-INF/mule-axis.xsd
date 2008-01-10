@@ -88,7 +88,11 @@
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:inboundEndpointType">
-                <xsd:group ref="propertyElements"/>
+                <xsd:sequence>
+                    <xsd:group ref="inboundPropertyElements"/>
+                    <xsd:group ref="generalPropertyElements"/>
+                    <xsd:group ref="mule:propertiesGroup"/>
+                </xsd:sequence>
                 <xsd:attributeGroup ref="propertyAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -98,7 +102,10 @@
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
-                <xsd:group ref="propertyElements"/>
+                <xsd:sequence>
+                    <xsd:group ref="generalPropertyElements"/>
+                    <xsd:group ref="mule:propertiesGroup"/>
+                </xsd:sequence>
                 <xsd:attributeGroup ref="propertyAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -109,7 +116,8 @@
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
                 <xsd:sequence>
-                    <xsd:group ref="propertyElements"/>
+                    <xsd:group ref="inboundPropertyElements"/>
+                    <xsd:group ref="generalPropertyElements"/>
                     <xsd:group ref="mule:propertiesGroup"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="propertyAttributes"/>
@@ -120,12 +128,11 @@
     <xsd:attributeGroup name="propertyAttributes">
         <xsd:attribute name="clientConfig" type="xsd:string"/>
         <xsd:attribute name="soapAction" type="xsd:string"/>
-        <xsd:attribute name="allowedMethods" type="xsd:string"/>
         <xsd:attribute name="serviceNamespace" type="xsd:string"/>
-        <xsd:attribute name="treatMapAsNamedParams" type="mule:substitutableBoolean"/>
         <xsd:attribute name="style">
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
+                    <!-- see org.apache.axis.constants.Style -->
                     <xsd:enumeration value="RPC"/>
                     <xsd:enumeration value="DOCUMENT"/>
                     <xsd:enumeration value="MESSAGE"/>
@@ -143,7 +150,7 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:group name="propertyElements">
+    <xsd:group name="inboundPropertyElements">
         <xsd:sequence>
             <xsd:element name="options" minOccurs="0">
                 <xsd:complexType>
@@ -160,13 +167,18 @@
                     <xsd:attribute name="extraClasses" type="xsd:string"/>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:element ref="bean-type" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:group name="generalPropertyElements">
+        <xsd:sequence>
             <xsd:element name="soap-service" minOccurs="0" maxOccurs="unbounded">
                 <xsd:complexType>
                     <xsd:attribute name="interface" type="xsd:string"/>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element ref="bean-type" minOccurs="0" maxOccurs="unbounded"/>
-             <xsd:element name="soap-method" minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="soap-method" minOccurs="0" maxOccurs="unbounded">
                 <xsd:complexType>
                     <xsd:sequence>
                         <xsd:element name="soap-parameter" minOccurs="0" maxOccurs="unbounded">

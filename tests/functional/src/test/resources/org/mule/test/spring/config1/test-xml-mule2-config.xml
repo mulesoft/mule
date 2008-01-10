@@ -61,10 +61,8 @@
     <endpoint name="appleInEndpoint" address="test://AppleQueue"/>
     <endpoint name="appleResponseEndpoint" address="test://AppleResponseQueue"/>
     <endpoint name="orangeEndpoint" address="test://orangeQ">
-        <properties>
-            <spring:entry key="beanProperty2" value="12"/>
-            <spring:entry key="containerProperty" value="myString"/>
-        </properties>
+        <property key="beanProperty2" value="12"/>
+        <property key="containerProperty" value="myString"/>
     </endpoint>
 
     <!-- TODO RM*: Add an interceptor wrapper and use spring AOP to configure these -->
@@ -95,14 +93,13 @@
                                   responseTransformer-refs="TestCompressionTransformer"/>
                 <inbound-endpoint ref="orangeEndpoint" transformer-refs="TestCompressionTransformer">
                     <payload-type-filter expectedType="java.lang.String"/>
-                    <properties>
-                        <spring:entry key="testLocal" value="value1"/>
-                    </properties>
+                    <property key="testLocal" value="value1"/>
                 </inbound-endpoint>
             </inbound-router>
 
             <component>
                 <singleton-object instance-ref="orange">
+                    <!-- no attempt made to simplify this! -->
                     <properties>
                         <spring:entry key="brand" value="Juicy Baby!"/>
                         <spring:entry key="segments" value="9"/>

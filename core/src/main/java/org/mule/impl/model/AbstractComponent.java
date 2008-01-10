@@ -68,6 +68,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractComponent implements UMOComponent
 {
+    
     /**
      * logger used by this class
      */

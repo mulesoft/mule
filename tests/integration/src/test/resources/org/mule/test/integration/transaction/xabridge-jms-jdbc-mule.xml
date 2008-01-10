@@ -64,9 +64,7 @@
 
     <jms:connector name="jmsConnector" eagerConsumer="false">
         <jms:connection-factory class="org.apache.activemq.ActiveMQXAConnectionFactory">
-            <properties>
-                <spring:entry key="brokerURL" value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
-            </properties>
+            <property key="brokerURL" value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
         </jms:connection-factory>
     </jms:connector>
 

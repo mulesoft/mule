@@ -7,18 +7,14 @@
       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <endpoint name="foo" address="test://foo">
-        <properties>
-            <spring:entry key="global" value="global"/>
-        </properties>
+        <property key="global" value="global"/>
     </endpoint>
 
     <model name="model">
         <service name="service">
             <inbound-router>
                 <inbound-endpoint ref="foo">
-                    <properties>
-                        <spring:entry key="local" value="local"/>
-                    </properties>
+                    <property key="local" value="local"/>
                 </inbound-endpoint>
             </inbound-router>
             <null-component/>

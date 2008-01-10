@@ -12,11 +12,15 @@ package org.mule.providers.soap.axis;
 
 import org.mule.providers.soap.axis.mock.MockAxisServer;
 import org.mule.providers.soap.axis.mock.MockProvider;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.util.Map;
 import java.util.List;
+
+import org.apache.axis.constants.Use;
+import org.apache.axis.constants.Style;
 
 public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
 {   
@@ -57,14 +61,13 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         UMOImmutableEndpoint endpoint =
                 managementContext.getRegistry().lookupEndpointBuilder("endpoint").buildOutboundEndpoint();
         Map props = endpoint.getProperties();
-        assertEquals("[methodNamespace][method]", assertKey(props, "soapAction", String.class));
-        assertEquals("echo,getdate", assertKey(props, "allowedMethods", String.class));
-        assertEquals("true", assertKey(props, "treatMapAsNamedParams", String.class));
-        assertEquals("ENCODED", assertKey(props, "use", String.class));
-        assertEquals("DOCUMENT", assertKey(props, "style", String.class));
+        assertEquals("[methodNamespace][method]", assertKey(props, SoapConstants.SOAP_ACTION_PROPERTY, String.class));
+        assertEquals("clientConfig", assertKey(props, "clientConfig", String.class));
+        assertEquals(Use.ENCODED_STR, assertKey(props, AxisConnector.USE, String.class));
+        assertEquals(Style.DOCUMENT_STR, assertKey(props, AxisConnector.STYLE, String.class));
         assertEquals("value1", assertKey(props, "key1", String.class));
         assertEquals("value2", assertKey(props, "key2", String.class));
-        Map options = (Map) assertKey(props, "axisOptions", Map.class);
+        Map options = (Map) assertKey(props, AxisMessageReceiver.AXIS_OPTIONS, Map.class);
         assertEquals(10, options.size());
         assertEquals("value1", assertKey(options, "key1", String.class));
         assertEquals("value2", assertKey(options, "key2", String.class));
@@ -76,7 +79,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("wsdlInputSchema", assertKey(options, "wsdlInputSchema", String.class));
         assertEquals("wsdlSoapActionMode", assertKey(options, "wsdlSoapActionMode", String.class));
         assertEquals("extraClasses", assertKey(options, "extraClasses", String.class));
-        Map methods = (Map) assertKey(props, "soapMethods", Map.class);
+        Map methods = (Map) assertKey(props, AxisConnector.SOAP_METHODS, Map.class);
         List method1 = (List) assertKey(methods, "method1", List.class);
         assertEquals(3, method1.size());
         assertEquals("symbol;string;in", method1.get(0));
@@ -86,7 +89,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(2, method2.size());
         assertEquals("param;string;in", method2.get(0));
         assertEquals("addedFromSpring;string;in", method2.get(1));
-        List interfaces = (List) assertKey(props, "serviceInterfaces", List.class);
+        List interfaces = (List) assertKey(props, SoapConstants.SERVICE_INTERFACES, List.class);
         assertEquals(2, interfaces.size());
         assertEquals("class1", interfaces.get(0));
         assertEquals("class2", interfaces.get(1));

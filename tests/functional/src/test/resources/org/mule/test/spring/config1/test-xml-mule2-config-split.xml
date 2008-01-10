@@ -22,9 +22,7 @@
                         <transaction-factory class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>
                     </transaction>
                     -->
-                    <properties>
-                        <spring:entry key="testEndpointProperty" value="Prop1"/>
-                    </properties>
+                    <property key="testEndpointProperty" value="Prop1"/>
                 </inbound-endpoint>
             </inbound-router>
             <component class="org.mule.tck.testmodels.fruit.Apple"/>

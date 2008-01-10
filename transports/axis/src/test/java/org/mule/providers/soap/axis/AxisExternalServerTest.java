@@ -44,8 +44,8 @@ public class AxisExternalServerTest extends AbstractMuleTestCase
         String URL = "axis:http://localhost:8080/axis/Calculator.jws?method=add";
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        props.put("style", "wrapped");
-        props.put("use", "literal");
+        props.put(AxisConnector.STYLE, "wrapped");
+        props.put(AxisConnector.USE, "literal");
         UMOMessage result = client.send(URL, new Object[]{new Integer(3), new Integer(3)}, props);
         assertNotNull(result);
 
@@ -63,8 +63,8 @@ public class AxisExternalServerTest extends AbstractMuleTestCase
         method.setReturnType(NamedParameter.XSD_INT);
 
         Map props = new HashMap();
-        props.put("style", "wrapped");
-        props.put("use", "literal");
+        props.put(AxisConnector.STYLE, "wrapped");
+        props.put(AxisConnector.USE, "literal");
         props.put(MuleProperties.MULE_METHOD_PROPERTY, method);
         UMOMessage result = client.send(URL, new Object[]{new Integer(3), new Integer(3)}, props);
         assertNotNull(result);

@@ -14,6 +14,7 @@ import org.mule.config.MuleProperties;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.SoapConstants;
+import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.util.StringUtils;
@@ -35,12 +36,11 @@ public class AxisCleanAndAddProperties
         
         Map props = new HashMap();
         UMOMessage currentMessage = muleEventContext.getMessage();
-        final String SOAP_METHODS = "soapMethods";
 
         for (Iterator iterator = currentMessage.getPropertyNames().iterator(); iterator.hasNext();)
         {
             String name = (String)iterator.next();
-            if (!StringUtils.equals(name, SOAP_METHODS)
+            if (!StringUtils.equals(name, AxisConnector.SOAP_METHODS)
                 && !StringUtils.equals(name, SoapConstants.SOAP_ACTION_PROPERTY)
                 && !StringUtils.equals(name, MuleProperties.MULE_METHOD_PROPERTY)
                 && (!name.startsWith(MuleProperties.PROPERTY_PREFIX) || StringUtils.equals(name,

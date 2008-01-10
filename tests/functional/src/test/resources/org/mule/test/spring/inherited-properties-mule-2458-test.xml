@@ -8,6 +8,7 @@
 
     <endpoint name="endpoint" address="test://path?url-only=url&amp;all=url&amp;global-and-url=url&amp;local-and-url=url">
         <property key="global-and-url" value="global"/>
+        <!-- old style for test -->
         <properties>
             <spring:entry key="all" value="global"/>
             <spring:entry key="global-only" value="global"/>

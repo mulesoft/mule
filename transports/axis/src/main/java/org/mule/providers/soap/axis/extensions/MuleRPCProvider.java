@@ -12,7 +12,6 @@ package org.mule.providers.soap.axis.extensions;
 
 import org.mule.MuleServer;
 import org.mule.impl.RequestContext;
-import org.mule.providers.soap.ServiceProxy;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageReceiver;
 import org.mule.providers.soap.axis.AxisServiceProxy;
@@ -76,7 +75,7 @@ public class MuleRPCProvider extends RPCProvider
         {
             throw new AxisFault("Could not find Mule registered service: " + s);
         }
-        Class[] classes = ServiceProxy.getInterfacesForComponent(receiver.getComponent());
+        Class[] classes = AxisServiceProxy.getInterfacesForComponent(receiver.getComponent());
         return AxisServiceProxy.createProxy(receiver, true, classes);
     }
 
@@ -86,7 +85,7 @@ public class MuleRPCProvider extends RPCProvider
         UMOComponent component = MuleServer.getManagementContext().getRegistry().lookupComponent(soapService.getName());
         try
         {
-            Class[] classes = ServiceProxy.getInterfacesForComponent(component);
+            Class[] classes = AxisServiceProxy.getInterfacesForComponent(component);
             return Proxy.getProxyClass(Thread.currentThread().getContextClassLoader(), classes);
         }
         catch (Exception e)

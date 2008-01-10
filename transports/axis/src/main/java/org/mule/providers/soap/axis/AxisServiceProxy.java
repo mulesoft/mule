@@ -15,16 +15,25 @@ import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractMessageReceiver;
-import org.mule.providers.soap.ServiceProxy;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look like
@@ -32,8 +41,10 @@ import java.lang.reflect.Proxy;
  * service interfaces in Mule.
  */
 
-public class AxisServiceProxy extends ServiceProxy
+public class AxisServiceProxy
 {
+
+    private static ThreadLocal properties = new ThreadLocal();
 
     public static Object createProxy(AbstractMessageReceiver receiver, boolean synchronous, Class[] classes)
     {
@@ -97,4 +108,121 @@ public class AxisServiceProxy extends ServiceProxy
             }
         }
     }
+
+    /*
+       This is a horrible hack, which is axis-specific (no general classes are affected).  It was
+       added to allow service interface to be configured on endpoints.  The reason it needs to be
+       via a global thread local is that:
+       - the routine getInterfacesForComponent is called from "callback" objects, of which at least
+         one is set in the axis connector.  So the endpoint properties are unavailable when set.
+       - the information passed to the callback is sufficient to identify the component, but not
+         the endpoint, and we would like this configuration to be endpoint specific for two
+         reasons: (i) it is more flexible and (ii) we want to avoid transport specific config
+         on the component (setting it on the connector is way too constraining)
+       - the only other solution (which also uses thread local globals) would be to use the
+         request context, but this is called, amongst other places, from the create() method
+         of the axis message receiver, so no request context is currently in scope.
+       I apologise for this poor code, but after discussing it with rest of the 2.x team we
+       decided that if it worked, it was probably sufficient, since axis 1 support is largely
+       legacy-based.  AC.
+     */
+    public static void setProperties(Map properties)
+    {
+        AxisServiceProxy.properties.set(properties);
+    }
+
+    public static Class[] getInterfacesForComponent(UMOComponent component)
+        throws UMOException, ClassNotFoundException
+    {
+        Class[] interfaces;
+//        List ifaces = (List)component.getProperties().get(SERVICE_INTERFACES);
+        Map localProperties = (Map) properties.get();
+        List ifaces = null;
+        if (null != localProperties)
+        {
+            ifaces = (List) localProperties.get(SoapConstants.SERVICE_INTERFACES);
+        }
+        if (ifaces == null || ifaces.size() == 0)
+        {
+            final Class implementationClass;
+            try
+            {
+                implementationClass = component.getServiceFactory().getOrCreate().getClass();
+            }
+            catch (Exception e)
+            {
+                throw new ClassNotFoundException("Unable to retrieve class from service factory", e);
+            }
+            // get all implemented interfaces from superclasses as well
+            final List intfList = ClassUtils.getAllInterfaces(implementationClass);
+            interfaces = (Class[])intfList.toArray(new Class[intfList.size()]);
+
+        }
+        else
+        {
+            interfaces = new Class[ifaces.size()];
+            for (int i = 0; i < ifaces.size(); i++)
+            {
+                String iface = (String)ifaces.get(i);
+                interfaces[i] = ClassUtils.loadClass(iface, AxisServiceProxy.class);
+            }
+        }
+
+        interfaces = removeInterface(interfaces, Callable.class);
+        interfaces = removeInterface(interfaces, Disposable.class);
+        interfaces = removeInterface(interfaces, Initialisable.class);
+        return interfaces;
+    }
+
+    public static Class[] removeInterface(Class[] interfaces, Class iface)
+    {
+        if (interfaces == null)
+        {
+            return null;
+        }
+        List results = new ArrayList();
+        for (int i = 0; i < interfaces.length; i++)
+        {
+            Class anInterface = interfaces[i];
+            if (!anInterface.equals(iface))
+            {
+                results.add(anInterface);
+            }
+        }
+        Class[] arResults = new Class[results.size()];
+        if (arResults.length == 0)
+        {
+            return arResults;
+        }
+        else
+        {
+            results.toArray(arResults);
+            return arResults;
+        }
+    }
+
+    public static Method[] getMethods(Class[] interfaces)
+    {
+        List methodNames = new ArrayList();
+        for (int i = 0; i < interfaces.length; i++)
+        {
+            methodNames.addAll(Arrays.asList(interfaces[i].getMethods()));
+        }
+        Method[] results = new Method[methodNames.size()];
+        return (Method[])methodNames.toArray(results);
+
+    }
+
+    public static String[] getMethodNames(Class[] interfaces)
+    {
+        Method[] methods = getMethods(interfaces);
+
+        String[] results = new String[methods.length];
+        for (int i = 0; i < results.length; i++)
+        {
+            results[i] = methods[i].getName();
+        }
+        return results;
+    }
+
 }

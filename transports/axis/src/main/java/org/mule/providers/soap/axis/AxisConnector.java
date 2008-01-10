@@ -90,6 +90,11 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     public static final String WSDL_URL_PROPERTY = "wsdlUrl";
     public static final String AXIS = "axis";
 
+    // used by dispatcher and receiver
+    public static final String SOAP_METHODS = "soapMethods";
+    public static final String STYLE = "style";
+    public static final String USE = "use";
+
     private String serverConfig = DEFAULT_MULE_AXIS_SERVER_CONFIG;
 
     private AxisServer axis = null;

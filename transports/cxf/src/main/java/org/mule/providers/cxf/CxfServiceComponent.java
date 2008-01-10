@@ -195,7 +195,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
 
             // TODO: Not sure if this is 100% correct - DBD
             String soapAction = getSoapAction(ctx.getMessage());
-            m.put("SOAPAction", soapAction);
+            m.put(SoapConstants.SOAP_ACTION_PROPERTY, soapAction);
 
             EndpointInfo ei = receiver.getServer().getEndpoint().getEndpointInfo();
 
