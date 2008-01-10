@@ -21,6 +21,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.CreateException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.ArrayUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -92,9 +93,12 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             UMOMessage umoMessage = new MuleMessage(msgAdapter);
             if (this.ackStmt != null)
             {
-
                 Object[] ackParams = connector.getParams(endpoint, this.ackParams, umoMessage, this.endpoint.getEndpointURI().getAddress());
-                int nbRows = connector.createQueryRunner().update(con, this.ackStmt, ackParams);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(ackParams));
+                }
+                int nbRows = connector.getQueryRunner().update(con, this.ackStmt, ackParams);
                 if (nbRows != 1)
                 {
                     logger.warn("Row count for ack should be 1 and not " + nbRows);
@@ -148,8 +152,12 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             }
 
             Object[] readParams = connector.getParams(endpoint, this.readParams, null, this.endpoint.getEndpointURI().getAddress());
-            Object results = connector.createQueryRunner().query(con, this.readStmt, readParams,
-                    connector.createResultSetHandler());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(readParams));
+            }
+            Object results = connector.getQueryRunner().query(con, this.readStmt, readParams,
+                    connector.getResultSetHandler());
             return (List) results;
         }
         finally

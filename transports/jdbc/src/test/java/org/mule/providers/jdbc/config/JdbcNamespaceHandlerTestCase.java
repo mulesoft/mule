@@ -13,7 +13,6 @@ import org.mule.providers.jdbc.JdbcConnector;
 import org.mule.providers.jdbc.test.TestDataSource;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.util.object.ObjectFactory;
 
 
 /**
@@ -29,15 +28,10 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
     public void testWithDataSource() throws Exception
     {
         JdbcConnector c = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector1");
-        assertNotNull(c);
-        
-        ObjectFactory dsf = c.getDataSourceFactory();
-        assertNotNull(dsf);
-        Object ds=dsf.getOrCreate();
-        assertNotNull(ds);
-        assertEquals(TestDataSource.class, ds.getClass());
-        assertNull(c.getQueries());
-        
+        assertNotNull(c);        
+
+        assertTrue(c.getDataSource() instanceof TestDataSource);
+        assertNull(c.getQueries());       
     }
 
     public void testWithDataSourceViaJndi() throws Exception
@@ -45,11 +39,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         JdbcConnector c = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector2");
         assertNotNull(c);
         
-        ObjectFactory dsf = c.getDataSourceFactory();
-        assertNotNull(dsf);
-        Object ds=dsf.getOrCreate();
-        assertNotNull(ds);
-        assertEquals(TestDataSource.class, ds.getClass());
+        assertTrue(c.getDataSource() instanceof TestDataSource);
         assertNull(c.getQueries());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
@@ -60,11 +50,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         JdbcConnector c = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector3");
         assertNotNull(c);
         
-        ObjectFactory dsf = c.getDataSourceFactory();
-        assertNotNull(dsf);
-        Object ds=dsf.getOrCreate();
-        assertNotNull(ds);
-        assertEquals(TestDataSource.class, ds.getClass());
+        assertTrue(c.getDataSource() instanceof TestDataSource);
         
 //        assertEquals(2,c.getPropertyExtractors().size());
 //        assertTrue(c.getPropertyExtractors().iterator().next() instanceof PropertyExtractor);
@@ -95,7 +81,5 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
 
         //Does not exist on either
         assertNull(c.getQuery(testJdbcEndpoint, "getTest4"));
-
-        
     }
 }

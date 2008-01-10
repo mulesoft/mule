@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.0"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd">
+
+    <spring:bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
+        <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+        <spring:property name="url" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+    </spring:bean>
+
+    <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource">
+        <jdbc:queries>
+            <spring:entry key="getTest"
+                          value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE ID = 1 AND ACK IS NULL"/>
+            <spring:entry key="getTest.ack"
+                          value="UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id}"/>
+            <spring:entry key="writeTest"
+                          value="INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES(1, NULL, NULL, NULL, NULL)"/>
+        </jdbc:queries>
+    </jdbc:connector>
+</mule>

@@ -11,10 +11,8 @@
 package org.mule.providers.jdbc;
 
 import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.jdbc.i18n.JdbcMessages;
-import org.mule.providers.jdbc.xa.DataSourceWrapper;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
@@ -23,43 +21,28 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
-import org.mule.util.ClassUtils;
-import org.mule.util.ExceptionUtils;
-import org.mule.util.object.ObjectFactory;
 import org.mule.util.properties.PropertyExtractorManager;
 
 import java.sql.Connection;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
-import javax.sql.XADataSource;
-import javax.transaction.TransactionManager;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 
 public class JdbcConnector extends AbstractConnector
 {
-
     public static final String JDBC = "jdbc";
 
     // These are properties that can be overridden on the Receiver by the endpoint
     // declaration
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final long DEFAULT_POLLING_FREQUENCY = 1000;
-
-    private static final String DEFAULT_QUERY_RUNNER = "org.apache.commons.dbutils.QueryRunner";
-    private static final String DEFAULT_RESULTSET_HANDLER = "org.apache.commons.dbutils.handlers.MapListHandler";
 
     private static final Pattern STATEMENT_ARGS = Pattern.compile("\\$\\{[^\\}]*\\}");
 
@@ -70,93 +53,28 @@ public class JdbcConnector extends AbstractConnector
     }
 
     protected long pollingFrequency = 0;
-    protected DataSource dataSource;
-    protected String dataSourceJndiName;
-    protected Context jndiContext;
-    protected String jndiInitialFactory;
-    protected String jndiProviderUrl;
-    protected Map providerProperties;
     protected Map queries;
-    protected ObjectFactory resultSetHandler;
-    protected ObjectFactory queryRunner;
-    //protected String resultSetHandler = DEFAULT_RESULTSET_HANDLER;
-    //protected String queryRunner = DEFAULT_QUERY_RUNNER;
+    
+    private DataSource dataSource;
+    private ResultSetHandler resultSetHandler;
+    private QueryRunner queryRunner;
+    
     //protected Set propertyExtractors = new HashSet();
-    protected ObjectFactory dataSourceFactory;
 
     protected void doInitialise() throws InitialisationException
     {
-        try
+        if (dataSource == null)
         {
-            //Use this order to insitalise dataSource
-            // 1) Use dataSourceFactory ObjectFactory
-            // 2) Use datasource instance
-            // 3) Use jndi context (configured via jndi properties) and jndi
-            // datasource name
-            if (dataSourceFactory != null)
-            {
-                dataSource = (DataSource) dataSourceFactory.getOrCreate();
-            }
-            else
-            {
-                // If we have a dataSource, there is no need to initialise
-                // the JndiContext
-                if (dataSource == null)
-                {
-                    initJndiContext();
-                    createDataSource();
-
-                }
-            }
-
-            if (dataSource != null && dataSource instanceof XADataSource)
-            {
-                final TransactionManager tm = managementContext.getTransactionManager();
-                if (tm != null)
-                {
-                    dataSource = new DataSourceWrapper((XADataSource)dataSource, tm);
-                }
-            }
+            throw new InitialisationException(MessageFactory.createStaticMessage("Missing data source"), this);
         }
-        catch (Exception e)
+        if (resultSetHandler == null)
         {
-            throw new InitialisationException(CoreMessages.failedToCreate("Jdbc Connector"), e, this);
+            resultSetHandler = new MapListHandler();
         }
-    }
-
-    protected void doDispose()
-    {
-        // template method
-    }
-
-    protected void doConnect() throws Exception
-    {
-        // template method
-    }
-
-    protected void doDisconnect() throws Exception
-    {
-        // template method
-    }
-
-    protected void doStart() throws UMOException
-    {
-        // template method
-    }
-
-    protected void doStop() throws UMOException
-    {
-        // template method
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.umo.provider.UMOConnector#getProtocol()
-     */
-    public String getProtocol()
-    {
-        return JDBC;
+        if (queryRunner == null)
+        {
+            queryRunner = new QueryRunner();
+        }
     }
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOImmutableEndpoint endpoint) throws Exception
@@ -178,42 +96,6 @@ public class JdbcConnector extends AbstractConnector
 
         String[] params = getReadAndAckStatements(endpoint);
         return getServiceDescriptor().createMessageReceiver(this, component, endpoint, params);
-    }
-
-    protected void initJndiContext() throws NamingException
-    {
-        if (this.jndiContext == null)
-        {
-            Hashtable props = new Hashtable();
-            if (this.jndiInitialFactory != null)
-            {
-                props.put(Context.INITIAL_CONTEXT_FACTORY, this.jndiInitialFactory);
-            }
-            if (this.jndiProviderUrl != null)
-            {
-                props.put(Context.PROVIDER_URL, jndiProviderUrl);
-            }
-            if (this.providerProperties != null)
-            {
-                props.putAll(this.providerProperties);
-            }
-            this.jndiContext = new InitialContext(props);
-        }
-
-    }
-
-    protected void createDataSource() throws InitialisationException, NamingException
-    {
-        Object temp = this.jndiContext.lookup(this.dataSourceJndiName);
-        if (temp instanceof DataSource)
-        {
-            dataSource = (DataSource)temp;
-        }
-        else
-        {
-            throw new InitialisationException(
-                JdbcMessages.jndiResourceNotFound(this.dataSourceJndiName), this);
-        }
     }
 
     public String[] getReadAndAckStatements(UMOImmutableEndpoint endpoint)
@@ -298,146 +180,6 @@ public class JdbcConnector extends AbstractConnector
         return query == null ? null : query.toString();
     }
 
-    /**
-     * @return Returns the dataSource.
-     * @deprecated
-     */
-    public DataSource getDataSource()
-    {
-        return dataSource;
-    }
-
-    /**
-     * @param dataSource The dataSource to set.
-     * @deprecated
-     */
-    public void setDataSource(DataSource dataSource)
-    {
-        this.dataSource = dataSource;
-    }
-
-    /**
-     * @return Returns the pollingFrequency.
-     */
-    public long getPollingFrequency()
-    {
-        return pollingFrequency;
-    }
-
-    /**
-     * @param pollingFrequency The pollingFrequency to set.
-     */
-    public void setPollingFrequency(long pollingFrequency)
-    {
-        this.pollingFrequency = pollingFrequency;
-    }
-
-    /**
-     * @return Returns the queries.
-     */
-    public Map getQueries()
-    {
-        return queries;
-    }
-
-    /**
-     * @param queries The queries to set.
-     */
-    public void setQueries(Map queries)
-    {
-        this.queries = queries;
-    }
-
-    /**
-     * @return Returns the dataSourceJndiName.
-     * @deprecated
-     */
-    public String getDataSourceJndiName()
-    {
-        return dataSourceJndiName;
-    }
-
-    /**
-     * @param dataSourceJndiName The dataSourceJndiName to set.
-     * @deprecated
-     */
-    public void setDataSourceJndiName(String dataSourceJndiName)
-    {
-        this.dataSourceJndiName = dataSourceJndiName;
-    }
-
-    /**
-     * @return Returns the jndiContext.
-     * @deprecated
-     */
-    public Context getJndiContext()
-    {
-        return jndiContext;
-    }
-
-    /**
-     * @param jndiContext The jndiContext to set.
-     * @deprecated
-     */
-    public void setJndiContext(Context jndiContext)
-    {
-        this.jndiContext = jndiContext;
-    }
-
-    /**
-     * @return Returns the jndiInitialFactory.
-     * @deprecated
-     */
-    public String getJndiInitialFactory()
-    {
-        return jndiInitialFactory;
-    }
-
-    /**
-     * @param jndiInitialFactory The jndiInitialFactory to set.
-     * @deprecated
-     */
-    public void setJndiInitialFactory(String jndiInitialFactory)
-    {
-        this.jndiInitialFactory = jndiInitialFactory;
-    }
-
-    /**
-     * @return Returns the jndiProviderUrl.
-     * @deprecated
-     */
-    public String getJndiProviderUrl()
-    {
-        return jndiProviderUrl;
-    }
-
-    /**
-     * @param jndiProviderUrl The jndiProviderUrl to set.
-     * @deprecated
-     */
-    public void setJndiProviderUrl(String jndiProviderUrl)
-    {
-        this.jndiProviderUrl = jndiProviderUrl;
-    }
-
-    /**
-     * @return Returns the providerProperties.
-     * @deprecated
-     */
-    public Map getProviderProperties()
-    {
-        return providerProperties;
-    }
-
-    /**
-     * @param providerProperties The providerProperties to set.
-     * @deprecated
-     */
-    public void setProviderProperties(Map providerProperties)
-    {
-        this.providerProperties = providerProperties;
-    }
-
     public Connection getConnection() throws Exception
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -465,90 +207,6 @@ public class JdbcConnector extends AbstractConnector
             }
         }
         return con;
-    }
-
-    /**
-     * @return Returns the resultSetHandler.
-     */
-    public ObjectFactory getResultSetHandler()
-    {
-        return this.resultSetHandler;
-    }
-
-    /**
-     * @param resultSetHandler The resultSetHandler class name to set.
-     */
-    public void setResultSetHandler(ObjectFactory resultSetHandler)
-    {
-        this.resultSetHandler = resultSetHandler;
-    }
-
-    /**
-     * @return a new instance of the ResultSetHandler class as defined in the
-     *         JdbcConnector
-     */
-    protected ResultSetHandler createResultSetHandler()
-    {
-        try
-        {
-            if (resultSetHandler != null)
-            {
-                return (ResultSetHandler) resultSetHandler.getOrCreate();
-            }
-            else
-            {
-                return (ResultSetHandler) ClassUtils.instanciateClass(DEFAULT_RESULTSET_HANDLER,
-                                                                      ClassUtils.NO_ARGS);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new IllegalArgumentException("Error creating instance of the resultSetHandler class :"
-                                               + getResultSetHandler() + System.getProperty("line.separator")
-                                               + ExceptionUtils.getFullStackTrace(e));
-        }
-    }
-
-    /**
-     * @return Returns the queryRunner.
-     */
-    public ObjectFactory getQueryRunner()
-    {
-        return this.queryRunner;
-    }
-
-    /**
-     * @param queryRunner The QueryRunner class name to set.
-     */
-    public void setQueryRunner(ObjectFactory queryRunner)
-    {
-        this.queryRunner = queryRunner;
-    }
-
-    /**
-     * @return a new instance of the QueryRunner class as defined in the
-     *         JdbcConnector
-     */
-    protected QueryRunner createQueryRunner()
-    {
-        try
-        {
-            if (queryRunner != null)
-            {
-                return (QueryRunner) queryRunner.getOrCreate();
-            }
-            else
-            {
-                return (QueryRunner) ClassUtils.instanciateClass(DEFAULT_QUERY_RUNNER,
-                                                                 ClassUtils.NO_ARGS);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new IllegalArgumentException("Error creating instance of the queryRunner class :"
-                                               + getQueryRunner() + System.getProperty("line.separator")
-                                               + ExceptionUtils.getFullStackTrace(e));
-        }
     }
 
     /**
@@ -612,14 +270,99 @@ public class JdbcConnector extends AbstractConnector
         return params;
     }
 
-    public ObjectFactory getDataSourceFactory()
+    protected void doDispose()
     {
-        return dataSourceFactory;
+        // template method
     }
 
-    public void setDataSourceFactory(ObjectFactory dataSourceFactory)
+    protected void doConnect() throws Exception
     {
-        this.dataSourceFactory = dataSourceFactory;
+        // template method
     }
 
+    protected void doDisconnect() throws Exception
+    {
+        // template method
+    }
+
+    protected void doStart() throws UMOException
+    {
+        // template method
+    }
+
+    protected void doStop() throws UMOException
+    {
+        // template method
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // Getters and Setters
+    //////////////////////////////////////////////////////////////////////////////////////
+    
+    public String getProtocol()
+    {
+        return JDBC;
+    }
+
+    public DataSource getDataSource()
+    {
+        return dataSource;
+    }
+
+    public void setDataSource(DataSource dataSource)
+    {
+        this.dataSource = dataSource;
+    }
+
+    public ResultSetHandler getResultSetHandler()
+    {
+        return resultSetHandler;
+    }
+
+    public void setResultSetHandler(ResultSetHandler resultSetHandler)
+    {
+        this.resultSetHandler = resultSetHandler;
+    }
+
+    public QueryRunner getQueryRunner()
+    {
+        return queryRunner;
+    }
+
+    public void setQueryRunner(QueryRunner queryRunner)
+    {
+        this.queryRunner = queryRunner;
+    }
+
+    /**
+     * @return Returns the pollingFrequency.
+     */
+    public long getPollingFrequency()
+    {
+        return pollingFrequency;
+    }
+
+    /**
+     * @param pollingFrequency The pollingFrequency to set.
+     */
+    public void setPollingFrequency(long pollingFrequency)
+    {
+        this.pollingFrequency = pollingFrequency;
+    }
+
+    /**
+     * @return Returns the queries.
+     */
+    public Map getQueries()
+    {
+        return queries;
+    }
+
+    /**
+     * @param queries The queries to set.
+     */
+    public void setQueries(Map queries)
+    {
+        this.queries = queries;
+    }
 }

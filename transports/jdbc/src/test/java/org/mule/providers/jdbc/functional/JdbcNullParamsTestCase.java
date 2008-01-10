@@ -8,43 +8,28 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.jdbc;
+package org.mule.providers.jdbc.functional;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.NullPayload;
-import org.mule.providers.jdbc.JdbcConnector;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.provider.UMOConnector;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
 {
-    public static final int idValue = 1;
-    public static final String SQL_READ_NULL = "SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE ID = " + idValue + " AND ACK IS NULL";
-    public static final String SQL_ACK_NULL = "UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id}";
-    public static final String SQL_WRITE_NULL = "INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES(1, NULL, NULL, NULL, NULL)";
-    
-    public UMOConnector createConnector() throws Exception
+    public JdbcNullParamsTestCase()
     {
-        JdbcConnector connector = new JdbcConnector();
-        connector.setDataSource(getDataSource());
-        connector.setName(CONNECTOR_NAME);
-        connector.getDispatcherThreadingProfile().setDoThreading(false);
-        connector.setPollingFrequency(5000);
-
-        Map queries = new HashMap();
-        queries.put("getTest", SQL_READ_NULL);
-        queries.put("getTest.ack", SQL_ACK_NULL);
-        queries.put("writeTest", SQL_WRITE_NULL);
-        connector.setQueries(queries);
-
-        return connector;
+        setPopulateTestData(false);
     }
     
+    protected String getConfigResources()
+    {
+        return "jdbc-null-params.xml";
+    }
+
     public void testJdbcNullParams() throws Exception
     {
         MuleClient client = new MuleClient();
@@ -57,7 +42,7 @@ public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
         //execute the write query by sending a message on the jdbc://writeTest
         //the message is a nullpayload since we are not taking any params from any object
         //No other params will be sent to this endpoint
-        client.dispatch("jdbc://writeTest", new MuleMessage(NullPayload.getInstance()));
+        client.send("jdbc://writeTest", new MuleMessage(NullPayload.getInstance()));
         
         //get the data which was written by the previous statement and test it
         reply = client.request("jdbc://getTest", 1000);
@@ -71,12 +56,9 @@ public class JdbcNullParamsTestCase extends AbstractJdbcFunctionalTestCase
         
         //check that id is equal to the one set originally and all others are null
         Integer id = (Integer)res.get("ID");
-        assertEquals(idValue, id.intValue());
+        assertEquals(1, id.intValue());
         assertNull(res.get("TYPE"));
         assertNull(res.get("DATA"));
         assertNull(res.get("RESULT"));
     }
-
 }
-
-

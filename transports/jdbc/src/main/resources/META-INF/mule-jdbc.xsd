@@ -16,12 +16,12 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
-                    <xsd:element name="dataSource" type="mule:genericObjectFactoryType" />
                     <xsd:element name="queries" type="mule:mapType" minOccurs="0"/>
-                    <xsd:element name="resultSetHandler" type="mule:genericObjectFactoryType" minOccurs="0" />
-                    <xsd:element name="queryRunner" type="mule:genericObjectFactoryType" minOccurs="0" />
                 </xsd:sequence>
                 <xsd:attribute name="pollingFrequency" type="mule:substitutableLong" />
+                <xsd:attribute name="dataSource-ref" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="queryRunner-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="resultSetHandler-ref" type="xsd:NMTOKEN"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

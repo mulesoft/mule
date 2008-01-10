@@ -8,29 +8,17 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jdbc/2.0 http://www.mulesource.org/schema/mule/jdbc/2.0/mule-jdbc.xsd">
 
-    <model name="JdbcSelectOnOutbound">
-        <service name="bridge">
+    <model name="test">
+        <service name="bridgeB">
             <inbound-router>
-                <inbound-endpoint address="vm://jdbc.test"/>
+                <inbound-endpoint address="jdbc://getTest?type=1"/>
             </inbound-router>
+            <component>
+                <singleton-object class="org.mule.providers.jdbc.test.JdbcFunctionalTestComponent"/>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <jdbc:outbound-endpoint queryKey="getTest">
-                        <properties>
-                            <spring:entry key="type" value="1"/>
-                        </properties>
-                    </jdbc:outbound-endpoint>
-                </outbound-pass-through-router>
-            </outbound-router>
-        </service>
-
-        <service name="bridgeA">
-            <inbound-router>
-                <inbound-endpoint address="vm://terra"/>
-            </inbound-router>
-            <outbound-router>
-                <outbound-pass-through-router>
-                    <jdbc:outbound-endpoint address="jdbc://getTestPayload"/>
+                    <jdbc:outbound-endpoint address="jdbc://writeTest?type=2"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>

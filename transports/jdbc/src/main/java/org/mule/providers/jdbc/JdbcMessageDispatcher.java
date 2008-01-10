@@ -18,6 +18,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.ArrayUtils;
 import org.mule.util.StringUtils;
 
 import java.sql.Connection;
@@ -75,7 +76,11 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
                 writeStmt = STORED_PROCEDURE_PREFIX + writeStmt + STORED_PROCEDURE_SUFFIX;
             }
             
-            int nbRows = connector.createQueryRunner().update(con, writeStmt, paramValues);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("SQL UPDATE: " + writeStmt + ", params = " + ArrayUtils.toString(paramValues));
+            }
+            int nbRows = connector.getQueryRunner().update(con, writeStmt, paramValues);
             if (nbRows != 1)
             {
                 logger.warn("Row count for write should be 1 and not " + nbRows);
@@ -209,12 +214,14 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             Object result;
             do
             {
-                result = connector.createQueryRunner().query(con, readStmt,
-                                                             connector.getParams(endpoint,
-                                                                                 readParams,
-                                                                                 event!=null ? event.getMessage() : null,
-                                                                                 endpoint.getEndpointURI().getAddress()),
-                                                             connector.createResultSetHandler());
+                Object[] params = connector.getParams(endpoint, readParams,
+                    event!=null ? event.getMessage() : null,
+                    endpoint.getEndpointURI().getAddress());
+                if (staticLogger.isDebugEnabled())
+                {
+                    staticLogger.debug("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(params));
+                }
+                result = connector.getQueryRunner().query(con, readStmt, params, connector.getResultSetHandler());
                 if (result != null)
                 {
                     if (staticLogger.isDebugEnabled())
@@ -242,8 +249,12 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
             while (true);
             if (ackStmt != null)
             {
-                int nbRows = connector.createQueryRunner().update(con, ackStmt,
-                                                                  connector.getParams(endpoint, ackParams, result, ackStmt));
+                Object[] params = connector.getParams(endpoint, ackParams, result, ackStmt);
+                if (staticLogger.isDebugEnabled())
+                {
+                    staticLogger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(params));
+                }
+                int nbRows = connector.getQueryRunner().update(con, ackStmt, params);
                 if (nbRows != 1)
                 {
                     staticLogger.warn("Row count for ack should be 1 and not " + nbRows);

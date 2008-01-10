@@ -13,8 +13,6 @@ package org.mule.providers.jdbc;
 import org.mule.providers.jdbc.test.TestDataSource;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.PrototypeObjectFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -25,21 +23,13 @@ import org.apache.commons.dbutils.ResultSetHandler;
 
 public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
 {
-
     public void testCustomResultSetHandlerIsNotIgnored() throws Exception
     {
         JdbcConnector connector = new JdbcConnector();
         
-        ObjectFactory of;
-        of = new PrototypeObjectFactory(TestQueryRunner.class);
-        of.initialise();
-        connector.setQueryRunner(of);
-        of = new PrototypeObjectFactory(TestResultSetHandler.class);
-        of.initialise();
-        connector.setResultSetHandler(of);
-        of = new PrototypeObjectFactory(TestDataSource.class);
-        of.initialise();
-        connector.setDataSourceFactory(of);
+        connector.setQueryRunner(new TestQueryRunner());
+        connector.setResultSetHandler(new TestResultSetHandler());
+        connector.setDataSource(new TestDataSource());
         
         connector.setManagementContext(managementContext);
         //managementContext.applyLifecycle(connector);
