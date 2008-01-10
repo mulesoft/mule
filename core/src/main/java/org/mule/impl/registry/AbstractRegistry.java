@@ -224,12 +224,12 @@ public abstract class AbstractRegistry implements Registry
         Object o = lookupObject(name);
         if (o instanceof UMOEndpointBuilder)
         {
-            logger.debug("Global endpoint EndpointBuilder for name: " + name + "found");
+            logger.debug("Global endpoint EndpointBuilder for name: " + name + " found");
             return (UMOEndpointBuilder) o;
         }
         else
         {
-            logger.debug("No endpoint builder with the name: " + name + "found.");
+            logger.debug("No endpoint builder with the name: " + name + " found.");
             return null;
         }
     }
