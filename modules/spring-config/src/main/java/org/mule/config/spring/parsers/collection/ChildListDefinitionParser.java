@@ -25,11 +25,7 @@ public class ChildListDefinitionParser extends ChildDefinitionParser {
     public ChildListDefinitionParser(String setterMethod)
     {
         super(setterMethod, ArrayList.class);
-    }
-
-    public ChildListDefinitionParser(String setterMethod, Class listType)
-    {
-        super(setterMethod, listType, List.class);
+        addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
     }
 
     protected Class getBeanClass(Element element)
@@ -43,7 +39,6 @@ public class ChildListDefinitionParser extends ChildDefinitionParser {
         List parsedList = parserContext.getDelegate().parseListElement(element, builder.getRawBeanDefinition());
         builder.addPropertyValue("sourceList", parsedList);
         builder.addPropertyValue("targetListClass", super.getBeanClass(element));
-        getBeanAssembler(element, builder).setBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
     }
 
 }

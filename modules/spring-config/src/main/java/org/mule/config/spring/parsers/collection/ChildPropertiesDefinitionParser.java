@@ -29,6 +29,7 @@ public class ChildPropertiesDefinitionParser extends ChildDefinitionParser
     public ChildPropertiesDefinitionParser(String setterMethod)
     {
         super(setterMethod, /*clazz*/null);
+        addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
     }
     
     protected Class getBeanClass(Element element)
@@ -41,7 +42,6 @@ public class ChildPropertiesDefinitionParser extends ChildDefinitionParser
         super.parseChild(element, parserContext, builder);
         Properties parsedProps = parserContext.getDelegate().parsePropsElement(element);
         builder.addPropertyValue("properties", parsedProps);
-        getBeanAssembler(element, builder).setBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
     }
 
 }

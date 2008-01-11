@@ -45,6 +45,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     public static final String BEANS = "beans"; // cannot find this in Spring api!
     public static final String MULE_REPEAT_PARSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_REPEAT_PARSE";
     public static final String MULE_NO_RECURSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE";
+    public static final String MULE_FORCE_RECURSE = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_FORCE_RECURSE";
     public static final String MULE_NO_REGISTRATION = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION";
     public static final String MULE_POST_CHILDREN = "org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate.MULE_POST_CHILDREN";
     private DefaultBeanDefinitionDocumentReader spring;
@@ -78,14 +79,16 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                 return null;
             }
 
-            boolean isRecurse = false;
+            boolean noRecurse = false;
+            boolean forceRecurse = false;
             BeanDefinition finalChild;
 
             do {
                 ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
                 finalChild = handler.parse(element, parserContext);
                 registerBean(element, finalChild);
-                isRecurse = isRecurse || ! testFlag(finalChild, MULE_NO_RECURSE);
+                noRecurse = noRecurse || testFlag(finalChild, MULE_NO_RECURSE);
+                forceRecurse = forceRecurse || testFlag(finalChild, MULE_FORCE_RECURSE);
             } while (null != finalChild && testFlag(finalChild, MULE_REPEAT_PARSE));
 
             // Only iterate and parse child mule name-spaced elements. Spring does not do
@@ -98,7 +101,33 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             // which handles iteration internally (this is a hack needed because Spring doesn't
             // expose the DP for "<spring:entry>" elements directly).
 
-            if (SpringXMLUtils.isMuleNamespace(element) && isRecurse)
+            boolean isRecurse;
+            if (noRecurse)
+            {
+                if (forceRecurse)
+                {
+                    // inconsistent control
+                    throw new IllegalStateException("Recursion requested and blocked");
+                }
+                else
+                {
+                    isRecurse = false;
+                }
+            }
+            else
+            {
+                if (forceRecurse)
+                {
+                    isRecurse = true;
+                }
+                else
+                {
+                    // default behaviour if no control specified
+                    isRecurse = SpringXMLUtils.isMuleNamespace(element);
+                }
+            }
+
+            if (isRecurse)
             {
                 NodeList list = element.getChildNodes();
                 for (int i = 0; i < list.getLength(); i++)

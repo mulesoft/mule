@@ -170,4 +170,9 @@ public class AllAttributeChildDefinitionParser
         return AutoIdUtils.getUniqueName(element, "all-attribute");
     }
 
+    public void addBeanFlag(String flag)
+    {
+        delegate.addBeanFlag(flag);
+    }
+
 }

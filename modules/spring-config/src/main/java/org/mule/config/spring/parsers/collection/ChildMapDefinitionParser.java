@@ -30,11 +30,7 @@ public class ChildMapDefinitionParser extends ChildDefinitionParser
     public ChildMapDefinitionParser(String setterMethod)
     {
         super(setterMethod, HashMap.class);
-    }
-
-    public ChildMapDefinitionParser(String setterMethod, Class mapType)
-    {
-        super(setterMethod, mapType, Map.class);
+        addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
     }
 
     protected Class getBeanClass(Element element)
@@ -48,7 +44,6 @@ public class ChildMapDefinitionParser extends ChildDefinitionParser
         Map parsedMap = parserContext.getDelegate().parseMapElement(element, builder.getRawBeanDefinition());
         builder.addPropertyValue("sourceMap", parsedMap);
         builder.addPropertyValue("targetMapClass", super.getBeanClass(element));
-        getBeanAssembler(element, builder).setBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
     }
 
 }

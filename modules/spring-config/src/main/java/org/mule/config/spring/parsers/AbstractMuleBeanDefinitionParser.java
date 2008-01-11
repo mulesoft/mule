@@ -18,11 +18,14 @@ import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.ClassUtils;
+import org.mule.util.XMLUtils;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,7 +107,8 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     private BeanDefinitionRegistry registry;
     private LinkedList preProcessors = new LinkedList();
     private List postProcessors = new LinkedList();
-    //By default Mule objects are not singletons
+    private Set beanAttributes = new HashSet();
+    // By default Mule objects are not singletons
     protected boolean singleton = false;
 
     /** Allow the bean class to be set explicitly via the "class" attribute. */
@@ -191,7 +195,6 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     /**
      * Hook method that derived classes can implement to inspect/change a
      * bean definition after parsing is complete.
-     * <p>The default implementation does nothing.
      *
      * @param assembler the parsed (and probably totally defined) bean definition being built
      * @param element   the XML element that was the source of the bean definition's metadata
@@ -199,8 +202,11 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     protected void postProcess(BeanAssembler assembler, Element element)
     {
         element.setAttribute(ATTRIBUTE_NAME, getBeanName(element));
-        Iterator processes = postProcessors.iterator();
-        while (processes.hasNext())
+        for (Iterator attributes = beanAttributes.iterator(); attributes.hasNext();)
+        {
+            assembler.setBeanFlag((String) attributes.next());
+        }
+        for (Iterator processes = postProcessors.iterator(); processes.hasNext();)
         {
             ((PostProcessor) processes.next()).postProcess(assembler, element);
         }
@@ -316,12 +322,12 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         }
         if (null != beanClass && null != classConstraint && !classConstraint.isAssignableFrom(beanClass))
         {
-            logger.error(beanClass + " not a subclass of " + classConstraint);
-            beanClass = null;
+            throw new IllegalStateException(beanClass + " not a subclass of " + classConstraint +
+                    " for " + XMLUtils.elementToString(element));
         }
         if (null == beanClass)
         {
-            throw new IllegalStateException("No class for element " + element.getNodeName());
+            throw new IllegalStateException("No class for element " + XMLUtils.elementToString(element));
         }
         return beanClass;
     }
@@ -481,6 +487,11 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     public String getBeanName(Element element)
     {
         return AutoIdUtils.getUniqueName(element, "mule-bean");
+    }
+
+    public void addBeanFlag(String flag)
+    {
+        beanAttributes.add(flag);
     }
 
 }

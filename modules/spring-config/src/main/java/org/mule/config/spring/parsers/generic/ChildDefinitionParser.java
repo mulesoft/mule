@@ -50,7 +50,7 @@ public class ChildDefinitionParser extends AbstractChildDefinitionParser
      * a subclass of the constraint
      * @param setterMethod The target method (where the child will be injected)
      * @param clazz The class created by this element/parser (may be null)
-     * @param constraint Superclass of clazz (may be null) 
+     * @param constraint Superclass of clazz (may be null)
      */
     public ChildDefinitionParser(String setterMethod, Class clazz, Class constraint)
     {

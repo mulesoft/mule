@@ -175,4 +175,12 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         return AutoIdUtils.getUniqueName(element, "delegate");
     }
 
+    public void addBeanFlag(String flag)
+    {
+        for (int i = 0; i < delegates.length; ++i)
+        {
+            delegates[i].addBeanFlag(flag);
+        }
+    }
+
 }

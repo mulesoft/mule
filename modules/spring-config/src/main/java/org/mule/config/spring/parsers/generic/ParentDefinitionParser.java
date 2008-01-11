@@ -27,6 +27,11 @@ import org.w3c.dom.Element;
 public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
 {
 
+    public ParentDefinitionParser()
+    {
+        addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION);
+    }
+
     protected Class getBeanClass(Element element)
     {
         try
@@ -58,7 +63,6 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
         doParse(element, parserContext, builder);
         BeanAssembler beanAssembler = getBeanAssembler(element, builder);
         beanAssembler.copyBeanToTarget();
-        beanAssembler.setBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_REGISTRATION);
         return (AbstractBeanDefinition) beanAssembler.getTarget();
     }
 
