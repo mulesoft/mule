@@ -4,5 +4,5 @@
 
 # Disable Multicast tests unless configured
 # acooke - since this runs ok on CI, leaving enabled
-#org.mule.providers.multicast.MulticastConnectorFunctionalTestCase
+org.mule.providers.multicast.MulticastConnectorFunctionalTestCase
 
