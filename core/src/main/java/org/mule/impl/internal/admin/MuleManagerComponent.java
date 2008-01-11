@@ -282,7 +282,7 @@ public class MuleManagerComponent implements Callable, Initialisable
      * @param e the Exception thrown
      * @return an Xml String message result
      */
-    protected String handleException(UMOMessage result, Throwable e)
+    protected Object handleException(UMOMessage result, Throwable e)
     {
         logger.error("Failed to process admin request: " + e.getMessage(), e);
         if (result == null)
@@ -294,7 +294,7 @@ public class MuleManagerComponent implements Callable, Initialisable
         {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             wireFormat.write(out, result, getEncoding());
-            return out.toString(getEncoding());
+            return out.toByteArray();
         }
         catch (Exception e1)
         {

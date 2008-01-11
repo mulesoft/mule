@@ -37,7 +37,8 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         assertNotNull(result);
         UMOExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getRootException() instanceof TransformerException);
+        assertTrue(exceptionPayload.getException().getCause() instanceof TransformerException);
+        assertTrue(exceptionPayload.getRootException() instanceof Exception);
     }
 
     public void testClientMalformedEndpointException() throws Exception

@@ -72,13 +72,7 @@ public abstract class UMOServerNotification extends EventObject
 
     public UMOServerNotification(Object message, int action)
     {
-        super((message == null ? NULL_MESSAGE : message));
-        this.action = action;
-        if (RegistryContext.getRegistry() != null && null != message)
-        {
-            serverId = message.toString();
-        }
-        timestamp = System.currentTimeMillis();
+        this(message, action, null);
     }
 
     public UMOServerNotification(Object message, int action, String resourceIdentifier)
@@ -86,7 +80,10 @@ public abstract class UMOServerNotification extends EventObject
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
-        serverId = message.toString();
+        if (RegistryContext.getRegistry() != null && null != message)
+        {
+            serverId = message.toString();
+        }
         timestamp = System.currentTimeMillis();
     }
 

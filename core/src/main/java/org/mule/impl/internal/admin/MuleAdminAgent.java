@@ -129,6 +129,7 @@ public class MuleAdminAgent extends AbstractAgent
                 {
                     UMOEndpointURI uri = new MuleEndpointURI(serverUri);
                     endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+                    endpointBuilder.setSynchronous(true);
 
                     // TODO DF: Doesn't the EndpointBuilder do this?
                     UMOConnector connector = TransportFactory.getOrCreateConnectorByProtocol(uri, managementContext);

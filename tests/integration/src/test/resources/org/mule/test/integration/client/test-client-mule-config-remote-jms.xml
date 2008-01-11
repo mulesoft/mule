@@ -1,63 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
-                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+    <admin-agent serverUri="jms://jmsSysProvider/mule.sys.queue" />
 
-<mule-configuration id="client_test" version="1.0">
-
-    <mule-environment-properties
-        synchronous="true"
-        serverUrl="jms://jmsSysProvider/mule.sys.queue?createConnector=NEVER"
-        />
-
-     <container-context className="org.mule.extras.spring.SpringContainerContext">
-        <properties>
-            <text-property name="configuration">
-                <![CDATA[
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-                <beans>
-                <bean id="jmsConnectionFactory"
-        class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL"><value>vm://localhost?broker.persistent=true</value></property>
-    </bean>
-                </beans>
-                ]]>
-            </text-property>
-        </properties> 
-    </container-context>
-    <!--
-    JmsConnector is used to send and receive information via the Jms channel
-    -->
-    <!-- Testing with ActiveMq -->
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
-        <properties>
-            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
-            <property name="specification" value="1.1"/>
-        </properties>
-    </connector>
+    <configuration defaultSynchronousEndpoints="true" />
 
     <!-- this connector simulates an existing endpoint on a remote server -->
-    <connector name="vmRemoteConnector" className="org.mule.providers.vm.VMConnector">
-        <properties>
-            <property name="queueEvents" value="true"/>
-        </properties>
-    </connector>
+    <vm:connector name="vmRemoteConnector" queueEvents="true" />
 
-    <global-endpoints>
-        <endpoint name="vmRemoteEndpoint" connector="vmRemoteConnector" address="vm://remote.queue"/>
-        <endpoint name="jmsSysEndpoint" connector="jmsConnector" address="jms://mule.sys.queue"/>
-    </global-endpoints>
+
+    <!-- Testing with ActiveMq -->
+    <jms:activemq-connector name="jmsConnector" specification="1.1" />
+
+    <endpoint name="vmRemoteEndpoint" connector-ref="vmRemoteConnector" address="vm://remote.endpoint" />
+    <endpoint name="jmsSysEndpoint" connector-ref="jmsConnector" address="jms://mule.sys.queue" />
+
 
     <model name="model">
-        <mule-descriptor name="TestReceiverUMO" implementation="org.mule.test.integration.service.TestReceiver">
+        <service name="TestReceiverUMO">
             <inbound-router>
-                <endpoint address="vm://test.queue"/>
+                <inbound-endpoint address="vm://test.queue" />
             </inbound-router>
+            <component class="org.mule.test.integration.service.TestReceiver" />
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="stdio://System.out"/>
-                </router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="stdio://System.out" />
+                </outbound-pass-through-router>
             </outbound-router>
-        </mule-descriptor>
+        </service>
     </model>
-</mule-configuration>
+</mule>
+

@@ -85,11 +85,11 @@ public class RemoteDispatcher implements Disposable
     protected RemoteDispatcher(String endpoint) throws UMOException
     {
         UMOEndpointFactory endpointFactory = RegistryContext.getRegistry().lookupEndpointFactory();
-        asyncServerEndpoint = endpointFactory.getInboundEndpoint(endpoint);
+        asyncServerEndpoint = endpointFactory.getOutboundEndpoint(endpoint);
         
         UMOEndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpoint);
         endpointBuilder.setRemoteSync(true);
-        syncServerEndpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        syncServerEndpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointBuilder);
 
         wireFormat = new SerializationWireFormat();

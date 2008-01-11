@@ -6,6 +6,12 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
+    <admin-agent serverUri="tcp://localhost:38100">
+        <spring:property name="wireFormat">
+            <spring:bean class="org.mule.transformers.xml.wire.XStreamWireFormat"/>
+        </spring:property>
+    </admin-agent>
+    
     <model name="test">
         <service name="mycomponent">
             <inbound-router>

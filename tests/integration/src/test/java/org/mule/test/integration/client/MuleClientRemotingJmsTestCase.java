@@ -31,7 +31,7 @@ public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
 
     public void testClientSendToRemoteComponent() throws Exception
     {
-        // Will connect to the server using tcp://localhost:60504
+        // Will connect to the server using jms://jmsSysProvider/mule.sys.queue
         MuleClient client = new MuleClient();
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
@@ -45,7 +45,7 @@ public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
     public void testClientSendAndReceiveRemote() throws Exception
     {
         String remoteEndpoint = "vm://vmRemoteProvider/remote.queue";
-        // Will connect to the server using tcp://localhost:60504
+        // Will connect to the server using jms://jmsSysProvider/mule.sys.queue
         MuleClient client = new MuleClient();
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
@@ -57,7 +57,7 @@ public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
         // thus eaiser to test
         dispatcher.sendRemote(remoteEndpoint, "Test Remote Message 2", null);
 
-        message = dispatcher.receiveRemote(remoteEndpoint, 100000);
+        message = dispatcher.receiveRemote(remoteEndpoint, 1000);
         assertNotNull(message);
         assertEquals("Test Remote Message 2", message.getPayload());
 
@@ -65,6 +65,6 @@ public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
 
     public String getServerUrl()
     {
-        return "jms://jmsSysProvider/mule.sys.queue?createConnector=NEVER";
+        return "jms://jmsSysProvider/mule.sys.queue";
     }
 }

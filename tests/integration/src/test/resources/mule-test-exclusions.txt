@@ -21,8 +21,6 @@ org.mule.test.integration.VisualizerServiceTestCase
 org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
 
 #org.mule.test.integration.client.RemoteExceptionTestCase
-org.mule.test.integration.client.MuleClientRemotingHttpTestCase
-org.mule.test.integration.client.MuleClientRemotingJmsTestCase
 org.mule.test.integration.transaction.OutboundTransactionsTestCase
 
 # These tests work when run from the IDE (IntelliJ)
@@ -43,7 +41,6 @@ org.mule.test.usecases.sync.TcpToFileTestCase
 ##########################################################################
 
 org.mule.test.integration.EventMetaDataPropagationTestCase
-org.mule.test.integration.client.RemoteExceptionTestCase
 org.mule.test.integration.message.AttachmentsPropagationTestCase
 org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
 org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
@@ -66,10 +63,8 @@ org.mule.test.integration.routing.MessageChunkingTestCase
 # How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
 org.mule.test.integration.persistence.FilePersistenceTestCase
 
-# MULE-2743 - Remoting does not seem to be working yet in 2.x?
-org.mule.test.integration.client.MuleClientRemotingTestCase
+# MULE-2881
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
-org.mule.test.integration.spring.MuleAdminTestCase
 
 # MULE-2740
 org.mule.test.integration.MuleEndpointConfigurationTestCase
