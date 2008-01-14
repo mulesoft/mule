@@ -29,7 +29,7 @@
                    address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
                    connector-ref="axisConnector2"
                    soapAction="[methodNamespace][method]"
-                   soapActionDirect="direct"
+                   SOAPAction="direct"
                    style="DOCUMENT"
                    use="ENCODED"
                    serviceNamespace="http://foo.namespace">
@@ -49,12 +49,12 @@
         <axis:soap-service interface="class1"/>
         <axis:soap-service interface="class2"/>
         <axis:soap-method method="method1">
-            <axis:soap-parameter parameter="symbol" type="string" mode="in"/>
-            <axis:soap-parameter parameter="GetQuoteResult" type="string" mode="out"/>
+            <axis:soap-parameter parameter="symbol" type="string" mode="IN"/>
+            <axis:soap-parameter parameter="GetQuoteResult" type="string" mode="OUT"/>
             <axis:soap-return type="string"/>
         </axis:soap-method>
         <axis:soap-method method="method2">
-            <axis:soap-parameter parameter="param" type="string" mode="in"/>
+            <axis:soap-parameter parameter="param" type="string" mode="IN"/>
         </axis:soap-method>
         <property key="key1" value="value1"/>
         <properties>

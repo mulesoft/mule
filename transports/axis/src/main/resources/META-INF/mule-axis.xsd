@@ -128,7 +128,7 @@
     <xsd:attributeGroup name="propertyAttributes">
         <xsd:attribute name="clientConfig" type="xsd:string"/>
         <xsd:attribute name="soapAction" type="xsd:string"/>
-        <xsd:attribute name="soapActionDirect" type="xsd:string"/>
+        <xsd:attribute name="SOAPAction" type="xsd:string"/>
         <xsd:attribute name="serviceNamespace" type="xsd:string"/>
         <xsd:attribute name="style">
             <xsd:simpleType>
@@ -186,7 +186,15 @@
                             <xsd:complexType>
                                 <xsd:attribute name="parameter" type="xsd:string" use="required"/>
                                 <xsd:attribute name="type" type="xsd:string" use="required"/>
-                                <xsd:attribute name="mode" type="xsd:string" use="required"/>
+                                <xsd:attribute name="mode">
+                                    <xsd:simpleType>
+                                        <xsd:restriction base="xsd:NMTOKEN">
+                                            <xsd:enumeration value="IN"/>
+                                            <xsd:enumeration value="OUT"/>
+                                            <xsd:enumeration value="INOUT"/>
+                                        </xsd:restriction>
+                                    </xsd:simpleType>
+                                </xsd:attribute>
                             </xsd:complexType>
                         </xsd:element>
                         <xsd:element name="soap-return" minOccurs="0">

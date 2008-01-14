@@ -11,12 +11,14 @@
     <!-- is this file used?  i had the impression it was used somehow by AxisExternalServerTest
          as part of external tests, but now cannot see how -->
 
-    <axis:endpoint name="calculatorAddEndpoint" address="http://localhost:62088/axis/Calculator?method=add">
-        <properties>
-            <spring:entry key="style" value="wrapped"/>
-            <spring:entry key="use" value="literal"/>
-            <spring:entry key="soapMethods" value="Number1;int;in,Number2;int;in,return;int"/>
-        </properties>
+    <axis:endpoint name="calculatorAddEndpoint"
+                   address="http://localhost:62088/axis/Calculator?method=add"
+                   style="WRAPPED" use="LITERAL">
+        <axis:soap-method method="add">
+            <axis:soap-parameter parameter="Number1" type="int" mode="IN"/>
+            <axis:soap-parameter parameter="Number2" type="int" mode="IN"/>
+            <axis:soap-return type="int"/>
+        </axis:soap-method>
     </axis:endpoint>
 
     <model name="test">

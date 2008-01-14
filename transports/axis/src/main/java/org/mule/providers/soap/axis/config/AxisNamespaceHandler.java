@@ -61,7 +61,7 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerMetaTransportEndpoints(SEPARATE_PROPERTIES, AxisConnector.AXIS).addMapping(AxisConnector.USE, USE_MAP).addMapping(AxisConnector.STYLE, STYLE_MAP).addAlias("soapActionDirect", SoapConstants.SOAP_ACTION_PROPERTY_CAPS);
+        registerMetaTransportEndpoints(SEPARATE_PROPERTIES, AxisConnector.AXIS).addMapping(AxisConnector.USE, USE_MAP).addMapping(AxisConnector.STYLE, STYLE_MAP);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(AxisConnector.class, true));
         registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes", "value"));
         registerBeanDefinitionParser("soap-method", new ElementInNestedMapDefinitionParser(PROPERTIES, AxisConnector.SOAP_METHODS, "method"));
