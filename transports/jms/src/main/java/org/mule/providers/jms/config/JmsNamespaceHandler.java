@@ -22,6 +22,7 @@ import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.impl.endpoint.URIBuilder;
+import org.mule.providers.jms.JmsClientAcknowledgeTransactionFactory;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsTransactionFactory;
 import org.mule.providers.jms.activemq.ActiveMQJmsConnector;
@@ -61,6 +62,7 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("redelivery-handler", new ObjectFactoryWrapper("redeliveryHandler"));
 
         registerBeanDefinitionParser("transaction-factory", new TransactionFactoryDefinitionParser(JmsTransactionFactory.class));
+        registerBeanDefinitionParser("client-ack-transaction-factory", new TransactionFactoryDefinitionParser(JmsClientAcknowledgeTransactionFactory.class));
 
         registerBeanDefinitionParser("transformer-jmsmessage-to-object", new TransformerDefinitionParser(JMSMessageToObject.class));   
         registerBeanDefinitionParser("transformer-object-to-jmsmessage", new TransformerDefinitionParser(ObjectToJMSMessage.class));

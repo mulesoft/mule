@@ -122,17 +122,6 @@
         </xsd:complexContent>
     </xsd:complexType>
     
-    <!-- TODO MULE-1726 -->
-    <xsd:element name="oracleaq-connector" substitutionGroup="mule:abstract-connector">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="vendorJmsConnectorType">
-                    <!-- JDBC Data Source -->
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:element name="weblogic-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:element name="websphere-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
  
@@ -142,6 +131,8 @@
             <xsd:extension base="mule:abstractTransactionFactoryType"/>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="client-ack-transaction-factory" type="jmsTransactionFactoryType" substitutionGroup="mule:abstract-transaction-factory"/>
 
     <xsd:element name="transformer-jmsmessage-to-object" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:element name="transformer-object-to-jmsmessage" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
