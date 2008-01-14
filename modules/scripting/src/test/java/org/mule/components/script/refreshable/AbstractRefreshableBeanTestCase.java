@@ -24,15 +24,12 @@ public abstract class AbstractRefreshableBeanTestCase extends FunctionalTestCase
 
     protected static final int WAIT_TIME = 1000;
     
-    protected void writeScript(String src, String path) throws IOException, InterruptedException
+    protected void writeScript(String src, String path) throws IOException
     {
-        for (int i=0; i<1; i++)
-        {
-            FileWriter scriptFile = new FileWriter(path, false);
-            scriptFile.write(src);
-            scriptFile.flush();
-            scriptFile.close();
-        }
+        FileWriter scriptFile = new FileWriter(path, false);
+        scriptFile.write(src);
+        scriptFile.flush();
+        scriptFile.close();
     }
 
     protected String nameToPath(String name)
