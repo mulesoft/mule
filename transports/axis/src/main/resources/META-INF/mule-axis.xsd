@@ -128,6 +128,7 @@
     <xsd:attributeGroup name="propertyAttributes">
         <xsd:attribute name="clientConfig" type="xsd:string"/>
         <xsd:attribute name="soapAction" type="xsd:string"/>
+        <xsd:attribute name="soapActionDirect" type="xsd:string"/>
         <xsd:attribute name="serviceNamespace" type="xsd:string"/>
         <xsd:attribute name="style">
             <xsd:simpleType>

@@ -19,9 +19,7 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="returnMessage" value="mycomponent1"/>
-                    </properties>
+                    <property key="returnMessage" value="mycomponent1"/>
                 </pooled-object>
             </component>
 
@@ -34,9 +32,7 @@
 
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="returnMessage" value="mycomponent2"/>
-                    </properties>
+                    <property key="returnMessage" value="mycomponent2"/>
                 </pooled-object>
             </component>
         </service>

@@ -18,6 +18,7 @@ import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComplexComponentDefinitionParser;
 import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.components.RestServiceWrapper;
 import org.mule.providers.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.providers.http.transformers.HttpResponseToString;
@@ -32,7 +33,8 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerStandardTransportEndpoints(HttpConnector.HTTP, URIBuilder.SOCKET_ATTRIBUTES);
+        registerStandardTransportEndpoints(SEPARATE_PROPERTIES, HttpConnector.HTTP, URIBuilder.SOCKET_ATTRIBUTES)
+                .addAlias("contentType", HttpConstants.HEADER_CONTENT_TYPE);
         
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(HttpConnector.class, true));
 

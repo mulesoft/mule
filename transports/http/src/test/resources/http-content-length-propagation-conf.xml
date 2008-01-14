@@ -18,11 +18,8 @@
         
         <service name="PSMaxMsg1">
             <inbound-router>
-                <http:inbound-endpoint name="httpEndpoint" host="localhost" port="8085" transformer-refs="Xslt">
-                    <properties>
-                        <spring:entry key="Content-Type" value="text/xml"/>
-                    </properties>
-                </http:inbound-endpoint>
+                <http:inbound-endpoint name="httpEndpoint" host="localhost" port="8085"
+                                       transformer-refs="Xslt" contentType="text/xml"/>
                 <forwarding-router/>
             </inbound-router>
             <outbound-router>

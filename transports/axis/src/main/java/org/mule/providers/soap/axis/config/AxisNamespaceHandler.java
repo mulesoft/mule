@@ -61,10 +61,7 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        // unusual propertires handling, so non-standard endpoint registration
-        registerMuleBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, new String[]{}, new String[]{})).addMapping(AxisConnector.USE, USE_MAP).addMapping(AxisConnector.STYLE, STYLE_MAP).addAlias(SoapConstants.SOAP_ACTION_PROPERTY, SoapConstants.SOAP_ACTION_PROPERTY_CAPS);
-        registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, InboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping(AxisConnector.USE, USE_MAP).addMapping(AxisConnector.STYLE, STYLE_MAP).addAlias(SoapConstants.SOAP_ACTION_PROPERTY, SoapConstants.SOAP_ACTION_PROPERTY_CAPS);
-        registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(AxisConnector.AXIS, TransportGlobalEndpointDefinitionParser.META, false, OutboundEndpointFactoryBean.class, new String[]{}, new String[]{})).addMapping(AxisConnector.USE, USE_MAP).addMapping(AxisConnector.STYLE, STYLE_MAP).addAlias(SoapConstants.SOAP_ACTION_PROPERTY, SoapConstants.SOAP_ACTION_PROPERTY_CAPS);
+        registerMetaTransportEndpoints(SEPARATE_PROPERTIES, AxisConnector.AXIS).addMapping(AxisConnector.USE, USE_MAP).addMapping(AxisConnector.STYLE, STYLE_MAP).addAlias("soapActionDirect", SoapConstants.SOAP_ACTION_PROPERTY_CAPS);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(AxisConnector.class, true));
         registerBeanDefinitionParser("supported-scheme", new ChildListEntryDefinitionParser("supportedSchemes", "value"));
         registerBeanDefinitionParser("soap-method", new ElementInNestedMapDefinitionParser(PROPERTIES, AxisConnector.SOAP_METHODS, "method"));

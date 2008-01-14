@@ -29,6 +29,7 @@
                    address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
                    connector-ref="axisConnector2"
                    soapAction="[methodNamespace][method]"
+                   soapActionDirect="direct"
                    style="DOCUMENT"
                    use="ENCODED"
                    serviceNamespace="http://foo.namespace">

@@ -125,6 +125,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:inboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="propertyAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -134,6 +135,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="propertyAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -143,6 +145,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="propertyAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -153,6 +156,25 @@
         <xsd:attribute name="host" type="xsd:string"/>
         <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
         <xsd:attribute name="path" type="xsd:string"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="propertyAttributes">
+        <!-- maybe we mant a more general mechanism, perhaps an element for header values? -->
+        <xsd:attribute name="contentType" type="xsd:string"/>
+        <xsd:attribute name="method">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="OPTIONS"/>
+                    <xsd:enumeration value="GET"/>
+                    <xsd:enumeration value="HEAD"/>
+                    <xsd:enumeration value="POST"/>
+                    <xsd:enumeration value="PUT"/>
+                    <xsd:enumeration value="TRACE"/>
+                    <xsd:enumeration value="CONNECT"/>
+                    <xsd:enumeration value="DELETE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
 </xsd:schema>

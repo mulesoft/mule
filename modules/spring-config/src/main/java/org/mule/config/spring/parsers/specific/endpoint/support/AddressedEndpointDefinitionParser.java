@@ -41,6 +41,8 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     protected Log logger = LogFactory.getLog(getClass());
     public static final boolean META = ChildAddressDefinitionParser.META;
     public static final boolean PROTOCOL = ChildAddressDefinitionParser.PROTOCOL;
+    public static final boolean URI_PROPERTIES = true;
+    public static final boolean SEPARATE_PROPERTIES = false;
     public static final String QUERY_MAP = "queryMap";
     public static final String PROPERTIES = "properties";
     public static final String[] RESTRICTED_ENDPOINT_ATTRIBUTES =
@@ -61,7 +63,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
     public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, MuleDefinitionParser endpointParser)
     {
-        this(metaOrProtocol, isMeta, true, endpointParser, new String[]{}, new String[]{});
+        this(metaOrProtocol, isMeta, URI_PROPERTIES, endpointParser, new String[]{}, new String[]{});
     }
 
     public AddressedEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, boolean uriProperties,

@@ -40,9 +40,7 @@
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.components.simple.StaticComponent">
-                    <properties>
-                        <spring:entry key="data" value="Here's your content."/>
-                    </properties>
+                    <property key="data" value="Here's your content."/>
                 </singleton-object>
             </component>
         </service>

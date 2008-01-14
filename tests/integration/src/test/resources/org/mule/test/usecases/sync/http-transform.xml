@@ -12,11 +12,8 @@
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-    <endpoint name="httpEndpoint" address="http://localhost:18080/RemoteService" synchronous="true">
-        <properties>
-            <spring:entry key="Content-Type" value="text/plain"/>
-        </properties>
-    </endpoint>
+    <http:endpoint name="httpEndpoint" address="http://localhost:18080/RemoteService"
+                   synchronous="true" contentType="text/plain"/>
     <endpoint name="httpEndpoint2" address="http://localhost:18081/RemoteService?method=post" synchronous="true"/>
     <endpoint name="vmEndpoint" address="vm://LocalService" synchronous="true"/>
 

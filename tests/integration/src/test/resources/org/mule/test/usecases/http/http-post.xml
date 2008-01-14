@@ -2,22 +2,21 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesource.org/schema/mule/http/2.0"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
-    <endpoint name="httpRequest"
-              address="http://localhost:18080/RemoteService"
-              synchronous="true">
-        <properties>
-            <spring:entry key="method" value="post" />
-            <spring:entry key="http.post.body.param" value="IncidentData"/>
-        </properties>
-    </endpoint>
+    <http:endpoint name="httpRequest"
+                   address="http://localhost:18080/RemoteService"
+                   synchronous="true"
+                   method="POST">
+        <property key="http.post.body.param" value="IncidentData"/>
+    </http:endpoint>
     <endpoint name="httpService"
               address="http://localhost:18080/RemoteService"
-              synchronous="true">
-    </endpoint>
+              synchronous="true"/>
 
     <model name="model">
         <service name="HttpService">
