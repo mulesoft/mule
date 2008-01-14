@@ -14,12 +14,8 @@
         <!-- hosting the Axis Service -->
         <service name="AxisService">
             <inbound-router>
-                <axis:inbound-endpoint address="http://localhost:63381/services">
-                    <properties>
-                        <spring:entry key="style" value="Wrapped"/>
-                        <spring:entry key="use" value="Literal"/>
-                    </properties>
-                </axis:inbound-endpoint>
+                <axis:inbound-endpoint address="http://localhost:63381/services"
+                        style="WRAPPED" use="LITERAL"/>
             </inbound-router>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>

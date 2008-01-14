@@ -21,14 +21,8 @@
         <service name="mycomponent2">
             <inbound-router>
                 <axis:inbound-endpoint address="vm://mycomponent2">
-                    <properties>
-                        <spring:entry key="serviceInterfaces">
-                            <spring:list>
-                                <spring:value>org.mule.components.simple.EchoService</spring:value>
-                                <spring:value>org.mule.tck.testmodels.services.DateService</spring:value>
-                            </spring:list>
-                        </spring:entry>
-                    </properties>
+                    <axis:soap-service interface="org.mule.components.simple.EchoService"/>
+                    <axis:soap-service interface="org.mule.tck.testmodels.services.DateService"/>
                 </axis:inbound-endpoint>
             </inbound-router>
             <component>
@@ -54,4 +48,5 @@
             </component>
         </service>
     </model>
+    
 </mule>
