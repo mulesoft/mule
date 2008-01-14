@@ -74,7 +74,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
         
         //On connector, overridden on endpoint
         assertNotNull(c.getQuery(testJdbcEndpoint, "getTest2"));
-        assertEquals("OVERRIDDEN VALUE",c.getQuery(testJdbcEndpoint, "getTest2"));
+        assertEquals("OVERRIDDEN VALUE", c.getQuery(testJdbcEndpoint, "getTest2"));
         
         //Only on endpoint
         assertNotNull(c.getQuery(testJdbcEndpoint, "getTest3"));

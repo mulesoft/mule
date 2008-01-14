@@ -39,6 +39,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.StringUtils;
+import org.mule.util.MapCombiner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.LinkedList;
 
 /**
  * Abstract endpoint builder used for externalizing the complex creation logic of endpoints out of the
@@ -216,23 +218,24 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
     protected Map getProperties()
     {
         // Add properties from builder, endpointURI and then seal (make unmodifiable)
-        Map props = new HashMap();
+        LinkedList maps = new LinkedList();
         // properties from url come first
         if (null != uriBuilder)
         {
             UMOEndpointURI endpointURI = uriBuilder.getEndpoint();
             // properties from the URI itself
-            props.putAll(endpointURI.getParams());
+            maps.addLast(endpointURI.getParams());
             // additional properties not added to the URI (sometimes needed for "meta" protocols like axis)
-            props.putAll(uriBuilder.getProperties());
+            maps.addLast(uriBuilder.getProperties());
         }
         // properties on builder may override url
         if (properties != null)
         {
-            props.putAll(properties);
+            maps.addLast(properties);
         }
-        props = Collections.unmodifiableMap(props);
-        return props;
+        MapCombiner combiner = new MapCombiner();
+        combiner.setList(maps);
+        return Collections.unmodifiableMap(combiner);
     }
 
     protected boolean getRemoteSync(UMOConnector connector)

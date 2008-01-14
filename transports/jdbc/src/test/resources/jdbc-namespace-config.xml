@@ -25,17 +25,10 @@
                     value="UPDATE TEST SET ACK = ${function:NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}" />
     </jdbc:connector>
 
-    <endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
-        <properties>
-            <spring:entry key="queries">
-                <spring:map>
-                    <spring:entry key="getTest2" value="OVERRIDDEN VALUE" />
-                    <spring:entry key="getTest3"
-                           value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL" />
-                </spring:map>
-            </spring:entry>
-        </properties>
-    </endpoint>
+    <jdbc:endpoint name="testJdbcEndpoint" address="jdbc://getTest?type=1" connector-ref="jdbcConnector3">
+        <jdbc:query key="getTest2" value="OVERRIDDEN VALUE" />
+        <jdbc:query key="getTest3" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL" />
+    </jdbc:endpoint>
 
     <spring:bean id="testDS1" class="org.mule.providers.jdbc.test.TestDataSource" />
 

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.assembly;
+package org.mule.util;
 
 import java.util.Map;
 import java.util.Collection;
@@ -21,8 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This is used internally by {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}.
- * It allows a collection (list) of maps to be defined in Spring, via the "list" property, and
+ * This allows a collection (list) of maps to be defined in Spring, via the "list" property, and
  * then presents all the maps as a single combine map at run time.  For efficiency the combination
  * of maps is done once and then cached.
  */

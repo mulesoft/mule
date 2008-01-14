@@ -11,6 +11,7 @@
 package org.mule.config.spring.parsers.assembly;
 
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.util.MapCombiner;
 
 import java.util.Iterator;
 import java.util.Map;

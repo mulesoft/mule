@@ -164,6 +164,8 @@
         <xsd:attribute name="moveToPattern" type="xsd:string"/>
         <xsd:attribute name="moveToDirectory" type="xsd:string"/>
         <xsd:attribute name="readFromDirectoryName" type="xsd:string"/>
+        <xsd:attribute name="comparator" type="xsd:string"/>
+        <xsd:attribute name="reverseOrder" type="mule:substitutableBoolean"/>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="outboundAttributes">

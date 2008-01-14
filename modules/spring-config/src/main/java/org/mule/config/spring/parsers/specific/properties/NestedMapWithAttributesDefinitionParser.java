@@ -24,7 +24,7 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
  * just a simple value, {@link org.mule.config.spring.parsers.specific.properties.SimplePropertyDefinitionParser}.
  * The target setter is {@link org.mule.config.spring.parsers.assembly.MapEntryCombiner#VALUE}.
  */
-public class NestedMapWithAttributesDefinitionParser  extends AbstractSingleParentFamilyDefinitionParser
+public class NestedMapWithAttributesDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
 {
 
     public NestedMapWithAttributesDefinitionParser(String mapSetter, String mapKey)

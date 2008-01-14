@@ -12,22 +12,21 @@ package org.mule.config.spring.parsers.specific.properties;
 
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.processors.AddAttribute;
 import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 /**
- * This extends a list that is itself a property (with key mapKey).  It does not have any
+ * This extends a map that is itself a property (with key mapKey).  It does not have any
  * container element.
  */
-public class NestedListDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
+public class NestedMapDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
 {
 
     // we use this so that "key" can be used as the attribute name!
     public static final String HIDDEN_KEY = "hiddenKey";
 
-    public NestedListDefinitionParser(String mapSetter, String mapKey, String attribute)
+    public NestedMapDefinitionParser(String mapSetter, String mapKey)
     {
         addDelegate(new ChildSingletonMapDefinitionParser(mapSetter))
                 .registerPreProcessor(new AddAttribute(HIDDEN_KEY, mapKey))
@@ -36,8 +35,9 @@ public class NestedListDefinitionParser extends AbstractSingleParentFamilyDefini
                 .addAlias(HIDDEN_KEY, MapEntryCombiner.KEY)
                 .removeIgnored(HIDDEN_KEY)
                 .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        addChildDelegate(new ChildListEntryDefinitionParser(MapEntryCombiner.VALUE, attribute))
-                .addCollection(MapEntryCombiner.VALUE);
+        addChildDelegate(new SimplePropertyDefinitionParser())
+                .addIgnored(HIDDEN_KEY)
+                .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
     }
 
 }

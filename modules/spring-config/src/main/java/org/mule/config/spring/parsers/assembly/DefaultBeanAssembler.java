@@ -18,6 +18,7 @@ import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.util.ClassUtils;
+import org.mule.util.MapCombiner;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

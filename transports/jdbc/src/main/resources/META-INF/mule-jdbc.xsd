@@ -15,9 +15,7 @@
     <xsd:complexType name="jdbcConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:sequence>
-                    <xsd:element name="query" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
+                <xsd:group ref="queryElements"/>
                 <xsd:attribute name="pollingFrequency" type="mule:substitutableLong" />
                 <xsd:attribute name="dataSource-ref" type="xsd:NMTOKEN" use="required"/>
                 <xsd:attribute name="queryRunner-ref" type="xsd:NMTOKEN"/>
@@ -40,6 +38,7 @@
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:inboundEndpointType">
+                <xsd:group ref="queryElements"/>
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -49,6 +48,7 @@
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
+                <xsd:group ref="queryElements"/>
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -58,6 +58,7 @@
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
+                <xsd:group ref="queryElements"/>
                 <xsd:attributeGroup ref="addressAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -67,5 +68,11 @@
         <xsd:attribute name="queryKey" type="xsd:string"/>
         <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
     </xsd:attributeGroup>
+
+    <xsd:group name="queryElements">
+        <xsd:sequence>
+            <xsd:element name="query" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:group>
 
 </xsd:schema>
