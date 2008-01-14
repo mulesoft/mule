@@ -136,7 +136,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
             if (!fallback)
             {
                 throw new NoSuchMethodException(
-                        CoreMessages.methodWithParamsNotFoundOnObject(method.getName(), "unknown",
+                        CoreMessages.methodWithParamsNotFoundOnObject("null", "unknown",
                                 component.getClass()).toString());
             }
         }
