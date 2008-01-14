@@ -757,7 +757,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     private String getSoapAction(UMOEventContext context) throws AxisFault
     {
-        String soapAction = context.getMessage().getStringProperty(SoapConstants.SOAP_ACTION_PROPERTY, null);
+        String soapAction = context.getMessage().getStringProperty(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, null);
         if (logger.isDebugEnabled())
         {
             logger.debug("Header Soap Action:" + soapAction);

@@ -184,7 +184,7 @@ public class UniversalSender extends BasicHandler
                 {
                     uri = call.getSOAPActionURI();
                 }
-                props.put(SoapConstants.SOAP_ACTION_PROPERTY, uri);
+                props.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, uri);
             }
             if (contentLength > 0)
             {

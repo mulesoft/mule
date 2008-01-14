@@ -17,6 +17,3 @@ org.mule.providers.soap.axis.functional.SoapAttachmentsFunctionalTestCase
 
 # MULE-2638
 org.mule.providers.soap.axis.style.AxisMessageStyleServiceWithoutNamespaceTestCase
-
-# sorry, it's later and i don't understand - will continue tomorrow
-org.mule.providers.soap.axis.AxisConnectorJmsEndpointFormatTestCase

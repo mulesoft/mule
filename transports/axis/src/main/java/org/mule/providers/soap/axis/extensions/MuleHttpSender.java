@@ -132,7 +132,7 @@ public class MuleHttpSender extends BasicHandler
             {
                 uri = call.getSOAPActionURI();
             }
-            msgContext.setProperty(SoapConstants.SOAP_ACTION_PROPERTY, uri);
+            msgContext.setProperty(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, uri);
 
             BooleanHolder useFullURL = new BooleanHolder(false);
             StringBuffer otherHeaders = new StringBuffer(64);
