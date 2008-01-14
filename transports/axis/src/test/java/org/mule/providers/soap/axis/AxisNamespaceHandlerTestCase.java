@@ -83,12 +83,12 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         Map methods = (Map) assertKey(props, AxisConnector.SOAP_METHODS, Map.class);
         List method1 = (List) assertKey(methods, "method1", List.class);
         assertEquals(3, method1.size());
-        assertEquals("symbol;string;in", method1.get(0));
-        assertEquals("GetQuoteResult;string;out", method1.get(1));
+        assertEquals("symbol;string;IN", method1.get(0));
+        assertEquals("GetQuoteResult;string;OUT", method1.get(1));
         assertEquals("return;string", method1.get(2));
         List method2 = (List) assertKey(methods, "method2", List.class);
         assertEquals(2, method2.size());
-        assertEquals("param;string;in", method2.get(0));
+        assertEquals("param;string;IN", method2.get(0));
         assertEquals("addedFromSpring;string;in", method2.get(1));
         List interfaces = (List) assertKey(props, SoapConstants.SERVICE_INTERFACES, List.class);
         assertEquals(2, interfaces.size());
