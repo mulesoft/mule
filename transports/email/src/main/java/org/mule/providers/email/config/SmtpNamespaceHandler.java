@@ -24,7 +24,13 @@ public class SmtpNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
-        registerStandardTransportEndpoints(SmtpConnector.SMTP, URIBuilder.HOST_ATTRIBUTES).addAlias("to", MailProperties.TO_ADDRESSES_PROPERTY).addAlias("from", MailProperties.FROM_ADDRESS_PROPERTY).addAlias("cc", MailProperties.CC_ADDRESSES_PROPERTY).addAlias("bcc", MailProperties.BCC_ADDRESSES_PROPERTY).addAlias("from", MailProperties.FROM_ADDRESS_PROPERTY).addAlias("replyTo", MailProperties.REPLY_TO_ADDRESSES_PROPERTY);
+        registerStandardTransportEndpoints(SmtpConnector.SMTP, URIBuilder.HOST_ATTRIBUTES)
+                .addAlias("to", MailProperties.TO_ADDRESSES_PROPERTY)
+                .addAlias("from", MailProperties.FROM_ADDRESS_PROPERTY)
+                .addAlias("cc", MailProperties.CC_ADDRESSES_PROPERTY)
+                .addAlias("bcc", MailProperties.BCC_ADDRESSES_PROPERTY)
+                .addAlias("from", MailProperties.FROM_ADDRESS_PROPERTY)
+                .addAlias("replyTo", MailProperties.REPLY_TO_ADDRESSES_PROPERTY);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(SmtpConnector.class, true));
         registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "key", "value"));
     }

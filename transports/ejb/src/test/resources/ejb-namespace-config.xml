@@ -23,9 +23,7 @@
                    jndiInitialFactory="org.mule.tck.jndi.InMemoryContextFactory"
                    jndiProviderUrl="efg"
                    jndiUrlPkgPrefixes="fgh">
-        <jndi-provider-properties>
-            <spring:entry key="ghi" value="hij"/>
-        </jndi-provider-properties>
+        <jndi-provider-property key="ghi" value="hij"/>
     </ejb:connector>
 
     <ejb:connector name="ejbConnector2"

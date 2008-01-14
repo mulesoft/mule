@@ -39,6 +39,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
                 <xsd:attributeGroup ref="email:addressAttributes"/>
+                <xsd:attributeGroup ref="smtp:addressProperties"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -48,6 +49,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
                 <xsd:attributeGroup ref="email:addressAttributes"/>
+                <xsd:attributeGroup ref="smtp:addressProperties"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
