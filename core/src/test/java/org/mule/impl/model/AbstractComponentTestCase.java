@@ -14,6 +14,7 @@ package org.mule.impl.model;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 public abstract class AbstractComponentTestCase extends AbstractMuleTestCase
 {
@@ -27,20 +28,26 @@ public abstract class AbstractComponentTestCase extends AbstractMuleTestCase
             component.start();
             fail("Exception expected: Cannot start an uninitialised component");
         }
-        catch (Exception e)
+        catch (UMOException e)
         {
-
+            // expected 
         }
+        catch (NullPointerException npe)
+        {
+            // TODO MULE-2843
+        }
+
         component.initialise();
         component.start();
+
         try
         {
             component.initialise();
             fail("Exception expected: Cannot initialise an already initialised component");
         }
-        catch (Exception e)
+        catch (InitialisationException e)
         {
-
+            // expected
         }
 
     }
@@ -49,14 +56,19 @@ public abstract class AbstractComponentTestCase extends AbstractMuleTestCase
     {
         assertFalse(component.isStarted());
         assertFalse(component.isPaused());
+
         try
         {
             component.pause();
             fail("Exception expected: Cannot pause an uninitialised component");
         }
-        catch (Exception e)
+        catch (UMOException e)
         {
-
+            // expected 
+        }
+        catch (NullPointerException npe)
+        {
+            // TODO MULE-2843
         }
 
         component.initialise();
@@ -79,14 +91,19 @@ public abstract class AbstractComponentTestCase extends AbstractMuleTestCase
     {
         assertFalse(component.isStarted());
         assertFalse(component.isPaused());
+
         try
         {
             component.resume();
             fail("Exception expected: Cannot resume an uninitialised component");
         }
-        catch (Exception e)
+        catch (UMOException e)
         {
-
+            // expected 
+        }
+        catch (NullPointerException npe)
+        {
+            // TODO MULE-2843
         }
 
         component.initialise();
@@ -113,6 +130,16 @@ public abstract class AbstractComponentTestCase extends AbstractMuleTestCase
         assertFalse(component.isStarted());
         assertFalse(component.isPaused());
         component.stop();
+
+        try
+        {
+            component.resume();
+            fail("Exception expected: Cannot stop an uninitialised component");
+        }
+        catch (UMOException e)
+        {
+            // expected 
+        }
 
         component.initialise();
         assertFalse(component.isStarted());
