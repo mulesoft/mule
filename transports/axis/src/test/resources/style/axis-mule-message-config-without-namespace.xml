@@ -13,17 +13,10 @@
     <model name="WebService_Test">
         <service name="ServiceEntryPoint">
             <inbound-router>
-                <inbound-endpoint address="axis:http://localhost:8088">
-                    <properties>
-                        <spring:entry key="style" value="Message"/>
-                        <spring:entry key="serviceNamespace" value=""/>
-                        <spring:entry key="axisOptions">
-                            <spring:map>
-                                <spring:entry key="wsdlServiceElement" value="testService"/>
-                            </spring:map>
-                        </spring:entry>
-                    </properties>
-                </inbound-endpoint>
+                <axis:inbound-endpoint address="axis:http://localhost:8088"
+                    style="MESSAGE" serviceNamespace="">
+                    <axis:options wsdlServiceElement="testService"/>
+                </axis:inbound-endpoint>
             </inbound-router>
             <component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
         </service>
