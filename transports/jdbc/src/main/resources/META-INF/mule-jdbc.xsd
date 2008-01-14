@@ -16,7 +16,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
-                    <xsd:element name="queries" type="mule:mapType" minOccurs="0"/>
+                    <xsd:element name="query" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="pollingFrequency" type="mule:substitutableLong" />
                 <xsd:attribute name="dataSource-ref" type="xsd:NMTOKEN" use="required"/>

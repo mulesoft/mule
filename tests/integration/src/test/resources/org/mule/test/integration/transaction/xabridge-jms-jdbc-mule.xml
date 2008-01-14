@@ -75,11 +75,9 @@
         <jdbc:dataSource>
             <singleton-object instance-ref="jdbcDataSource"/>
         </jdbc:dataSource>
-        <jdbc:queries>
-            <spring:entry key="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
-            <spring:entry key="getTest.ack" value="UPDATE TEST SET ACK = ${function:NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}" />
-            <spring:entry key="writeTest" value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)" />
-        </jdbc:queries>
+        <jdbc:query key="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
+        <jdbc:query key="getTest.ack" value="UPDATE TEST SET ACK = ${function:NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}" />
+        <jdbc:query key="writeTest" value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)" />
     </jdbc:connector>
 
     <model name="model">

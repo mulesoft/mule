@@ -14,17 +14,15 @@
     </spring:bean>
 
     <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource">
-        <jdbc:queries>
-            <spring:entry key="getTest"
-                          value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
-            <spring:entry key="getTestPayload"
-                          value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${jxpath:type} AND ACK IS NULL"/>
-            <spring:entry key="getTest.ack"
-                          value="UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}"/>
-            <spring:entry key="writeTest"
-                          value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)"/>
-            <spring:entry key="writeMap"
-                          value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${map:data}, NULL, NULL)"/>
-        </jdbc:queries>
+        <jdbc:query key="getTest"
+                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
+        <jdbc:query key="getTestPayload"
+                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${jxpath:type} AND ACK IS NULL"/>
+        <jdbc:query key="getTest.ack"
+                    value="UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}"/>
+        <jdbc:query key="writeTest"
+                    value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${payload}, NULL, NULL)"/>
+        <jdbc:query key="writeMap"
+                    value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(${type}, ${map:data}, NULL, NULL)"/>
     </jdbc:connector>
 </mule>
