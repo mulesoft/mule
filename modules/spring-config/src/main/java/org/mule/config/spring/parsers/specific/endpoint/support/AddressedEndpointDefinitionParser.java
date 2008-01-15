@@ -97,14 +97,33 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
         enableAttribute(endpointParser, AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
         addDelegate(endpointParser);
 
-        // the next delegate parses the address.  it will see the endpoint as parent automatically.
-        MuleChildDefinitionParser addressParser =
-                new AddressWithPropertiesParser(metaOrProtocol, isMeta, uriProperties,
-                        endpointAttributes, requiredAddressAttributes, requiredProperties);
+        if (uriProperties)
+        {
+            // the next delegate parses the address and properties.
+            // it will see the endpoint as parent automatically.
+            MuleChildDefinitionParser addressParser =
+                    new AddressWithPropertiesParser(metaOrProtocol, isMeta,
+                            endpointAttributes, requiredAddressAttributes, requiredProperties);
 
-        // this handles the exception thrown if a ref is found in the address parser
-        addHandledException(BlockAttribute.BlockAttributeException.class);
-        addChildDelegate(addressParser);
+            // this handles the exception thrown if a ref is found in the address parser
+            addHandledException(BlockAttribute.BlockAttributeException.class);
+            addChildDelegate(addressParser);
+        }
+        else
+        {
+            // alternatively, we can handle the address and properties separately, setting the
+            // properties directly on the endpoint (rather than as part of the address)
+            MuleChildDefinitionParser addressParser =
+                    new AddressParser(metaOrProtocol, isMeta, requiredAddressAttributes);
+
+            // this handles the exception thrown if a ref is found in the address parser
+            addHandledException(BlockAttribute.BlockAttributeException.class);
+            addChildDelegate(addressParser);
+
+            MuleChildDefinitionParser propertiesParser =
+                    new PropertiesParser(PROPERTIES, endpointAttributes, requiredAddressAttributes, requiredProperties);
+            addChildDelegate(propertiesParser);
+        }
     }
 
     /**
@@ -118,7 +137,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
 
         private MuleChildDefinitionParser addressParser;
 
-        public AddressWithPropertiesParser(String metaOrProtocol, boolean isMeta, boolean uriProperties,
+        public AddressWithPropertiesParser(String metaOrProtocol, boolean isMeta,
                 String[] endpointAttributes, String[][] requiredAddressAttributes, String[][] requiredProperties)
         {
             super(false); // don't reset name!
@@ -128,7 +147,7 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
             addDelegate(addressParser);
 
             // the next delegate parses property attributes
-            MuleChildDefinitionParser propertiesParser = new PropertiesParser(uriProperties,
+            MuleChildDefinitionParser propertiesParser = new PropertiesParser(QUERY_MAP,
                     endpointAttributes, requiredAddressAttributes, requiredProperties);
             propertiesParser.registerPreProcessor(new BlockAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
             addChildDelegate(propertiesParser);
@@ -182,10 +201,10 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     private static class PropertiesParser extends AttributePropertiesDefinitionParser
     {
 
-        public PropertiesParser(boolean uriProperties,
+        public PropertiesParser(String setter,
                 String[] endpointAttributes, String[][] requiredAddressAttributes, String[][] requiredProperties)
         {
-            super(uriProperties ? QUERY_MAP : PROPERTIES);
+            super(setter);
 
             // the properties parser gets to see everything that the other parsers don't - if you
             // don't want something, don't enable it in the schema!
