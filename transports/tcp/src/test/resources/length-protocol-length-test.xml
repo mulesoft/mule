@@ -31,9 +31,7 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="addReceived" value="false"/>
-                    </properties>
+                    <property key="addReceived" value="false"/>
                 </pooled-object>
             </component>
         </service>

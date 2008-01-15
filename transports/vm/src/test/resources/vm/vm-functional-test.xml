@@ -19,9 +19,7 @@
 
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="returnMessage" value="Polo"/>
-                    </properties>
+                    <property key="returnMessage" value="Polo"/>
                 </pooled-object>
             </component>
 

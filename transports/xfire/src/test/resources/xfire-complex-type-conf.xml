@@ -11,29 +11,17 @@
        http://www.mulesource.org/schema/mule/wsdl-xfire/2.0 http://www.mulesource.org/schema/mule/wsdl-xfire/2.0/mule-wsdl-xfire.xsd">
 
     <wsdl-xfire:endpoint address="http://localhost:63999/services/PeopleServiceWS?WSDL&amp;method=addPersonWithConfirmation" name="wsdlEndpoint">
-        <properties>
-            <spring:entry key="complexTypes">
-                <spring:map>
-                    <spring:entry key="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
-                    <spring:entry key="org.mule.tck.testmodels.services.PersonResponse" value="PersonResponse:http://services.testmodels.tck.mule.org"/>
-                    <spring:entry key="org.mule.tck.testmodels.services.Address" value="Address:http://services.testmodels.tck.mule.org"/>
-                    <spring:entry key="org.mule.tck.testmodels.services.PersonResponse" value="addPersonWithConfirmationout:http://services.testmodels.tck.mule.org"/>
-                </spring:map>
-            </spring:entry>
-        </properties>
+        <xfire:complex-type key="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
+        <xfire:complex-type key="org.mule.tck.testmodels.services.PersonResponse" value="PersonResponse:http://services.testmodels.tck.mule.org"/>
+        <xfire:complex-type key="org.mule.tck.testmodels.services.Address" value="Address:http://services.testmodels.tck.mule.org"/>
+        <xfire:complex-type key="org.mule.tck.testmodels.services.PersonResponse" value="addPersonWithConfirmationout:http://services.testmodels.tck.mule.org"/>
     </wsdl-xfire:endpoint>
 
     <xfire:endpoint address="http://localhost:63999/services/PeopleServiceWS?method=addPersonWithConfirmation" name="xfireEndpoint">
-        <properties>
-            <spring:entry key="complexTypes">
-                <spring:map>
-                    <spring:entry key="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
-                    <spring:entry key="org.mule.tck.testmodels.services.PersonResponse" value="PersonResponse:http://services.testmodels.tck.mule.org"/>
-                    <spring:entry key="org.mule.tck.testmodels.services.Address" value="Address:http://services.testmodels.tck.mule.org"/>
-                    <spring:entry key="org.mule.tck.testmodels.services.PersonResponse" value="addPersonWithConfirmationout:http://services.testmodels.tck.mule.org"/>
-                </spring:map>
-            </spring:entry>
-        </properties>
+        <xfire:complex-type key="org.mule.tck.testmodels.services.Person" value="Person:http://services.testmodels.tck.mule.org"/>
+        <xfire:complex-type key="org.mule.tck.testmodels.services.PersonResponse" value="PersonResponse:http://services.testmodels.tck.mule.org"/>
+        <xfire:complex-type key="org.mule.tck.testmodels.services.Address" value="Address:http://services.testmodels.tck.mule.org"/>
+        <xfire:complex-type key="org.mule.tck.testmodels.services.PersonResponse" value="addPersonWithConfirmationout:http://services.testmodels.tck.mule.org"/>
     </xfire:endpoint>
 
     <model name="ComplexTypes">
@@ -41,14 +29,18 @@
             <inbound-router>
                 <xfire:inbound-endpoint address="http://localhost:63999/services"/>
             </inbound-router>
-            <component class="org.mule.providers.soap.xfire.testmodels.XFireComplexTypeService">
-                <properties>
-                    <spring:entry key="SOAP_NAMESPACE_PROPERTY" value="http://services.testmodels.tck.mule.org"/>
-                    <spring:entry key="style" value="document"/>
-                    <spring:entry key="use" value="literal"/>
-                </properties>
+            <component>
+                <singleton-object instance-ref="service">
+                    <properties>
+                        <spring:entry key="SOAP_NAMESPACE_PROPERTY" value="http://services.testmodels.tck.mule.org"/>
+                        <spring:entry key="style" value="document"/>
+                        <spring:entry key="use" value="literal"/>
+                    </properties>
+                </singleton-object>
             </component>
         </service>
     </model>
+
+    <spring:bean id="service" class="org.mule.providers.soap.xfire.testmodels.XFireComplexTypeService"/>
 
 </mule>

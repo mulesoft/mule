@@ -11,6 +11,11 @@
 package org.mule.providers.soap.xfire.config;
 
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
+import org.mule.config.spring.parsers.specific.properties.NestedListDefinitionParser;
+import org.mule.config.spring.parsers.specific.properties.NestedMapDefinitionParser;
+import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
+import org.mule.config.spring.parsers.processors.AddAttribute;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.providers.soap.xfire.XFireConnector;
 
@@ -26,6 +31,8 @@ public class XFireNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("client-service", new ChildListEntryDefinitionParser("clientServices"));
         registerBeanDefinitionParser("server-in-handler", new ChildListEntryDefinitionParser("serverInHandlers"));
         registerBeanDefinitionParser("server-out-handler", new ChildListEntryDefinitionParser("serverOutHandlers"));
+        registerMuleBeanDefinitionParser("soap-11-transport", new NestedListDefinitionParser("properties", "soap11Transports", MapEntryCombiner.VALUE));
+        registerMuleBeanDefinitionParser("complex-type", new NestedMapDefinitionParser("properties", "complexTypes"));
     }
     
 }

@@ -27,6 +27,7 @@ import org.codehaus.xfire.service.Service;
 public class XFireWsdlConnector extends XFireConnector
 {
 
+    public static final String WSDL_URL_PROPERTY = "wsdlUrl";
     public static final String WSDL_XFIRE = "wsdl-xfire";
 
     protected void registerProtocols()
@@ -54,9 +55,9 @@ public class XFireWsdlConnector extends XFireConnector
             String serviceName = endpoint.getEndpointURI().getAddress();
 
             // If the property specified an alternative WSDL url, use it
-            if (endpoint.getProperty("wsdlUrl") != null && StringUtils.isNotBlank(endpoint.getProperty("wsdlUrl").toString()))
+            if (endpoint.getProperty(WSDL_URL_PROPERTY) != null && StringUtils.isNotBlank(endpoint.getProperty(WSDL_URL_PROPERTY).toString()))
             {
-                wsdlUrl = (String) endpoint.getProperty("wsdlUrl");
+                wsdlUrl = (String) endpoint.getProperty(WSDL_URL_PROPERTY);
             }
 
             if (serviceName.indexOf("?") > -1)

@@ -23,11 +23,7 @@
                    jndiInitialFactory="org.mule.tck.jndi.InMemoryContextFactory"
                    jndiProviderUrl="efg"
                    jndiUrlPkgPrefixes="fgh">
-
-        <!-- obviously here we are nt restricted to string pairs, so it could be done a little better -->
-        <jndi-provider-properties>
-            <spring:entry key="ghi" value="hij"/>
-        </jndi-provider-properties>
+        <jndi-provider-property key="ghi" value="hij"/>
     </rmi:connector>
 
     <rmi:connector name="rmiConnector2"

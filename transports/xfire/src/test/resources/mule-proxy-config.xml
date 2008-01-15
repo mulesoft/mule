@@ -41,9 +41,7 @@
             </inbound-router>
             <component>
                 <pooled-object class="org.mule.providers.soap.WSProxyService">
-                    <properties>
-                        <spring:entry key="wsdlFile" value="localWsdl.wsdl"/>
-                    </properties>
+                    <property key="wsdlFile" value="localWsdl.wsdl"/>
                 </pooled-object>
             </component>
             <outbound-router>

@@ -24,11 +24,8 @@
 
         <service name="echoService2">
             <inbound-router>
-                <xfire:inbound-endpoint address="http://localhost:63082/services">
-                    <properties>
-                        <spring:entry key="wsdlUrl" value="file://xfire-blat"/>
-                    </properties>
-                </xfire:inbound-endpoint>
+                <xfire:inbound-endpoint address="http://localhost:63082/services"
+                                        wsdlUrl="file://xfire-blat"/>
             </inbound-router>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
@@ -42,15 +39,9 @@
 
         <service name="echoService4">
             <inbound-router>
-                <xfire:inbound-endpoint address="http://localhost:63084/services">
-                    <properties>
-                        <spring:entry key="createDefaultBindings" value="false"/>
-                        <spring:entry key="soap11Transports">
-                            <spring:list>
-                                <spring:value>http://schemas.xmlsoap.org/soap/http</spring:value>
-                            </spring:list>
-                        </spring:entry>
-                    </properties>
+                <xfire:inbound-endpoint address="http://localhost:63084/services"
+                                        createDefaultBindings="false">
+                    <xfire:soap-11-transport value="http://schemas.xmlsoap.org/soap/http"/>
                 </xfire:inbound-endpoint>
             </inbound-router>
             <component class="org.mule.components.simple.EchoComponent"/>

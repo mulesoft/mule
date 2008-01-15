@@ -56,9 +56,7 @@
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="asString" value="false"/>
-                    </properties>
+                    <property key="asString" value="false"/>
                 </singleton-object>
             </component>
         </service>

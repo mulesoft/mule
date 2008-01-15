@@ -15,12 +15,9 @@
     <model name="TestXfire">
         <service name="echoServiceWsdlPortType">
             <inbound-router>
-                <xfire:inbound-endpoint address="http://localhost:63081/services">
-                    <properties>
-                        <spring:entry key="wsdlUrl" value="file://xfire-advanced-echo-service.wsdl"/>
-                        <spring:entry key="portType" value="qname{http://www.muleumo.org:echoServiceCustomPortType}"/>
-                    </properties>
-                </xfire:inbound-endpoint>
+                <xfire:inbound-endpoint address="http://localhost:63081/services"
+                                        wsdlUrl="file://xfire-advanced-echo-service.wsdl"
+                                        portType="qname{http://www.muleumo.org:echoServiceCustomPortType}"/>
             </inbound-router>
             <echo-component/>
         </service>

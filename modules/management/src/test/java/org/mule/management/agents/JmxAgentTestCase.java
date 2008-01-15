@@ -25,6 +25,7 @@ import javax.management.remote.rmi.RMIConnectorServer;
 
 public class JmxAgentTestCase extends AbstractMuleTestCase
 {
+
     private static final String[] VALID_AUTH_TOKEN = {"mule", "mulepassword"};
     private static final String DOMAIN = "JmxAgentTest";
     

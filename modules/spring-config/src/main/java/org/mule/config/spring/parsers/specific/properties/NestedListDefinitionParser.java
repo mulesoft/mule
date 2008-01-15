@@ -20,12 +20,20 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 /**
  * This extends a list that is itself a property (with key mapKey).  It does not have any
  * container element.
+ *
+ * This could also be achieved with
+ * new ChildSingletonMapDefinitionParser("properties")
+ * .registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "soap11Transports"))
+ * .addCollection(MapEntryCombiner.VALUE)
+ * .addCollection("properties");
+ * I think, but the following avoids worries about special attribute names.
  */
 public class NestedListDefinitionParser extends AbstractSingleParentFamilyDefinitionParser
 {
 
-    // we use this so that "key" can be used as the attribute name!
+    // we use this so that they can be used as the attribute name!
     public static final String HIDDEN_KEY = "hiddenKey";
+    public static final String HIDDEN_VALUE = "hiddenValue";
 
     public NestedListDefinitionParser(String mapSetter, String mapKey, String attribute)
     {
@@ -36,8 +44,9 @@ public class NestedListDefinitionParser extends AbstractSingleParentFamilyDefini
                 .addAlias(HIDDEN_KEY, MapEntryCombiner.KEY)
                 .removeIgnored(HIDDEN_KEY)
                 .addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME);
-        addChildDelegate(new ChildListEntryDefinitionParser(MapEntryCombiner.VALUE, attribute))
-                .addCollection(MapEntryCombiner.VALUE);
+        addChildDelegate(new ChildListEntryDefinitionParser(HIDDEN_VALUE, attribute))
+                .addAlias(HIDDEN_VALUE, MapEntryCombiner.VALUE)
+                .addCollection(HIDDEN_VALUE);
     }
 
 }

@@ -87,7 +87,6 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     public static final String SERVICE_PROPERTY_COMPONENT_NAME = "componentName";
     public static final String SERVICE_PROPERTY_SERVCE_PATH = "servicePath";
 
-    public static final String WSDL_URL_PROPERTY = "wsdlUrl";
     public static final String AXIS = "axis";
 
     // used by dispatcher and receiver

@@ -24,11 +24,8 @@
     <endpoint name="GoodType"
               address="jnp://localhost:1099/MatchingUMO?method=reverseString&amp;methodArgumentTypes=java.lang.String"/>
 
-    <jnp:endpoint name="BadType" address="jnp://localhost:1099/MatchingUMO" method="reverseString">
-        <properties>
-            <spring:entry key="methodArgumentTypes" value="java.lang.StringBuffer"/>
-        </properties>
-    </jnp:endpoint>
+    <jnp:endpoint name="BadType" address="jnp://localhost:1099/MatchingUMO"
+                  method="reverseString" methodArgumentTypes="java.lang.StringBuffer"/>
 
     <model name="sample">
 

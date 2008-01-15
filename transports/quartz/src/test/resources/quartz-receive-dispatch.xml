@@ -12,14 +12,9 @@
 
     <vm:connector name="vmQueueConnector" queueEvents="true"/>
 
-    <quartz:endpoint name="schedulerEndpoint" address="quartz:/myService">
-        <properties>
-            <spring:entry key="repeatInterval" value="1000"/>
-            <spring:entry key="jobClass" value="org.mule.providers.quartz.jobs.MuleClientReceiveJob"/>
-            <spring:entry key="jobReceiveEndpoint" value="vm://event.queue"/>
-            <spring:entry key="jobDispatchEndpoint" value="vm://quartz.in"/>
-        </properties>
-    </quartz:endpoint>
+    <quartz:endpoint name="schedulerEndpoint" address="quartz:/myService"
+        repeatInterval="1000" jobClass="org.mule.providers.quartz.jobs.MuleClientReceiveJob"
+        jobReceiveEndpoint="vm://event.queue" jobDispatchEndpoint="vm://quartz.in"/>
 
     <model name="quartz-dispatcher">
         <service name="quartzSchedulingService">
