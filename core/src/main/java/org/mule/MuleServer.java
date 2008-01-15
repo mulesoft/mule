@@ -49,9 +49,9 @@ public class MuleServer implements Runnable
     };
 
     /**
-     * Don't use a class object so the core doesn't depend on mule-module-builders.
+     * Don't use a class object so the core doesn't depend on mule-module-spring-config.
      */
-    protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.builders.MuleXmlConfigurationBuilder";
+    protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
 
     /**
      * This builder sets up the configuration for an idle Mule node - a node
