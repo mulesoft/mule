@@ -18,9 +18,7 @@
     <jms:connector name="jmsConnector2">
         <jms:connection-factory>
             <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory">
-                <properties>
-                    <spring:entry key="connectionFactoryProperty" value="TEST_VALUE"/>
-                </properties>
+                <property key="connectionFactoryProperty" value="TEST_VALUE"/>
             </prototype-object>
         </jms:connection-factory>            
     </jms:connector>

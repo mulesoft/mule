@@ -222,11 +222,8 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         // properties from url come first
         if (null != uriBuilder)
         {
-            UMOEndpointURI endpointURI = uriBuilder.getEndpoint();
             // properties from the URI itself
-            maps.addLast(endpointURI.getParams());
-            // additional properties not added to the URI (sometimes needed for "meta" protocols like axis)
-            maps.addLast(uriBuilder.getProperties());
+            maps.addLast(uriBuilder.getEndpoint().getParams());
         }
         // properties on builder may override url
         if (properties != null)

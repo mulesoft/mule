@@ -32,9 +32,9 @@ public class RmiNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerMuleBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, true, ADDRESS, PROPERTIES)).addAlias(OBJECT, URIBuilder.PATH);
-        registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, true, InboundEndpointFactoryBean.class, ADDRESS, PROPERTIES)).addAlias(OBJECT, URIBuilder.PATH);
-        registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, true, OutboundEndpointFactoryBean.class, ADDRESS, PROPERTIES)).addAlias(OBJECT, URIBuilder.PATH);
+        registerMuleBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, ADDRESS, PROPERTIES)).addAlias(OBJECT, URIBuilder.PATH);
+        registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, InboundEndpointFactoryBean.class, ADDRESS, PROPERTIES)).addAlias(OBJECT, URIBuilder.PATH);
+        registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, OutboundEndpointFactoryBean.class, ADDRESS, PROPERTIES)).addAlias(OBJECT, URIBuilder.PATH);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(RmiConnector.class, true));
     }
 

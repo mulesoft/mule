@@ -28,7 +28,7 @@ public class FileNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerStandardTransportEndpoints(SEPARATE_PROPERTIES, FileConnector.FILE, URIBuilder.PATH_ATTRIBUTES);
+        registerStandardTransportEndpoints(FileConnector.FILE, URIBuilder.PATH_ATTRIBUTES);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(FileConnector.class, true));
         registerBeanDefinitionParser("filename-parser",
                     new ChildDefinitionParser("filenameParser", null, FilenameParser.class));

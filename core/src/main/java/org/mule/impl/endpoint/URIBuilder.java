@@ -78,7 +78,6 @@ public class URIBuilder
     private Integer port;
     private String path;
     private Map queryMap;
-    private Map properties = new HashMap();
 
     private AtomicReference cache = new AtomicReference();
 
@@ -165,12 +164,6 @@ public class URIBuilder
         this.queryMap = queryMap;
     }
 
-    public void setProperties(Map properties)
-    {
-        assertNotUsed();
-        this.properties = properties;
-    }
-
     public UMOEndpointURI getEndpoint()
     {
         if (null == cache.get())
@@ -186,11 +179,6 @@ public class URIBuilder
             }
         }
         return (UMOEndpointURI)cache.get();
-    }
-
-    public Map getProperties()
-    {
-        return this.properties;
     }
 
     /**

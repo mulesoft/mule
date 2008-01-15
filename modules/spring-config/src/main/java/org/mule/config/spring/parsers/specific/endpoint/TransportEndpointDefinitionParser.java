@@ -13,10 +13,6 @@ package org.mule.config.spring.parsers.specific.endpoint;
 import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
-
 /**
  * This is intended for use by endpoint-specific parsers for non-global endpoint
  * elements.
@@ -39,31 +35,30 @@ public class TransportEndpointDefinitionParser extends AddressedEndpointDefiniti
     public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint,
                                              String[] requiredAddressAttributes)
     {
-        this(metaOrProtocol, isMeta, true, endpoint, requiredAddressAttributes, new String[]{});
+        this(metaOrProtocol, isMeta, endpoint, requiredAddressAttributes, new String[]{});
     }
 
     /**
      * @param metaOrProtocol The transport metaOrProtocol ("tcp" etc)
      * @param isMeta Whether transport is "meta" or not (eg cxf)
-     * @param uriProperties Whether properties are added to the URI or not
      * @param endpoint The endpoint class to construct
      * @param requiredAddressAttributes A list of attribute names that are required if "address"
      * isn't present
      * @param requiredProperties A list of property names that are required if "address" isn't present
      */
-    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, boolean uriProperties, Class endpoint,
+    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint,
                                              String[] requiredAddressAttributes, String[] requiredProperties)
     {
-        super(metaOrProtocol, isMeta, uriProperties, new ChildEndpointDefinitionParser(endpoint),
+        super(metaOrProtocol, isMeta, new ChildEndpointDefinitionParser(endpoint),
                 requiredAddressAttributes, requiredProperties);
     }
 
-    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, boolean uriProperties, Class endpoint,
+    public TransportEndpointDefinitionParser(String metaOrProtocol, boolean isMeta, Class endpoint,
                                              String[] endpointAttributes,
                                              String[][] requiredAddressAttributes,
                                              String[][] requiredProperties)
     {
-        super(metaOrProtocol, isMeta, uriProperties, new ChildEndpointDefinitionParser(endpoint),
+        super(metaOrProtocol, isMeta, new ChildEndpointDefinitionParser(endpoint),
                 endpointAttributes, requiredAddressAttributes, requiredProperties);
     }
 

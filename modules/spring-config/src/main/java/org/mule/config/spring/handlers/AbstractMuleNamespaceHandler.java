@@ -38,9 +38,6 @@ import org.w3c.dom.Element;
 public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSupport
 {
 
-    public static final boolean URI_PROPERTIES = AddressedEndpointDefinitionParser.URI_PROPERTIES;
-    public static final boolean SEPARATE_PROPERTIES = AddressedEndpointDefinitionParser.SEPARATE_PROPERTIES;
-
     /**
      * @param name The name of the element to be ignored.
      */
@@ -55,26 +52,15 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         return parser;
     }
 
-    protected MuleDefinitionParserConfiguration registerStandardTransportEndpoints(boolean uriProperties, String protocol, String[] requiredAttributes)
-    {
-        return new RegisteredMdps(protocol, AddressedEndpointDefinitionParser.PROTOCOL, uriProperties, requiredAttributes);
-    }
-
-    protected MuleDefinitionParserConfiguration registerMetaTransportEndpoints(boolean uriProperties, String protocol)
-    {
-        return new RegisteredMdps(protocol, AddressedEndpointDefinitionParser.META, uriProperties, new String[]{});
-    }
-
     protected MuleDefinitionParserConfiguration registerStandardTransportEndpoints(String protocol, String[] requiredAttributes)
     {
-        return registerStandardTransportEndpoints(URI_PROPERTIES, protocol, requiredAttributes);
+        return new RegisteredMdps(protocol, AddressedEndpointDefinitionParser.PROTOCOL, requiredAttributes);
     }
 
     protected MuleDefinitionParserConfiguration registerMetaTransportEndpoints(String protocol)
     {
-        return registerMetaTransportEndpoints(SEPARATE_PROPERTIES, protocol);
+        return new RegisteredMdps(protocol, AddressedEndpointDefinitionParser.META, new String[]{});
     }
-
 
     private class IgnoredDefinitionParser implements BeanDefinitionParser
     {
@@ -89,11 +75,11 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
 
         private Set bdps = new HashSet();
 
-        private RegisteredMdps(String protocol, boolean isMeta, boolean uriProperties, String[] requiredAttributes)
+        private RegisteredMdps(String protocol, boolean isMeta, String[] requiredAttributes)
         {
-            registerBeanDefinitionParser("endpoint", add(new TransportGlobalEndpointDefinitionParser(protocol, isMeta, uriProperties, requiredAttributes, new String[]{})));
-            registerBeanDefinitionParser("inbound-endpoint", add(new TransportEndpointDefinitionParser(protocol, isMeta, uriProperties, InboundEndpointFactoryBean.class, requiredAttributes, new String[]{})));
-            registerBeanDefinitionParser("outbound-endpoint", add(new TransportEndpointDefinitionParser(protocol, isMeta, uriProperties, OutboundEndpointFactoryBean.class, requiredAttributes, new String[]{})));
+            registerBeanDefinitionParser("endpoint", add(new TransportGlobalEndpointDefinitionParser(protocol, isMeta, requiredAttributes, new String[]{})));
+            registerBeanDefinitionParser("inbound-endpoint", add(new TransportEndpointDefinitionParser(protocol, isMeta, InboundEndpointFactoryBean.class, requiredAttributes, new String[]{})));
+            registerBeanDefinitionParser("outbound-endpoint", add(new TransportEndpointDefinitionParser(protocol, isMeta, OutboundEndpointFactoryBean.class, requiredAttributes, new String[]{})));
         }
 
         private MuleDefinitionParser add(MuleDefinitionParser bdp)

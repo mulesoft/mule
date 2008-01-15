@@ -24,9 +24,9 @@ public class EjbNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerMuleBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(EjbConnector.EJB, TransportGlobalEndpointDefinitionParser.PROTOCOL, true, RmiNamespaceHandler.ADDRESS, RmiNamespaceHandler.PROPERTIES)).addAlias(RmiNamespaceHandler.OBJECT, URIBuilder.PATH);
-        registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(EjbConnector.EJB, TransportGlobalEndpointDefinitionParser.PROTOCOL, true, InboundEndpointFactoryBean.class, RmiNamespaceHandler.ADDRESS, RmiNamespaceHandler.PROPERTIES)).addAlias(RmiNamespaceHandler.OBJECT, URIBuilder.PATH);
-        registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(EjbConnector.EJB, TransportGlobalEndpointDefinitionParser.PROTOCOL, true, OutboundEndpointFactoryBean.class, RmiNamespaceHandler.ADDRESS, RmiNamespaceHandler.PROPERTIES)).addAlias(RmiNamespaceHandler.OBJECT, URIBuilder.PATH);
+        registerMuleBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(EjbConnector.EJB, TransportGlobalEndpointDefinitionParser.PROTOCOL, RmiNamespaceHandler.ADDRESS, RmiNamespaceHandler.PROPERTIES)).addAlias(RmiNamespaceHandler.OBJECT, URIBuilder.PATH);
+        registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(EjbConnector.EJB, TransportGlobalEndpointDefinitionParser.PROTOCOL, InboundEndpointFactoryBean.class, RmiNamespaceHandler.ADDRESS, RmiNamespaceHandler.PROPERTIES)).addAlias(RmiNamespaceHandler.OBJECT, URIBuilder.PATH);
+        registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(EjbConnector.EJB, TransportGlobalEndpointDefinitionParser.PROTOCOL, OutboundEndpointFactoryBean.class, RmiNamespaceHandler.ADDRESS, RmiNamespaceHandler.PROPERTIES)).addAlias(RmiNamespaceHandler.OBJECT, URIBuilder.PATH);
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(EjbConnector.class, true));
     }
 
