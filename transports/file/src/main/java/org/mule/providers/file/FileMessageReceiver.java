@@ -522,7 +522,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     protected Comparator getComparator() throws Exception
     {
 
-        Object o = this.getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
+        Object o = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
         Object reverseProperty = this.getEndpoint().getProperty(COMPARATOR_REVERSE_ORDER_PROPERTY);
         boolean reverse = false;
         if (o != null)

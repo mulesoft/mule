@@ -16,9 +16,8 @@
             <outbound-router>
                 <outbound-pass-through-router>
                     <jdbc:outbound-endpoint queryKey="getTest">
-                        <properties>
-                            <spring:entry key="type" value="1"/>
-                        </properties>
+                        <!-- this is substituted in the SQL template defined in jdbc-connector.xml -->
+                        <property key="type" value="1"/>
                     </jdbc:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
