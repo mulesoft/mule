@@ -19,6 +19,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:sequence>
+                    <xsd:element name="factory-property" type="mule:keyValueType" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="factory-properties" type="spring:mapType" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="scheduler-ref" type="xsd:NMTOKEN"/>

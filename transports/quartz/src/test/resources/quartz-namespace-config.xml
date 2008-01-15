@@ -31,13 +31,15 @@
 
     <!-- Default config but provide some factory properties. -->
     <quartz:connector name="quartzConnector2">
+        <quartz:factory-property key="org.quartz.scheduler.instanceName" value="MuleScheduler2"/>
+        <quartz:factory-property key="org.quartz.threadPool.class" value="org.quartz.simpl.SimpleThreadPool"/>
+        <quartz:factory-property key="org.quartz.threadPool.threadCount" value="3"/>
+        <quartz:factory-property key="org.quartz.scheduler.rmi.export" value="false"/>
         <quartz:factory-properties>
-            <spring:entry key="org.quartz.scheduler.instanceName" value="MuleScheduler2"/>
-            <spring:entry key="org.quartz.threadPool.class" value="org.quartz.simpl.SimpleThreadPool"/>
-            <spring:entry key="org.quartz.threadPool.threadCount" value="3"/>
-            <spring:entry key="org.quartz.scheduler.rmi.export" value="false"/>
+            <!-- this allows more complex values to be constructed via spring -->
             <spring:entry key="org.quartz.scheduler.rmi.proxy" value="false"/>
             <spring:entry key="org.quartz.jobStore.class" value="org.quartz.simpl.RAMJobStore"/>
         </quartz:factory-properties>
     </quartz:connector>
+
 </mule>

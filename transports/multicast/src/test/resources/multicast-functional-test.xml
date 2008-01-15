@@ -23,9 +23,7 @@
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="appendComponentName" value="true"/>
-                    </properties>
+                    <property key="appendComponentName" value="true"/>
                 </singleton-object>
             </component>
             <outbound-router>
@@ -41,9 +39,7 @@
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="appendComponentName" value="true"/>
-                    </properties>
+                    <property key="appendComponentName" value="true"/>
                 </singleton-object>
             </component>
             <outbound-router>
@@ -59,9 +55,7 @@
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
-                    <properties>
-                        <spring:entry key="appendComponentName" value="true"/>
-                    </properties>
+                    <property key="appendComponentName" value="true"/>
                 </singleton-object>
             </component>
             <outbound-router>
