@@ -2202,6 +2202,7 @@
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:group ref="connectorElements"/>
                 </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass"/>
                 <xsd:attributeGroup ref="connectorAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
