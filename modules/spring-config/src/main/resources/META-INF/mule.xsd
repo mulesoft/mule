@@ -1281,17 +1281,10 @@
     <!-- Custom connector element -->
 
     <xsd:element name="custom-connector" type="customConnectorType" substitutionGroup="abstract-connector"/>
-
     <xsd:complexType name="customConnectorType">
         <xsd:complexContent>
-            <xsd:extension base="abstractConnectorType">
-                <!-- MULE-2091, 2093 - cannot extend connectorType as need properties first -->
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:group ref="connectorElements"/>
-                </xsd:sequence>
+            <xsd:extension base="connectorType">
                 <xsd:attribute name="class" type="substitutableClass" use="required"/>
-                <xsd:attributeGroup ref="connectorAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2199,23 +2192,26 @@
         <xsd:complexContent>
             <xsd:extension base="abstractConnectorType">
                 <xsd:sequence>
+                    <!-- for normal connectors, this is for emergency use only, but it is
+                         critical for custom connector -->
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:group ref="connectorElements"/>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass"/>
                 <xsd:attributeGroup ref="connectorAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <!-- we do this so that they can be included elsewhere - necessary because
-         custom connector needs "properties" to be first element, so cannot
+         custom connector needs "property" to be first element, so cannot
          inherit directly -->
 
     <xsd:attributeGroup name="connectorAttributes">
         <xsd:attribute name="name" type="xsd:string" use="required"/>
         <xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
         <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
+        <xsd:attribute name="numberOfConcurrentTransactedReceivers" type="substitutableInt"/>
+        <xsd:attribute name="dynamicNotification" type="substitutableBoolean"/>
     </xsd:attributeGroup>
 
     <xsd:group name="connectorElements">

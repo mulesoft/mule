@@ -54,6 +54,7 @@ import org.codehaus.xfire.util.dom.DOMOutHandler;
 
 public class WsSecurityFilter extends AbstractEndpointSecurityFilter
 {
+    
     private String wsDecryptionFile = null;
     private String wsSignatureFile = null;
     private Map addOutboundProperties = null;

@@ -20,13 +20,11 @@
 
     <jms:activemq-xa-connector name="jmsConnectorTestDriver" specification="1.1"/>
 
-    <jms:activemq-xa-connector name="jmsConnectorC1" specification="1.1" durable="true" clientId="C1">
-        <spring:property name="numberOfConcurrentTransactedReceivers" value="1"/>
-    </jms:activemq-xa-connector>
+    <jms:activemq-xa-connector name="jmsConnectorC1" specification="1.1" durable="true" clientId="C1"
+            numberOfConcurrentTransactedReceivers="1"/>
 
-    <jms:activemq-xa-connector name="jmsConnectorC2" specification="1.1" durable="true" clientId="C2">
-        <spring:property name="numberOfConcurrentTransactedReceivers" value="1"/>
-    </jms:activemq-xa-connector>
+    <jms:activemq-xa-connector name="jmsConnectorC2" specification="1.1" durable="true" clientId="C2"
+        numberOfConcurrentTransactedReceivers="1"/>
 
     <endpoint name="in" address="vm://in" connector-ref="vm"/>
     <endpoint name="out" address="vm://out" connector-ref="vm"/>

@@ -21,6 +21,7 @@ import org.mule.umo.UMOEventContext;
  */
 public interface UMOEntryPointResolverSet
 {
+
     Object invoke(Object component, UMOEventContext context) throws Exception;
 
     /**
@@ -38,4 +39,5 @@ public interface UMOEntryPointResolverSet
      * @return true if the resolver was found and removed from the list
      */
     boolean removeEntryPointResolver(UMOEntryPointResolver resolver);
+
 }

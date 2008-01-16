@@ -13,13 +13,13 @@ package org.mule.config.spring.parsers.specific;
 import org.mule.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.util.object.AbstractObjectFactory;
-import org.mule.util.object.SpringFactoryBean;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.w3c.dom.Element;
 
 public class ObjectFactoryDefinitionParser extends AbstractChildDefinitionParser
 {
+    
     protected Class beanClass = null;
     protected String setterMethod = null;
 
@@ -47,7 +47,6 @@ public class ObjectFactoryDefinitionParser extends AbstractChildDefinitionParser
         else
         {
             BeanDefinition parent = getParentBeanDefinition(element);
-            String nodeName = element.getNodeName();
             String setter = (String) parent.getAttribute(ObjectFactoryWrapper.OBJECT_FACTORY_SETTER);
             return setter;
         }

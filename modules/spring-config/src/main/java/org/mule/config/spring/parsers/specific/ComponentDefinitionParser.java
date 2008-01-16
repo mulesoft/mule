@@ -27,6 +27,7 @@ import org.w3c.dom.Node;
 
 public class ComponentDefinitionParser extends AbstractParallelDelegatingDefinitionParser
 {
+
     private MuleDefinitionParser normalConfig = new ObjectFactoryWrapper("serviceFactory");
     private MuleDefinitionParser shortcutConfig = new ObjectFactoryDefinitionParser(PooledObjectFactory.class, "serviceFactory");
 

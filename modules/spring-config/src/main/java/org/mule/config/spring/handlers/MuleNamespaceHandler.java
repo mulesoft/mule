@@ -253,7 +253,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("component", new ComponentDefinitionParser());
         registerMuleBeanDefinitionParser("binding", new BindingDefinitionParser("nestedRouter.routers", NestedRouter.class)).addCollection("nestedRouter.routers");
 
-        // Other Somponents
+        // Other Components
         registerBeanDefinitionParser("bridge-component", new SimplePojoServiceDefinitionParser(PassThroughComponent.class));
         registerBeanDefinitionParser("pass-through-component", new SimplePojoServiceDefinitionParser(PassThroughComponent.class));
         registerBeanDefinitionParser("log-component", new SimplePojoServiceDefinitionParser(LogComponent.class));
