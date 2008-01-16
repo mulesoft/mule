@@ -66,6 +66,14 @@ import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.internal.notifications.manager.ListenerSubscriptionPair;
 import org.mule.impl.model.seda.SedaComponent;
 import org.mule.impl.model.seda.SedaModel;
+import org.mule.impl.model.resolvers.DefaultEntryPointResolverSet;
+import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
+import org.mule.impl.model.resolvers.CallableEntryPointResolver;
+import org.mule.impl.model.resolvers.MethodHeaderPropertyEntryPointResolver;
+import org.mule.impl.model.resolvers.ExplicitMethodEntryPointResolver;
+import org.mule.impl.model.resolvers.ReflectionEntryPointResolver;
+import org.mule.impl.model.resolvers.NoArgumentsEntryPointResolver;
+import org.mule.impl.model.resolvers.ArrayEntryPointResolver;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
 import org.mule.impl.security.SecretKeyEncryptionStrategy;
 import org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter;
@@ -238,12 +246,16 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 //        registerBeanDefinitionParser("model-seda-optimised", new OrphanDefinitionParser(OptimisedSedaModel.class, true));
 //        registerBeanDefinitionParser("model-pipeline", new OrphanDefinitionParser(PipelineModel.class, true));
 
-        //TODO RM*
-        registerBeanDefinitionParser("custom-entrypoint-resolver", new ChildDefinitionParser("entryPointResolverSet", null));
-        //registerBeanDefinitionParser("callable-entrypoint-resolver", new ChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));
-        //registerBeanDefinitionParser("method-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", MethodEntryPointResolver.class));
-        //registerBeanDefinitionParser("reflection-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", MethodEntryPointResolver.class));
-        //registerBeanDefinitionParser("non-void-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", NonVoidEntryPointResolver.class));
+        registerBeanDefinitionParser("empty-entrypoint-resolver-set", new ChildDefinitionParser("entryPointResolverSet", DefaultEntryPointResolverSet.class));
+        registerBeanDefinitionParser("legacy-entrypoint-resolver-set", new ChildDefinitionParser("entryPointResolverSet", LegacyEntryPointResolverSet.class));
+
+        registerBeanDefinitionParser("custom-entrypoint-resolver", new ChildDefinitionParser("entryPointResolver"));
+        registerBeanDefinitionParser("callable-entrypoint-resolver", new ChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));
+        registerBeanDefinitionParser("property-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", MethodHeaderPropertyEntryPointResolver.class));
+        registerBeanDefinitionParser("method-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", ExplicitMethodEntryPointResolver.class));
+        registerBeanDefinitionParser("reflection-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", ReflectionEntryPointResolver.class));
+        registerBeanDefinitionParser("no-arguments-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", NoArgumentsEntryPointResolver.class));
+        registerBeanDefinitionParser("array-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", ArrayEntryPointResolver.class));
 
         // Services
         registerBeanDefinitionParser("seda-component", new ServiceDefinitionParser(SedaComponent.class));

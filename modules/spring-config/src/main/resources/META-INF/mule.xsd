@@ -1300,7 +1300,7 @@
     <xsd:complexType name="abstractModelType">
         <xsd:sequence>
             <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-            <xsd:element ref="abstract-entrypoint-resolver" minOccurs="0"/>
+            <xsd:element ref="abstract-entrypoint-resolver-set" minOccurs="0"/>
             <xsd:element ref="abstract-service" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required"/>
@@ -1330,6 +1330,21 @@
     <xsd:element name="abstract-queue-profile" abstract="true" type="abstractQueueProfileType"/>
     <xsd:complexType name="abstractQueueProfileType"/>
 
+    <xsd:element name="abstract-entrypoint-resolver-set" abstract="true" type="abstractEntrypointResolverSetType"/>
+    <xsd:complexType name="abstractEntrypointResolverSetType"/>
+
+    <xsd:element name="legacy-entrypoint-resolver-set" type="extensibleEntrypointResolverSet" substitutionGroup="abstract-entrypoint-resolver-set"/>
+    <xsd:element name="empty-entrypoint-resolver-set" type="extensibleEntrypointResolverSet" substitutionGroup="abstract-entrypoint-resolver-set"/>
+    <xsd:complexType name="extensibleEntrypointResolverSet">
+        <xsd:complexContent>
+            <xsd:extension base="abstractEntrypointResolverSetType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-entrypoint-resolver" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="abstract-entrypoint-resolver" abstract="true" type="abstractEntrypointResolverType"/>
     <xsd:complexType name="abstractEntrypointResolverType"/>
 
@@ -1346,14 +1361,12 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="callable-entrypoint-resolver" type="callableEntrypointResolverType"
-                 substitutionGroup="abstract-entrypoint-resolver"/>
-    <xsd:complexType name="callableEntrypointResolverType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractEntrypointResolverType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
+    <xsd:element name="callable-entrypoint-resolver" type="abstractEntrypointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
+    <xsd:element name="property-entrypoint-resolver" type="abstractEntrypointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
+    <xsd:element name="method-entrypoint-resolver" type="abstractEntrypointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
+    <xsd:element name="reflection-entrypoint-resolver" type="abstractEntrypointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
+    <xsd:element name="no-arguments-entrypoint-resolver" type="abstractEntrypointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
+    <xsd:element name="array-entrypoint-resolver" type="abstractEntrypointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
 
     <!--==============================================================-->
     <!--  Routers                                                     -->

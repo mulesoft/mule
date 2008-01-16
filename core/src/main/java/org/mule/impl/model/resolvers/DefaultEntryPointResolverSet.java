@@ -34,8 +34,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultEntryPointResolverSet implements UMOEntryPointResolverSet
 {
-    /** logger used by this class */
-    protected transient final Log logger = LogFactory.getLog(DefaultEntryPointResolverSet.class);
+
+    protected final Log logger = LogFactory.getLog(getClass());
 
     private final Set entryPointResolvers = new LinkedHashSet(4);
     private List exceptions = new CopyOnWriteArrayList();
