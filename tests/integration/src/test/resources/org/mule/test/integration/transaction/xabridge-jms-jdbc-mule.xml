@@ -58,7 +58,7 @@
     -->
 
     <!-- Transaction manager -->
-    <jbossts:jboss-transaction-manager/>
+    <jbossts:transaction-manager/>
 
     <custom-transaction-factory name="xaTxFactory" class="org.mule.transaction.XaTransactionFactory"/>
 

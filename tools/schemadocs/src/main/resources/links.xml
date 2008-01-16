@@ -668,9 +668,7 @@
 </link><link>
 <item>file:transformer-file-to-string</item><page/>
 </link><link>
-<item>jbossts:jboss-transaction-manager</item><page/>
-</link><link>
-<item>jbossts:properties</item><page/>
+<item>jbossts:transaction-manager</item><page/>
 </link><link>
 <item>jdbc:connector</item><page/>
 </link><link>

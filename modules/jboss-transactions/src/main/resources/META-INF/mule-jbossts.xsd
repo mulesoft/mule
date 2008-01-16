@@ -13,14 +13,14 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
 
-    <xsd:element name="jboss-transaction-manager" type="transactionManagerType"
+    <xsd:element name="transaction-manager" type="transactionManagerType"
                  substitutionGroup="mule:abstract-transaction-manager"/>
 
     <xsd:complexType name="transactionManagerType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransactionManagerType">
                 <xsd:sequence>
-                    <xsd:element name="properties" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:group ref="mule:propertiesGroup"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>

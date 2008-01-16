@@ -22,7 +22,7 @@ public class JbossTSNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("jboss-transaction-manager", new MuleOrphanDefinitionParser(JBossArjunaTransactionManagerFactory.class, true));
+        registerBeanDefinitionParser("transaction-manager", new MuleOrphanDefinitionParser(JBossArjunaTransactionManagerFactory.class, true));
         registerBeanDefinitionParser("properties", new ChildMapEntryDefinitionParser("properties","key","value"));
     }
 
