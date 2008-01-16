@@ -246,8 +246,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 //        registerBeanDefinitionParser("model-seda-optimised", new OrphanDefinitionParser(OptimisedSedaModel.class, true));
 //        registerBeanDefinitionParser("model-pipeline", new OrphanDefinitionParser(PipelineModel.class, true));
 
-        registerBeanDefinitionParser("empty-entrypoint-resolver-set", new ChildDefinitionParser("entryPointResolverSet", DefaultEntryPointResolverSet.class));
-        registerBeanDefinitionParser("legacy-entrypoint-resolver-set", new ChildDefinitionParser("entryPointResolverSet", LegacyEntryPointResolverSet.class));
+        registerBeanDefinitionParser("entrypoint-resolvers", new ChildDefinitionParser("entryPointResolverSet", DefaultEntryPointResolverSet.class));
+        registerBeanDefinitionParser("legacy-entrypoint-resolvers", new ChildDefinitionParser("entryPointResolverSet", LegacyEntryPointResolverSet.class));
+        registerBeanDefinitionParser("custom-entrypoint-resolvers", new ChildDefinitionParser("entryPointResolverSet"));
 
         registerBeanDefinitionParser("custom-entrypoint-resolver", new ChildDefinitionParser("entryPointResolver"));
         registerBeanDefinitionParser("callable-entrypoint-resolver", new ChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));

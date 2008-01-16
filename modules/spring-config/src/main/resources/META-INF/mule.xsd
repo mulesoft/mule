@@ -1333,14 +1333,27 @@
     <xsd:element name="abstract-entrypoint-resolver-set" abstract="true" type="abstractEntrypointResolverSetType"/>
     <xsd:complexType name="abstractEntrypointResolverSetType"/>
 
-    <xsd:element name="legacy-entrypoint-resolver-set" type="extensibleEntrypointResolverSet" substitutionGroup="abstract-entrypoint-resolver-set"/>
-    <xsd:element name="empty-entrypoint-resolver-set" type="extensibleEntrypointResolverSet" substitutionGroup="abstract-entrypoint-resolver-set"/>
+    <xsd:element name="legacy-entrypoint-resolvers" type="extensibleEntrypointResolverSet" substitutionGroup="abstract-entrypoint-resolver-set"/>
+    <xsd:element name="entrypoint-resolvers" type="extensibleEntrypointResolverSet" substitutionGroup="abstract-entrypoint-resolver-set"/>
     <xsd:complexType name="extensibleEntrypointResolverSet">
         <xsd:complexContent>
             <xsd:extension base="abstractEntrypointResolverSetType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-entrypoint-resolver" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-entrypoint-resolvers" type="customEntrypointResolverSetType"
+                 substitutionGroup="abstract-entrypoint-resolver-set"/>
+    <xsd:complexType name="customEntrypointResolverSetType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractEntrypointResolverSetType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
