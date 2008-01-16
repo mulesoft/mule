@@ -10,16 +10,17 @@
 package org.mule.providers.jdbc.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryWrapper;
+import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.properties.NestedMapDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.jdbc.JdbcConnector;
+import org.mule.providers.jdbc.JdbcTransactionFactory;
 
 /** Registers Bean Definition Parsers for the "jdbc" namespace. */
 public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
@@ -38,6 +39,7 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
         endpointQuery.addCollection("properties");
         registerMuleBeanDefinitionParser("query", new ParentContextDefinitionParser("connector", connectorQuery).otherwise(endpointQuery));
         registerBeanDefinitionParser("extractors", new ParentDefinitionParser());
+        registerBeanDefinitionParser("transaction-factory", new TransactionFactoryDefinitionParser(JdbcTransactionFactory.class));
     }
 
 }
