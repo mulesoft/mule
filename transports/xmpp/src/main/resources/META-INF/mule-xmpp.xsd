@@ -24,10 +24,51 @@
         </xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:element name="inbound-endpoint" type="mule:inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:inboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="propertyAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="mule:outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:outboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="propertyAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-    <xsd:element name="endpoint" type="mule:globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:globalEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="propertyAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="addressAttributes">
+        <xsd:attribute name="user" type="xsd:string"/>
+        <xsd:attribute name="password" type="xsd:string"/>
+        <xsd:attribute name="host" type="xsd:string"/>
+        <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
+        <xsd:attribute name="recipient" type="xsd:string"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="propertyAttributes">
+        <xsd:attribute name="groupChat" type="mule:substitutableBoolean"/>
+        <xsd:attribute name="nickname" type="xsd:string"/>
+        <xsd:attribute name="resource" type="xsd:string"/>
+        <xsd:attribute name="thread" type="xsd:string"/>
+        <xsd:attribute name="to" type="xsd:string"/>
+        <xsd:attribute name="from" type="xsd:string"/>
+    </xsd:attributeGroup>
 
 </xsd:schema>

@@ -8,11 +8,7 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xmpp/2.0 http://www.mulesource.org/schema/mule/xmpp/2.0/mule-xmpp.xsd">
 
-    <xmpp:connector name="xmppConnector"/>
-
-    <xmpp:endpoint name="simpleEndpoint" host="localhost" port="1234" user="mule" password="secret" recipient="recipient"/>
-
-    <xmpp:endpoint name="groupChatEndpoint" host="localhost" port="1234" user="mule" password="secret" recipient="recipient"
-        groupChat="true" nickname="bob"/>
+    <xmpp:endpoint name="noNicknameEndpoint" host="localhost" port="1234" user="mule" password="secret"
+        recipient="recipient" groupChat="true"/>
 
 </mule>

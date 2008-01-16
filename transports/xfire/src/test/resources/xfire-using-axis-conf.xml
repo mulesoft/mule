@@ -30,6 +30,8 @@
             </inbound-router>
             <outbound-router>
                 <outbound-pass-through-router>
+                    <!-- assume this can be translated to the new config, but since test is currently blocked
+                         i haven't tried (need to run test to be sure translation ok) -->
                     <outbound-endpoint address="axis:http://localhost:63382/services/XfireService?method=receive">
                         <properties>
                             <spring:entry key="soapAction" value="${methodNamespace}${method}"/>

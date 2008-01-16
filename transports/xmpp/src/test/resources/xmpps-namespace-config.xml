@@ -2,17 +2,17 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:xmpp="http://www.mulesource.org/schema/mule/xmpp/2.0"
+       xmlns:xmpps="http://www.mulesource.org/schema/mule/xmpps/2.0"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
-       http://www.mulesource.org/schema/mule/xmpp/2.0 http://www.mulesource.org/schema/mule/xmpp/2.0/mule-xmpp.xsd">
+       http://www.mulesource.org/schema/mule/xmpps/2.0 http://www.mulesource.org/schema/mule/xmpps/2.0/mule-xmpps.xsd">
 
-    <xmpp:connector name="xmppConnector"/>
+    <xmpps:connector name="xmppsConnector"/>
 
-    <xmpp:endpoint name="simpleEndpoint" host="localhost" port="1234" user="mule" password="secret" recipient="recipient"/>
+    <xmpps:endpoint name="simpleEndpoint" host="localhost" port="1234" user="mule" password="secret" recipient="recipient"/>
 
-    <xmpp:endpoint name="groupChatEndpoint" host="localhost" port="1234" user="mule" password="secret" recipient="recipient"
+    <xmpps:endpoint name="groupChatEndpoint" host="localhost" port="1234" user="mule" password="secret" recipient="recipient"
         groupChat="true" nickname="bob"/>
 
 </mule>

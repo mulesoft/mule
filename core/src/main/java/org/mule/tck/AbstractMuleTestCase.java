@@ -276,8 +276,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     protected TestCaseWatchdog createWatchdog()
     {
-        // TODO - temp extension acooke
-        return new TestCaseWatchdog(1000, TimeUnit.MINUTES, this);
+        return new TestCaseWatchdog(10, TimeUnit.MINUTES, this);
     }
 
     public void handleTimeout(long timeout, TimeUnit unit)
@@ -320,7 +319,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 //            {
 //                managementContext.getRegistry().initialise();
 //            }
-            if (isStartContext() && managementContext.isStarted() == false)
+            if (isStartContext() && null != managementContext && managementContext.isStarted() == false)
             {
                 managementContext.start();
             }

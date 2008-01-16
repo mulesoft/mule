@@ -10,12 +10,19 @@
 
 package org.mule.providers.xmpp;
 
-public class XmppNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
+public class XmppsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
 {
 
-    public XmppNamespaceHandlerTestCase()
+    public XmppsNamespaceHandlerTestCase()
     {
-        super(XmppConnector.XMPP);
+        super(XmppsConnector.XMPPS);
+    }
+
+    public void testSubclassConfig() throws Exception
+    {
+        XmppsConnector connector =
+            (XmppsConnector)managementContext.getRegistry().lookupConnector("xmppsConnector");
+        assertNotNull(connector);
     }
 
 }

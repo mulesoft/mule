@@ -69,7 +69,7 @@ public class RequireAttribute implements PreProcessor
     public static class RequireAttributeException extends IllegalStateException
     {
 
-        private RequireAttributeException(String message)
+        public RequireAttributeException(String message)
         {
             super(message);
         }

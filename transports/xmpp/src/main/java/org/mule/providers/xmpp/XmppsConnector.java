@@ -18,9 +18,12 @@ import org.jivesoftware.smack.XMPPException;
 
 public class XmppsConnector extends XmppConnector
 {
+
+    public static final String XMPPS = "xmpps";
+
     public String getProtocol()
     {
-        return "xmpps";
+        return XMPPS;
     }
 
     /**
@@ -42,4 +45,5 @@ public class XmppsConnector extends XmppConnector
         
         return xmppConnection;
     }
+    
 }
