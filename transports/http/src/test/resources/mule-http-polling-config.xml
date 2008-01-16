@@ -22,7 +22,7 @@
 
         <service name="pollingUMO">
             <inbound-router>
-                <http:inbound-endpoint user="marie" password="marie" host="localhost" port="60205"
+                <http:inbound-endpoint user="marie" password="marie" host="localhost" port="61205"
                                        connector-ref="PollingHttpConnector">
                     <property key="pollingFrequency" value="30000"/>
                 </http:inbound-endpoint>
@@ -39,7 +39,7 @@
 
         <service name="polledUMO">
             <inbound-router>
-                <inbound-endpoint address="http://localhost:60205" connector-ref="HttpConnector"/>
+                <inbound-endpoint address="http://localhost:61205" connector-ref="HttpConnector"/>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
