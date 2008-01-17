@@ -18,7 +18,8 @@ public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
     public void testJmsQueue() throws Exception
     {
         dispatchMessage();
-        recieveMessage();
+        receiveMessage();
+        receive(scenarioNotReceive);
     }
 
     protected String getConfigResources()

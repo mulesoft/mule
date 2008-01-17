@@ -20,8 +20,8 @@ public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
         // One message is sent.
         dispatchMessage();
         // The same message is read twice from the same JMS topic.
-        recieveMessage();
-        recieveMessage();
+        receiveMessage();
+        receiveMessage();
     }
 
     protected String getConfigResources()
