@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
       xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
@@ -14,8 +12,6 @@
     <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
     <jms:endpoint name="topic" topic="broadcast" connector-ref="jmsConnector"/>
     <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
-
-    <jms:transformer-object-to-jmsmessage name="ObjectToJMSMessage"/>
 
     <model name="echoSample">
 
@@ -28,7 +24,7 @@
             </component>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="topic" transformer-refs="ObjectToJMSMessage"/>
+                    <outbound-endpoint ref="topic"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -44,7 +40,7 @@
             </component>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage"/>
+                    <outbound-endpoint ref="out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -60,7 +56,7 @@
             </component>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage"/>
+                    <outbound-endpoint ref="out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
