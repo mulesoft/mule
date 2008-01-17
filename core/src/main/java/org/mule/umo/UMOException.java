@@ -64,7 +64,10 @@ public abstract class UMOException extends Exception
             setMessage(MessageFactory.createStaticMessage(cause.getMessage() 
                 + " (" + cause.getClass().getName() + ")"));
         }
-        initialise();
+        else
+        {
+            initialise();
+        }
     }
 
     protected UMOException()

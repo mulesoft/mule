@@ -16,6 +16,7 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -29,18 +30,15 @@ import org.xml.sax.SAXException;
 public class SchemaValidationMule2225TestCase extends AbstractMuleTestCase
 {
 
-    // not available in 1.4 constants?
-    public static final String XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
-
     /**
-     * If this fails for you, check if you are using JDK 1.5. if so make sure you build from maven with the
-     * -Pjava14 profile flag
-     * @throws SAXException
-     * @throws IOException
+     * This test will fail when run with plain JDK 1.4 or even 1.5 - schema validation
+     * requires a proper JAXP installation in the JDK's endorsed directory. It works fine
+     * with Xerces 2.9.1 (as with mule 1.4.x) or a manually installed JAXP Sun RI on JDK
+     * 1.5; JDK 1.6 works out of the box.
      */
     public void testValidation() throws SAXException, IOException
     {
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XML_SCHEMA);
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
         Source muleXsd = new StreamSource(load("META-INF/mule.xsd"));
         Schema schema = schemaFactory.newSchema(muleXsd);

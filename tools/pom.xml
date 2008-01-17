@@ -21,15 +21,4 @@
         <module>mule-project-archetype</module>
         <!--  <module>schemadocs</module> -->
     </modules>
-
-    <!--    <pluginRepositories>
-        <pluginRepository>
-            <id>mule-plugins</id>
-            <name>Mule Plugin Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>-->
 </project>

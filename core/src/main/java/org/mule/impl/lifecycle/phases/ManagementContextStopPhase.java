@@ -49,8 +49,7 @@ public class ManagementContextStopPhase extends LifecyclePhase
         stopOrderedObjects.add(new NotificationLifecycleObject(UMOConnector.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(UMOAgent.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(UMOModel.class, ManagerNotification.class,
-                ManagerNotification.getActionName(ManagerNotification.MANAGER_STOPPING_MODELS),
-                ManagerNotification.getActionName(ManagerNotification.MANAGER_STOPPED_MODELS)));
+                ManagerNotification.MANAGER_STOPPING_MODELS,ManagerNotification.MANAGER_STOPPED_MODELS));
         stopOrderedObjects.add(new NotificationLifecycleObject(UMOComponent.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
 

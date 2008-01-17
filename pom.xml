@@ -209,29 +209,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-<!--            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-remoting</artifactId>
-                <version>${springVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>aopalliance</groupId>
-                        <artifactId>aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-aop</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-web</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>-->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-orm</artifactId>
@@ -575,9 +552,6 @@
             <id>mule-plugins-deps</id>
             <name>Mule Plugin Dependencies</name>
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-<!--            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>-->
         </pluginRepository>
     </pluginRepositories>
 
@@ -591,13 +565,6 @@
                 <artifactId>wagon-webdav</artifactId>
             </extension>
         </extensions>
-
-        <!-- Project version filters -->
-        <!-- Fails if the project doesn't have this file, need to push it down?  Use settings.xml instead.
-        <filters>
-            <filter>project.properties</filter>
-        </filters
-        -->
 
         <!-- specify versions of the plugins used in child poms here -->
         <pluginManagement>
@@ -622,30 +589,45 @@
         </pluginManagement>
 
         <plugins>
-            <!-- Compile to JDK 1.4 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <!-- MULE-2070: 1.0-alpha-3 is broke so enforce previous version  -->
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven-version</id>
+                        <goals>
+                            <goal>enforce-once</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <!-- minimum version is 2.0.6, higher versions allowed -->
+                                    <version>[2.0.6,)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <!-- minimum version is 1.4.2, Java 5 and higher not allowed -->
+                                    <version>[1.4.2,1.5.0)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 
+                Default is still to compile to JDK 1.4. Individual modules may override
+                this setting.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <!--
-                        we should really, really use the eclipse compiler but cannot:
-                        http://jira.codehaus.org/browse/MCOMPILER-43
-                        http://jira.codehaus.org/browse/PLXCOMP-59
-                        -->
-                    <!-- <compilerId>eclipse</compilerId> -->
                     <source>1.4</source>
                     <target>1.4</target>
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
-                <!--
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-compiler-eclipse</artifactId>
-                        <version>1.5.1</version>
-                    </dependency>
-                </dependencies>
-                -->
             </plugin>
 
             <plugin>
@@ -683,7 +665,6 @@
                             <Dev-List-Email>dev@mule.codehaus.org</Dev-List-Email>
                         </manifestEntries>
                     </archive>
-
                 </configuration>
             </plugin>
 
@@ -931,46 +912,41 @@
         </plugins>
     </reporting>
 
-    <modules>
-        <module>buildtools</module>
-        <module>core</module>
-        <module>modules</module>
-        <module>transports</module>
-        <module>tests</module>
-        <module>examples</module>
-        <!-- see:
-            http://mule.mulesource.org/jira/browse/MULETOOLS-2
-            http://mule.mulesource.org/jira/browse/MULETOOLS-21
-            http://mule.mulesource.org/jira/browse/MULETOOLS-22
-        -->
-        <module>tools</module>
-    </modules>
-
-    <!--
-    The default profiles for the build are configured in the file settings.xml.
-    You can override the default profiles from the command line as follows:
-        "mvn -Ddistributions=true -Dtests=false -Doracle=true"
-
-    (For other ways to work with profiles, see
-        http://maven.apache.org/guides/introduction/introduction-to-profiles.html)
-    -->
     <profiles>
         <profile>
-            <id>java14</id>
+            <id>jdk14</id>
             <activation>
-                <jdk>1.4</jdk>
+                <property>
+                    <!--
+                        This profile is always active and is NOT activated by JDK
+                        on purpose. We always want to compile at least the 1.4 compatible
+                        sources as the bottom line.
+
+                        To disable this profile specify -DskipJDK14=true on the commandline
+                        -->
+                    <name>!skipJDK14</name>
+                </property>
             </activation>
+            <modules>
+                <module>buildtools</module>
+                <module>core</module>
+                <module>modules</module>
+                <module>transports</module>
+                <module>tests</module>
+                <module>examples</module>
+                <!-- see:
+                     http://mule.mulesource.org/jira/browse/MULETOOLS-2
+                     http://mule.mulesource.org/jira/browse/MULETOOLS-21
+                     http://mule.mulesource.org/jira/browse/MULETOOLS-22
+                     -->
+                <module>tools</module>
+            </modules>
         </profile>
 
         <profile>
-            <id>java5</id>
+            <id>jdk15</id>
             <activation>
-                <!--
-                    do not put any activation rules in here. We don't want to auto-enable
-                    the enforcer plugin so the user has to make a conscious decision
-                    of compiling with jdk 1.5
                 <jdk>1.5</jdk>
-                -->
             </activation>
             <build>
                 <plugins>
@@ -992,38 +968,39 @@
                                             <version>[2.0.6,)</version>
                                         </requireMavenVersion>
                                         <requireJavaVersion>
-                                            <!-- java version is Java 5 exactly -->
-                                            <version>[1.5.0, 1.6.0)</version>
+                                            <!-- Java version must be 1.5 or higher -->
+                                            <version>[1.5.0,)</version>
                                         </requireJavaVersion>
                                     </rules>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
+                    <!-- 
+                        If this profile is activated, all classes will be compiled using
+                        JDK 1.5 compatability.
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>1.5</source>
+                            <target>1.5</target>
+                            <encoding>ISO-8859-1</encoding>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
-        </profile>
-
-        <profile>
-            <id>distributions</id>
-            <activation>
-                <property>
-                    <name>distributions</name>
-                    <value>true</value>
-                </property>
-            </activation>
             <modules>
-                <module>distributions</module>
+                <module>transports</module>
             </modules>
         </profile>
 
         <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>windows</family>
-                </os>
-            </activation>
+            <id>distributions</id>
+            <modules>
+                <module>distributions</module>
+            </modules>
         </profile>
 
         <profile>
@@ -1078,62 +1055,6 @@
                             <timestampFormat>{0,date,yyyy-MMM-dd HH:mm:ss}</timestampFormat>
                         </configuration>
                      </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!--
-            The maven-enforcer-plugin has an option to skip all checks (-Denforcer.skip=true)
-            but this runs the enforcer plugin anyway with each and every module, sometimes 
-            even multiple times.
-
-            So we put it in a profile here to completely disable the enforcer plugin
-            e.g. on the CI server etc.
-        -->
-        <profile>
-            <id>enforcer-plugin</id>
-            <activation>
-                <property>
-                    <!--
-                        This profile is activated if NO system property
-                        'skipEnforcer' is found. Disable this profile
-                        by specifying -DskipEnforcer=true on the commandline
-                        -->
-                    <name>!skipEnforcer</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- Enforce minimum maven version.
-                         This must be done through the maven-enforcer-plugin as per 
-                         http://jira.codehaus.org/browse/MNG-2423 the prerequisites are not inherited.
-                         -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <!-- MULE-2070: 1.0-alpha-3 is broke so enforce previous version  -->
-                        <version>1.0-alpha-2</version>
-                        <executions>
-                            <execution>
-                                <id>enforce-maven-version</id>
-                                <goals>
-                                    <goal>enforce-once</goal>
-                                </goals>
-                                <configuration>
-                                    <rules>
-                                        <requireMavenVersion>
-                                            <!-- minimum version is 2.0.6, higher versions allowed -->
-                                            <version>[2.0.6,)</version>
-                                        </requireMavenVersion>
-                                        <requireJavaVersion>
-                                            <!-- minimum version is 1.4.2, Java 5 and higher not allowed -->
-                                            <version>[1.4.2,1.5.0)</version>
-                                        </requireJavaVersion>
-                                    </rules>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>
         </profile>

@@ -57,6 +57,11 @@
             <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
+        </dependency>
 
         <!-- Needed for common SOAP test classes -->
         <dependency>

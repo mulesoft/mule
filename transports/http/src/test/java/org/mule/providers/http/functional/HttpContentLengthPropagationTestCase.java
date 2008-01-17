@@ -42,8 +42,6 @@ public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
         assertNotNull("Payload test file not found.", is);
         byte[] fileContents = IOUtils.toByteArray(is);
 
-
-
         MuleClient client = new MuleClient();
         UMOMessage result = client.send("http://localhost:8085", new MuleMessage(fileContents));
 
@@ -52,7 +50,6 @@ public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
         final byte[] locallyTransformedBytes = (byte[]) trans.doTransform(fileContents, "UTF-8");
 
         assertEquals(new String(locallyTransformedBytes), result.getPayloadAsString());
-
     }
 
 }

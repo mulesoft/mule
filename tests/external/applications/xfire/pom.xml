@@ -28,7 +28,7 @@
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
-                </exclusion>                
+                </exclusion>
                 <exclusion>
                     <!-- we want the newer version below -->
                     <groupId>woodstox</groupId>
@@ -37,6 +37,10 @@
                 <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>commons-logging</groupId>

@@ -11,7 +11,6 @@
     <name>Mule Transport Archetype</name>
     <!-- Do not specify group here, otherwise deployment will break -->
     <artifactId>mule-transport-archetype</artifactId>
-    <version>2.0.0-RC2-SNAPSHOT</version>
     <description>Archetype for Mule 2.0 and above transport projects.</description>
 
     <dependencies>
@@ -42,5 +41,4 @@
         </dependency>
     </dependencies>
     <!-- note that the tests for this archetype are located in <project root>/tests/archetype/transport-archetype -->
-
 </project>

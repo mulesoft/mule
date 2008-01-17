@@ -56,7 +56,6 @@
             <artifactId>log4j</artifactId>
         </dependency>
 
-        <!-- The following libraries are provided by the mule-module-util bundle -->
         <dependency>
             <groupId>backport-util-concurrent</groupId>
             <artifactId>backport-util-concurrent</artifactId>

@@ -51,8 +51,7 @@ public class TransientRegistryDisposePhase extends LifecyclePhase
 //                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSED)));
         disposeOrderedObjects.add(new NotificationLifecycleObject(UMOManagementContext.class));
         disposeOrderedObjects.add(new NotificationLifecycleObject(UMOConnector.class, ManagerNotification.class,
-                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSING_CONNECTORS),
-                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSED_CONNECTORS)));
+                ManagerNotification.MANAGER_DISPOSING_CONNECTORS,ManagerNotification.MANAGER_DISPOSED_CONNECTORS));
         disposeOrderedObjects.add(new NotificationLifecycleObject(UMOAgent.class));
         disposeOrderedObjects.add(new NotificationLifecycleObject(UMOModel.class));
         disposeOrderedObjects.add(new NotificationLifecycleObject(Disposable.class));

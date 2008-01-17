@@ -22,10 +22,10 @@
             <version>${muleVersion}</version>
         </dependency>
         <dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-spring-config</artifactId>
-			<version>${version}</version>
-		</dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
@@ -36,7 +36,7 @@
             <artifactId>mule-module-xml</artifactId>
             <version>${muleVersion}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
@@ -51,8 +51,15 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
             <version>${muleVersion}</version>
-        </dependency>        
-        
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${muleVersion}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>javax.mail</groupId>
             <!-- this is the dist pom that does not have a parent set. Make sure

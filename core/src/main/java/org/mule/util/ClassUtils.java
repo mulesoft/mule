@@ -290,6 +290,26 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         }
     }
 
+    /**
+     * Ensure that the given class is properly initialized when the argument is passed in
+     * as .class literal. This method can never fail unless the bytecode is corrupted or
+     * the VM is otherwise seriously confused.
+     * 
+     * @param clazz the Class to be initialized
+     * @return the same class but initialized
+     */
+    public static Class initializeClass(Class clazz)
+    {
+        try
+        {
+            return getClass(clazz.getName(), true);
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new IllegalStateException();
+        }
+    }
+
     public static Object instanciateClass(Class clazz, Object[] constructorArgs)
             throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
             IllegalAccessException, InvocationTargetException

@@ -32,10 +32,6 @@
         <module>spring-config</module>
         <module>wssecurity</module>
         <module>xml</module>
-        <!-- Mule 3.x
-        <module>persistence</module>
-        <module>registry</module>
-        -->
     </modules>
 
     <profiles>
@@ -43,7 +39,6 @@
             <id>osgi</id>
             <modules>
                 <module>osgi</module>
-                <module>util</module>
             </modules>
         </profile>
     </profiles>
