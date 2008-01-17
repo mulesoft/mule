@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector"/>
+
+    <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
+    <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector"/>
+    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
+
+    <model name="test">
+
+        <service name="InputPart">
+            <inbound-router>
+                <inbound-endpoint ref="in"/>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="middle"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+        <service name="MiddlePart">
+            <inbound-router>
+                <inbound-endpoint ref="middle"/>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="out"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+        <service name="OutputPart">
+            <inbound-router>
+                <inbound-endpoint ref="middle"/>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <property key="returnMessage" value="OUTPUT MESSAGE"/>
+                </singleton-object>
+            </component>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <outbound-endpoint ref="out"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+
+</mule>
