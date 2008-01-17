@@ -69,6 +69,10 @@
             <artifactId>spring-jms</artifactId>
             <exclusions>
                 <exclusion>
+                    <artifactId>commons-pool</artifactId>
+                    <groupId>commons-pool</groupId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-support</artifactId>
                 </exclusion>
