@@ -15,10 +15,7 @@
     <jms:endpoint name="topic" topic="broadcast" connector-ref="jmsConnector"/>
     <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
 
-    <custom-transformer name="ObjectToJMSMessage"
-                        class="org.mule.providers.jms.transformers.ObjectToJMSMessage"
-                        returnClass="javax.jms.TextMessage"/>
-
+    <jms:transformer-object-to-jmsmessage name="ObjectToJMSMessage"/>
 
     <model name="echoSample">
 

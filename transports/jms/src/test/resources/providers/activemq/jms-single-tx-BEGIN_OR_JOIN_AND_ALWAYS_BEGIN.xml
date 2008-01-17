@@ -11,15 +11,13 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <endpoint name="in" address="jms://in" connector-ref="jmsConnector"/>
+    <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
     <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector"/>
-    <jms:endpoint name="out" address="jms://out" connector-ref="jmsConnector"/>
+    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
 
-    <spring:bean name="txFactory" class="org.mule.providers.jms.JmsTransactionFactory"/>
+    <jms:transaction-factory name="txFactory"/>
 
-    <custom-transformer name="ObjectToJMSMessage"
-                        class="org.mule.providers.jms.transformers.ObjectToJMSMessage"
-                        returnClass="javax.jms.TextMessage"/>
+    <jms:transformer-object-to-jmsmessage name="ObjectToJMSMessage"/>
 
     <model name="jmsTest">
 
