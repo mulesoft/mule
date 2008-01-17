@@ -271,7 +271,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             Message message = consumer.receive(TIMEOUT);
             assertNotNull(message);
             assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
-            assertEquals(((TextMessage) message).getText(), DEFAULT_OUTPUT_MESSAGE);
+            assertEquals(DEFAULT_OUTPUT_MESSAGE, ((TextMessage) message).getText());
             session.rollback();
             return message;
         }
@@ -295,7 +295,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             Message message = consumer.receive(TIMEOUT);
             assertNotNull(message);
             assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
-            assertEquals(((TextMessage) message).getText(), DEFAULT_OUTPUT_MESSAGE);
+            assertEquals(DEFAULT_OUTPUT_MESSAGE, ((TextMessage) message).getText());
             session.commit();
             return message;
         }
@@ -340,7 +340,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             Message message = consumer.receive(TIMEOUT);
             assertNotNull(message);
             assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
-            assertEquals(((TextMessage) message).getText(), DEFAULT_OUTPUT_MESSAGE);
+            assertEquals(DEFAULT_OUTPUT_MESSAGE, ((TextMessage) message).getText());
             return message;
         }
     };
