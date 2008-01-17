@@ -94,8 +94,10 @@ rem ATTENTION: %_REALPATH% contains a trailing path delimiter that will cause th
 rem (making MULE_EXE as absolute path to enable wrapper include additional configs correctly)
 for /f "tokens=* delims= " %%a in ('attrib %MULE_HOME%\bin') do set MULE_EXE=%%a
 
-rem add XML compatibility jars when running with JDK 1.4
+rem add XML compatibility jars when running with JDK 1.4 or JDK 1.5
 java -version 2>&1 | findstr "1.4" >NUL
+IF %ERRORLEVEL% == 0 set MULE_ENDORSED=-M-Djava.endorsed.dirs="%MULE_HOME%\lib\endorsed"
+java -version 2>&1 | findstr "1.5" >NUL
 IF %ERRORLEVEL% == 0 set MULE_ENDORSED=-M-Djava.endorsed.dirs="%MULE_HOME%\lib\endorsed"
 
 rem Mule options: Set the working directory to the current one and pass all command-line

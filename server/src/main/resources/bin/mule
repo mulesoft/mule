@@ -46,8 +46,8 @@ WRAPPER_CONF="${MULE_BASE}/conf/wrapper.conf"
 # Set the startup directory so that any relative paths can be resolved later.
 STARTUP_DIR=`pwd`
 
-# add XML compatibility jars when running with JDK 1.4
-if [ "`java -version 2>&1 | grep 1.4`" ]; then
+# add XML compatibility jars when running with JDK 1.4 or JDK 1.5
+if [ "`java -version 2>&1 | grep -e '1.[45]'`" ]; then
 	MULE_ENDORSED=-M-Djava.endorsed.dirs="${MULE_HOME}/lib/endorsed"
 fi
 
