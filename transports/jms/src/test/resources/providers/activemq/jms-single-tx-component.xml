@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector"/>
+
+    <jms:transaction-factory name="txFactory"/>
+
+    <model name="jmsTest">
+        <service name="Part1">
+            <inbound-router>
+                <jms:inbound-endpoint queue="in">
+                    <transaction action="BEGIN_OR_JOIN">
+                        <transaction-factory ref="txFactory" />
+                    </transaction>
+                </jms:inbound-endpoint>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <jms:outbound-endpoint queue="middle"/>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+        <service name="Part2">
+            <inbound-router>
+                <jms:inbound-endpoint queue="middle">
+                    <transaction action="BEGIN_OR_JOIN">
+                        <transaction-factory ref="txFactory"/>
+                    </transaction>
+                </jms:inbound-endpoint>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <jms:outbound-endpoint queue="q1">
+                        <transaction action="BEGIN_OR_JOIN">
+                            <transaction-factory ref="txFactory"/>
+                        </transaction>
+                    </jms:outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+        <service name="Part3">
+            <inbound-router>
+                <jms:inbound-endpoint queue="q1">
+                    <transaction action="BEGIN_OR_JOIN">
+                        <transaction-factory ref="txFactory"/>
+                    </transaction>
+                </jms:inbound-endpoint>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+            </component>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <jms:outbound-endpoint queue="q2">
+                        <transaction action="BEGIN_OR_JOIN">
+                            <transaction-factory ref="txFactory"/>
+                        </transaction>
+                    </jms:outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+
+        <service name="Part4">
+            <inbound-router>
+                <jms:inbound-endpoint queue="q2">
+                    <transaction action="BEGIN_OR_JOIN">
+                        <transaction-factory ref="txFactory"/>
+                    </transaction>
+                </jms:inbound-endpoint>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <property key="returnMessage" value="OUTPUT MESSAGE"/>
+                </singleton-object>
+            </component>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <jms:outbound-endpoint queue="out">
+                        <transaction action="BEGIN_OR_JOIN">
+                            <transaction-factory ref="txFactory"/>
+                        </transaction>
+                    </jms:outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+        </service>
+    </model>
+</mule>
