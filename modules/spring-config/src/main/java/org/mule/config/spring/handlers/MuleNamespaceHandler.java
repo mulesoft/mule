@@ -194,17 +194,17 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("no-action-transformer", new TransformerDefinitionParser(NoActionTransformer.class));
         registerBeanDefinitionParser("message-properties-transformer", new TransformerDefinitionParser(MessagePropertiesTransformer.class));
 
-        registerBeanDefinitionParser("base64-encoder-transfomer", new TransformerDefinitionParser(Base64Encoder.class));
-        registerBeanDefinitionParser("base64-decoder-transfomer", new TransformerDefinitionParser(Base64Decoder.class));
+        registerBeanDefinitionParser("base64-encoder-transformer", new TransformerDefinitionParser(Base64Encoder.class));
+        registerBeanDefinitionParser("base64-decoder-transformer", new TransformerDefinitionParser(Base64Decoder.class));
 
-        registerBeanDefinitionParser("xml-entity-encoder-transfomer", new TransformerDefinitionParser(XmlEntityEncoder.class));
-        registerBeanDefinitionParser("xml-entity-decoder-transfomer", new TransformerDefinitionParser(XmlEntityDecoder.class));
-        registerBeanDefinitionParser("gzip-compress-transfomer", new TransformerDefinitionParser(GZipCompressTransformer.class));
-        registerBeanDefinitionParser("gzip-uncompress-transfomer", new TransformerDefinitionParser(GZipUncompressTransformer.class));
-        registerBeanDefinitionParser("encrypt-transfomer", new TransformerDefinitionParser(EncryptionTransformer.class));
-        registerBeanDefinitionParser("decrypt-transfomer", new TransformerDefinitionParser(DecryptionTransformer.class));
-        registerBeanDefinitionParser("byte-array-to-hex-string-transfomer", new TransformerDefinitionParser(ByteArrayToHexString.class));
-        registerBeanDefinitionParser("hex-string-to-byte-array-transfomer", new TransformerDefinitionParser(HexStringToByteArray.class));
+        registerBeanDefinitionParser("xml-entity-encoder-transformer", new TransformerDefinitionParser(XmlEntityEncoder.class));
+        registerBeanDefinitionParser("xml-entity-decoder-transformer", new TransformerDefinitionParser(XmlEntityDecoder.class));
+        registerBeanDefinitionParser("gzip-compress-transformer", new TransformerDefinitionParser(GZipCompressTransformer.class));
+        registerBeanDefinitionParser("gzip-uncompress-transformer", new TransformerDefinitionParser(GZipUncompressTransformer.class));
+        registerBeanDefinitionParser("encrypt-transformer", new TransformerDefinitionParser(EncryptionTransformer.class));
+        registerBeanDefinitionParser("decrypt-transformer", new TransformerDefinitionParser(DecryptionTransformer.class));
+        registerBeanDefinitionParser("byte-array-to-hex-string-transformer", new TransformerDefinitionParser(ByteArrayToHexString.class));
+        registerBeanDefinitionParser("hex-string-to-byte-array-transformer", new TransformerDefinitionParser(HexStringToByteArray.class));
 
         registerBeanDefinitionParser("byte-array-to-object-transformer", new TransformerDefinitionParser(ByteArrayToObject.class));
         registerBeanDefinitionParser("object-to-byte-array-transformer", new TransformerDefinitionParser(ObjectToByteArray.class));
