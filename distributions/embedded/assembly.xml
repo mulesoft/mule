@@ -58,7 +58,7 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.modules:mule-module-scripting</include>
         <include>org.mule.modules:mule-module-spring-config</include>
         <include>org.mule.modules:mule-module-spring-extras</include>
-        <include>org.mule.modules:mule-module-wssecurity</include>
+        <!-- include>org.mule.modules:mule-module-wssecurity</include -->
         <include>org.mule.modules:mule-module-xml</include>
       </includes>
       <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
