@@ -10,16 +10,12 @@
 
 package org.mule.providers.stdio;
 
-import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.CreateException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
-
-import com.mockobjects.dynamic.Mock;
 
 public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
@@ -39,8 +35,6 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
         assertNotNull(component);
 
         endpoint.getConnector().start();
-        Mock connector = new Mock(UMOConnector.class);
-        connector.expectAndReturn("getExceptionListener", new DefaultExceptionStrategy());
 
         receiver.setFrequency(1001);
         receiver.setInputStream(System.in);
@@ -50,11 +44,6 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
         assertTrue(receiver.getFrequency() == StdioMessageReceiver.DEFAULT_POLL_FREQUENCY);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.tck.providers.AbstractMessageReceiverTestCase#getMessageReceiver()
-     */
     public UMOMessageReceiver getMessageReceiver() throws CreateException
     {
         return new StdioMessageReceiver(endpoint.getConnector(), component, endpoint, 1000);
