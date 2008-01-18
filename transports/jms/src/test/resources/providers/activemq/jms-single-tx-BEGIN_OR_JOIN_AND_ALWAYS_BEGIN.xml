@@ -17,7 +17,7 @@
 
     <jms:transaction-factory name="txFactory"/>
 
-    <jms:transformer-object-to-jmsmessage name="ObjectToJMSMessage"/>
+    <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
 
     <model name="jmsTest">
 

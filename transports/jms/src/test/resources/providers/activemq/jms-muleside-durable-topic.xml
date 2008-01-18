@@ -15,7 +15,7 @@
 
     <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
 
-    <jms:transformer-object-to-jmsmessage name="ObjectToJMSMessage"/>
+    <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
 
     <model name="TEST">
 
