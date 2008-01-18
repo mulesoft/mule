@@ -2,21 +2,5 @@
 # Test cases listed in this file are not run.
 #
 
-# MULE-2071
-# These are intermittent, unfortunately - there may be more, but I've re-enabled many tests
-# as I seem to have fixed some issues.  So sorry, but we need to wait for failures again.
-# Note - all these have similar errors and all extend AbstractJmsTransactionFunctionalTest
-org.mule.providers.jms.issues.ActiveMQJmsTransactionMule2071TestCase
-org.mule.providers.jms.transactions.ActiveMQJmsXaTransactionFunctionalTestCase
-org.mule.providers.jms.transactions.ActiveMQJmsSingleResourceTransactionFunctionalTestCase
-org.mule.providers.jms.transactions.ActiveMQJmsTransactionFunctionalTestCase
-org.mule.providers.jms.transactions.JmsClientAcknowledgeSingleResourceTransactionFunctionalTestCase
-org.mule.providers.jms.transactions.JmsClientAcknowledgeTransactionFunctionalTestCase
-
-# These fail intermittently too, but look different to the 2071 errors
-org.mule.providers.jms.functional.ActiveMQJmsTopicFunctionalTestCase
-org.mule.providers.jms.functional.ActiveMQJmsQueueFunctionalTestCase
-
-
 # MULE-2868
 org.mule.providers.jms.issues.JmsRemoteSyncMule2868TestCase

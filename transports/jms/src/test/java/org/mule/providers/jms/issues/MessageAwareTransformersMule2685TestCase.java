@@ -13,7 +13,7 @@ package org.mule.providers.jms.issues;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.functional.AbstractJmsFunctionalTestCase;
+import org.mule.providers.jms.integration.AbstractJmsFunctionalTestCase;
 import org.mule.providers.jms.transformers.AbstractJmsTransformer;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.routing.outbound.StaticRecipientList;

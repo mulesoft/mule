@@ -11,7 +11,7 @@
 package org.mule.providers.jms;
 
 import org.mule.impl.RequestContext;
-import org.mule.providers.jms.functional.AbstractJmsFunctionalTestCase;
+import org.mule.providers.jms.integration.AbstractJmsFunctionalTestCase;
 import org.mule.providers.jms.transformers.AbstractJmsTransformer;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
