@@ -51,7 +51,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
         });
 
         // throwing exception
-        DefaultExceptionStrategy strategy = new DefaultExceptionStrategy();
+        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy();
         strategy.setManagementContext(managementContext);
         strategy.exceptionThrown(new IllegalArgumentException("boom"));
 
@@ -72,11 +72,16 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
             super.defaultHandler(t);
         }
 
+        // @Override
+        protected void logException(Throwable t)
+        {
+            // do not log anything here, we're running as part of a unit test
+        }
+
         public int getCount()
         {
             return count;
         }
-
     }
 
 }
