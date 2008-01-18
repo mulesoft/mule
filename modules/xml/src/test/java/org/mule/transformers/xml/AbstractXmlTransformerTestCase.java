@@ -25,6 +25,7 @@ public abstract class AbstractXmlTransformerTestCase extends AbstractTransformer
     {
         super();
         XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setXSLTVersion("2.0");
     }
 
     // @Override

@@ -29,7 +29,7 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setXslt("<?xml version='1.0'?>\n"
-                            + "<xsl:stylesheet version='1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>\n"
+                            + "<xsl:stylesheet version='2.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>\n"
                             + "<xsl:output method='xml'/>\n" + "<xsl:template match='/'>\n"
                             + "  <some-xml>\n" + "    <xsl:copy-of select='.'/>\n" + "  </some-xml>\n"
                             + "</xsl:template>\n" + "</xsl:stylesheet>");

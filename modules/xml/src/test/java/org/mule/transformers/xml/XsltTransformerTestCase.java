@@ -104,13 +104,10 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
                 "</node1>";
 
         String xsl =
-                "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"1.0\"" +
+                "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"2.0\"" +
                      " xmlns:wsdlsoap=\"http://schemas.xmlsoap.org/wsdl/soap/\"" +
                      " xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\">" +
                      "<xsl:param name=\"param1\"/>" +
-                     "<xsl:template match=\"@*|node()\">" +
-                         "<xsl:copy><xsl:apply-templates select=\"@*|node()\"/></xsl:copy>" +
-                     "</xsl:template>" +
                      "<xsl:template match=\"@*|node()\">" +
                          "<xsl:copy><xsl:apply-templates select=\"@*|node()\"/></xsl:copy>" +
                      "</xsl:template>" +
@@ -161,13 +158,10 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
                 "</node1>";
 
         String xsl =
-                "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"1.0\"" +
+                "<xsl:stylesheet xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" version=\"2.0\"" +
                     " xmlns:wsdlsoap=\"http://schemas.xmlsoap.org/wsdl/soap/\"" +
                     " xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\">" +
                     "<xsl:param name=\"param1\"/>" +
-                    "<xsl:template match=\"@*|node()\">" +
-                        "<xsl:copy><xsl:apply-templates select=\"@*|node()\"/></xsl:copy>" +
-                    "</xsl:template>" +
                     "<xsl:template match=\"@*|node()\">" +
                         "<xsl:copy><xsl:apply-templates select=\"@*|node()\"/></xsl:copy>" +
                     "</xsl:template>" +
