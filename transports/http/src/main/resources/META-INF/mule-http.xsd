@@ -115,10 +115,10 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="http-client-response-to-object" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="http-response-to-string" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="object-to-http-client-request" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="message-to-http-response" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="http-client-response-to-object-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="http-response-to-string-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="object-to-http-client-request-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="message-to-http-response-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
 
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">

@@ -631,17 +631,17 @@
 
     <xsd:element name="custom-transaction-manager" type="customTransactionManagerType"
                  substitutionGroup="abstract-transaction-manager"/>
-    <xsd:element name="transaction-manager-jndi" type="transactionManagerType"
+    <xsd:element name="jndi-transaction-manager" type="transactionManagerType"
                  substitutionGroup="abstract-transaction-manager"/>
-    <xsd:element name="transaction-manager-weblogic" type="jndiTransactionManagerType"
+    <xsd:element name="weblogic-transaction-manager" type="jndiTransactionManagerType"
                  substitutionGroup="abstract-transaction-manager"/>
-    <xsd:element name="transaction-manager-websphere" type="transactionManagerType"
+    <xsd:element name="websphere-transaction-manager" type="transactionManagerType"
                  substitutionGroup="abstract-transaction-manager"/>
-    <xsd:element name="transaction-manager-jrun" type="transactionManagerType"
+    <xsd:element name="jrun-transaction-manager" type="transactionManagerType"
                  substitutionGroup="abstract-transaction-manager"/>
-    <xsd:element name="transaction-manager-jboss" type="transactionManagerType"
+    <xsd:element name="jboss-transaction-manager" type="transactionManagerType"
                  substitutionGroup="abstract-transaction-manager"/>
-    <xsd:element name="transaction-manager-resin" type="transactionManagerType"
+    <xsd:element name="resin-transaction-manager" type="transactionManagerType"
                  substitutionGroup="abstract-transaction-manager"/>
 
 
@@ -926,7 +926,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="transformer-message-properties" type="messagePropertiesTransformerType"
+    <xsd:element name="message-properties-transformer" type="messagePropertiesTransformerType"
                  substitutionGroup="abstract-transformer"/>
     <xsd:complexType name="messagePropertiesTransformerType">
         <xsd:complexContent>
@@ -941,47 +941,47 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="transformer-no-action" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-base64-encoder" type="abstractTransformerType"
+    <xsd:element name="no-action-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="base64-encoder-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-base64-decoder" type="abstractTransformerType"
+    <xsd:element name="base64-decoder-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-uc-encoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-uc-decoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-uu-encoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-uu-decoder" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-xml-entity-encoder" type="abstractTransformerType"
+    <xsd:element name="uc-encoder-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="uc-decoder-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="uu-encoder-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="uu-decoder-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="xml-entity-encoder-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-xml-entity-decoder" type="abstractTransformerType"
+    <xsd:element name="xml-entity-decoder-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-gzip-compress" type="abstractTransformerType"
+    <xsd:element name="gzip-compress-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-gzip-uncompress" type="abstractTransformerType"
+    <xsd:element name="gzip-uncompress-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
     <!-- TODO RM* encryption -->
-    <xsd:element name="transformer-encrypt" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-decrypt" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="encrypt-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:element name="decrypt-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer"/>
 
-    <xsd:element name="transformer-byte-array-to-hex-string" type="abstractTransformerType"
+    <xsd:element name="byte-array-to-hex-string-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-hex-sting-to-byte-array" type="abstractTransformerType"
+    <xsd:element name="hex-string-to-byte-array-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-byte-array-to-object" type="abstractTransformerType"
+    <xsd:element name="byte-array-to-object-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-object-to-byte-array" type="abstractTransformerType"
+    <xsd:element name="object-to-byte-array-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-object-to-string" type="abstractTransformerType"
+    <xsd:element name="object-to-string-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-byte-array-to-serializable" type="abstractTransformerType"
+    <xsd:element name="byte-array-to-serializable-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-serializable-to-byte-array" type="abstractTransformerType"
+    <xsd:element name="serializable-to-byte-array-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-byte-array-to-string" type="abstractTransformerType"
+    <xsd:element name="byte-array-to-string-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
-    <xsd:element name="transformer-string-to-byte-array" type="abstractTransformerType"
+    <xsd:element name="string-to-byte-array-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer"/>
 
-    <xsd:element name="transformer-append-string" substitutionGroup="abstract-transformer">
+    <xsd:element name="append-string-transformer" substitutionGroup="abstract-transformer">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="abstractTransformerType">

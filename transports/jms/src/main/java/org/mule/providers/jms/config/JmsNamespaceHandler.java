@@ -64,9 +64,9 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("client-ack-transaction-factory", new TransactionFactoryDefinitionParser(JmsClientAcknowledgeTransactionFactory.class));
         registerBeanDefinitionParser("xa-transaction-factory", new TransactionFactoryDefinitionParser(XaTransactionFactory.class));        
 
-        registerBeanDefinitionParser("transformer-jmsmessage-to-object", new TransformerDefinitionParser(JMSMessageToObject.class));   
-        registerBeanDefinitionParser("transformer-object-to-jmsmessage", new TransformerDefinitionParser(ObjectToJMSMessage.class));
+        registerBeanDefinitionParser("jmsmessage-to-object-transformer", new TransformerDefinitionParser(JMSMessageToObject.class));
 
+        registerBeanDefinitionParser("object-to-jmsmessage-transformer", new TransformerDefinitionParser(ObjectToJMSMessage.class));
         registerBeanDefinitionParser("property-filter", new FilterDefinitionParser(JmsPropertyFilter.class));
         registerBeanDefinitionParser("selector", new ChildDefinitionParser(FilterDefinitionParser.FILTER, JmsSelectorFilter.class));
     }

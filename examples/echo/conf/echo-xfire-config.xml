@@ -23,7 +23,7 @@
         <service name="EchoUMO">
             <inbound-router>
                 <inbound-endpoint address="xfire:http://localhost:65081/services">
-                    <soap:transformer-http-to-soap-request/>
+                    <soap:http-to-soap-request-transformer/>
                 </inbound-endpoint>
                 <inbound-endpoint address="xfire:http://localhost:65082/services"/>
             </inbound-router>

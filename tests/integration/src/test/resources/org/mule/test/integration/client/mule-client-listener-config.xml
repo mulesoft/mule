@@ -19,7 +19,7 @@
         <service name="tcpComponent" initialState="stopped">
             <inbound-router>
                 <inbound-endpoint address="tcp://localhost:56324" synchronous="true">
-                    <transformer-byte-array-to-string/>
+                    <byte-array-to-string-transformer/>
                 </inbound-endpoint>
             </inbound-router>
             <component>

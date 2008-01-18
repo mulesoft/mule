@@ -49,7 +49,7 @@
         <spring:property name="containerProperty" value="myString"/>
     </custom-transformer>
 
-    <transformer-no-action name="Default"/>
+    <no-action-transformer name="Default"/>
 
     <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
         <mxml:jxpath-filter expectedValue="bar" pattern="name">

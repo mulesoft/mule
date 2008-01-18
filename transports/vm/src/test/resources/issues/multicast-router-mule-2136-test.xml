@@ -13,8 +13,8 @@
     <vm:connector name="default"/>
     <vm:connector name="queue" queueEvents="true"/>
 
-    <mxml:object-to-xml name="objectToXml"/>
-    <mxml:xml-to-object name="xmlToObject"/>
+    <mxml:object-to-xml-transformer name="objectToXml"/>
+    <mxml:xml-to-object-transformer name="xmlToObject"/>
 
     <vm:endpoint name="xml-in" path="xml-in" connector-ref="default"/>
     <vm:endpoint name="object-in" address="vm://object-in" connector-ref="default"/>

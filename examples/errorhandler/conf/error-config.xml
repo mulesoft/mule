@@ -68,9 +68,9 @@
         All transformers must be declared here to be referenced by their names in the 
         endpoint definitions 
     -->
-    <email:transformer-string-to-email name="StringToEmailMessage"/>
-    <jms:transformer-object-to-jmsmessage name="ObjectToJMSMessage"/>
-    <jms:transformer-jmsmessage-to-object name="JMSMessageToObject"/>
+    <email:string-to-email-transformer name="StringToEmailMessage"/>
+    <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
+    <jms:jmsmessage-to-object-transformer name="JMSMessageToObject"/>
     <custom-transformer name="XMLToExceptionBean"
                              class="org.mule.transformers.xml.XmlToObject"
                              returnClass="org.mule.samples.errorhandler.ExceptionBean"/>

@@ -58,7 +58,7 @@
             <property name="beanProperty2" value="12"/>
             <property name="containerProperty" value="a string"/>
         </mule:custom-transformer>
-        <mule:transformer-no-action name="TestTransformer" returnClass="[B"/>
+        <mule:no-action-transformer name="TestTransformer" returnClass="[B"/>
 
         <mule:endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
             <mxml:jxpath-filter pattern="name" expectedValue="bar">

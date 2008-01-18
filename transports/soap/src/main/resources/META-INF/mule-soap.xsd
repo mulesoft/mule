@@ -10,7 +10,7 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
-    <xsd:element name="transformer-http-to-soap-request" type="mule:abstractTransformerType"
+    <xsd:element name="http-to-soap-request-transformer" type="mule:abstractTransformerType"
                  substitutionGroup="mule:abstract-transformer"/>
 
 </xsd:schema>

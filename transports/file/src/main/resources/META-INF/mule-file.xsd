@@ -122,8 +122,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="transformer-file-to-byte-array" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="transformer-file-to-string" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="file-to-byte-array-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="file-to-string-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
 
     <xsd:element name="filter-filename-wildcard" type="mule:wildcardFilterType" substitutionGroup="mule:abstract-filter"/>
 

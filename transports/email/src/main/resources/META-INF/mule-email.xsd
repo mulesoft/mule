@@ -61,10 +61,10 @@
         <xsd:attribute name="port" type="mule:substitutablePortNumber"/>
     </xsd:attributeGroup>
 
-    <xsd:element name="transformer-email-to-string" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="transformer-string-to-email" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="transformer-object-to-mime" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="transformer-mime-to-bytes" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="transformer-bytes-to-mime" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="email-to-string-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="string-to-email-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="object-to-mime-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="mime-to-bytes-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="bytes-to-mime-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
 
 </xsd:schema>

@@ -17,12 +17,12 @@
     <endpoint name="httpEndpoint2" address="http://localhost:18081/RemoteService?method=post" synchronous="true"/>
     <endpoint name="vmEndpoint" address="vm://LocalService" synchronous="true"/>
 
-    <transformer-byte-array-to-string name="ByteArrayToString"/>
-    <transformer-byte-array-to-serializable name="ByteArrayToSerializable"/>
-    <transformer-serializable-to-byte-array name="SerializableToByteArray"/>
-    <xm:object-to-xml name="ObjectToXml"/>
-    <transformer-gzip-compress name="Compress"/>
-    <http:message-to-http-response name="ToHttpResponse"/>
+    <byte-array-to-string-transformer name="ByteArrayToString"/>
+    <byte-array-to-serializable-transformer name="ByteArrayToSerializable"/>
+    <serializable-to-byte-array-transformer name="SerializableToByteArray"/>
+    <xm:object-to-xml-transformer name="ObjectToXml"/>
+    <gzip-compress-transformer name="Compress"/>
+    <http:message-to-http-response-transformer name="ToHttpResponse"/>
 
     <model name="model">
         <service name="HttpService">

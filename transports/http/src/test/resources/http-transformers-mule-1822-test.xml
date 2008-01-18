@@ -89,7 +89,7 @@
         <service name="bothService1">
             <inbound-router>
                 <http:inbound-endpoint ref="both" responseTransformer-refs="appendResponse">
-                   <transformer-object-to-string/>
+                   <object-to-string-transformer/>
                    <transformer ref="appendString" />
                 </http:inbound-endpoint>
                 <forwarding-router/>
@@ -106,7 +106,7 @@
             <inbound-router>
                 <vm:inbound-endpoint address="vm://echo3" synchronous="true"
                 				  responseTransformer-refs="appendResponse2">
-                  <transformer-object-to-string />
+                  <object-to-string-transformer />
                   <transformer ref="appendString2" />
                 </vm:inbound-endpoint>
             </inbound-router>

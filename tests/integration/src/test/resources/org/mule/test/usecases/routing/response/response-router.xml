@@ -83,7 +83,7 @@
         <service name="W10FO">
             <inbound-router>
                 <inbound-endpoint address="vm://getFO">
-                    <transformer-byte-array-to-string/>
+                    <byte-array-to-string-transformer/>
                 </inbound-endpoint>
             </inbound-router>
             <component class="org.mule.test.integration.service.TestReceiver"/>

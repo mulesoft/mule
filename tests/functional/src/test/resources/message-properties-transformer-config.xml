@@ -6,7 +6,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <transformer-message-properties name="testTransformer" overwrite="true">
+    <message-properties-transformer name="testTransformer" overwrite="true">
         <delete-message-property key="test-property1"/>
         <delete-message-property key="test-property2"/>
         <add-message-property key="Content-Type" value="text/baz;charset=UTF-16BE"/>
@@ -14,7 +14,7 @@
         <add-message-properties>
             <spring:entry key="key" value="value"/>
         </add-message-properties>
-    </transformer-message-properties>
+    </message-properties-transformer>
 
 
 </mule>

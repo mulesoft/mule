@@ -37,8 +37,8 @@
                     proxyPort="${proxyPort}"
                     proxyUsername="${proxyUsername}"/>
 
-    <xm:xml-to-object name="XmlToObject"/>
-    <transformer-xml-entity-decoder name="XmlDecoder"/>
+    <xm:xml-to-object-transformer name="XmlToObject"/>
+    <xml-entity-decoder-transformer name="XmlDecoder"/>
     <xm:xslt-transformer name="Xslt" xsl-file="xsl/soap-stock.xsl"/>
 
     <model name="Sample-WSDL">

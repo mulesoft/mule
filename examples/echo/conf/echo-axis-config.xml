@@ -25,7 +25,7 @@
         <service name="EchoUMO">
             <inbound-router>
                 <inbound-endpoint address="axis:http://localhost:65081/services">
-                    <soap:transformer-http-to-soap-request/>
+                    <soap:http-to-soap-request-transformer/>
                 </inbound-endpoint>
                 <axis:inbound-endpoint address="http://localhost:65082/services"/>
                 <inbound-endpoint address="vm://echo" />

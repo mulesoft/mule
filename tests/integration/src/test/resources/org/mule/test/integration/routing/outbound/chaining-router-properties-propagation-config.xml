@@ -6,12 +6,12 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <transformer-message-properties name="hop1ResponseEnricher">
+    <message-properties-transformer name="hop1ResponseEnricher">
         <add-message-property key="TICKET" value="hop1"/>
-    </transformer-message-properties>
-    <transformer-message-properties name="hop2enricher">
+    </message-properties-transformer>
+    <message-properties-transformer name="hop2enricher">
         <add-message-property key="TTL" value="10000"/>
-    </transformer-message-properties>
+    </message-properties-transformer>
 
     <endpoint name="inboundEndpoint" address="vm://inbound"/>
     <endpoint name="hop1Endpoint" address="vm://hop1"/>

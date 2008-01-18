@@ -11,9 +11,9 @@
     <!-- Testing with ActiveMq -->
     <jms:activemq-connector name="jmsConnector"/>
 
-    <jms:transformer-jmsmessage-to-object name="jmsmessagetoobject"/>
-    <transformer-byte-array-to-string name="inboundtransformer"/>
-    <transformer-string-to-byte-array name="responsetransformer"/>
+    <jms:jmsmessage-to-object-transformer name="jmsmessagetoobject"/>
+    <byte-array-to-string-transformer name="inboundtransformer"/>
+    <string-to-byte-array-transformer name="responsetransformer"/>
     
     <model name="model">
         <service name="TcpReceiver">

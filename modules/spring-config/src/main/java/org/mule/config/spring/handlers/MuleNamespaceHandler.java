@@ -56,7 +56,6 @@ import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
-import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.container.JndiContainerContext;
@@ -192,39 +191,39 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("transformer", new TransformerRefDefinitionParser());
 
         registerBeanDefinitionParser("custom-transformer", new TransformerDefinitionParser());
-        registerBeanDefinitionParser("transformer-no-action", new TransformerDefinitionParser(NoActionTransformer.class));
-        registerBeanDefinitionParser("transformer-message-properties", new TransformerDefinitionParser(MessagePropertiesTransformer.class));
+        registerBeanDefinitionParser("no-action-transformer", new TransformerDefinitionParser(NoActionTransformer.class));
+        registerBeanDefinitionParser("message-properties-transformer", new TransformerDefinitionParser(MessagePropertiesTransformer.class));
 
-        registerBeanDefinitionParser("transformer-base64-encoder", new TransformerDefinitionParser(Base64Encoder.class));
-        registerBeanDefinitionParser("transformer-base64-decoder", new TransformerDefinitionParser(Base64Decoder.class));
+        registerBeanDefinitionParser("base64-encoder-transfomer", new TransformerDefinitionParser(Base64Encoder.class));
+        registerBeanDefinitionParser("base64-decoder-transfomer", new TransformerDefinitionParser(Base64Decoder.class));
 
-        registerBeanDefinitionParser("transformer-xml-entity-encoder", new TransformerDefinitionParser(XmlEntityEncoder.class));
-        registerBeanDefinitionParser("transformer-xml-entity-decoder", new TransformerDefinitionParser(XmlEntityDecoder.class));
-        registerBeanDefinitionParser("transformer-gzip-compress", new TransformerDefinitionParser(GZipCompressTransformer.class));
-        registerBeanDefinitionParser("transformer-gzip-uncompress", new TransformerDefinitionParser(GZipUncompressTransformer.class));
-        registerBeanDefinitionParser("transformer-encrypt", new TransformerDefinitionParser(EncryptionTransformer.class));
-        registerBeanDefinitionParser("transformer-decrypt", new TransformerDefinitionParser(DecryptionTransformer.class));
-        registerBeanDefinitionParser("transformer-byte-array-to-hex-string", new TransformerDefinitionParser(ByteArrayToHexString.class));
-        registerBeanDefinitionParser("transformer-hex-sting-to-byte-array", new TransformerDefinitionParser(HexStringToByteArray.class));
+        registerBeanDefinitionParser("xml-entity-encoder-transfomer", new TransformerDefinitionParser(XmlEntityEncoder.class));
+        registerBeanDefinitionParser("xml-entity-decoder-transfomer", new TransformerDefinitionParser(XmlEntityDecoder.class));
+        registerBeanDefinitionParser("gzip-compress-transfomer", new TransformerDefinitionParser(GZipCompressTransformer.class));
+        registerBeanDefinitionParser("gzip-uncompress-transfomer", new TransformerDefinitionParser(GZipUncompressTransformer.class));
+        registerBeanDefinitionParser("encrypt-transfomer", new TransformerDefinitionParser(EncryptionTransformer.class));
+        registerBeanDefinitionParser("decrypt-transfomer", new TransformerDefinitionParser(DecryptionTransformer.class));
+        registerBeanDefinitionParser("byte-array-to-hex-string-transfomer", new TransformerDefinitionParser(ByteArrayToHexString.class));
+        registerBeanDefinitionParser("hex-string-to-byte-array-transfomer", new TransformerDefinitionParser(HexStringToByteArray.class));
 
-        registerBeanDefinitionParser("transformer-byte-array-to-object", new TransformerDefinitionParser(ByteArrayToObject.class));
-        registerBeanDefinitionParser("transformer-object-to-byte-array", new TransformerDefinitionParser(ObjectToByteArray.class));
-        registerBeanDefinitionParser("transformer-object-to-string", new TransformerDefinitionParser(ObjectToString.class));
-        registerBeanDefinitionParser("transformer-byte-array-to-serializable", new TransformerDefinitionParser(ByteArrayToSerializable.class));
-        registerBeanDefinitionParser("transformer-serializable-to-byte-array", new TransformerDefinitionParser(SerializableToByteArray.class));
-        registerBeanDefinitionParser("transformer-byte-array-to-string", new TransformerDefinitionParser(ObjectToString.class));
-        registerBeanDefinitionParser("transformer-string-to-byte-array", new TransformerDefinitionParser(ObjectToByteArray.class));
+        registerBeanDefinitionParser("byte-array-to-object-transformer", new TransformerDefinitionParser(ByteArrayToObject.class));
+        registerBeanDefinitionParser("object-to-byte-array-transformer", new TransformerDefinitionParser(ObjectToByteArray.class));
+        registerBeanDefinitionParser("object-to-string-transformer", new TransformerDefinitionParser(ObjectToString.class));
+        registerBeanDefinitionParser("byte-array-to-serializable-transformer", new TransformerDefinitionParser(ByteArrayToSerializable.class));
+        registerBeanDefinitionParser("serializable-to-byte-array-transformer", new TransformerDefinitionParser(SerializableToByteArray.class));
+        registerBeanDefinitionParser("byte-array-to-string-transformer", new TransformerDefinitionParser(ObjectToString.class));
+        registerBeanDefinitionParser("string-to-byte-array-transformer", new TransformerDefinitionParser(ObjectToByteArray.class));
 
-        registerBeanDefinitionParser("transformer-append-string", new TransformerDefinitionParser(StringAppendTransformer.class));
+        registerBeanDefinitionParser("append-string-transformer", new TransformerDefinitionParser(StringAppendTransformer.class));
 
         //Transaction Managers
         registerBeanDefinitionParser("custom-transaction-manager", new TransactionManagerDefinitionParser());
-        registerBeanDefinitionParser("transaction-manager-jndi", new TransactionManagerDefinitionParser(GenericTransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("transaction-manager-weblogic", new TransactionManagerDefinitionParser(WeblogicTransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("transaction-manager-jboss", new TransactionManagerDefinitionParser(JBossTransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("transaction-manager-jrun", new TransactionManagerDefinitionParser(JRunTransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("transaction-manager-resin", new TransactionManagerDefinitionParser(Resin3TransactionManagerLookupFactory.class));
-        registerBeanDefinitionParser("transaction-manager-websphere", new TransactionManagerDefinitionParser(WebsphereTransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("jndi-transaction-manager", new TransactionManagerDefinitionParser(GenericTransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("weblogic-transaction-manager", new TransactionManagerDefinitionParser(WeblogicTransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("jboss-transaction-manager", new TransactionManagerDefinitionParser(JBossTransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("jrun-transaction-manager", new TransactionManagerDefinitionParser(JRunTransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("resin-transaction-manager", new TransactionManagerDefinitionParser(Resin3TransactionManagerLookupFactory.class));
+        registerBeanDefinitionParser("websphere-transaction-manager", new TransactionManagerDefinitionParser(WebsphereTransactionManagerLookupFactory.class));
 
         //Endpoint elements
         registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));

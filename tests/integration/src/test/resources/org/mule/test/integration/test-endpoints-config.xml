@@ -19,9 +19,9 @@
     <vm:connector name="vmConnector2" />
     <test:connector name="testConnector1" />
 
-    <file:transformer-file-to-string name="ObjectToFileMessage" />
-    <xm:object-to-xml name="ObjectToXml" />
-    <xm:xml-to-object name="XmlToObject" />
+    <file:file-to-string-transformer name="ObjectToFileMessage" />
+    <xm:object-to-xml-transformer name="ObjectToXml" />
+    <xm:xml-to-object-transformer name="XmlToObject" />
 
     <endpoint name="server1" address="tcp://localhost:45431" />
     <endpoint name="server2" address="tcp://localhost:45432" />

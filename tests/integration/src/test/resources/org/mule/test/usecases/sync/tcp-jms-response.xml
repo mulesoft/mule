@@ -14,8 +14,8 @@
 
     <jms:activemq-connector name="jmsConnector" specification="1.1" />
 
-    <jms:transformer-jmsmessage-to-object name="jmsmessage-to-object" />
-    <transformer-byte-array-to-object name="bytearray-to-object" />
+    <jms:jmsmessage-to-object-transformer name="jmsmessage-to-object" />
+    <byte-array-to-object-transformer name="bytearray-to-object" />
 
     <model name="model">
 

@@ -20,7 +20,7 @@
         <spring:property name="userMap" value="ross=ross_may_not_invoke_web_service,ROLE_ADMIN"/>
     </spring:bean>
 
-    <transformer-byte-array-to-string name="ByteArrayToString"/>
+    <byte-array-to-string-transformer name="ByteArrayToString"/>
 
     <servlet:connector name="servletConnector" servletUrl="http://localhost:18088/services">
         <!--  TODO DO: this should not be necessary, see MULE-1508 -->

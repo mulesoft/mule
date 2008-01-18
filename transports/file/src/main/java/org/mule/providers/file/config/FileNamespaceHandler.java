@@ -32,8 +32,8 @@ public class FileNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(FileConnector.class, true));
         registerBeanDefinitionParser("filename-parser",
                     new ChildDefinitionParser("filenameParser", null, FilenameParser.class));
-        registerBeanDefinitionParser("transformer-file-to-byte-array", new MuleOrphanDefinitionParser(FileToByteArray.class, false));
-        registerBeanDefinitionParser("transformer-file-to-string", new MuleOrphanDefinitionParser(FileToString.class, false));
+        registerBeanDefinitionParser("file-to-byte-array-transformer", new MuleOrphanDefinitionParser(FileToByteArray.class, false));
+        registerBeanDefinitionParser("file-to-string-transformer", new MuleOrphanDefinitionParser(FileToString.class, false));
         registerBeanDefinitionParser("filter-filename-wildcard", new ChildDefinitionParser("filter", FilenameWildcardFilter.class));
     }
 

@@ -18,13 +18,13 @@
         <custom-exception-strategy class="org.mule.modules.xml.functional.HideExceptions"/>
     </vm:connector>
 
-    <mxml:dom-to-xml name="domToXml"/>
-    <mxml:xml-to-dom name="xmlToDom" returnClass="org.w3c.dom.Document"/>
+    <mxml:dom-to-xml-transformer name="domToXml"/>
+    <mxml:xml-to-dom-transformer name="xmlToDom" returnClass="org.w3c.dom.Document"/>
 
-    <mxml:jxpath-extractor name="jxpath" expression="count(//parent)"/>
+    <mxml:jxpath-extractor-transformer name="jxpath" expression="count(//parent)"/>
 
-    <mxml:object-to-xml name="objectToXml"/>
-    <mxml:xml-to-object name="xmlToObject"/>
+    <mxml:object-to-xml-transformer name="objectToXml"/>
+    <mxml:xml-to-object-transformer name="xmlToObject"/>
 
     <mxml:xslt-transformer name="xslt" returnClass="org.dom4j.Document">
         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">

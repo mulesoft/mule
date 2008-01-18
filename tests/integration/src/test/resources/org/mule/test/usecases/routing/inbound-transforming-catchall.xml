@@ -35,12 +35,12 @@
             <inbound-router matchAll="true">
                 <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
                     <outbound-endpoint address="vm://catchall" connector-ref="vmQueue">
-                        <transformer-string-to-byte-array/>
+                        <string-to-byte-array-transformer/>
                     </outbound-endpoint>
                 </custom-forwarding-catch-all-strategy>
 
                 <inbound-endpoint address="vm://in2" connector-ref="vmQueue">
-                    <transformer-string-to-byte-array/>
+                    <string-to-byte-array-transformer/>
                 </inbound-endpoint>
 
                 <selective-consumer-router>

@@ -21,7 +21,7 @@ public class SoapNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerBeanDefinitionParser("transformer-http-to-soap-request", new TransformerDefinitionParser(HttpRequestToSoapRequest.class));
+        registerBeanDefinitionParser("http-to-soap-request-transformer", new TransformerDefinitionParser(HttpRequestToSoapRequest.class));
     }
 
 }

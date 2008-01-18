@@ -22,11 +22,11 @@ public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerBeanDefinitionParser("transformer-email-to-string", new TransformerDefinitionParser(EmailMessageToString.class));   
-        registerBeanDefinitionParser("transformer-string-to-email", new TransformerDefinitionParser(StringToEmailMessage.class));   
-        registerBeanDefinitionParser("transformer-object-to-mime", new TransformerDefinitionParser(ObjectToMimeMessage.class));   
-        registerBeanDefinitionParser("transformer-mime-to-bytes", new TransformerDefinitionParser(MimeMessageToRfc822ByteArray.class));   
-        registerBeanDefinitionParser("transformer-bytes-to-mime", new TransformerDefinitionParser(Rfc822ByteArraytoMimeMessage.class));   
+        registerBeanDefinitionParser("email-to-string-transformer", new TransformerDefinitionParser(EmailMessageToString.class));
+        registerBeanDefinitionParser("string-to-email-transformer", new TransformerDefinitionParser(StringToEmailMessage.class));
+        registerBeanDefinitionParser("object-to-mime-transformer", new TransformerDefinitionParser(ObjectToMimeMessage.class));
+        registerBeanDefinitionParser("mime-to-bytes-transformer", new TransformerDefinitionParser(MimeMessageToRfc822ByteArray.class));
+        registerBeanDefinitionParser("bytes-to-mime-transformer", new TransformerDefinitionParser(Rfc822ByteArraytoMimeMessage.class));   
     }
 
 }

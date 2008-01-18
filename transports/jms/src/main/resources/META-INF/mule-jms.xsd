@@ -135,8 +135,8 @@
     <xsd:element name="client-ack-transaction-factory" type="jmsTransactionFactoryType" substitutionGroup="mule:abstract-transaction-factory"/>
     <xsd:element name="xa-transaction-factory" type="jmsTransactionFactoryType" substitutionGroup="mule:abstract-transaction-factory"/>
 
-    <xsd:element name="transformer-jmsmessage-to-object" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
-    <xsd:element name="transformer-object-to-jmsmessage" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="jmsmessage-to-object-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:element name="object-to-jmsmessage-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">

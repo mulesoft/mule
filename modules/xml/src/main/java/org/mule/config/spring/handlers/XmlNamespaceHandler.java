@@ -38,12 +38,12 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("is-xml-filter", new ChildDefinitionParser("filter", IsXmlFilter.class));
         registerBeanDefinitionParser("message-splitter", new RouterDefinitionParser("router", FilteringXmlMessageSplitter.class));
         registerMuleBeanDefinitionParser("round-robin-splitter", new RouterDefinitionParser("router", RoundRobinXmlSplitter.class)).addAlias("endpointFiltering", "enableEndpointFiltering");
-        registerBeanDefinitionParser("dom-to-xml", new MuleOrphanDefinitionParser(DomDocumentToXml.class, false));
+        registerBeanDefinitionParser("dom-to-xml-transformer", new MuleOrphanDefinitionParser(DomDocumentToXml.class, false));
         registerBeanDefinitionParser("dom-to-output-handler", new MuleOrphanDefinitionParser(DocumentToOutputHandler.class, false));
-        registerBeanDefinitionParser("jxpath-extractor", new MuleOrphanDefinitionParser(JXPathExtractor.class, false));
-        registerBeanDefinitionParser("object-to-xml", new MuleOrphanDefinitionParser(ObjectToXml.class, false));
-        registerBeanDefinitionParser("xml-to-dom", new MuleOrphanDefinitionParser(XmlToDomDocument.class, false));
-        registerBeanDefinitionParser("xml-to-object", new MuleOrphanDefinitionParser(XmlToObject.class, false));
+        registerBeanDefinitionParser("jxpath-extractor-transformer", new MuleOrphanDefinitionParser(JXPathExtractor.class, false));
+        registerBeanDefinitionParser("object-to-xml-transformer", new MuleOrphanDefinitionParser(ObjectToXml.class, false));
+        registerBeanDefinitionParser("xml-to-dom-transformer", new MuleOrphanDefinitionParser(XmlToDomDocument.class, false));
+        registerBeanDefinitionParser("xml-to-object-transformer", new MuleOrphanDefinitionParser(XmlToObject.class, false));
         registerBeanDefinitionParser("xslt-transformer", new XsltTransformerDefinitionParser());
         registerBeanDefinitionParser("jxpath-property-extractor", new ChildDefinitionParser("propertyExtractor", JXPathPropertyExtractor.class));
         registerBeanDefinitionParser("xpath-property-extractor", new ChildDefinitionParser("propertyExtractor", XPathPayloadPropertyExtractor.class));

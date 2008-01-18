@@ -107,7 +107,7 @@
         <service name="inboundService1">
             <inbound-router>
                 <inbound-endpoint ref="inbound">
-                    <transformer-object-to-string/>
+                    <object-to-string-transformer/>
                     <transformer ref="appendString"/>
                 </inbound-endpoint>
                 <forwarding-router/>
@@ -122,7 +122,7 @@
         <service name="inboundService2">
             <inbound-router>
                 <inbound-endpoint address="vm://echo4" synchronous="true">
-                  <transformer-object-to-string/>
+                  <object-to-string-transformer/>
                   <transformer ref="appendString2" />
                 </inbound-endpoint>
             </inbound-router>

@@ -14,9 +14,9 @@
         <service name="service1">
             <inbound-router>
                 <vm:inbound-endpoint path="test1-in">
-                    <transformer-append-string message="1"/>
-                    <transformer-append-string message="2"/>
-                    <transformer-append-string message="3"/>
+                    <append-string-transformer message="1"/>
+                    <append-string-transformer message="2"/>
+                    <append-string-transformer message="3"/>
                 </vm:inbound-endpoint>
             </inbound-router>
             <pass-through-component/>
@@ -28,9 +28,9 @@
         </service>
     </model>
 
-    <transformer-append-string message="1" name="1"/>
-    <transformer-append-string message="2" name="2"/>
-    <transformer-append-string message="3" name="3"/>
+    <append-string-transformer message="1" name="1"/>
+    <append-string-transformer message="2" name="2"/>
+    <append-string-transformer message="3" name="3"/>
 
     <model name="model2">
         <service name="service2">
@@ -55,18 +55,18 @@
         <service name="service3">
             <inbound-router>
                 <vm:inbound-endpoint path="test3-in">
-                    <transformer-append-string message="1"/>
-                    <transformer-append-string message="2"/>
-                    <transformer-append-string message="3"/>
+                    <append-string-transformer message="1"/>
+                    <append-string-transformer message="2"/>
+                    <append-string-transformer message="3"/>
                 </vm:inbound-endpoint>
             </inbound-router>
             <pass-through-component/>
             <outbound-router>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="test3-out">
-                        <transformer-append-string message="a"/>
-                        <transformer-append-string message="b"/>
-                        <transformer-append-string message="c"/>
+                        <append-string-transformer message="a"/>
+                        <append-string-transformer message="b"/>
+                        <append-string-transformer message="c"/>
                     </vm:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>

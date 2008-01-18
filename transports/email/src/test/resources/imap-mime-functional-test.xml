@@ -14,7 +14,7 @@
     <vm:connector name="vmConnector" queueEvents="true"/>
 
     <!-- for variety, this test uses a mime message, so blank out transformer -->
-    <transformer-no-action name="noActionTransformer"/>
+    <no-action-transformer name="noActionTransformer"/>
 
     <model name="test">
 
