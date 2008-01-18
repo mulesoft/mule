@@ -18,9 +18,12 @@
             <inbound-router>
                 <inbound-endpoint address="vm://in" connector-ref="VmConnector"/>
             </inbound-router>
-            <no-args-call-component>
-                <delegateClass class="org.mule.tck.testmodels.fruit.Apple" method="toString"/>
-            </no-args-call-component>
+            <component>
+                <no-arguments-entry-point-resolver>
+                    <include-entry-point method="toString"/>
+                </no-arguments-entry-point-resolver>
+                <singleton-object class="org.mule.tck.testmodels.fruit.Apple"/>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out" connector-ref="VmConnector"/>
@@ -32,9 +35,12 @@
             <inbound-router>
                 <inbound-endpoint address="vm://invokeWithInjected" connector-ref="VmConnector"/>
             </inbound-router>
-            <no-args-call-component>
-                <delegateInstance ref="containerDelegate" method="wash"/>
-            </no-args-call-component>
+            <component>
+                <no-arguments-entry-point-resolver>
+                    <include-entry-point method="wash"/>
+                </no-arguments-entry-point-resolver>
+                <singleton-object instance-ref="containerDelegate"/>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://outWithInjected" connector-ref="VmConnector"/>

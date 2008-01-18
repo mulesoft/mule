@@ -18,9 +18,9 @@
             </inbound-router>
             <component>
                 <no-arguments-entry-point-resolver>
-                    <ignore-object-methods/>
-                    <ignore-method value="unused"/>
-                    <ignore-method value="selected"/>
+                    <exclude-object-methods/>
+                    <exclude-entry-point method="unused"/>
+                    <exclude-entry-point method="selected"/>
                 </no-arguments-entry-point-resolver>
                 <singleton-object instance-ref="target"/>
             </component>
@@ -32,7 +32,7 @@
             </inbound-router>
             <component>
                 <no-arguments-entry-point-resolver>
-                    <method value="selected"/>
+                    <include-entry-point method="selected"/>
                 </no-arguments-entry-point-resolver>
                 <singleton-object instance-ref="target"/>
             </component>

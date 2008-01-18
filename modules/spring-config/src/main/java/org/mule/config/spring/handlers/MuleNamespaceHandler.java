@@ -11,7 +11,6 @@ package org.mule.config.spring.handlers;
 
 import org.mule.components.simple.EchoComponent;
 import org.mule.components.simple.LogComponent;
-import org.mule.components.simple.NoArgsCallWrapper;
 import org.mule.components.simple.NullComponent;
 import org.mule.components.simple.PassThroughComponent;
 import org.mule.config.MuleConfiguration;
@@ -19,7 +18,6 @@ import org.mule.config.MuleProperties;
 import org.mule.config.QueueProfile;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
-import org.mule.config.spring.parsers.collection.AttributeMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -256,12 +254,12 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("callable-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));
         registerMuleBeanDefinitionParser("property-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", MethodHeaderPropertyEntryPointResolver.class)).addAlias("property", "methodProperty");
         registerBeanDefinitionParser("method-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", ExplicitMethodEntryPointResolver.class));
-        registerMuleBeanDefinitionParser("method", new ParentDefinitionParser()).addAlias(MapEntryCombiner.VALUE, "method");
         registerBeanDefinitionParser("reflection-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", ReflectionEntryPointResolver.class));
         registerBeanDefinitionParser("no-arguments-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", NoArgumentsEntryPointResolver.class));
         registerBeanDefinitionParser("array-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", ArrayEntryPointResolver.class));
-        registerMuleBeanDefinitionParser("ignore-method", new ParentDefinitionParser()).addAlias(MapEntryCombiner.VALUE, "ignoredMethod");
-        registerMuleBeanDefinitionParser("ignore-object-methods", new IgnoreObjectMethodsDefinitionParser());
+        registerMuleBeanDefinitionParser("include-entry-point", new ParentDefinitionParser());
+        registerMuleBeanDefinitionParser("exclude-entry-point", new ParentDefinitionParser()).addAlias("method", "ignoredMethod");
+        registerMuleBeanDefinitionParser("exclude-object-methods", new IgnoreObjectMethodsDefinitionParser());
 
         // Services
         registerBeanDefinitionParser("seda-component", new ServiceDefinitionParser(SedaComponent.class));
@@ -277,7 +275,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("log-component", new SimplePojoServiceDefinitionParser(LogComponent.class));
         registerBeanDefinitionParser("echo-component", new SimplePojoServiceDefinitionParser(EchoComponent.class));
         registerBeanDefinitionParser("null-component", new SimplePojoServiceDefinitionParser(NullComponent.class));
-        registerBeanDefinitionParser("no-args-call-component", new SimplePojoServiceDefinitionParser(NoArgsCallWrapper.class));
 
         // Object Factories
         registerBeanDefinitionParser("singleton-object", new ObjectFactoryDefinitionParser(SingletonObjectFactory.class));
@@ -289,10 +286,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("inbound-router", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
         registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
         registerBeanDefinitionParser("async-reply-router", new ChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
-
-        //NoArgsCallWrapper
-        registerMuleBeanDefinitionParser("delegateClass", new AttributeMapDefinitionParser("properties")).addAlias("class", "delegateClass").addAlias("method", "delegateMethod");
-        registerMuleBeanDefinitionParser("delegateInstance", new AttributeMapDefinitionParser("properties")).addAlias("ref", "delegateInstance").addAlias("method", "delegateMethod");
 
         //Inbound Routers
         registerBeanDefinitionParser("forwarding-router", new ForwardingRouterDefinitionParser());

@@ -82,10 +82,6 @@ public class Apple implements Fruit, Callable
         this.cleaner = cleaner;
     }
 
-    /**
-     * Used in {@link org.mule.components.simple.NoArgsCallWrapper} tests.
-     * @return will always return null
-     */
     public Object methodReturningNull()
     {
         return null;

@@ -9,13 +9,14 @@
  */
 package org.mule.test.integration.components;
 
-import org.mule.components.simple.NoArgsCallWrapper;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 
+/**
+ * This test re-written to use entry point resolvers.  As a consequence, some tests, which verified
+ * implementation details rather than functionality, were dropped.
+ */
 public class NoArgsCallComponentTestCase extends FunctionalTestCase
 {
 
@@ -38,24 +39,6 @@ public class NoArgsCallComponentTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "org/mule/test/integration/components/no-args-call-component-functional-test.xml";
-    }
-
-    public void testDelegateClassNamespaceHandler() throws Exception{
-        UMOComponent component=managementContext.getRegistry().lookupComponent(SERVICE_DC_NAME);
-        Object object=component.getServiceFactory().getOrCreate();
-        assertEquals(object.getClass().getName(), NoArgsCallWrapper.class.getName());
-        NoArgsCallWrapper noArgsCallWrapper = (NoArgsCallWrapper)object;
-        assertEquals(noArgsCallWrapper.getDelegateClass(), Apple.class.getName());
-        assertEquals(noArgsCallWrapper.getDelegateMethod(), DELEGATE_DC_METHOD_NAME);
-    }
-
-    public void testDelegateInstanceNamespaceHandler() throws Exception{
-        UMOComponent component=managementContext.getRegistry().lookupComponent(SERVICE_DI_NAME);
-        Object object=component.getServiceFactory().getOrCreate();
-        assertEquals(object.getClass().getName(), NoArgsCallWrapper.class.getName());
-        NoArgsCallWrapper noArgsCallWrapper = (NoArgsCallWrapper)object;
-        assertEquals(noArgsCallWrapper.getDelegateInstance().getClass().getName(), Apple.class.getName());
-        assertEquals(noArgsCallWrapper.getDelegateMethod(), DELEGATE_DI_METHOD_NAME);
     }
 
     public void testDelegateClass() throws Exception

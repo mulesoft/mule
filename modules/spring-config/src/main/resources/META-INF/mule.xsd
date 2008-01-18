@@ -590,36 +590,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="no-args-call-component" type="noArgsCallComponentType" substitutionGroup="abstract-component">
-        <xsd:annotation>
-            <xsd:documentation>
-                Built-in NoArgsCallWrapper
-                There's a need to call a method having no arguments.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="noArgsCallComponentType">
-        <xsd:complexContent>
-            <xsd:extension base="defaultComponentType">
-                <xsd:choice minOccurs="1" maxOccurs="1">
-                    <xsd:element name="delegateClass" type="noArgsCallDelegateClassType"/>
-                    <xsd:element name="delegateInstance" type="noArgsCallDelegateInstanceType"/>
-                </xsd:choice>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="noArgsCallDelegateClassType">
-        <xsd:attribute name="class" type="substitutableClass" use="required"/>
-        <xsd:attribute name="method" type="xsd:string" use="required"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="noArgsCallDelegateInstanceType">
-        <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required"/>
-        <xsd:attribute name="method" type="xsd:string" use="required"/>
-    </xsd:complexType>
-
 
     <!--==============================================================-->
     <!--   Transactions                                               -->
@@ -1408,7 +1378,7 @@
         <xsd:complexContent>
             <xsd:extension base="baseEntryPointResolverType">
                 <xsd:sequence>
-                    <xsd:element ref="method" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element ref="include-entry-point" minOccurs="1" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -1419,8 +1389,8 @@
         <xsd:complexContent>
             <xsd:extension base="baseEntryPointResolverType">
                 <xsd:sequence>
-                    <xsd:element name="ignore-object-methods" minOccurs="0"/>
-                    <xsd:element name="ignore-method" type="valueType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="exclude-object-methods" minOccurs="0"/>
+                    <xsd:element name="exclude-entry-point" type="methodType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -1432,14 +1402,17 @@
         <xsd:complexContent>
             <xsd:extension base="reflectionEntryPointResolverType">
                 <xsd:sequence>
-                    <xsd:element ref="method" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="include-entry-point" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="enableDiscovery" type="substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="method" type="valueType"/>
+    <xsd:element name="include-entry-point" type="methodType"/>
+    <xsd:complexType name="methodType">
+        <xsd:attribute name="method" type="nonBlankString"/>
+    </xsd:complexType>
 
     <!--==============================================================-->
     <!--  Routers                                                     -->

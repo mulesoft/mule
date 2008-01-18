@@ -13,7 +13,7 @@
     <model name="LegacyModel">
         <!-- these should be over-ridden by the legacy support on the service below -->
         <method-entry-point-resolver>
-            <method value="methodString"/>
+            <include-entry-point method="methodString"/>
         </method-entry-point-resolver>
         <service name="Legacy">
            <inbound-router>
@@ -66,8 +66,8 @@
             </inbound-router>
             <component>
                 <method-entry-point-resolver>
-                    <method value="methodString"/>
-                    <method value="methodInteger"/>
+                    <include-entry-point method="methodString"/>
+                    <include-entry-point method="methodInteger"/>
                 </method-entry-point-resolver>
                 <singleton-object instance-ref="target"/>
             </component>
@@ -100,7 +100,7 @@
             </inbound-router>
             <component>
                 <reflection-entry-point-resolver>
-                    <ignore-method value="methodInteger"/>
+                    <exclude-entry-point method="methodInteger"/>
                 </reflection-entry-point-resolver>
                 <singleton-object instance-ref="target"/>
             </component>
@@ -113,10 +113,10 @@
             <component>
                 <entry-point-resolver-set>
                     <method-entry-point-resolver>
-                        <method value="methodInteger"/>
+                        <include-entry-point method="methodInteger"/>
                     </method-entry-point-resolver>
                     <reflection-entry-point-resolver>
-                        <ignore-method value="methodInteger"/>
+                        <exclude-entry-point method="methodInteger"/>
                     </reflection-entry-point-resolver>
                 </entry-point-resolver-set>
                 <singleton-object instance-ref="target"/>

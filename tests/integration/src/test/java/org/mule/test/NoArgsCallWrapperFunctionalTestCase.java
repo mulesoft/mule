@@ -14,6 +14,9 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
+/**
+ * This test has been re-written to use entry point resolvers.
+ */
 public class NoArgsCallWrapperFunctionalTestCase extends FunctionalTestCase
 {
     private static final int RECEIVE_TIMEOUT = 5000;

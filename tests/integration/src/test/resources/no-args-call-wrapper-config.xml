@@ -12,14 +12,20 @@
 
     <vm:connector name="VMConnector" queueEvents="true"/>
 
+    <!-- NOTE - this test has been re-written to use entry point resolvers rather than the
+         no-args component -->
+
     <model name="NoArgsWrapperModel">
         <service name="WrapperUMO">
             <inbound-router>
                 <inbound-endpoint address="vm://invoke"/>
             </inbound-router>
-            <no-args-call-component>
-                <delegateClass class="org.mule.tck.testmodels.fruit.Apple" method="toString"/>
-            </no-args-call-component>
+            <component>
+                <no-arguments-entry-point-resolver>
+                    <include-entry-point method="toString"/>
+                </no-arguments-entry-point-resolver>
+                <singleton-object class="org.mule.tck.testmodels.fruit.Apple"/>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out"/>
@@ -31,9 +37,12 @@
             <inbound-router>
                 <inbound-endpoint address="vm://invokeWithInjected"/>
             </inbound-router>
-            <no-args-call-component>
-                <delegateInstance ref="containerDelegate" method="wash"/>
-            </no-args-call-component>
+            <component>
+                <no-arguments-entry-point-resolver>
+                    <include-entry-point method="wash"/>
+                </no-arguments-entry-point-resolver>
+                <singleton-object instance-ref="containerDelegate"/>
+            </component>
             <outbound-router>
                 <outbound-pass-through-router>
                     <!--

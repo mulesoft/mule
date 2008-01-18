@@ -75,11 +75,12 @@ class CheckExclusiveClassAttributeObjectFactory implements PreProcessor
                 for (int j = 0; j < element.getChildNodes().getLength(); j++)
                 {
                     Node child = element.getChildNodes().item(j);
-                    if (child instanceof Element && !child.getLocalName().equals(BINDING_CHILD_ELEMENT))
+                    if (child instanceof Element &&
+                            !child.getLocalName().equals(BINDING_CHILD_ELEMENT))
                     {
                         StringBuffer message = new StringBuffer("The child element '");
                         message.append(child.getLocalName());
-                        message.append("' cannot appear with the 'class' attrtibute");
+                        message.append("' cannot appear with the 'class' attribute");
                         message.append(" in element ");
                         message.append(SpringXMLUtils.elementToString(element));
                         message.append(".");
