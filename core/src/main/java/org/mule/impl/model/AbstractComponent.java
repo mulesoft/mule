@@ -18,6 +18,7 @@ import org.mule.impl.InitialisationCallback;
 import org.mule.impl.ManagementContextAware;
 import org.mule.impl.OptimizedRequestContext;
 import org.mule.impl.UMOComponentAware;
+import org.mule.impl.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
@@ -41,6 +42,7 @@ import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.model.UMOModel;
+import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.routing.UMOInboundRouterCollection;
@@ -57,6 +59,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -926,4 +929,22 @@ public abstract class AbstractComponent implements UMOComponent
     {
         this.entryPointResolverSet = resolverSet;
     }
+
+    /**
+     * Allow for incremental addition of resolvers
+     *
+     * @param entryPointResolvers Resolvers to add
+     */
+    public void setEntryPointResolvers(Collection entryPointResolvers)
+    {
+        if (null == entryPointResolverSet)
+        {
+            entryPointResolverSet = new DefaultEntryPointResolverSet();
+        }
+        for (Iterator resolvers = entryPointResolvers.iterator(); resolvers.hasNext();)
+        {
+            entryPointResolverSet.addEntryPointResolver((UMOEntryPointResolver) resolvers.next());
+        }
+    }
+
 }

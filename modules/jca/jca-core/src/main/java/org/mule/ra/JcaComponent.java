@@ -89,7 +89,10 @@ public class JcaComponent extends AbstractComponent implements WorkListener
 
     public synchronized void doInitialise() throws InitialisationException
     {
-        entryPointResolverSet = model.getEntryPointResolverSet();
+        if (null == entryPointResolverSet)
+        {
+            entryPointResolverSet = model.getEntryPointResolverSet();
+        }
     }
 
     protected void doDispatch(UMOEvent event) throws UMOException

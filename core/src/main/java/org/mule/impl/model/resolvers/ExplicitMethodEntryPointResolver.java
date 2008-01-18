@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.Collection;
 
 /**
  * An Entrypoint resolver that allows the user to set one or more acceptiple methd names to look for.
@@ -28,11 +29,12 @@ import java.util.Set;
  */
 public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
 {
+
     private Set methods = new LinkedHashSet(2);
 
-    public void setMethods(Set methods)
+    public void setMethods(Collection methods)
     {
-        this.methods = methods;
+        this.methods = new LinkedHashSet(methods);
     }
 
     public void addMethod(String name)

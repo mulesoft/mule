@@ -10,7 +10,7 @@
 package org.mule.impl.model.resolvers;
 
 /**
- * An {@link UMOEntryPointResolverSet} that mimics the behaviour of the Mule 1.x
+ * An {@link org.mule.umo.model.UMOEntryPointResolverSet} that mimics the behaviour of the Mule 1.x
  * DynamicEntryPointResolver.
  */
 public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
@@ -22,13 +22,13 @@ public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
 
         ReflectionEntryPointResolver preTransformResolver = new ReflectionEntryPointResolver();
         //In Mule 1.x you could call setXX methods as service methods by default
-        preTransformResolver.removeIgnorredMethod("set*");
+        preTransformResolver.removeIgnoredMethod("set*");
         addEntryPointResolver(preTransformResolver);
 
         ReflectionEntryPointResolver postTransformResolver = new ReflectionEntryPointResolver();
         postTransformResolver.setTransformFirst(false);
         //In Mule 1.x you could call setXX methods as service methods by default
-        postTransformResolver.removeIgnorredMethod("set*");
+        postTransformResolver.removeIgnoredMethod("set*");
         addEntryPointResolver(postTransformResolver);
     }
 }

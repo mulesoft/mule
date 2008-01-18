@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Collection;
 
 /**
  * <code>ReflectEntryPointResolver</code> is used to determine the entry point on a component
@@ -73,28 +74,28 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
 
     /**
      * Returns an unmodifable Set of ignoredMethods on this resolver
-     * To add method to the resolver use {@link #addIgnorredMethod(String)}
+     * To add method to the resolver use {@link #addIgnoredMethod(String)}
      *
      * @return unmodifiable set of method names set on this resolver
      */
-    public Set getIgnoredMethods()
+    public Collection getIgnoredMethods()
     {
         return Collections.unmodifiableSet(ignoredMethods);
     }
 
-    public void setIgnoredMethods(Set methods)
+    public void setIgnoredMethods(Collection methods)
     {
-        this.ignoredMethods = methods;
+        this.ignoredMethods = new HashSet(methods);
         updateFilter();
     }
 
-    public void addIgnorredMethod(String name)
+    public void addIgnoredMethod(String name)
     {
         this.ignoredMethods.add(name);
         updateFilter();
     }
 
-    public boolean removeIgnorredMethod(String name)
+    public boolean removeIgnoredMethod(String name)
     {
         boolean result = this.ignoredMethods.remove(name);
         updateFilter();

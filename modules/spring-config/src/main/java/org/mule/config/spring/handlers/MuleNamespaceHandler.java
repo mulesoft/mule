@@ -55,8 +55,10 @@ import org.mule.config.spring.parsers.specific.TransactionFactoryDefinitionParse
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
+import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
+import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.container.JndiContainerContext;
@@ -246,17 +248,20 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 //        registerBeanDefinitionParser("model-seda-optimised", new OrphanDefinitionParser(OptimisedSedaModel.class, true));
 //        registerBeanDefinitionParser("model-pipeline", new OrphanDefinitionParser(PipelineModel.class, true));
 
-        registerBeanDefinitionParser("entrypoint-resolvers", new ChildDefinitionParser("entryPointResolverSet", DefaultEntryPointResolverSet.class));
-        registerBeanDefinitionParser("legacy-entrypoint-resolvers", new ChildDefinitionParser("entryPointResolverSet", LegacyEntryPointResolverSet.class));
-        registerBeanDefinitionParser("custom-entrypoint-resolvers", new ChildDefinitionParser("entryPointResolverSet"));
+        registerBeanDefinitionParser("entry-point-resolver-set", new ChildDefinitionParser("entryPointResolverSet", DefaultEntryPointResolverSet.class));
+        registerBeanDefinitionParser("legacy-entry-point-resolver-set", new ChildDefinitionParser("entryPointResolverSet", LegacyEntryPointResolverSet.class));
+        registerBeanDefinitionParser("custom-entry-point-resolver-set", new ChildDefinitionParser("entryPointResolverSet"));
 
-        registerBeanDefinitionParser("custom-entrypoint-resolver", new ChildDefinitionParser("entryPointResolver"));
-        registerBeanDefinitionParser("callable-entrypoint-resolver", new ChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));
-        registerBeanDefinitionParser("property-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", MethodHeaderPropertyEntryPointResolver.class));
-        registerBeanDefinitionParser("method-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", ExplicitMethodEntryPointResolver.class));
-        registerBeanDefinitionParser("reflection-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", ReflectionEntryPointResolver.class));
-        registerBeanDefinitionParser("no-arguments-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", NoArgumentsEntryPointResolver.class));
-        registerBeanDefinitionParser("array-entrypoint-resolver", new ChildDefinitionParser("entrypointResolver", ArrayEntryPointResolver.class));
+        registerBeanDefinitionParser("custom-entry-point-resolver", new ChildDefinitionParser("entryPointResolver"));
+        registerBeanDefinitionParser("callable-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", CallableEntryPointResolver.class));
+        registerMuleBeanDefinitionParser("property-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", MethodHeaderPropertyEntryPointResolver.class)).addAlias("property", "methodProperty");
+        registerBeanDefinitionParser("method-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", ExplicitMethodEntryPointResolver.class));
+        registerMuleBeanDefinitionParser("method", new ParentDefinitionParser()).addAlias(MapEntryCombiner.VALUE, "method");
+        registerBeanDefinitionParser("reflection-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", ReflectionEntryPointResolver.class));
+        registerBeanDefinitionParser("no-arguments-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", NoArgumentsEntryPointResolver.class));
+        registerBeanDefinitionParser("array-entry-point-resolver", new ChildDefinitionParser("entryPointResolver", ArrayEntryPointResolver.class));
+        registerMuleBeanDefinitionParser("ignore-method", new ParentDefinitionParser()).addAlias(MapEntryCombiner.VALUE, "ignoredMethod");
+        registerMuleBeanDefinitionParser("ignore-object-methods", new IgnoreObjectMethodsDefinitionParser());
 
         // Services
         registerBeanDefinitionParser("seda-component", new ServiceDefinitionParser(SedaComponent.class));

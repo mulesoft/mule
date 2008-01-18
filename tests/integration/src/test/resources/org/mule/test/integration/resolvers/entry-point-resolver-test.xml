@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <spring:bean name="target" class="org.mule.test.integration.resolvers.Target"/>
+
+    <model name="LegacyModel">
+        <!-- these should be over-ridden by the legacy support on the service below -->
+        <method-entry-point-resolver>
+            <method value="methodString"/>
+        </method-entry-point-resolver>
+        <service name="Legacy">
+           <inbound-router>
+                <vm:inbound-endpoint path="legacy"/>
+            </inbound-router>
+            <component>
+                <legacy-entry-point-resolver-set/>
+                <singleton-object instance-ref="target"/>
+            </component>
+        </service>
+    </model>
+
+    <model name="ArrayModel">
+        <array-entry-point-resolver/>
+        <service name="Array">
+            <inbound-router>
+                <vm:inbound-endpoint path="array"/>
+            </inbound-router>
+            <component>
+                <singleton-object instance-ref="target"/>
+            </component>
+        </service>
+    </model>
+
+    <model name="MultipleModel">
+
+        <service name="Callable">
+            <inbound-router>
+                <vm:inbound-endpoint path="callable"/>
+            </inbound-router>
+            <component>
+                <callable-entry-point-resolver/>
+                <singleton-object instance-ref="target"/>
+            </component>
+        </service>
+
+        <service name="Custom">
+            <inbound-router>
+                <vm:inbound-endpoint path="custom"/>
+            </inbound-router>
+            <component>
+                <custom-entry-point-resolver class="org.mule.test.integration.resolvers.CustomEntryPointResolver"/>
+                <singleton-object instance-ref="target"/>
+            </component>
+        </service>
+        
+        <service name="Method">
+            <inbound-router>
+                <vm:inbound-endpoint path="method"/>
+            </inbound-router>
+            <component>
+                <method-entry-point-resolver>
+                    <method value="methodString"/>
+                    <method value="methodInteger"/>
+                </method-entry-point-resolver>
+                <singleton-object instance-ref="target"/>
+            </component>
+        </service>
+
+        <!-- this lets us simulate the no-args-component -->
+        <service name="NoArguments">
+            <inbound-router>
+                <vm:inbound-endpoint path="no-arguments"/>
+            </inbound-router>
+            <component>
+                <no-arguments-entry-point-resolver/>
+                <singleton-object instance-ref="target"/>
+            </component>
+        </service>
+
+        <service name="Property">
+            <inbound-router>
+                <vm:inbound-endpoint path="property"/>
+            </inbound-router>
+            <component>
+                <property-entry-point-resolver property="propertyName"/>
+                <singleton-object instance-ref="target"/>
+            </component>
+        </service>
+
+        <service name="Reflection">
+            <inbound-router>
+                <vm:inbound-endpoint path="reflection"/>
+            </inbound-router>
+            <component>
+                <reflection-entry-point-resolver>
+                    <ignore-method value="methodInteger"/>
+                </reflection-entry-point-resolver>
+                <singleton-object instance-ref="target"/>
+            </component>
+        </service>
+
+        <service name="Ordered">
+            <inbound-router>
+                <vm:inbound-endpoint path="ordered"/>
+            </inbound-router>
+            <component>
+                <entry-point-resolver-set>
+                    <method-entry-point-resolver>
+                        <method value="methodInteger"/>
+                    </method-entry-point-resolver>
+                    <reflection-entry-point-resolver>
+                        <ignore-method value="methodInteger"/>
+                    </reflection-entry-point-resolver>
+                </entry-point-resolver-set>
+                <singleton-object instance-ref="target"/>
+            </component>
+        </service>
+
+    </model>
+
+</mule>

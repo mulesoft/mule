@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Collection;
 
 /**
  * Extend the Apache Commons ClassUtils to provide additional functionality.
@@ -495,7 +496,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                                              Class[] parameterTypes,
                                              boolean voidOk,
                                              boolean matchOnObject,
-                                             Set ignoredMethodNames,
+                                             Collection ignoredMethodNames,
                                              WildcardFilter filter)
     {
 

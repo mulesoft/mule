@@ -54,7 +54,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
     public void testDynamicMethodMatchFailOnWildcardMatch() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
-        assertTrue(resolver.removeIgnorredMethod("is*"));
+        assertTrue(resolver.removeIgnoredMethod("is*"));
         InvocationResult result = resolver.invoke(new InvalidSatsuma(), getTestEventContext("blah"));
         assertEquals("Satsuma component has a number of matching method, so should have failed",
                 result.getState(), InvocationResult.STATE_INVOKED_FAILED);

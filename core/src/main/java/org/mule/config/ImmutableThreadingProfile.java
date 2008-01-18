@@ -14,6 +14,7 @@ import org.mule.impl.work.MuleWorkManager;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitPolicy;
+import org.mule.util.StringUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
@@ -236,7 +237,7 @@ public class ImmutableThreadingProfile implements ThreadingProfile
         else
         {
             // ..else create a "NamedThreadFactory" if a proper name was passed in
-            if (name != null)
+            if (StringUtils.isNotBlank(name))
             {
                 pool.setThreadFactory(new NamedThreadFactory(name)); 
             }
