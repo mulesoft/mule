@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <connector name="vm" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+            <property name="numberOfConcurrentTransactedReceivers" value="1"/>
+        </properties>
+    </connector>
+
+    <model name="main">
+        <mule-descriptor name="test" implementation="org.mule.providers.vm.functional.VmTransactionTestCase$TestComponent">
+            <inbound-router>
+                <endpoint address="vm://in">
+                    <transaction action="BEGIN_OR_JOIN" factory="org.mule.providers.vm.VMTransactionFactory"/>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://out"/>
+                </router>
+            </outbound-router>
+            <threading-profile maxThreadsActive="1"/>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

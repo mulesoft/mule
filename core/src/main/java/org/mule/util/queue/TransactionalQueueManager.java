@@ -312,7 +312,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
                 added.put(queue, queueAdded);
             }
             // wait for enough room
-            if (queue.offer(null, queueAdded.size(), Long.MAX_VALUE))
+            if (queue.offer(null, queueAdded.size(), timeout))
             {
                 queueAdded.add(item);
                 return true;
@@ -334,7 +334,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
                     return queueAdded.remove(queueAdded.size() - 1);
                 }
             }
-            Object o = queue.poll(Long.MAX_VALUE);
+            Object o = queue.poll(timeout);
             if (o != null)
             {
                 if (removed == null)

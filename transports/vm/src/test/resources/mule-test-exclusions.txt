@@ -12,3 +12,7 @@ org.mule.issues.TransformerChainMule2131TestCase
 # MULE-2620
 org.mule.modules.xml.functional.BeanPropertyExtractorMultipleEndpointsTestCase
 org.mule.modules.xml.functional.BeanPropertyExtractorTestCase
+
+# MULE-2905
+org.mule.providers.vm.functional.VmTransactionTestCase
+
