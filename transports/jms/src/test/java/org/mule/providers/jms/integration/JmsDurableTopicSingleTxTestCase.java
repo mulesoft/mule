@@ -9,11 +9,6 @@
  */
 package org.mule.providers.jms.integration;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
 
 /**
  * Testing durable topic with external subscriber
@@ -51,84 +46,27 @@ public class JmsDurableTopicSingleTxTestCase extends JmsDurableTopicTestCase
 
     }
 
-    AbstractJmsFunctionalTestCase.Scenario scenarioCommit = new AbstractJmsFunctionalTestCase.AbstractScenario()
+    Scenario scenarioCommit = new ScenarioCommit()
     {
-
         public String getOutputQueue()
         {
             return TOPIC_QUEUE_NAME;
         }
-
-        public void send(Session session, MessageProducer producer) throws JMSException
-        {
-            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-            session.commit();
-        }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(TIMEOUT);
-            assertNotNull(message);
-            session.commit();
-            return message;
-        }
-
-        public boolean isTransacted()
-        {
-            return true;
-        }
     };
 
-    AbstractJmsFunctionalTestCase.Scenario scenarioRollback = new AbstractJmsFunctionalTestCase.AbstractScenario()
+    Scenario scenarioRollback = new ScenarioRollback()
     {
-
         public String getOutputQueue()
         {
             return TOPIC_QUEUE_NAME;
         }
-
-        public void send(Session session, MessageProducer producer) throws JMSException
-        {
-            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-            session.rollback();
-        }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(TIMEOUT);
-            assertNotNull(message);
-            session.rollback();
-            return message;
-        }
-
-        public boolean isTransacted()
-        {
-            return true;
-        }
-
     };
 
-
-    AbstractJmsFunctionalTestCase.Scenario scenarioNotReceive = new AbstractJmsFunctionalTestCase.AbstractScenario()
+    Scenario scenarioNotReceive = new ScenarioNotReceive()
     {
-
         public String getOutputQueue()
         {
             return TOPIC_QUEUE_NAME;
         }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(SMALL_TIMEOUT);
-            assertNull(message);
-            return message;
-        }
-
-        public boolean isTransacted()
-        {
-            return true;
-        }
-
     };
-
 }

@@ -9,11 +9,8 @@
  */
 package org.mule.providers.jms.integration;
 
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
 import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicSession;
@@ -23,7 +20,6 @@ import org.apache.activemq.command.ActiveMQTopic;
 
 public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-
     public static final String TOPIC_QUEUE_NAME = "durable.broadcast";
     private String clientId;
 
@@ -48,46 +44,22 @@ public class JmsDurableTopicTestCase extends AbstractJmsFunctionalTestCase
         setClientId("Client2");
         receive(scenarioNonTx);
         receive(scenarioNotReceive);
-
     }
 
-    AbstractJmsFunctionalTestCase.Scenario scenarioNonTx = new AbstractJmsFunctionalTestCase.AbstractScenario()
+    Scenario scenarioNonTx = new NonTransactedScenario()
     {
-
         public String getOutputQueue()
         {
             return TOPIC_QUEUE_NAME;
         }
-
-        public void send(Session session, MessageProducer producer) throws JMSException
-        {
-            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-        }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(TIMEOUT);
-            assertNotNull(message);
-            return message;
-        }
-
     };
 
-    AbstractJmsFunctionalTestCase.Scenario scenarioNotReceive = new AbstractJmsFunctionalTestCase.AbstractScenario()
+    Scenario scenarioNotReceive = new ScenarioNotReceive()
     {
-
         public String getOutputQueue()
         {
             return TOPIC_QUEUE_NAME;
         }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(SMALL_TIMEOUT);
-            assertNull(message);
-            return message;
-        }
-
     };
 
     public Message receive(Scenario scenario) throws Exception

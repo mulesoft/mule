@@ -34,7 +34,7 @@ public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunction
         receive(scenarioNotReceive);
     }
 
-    Scenario scenarioAcknowledge = new AbstractScenario()
+    Scenario scenarioAcknowledge = new NonTransactedScenario()
     {
         //@Override
         public int getAcknowledge()
@@ -54,31 +54,14 @@ public class JmsClientAcknowledgeTransactionTestCase extends AbstractJmsFunction
             message.acknowledge();
             return message;
         }
-
-        public boolean isTransacted()
-        {
-            return false;
-        }
-
-
     };
 
-    Scenario scenarioWithoutAcknowledge = new AbstractScenario()
+    Scenario scenarioWithoutAcknowledge = new NonTransactedScenario()
     {
         //@Override
         public int getAcknowledge()
         {
             return Session.CLIENT_ACKNOWLEDGE;
         }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(TIMEOUT);
-            assertNotNull(message);
-            return message;
-        }
-
     };
-
-
 }

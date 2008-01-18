@@ -52,7 +52,7 @@ public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCa
 
     }
 
-    Scenario scenarioNoTx = new AbstractScenario()
+    Scenario scenarioNoTx = new NonTransactedScenario()
     {
         public String getInputQueue()
         {

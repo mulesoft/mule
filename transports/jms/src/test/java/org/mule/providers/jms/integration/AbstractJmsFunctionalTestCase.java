@@ -34,7 +34,6 @@ import org.apache.activemq.command.ActiveMQQueue;
  */
 public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 {
-
     public static final String DEFAULT_BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
     public static final String DEFAULT_INPUT_MESSAGE = "INPUT MESSAGE";
     public static final String DEFAULT_OUTPUT_MESSAGE = "OUTPUT MESSAGE";
@@ -72,7 +71,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         assertNull(result);
     }
 
-
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -88,61 +86,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected MuleClient getClient()
     {
         return client;
-    }
-
-    interface Scenario
-    {
-        String getBrokerUrl();
-
-        String getInputQueue();
-
-        String getOutputQueue();
-
-        int getAcknowledge();
-
-        void send(Session session, MessageProducer producer) throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException, RollbackException;
-
-        Message receive(Session session, MessageConsumer consumer) throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException, RollbackException;
-
-        boolean isTransacted();
-    }
-
-    abstract class AbstractScenario implements Scenario
-    {
-        public String getBrokerUrl()
-        {
-            return DEFAULT_BROKER_URL;
-        }
-
-        public String getInputQueue()
-        {
-            return DEFAULT_INPUT_MQ_QUEUE_NAME;
-        }
-
-        public String getOutputQueue()
-        {
-            return DEFUALT_OUTPUT_MQ_QUEUE_NAME;
-        }
-
-        public int getAcknowledge()
-        {
-            return Session.AUTO_ACKNOWLEDGE;
-        }
-
-        public boolean isTransacted()
-        {
-            return false;
-        }
-
-        public void send(Session session, MessageProducer producer) throws JMSException, HeuristicMixedException, SystemException, HeuristicRollbackException, RollbackException
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException, RollbackException
-        {
-            throw new UnsupportedOperationException();
-        }
     }
 
     public void send(Scenario scenario) throws Exception
@@ -201,7 +144,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-
     public Message receive(Scenario scenario) throws Exception
     {
         Connection connection = null;
@@ -258,12 +200,53 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    Scenario scenarioRollback = new AbstractScenario()
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // Test Scenarios
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    interface Scenario
     {
+        String getBrokerUrl();
+
+        String getInputQueue();
+
+        String getOutputQueue();
+
+        int getAcknowledge();
+
+        void send(Session session, MessageProducer producer) throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException, RollbackException;
+
+        Message receive(Session session, MessageConsumer consumer) throws JMSException, SystemException, HeuristicMixedException, HeuristicRollbackException, RollbackException;
+
+        boolean isTransacted();
+    }
+
+    abstract class AbstractScenario implements Scenario
+    {
+        public String getBrokerUrl()
+        {
+            return DEFAULT_BROKER_URL;
+        }
+
+        public String getInputQueue()
+        {
+            return DEFAULT_INPUT_MQ_QUEUE_NAME;
+        }
+
+        public String getOutputQueue()
+        {
+            return DEFUALT_OUTPUT_MQ_QUEUE_NAME;
+        }
+
+        public int getAcknowledge()
+        {
+            return Session.AUTO_ACKNOWLEDGE;
+        }
+
         public void send(Session session, MessageProducer producer) throws JMSException
         {
             producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-            session.rollback();
+            applyTransaction(session);
         }
 
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
@@ -272,78 +255,63 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             assertNotNull(message);
             assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
             assertEquals(DEFAULT_OUTPUT_MESSAGE, ((TextMessage) message).getText());
+            applyTransaction(session);
+            return message;
+        }
+
+        abstract protected void applyTransaction(Session session) throws JMSException;
+    }
+
+    Scenario scenarioNoTx = new NonTransactedScenario();
+    class NonTransactedScenario extends AbstractScenario
+    {
+        public boolean isTransacted()
+        {
+            return false;
+        }
+        
+        protected void applyTransaction(Session session) throws JMSException
+        {
+            // do nothing
+        }        
+    };
+
+    Scenario scenarioCommit = new ScenarioCommit();
+    class ScenarioCommit extends AbstractScenario
+    {
+        public boolean isTransacted()
+        {
+            return true;
+        }
+        
+        protected void applyTransaction(Session session) throws JMSException
+        {
+            session.commit();
+        }        
+    };
+
+    Scenario scenarioRollback = new ScenarioRollback();
+    class ScenarioRollback extends AbstractScenario
+    {
+        public boolean isTransacted()
+        {
+            return true;
+        }
+        
+        protected void applyTransaction(Session session) throws JMSException
+        {
             session.rollback();
-            return message;
-        }
-
-        public boolean isTransacted()
-        {
-            return true;
-        }
+        }        
     };
 
-    Scenario scenarioCommit = new AbstractScenario()
+    Scenario scenarioNotReceive = new ScenarioNotReceive();
+    class ScenarioNotReceive extends NonTransactedScenario
     {
-        public void send(Session session, MessageProducer producer) throws JMSException
-        {
-            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-            session.commit();
-        }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(TIMEOUT);
-            assertNotNull(message);
-            assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
-            assertEquals(DEFAULT_OUTPUT_MESSAGE, ((TextMessage) message).getText());
-            session.commit();
-            return message;
-        }
-
-        public boolean isTransacted()
-        {
-            return true;
-        }
-
-    };
-
-    Scenario scenarioNotReceive = new AbstractScenario()
-    {
-        public void send(Session session, MessageProducer producer) throws JMSException
-        {
-            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-        }
-
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             Message message = consumer.receive(SMALL_TIMEOUT);
             assertNull(message);
             return message;
         }
-
-        public boolean isTransacted()
-        {
-            return false;
-        }
-
     };
-
-    Scenario scenarioNoTx = new AbstractScenario()
-    {
-        public void send(Session session, MessageProducer producer) throws JMSException
-        {
-            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-        }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(TIMEOUT);
-            assertNotNull(message);
-            assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
-            assertEquals(DEFAULT_OUTPUT_MESSAGE, ((TextMessage) message).getText());
-            return message;
-        }
-    };
-    
-
 }
