@@ -68,7 +68,6 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
             }
             catch (Exception ex)
             {
-                // TODO MULE-863: Is this bad enough to fail?
                 logger.error("Could not access OS environment: ", ex);
                 environment = Collections.EMPTY_MAP;
             }

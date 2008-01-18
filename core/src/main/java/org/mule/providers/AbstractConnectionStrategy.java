@@ -83,8 +83,7 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
                             {
                                 ((AbstractMessageReceiver) connectable).handleException(e);
                             }
-                            // TODO MULE-863: And if it's not?
-                            // AP if it's not, it's not handled and Mule just sits doing nothing
+                            // if it's none of the above, it's not handled and Mule just sits doing nothing
                         }
                     }
                 });

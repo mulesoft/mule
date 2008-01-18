@@ -74,7 +74,6 @@ public class MultiContainerContext implements UMOContainerContext
         Throwable finalCause = null;
 
         // first see if a particular container has been requested
-        // TODO MULE-863: possible class cast exception below.  Document?
         if (key instanceof String)
         {
             realKey = new ContainerKeyPair(null, key);
