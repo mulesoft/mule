@@ -9,12 +9,11 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
-    <jms:endpoint name="topic" topic="broadcast" connector-ref="jmsConnector"/>
-    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
+    <jms:endpoint name="in" queue="in"/>
+    <jms:endpoint name="topic" topic="broadcast"/>
+    <jms:endpoint name="out" queue="out"/>
 
     <model name="echoSample">
-
         <service name="InputPart">
             <inbound-router>
                 <inbound-endpoint ref="in"/>
@@ -61,5 +60,4 @@
             </outbound-router>
         </service>
     </model>
-
 </mule>

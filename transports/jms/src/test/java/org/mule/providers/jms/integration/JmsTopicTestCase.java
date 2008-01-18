@@ -14,7 +14,11 @@ package org.mule.providers.jms.integration;
  */
 public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
 {
-
+    protected String getConfigResources()
+    {
+        return "providers/activemq/jms-topic.xml";
+    }
+    
     public void testJmsTopic() throws Exception
     {
         // One message is sent.
@@ -24,8 +28,15 @@ public class JmsTopicTestCase extends AbstractJmsFunctionalTestCase
         receiveMessage();
     }
 
-    protected String getConfigResources()
+    public void testMultipleSend() throws Exception
     {
-        return "providers/activemq/jms-topic.xml";
+        // One message is sent.
+        dispatchMessage();
+        dispatchMessage();
+        // The same message is read twice from the same JMS topic.
+        receiveMessage();
+        receiveMessage();
+        receiveMessage();
+        receiveMessage();
     }
 }

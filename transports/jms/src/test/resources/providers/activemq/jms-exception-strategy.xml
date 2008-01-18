@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+      xsi:schemaLocation="
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
+
+    <jms:activemq-connector name="jmsConnector"/>
+
+    <jms:transaction-factory name="txFactory"/>
+    
+    <model name="test">
+        <service name="DeadLetter">
+            <inbound-router>
+                <jms:inbound-endpoint queue="in">
+                    <transaction action="ALWAYS_BEGIN">
+                        <transaction-factory ref="txFactory"/>
+                    </transaction>
+                </jms:inbound-endpoint>
+            </inbound-router>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <property key="returnMessage" value="OUTPUT MESSAGE"/>
+                    <property key="throwException" value="true"/>                    
+                </singleton-object>
+            </component>
+            <outbound-router>
+                <outbound-pass-through-router>
+                    <jms:outbound-endpoint queue="out">
+                        <transaction action="ALWAYS_JOIN">
+                            <transaction-factory ref="txFactory"/>
+                        </transaction>                    
+                    </jms:outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound-router>
+            <default-service-exception-strategy>
+                <jms:outbound-endpoint queue="dead.letter">
+                    <transaction action="ALWAYS_JOIN">
+                        <transaction-factory ref="txFactory"/>
+                    </transaction>                    
+                </jms:outbound-endpoint>
+            </default-service-exception-strategy>
+        </service>
+    </model>
+</mule>

@@ -14,6 +14,10 @@ package org.mule.providers.jms.integration;
  */
 public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
 {
+    protected String getConfigResources()
+    {
+        return "providers/activemq/jms-queue.xml";
+    }
 
     public void testJmsQueue() throws Exception
     {
@@ -22,8 +26,14 @@ public class JmsQueueTestCase extends AbstractJmsFunctionalTestCase
         receive(scenarioNotReceive);
     }
 
-    protected String getConfigResources()
+    public void testMultipleSend() throws Exception
     {
-        return "providers/activemq/jms-queue.xml";
+        dispatchMessage();
+        dispatchMessage();
+        dispatchMessage();
+        receiveMessage();
+        receiveMessage();
+        receiveMessage();
+        receive(scenarioNotReceive);
     }
 }

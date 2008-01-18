@@ -9,44 +9,38 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <jms:endpoint name="in" queue="in" connector-ref="jmsConnector"/>
-    <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector"/>
-    <jms:endpoint name="d" queue="d" connector-ref="jmsConnector"/>
-    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
-
     <model name="test">
-
         <service name="InputPart">
             <inbound-router>
-                <inbound-endpoint ref="in"/>
+                <jms:inbound-endpoint queue="in"/>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="middle"/>
+                    <jms:outbound-endpoint queue="q1"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
 
         <service name="MiddlePart">
             <inbound-router>
-                <inbound-endpoint ref="middle"/>
+                <jms:inbound-endpoint queue="q1"/>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="d"/>
+                    <jms:outbound-endpoint queue="q2"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
 
         <service name="OutputPart">
             <inbound-router>
-                <inbound-endpoint ref="d"/>
+                <jms:inbound-endpoint queue="q2"/>
             </inbound-router>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
@@ -55,10 +49,9 @@
             </component>
             <outbound-router>
                 <outbound-pass-through-router>
-                    <outbound-endpoint ref="out"/>
+                    <jms:outbound-endpoint queue="out"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
     </model>
-
 </mule>

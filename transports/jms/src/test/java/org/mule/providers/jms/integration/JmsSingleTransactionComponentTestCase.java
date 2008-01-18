@@ -25,8 +25,11 @@ public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctional
     public void testSingleTransactionComponent() throws Exception
     {
         send(scenarioCommit);
+        // Receive message but roll back transaction.
         receive(scenarioRollback);
+        // Receive message again and commit transaction.
         receive(scenarioCommit);
+        // Verify there is no more message to receive.
         receive(scenarioNotReceive);
     }
 }
