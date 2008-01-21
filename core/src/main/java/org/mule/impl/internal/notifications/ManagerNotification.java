@@ -10,13 +10,13 @@
 
 package org.mule.impl.internal.notifications;
 
-import org.mule.umo.UMOManagementContext;
+import org.mule.api.MuleContext;
 import org.mule.umo.manager.UMOServerNotification;
 
 /**
  * <code>ManagerNotification</code> is fired when an event such as the manager
  * starting occurs. The payload of this event will always be a reference to the
- *managementContext.
+ *muleContext.
  *
  */
 public class ManagerNotification extends UMOServerNotification implements BlockingServerEvent
@@ -61,12 +61,12 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
     private String domain;
 
 
-    public ManagerNotification(UMOManagementContext context, String action)
+    public ManagerNotification(MuleContext context, String action)
     {
         this(context, getActionId(action));
     }
 
-    public ManagerNotification(UMOManagementContext context, int action)
+    public ManagerNotification(MuleContext context, int action)
     {
         super(getId(context), action);
         resourceIdentifier = getId(context);
@@ -74,7 +74,7 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
         this.domain = context.getDomain();
     }
 
-    private static String getId(UMOManagementContext context)
+    private static String getId(MuleContext context)
     {
         return context.getDomain() + "." + context.getClusterId() + "." + context.getId();
     }
@@ -91,7 +91,7 @@ public class ManagerNotification extends UMOServerNotification implements Blocki
 
     protected String getPayloadToString()
     {
-        return ((UMOManagementContext) source).getId();
+        return ((MuleContext) source).getId();
     }
 
     public String toString()

@@ -45,7 +45,7 @@ public class ScriptComponent extends Scriptable implements Callable
     protected void populateBindings(Bindings namespace, UMOEventContext context)
     {
         namespace.put("eventContext", context);
-        namespace.put("managementContext", context.getManagementContext());
+        namespace.put("muleContext", context.getMuleContext());
         namespace.put("message", context.getMessage());
         namespace.put("descriptor", context.getComponent());
         namespace.put("componentNamespace", this.bindings);

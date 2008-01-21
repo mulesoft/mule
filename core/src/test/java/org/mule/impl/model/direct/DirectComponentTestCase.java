@@ -23,7 +23,7 @@ public class DirectComponentTestCase extends AbstractComponentTestCase
         component.setName("direct");
         component.setServiceFactory(new SingletonObjectFactory(Object.class));
         component.setModel(new DirectModel());
-        component.setManagementContext(managementContext);
+        component.setMuleContext(muleContext);
     }
 
     protected void doTearDown() throws Exception

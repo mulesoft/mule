@@ -24,7 +24,7 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
 
     public void testProperties()
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("service");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("service");
         assertNotNull(component);
         UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) component.getInboundRouter().getEndpoints().get(0);
         assertNotNull(endpoint);

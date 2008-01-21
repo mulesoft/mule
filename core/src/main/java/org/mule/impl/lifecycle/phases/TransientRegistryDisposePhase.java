@@ -9,11 +9,11 @@
  */
 package org.mule.impl.lifecycle.phases;
 
+import org.mule.api.MuleContext;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.lifecycle.LifecyclePhase;
 import org.mule.impl.lifecycle.NotificationLifecycleObject;
 import org.mule.registry.Registry;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.UMOLifecyclePhase;
@@ -29,7 +29,7 @@ import java.util.Set;
  * with initiate this phase via the {@link org.mule.umo.lifecycle.UMOLifecycleManager}.
  * This phase controls the order in which objects should be disposed.
  *
- * @see org.mule.umo.UMOManagementContext
+ * @see org.mule.api.MuleContext
  * @see org.mule.umo.lifecycle.UMOLifecycleManager
  * @see org.mule.impl.registry.TransientRegistry
  * @see org.mule.umo.lifecycle.Disposable
@@ -46,10 +46,10 @@ public class TransientRegistryDisposePhase extends LifecyclePhase
         super(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME);
 
         Set disposeOrderedObjects = new LinkedHashSet();
-//        disposeOrderedObjects.add(new NotificationLifecycleObject(UMOManagementContext.class, ManagerNotification.class,
+//        disposeOrderedObjects.add(new NotificationLifecycleObject(MuleContext.class, ManagerNotification.class,
 //                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSING),
 //                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSED)));
-        disposeOrderedObjects.add(new NotificationLifecycleObject(UMOManagementContext.class));
+        disposeOrderedObjects.add(new NotificationLifecycleObject(MuleContext.class));
         disposeOrderedObjects.add(new NotificationLifecycleObject(UMOConnector.class, ManagerNotification.class,
                 ManagerNotification.MANAGER_DISPOSING_CONNECTORS,ManagerNotification.MANAGER_DISPOSED_CONNECTORS));
         disposeOrderedObjects.add(new NotificationLifecycleObject(UMOAgent.class));

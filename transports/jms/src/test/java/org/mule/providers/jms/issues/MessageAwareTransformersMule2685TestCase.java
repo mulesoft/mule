@@ -45,7 +45,7 @@ public class MessageAwareTransformersMule2685TestCase extends AbstractJmsFunctio
     {
         super.doSetUp();
 
-        JmsConnector connector = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector");
+        JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
         ConnectionFactory cf = connector.getConnectionFactory();
 
         session = cf.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);

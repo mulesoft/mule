@@ -27,7 +27,7 @@ public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
 
     protected Object assertBeanExists(String name, Class clazz)
     {
-        Object bean = managementContext.getRegistry().lookupObject(name);
+        Object bean = muleContext.getRegistry().lookupObject(name);
         assertNotNull(name + " bean missing", bean);
         assertTrue(bean.getClass().equals(clazz));
         logger.debug("found bean " + name + "/" + ClassUtils.getSimpleName(bean.getClass()));

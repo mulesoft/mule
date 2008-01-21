@@ -24,7 +24,7 @@ public abstract class ServletNamespaceHandlerTestCase extends FunctionalTestCase
     public void testConnectorProperties()
     {
         ServletConnector connector =
-                (ServletConnector) managementContext.getRegistry().lookupConnector("servletConnector");
+                (ServletConnector) muleContext.getRegistry().lookupConnector("servletConnector");
         assertNotNull(connector);
 
         assertEquals("", connector.getServletUrl());

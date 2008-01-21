@@ -9,12 +9,12 @@
  */
 package org.mule.impl.lifecycle.phases;
 
+import org.mule.api.MuleContext;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.lifecycle.LifecyclePhase;
 import org.mule.impl.lifecycle.NotificationLifecycleObject;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
@@ -34,14 +34,14 @@ import java.util.Set;
  * @see org.mule.umo.lifecycle.UMOLifecycleManager
  * @see org.mule.umo.lifecycle.Startable
  */
-public class ManagementContextStartPhase extends LifecyclePhase
+public class MuleContextStartPhase extends LifecyclePhase
 {
-    public ManagementContextStartPhase()
+    public MuleContextStartPhase()
     {
-        this(new Class[]{Registry.class, UMOManagementContext.class});
+        this(new Class[]{Registry.class, MuleContext.class});
     }
 
-    public ManagementContextStartPhase(Class[] ignorredObjects)
+    public MuleContextStartPhase(Class[] ignorredObjects)
     {
         super(Startable.PHASE_NAME, Startable.class, Stoppable.PHASE_NAME);
 

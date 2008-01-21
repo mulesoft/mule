@@ -24,7 +24,7 @@ public class WeblogicJmsConnectorTestCase extends FunctionalTestCase
 
     public void testDefaultConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector");
+        JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");
         assertNotNull(c);
 
         // TODO has to be confirmed for Weblogic

@@ -16,17 +16,17 @@ public class LifecycleNotificationTestCase extends AbstractMuleTestCase
 
     public void testManageLifecycle() throws Exception
     {
-        assertTrue(managementContext.isInitialised());
-//        managementContext.start();
-//        assertTrue(managementContext.isStarted());
-//        managementContext.stop();
-//        assertFalse(managementContext.isStarted());
-//        managementContext.dispose();
-//        assertTrue(managementContext.isDisposed());
-//        managementContext.initialise();
-//        assertTrue(managementContext.isInitialised());
-//        managementContext.start();
-//        assertTrue(managementContext.isStarted());
+        assertTrue(muleContext.isInitialised());
+//        muleContext.start();
+//        assertTrue(muleContext.isStarted());
+//        muleContext.stop();
+//        assertFalse(muleContext.isStarted());
+//        muleContext.dispose();
+//        assertTrue(muleContext.isDisposed());
+//        muleContext.initialise();
+//        assertTrue(muleContext.isInitialised());
+//        muleContext.start();
+//        assertTrue(muleContext.isStarted());
 
 
     }

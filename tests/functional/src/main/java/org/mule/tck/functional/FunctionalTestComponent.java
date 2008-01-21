@@ -12,11 +12,11 @@ package org.mule.tck.functional;
 
 import org.mule.MuleException;
 import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.RequestContext;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -116,13 +116,13 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
             }
         }
 
-        UMOManagementContext managementContext = context.getManagementContext();
-        if (managementContext == null)
+        MuleContext muleContext = context.getMuleContext();
+        if (muleContext == null)
         {
-            logger.warn("No ManagementContext available from EventContext");
-            managementContext = MuleServer.getManagementContext();
+            logger.warn("No MuleContext available from EventContext");
+            muleContext = MuleServer.getMuleContext();
         }
-        managementContext.fireNotification(
+        muleContext.fireNotification(
             new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)
@@ -180,7 +180,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
             replyMessage = contents + " Received";
         }
 
-        context.getManagementContext().fireNotification(
+        context.getMuleContext().fireNotification(
                 new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)

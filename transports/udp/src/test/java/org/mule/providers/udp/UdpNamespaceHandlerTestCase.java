@@ -23,7 +23,7 @@ public class UdpNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testConfig() throws Exception
     {
-        UdpConnector c = (UdpConnector)managementContext.getRegistry().lookupConnector("udpConnector");
+        UdpConnector c = (UdpConnector)muleContext.getRegistry().lookupConnector("udpConnector");
         assertNotNull(c);
 
         assertEquals(1234, c.getReceiveBufferSize());

@@ -27,7 +27,7 @@ public class ServiceDescriptorLegacyTestCase extends FunctionalTestCase
 
     public void testClassName() throws Exception
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent("orange1");
+        UMOComponent c = muleContext.getRegistry().lookupComponent("orange1");
         Object service =  c.getServiceFactory().getOrCreate();
         assertTrue("Service should be an Orange", service instanceof Orange);
         // Default values
@@ -36,7 +36,7 @@ public class ServiceDescriptorLegacyTestCase extends FunctionalTestCase
 
     public void testContainerReference() throws Exception
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent("orange2");
+        UMOComponent c = muleContext.getRegistry().lookupComponent("orange2");
         Object service =  c.getServiceFactory().getOrCreate();
         assertTrue("Service should be an Orange", service instanceof Orange);
         // Default values

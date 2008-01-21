@@ -9,8 +9,8 @@
  */
 package org.mule.impl.lifecycle;
 
+import org.mule.api.MuleContext;
 import org.mule.impl.internal.notifications.ManagerNotification;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.manager.UMOServerNotification;
 
 /**
@@ -26,7 +26,7 @@ public class ManagerLifecycleObject extends NotificationLifecycleObject
         this.notificationClass = notificationClass;
     }
 
-    protected UMOServerNotification createNotification(UMOManagementContext context, String action)
+    protected UMOServerNotification createNotification(MuleContext context, String action)
     {
         //return ClassUtils.instanciateClass(notificationClass, new Object[]{context, action});
 

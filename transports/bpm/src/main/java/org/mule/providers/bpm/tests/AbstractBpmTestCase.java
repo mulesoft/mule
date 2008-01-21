@@ -21,7 +21,7 @@ public abstract class AbstractBpmTestCase extends FunctionalTestCase
 
     protected void doSetUp() throws Exception {
         connector =
-            (ProcessConnector) managementContext.getRegistry().lookupConnector("bpmConnector");
+            (ProcessConnector) muleContext.getRegistry().lookupConnector("bpmConnector");
         bpms = connector.getBpms();
         super.doSetUp();
     }

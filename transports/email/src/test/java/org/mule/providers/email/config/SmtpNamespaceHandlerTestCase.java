@@ -11,9 +11,6 @@ package org.mule.providers.email.config;
 
 import org.mule.providers.email.SmtpConnector;
 import org.mule.providers.email.SmtpsConnector;
-import org.mule.providers.email.Pop3Connector;
-import org.mule.providers.email.Pop3sConnector;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 
 import java.util.Properties;
@@ -27,7 +24,7 @@ public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
     public void testConfig() throws Exception
     {
-        SmtpConnector c = (SmtpConnector)managementContext.getRegistry().lookupConnector("smtpConnector");
+        SmtpConnector c = (SmtpConnector)muleContext.getRegistry().lookupConnector("smtpConnector");
         assertNotNull(c);
 
         assertEquals("abc@example.com", c.getBccAddresses());
@@ -51,7 +48,7 @@ public class SmtpNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
     public void testSecureConfig() throws Exception
     {
-        SmtpsConnector c = (SmtpsConnector)managementContext.getRegistry().lookupConnector("smtpsConnector");
+        SmtpsConnector c = (SmtpsConnector)muleContext.getRegistry().lookupConnector("smtpsConnector");
         assertNotNull(c);
 
         assertEquals("abc@example.com", c.getBccAddresses());

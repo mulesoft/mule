@@ -11,9 +11,7 @@ package org.mule.providers.email.config;
 
 import org.mule.providers.email.ImapConnector;
 import org.mule.providers.email.ImapsConnector;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
@@ -24,7 +22,7 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
     public void testConfig() throws Exception
     {
-        ImapConnector c = (ImapConnector)managementContext.getRegistry().lookupConnector("imapConnector");
+        ImapConnector c = (ImapConnector)muleContext.getRegistry().lookupConnector("imapConnector");
         assertNotNull(c);
 
         assertTrue(c.isBackupEnabled());
@@ -41,7 +39,7 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
     public void testSecureConfig() throws Exception
     {
-        ImapsConnector c = (ImapsConnector)managementContext.getRegistry().lookupConnector("imapsConnector");
+        ImapsConnector c = (ImapsConnector)muleContext.getRegistry().lookupConnector("imapsConnector");
         assertNotNull(c);
 
         assertFalse(c.isBackupEnabled());

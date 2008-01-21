@@ -51,6 +51,6 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
 
     public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("stdio://System");
+        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("stdio://System");
     }
 }

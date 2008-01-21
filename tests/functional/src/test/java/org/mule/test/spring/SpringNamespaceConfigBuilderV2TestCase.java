@@ -10,7 +10,7 @@
 
 package org.mule.test.spring;
 
-import org.mule.config.ConfigurationBuilder;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.response.AbstractResponseRouter;
@@ -56,12 +56,12 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     // @Override
     public ConfigurationBuilder getBuilder()
     {
-        return new SpringXmlConfigurationBuilder();
+        return new SpringXmlConfigurationBuilder(getConfigResources());
     }
 
     public void testPropertyExtractorConfig() throws Exception
     {
-        UMOComponent d = managementContext.getRegistry().lookupComponent("propertyExtractorTestComponent");
+        UMOComponent d = muleContext.getRegistry().lookupComponent("propertyExtractorTestComponent");
         assertNotNull(d);
         UMOOutboundRouterCollection router = d.getOutboundRouter();
         assertNotNull(router);
@@ -77,7 +77,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyExtractorResponseRouterConfig() throws Exception
     {
-        UMOComponent d = managementContext.getRegistry().lookupComponent("propertyExtractorResponseRouterTestComponent");
+        UMOComponent d = muleContext.getRegistry().lookupComponent("propertyExtractorResponseRouterTestComponent");
         assertNotNull(d);
         UMOResponseRouterCollection router = d.getResponseRouter();
         assertNotNull(router);
@@ -93,7 +93,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyTypesConfig() throws Exception
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent("testPropertiesComponent");
+        UMOComponent c = muleContext.getRegistry().lookupComponent("testPropertiesComponent");
         assertNotNull(c);
         Object obj = c.getServiceFactory().getOrCreate();
         assertNotNull(obj);
@@ -104,7 +104,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testEndpointURIParamsConfig()
     {
-        UMOComponent d = managementContext.getRegistry().lookupComponent("testPropertiesComponent");
+        UMOComponent d = muleContext.getRegistry().lookupComponent("testPropertiesComponent");
         assertNotNull(d);
         final UMOInboundRouterCollection router = d.getInboundRouter();
         assertNotNull(router);
@@ -127,7 +127,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         // first of all test generic transformer configuration
         super.testTransformerConfig();
 
-        UMOTransformer t = managementContext.getRegistry().lookupTransformer("TestCompressionTransformer");
+        UMOTransformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
 
@@ -139,7 +139,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
         assertEquals(t.getReturnClass(), java.lang.String.class);
 
-        t = managementContext.getRegistry().lookupTransformer("TestTransformer");
+        t = muleContext.getRegistry().lookupTransformer("TestTransformer");
         assertNotNull(t);
         assertEquals(t.getReturnClass(), byte[].class);
     }
@@ -147,7 +147,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     public void testSystemPropertyOverride()
     {
         // MULE-2183
-//        assertEquals("default", managementContext.getRegistry().lookupObject("system-prop2"));
+//        assertEquals("default", muleContext.getRegistry().lookupObject("system-prop2"));
     }
 
 // no longer overrride - made both configs same (and agree with 1.x)
@@ -179,7 +179,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 //        assertEquals(60001, tp.getThreadTTL());
 //
 //        // test thatvalues not set retain a default value
-//        AbstractConnector c = (AbstractConnector)managementContext.getRegistry().lookupConnector("dummyConnector");
+//        AbstractConnector c = (AbstractConnector)muleContext.getRegistry().lookupConnector("dummyConnector");
 //        tp = c.getDispatcherThreadingProfile();
 //        assertEquals(2, tp.getMaxBufferSize());
 //        assertEquals(8, tp.getMaxThreadsActive());
@@ -187,7 +187,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 //        assertEquals(0, tp.getPoolExhaustedAction());
 //        assertEquals(60001, tp.getThreadTTL());
 //
-//        UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent2");
+//        UMOComponent component = muleContext.getRegistry().lookupComponent("appleComponent2");
 //        assertTrue("component must be SedaComponent to get threading profile", component instanceof SedaComponent);
 //        tp = ((SedaComponent) component).getThreadingProfile();
 //        assertEquals(6, tp.getMaxBufferSize());
@@ -200,13 +200,13 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     // MULE-2458 (now has separate test)
 //    public void testGlobalEndpointOverrides()
 //    {
-//        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
+//        UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpoint("orangeEndpoint");
 //        assertNotNull(ep);
 //        assertEquals(1, ep.getProperties().size());
 //        assertEquals("value1", ep.getProperties().get("testGlobal"));
 //        assertNull(ep.getFilter());
 //
-//        MuleDescriptor descriptor = (MuleDescriptor)managementContext.getRegistry().lookupService(
+//        MuleDescriptor descriptor = (MuleDescriptor)muleContext.getRegistry().lookupService(
 //            "orangeComponent");
 //        assertNotNull(descriptor);
 //        ep = descriptor.getInboundRouter().getEndpoint("orangeEndpoint");

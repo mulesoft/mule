@@ -28,7 +28,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testDefaults() throws Exception
     {
-        VMConnector c = (VMConnector)managementContext.getRegistry().lookupConnector("vmConnectorDefaults");
+        VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnectorDefaults");
         assertNotNull(c);
         
         assertFalse(c.isQueueEvents());
@@ -42,7 +42,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testDefaultQueueProfile() throws Exception
     {
-        VMConnector c = (VMConnector)managementContext.getRegistry().lookupConnector("vmConnector1");
+        VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnector1");
         assertNotNull(c);
         
         assertTrue(c.isQueueEvents());
@@ -57,7 +57,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testConfig() throws Exception
     {
-        VMConnector c = (VMConnector)managementContext.getRegistry().lookupConnector("vmConnector2");
+        VMConnector c = (VMConnector)muleContext.getRegistry().lookupConnector("vmConnector2");
         assertNotNull(c);
         
         assertTrue(c.isQueueEvents());
@@ -73,7 +73,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testGlobalEndpoint() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vmEndpoint");
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vmEndpoint");
         assertNotNull(endpoint);
         UMOEndpointURI uri = endpoint.getEndpointURI();
         assertNotNull(uri);

@@ -10,8 +10,8 @@
 
 package org.mule.transaction;
 
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
 
@@ -26,9 +26,9 @@ public class TransactionTemplate
 
     private final UMOTransactionConfig config;
     private final ExceptionListener exceptionListener;
-    private final UMOManagementContext context;
+    private final MuleContext context;
 
-    public TransactionTemplate(UMOTransactionConfig config, ExceptionListener listener, UMOManagementContext context)
+    public TransactionTemplate(UMOTransactionConfig config, ExceptionListener listener, MuleContext context)
     {
         this.config = config;
         exceptionListener = listener;

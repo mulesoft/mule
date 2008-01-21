@@ -82,7 +82,7 @@ public class MuleRPCProvider extends RPCProvider
     protected Class getServiceClass(String s, SOAPService soapService, MessageContext messageContext)
         throws AxisFault
     {
-        UMOComponent component = MuleServer.getManagementContext().getRegistry().lookupComponent(soapService.getName());
+        UMOComponent component = MuleServer.getMuleContext().getRegistry().lookupComponent(soapService.getName());
         try
         {
             Class[] classes = AxisServiceProxy.getInterfacesForComponent(component);

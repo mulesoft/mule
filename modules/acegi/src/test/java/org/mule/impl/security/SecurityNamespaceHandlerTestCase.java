@@ -29,7 +29,7 @@ public class SecurityNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testSecurity()
     {
-        UMOSecurityManager securityManager = managementContext.getSecurityManager();
+        UMOSecurityManager securityManager = muleContext.getSecurityManager();
         assertNotNull(securityManager.getProvider("dummySecurityProvider"));
         assertTrue(securityManager.getProvider("dummySecurityProvider") instanceof MockSecurityProvider);
         verifyEncryptionStrategy(securityManager, "dummyEncryptionStrategy", MockEncryptionStrategy.class);

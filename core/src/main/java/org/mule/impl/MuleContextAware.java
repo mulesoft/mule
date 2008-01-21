@@ -9,13 +9,13 @@
  */
 package org.mule.impl;
 
-import org.mule.umo.UMOManagementContext;
+import org.mule.api.MuleContext;
 
 /**
- * Objects who want to be aware of the UMOManagementContext should implement this interface. Once the context has
+ * Objects who want to be aware of the MuleContext should implement this interface. Once the context has
  * been initialised it will be passed to all objects implementing this interface.
  */
-public interface ManagementContextAware
+public interface MuleContextAware
 {
-    void setManagementContext(UMOManagementContext context);
+    void setMuleContext(MuleContext context);
 }

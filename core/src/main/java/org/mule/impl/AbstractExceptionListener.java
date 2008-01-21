@@ -10,6 +10,7 @@
 
 package org.mule.impl;
 
+import org.mule.api.MuleContext;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.internal.notifications.ExceptionNotification;
@@ -21,7 +22,6 @@ import org.mule.umo.TransactionException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.InvalidEndpointTypeException;
@@ -50,7 +50,7 @@ import org.apache.commons.logging.LogFactory;
  * this exception listener and provides an implementation for dispatching exception
  * events from this Listener.
  */
-public abstract class AbstractExceptionListener implements ExceptionListener, Initialisable, Disposable, ManagementContextAware
+public abstract class AbstractExceptionListener implements ExceptionListener, Initialisable, Disposable, MuleContextAware
 {
     /**
      * logger used by this class
@@ -61,11 +61,11 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     protected AtomicBoolean initialised = new AtomicBoolean(false);
 
-    protected UMOManagementContext managementContext;
+    protected MuleContext muleContext;
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 
     public List getEndpoints()
@@ -168,12 +168,12 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     {
         if (!initialised.get())
         {
-            doInitialise(managementContext);
+            doInitialise(muleContext);
             initialised.set(true);
         }
     }
 
-    protected void doInitialise(UMOManagementContext managementContext) throws InitialisationException
+    protected void doInitialise(MuleContext muleContext) throws InitialisationException
     {
         logger.info("Initialising exception listener: " + toString());
     }
@@ -360,9 +360,9 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      */
     protected void fireNotification(ExceptionNotification notification)
     {
-        if (managementContext != null)
+        if (muleContext != null)
         {
-            managementContext.fireNotification(notification);
+            muleContext.fireNotification(notification);
         }
     }
 

@@ -27,7 +27,7 @@ public class BpmNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testDefaults() throws Exception
     {
-        ProcessConnector c = (ProcessConnector)managementContext.getRegistry().lookupConnector("bpmConnectorDefaults");
+        ProcessConnector c = (ProcessConnector)muleContext.getRegistry().lookupConnector("bpmConnectorDefaults");
         assertNotNull(c);
         
         assertFalse(c.isAllowGlobalDispatcher());
@@ -45,7 +45,7 @@ public class BpmNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testConfig() throws Exception
     {
-        ProcessConnector c = (ProcessConnector)managementContext.getRegistry().lookupConnector("bpmConnector1");
+        ProcessConnector c = (ProcessConnector)muleContext.getRegistry().lookupConnector("bpmConnector1");
         assertNotNull(c);
         
         assertTrue(c.isAllowGlobalDispatcher());

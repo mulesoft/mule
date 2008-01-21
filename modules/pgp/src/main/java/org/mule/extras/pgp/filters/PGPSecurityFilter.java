@@ -191,7 +191,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
     {
         if (strategyName != null)
         {
-            strategy = endpoint.getManagementContext().getSecurityManager().getEncryptionStrategy(strategyName);
+            strategy = endpoint.getMuleContext().getSecurityManager().getEncryptionStrategy(strategyName);
         }
 
         if (strategy == null)

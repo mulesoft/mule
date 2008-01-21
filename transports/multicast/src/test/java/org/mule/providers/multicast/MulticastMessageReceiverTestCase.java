@@ -32,6 +32,6 @@ public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTes
 
     public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("multicast://228.2.3.4:10100");
+        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("multicast://228.2.3.4:10100");
     }
 }

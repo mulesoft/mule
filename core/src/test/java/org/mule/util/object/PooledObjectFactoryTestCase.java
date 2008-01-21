@@ -248,8 +248,8 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
     public void testWithinComponent() throws Exception
     {
         SedaModel model = new SedaModel();
-        model.setManagementContext(managementContext);
-        managementContext.applyLifecycle(model);
+        model.setMuleContext(muleContext);
+        muleContext.applyLifecycle(model);
         
         UMOComponent c = new SedaComponent();
         c.setName("test");
@@ -258,8 +258,8 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         c.setServiceFactory(of);
         c.setModel(model);
 
-        c.setManagementContext(managementContext);
-        managementContext.applyLifecycle(c);
+        c.setMuleContext(muleContext);
+        muleContext.applyLifecycle(c);
 
         assertTrue(c.getServiceFactory() instanceof PooledObjectFactory);
         assertEquals(0, ((PooledObjectFactory) c.getServiceFactory()).getPoolSize());

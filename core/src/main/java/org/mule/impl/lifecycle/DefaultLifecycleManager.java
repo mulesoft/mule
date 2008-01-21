@@ -9,12 +9,12 @@
  */
 package org.mule.impl.lifecycle;
 
-import org.mule.impl.lifecycle.phases.ManagementContextStartPhase;
-import org.mule.impl.lifecycle.phases.ManagementContextStopPhase;
+import org.mule.api.MuleContext;
+import org.mule.impl.lifecycle.phases.MuleContextStartPhase;
+import org.mule.impl.lifecycle.phases.MuleContextStopPhase;
 import org.mule.impl.lifecycle.phases.TransientRegistryDisposePhase;
 import org.mule.impl.lifecycle.phases.TransientRegistryInitialisePhase;
 import org.mule.registry.Registry;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
@@ -33,11 +33,11 @@ public class DefaultLifecycleManager extends GenericLifecycleManager
     public DefaultLifecycleManager()
     {
         //Create Lifecycle phases
-        Class[] ignorredObjects = new Class[]{Registry.class, UMOManagementContext.class};
+        Class[] ignorredObjects = new Class[]{Registry.class, MuleContext.class};
 
         registerLifecycle(new TransientRegistryInitialisePhase(ignorredObjects));
-        registerLifecycle(new ManagementContextStartPhase(ignorredObjects));
-        registerLifecycle(new ManagementContextStopPhase(ignorredObjects));
+        registerLifecycle(new MuleContextStartPhase(ignorredObjects));
+        registerLifecycle(new MuleContextStopPhase(ignorredObjects));
         registerLifecycle(new TransientRegistryDisposePhase(ignorredObjects));
     }
 }

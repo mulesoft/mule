@@ -31,12 +31,12 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
         connector.setResultSetHandler(new TestResultSetHandler());
         connector.setDataSource(new TestDataSource());
         
-        connector.setManagementContext(managementContext);
-        //managementContext.applyLifecycle(connector);
-        managementContext.getRegistry().registerConnector(connector);
+        connector.setMuleContext(muleContext);
+        //muleContext.applyLifecycle(connector);
+        muleContext.getRegistry().registerConnector(connector);
         
         
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "jdbc://select * from test");
         ep.request(0);
     }

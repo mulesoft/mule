@@ -10,10 +10,10 @@
 
 package org.mule.impl.security;
 
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -40,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
  * all security filters, namely configuring the SecurityManager for this instance
  */
 
-public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecurityFilter, ManagementContextAware
+public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecurityFilter, MuleContextAware
 {
     /** logger used by this class */
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -53,18 +53,18 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
     private UMOCredentialsAccessor credentialsAccessor;
     private boolean isInitialised = false;
 
-    protected UMOManagementContext managementContext;
+    protected MuleContext muleContext;
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 
     public final void initialise() throws InitialisationException
     {
         if (securityManager == null)
         {
-            securityManager = managementContext.getSecurityManager();
+            securityManager = muleContext.getSecurityManager();
         }
         if (securityManager == null)
         {

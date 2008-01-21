@@ -29,13 +29,13 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         File target = initForRequest();
 
         // add a receiver endpoint that will poll the readFromDirectory
-        UMOComponent relay = managementContext.getRegistry().lookupComponent("relay");
+        UMOComponent relay = muleContext.getRegistry().lookupComponent("relay");
         assertNotNull(relay);
         String url = fileToUrl(target) + "?connector=receiveConnector";
         logger.debug(url);
         
         UMOImmutableEndpoint endpoint = 
-            managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url);
+            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url);
         relay.getInboundRouter().addEndpoint(endpoint);
         relay.stop();
         relay.start();

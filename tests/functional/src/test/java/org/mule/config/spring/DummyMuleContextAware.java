@@ -10,8 +10,8 @@
 
 package org.mule.config.spring;
 
-import org.mule.impl.ManagementContextAware;
-import org.mule.umo.UMOManagementContext;
+import org.mule.api.MuleContext;
+import org.mule.impl.MuleContextAware;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
@@ -19,10 +19,10 @@ import org.mule.umo.transformer.TransformerException;
 
 import java.util.List;
 
-public class DummyManagementContextAware implements ManagementContextAware, UMOTransformer
+public class DummyMuleContextAware implements MuleContextAware, UMOTransformer
 {
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
         // empty
     }

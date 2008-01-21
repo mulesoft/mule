@@ -22,7 +22,7 @@ public class PropertyPlaceholderMule2150TestCase extends FunctionalTestCase
 
     protected String getProperty(String name)
     {
-        MapHolder holder = (MapHolder) managementContext.getRegistry().lookupObject("props");
+        MapHolder holder = (MapHolder) muleContext.getRegistry().lookupObject("props");
         String value = (String) holder.getMap().get(name);
         assertNotNull(name, value);
         return value;

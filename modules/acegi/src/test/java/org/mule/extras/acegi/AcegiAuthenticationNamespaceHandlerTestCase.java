@@ -26,7 +26,7 @@ public class AcegiAuthenticationNamespaceHandlerTestCase extends FunctionalTestC
 
     public void testAcegi()
     {
-        Collection endpoints = managementContext.getRegistry().getEndpoints();
+        Collection endpoints = muleContext.getRegistry().getEndpoints();
         Iterator it = endpoints.iterator();
         while (it.hasNext())
         {

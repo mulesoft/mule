@@ -10,6 +10,7 @@
 
 package org.mule.umo;
 
+import org.mule.api.MuleContext;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
@@ -247,8 +248,8 @@ public interface UMOEvent
     String getEncoding();
 
     /**
-     * Returns the managementContext for the Mule node that this event was received in
-     * @return the managementContext for the Mule node that this event was received in
+     * Returns the muleContext for the Mule node that this event was received in
+     * @return the muleContext for the Mule node that this event was received in
      */
-    UMOManagementContext getManagementContext();
+    MuleContext getMuleContext();
 }

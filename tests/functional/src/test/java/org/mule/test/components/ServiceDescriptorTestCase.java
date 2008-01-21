@@ -23,7 +23,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
 
     public void testGenericObjectFactory() throws Exception
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent("orange1");
+        UMOComponent c = muleContext.getRegistry().lookupComponent("orange1");
         
         Object service =  c.getServiceFactory().getOrCreate();
         assertTrue("Service should be an Orange", service instanceof Orange);
@@ -33,7 +33,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     
     public void testGenericObjectFactoryWithProperties() throws Exception
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent("orange2");
+        UMOComponent c = muleContext.getRegistry().lookupComponent("orange2");
 
         // Create an orange
         Object service =  c.getServiceFactory().getOrCreate();
@@ -50,7 +50,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     
     public void testSingletonObjectFactory() throws Exception
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent("orange3");
+        UMOComponent c = muleContext.getRegistry().lookupComponent("orange3");
         Object service =  c.getServiceFactory().getOrCreate();
         assertTrue("Service should be an Orange", service instanceof Orange);
         // Default values
@@ -59,7 +59,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     
     public void testSpringFactoryBean() throws Exception
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent("orange4");
+        UMOComponent c = muleContext.getRegistry().lookupComponent("orange4");
         Object service =  c.getServiceFactory().getOrCreate();
         assertNotNull(service);
         assertTrue("Service should be an Orange but is: " + service.getClass(), service instanceof Orange);

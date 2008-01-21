@@ -9,7 +9,7 @@
  */
 package org.mule.impl.lifecycle;
 
-import org.mule.umo.UMOManagementContext;
+import org.mule.api.MuleContext;
 import org.mule.umo.manager.UMOServerNotification;
 
 /**
@@ -56,7 +56,7 @@ public class LifecycleObject
         this.type = type;
     }
 
-    public void firePreNotification(UMOManagementContext context)
+    public void firePreNotification(MuleContext context)
     {
         if(preNotification!=null)
         {
@@ -64,7 +64,7 @@ public class LifecycleObject
         }
     }
 
-    public void firePostNotification(UMOManagementContext context)
+    public void firePostNotification(MuleContext context)
     {
         if(postNotification!=null)
         {

@@ -9,9 +9,9 @@
  */
 package org.mule.routing;
 
-import org.mule.impl.ManagementContextAware;
+import org.mule.api.MuleContext;
+import org.mule.impl.MuleContextAware;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.UMORouter;
 
@@ -20,11 +20,11 @@ import org.mule.umo.routing.UMORouter;
  * router types can vary depending on their usage pattern. The types of router are inbound, outbound
  * response and nested.
  */
-public abstract class AbstractRouter implements UMORouter, ManagementContextAware
+public abstract class AbstractRouter implements UMORouter, MuleContextAware
 {
     private RouterStatistics routerStatistics;
 
-    private UMOManagementContext managementContext;
+    private MuleContext muleContext;
 
 
     public void initialise() throws InitialisationException
@@ -38,14 +38,14 @@ public abstract class AbstractRouter implements UMORouter, ManagementContextAwar
         // Template
     }
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 
-    public UMOManagementContext getManagementContext()
+    public MuleContext getMuleContext()
     {
-        return managementContext;
+        return muleContext;
     }
 
     public void setRouterStatistics(RouterStatistics stats)

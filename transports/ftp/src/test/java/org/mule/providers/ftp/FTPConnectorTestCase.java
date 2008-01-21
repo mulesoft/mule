@@ -87,7 +87,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
     {
         final String testObject = "custom object";
 
-        final UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        final UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("ftp://test:test@example.com");
         final UMOEndpointURI endpointURI = endpoint.getEndpointURI();

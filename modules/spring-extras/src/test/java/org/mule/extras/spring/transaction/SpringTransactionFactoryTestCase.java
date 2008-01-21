@@ -32,7 +32,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
         SpringTransactionFactory factory = new SpringTransactionFactory();
         factory.setManager((PlatformTransactionManager)mockPTM.proxy());
 
-        UMOTransaction tx = factory.beginTransaction(managementContext);
+        UMOTransaction tx = factory.beginTransaction(muleContext);
 //        TransactionCoordination.getInstance().bindTransaction(tx);
         tx.commit();
     }
@@ -48,7 +48,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
         SpringTransactionFactory factory = new SpringTransactionFactory();
         factory.setManager((PlatformTransactionManager)mockPTM.proxy());
 
-        UMOTransaction tx = factory.beginTransaction(managementContext);
+        UMOTransaction tx = factory.beginTransaction(muleContext);
 //        TransactionCoordination.getInstance().bindTransaction(tx);
         tx.rollback();
     }

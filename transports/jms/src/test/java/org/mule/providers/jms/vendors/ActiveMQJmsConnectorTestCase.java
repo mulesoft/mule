@@ -31,7 +31,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 
     public void testConfigurationDefaults() throws Exception
     {
-        JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector");
+        JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");
         assertNotNull(c);
 
         assertFalse(c.isEagerConsumer());
@@ -47,7 +47,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     
     public void testDefaultActiveMqConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) managementContext.getRegistry().lookupConnector("activeMqJmsConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqJmsConnector");
 
         assertNotNull(c);
         assertTrue(c instanceof ActiveMQJmsConnector);
@@ -74,7 +74,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     
     public void testCustomActiveMqConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) managementContext.getRegistry().lookupConnector("customActiveMqJmsConnector");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("customActiveMqJmsConnector");
 
         assertNotNull(c);
         assertTrue(c instanceof ActiveMQJmsConnector);

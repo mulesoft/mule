@@ -11,9 +11,6 @@ package org.mule.providers.email.config;
 
 import org.mule.providers.email.Pop3Connector;
 import org.mule.providers.email.Pop3sConnector;
-import org.mule.providers.email.ImapConnector;
-import org.mule.providers.email.ImapsConnector;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 
 /**
@@ -28,7 +25,7 @@ public class Pop3NamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
     public void testConfig() throws Exception
     {
-        Pop3Connector c = (Pop3Connector)managementContext.getRegistry().lookupConnector("pop3Connector");
+        Pop3Connector c = (Pop3Connector)muleContext.getRegistry().lookupConnector("pop3Connector");
         assertNotNull(c);
 
         assertTrue(c.isBackupEnabled());
@@ -46,7 +43,7 @@ public class Pop3NamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
     public void testSecureConfig() throws Exception
     {
-        Pop3sConnector c = (Pop3sConnector)managementContext.getRegistry().lookupConnector("pop3sConnector");
+        Pop3sConnector c = (Pop3sConnector)muleContext.getRegistry().lookupConnector("pop3sConnector");
         assertNotNull(c);
 
         assertTrue(c.isBackupEnabled());

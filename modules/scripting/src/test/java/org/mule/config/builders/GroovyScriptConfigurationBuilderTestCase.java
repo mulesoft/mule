@@ -10,7 +10,7 @@
 
 package org.mule.config.builders;
 
-import org.mule.config.ConfigurationBuilder;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
 import org.mule.umo.UMOException;
 

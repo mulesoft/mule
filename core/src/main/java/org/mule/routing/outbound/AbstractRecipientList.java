@@ -157,14 +157,14 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             throws UMOException
     {
         UMOImmutableEndpoint endpoint = null;
-        if (null != getManagementContext() && null != getManagementContext().getRegistry())
+        if (null != getMuleContext() && null != getMuleContext().getRegistry())
         {
-            endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(uri,
+            endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getEndpoint(uri,
                 UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         }
         if (null != endpoint)
         {
-            MuleServer.getManagementContext().applyLifecycle(endpoint);
+            MuleServer.getMuleContext().applyLifecycle(endpoint);
         }
         return endpoint;
     }
@@ -173,9 +173,9 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             throws UMOException
     {
         UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) recipientCache.get(recipient);
-        if (null == endpoint && null != getManagementContext() && null != getManagementContext().getRegistry())
+        if (null == endpoint && null != getMuleContext() && null != getMuleContext().getRegistry())
         {
-            endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(recipient);
+            endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(recipient);
         }
         return endpoint;
     }

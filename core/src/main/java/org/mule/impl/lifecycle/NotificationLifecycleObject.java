@@ -10,9 +10,9 @@
 package org.mule.impl.lifecycle;
 
 import org.mule.MuleRuntimeException;
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.internal.notifications.ManagerNotification;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.util.ClassUtils;
 
@@ -84,7 +84,7 @@ public class NotificationLifecycleObject extends LifecycleObject
     }
 
     //@java.lang.Override
-    public void firePreNotification(UMOManagementContext context)
+    public void firePreNotification(MuleContext context)
     {
         if(getPreNotificationName()!=null)
         {
@@ -95,7 +95,7 @@ public class NotificationLifecycleObject extends LifecycleObject
     }
 
     //@java.lang.Override
-    public void firePostNotification(UMOManagementContext context)
+    public void firePostNotification(MuleContext context)
     {
         if(getPostNotificationName()!=null)
         {
@@ -104,7 +104,7 @@ public class NotificationLifecycleObject extends LifecycleObject
         super.firePostNotification(context);
     }
 
-    protected UMOServerNotification createNotification(UMOManagementContext context, String action)
+    protected UMOServerNotification createNotification(MuleContext context, String action)
     {
         try
         {

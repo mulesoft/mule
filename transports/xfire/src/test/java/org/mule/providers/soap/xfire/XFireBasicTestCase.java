@@ -39,7 +39,7 @@ public class XFireBasicTestCase extends FunctionalTestCase
 
 //    public void testEchoServiceMultiThreaded() throws Exception
 //    {
-//        final MuleClient client = new MuleClient(managementContext);
+//        final MuleClient client = new MuleClient(muleContext);
 //        final List results = new ArrayList(50);
 //        final ExceptionHolder exceptionHolder = new ExceptionHolder();
 //        Runnable r = new Runnable() {
@@ -96,14 +96,14 @@ public class XFireBasicTestCase extends FunctionalTestCase
 //        t.close();
 //        s.close();
 
-        MuleClient client = new MuleClient(managementContext);
+        MuleClient client = new MuleClient(muleContext);
         UMOMessage result = client.send("xfire:http://localhost:63083/services/echoService3?method=echo", "Hello!", null);
         assertEquals("Hello!", result.getPayload());
     }
     
     public void testNoLocalBinding() throws Exception
     {
-        MuleClient client = new MuleClient(managementContext);
+        MuleClient client = new MuleClient(muleContext);
         WSDLReader wsdlReader = new WSDLReaderImpl();
         Definition wsdlDefinition = wsdlReader.readWSDL("http://localhost:63084/services/echoService4?wsdl");
 
@@ -119,7 +119,7 @@ public class XFireBasicTestCase extends FunctionalTestCase
 
     public void testEchoWsdl() throws Exception
     {
-        MuleClient client = new MuleClient(managementContext);
+        MuleClient client = new MuleClient(muleContext);
         UMOMessage result = client.request("http://localhost:63081/services/echoService?wsdl", 5000);
         assertNotNull(result.getPayload());
         XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());
@@ -127,7 +127,7 @@ public class XFireBasicTestCase extends FunctionalTestCase
 
     public void testListServices() throws Exception
     {
-        MuleClient client = new MuleClient(managementContext);
+        MuleClient client = new MuleClient(muleContext);
         UMOMessage result = client.request("http://localhost:63081/services/echoService?list", 5000);
         assertNotNull(result.getPayload());
         System.out.println(result.getPayloadAsString());

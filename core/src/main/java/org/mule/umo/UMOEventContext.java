@@ -10,6 +10,7 @@
 
 package org.mule.umo;
 
+import org.mule.api.MuleContext;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
@@ -441,5 +442,5 @@ public interface UMOEventContext
 
     UMOSession getSession();
 
-    UMOManagementContext getManagementContext();
+    MuleContext getMuleContext();
 }

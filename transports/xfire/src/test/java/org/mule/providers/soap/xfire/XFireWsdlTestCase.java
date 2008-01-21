@@ -56,9 +56,9 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
         // make sure the Mule is up when not using MuleClient
         // MuleManager.getInstance().start();
 
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URL_NOWSDL, managementContext);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URL_NOWSDL, muleContext);
         endpointBuilder.setProperty("wsdlUrl", TEST_URL_WSDL);
-        UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry()
+        UMOEndpoint endpoint = (UMOEndpoint) muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint(endpointBuilder);
 

@@ -9,9 +9,9 @@
  */
 package org.mule.impl.lifecycle;
 
+import org.mule.api.MuleContext;
 import org.mule.impl.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
 import org.mule.umo.lifecycle.UMOLifecyclePhase;
 import org.mule.util.StringMessageUtils;
@@ -63,7 +63,7 @@ public class GenericLifecycleManager implements UMOLifecycleManager
         lifecycles.add(lci);
     }
 
-    public void firePhase(UMOManagementContext managementContext, String phase) throws UMOException
+    public void firePhase(MuleContext muleContext, String phase) throws UMOException
     {
         if (currentPhase.equalsIgnoreCase(phase))
         {
@@ -79,7 +79,7 @@ public class GenericLifecycleManager implements UMOLifecycleManager
         {
             setExecutingPhase(phase);
             UMOLifecyclePhase li = (UMOLifecyclePhase) lifecycles.get(phaseIndex.intValue());
-            li.fireLifecycle(managementContext, currentPhase);
+            li.fireLifecycle(muleContext, currentPhase);
             setCurrentPhase(li);
         }
         finally
@@ -127,7 +127,7 @@ public class GenericLifecycleManager implements UMOLifecycleManager
         return completedPhases.contains(phaseName);
     }
 
-    public void applyLifecycle(UMOManagementContext managementContext, Object object) throws UMOException
+    public void applyLifecycle(MuleContext muleContext, Object object) throws UMOException
     {
         //String startingPhase = UMOLifecyclePhase.PHASE_NAME;
         UMOLifecyclePhase lcp;

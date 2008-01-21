@@ -14,9 +14,7 @@ import org.mule.RegistryContext;
 import org.mule.providers.email.MailProperties;
 import org.mule.providers.email.MailUtils;
 import org.mule.providers.email.SmtpConnector;
-import org.mule.registry.RegistrationException;
 import org.mule.transformers.AbstractMessageAwareTransformer;
-import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.MapUtils;
@@ -84,7 +82,7 @@ public class StringToEmailMessage extends AbstractMessageAwareTransformer
         if (otherHeaders != null && !otherHeaders.isEmpty())
         {
                 //TODO Whats going on here?
-//                final UMOManagementContext mc = context.getManagementContext();
+//                final MuleContext mc = context.getMuleContext();
 //                for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();)
 //                {
 //                    String propertyKey = (String) iterator.next();

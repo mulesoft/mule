@@ -26,7 +26,7 @@ public class TransactionNotificationsTestCase extends AbstractMuleTestCase
     {
         final CountDownLatch latch = new CountDownLatch(3);
 
-        managementContext.registerListener(new TransactionNotificationListener()
+        muleContext.registerListener(new TransactionNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {

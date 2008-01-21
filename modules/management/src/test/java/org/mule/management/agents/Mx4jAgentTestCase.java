@@ -21,13 +21,13 @@ public class Mx4jAgentTestCase extends AbstractMuleJmxTestCase
 {
     public void testRedeploy() throws Exception
     {
-        managementContext.setId("Mx4jAgentTest");
-        final String name = jmxSupport.getDomainName(managementContext) +
+        muleContext.setId("Mx4jAgentTest");
+        final String name = jmxSupport.getDomainName(muleContext) +
                             ":" + Mx4jAgent.HTTP_ADAPTER_OBJECT_NAME;
         mBeanServer.registerMBean(new HttpAdaptor(), jmxSupport.getObjectName(name));
 
         Mx4jAgent agent = new Mx4jAgent();
-        agent.setManagementContext(managementContext);
+        agent.setMuleContext(muleContext);
         agent.initialise();
     }
 }

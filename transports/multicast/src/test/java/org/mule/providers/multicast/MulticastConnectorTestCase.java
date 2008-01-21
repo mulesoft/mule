@@ -69,7 +69,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
             // expected
         }
 
-        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("multicast://228.2.3.4:10100");
 

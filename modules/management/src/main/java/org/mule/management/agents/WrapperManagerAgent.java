@@ -121,7 +121,7 @@ public class WrapperManagerAgent extends AbstractAgent
                 return;
             }
 
-            wrapperName = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":" + WRAPPER_OBJECT_NAME);
+            wrapperName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + WRAPPER_OBJECT_NAME);
 
             unregisterMBeansIfNecessary();
             mBeanServer.registerMBean(wrapperManagerRef.get(), wrapperName);
@@ -226,7 +226,7 @@ public class WrapperManagerAgent extends AbstractAgent
         try
         {
             // remove the agent from the list, it's not functional
-            managementContext.getRegistry().unregisterAgent(this.getName());
+            muleContext.getRegistry().unregisterAgent(this.getName());
         }
         catch (UMOException e)
         {

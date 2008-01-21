@@ -118,7 +118,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                 throw new InitialisationException(MessageFactory.createStaticMessage("Component has no name to identify it"), this);
             }
             // Setup event Queue (used for VM execution).  The queue has the same name as the component.
-            queueProfile.configureQueue(name, managementContext.getQueueManager());
+            queueProfile.configureQueue(name, muleContext.getQueueManager());
         }
         catch (InitialisationException e)
         {
@@ -138,7 +138,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     public void doStop() throws UMOException
     {
-        if (managementContext.getQueueManager().getQueueSession().getQueue(name).size() > 0)
+        if (muleContext.getQueueManager().getQueueSession().getQueue(name).size() > 0)
         {
             try
             {
@@ -266,7 +266,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     public int getQueueSize()
     {
-        QueueSession session = managementContext.getQueueManager().getQueueSession();
+        QueueSession session = muleContext.getQueueManager().getQueueSession();
         Queue queue = session.getQueue(name);
         if (queue == null)
         {
@@ -285,7 +285,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         MuleEvent event = null;
         Object pojoService = null;
         MuleProxy proxy = null;
-        QueueSession queueSession = managementContext.getQueueManager().getQueueSession();
+        QueueSession queueSession = muleContext.getQueueManager().getQueueSession();
 
         while (!stopped.get())
         {
@@ -388,7 +388,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     protected void enqueue(UMOEvent event) throws Exception
     {
-        QueueSession session = managementContext.getQueueManager().getQueueSession();
+        QueueSession session = muleContext.getQueueManager().getQueueSession();
         Queue queue = session.getQueue(name);
         if (queue == null)
         {
@@ -403,7 +403,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     protected UMOEvent dequeue() throws Exception
     {
-        QueueSession session = managementContext.getQueueManager().getQueueSession();
+        QueueSession session = muleContext.getQueueManager().getQueueSession();
         Queue queue = session.getQueue(name);
         if (queue == null)
         {

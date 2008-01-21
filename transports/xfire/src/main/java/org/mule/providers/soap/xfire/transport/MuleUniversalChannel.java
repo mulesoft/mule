@@ -11,7 +11,6 @@
 package org.mule.providers.soap.xfire.transport;
 
 
-import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
@@ -22,7 +21,6 @@ import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.OutputHandler;
@@ -71,14 +69,10 @@ public class MuleUniversalChannel extends AbstractChannel
     /** logger used by this class */
     protected final transient Log logger = LogFactory.getLog(getClass());
 
-    private UMOManagementContext managementContext;
-
     public MuleUniversalChannel(String uri, Transport transport)
     {
         setTransport(transport);
         setUri(uri);
-        //TODO not keen on this static Access
-        this.managementContext = MuleServer.getManagementContext();
     }
 
     public void open()

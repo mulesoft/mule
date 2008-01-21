@@ -29,13 +29,13 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
 
     public void testDynamicAttribute()
     {
-        ServerNotificationManager manager = managementContext.getNotificationManager();
+        ServerNotificationManager manager = muleContext.getNotificationManager();
         assertTrue(manager.isNotificationDynamic());
     }
 
     public void testRoutingConfiguration()
     {
-        ServerNotificationManager manager = managementContext.getNotificationManager();
+        ServerNotificationManager manager = muleContext.getNotificationManager();
         assertTrue(manager.getInterfaceToTypes().size() > 2);
         Object ifaces = manager.getInterfaceToTypes().get(TestInterface.class);
         assertNotNull(ifaces);
@@ -49,10 +49,10 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
 
     public void testSimpleNotification() throws InterruptedException
     {
-        ServerNotificationManager manager = managementContext.getNotificationManager();
+        ServerNotificationManager manager = muleContext.getNotificationManager();
         Collection listeners = manager.getListeners();
         assertEquals(3, listeners.size());
-        TestListener listener = (TestListener) managementContext.getRegistry().lookupObject("listener");
+        TestListener listener = (TestListener) muleContext.getRegistry().lookupObject("listener");
         assertNotNull(listener);
         assertFalse(listener.isCalled());
         manager.fireNotification(new TestEvent());
@@ -62,15 +62,15 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
 
     public void testDisabledNotification() throws InterruptedException
     {
-        ServerNotificationManager manager = managementContext.getNotificationManager();
+        ServerNotificationManager manager = muleContext.getNotificationManager();
         Collection listeners = manager.getListeners();
         assertEquals(3, listeners.size());
         TestListener2 listener2 =
-                (TestListener2) managementContext.getRegistry().lookupObject("listener2");
+                (TestListener2) muleContext.getRegistry().lookupObject("listener2");
         assertNotNull(listener2);
         assertFalse(listener2.isCalled());
         TestAdminListener adminListener =
-                (TestAdminListener) managementContext.getRegistry().lookupObject("adminListener");
+                (TestAdminListener) muleContext.getRegistry().lookupObject("adminListener");
         assertNotNull(adminListener);
         assertFalse(adminListener.isCalled());
         manager.fireNotification(new TestAdminEvent());

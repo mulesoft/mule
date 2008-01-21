@@ -10,7 +10,7 @@
 
 package org.mule.umo.endpoint;
 
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
@@ -24,7 +24,7 @@ import org.mule.umo.UMOException;
  * a name in configuration. <br/> <br/> This factory always returns new unique endpoint instances. The
  * {@link Registry} should be used to lookup/create endpoints.
  */
-public interface UMOEndpointFactory extends ManagementContextAware
+public interface UMOEndpointFactory extends MuleContextAware
 {
 
     /**
@@ -34,7 +34,7 @@ public interface UMOEndpointFactory extends ManagementContextAware
      * MULE-2292
      * 
      * @param uri endpoint identifier or uri
-     * @param managementContext
+     * @param muleContext
      * @return
      * @throws UMOException
      */
@@ -47,7 +47,7 @@ public interface UMOEndpointFactory extends ManagementContextAware
      * MULE-2292
      * 
      * @param uri endpoint identifier or uri
-     * @param managementContext
+     * @param muleContext
      * @return
      * @throws UMOException
      */
@@ -57,7 +57,7 @@ public interface UMOEndpointFactory extends ManagementContextAware
      * Creates an endpoint with the "INBOUND" role using the builder provided.
      * 
      * @param builder
-     * @param managementContext
+     * @param muleContext
      * @return
      * @throws UMOException
      */
@@ -67,7 +67,7 @@ public interface UMOEndpointFactory extends ManagementContextAware
      * Creates an endpoint with the "OUTBOUND" role using the builder provided.
      * 
      * @param builder
-     * @param managementContext
+     * @param muleContext
      * @return
      * @throws UMOException
      */
@@ -76,7 +76,7 @@ public interface UMOEndpointFactory extends ManagementContextAware
     /**
      * @param endpointUri
      * @param endpointType
-     * @param managementContext
+     * @param muleContext
      * @return
      * @throws UMOException
      * @deprecated
@@ -98,7 +98,7 @@ public interface UMOEndpointFactory extends ManagementContextAware
      * 
      * 
      * @param uri endpoint identifier or uri
-     * @param managementContext
+     * @param muleContext
      * @return
      * @throws UMOException
      * @see UMOEndpointBuilder

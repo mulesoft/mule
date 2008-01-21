@@ -235,7 +235,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
 
         TestEventAwareTransformer trans = new TestEventAwareTransformer();
         trans.setLatch(transformerLatch);
-        managementContext.getRegistry().registerTransformer(trans);
+        muleContext.getRegistry().registerTransformer(trans);
 
         MuleApplicationEvent event = new MuleApplicationEvent("Event from a spring bean",
             "vm://testBean2?transformers=dummyTransformer");

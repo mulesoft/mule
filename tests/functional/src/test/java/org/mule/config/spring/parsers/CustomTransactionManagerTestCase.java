@@ -26,7 +26,7 @@ public class CustomTransactionManagerTestCase extends FunctionalTestCase
 
     public void testCustomTransactionManager() throws Exception
     {
-        TransactionManager transactionManager = managementContext.getTransactionManager();
+        TransactionManager transactionManager = muleContext.getTransactionManager();
         assertTrue(transactionManager instanceof Proxy);
         Proxy proxy = (Proxy) transactionManager;
         TestTransactionManagerFactory.InternalInvocationHandler ihandler =
@@ -42,7 +42,7 @@ public class CustomTransactionManagerTestCase extends FunctionalTestCase
 /*
     public void testWeblogicTransactionManager() throws Exception
     {
-        TransactionManager transactionManager = managementContext.getTransactionManager();
+        TransactionManager transactionManager = muleContext.getTransactionManager();
         assertNotNull(transactionManager);
         transactionManager.begin();
         Transaction transaction = transactionManager.getTransaction();

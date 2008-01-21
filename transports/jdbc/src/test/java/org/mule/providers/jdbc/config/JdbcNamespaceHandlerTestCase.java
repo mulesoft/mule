@@ -27,7 +27,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testWithDataSource() throws Exception
     {
-        JdbcConnector c = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector1");
+        JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector1");
         assertNotNull(c);        
 
         assertTrue(c.getDataSource() instanceof TestDataSource);
@@ -36,7 +36,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testWithDataSourceViaJndi() throws Exception
     {
-        JdbcConnector c = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector2");
+        JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector2");
         assertNotNull(c);
         
         assertTrue(c.getDataSource() instanceof TestDataSource);
@@ -47,7 +47,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testFullyConfigured() throws Exception
     {
-        JdbcConnector c = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector3");
+        JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector3");
         assertNotNull(c);
         
         assertTrue(c.getDataSource() instanceof TestDataSource);
@@ -64,8 +64,8 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testEndpointQueryOverride() throws Exception
     {
-        JdbcConnector c = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector3");
-        UMOImmutableEndpoint testJdbcEndpoint = managementContext.getRegistry()
+        JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector3");
+        UMOImmutableEndpoint testJdbcEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("testJdbcEndpoint");
         

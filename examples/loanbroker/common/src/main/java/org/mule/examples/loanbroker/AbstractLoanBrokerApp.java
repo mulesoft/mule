@@ -10,11 +10,13 @@
 
 package org.mule.examples.loanbroker;
 
-import org.mule.config.ConfigurationBuilder;
+import org.mule.api.MuleContextFactory;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.examples.loanbroker.messages.Customer;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.extras.client.MuleClient;
+import org.mule.impl.DefaultMuleContextFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
@@ -49,8 +51,8 @@ public abstract class AbstractLoanBrokerApp
     {
         if (config != null)
         {
-            ConfigurationBuilder builder = getConfigBuilder();
-            builder.configure(config);
+            MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+            muleContextFactory.createMuleContext(getConfigBuilder());
         }
 
         client = new MuleClient();
@@ -69,7 +71,7 @@ public abstract class AbstractLoanBrokerApp
 
     protected ConfigurationBuilder getConfigBuilder() throws UMOException
     {
-        return new SpringXmlConfigurationBuilder();
+        return new SpringXmlConfigurationBuilder(config);
     }
 
     protected void dispose() throws Exception

@@ -28,7 +28,7 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
 
     public void testDefaultJmxAgentConfig() throws Exception
     {
-        UMOAgent agent = managementContext.getRegistry().lookupAgent("JMX Agent");
+        UMOAgent agent = muleContext.getRegistry().lookupAgent("JMX Agent");
         assertNotNull(agent);
         assertEquals(JmxAgent.class, agent.getClass());
         JmxAgent jmxAgent = (JmxAgent) agent;
@@ -38,22 +38,22 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
         assertEquals(true, jmxAgent.isEnableStatistics());
 
         MBeanServer mBeanServer = jmxAgent.getMBeanServer();
-        String domainName = jmxAgent.getJmxSupportFactory().getJmxSupport().getDomainName(managementContext);
+        String domainName = jmxAgent.getJmxSupportFactory().getJmxSupport().getDomainName(muleContext);
         assertEquals(6, mBeanServer.queryMBeans(ObjectName.getInstance(domainName + ":*"), null).size());
 
-        agent = managementContext.getRegistry().lookupAgent("Log4j JMX Agent");
+        agent = muleContext.getRegistry().lookupAgent("Log4j JMX Agent");
         assertNotNull(agent);
         assertEquals(Log4jAgent.class, agent.getClass());
 
-        agent = managementContext.getRegistry().lookupAgent(JmxServerNotificationAgent.DEFAULT_AGENT_NAME);
+        agent = muleContext.getRegistry().lookupAgent(JmxServerNotificationAgent.DEFAULT_AGENT_NAME);
         assertNotNull(agent);
         assertEquals(JmxServerNotificationAgent.class, agent.getClass());
 
-        agent = managementContext.getRegistry().lookupAgent("Default Jmx Agent Support");
+        agent = muleContext.getRegistry().lookupAgent("Default Jmx Agent Support");
         assertNull(agent);
         
         //Assertion to check that all Mule MBeans were unregistered during disposal phase.
-        managementContext.dispose();
+        muleContext.dispose();
         assertEquals(0, mBeanServer.queryMBeans(ObjectName.getInstance(domainName + ":*"), null).size());
     
     }

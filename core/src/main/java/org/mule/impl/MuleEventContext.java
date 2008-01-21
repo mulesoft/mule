@@ -11,6 +11,7 @@
 package org.mule.impl;
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionCoordination;
@@ -20,7 +21,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
@@ -251,7 +251,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage sendEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(
+        UMOImmutableEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getEndpoint(
             endpointUri, UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
 
         // If synchronous receive has not been explicitly set, default it to
@@ -465,7 +465,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void dispatchEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(
+        UMOImmutableEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getEndpoint(
             endpointUri, UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         session.dispatchEvent(message, endpoint);
     }
@@ -540,7 +540,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOMessage receiveEvent(UMOEndpointURI endpointUri, long timeout) throws UMOException
     {
-        UMOImmutableEndpoint endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getEndpoint(
+        UMOImmutableEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getEndpoint(
             endpointUri, UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         return session.receiveEvent(endpoint, timeout);
     }
@@ -678,8 +678,8 @@ public class MuleEventContext implements UMOEventContext
         return event.toString();
     }
 
-    public UMOManagementContext getManagementContext()
+    public MuleContext getMuleContext()
     {
-        return event.getManagementContext();
+        return event.getMuleContext();
     }
 }

@@ -1,19 +1,19 @@
 package org.mule.config.spring;
 
+import org.mule.api.MuleContext;
 import org.mule.config.MuleConfiguration;
-import org.mule.impl.ManagementContextAware;
-import org.mule.umo.UMOManagementContext;
+import org.mule.impl.MuleContextAware;
 
 import org.springframework.beans.factory.SmartFactoryBean;
 
-public class MuleConfigurationConfigurator extends MuleConfiguration implements ManagementContextAware, SmartFactoryBean
+public class MuleConfigurationConfigurator extends MuleConfiguration implements MuleContextAware, SmartFactoryBean
 {
     
-    private UMOManagementContext managementContext;
+    private MuleContext muleContext;
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 
     public boolean isEagerInit()
@@ -28,7 +28,7 @@ public class MuleConfigurationConfigurator extends MuleConfiguration implements 
 
     public Object getObject() throws Exception
     {
-        MuleConfiguration configuration = managementContext.getConfiguration();
+        MuleConfiguration configuration = muleContext.getConfiguration();
         configuration.setDefaultSynchronousEndpoints(isDefaultSynchronousEndpoints());
         configuration.setWorkingDirectory(getWorkingDirectory());
         configuration.setDefaultSynchronousEventTimeout(getDefaultSynchronousEventTimeout());

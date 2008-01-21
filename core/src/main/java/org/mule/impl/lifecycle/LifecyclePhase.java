@@ -10,10 +10,10 @@
 package org.mule.impl.lifecycle;
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.lifecycle.UMOLifecyclePhase;
 import org.mule.util.ClassUtils;
@@ -63,7 +63,7 @@ public class LifecyclePhase implements UMOLifecyclePhase
         this.oppositeLifecyclePhase = oppositeLifecyclePhase;
     }
 
-    public void fireLifecycle(UMOManagementContext managementContext, String currentPhase) throws UMOException
+    public void fireLifecycle(MuleContext muleContext, String currentPhase) throws UMOException
     {
         if (logger.isDebugEnabled())
         {
@@ -94,7 +94,7 @@ public class LifecyclePhase implements UMOLifecyclePhase
             Collection objects = RegistryContext.getRegistry().lookupObjects(lo.getType(), getRegistryScope());
             if (objects != null && objects.size() > 0)
             {
-                lo.firePreNotification(managementContext);
+                lo.firePreNotification(muleContext);
 
                 for (Iterator iterator1 = objects.iterator(); iterator1.hasNext();)
                 {
@@ -112,7 +112,7 @@ public class LifecyclePhase implements UMOLifecyclePhase
                     called.add(new Integer(o.hashCode()));
                 }
 
-                lo.firePostNotification(managementContext);
+                lo.firePostNotification(muleContext);
             }
 
         }

@@ -10,16 +10,18 @@
 
 package org.mule;
 
-import org.mule.config.ConfigurationBuilder;
+import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.impl.DefaultMuleContextFactory;
 import org.mule.impl.MuleShutdownHook;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
@@ -29,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,14 +42,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleServer implements Runnable
 {
-    public static final String CLI_OPTIONS[][] = {
-            {"builder", "true", "Configuration Builder Type"},
-            {"config", "true", "Configuration File"},
-            {"idle", "false", "Whether to run in idle (unconfigured) mode"},
-            {"main", "true", "Main Class"},
-            {"mode", "true", "Run Mode"},
-            {"props", "true", "Startup Properties"}
-    };
+    public static final String CLI_OPTIONS[][] = {{"builder", "true", "Configuration Builder Type"},
+        {"config", "true", "Configuration File"},
+        {"idle", "false", "Whether to run in idle (unconfigured) mode"}, {"main", "true", "Main Class"},
+        {"mode", "true", "Run Mode"}, {"props", "true", "Startup Properties"}};
 
     /**
      * Don't use a class object so the core doesn't depend on mule-module-spring-config.
@@ -54,9 +53,8 @@ public class MuleServer implements Runnable
     protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
 
     /**
-     * This builder sets up the configuration for an idle Mule node - a node
-     * that doesn't do anything initially but is fed configuration during
-     * runtime
+     * This builder sets up the configuration for an idle Mule node - a node that
+     * doesn't do anything initially but is fed configuration during runtime
      */
     protected static final String CLASSNAME_DEFAULT_IDLE_CONFIG_BUILDER = "org.mule.config.builders.MuleIdleConfigurationBuilder";
 
@@ -99,16 +97,16 @@ public class MuleServer implements Runnable
     protected Map options = Collections.EMPTY_MAP;
 
     /**
-     * The ManagementContext should contain anything which does not belong in the Registry.
-     * There is one ManagementContext per Mule instance.
-     * Assuming it has been created, a handle to the local ManagementContext can be obtained from anywhere
-     * by calling MuleServer.getManagementContext()
+     * The MuleContext should contain anything which does not belong in the Registry.
+     * There is one MuleContext per Mule instance. Assuming it has been created, a
+     * handle to the local MuleContext can be obtained from anywhere by calling
+     * MuleServer.getMuleContext()
      */
-    protected static UMOManagementContext managementContext = null;
+    protected static MuleContext muleContext = null;
 
     /**
      * Application entry point.
-     *
+     * 
      * @param args command-line args
      */
     public static void main(String[] args) throws Exception
@@ -125,7 +123,7 @@ public class MuleServer implements Runnable
 
     public MuleServer(String configResources)
     {
-        //setConfigurationResources(configResources);
+        // setConfigurationResources(configResources);
         init(new String[]{"-config", configResources});
     }
 
@@ -152,12 +150,13 @@ public class MuleServer implements Runnable
             throw new IllegalArgumentException(me.toString());
         }
 
-        // set our own UrlStreamHandlerFactory to become more independent of system properties
+        // set our own UrlStreamHandlerFactory to become more independent of system
+        // properties
         MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
 
         String config = (String) options.get("config");
         // Try default if no config file was given.
-        if (config == null && !options.containsKey("idle") )
+        if (config == null && !options.containsKey("idle"))
         {
             logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
             // try to load the config as a file as well
@@ -218,9 +217,9 @@ public class MuleServer implements Runnable
 
     /**
      * Start the mule server
-     *
+     * 
      * @param ownThread determines if the server will run in its own daemon thread or
-     *                  the current calling thread
+     *            the current calling thread
      */
     public void start(boolean ownThread, boolean registerShutdownHook)
     {
@@ -251,7 +250,7 @@ public class MuleServer implements Runnable
             logger.info("Mule Server initializing...");
             initialize();
             logger.info("Mule Server starting...");
-            managementContext.start();
+            muleContext.start();
         }
         catch (Throwable e)
         {
@@ -263,10 +262,10 @@ public class MuleServer implements Runnable
      * Sets the configuration builder to use for this server. Note that if a builder
      * is not set and the server's start method is called the default is an instance
      * of <code>MuleXmlConfigurationBuilder</code>.
-     *
+     * 
      * @param builderClassName the configuration builder FQN to use
      * @throws ClassNotFoundException if the class with the given name can not be
-     *                                loaded
+     *             loaded
      */
     public static void setConfigBuilderClassName(String builderClassName) throws ClassNotFoundException
     {
@@ -280,7 +279,7 @@ public class MuleServer implements Runnable
             else
             {
                 throw new IllegalArgumentException("Not a usable ConfigurationBuilder class: "
-                        + builderClassName);
+                                                   + builderClassName);
             }
         }
         else
@@ -292,7 +291,7 @@ public class MuleServer implements Runnable
     /**
      * Returns the class name of the configuration builder used to create this
      * MuleServer.
-     *
+     * 
      * @return FQN of the current config builder
      */
     public static String getConfigBuilderClassName()
@@ -310,7 +309,7 @@ public class MuleServer implements Runnable
     /**
      * Initializes this daemon. Derived classes could add some extra behaviour if
      * they wish.
-     *
+     * 
      * @throws Exception if failed to initialize
      */
     public void initialize() throws Exception
@@ -328,13 +327,16 @@ public class MuleServer implements Runnable
                 logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
                 configurationResources = DEFAULT_CONFIGURATION;
             }
-            managementContext = cfgBuilder.configure(configurationResources, getStartupPropertiesFile());
+            Properties startupProperties = PropertiesUtils.loadProperties(getStartupPropertiesFile(),
+                getClass());
+            DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+            muleContextFactory.createMuleContext(configurationResources, startupProperties);
         }
     }
 
     /**
      * Will shut down the server displaying the cause and time of the shutdown
-     *
+     * 
      * @param e the exception that caused the shutdown
      */
     public void shutdown(Throwable e)
@@ -355,14 +357,14 @@ public class MuleServer implements Runnable
         msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
         msgs.add(" ");
         msgs.add(CoreMessages.fatalErrorInShutdown());
-        msgs.add(CoreMessages.serverStartedAt(managementContext.getStartDate()));
+        msgs.add(CoreMessages.serverStartedAt(muleContext.getStartDate()));
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
 
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
         logger.fatal(shutdownMessage);
 
         // make sure that Mule is shutdown correctly.
-        managementContext.dispose();
+        muleContext.dispose();
         System.exit(0);
     }
 
@@ -374,13 +376,13 @@ public class MuleServer implements Runnable
         logger.info("Mule server shutting dow due to normal shutdown request");
         List msgs = new ArrayList();
         msgs.add(CoreMessages.normalShutdown());
-        msgs.add(CoreMessages.serverStartedAt(managementContext.getStartDate()).getMessage());
+        msgs.add(CoreMessages.serverStartedAt(muleContext.getStartDate()).getMessage());
         msgs.add(CoreMessages.serverShutdownAt(new Date()).getMessage());
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
         logger.info(shutdownMessage);
 
         // make sure that Mule is shutdown correctly.
-        managementContext.dispose();
+        muleContext.dispose();
         System.exit(0);
     }
 
@@ -401,7 +403,7 @@ public class MuleServer implements Runnable
 
     /**
      * Getter for property messengerURL.
-     *
+     * 
      * @return Value of property messengerURL.
      */
     public String getConfigurationResources()
@@ -411,7 +413,7 @@ public class MuleServer implements Runnable
 
     /**
      * Setter for property messengerURL.
-     *
+     * 
      * @param configurationResources New value of property configurationResources.
      */
     public void setConfigurationResources(String configurationResources)
@@ -429,27 +431,28 @@ public class MuleServer implements Runnable
         MuleServer.startupPropertiesFile = startupPropertiesFile;
     }
 
-    public static UMOManagementContext getManagementContext()
+    public static MuleContext getMuleContext()
     {
-        return managementContext;
+        return muleContext;
     }
 
-    public static void setManagementContext(UMOManagementContext managementContext)
+    public static void setMuleContext(MuleContext muleContext)
     {
-        MuleServer.managementContext = managementContext;
+        MuleServer.muleContext = muleContext;
     }
 
-     /**
-     * This class is installed only for MuleServer running as commandline app. A clean Mule
-     * shutdown can be achieved by disposing the {@link org.mule.impl.ManagementContext}.
+    /**
+     * This class is installed only for MuleServer running as commandline app. A
+     * clean Mule shutdown can be achieved by disposing the
+     * {@link org.mule.impl.DefaultMuleContext}.
      */
     private class ShutdownThread extends Thread
     {
         public void run()
         {
-            if (!managementContext.isDisposed() && !managementContext.isDisposing())
+            if (!muleContext.isDisposed() && !muleContext.isDisposing())
             {
-                managementContext.dispose();
+                muleContext.dispose();
             }
         }
     }

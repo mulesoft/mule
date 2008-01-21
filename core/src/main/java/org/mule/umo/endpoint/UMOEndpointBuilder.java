@@ -10,11 +10,11 @@
 
 package org.mule.umo.endpoint;
 
-import org.mule.impl.ManagementContextAware;
+import org.mule.api.MuleContext;
+import org.mule.impl.MuleContextAware;
 import org.mule.impl.endpoint.URIBuilder;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
@@ -29,7 +29,7 @@ import java.util.Map;
  * uses, for generic endpoints we can either resolve the transport from uri string or use a default
  * implementation.
  */
-public interface UMOEndpointBuilder extends ManagementContextAware, Cloneable
+public interface UMOEndpointBuilder extends MuleContextAware, Cloneable
 {
 
     /**
@@ -84,7 +84,7 @@ public interface UMOEndpointBuilder extends ManagementContextAware, Cloneable
 
     void setRegistryId(String registryId);
 
-    void setManagementContext(UMOManagementContext managementContext);
+    void setMuleContext(MuleContext muleContext);
 
     void setConnectionStrategy(ConnectionStrategy connectionStrategy);
 

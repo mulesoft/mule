@@ -12,6 +12,7 @@ package org.mule.providers.http.jetty;
 
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
@@ -21,7 +22,6 @@ import org.mule.providers.http.servlet.MuleRESTReceiverServlet;
 import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -68,10 +68,10 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             scon.setServletUrl(endpoint.getEndpointURI().getAddress());
             try
             {
-                UMOManagementContext managementContext = MuleServer.getManagementContext();
-                scon.setManagementContext(managementContext);
-                //managementContext.applyLifecycle(scon);
-                managementContext.getRegistry().registerConnector(scon);
+                MuleContext muleContext = MuleServer.getMuleContext();
+                scon.setMuleContext(muleContext);
+                //muleContext.applyLifecycle(scon);
+                muleContext.getRegistry().registerConnector(scon);
 
                 String path = endpoint.getEndpointURI().getPath();
                 if (StringUtils.isEmpty(path))
@@ -80,9 +80,9 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                 }
 
                 UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("servlet://" + path.substring(1),
-                    connector.getManagementContext());
+                    connector.getMuleContext());
                 endpointBuilder.setTransformers(endpoint.getTransformers());
-                UMOImmutableEndpoint ep = connector.getManagementContext()
+                UMOImmutableEndpoint ep = connector.getMuleContext()
                     .getRegistry()
                     .lookupEndpointFactory()
                     .getInboundEndpoint(endpointBuilder);

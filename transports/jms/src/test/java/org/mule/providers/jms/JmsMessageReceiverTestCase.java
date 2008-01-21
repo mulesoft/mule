@@ -44,9 +44,9 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         connection.expect("stop");
         connector.setConnectionFactory((ConnectionFactory) connectionFactory.proxy());
         
-        connector.setManagementContext(managementContext);
-        //managementContext.applyLifecycle(connector);
-        managementContext.getRegistry().registerConnector(connector);
+        connector.setMuleContext(muleContext);
+        //muleContext.applyLifecycle(connector);
+        muleContext.getRegistry().registerConnector(connector);
         
         super.doSetUp();
     }
@@ -78,13 +78,13 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("jms://testcase", managementContext);
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("jms://testcase", muleContext);
         if (connector == null)
         {
             throw new InitialisationException(MessageFactory.createStaticMessage("Connector has not been initialized."), null);
         }
         builder.setConnector(connector);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+        endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
         return endpoint;
     }
 

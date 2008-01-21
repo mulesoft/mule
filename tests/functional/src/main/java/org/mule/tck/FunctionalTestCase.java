@@ -11,12 +11,12 @@
 package org.mule.tck;
 
 import org.mule.RegistryContext;
-import org.mule.config.ConfigurationBuilder;
+import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.registry.RegistrationException;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOManagementContext;
 
 /**
  * Is a base tast case for tests that initialise Mule using a configuration file. The
@@ -42,12 +42,12 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return new SpringXmlConfigurationBuilder();
+        return new SpringXmlConfigurationBuilder(getConfigurationResources());
     }
 
-    protected UMOManagementContext createManagementContext() throws Exception
+    protected MuleContext createMuleContext() throws Exception
     {
-        UMOManagementContext mc = super.createManagementContext();
+        MuleContext mc = super.createMuleContext();
         RegistryContext.getConfiguration().setDefaultWorkListener(new TestingWorkListener());
         return mc;
     }
@@ -62,7 +62,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     
     protected Object getPojoServiceForComponent(String componentName) throws Exception
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent(componentName);
+        UMOComponent c = muleContext.getRegistry().lookupComponent(componentName);
         if (c != null)
         {
             return c.getServiceFactory().getOrCreate();

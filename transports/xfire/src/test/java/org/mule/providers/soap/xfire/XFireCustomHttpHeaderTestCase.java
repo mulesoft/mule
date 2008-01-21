@@ -34,13 +34,13 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
     protected void doSetUp() throws Exception
     {
         latch = new CountDownLatch(1);
-        managementContext.registerListener(this);
+        muleContext.registerListener(this);
     }
 
     // @Override
     protected void doTearDown() throws Exception
     {
-        managementContext.unregisterListener(this);
+        muleContext.unregisterListener(this);
     }
 
     public void testXfire() throws Exception
@@ -48,7 +48,7 @@ public class XFireCustomHttpHeaderTestCase extends FunctionalTestCase implements
         Object payload = new Object[]{"Test String"};
         String myProperty = "myProperty";
 
-        managementContext.registerListener(this);
+        muleContext.registerListener(this);
         MuleClient client = new MuleClient();
 
         HashMap props = new HashMap();

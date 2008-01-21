@@ -10,6 +10,7 @@
 
 package org.mule.ra;
 
+import org.mule.api.MuleContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.extras.client.i18n.ClientMessages;
@@ -21,7 +22,6 @@ import org.mule.providers.AbstractConnector;
 import org.mule.ra.i18n.JcaMessages;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -38,11 +38,11 @@ import javax.resource.ResourceException;
 public class DefaultMuleConnection implements MuleConnection
 {
     private final MuleCredentials credentials;
-    private final UMOManagementContext manager;
+    private final MuleContext manager;
     private MuleManagedConnection managedConnection;
 
     public DefaultMuleConnection(MuleManagedConnection managedConnection,
-                                 UMOManagementContext manager,
+                                 MuleContext manager,
                                  MuleCredentials credentials)
     {
         this.manager = manager;

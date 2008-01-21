@@ -18,8 +18,8 @@ public class JbossTSNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testNamespaceHandler()
     {
-        assertNotNull(managementContext.getTransactionManager());
-        assertTrue(managementContext.getTransactionManager().getClass().getName().compareTo("arjuna") > 0);
+        assertNotNull(muleContext.getTransactionManager());
+        assertTrue(muleContext.getTransactionManager().getClass().getName().compareTo("arjuna") > 0);
         assertEquals(arjPropertyManager.propertyManager.getProperty("test"),"TEST");
     }
 

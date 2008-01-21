@@ -23,7 +23,7 @@ public class JettyNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
     public void testConnectorProperties()
     {
         JettyConnector connector =
-                (JettyConnector) managementContext.getRegistry().lookupConnector("jettyConnector");
+                (JettyConnector) muleContext.getRegistry().lookupConnector("jettyConnector");
         testBasicProperties(connector);
     }
 

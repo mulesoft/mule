@@ -67,18 +67,18 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
             }
         });
 
-        UMOComponent component = MuleTestUtils.getTestComponent(uniqueName("testComponent"), FunctionalTestComponent.class, props, managementContext, /*initialize*/false);
+        UMOComponent component = MuleTestUtils.getTestComponent(uniqueName("testComponent"), FunctionalTestComponent.class, props, muleContext, /*initialize*/false);
         UMOImmutableEndpoint ep = 
-            managementContext.getRegistry().lookupEndpointFactory()
+            muleContext.getRegistry().lookupEndpointFactory()
                 .getInboundEndpoint(getTestEndpointURI());
         UMOInboundRouterCollection inboundRouter = new InboundRouterCollection();
         inboundRouter.addEndpoint(ep);
         component.setInboundRouter(inboundRouter);
-        managementContext.getRegistry().registerComponent(component);
-        //managementContext.applyLifecycle(component);
-        if (!managementContext.isStarted())
+        muleContext.getRegistry().registerComponent(component);
+        //muleContext.applyLifecycle(component);
+        if (!muleContext.isStarted())
         {
-            managementContext.start();
+            muleContext.start();
         }
 
         logger.debug("waiting for count down");

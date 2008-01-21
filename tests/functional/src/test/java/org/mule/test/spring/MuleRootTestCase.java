@@ -24,8 +24,8 @@ public class MuleRootTestCase extends FunctionalTestCase
 
     public void testModel() throws UMOException
     {
-        assertNotNull("No model", managementContext.getRegistry().lookupModel("model"));
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("endpoint");
+        assertNotNull("No model", muleContext.getRegistry().lookupModel("model"));
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("endpoint");
         assertNotNull("No endpoint", endpoint);
         String address = endpoint.getEndpointURI().getAddress();
         assertNotNull("No address", address);

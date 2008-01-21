@@ -52,13 +52,13 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
 
         UMOComponent component = getTestComponent("anOrange", Orange.class);
         component.setModel(model);
-        managementContext.getRegistry().registerComponent(component);
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jdbc://test?sql=SELECT * FROM TABLE", managementContext);
+        muleContext.getRegistry().registerComponent(component);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jdbc://test?sql=SELECT * FROM TABLE", muleContext);
         endpointBuilder.setName("test");
         endpointBuilder.setConnector(connector);
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             endpointBuilder);
-        managementContext.start();
+        muleContext.start();
         connector.registerListener(component, endpoint);
 
         // The derbydb instance should be put offline before starting test

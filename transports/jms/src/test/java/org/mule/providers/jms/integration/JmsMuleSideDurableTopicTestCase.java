@@ -41,11 +41,11 @@ public class JmsMuleSideDurableTopicTestCase extends AbstractJmsFunctionalTestCa
         send(scenarioNoTx);
         receive(scenarioNoTx);
         receive(scenarioNoTx);
-        managementContext.getRegistry().lookupConnector(CONNECTOR1_NAME).stop();
-        assertEquals(managementContext.getRegistry().lookupConnector(CONNECTOR1_NAME).isStarted(), false);
+        muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).stop();
+        assertEquals(muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).isStarted(), false);
         logger.info(CONNECTOR1_NAME + " is stopped");
         send(scenarioNoTx);
-        managementContext.getRegistry().lookupConnector(CONNECTOR1_NAME).start();
+        muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).start();
         logger.info(CONNECTOR1_NAME + " is started");
         receive(scenarioNoTx);
         receive(scenarioNoTx);

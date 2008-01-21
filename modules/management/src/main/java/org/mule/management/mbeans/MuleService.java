@@ -11,9 +11,9 @@
 package org.mule.management.mbeans;
 
 import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.config.MuleManifest;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
@@ -47,11 +47,11 @@ public class MuleService implements MuleServiceMBean
     private String copyright = "Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com";
     private String license;
 
-    private UMOManagementContext managementContext;
+    private MuleContext muleContext;
 
-    public MuleService(UMOManagementContext managementContext)
+    public MuleService(MuleContext muleContext)
     {
-        this.managementContext = managementContext;
+        this.muleContext = muleContext;
         String patch = System.getProperty("sun.os.patch.level", null);
         jdk = System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")";
         os = System.getProperty("os.name");
@@ -77,19 +77,19 @@ public class MuleService implements MuleServiceMBean
 
     public boolean isInitialised()
     {
-        return managementContext!=null && managementContext.isInitialised();
+        return muleContext!=null && muleContext.isInitialised();
     }
 
     public boolean isStopped()
     {
-        return managementContext!=null && !managementContext.isStarted();
+        return muleContext!=null && !muleContext.isStarted();
     }
 
     public Date getStartTime()
     {
         if (!isStopped())
         {
-            return new Date(managementContext.getStartDate());
+            return new Date(muleContext.getStartDate());
         }
         else
         {
@@ -125,17 +125,17 @@ public class MuleService implements MuleServiceMBean
 
     public void start() throws UMOException
     {
-        managementContext.start();
+        muleContext.start();
     }
 
     public void stop() throws UMOException
     {
-        managementContext.stop();
+        muleContext.stop();
     }
 
     public void dispose() throws UMOException
     {
-        managementContext.dispose();
+        muleContext.dispose();
     }
 
     public long getFreeMemory()
@@ -155,7 +155,7 @@ public class MuleService implements MuleServiceMBean
 
     public String getServerId()
     {
-        return managementContext.getId();
+        return muleContext.getId();
     }
 
     public String getHostname()
@@ -219,7 +219,7 @@ public class MuleService implements MuleServiceMBean
 
     public String getInstanceId()
     {
-        return managementContext.getId();
+        return muleContext.getId();
     }
 
     public String getConfigBuilderClassName()

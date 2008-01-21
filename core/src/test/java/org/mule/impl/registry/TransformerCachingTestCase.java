@@ -23,24 +23,24 @@ public class TransformerCachingTestCase extends AbstractMuleTestCase
 {
     public void testCacheUpdate() throws Exception
     {
-        UMOTransformer trans = managementContext.getRegistry().lookupTransformer(FilterInputStream.class, byte[].class);
+        UMOTransformer trans = muleContext.getRegistry().lookupTransformer(FilterInputStream.class, byte[].class);
         assertNotNull(trans);
         assertTrue(trans instanceof ObjectToByteArray);
 
         UMOTransformer trans2 = new FilterInputStreamToByteArray();
-        managementContext.getRegistry().registerTransformer(trans2);
+        muleContext.getRegistry().registerTransformer(trans2);
 
-        trans = managementContext.getRegistry().lookupTransformer(FilterInputStream.class, byte[].class);
+        trans = muleContext.getRegistry().lookupTransformer(FilterInputStream.class, byte[].class);
         assertNotNull(trans);
         assertTrue(trans instanceof FilterInputStreamToByteArray);
 
-        trans = managementContext.getRegistry().lookupTransformer(InputStream.class, byte[].class);
+        trans = muleContext.getRegistry().lookupTransformer(InputStream.class, byte[].class);
         assertNotNull(trans);
         assertTrue(trans instanceof ObjectToByteArray);
 
-        managementContext.getRegistry().unregisterTransformer(trans2.getName());
+        muleContext.getRegistry().unregisterTransformer(trans2.getName());
 
-        trans = managementContext.getRegistry().lookupTransformer(FilterInputStream.class, byte[].class);
+        trans = muleContext.getRegistry().lookupTransformer(FilterInputStream.class, byte[].class);
         assertNotNull(trans);
         assertTrue(trans instanceof ObjectToByteArray);
 

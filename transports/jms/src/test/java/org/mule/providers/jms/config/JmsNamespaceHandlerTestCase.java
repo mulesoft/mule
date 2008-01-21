@@ -43,7 +43,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testDefaultConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnectorDefaults");
+        JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnectorDefaults");
         assertNotNull(c);
 
         assertNotNull(c.getConnectionFactory());
@@ -67,7 +67,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector1");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector1");
         assertNotNull(c);
 
         assertNotNull(c.getConnectionFactory());
@@ -98,7 +98,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testCustomConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector2");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector2");
         assertNotNull(c);
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
@@ -106,7 +106,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testTestConnectorConfig() throws Exception
     {
-        JmsConnector c = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector3");
+        JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector3");
         assertNotNull(c);
 
         assertNotNull(c.getConnectionFactory());
@@ -131,12 +131,12 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testEndpointConfig() throws EndpointException, InitialisationException
     {
-        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry().lookupEndpointBuilder("endpoint1").buildInboundEndpoint();
+        UMOImmutableEndpoint endpoint1 = muleContext.getRegistry().lookupEndpointBuilder("endpoint1").buildInboundEndpoint();
         assertNotNull(endpoint1);
         UMOFilter filter1 = endpoint1.getFilter();
         assertNotNull(filter1);
         assertTrue(filter1 instanceof JmsSelectorFilter);
-        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry().lookupEndpointBuilder("endpoint2").buildOutboundEndpoint();
+        UMOImmutableEndpoint endpoint2 = muleContext.getRegistry().lookupEndpointBuilder("endpoint2").buildOutboundEndpoint();
         assertNotNull(endpoint2);
         UMOFilter filter2 = endpoint2.getFilter();
         assertNotNull(filter2);
@@ -148,7 +148,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testCustomTransactions() throws EndpointException, InitialisationException
     {
-        UMOImmutableEndpoint endpoint3 = managementContext.getRegistry().lookupEndpointBuilder("endpoint3").buildInboundEndpoint();
+        UMOImmutableEndpoint endpoint3 = muleContext.getRegistry().lookupEndpointBuilder("endpoint3").buildInboundEndpoint();
         assertNotNull(endpoint3);
         TestTransactionFactory factory = (TestTransactionFactory) endpoint3.getTransactionConfig().getFactory();
         assertNotNull(factory);

@@ -15,7 +15,7 @@ import org.mule.RegistryContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.transformers.TransformerCollection;
@@ -109,7 +109,7 @@ public abstract class AbstractRegistry implements Registry
             transformerListCache.clear();
 
             doDispose();
-            lifecycleManager.firePhase(MuleServer.getManagementContext(), Disposable.PHASE_NAME);
+            lifecycleManager.firePhase(MuleServer.getMuleContext(), Disposable.PHASE_NAME);
             if (getParent() != null)
             {
                 parent.dispose();
@@ -162,8 +162,8 @@ public abstract class AbstractRegistry implements Registry
 //            parent.initialise();
 //        }
 
-        // I don't think it makes sense for the Registry to know about the ManagementContext at this point.
-        // UMOManagementContext mc = MuleServer.getManagementContext();
+        // I don't think it makes sense for the Registry to know about the MuleContext at this point.
+        // MuleContext mc = MuleServer.getMuleContext();
         // if (mc != null)
         // {
         // mc.fireNotification(new RegistryNotification(this, RegistryNotification.REGISTRY_INITIALISING));
@@ -177,7 +177,7 @@ public abstract class AbstractRegistry implements Registry
         try
         {
             doInitialise();
-            lifecycleManager.firePhase(MuleServer.getManagementContext(), Initialisable.PHASE_NAME);
+            lifecycleManager.firePhase(MuleServer.getMuleContext(), Initialisable.PHASE_NAME);
         }
         catch (InitialisationException e)
         {
@@ -634,9 +634,9 @@ public abstract class AbstractRegistry implements Registry
     {
         
         logger.debug("registerObject: key=" + key + " value=" + value + " metadata=" + metadata);
-        if (value instanceof ManagementContextAware)
+        if (value instanceof MuleContextAware)
         {
-            ((ManagementContextAware) value).setManagementContext(MuleServer.getManagementContext());
+            ((MuleContextAware) value).setMuleContext(MuleServer.getMuleContext());
         }
         doRegisterObject(key, value, metadata);
     }

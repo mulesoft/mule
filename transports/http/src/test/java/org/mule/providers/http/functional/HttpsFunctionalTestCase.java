@@ -33,7 +33,7 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 
     public void testSend() throws Exception
     {
-        final TestSedaComponent testSedaComponent = (TestSedaComponent) managementContext.getRegistry().lookupComponent("testComponent");
+        final TestSedaComponent testSedaComponent = (TestSedaComponent) muleContext.getRegistry().lookupComponent("testComponent");
         FunctionalTestComponent testComponent = (FunctionalTestComponent) testSedaComponent.getOrCreateService();
         assertNotNull(testComponent);
 

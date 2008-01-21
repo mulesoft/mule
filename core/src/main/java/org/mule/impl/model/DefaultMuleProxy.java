@@ -10,6 +10,7 @@
 
 package org.mule.impl.model;
 
+import org.mule.api.MuleContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.MuleEvent;
@@ -26,7 +27,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionPayload;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
@@ -62,18 +62,18 @@ public class DefaultMuleProxy implements MuleProxy
 
     private QueueSession queueSession = null;
 
-    protected UMOManagementContext managementContext;
+    protected MuleContext muleContext;
     
     /**
      * Constructs a Proxy using the UMO's AbstractMessageDispatcher and the UMO
      * itself
      */
-    public DefaultMuleProxy(Object pojoService, UMOComponent component, UMOManagementContext managementContext)
+    public DefaultMuleProxy(Object pojoService, UMOComponent component, MuleContext muleContext)
             throws UMOException
     {
         //this.pojoService = pojoService;
         this.component = component;
-        this.managementContext = managementContext;
+        this.muleContext = muleContext;
 
         UMOModel model = component.getModel();
         UMOEntryPointResolverSet resolver = model.getEntryPointResolverSet();
@@ -355,7 +355,7 @@ public class DefaultMuleProxy implements MuleProxy
             }
 
             // get the endpointUri for this uri
-            UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+            UMOImmutableEndpoint endpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getOutboundEndpoint(returnMessage.getReplyTo().toString());
             // make sure remove the replyTo property as not cause a a forever

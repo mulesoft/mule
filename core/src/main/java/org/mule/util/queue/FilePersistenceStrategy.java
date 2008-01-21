@@ -11,9 +11,9 @@
 package org.mule.util.queue;
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.MuleConfiguration;
-import org.mule.impl.ManagementContextAware;
-import org.mule.umo.UMOManagementContext;
+import org.mule.impl.MuleContextAware;
 import org.mule.util.FileUtils;
 import org.mule.util.file.DeleteException;
 
@@ -31,7 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.safehaus.uuid.UUIDGenerator;
 
-public class FilePersistenceStrategy implements QueuePersistenceStrategy, ManagementContextAware
+public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleContextAware
 {
 
     private static final Log logger = LogFactory.getLog(FilePersistenceStrategy.class);
@@ -42,7 +42,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, Manage
 
     private UUIDGenerator gen = UUIDGenerator.getInstance();
 
-    protected UMOManagementContext managementContext;
+    protected MuleContext muleContext;
 
     public FilePersistenceStrategy()
     {
@@ -50,9 +50,9 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, Manage
     }
 
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 
     protected String getId(Object obj)

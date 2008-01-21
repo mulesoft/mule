@@ -10,7 +10,7 @@
 
 package org.mule.config.spring.factories;
 
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
@@ -24,7 +24,7 @@ import org.springframework.beans.factory.FactoryBean;
  * Endpoint factory bean which uses type attribute to determine endpoint type (Used by 1to2migration module)
  */
 public class EndpointFactoryBean extends EndpointURIEndpointBuilder
-    implements FactoryBean, ManagementContextAware, Initialisable
+    implements FactoryBean, MuleContextAware, Initialisable
 {
 
     public static final String ALWAYS_CREATE_STRING = "ALWAYS_CREATE";

@@ -178,7 +178,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
                 axisTransportProtocols.put(s, MuleTransport.getTransportClass(s));
                 registerSupportedProtocol(s);
             }
-            managementContext.registerListener(this);
+            muleContext.registerListener(this);
         }
         catch (Exception e)
         {
@@ -355,7 +355,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         {
             // Lets unregister the 'template' instance, configure it and
             // then register again later
-            managementContext.getRegistry().unregisterComponent(AXIS_SERVICE_PROPERTY + getName());
+            muleContext.getRegistry().unregisterComponent(AXIS_SERVICE_PROPERTY + getName());
         }
         // if the axis server hasn't been set, set it now. The Axis server
         // may be set externally
@@ -386,7 +386,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
 
         boolean sync = receiver.getEndpoint().isSynchronous();
         
-        UMOEndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint, managementContext);
+        UMOEndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
         serviceEndpointbuilder.setSynchronous(sync);
         serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName);
         // Set the transformers on the endpoint too
@@ -401,7 +401,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         // TODO Do we really need to modify the existing receiver endpoint? What happnes if we don't security,
         // filters and transformers will get invoked twice?
         UMOEndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint(),
-            managementContext);
+            muleContext);
         receiverEndpointBuilder.setTransformers(TransformerUtils.UNDEFINED);
         receiverEndpointBuilder.setResponseTransformers(TransformerUtils.UNDEFINED);
         // Remove the Axis filter now
@@ -409,11 +409,11 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         // Remove the Axis Receiver Security filter now
         receiverEndpointBuilder.setSecurityFilter(null);
 
-        UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint serviceEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(serviceEndpointbuilder);
 
-        UMOImmutableEndpoint receiverEndpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint receiverEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(receiverEndpointBuilder);
 
@@ -445,16 +445,16 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     // Another consideration is how/when this implicit component gets disposed.
     protected UMOComponent getOrCreateAxisComponent() throws UMOException
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent(AXIS_SERVICE_PROPERTY + getName());
+        UMOComponent c = muleContext.getRegistry().lookupComponent(AXIS_SERVICE_PROPERTY + getName());
 
         if (c == null)
         {
             // TODO MULE-2228 Simplify this API
             c = new SedaComponent();
             c.setName(AXIS_SERVICE_PROPERTY + getName());
-            c.setModel(managementContext.getRegistry().lookupSystemModel());
-            //managementContext.getRegistry().registerComponent(c);
-            //c.setManagementContext(managementContext);
+            c.setModel(muleContext.getRegistry().lookupSystemModel());
+            //muleContext.getRegistry().registerComponent(c);
+            //c.setMuleContext(muleContext);
             //c.initialise();
 
             Map props = new HashMap();
@@ -484,7 +484,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     protected void doStop() throws UMOException
     {
         axis.stop();
-        // UMOModel model = managementContext.getRegistry().lookupModel();
+        // UMOModel model = muleContext.getRegistry().lookupModel();
         // model.unregisterComponent(model.getDescriptor(AXIS_SERVICE_COMPONENT_NAME));
     }
 
@@ -629,13 +629,13 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     {
         if (notification.getAction() == ManagerNotification.MANAGER_STARTED)
         {
-            // We need to register the Axis service component once the managementContext
+            // We need to register the Axis service component once the muleContext
             // starts because when the model starts listeners on components are started, thus
             // all listener need to be registered for this connector before the Axis service
             // component is registered.
             // The implication of this is that to add a new service and a
             // different http port the model needs to be restarted before the listener is available
-            if (managementContext.getRegistry().lookupComponent(AXIS_SERVICE_PROPERTY + getName()) == null)
+            if (muleContext.getRegistry().lookupComponent(AXIS_SERVICE_PROPERTY + getName()) == null)
             {
                 try
                 {
@@ -645,7 +645,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
                     {
                         axisComponent = getOrCreateAxisComponent();
                     }
-                    managementContext.getRegistry().registerComponent(axisComponent);
+                    muleContext.getRegistry().registerComponent(axisComponent);
 
                     // We have to perform a small hack here to rewrite servlet://
                     // endpoints with the

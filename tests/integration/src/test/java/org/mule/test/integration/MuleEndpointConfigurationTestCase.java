@@ -12,8 +12,8 @@ package org.mule.test.integration;
 
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.vm.VMConnector;
 import org.mule.providers.tcp.TcpConnector;
+import org.mule.providers.vm.VMConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transformers.TransformerUtils;
@@ -24,8 +24,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOOutboundRouterCollection;
-
-import sun.rmi.transport.tcp.TCPConnection;
 
 /**
  * Test the creation of various endpoints from the service descriptor
@@ -45,7 +43,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent3RouterEndpoints() throws Exception
     {
         // test inbound
-        UMOComponent component = managementContext.getRegistry().lookupComponent("TestComponent3");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("TestComponent3");
         assertNotNull(component);
         UMOOutboundRouterCollection outboundRouter = component.getOutboundRouter();
         assertNotNull(outboundRouter);
@@ -80,7 +78,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent4Endpoints() throws Exception
     {
         // test inbound
-        UMOComponent component = managementContext.getRegistry().lookupComponent("TestComponent4");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("TestComponent4");
         assertNotNull(component);
         assertNotNull(component.getInboundRouter().getEndpoints());
         assertEquals(1, component.getInboundRouter().getEndpoints().size());
@@ -97,7 +95,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent4RouterEndpoints() throws Exception
     {
         // test inbound
-        UMOComponent component = managementContext.getRegistry().lookupComponent("TestComponent4");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("TestComponent4");
         assertNotNull(component);
         UMOOutboundRouterCollection outboundRouter = component.getOutboundRouter();
         assertNotNull(outboundRouter);
@@ -122,7 +120,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent5RouterEndpoints() throws Exception
     {
         // test inbound
-        UMOComponent component = managementContext.getRegistry().lookupComponent("TestComponent5");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("TestComponent5");
         assertNotNull(component);
         UMOOutboundRouterCollection outboundRouter = component.getOutboundRouter();
         assertNotNull(outboundRouter);
@@ -145,7 +143,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
 
     public void testEndpointFromURI() throws Exception
     {
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://hello?remoteSync=true&remoteSyncTimeout=2002");
         assertTrue(ep.isRemoteSync());
         assertEquals(2002, ep.getRemoteSyncTimeout());
@@ -155,7 +153,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         UMOEvent event = new MuleEvent(new MuleMessage("hello"), ep, MuleTestUtils.getTestSession(), false);
         assertEquals(2002, event.getTimeout());
 
-        UMOImmutableEndpoint ep2 = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        UMOImmutableEndpoint ep2 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://hello");
 
         event = new MuleEvent(new MuleMessage("hello"), ep2, MuleTestUtils.getTestSession(), true);

@@ -56,7 +56,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         super.testManagerConfig();
 
-        assertNotNull(managementContext.getTransactionManager());
+        assertNotNull(muleContext.getTransactionManager());
     }
 
     // @Override
@@ -64,7 +64,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         super.testConnectorConfig();
 
-        TestConnector c = (TestConnector) managementContext.getRegistry().lookupConnector("dummyConnector");
+        TestConnector c = (TestConnector) muleContext.getRegistry().lookupConnector("dummyConnector");
         assertNotNull(c);
         assertNotNull(c.getExceptionListener());
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
@@ -82,7 +82,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         UMOImmutableEndpoint endpoint = null;
         try
         {
-            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("fruitBowlEndpoint");
+            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("fruitBowlEndpoint");
         }
         catch (UMOException e)
         {
@@ -108,7 +108,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         UMOImmutableEndpoint endpoint = null;
         try
         {
-            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("waterMelonEndpoint");
+            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("waterMelonEndpoint");
         }
         catch (UMOException e)
         {
@@ -119,13 +119,13 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals("UTF-8-TEST", endpoint.getEncoding());
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
-        UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent2");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("appleComponent2");
         assertNotNull(component);
     }
 
     public void testExceptionStrategy2()
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("appleComponent");
         assertNotNull(component.getExceptionListener());
         assertTrue(DefaultExceptionStrategy.class.isAssignableFrom(component.getExceptionListener().getClass()));
     }
@@ -135,7 +135,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         super.testTransformerConfig();
 
-        UMOTransformer t = managementContext.getRegistry().lookupTransformer("TestCompressionTransformer");
+        UMOTransformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
         assertEquals(t.getReturnClass(), java.lang.String.class);
@@ -147,7 +147,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         super.testModelConfig();
 
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
+        UMOModel model = muleContext.getRegistry().lookupModel("main");
         super.testModelConfig();
         // MULE-1995 Components are no longer registered with the model.
 //        assertTrue(model.isComponentRegistered("appleComponent"));
@@ -157,7 +157,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testOutboundRouterConfig2()
     {
         // test outbound message router
-        UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("appleComponent");
         assertNotNull(component.getOutboundRouter());
         UMOOutboundRouterCollection router = component.getOutboundRouter();
         assertNotNull(router.getCatchAllStrategy());
@@ -196,7 +196,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 
     public void testInboundRouterConfig2()
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("appleComponent");
         assertNotNull(component.getInboundRouter());
         UMOInboundRouterCollection messageRouter = component.getInboundRouter();
         assertNotNull(messageRouter.getCatchAllStrategy());
@@ -254,7 +254,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(defaultThreadTTL, tp.getThreadTTL());
 
         // test that unset values retain a default value
-        AbstractConnector c = (AbstractConnector) managementContext.getRegistry().lookupConnector("dummyConnector");
+        AbstractConnector c = (AbstractConnector) muleContext.getRegistry().lookupConnector("dummyConnector");
         tp = c.getDispatcherThreadingProfile();
         // this value is configured
         assertEquals(connectorMaxBufferSize, tp.getMaxBufferSize());
@@ -265,7 +265,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(defaultThreadTTL, tp.getThreadTTL());
 
         // test per-component values
-        UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent2");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("appleComponent2");
         assertTrue("component must be SedaComponent to get threading profile", component instanceof SedaComponent);
         tp = ((SedaComponent) component).getThreadingProfile();
         // these values are configured
@@ -289,7 +289,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertTrue(pp.getPoolFactory() instanceof CommonsPoolFactory);
 
         // test per-descriptor overrides
-//        MuleDescriptor descriptor = (MuleDescriptor) managementContext.getRegistry().lookupService(
+//        MuleDescriptor descriptor = (MuleDescriptor) muleContext.getRegistry().lookupService(
 //                "appleComponent2");
 //        PoolingProfile pp = descriptor.getPoolingProfile();
 //
@@ -309,14 +309,14 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertTrue(qp.isPersistent());
 
         // test inherit
-//        MuleDescriptor descriptor = (MuleDescriptor) managementContext.getRegistry().lookupService(
+//        MuleDescriptor descriptor = (MuleDescriptor) muleContext.getRegistry().lookupService(
 //                "orangeComponent");
 //        QueueProfile qp = descriptor.getQueueProfile();
 //        assertEquals(100, qp.getMaxOutstandingMessages());
 //        assertTrue(qp.isPersistent());
 //
 //        // test override
-//        descriptor = (MuleDescriptor)managementContext.getModel().getDescriptor("appleComponent2");
+//        descriptor = (MuleDescriptor)muleContext.getModel().getDescriptor("appleComponent2");
 //        qp = descriptor.getQueueProfile();
 //        assertEquals(102, qp.getMaxOutstandingMessages());
 //        assertFalse(qp.isPersistent());
@@ -325,7 +325,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testEndpointProperties() throws Exception
     {
         // test transaction config
-        UMOComponent component = managementContext.getRegistry().lookupComponent("appleComponent2");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("appleComponent2");
         MuleEndpoint inEndpoint = (MuleEndpoint) component.getInboundRouter().getEndpoint(
                 "transactedInboundEndpoint");
         assertNotNull(inEndpoint);
@@ -337,7 +337,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //    public void testTransactionConfig() throws Exception
 //    {
 //        // test transaction config
-//        UMODescriptor descriptor = managementContext.getRegistry().lookupService("appleComponent2");
+//        UMODescriptor descriptor = muleContext.getRegistry().lookupService("appleComponent2");
 //        UMOEndpoint inEndpoint = descriptor.getInboundRouter().getEndpoint("transactedInboundEndpoint");
 //        assertNotNull(inEndpoint);
 //        assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
@@ -355,16 +355,16 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 
     public void testEnvironmentProperties()
     {
-        assertEquals("true", managementContext.getRegistry().lookupObject("doCompression"));
-        assertEquals("this was set from the manager properties!", managementContext.getRegistry().lookupObject("beanProperty1"));
-        assertNotNull(managementContext.getRegistry().lookupObject("OS_Version"));
+        assertEquals("true", muleContext.getRegistry().lookupObject("doCompression"));
+        assertEquals("this was set from the manager properties!", muleContext.getRegistry().lookupObject("beanProperty1"));
+        assertNotNull(muleContext.getRegistry().lookupObject("OS_Version"));
     }
 
 
     public void testNestedRouterProxyCreation() throws ObjectNotFoundException
     {
         //Test that the proxy object was created and set on the service object
-        UMOComponent orange = managementContext.getRegistry().lookupComponent("orangeComponent");
+        UMOComponent orange = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertNotNull(orange);
         UMONestedRouter r = (UMONestedRouter) orange.getNestedRouter().getRouters().get(0);
         assertNotNull(r);

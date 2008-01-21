@@ -20,13 +20,13 @@ public class TcpSocketKeyTestCase extends FunctionalTestCase
     public void testHashAndEquals() throws UMOException
     {
         UMOImmutableEndpoint endpoint1in =
-                managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("globalEndpoint1");
+                muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("globalEndpoint1");
         TcpSocketKey key1in = new TcpSocketKey(endpoint1in);
         UMOImmutableEndpoint endpoint1out =
-                managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint("globalEndpoint1");
+                muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint("globalEndpoint1");
         TcpSocketKey key1out = new TcpSocketKey(endpoint1out);
         UMOImmutableEndpoint endpoint2in =
-                managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("globalEndpoint2");
+                muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("globalEndpoint2");
         TcpSocketKey key2in = new TcpSocketKey(endpoint2in);
 
         assertEquals(key1in, key1in);

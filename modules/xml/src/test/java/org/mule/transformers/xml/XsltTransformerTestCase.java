@@ -186,7 +186,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         transformer.initialise();
 
         // set up UMOEventContext
-        UMOEvent event = MuleTestUtils.getTestEvent("test message data", managementContext);
+        UMOEvent event = MuleTestUtils.getTestEvent("test message data", muleContext);
         event.getMessage().setProperty("myproperty", param);
         RequestContext.setEvent(event);
 

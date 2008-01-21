@@ -70,7 +70,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
             // expected
         }
 
-        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("udp://localhost:3456");
 

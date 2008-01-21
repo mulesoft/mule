@@ -66,7 +66,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
             .ceil((SerializationUtils.serialize(simpleSerializableObject).length / (double)2));
 
         // Listen to events fired by the ChunkingReceiver component
-        managementContext.registerListener(new FunctionalTestNotificationListener()
+        muleContext.registerListener(new FunctionalTestNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -91,7 +91,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         // Listen to Message Notifications on the Chunking receiver so we can
         // determine how
         // many message parts have been received
-        managementContext.registerListener(new MessageNotificationListener()
+        muleContext.registerListener(new MessageNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -117,7 +117,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         final Latch chunkingReceiverLatch = new Latch();
 
         // Listen to events fired by the ChunkingReceiver component
-        managementContext.registerListener(new FunctionalTestNotificationListener()
+        muleContext.registerListener(new FunctionalTestNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -135,7 +135,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         // Listen to Message Notifications on the Chunking receiver so we can
         // determine how
         // many message parts have been received
-        managementContext.registerListener(new MessageNotificationListener()
+        muleContext.registerListener(new MessageNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {

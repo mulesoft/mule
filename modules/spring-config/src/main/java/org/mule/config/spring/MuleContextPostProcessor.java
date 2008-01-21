@@ -10,40 +10,40 @@
 
 package org.mule.config.spring;
 
-import org.mule.impl.ManagementContextAware;
-import org.mule.umo.UMOManagementContext;
+import org.mule.api.MuleContext;
+import org.mule.impl.MuleContextAware;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * Responsible for passing in the ManagementContext instance for all objects in the
- * registry that want it. For an object to get an instance of the ManagementContext
- * it must implement ManagementContextAware.
+ * Responsible for passing in the MuleContext instance for all objects in the
+ * registry that want it. For an object to get an instance of the MuleContext
+ * it must implement MuleContextAware.
  * 
- * @see ManagementContextAware
- * @see org.mule.umo.UMOManagementContext
+ * @see MuleContextAware
+ * @see org.mule.api.MuleContext
  */
-public class ManagementContextPostProcessor implements BeanPostProcessor
+public class MuleContextPostProcessor implements BeanPostProcessor
 {
 
-    private UMOManagementContext managementContext;
+    private MuleContext muleContext;
 
-    public ManagementContextPostProcessor(UMOManagementContext managementContext)
+    public MuleContextPostProcessor(MuleContext muleContext)
     {
-        this.managementContext = managementContext;
+        this.muleContext = muleContext;
     }
 
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
     {
-        if (bean instanceof ManagementContextAware)
+        if (bean instanceof MuleContextAware)
         {
-            if (managementContext == null)
+            if (muleContext == null)
             {
                 return bean;
             }
 
-            ((ManagementContextAware) bean).setManagementContext(managementContext);
+            ((MuleContextAware) bean).setMuleContext(muleContext);
         }
         return bean;
     }

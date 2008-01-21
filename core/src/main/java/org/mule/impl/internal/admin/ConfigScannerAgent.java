@@ -12,7 +12,7 @@ package org.mule.impl.internal.admin;
 
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
-import org.mule.config.ConfigurationBuilder;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.impl.AbstractAgent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -190,13 +190,15 @@ public class ConfigScannerAgent extends AbstractAgent
     {
         try
         {
-            Class cfgBuilderClass = ClassUtils.loadClass("org.mule.config.builders.MuleXmlConfigurationBuilder", MuleServer.class);
-            ConfigurationBuilder cfgBuilder = (ConfigurationBuilder)cfgBuilderClass.newInstance();
+            Class cfgBuilderClass = ClassUtils.loadClass(
+                "org.mule.config.spring.SpringXmlConfigurationBuilder", MuleServer.class);
+            ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
+                cfgBuilderClass, new Object[]{configFile});
 
             if (!cfgBuilder.isConfigured())
             {
                 // TODO Update after MULE-1988
-                cfgBuilder.configure(configFile);
+                cfgBuilder.configure(muleContext);
             }
         }
         catch (Exception e)

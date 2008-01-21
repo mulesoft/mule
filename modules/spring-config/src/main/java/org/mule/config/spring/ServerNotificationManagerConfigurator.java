@@ -1,33 +1,33 @@
 
 package org.mule.config.spring;
 
-import org.mule.impl.ManagementContextAware;
+import org.mule.api.MuleContext;
+import org.mule.impl.MuleContextAware;
 import org.mule.impl.internal.notifications.manager.ServerNotificationManager;
-import org.mule.umo.UMOManagementContext;
 
 import java.util.Collection;
 import java.util.Map;
 
 import org.springframework.beans.factory.SmartFactoryBean;
 
-public class ServerNotificationManagerConfigurator implements ManagementContextAware, SmartFactoryBean
+public class ServerNotificationManagerConfigurator implements MuleContextAware, SmartFactoryBean
 {
 
-    private UMOManagementContext managementContext;
+    private MuleContext muleContext;
 
     private Boolean dynamic;
     private Map interfaceToEvents;
     private Collection interfaces;
     private Collection pairs;
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 
     public Object getObject() throws Exception
     {
-        ServerNotificationManager notificationManager = managementContext.getNotificationManager();
+        ServerNotificationManager notificationManager = muleContext.getNotificationManager();
         if (dynamic != null)
         {
             notificationManager.setNotificationDynamic(dynamic.booleanValue());

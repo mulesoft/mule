@@ -44,7 +44,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        managementContext.registerListener(this);
+        muleContext.registerListener(this);
         currentTx = null;
     }
 
@@ -76,7 +76,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
 
         // Start the server
         initialiseComponent(UMOTransactionConfig.ACTION_ALWAYS_BEGIN, callback);
-        managementContext.start();
+        muleContext.start();
 
         execSqlUpdate("INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (1, '" + DEFAULT_MESSAGE
                       + "', NULL, NULL)");
@@ -114,17 +114,17 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         txConfig.setFactory(tf);
         txConfig.setAction(txBeginAction);
         
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(getInDest(), managementContext);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(getInDest(), muleContext);
         endpointBuilder.setName("testIn");
         endpointBuilder.setConnector(connector);
         endpointBuilder.setTransactionConfig(txConfig);
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             endpointBuilder);
 
-        UMOEndpointBuilder endpointBuilder2 = new EndpointURIEndpointBuilder(getOutDest(), managementContext);
+        UMOEndpointBuilder endpointBuilder2 = new EndpointURIEndpointBuilder(getOutDest(), muleContext);
         endpointBuilder2.setName("testOut");
         endpointBuilder2.setConnector(connector);
-        UMOImmutableEndpoint outProvider = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        UMOImmutableEndpoint outProvider = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointBuilder2);
         
         component.setOutboundRouter(new OutboundRouterCollection());
@@ -138,7 +138,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         props.put("eventCallback", callback);
         component.setProperties(props);
         component.setModel(model);
-        managementContext.getRegistry().registerComponent(component);
+        muleContext.getRegistry().registerComponent(component);
         return component;
     }
 

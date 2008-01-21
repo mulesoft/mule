@@ -10,19 +10,19 @@
 
 package org.mule.impl.model;
 
+import org.mule.api.MuleContext;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultLifecycleAdapterFactory;
 import org.mule.impl.internal.notifications.ModelNotification;
-import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.impl.model.resolvers.DefaultEntryPointResolverSet;
+import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.model.UMOModel;
-import org.mule.umo.model.UMOEntryPointResolver;
 
 import java.beans.ExceptionListener;
 import java.util.Collection;
@@ -51,7 +51,7 @@ public abstract class AbstractModel implements UMOModel
     private ExceptionListener exceptionListener = new DefaultComponentExceptionStrategy();
 
     protected transient Log logger = LogFactory.getLog(getClass());
-    protected UMOManagementContext managementContext;
+    protected MuleContext muleContext;
 
     /*
      * (non-Javadoc)
@@ -203,19 +203,19 @@ public abstract class AbstractModel implements UMOModel
 
     void fireNotification(UMOServerNotification notification)
     {
-        if (managementContext != null)
+        if (muleContext != null)
         {
-            managementContext.fireNotification(notification);
+            muleContext.fireNotification(notification);
         }
         else if (logger.isDebugEnabled())
         {
-            logger.debug("ManagementContext is not yet available for firing notifications, ignoring event: " + notification);
+            logger.debug("MuleContext is not yet available for firing notifications, ignoring event: " + notification);
         }
     }
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 
 }

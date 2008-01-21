@@ -10,7 +10,7 @@
 
 package org.mule.umo.model;
 
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.umo.NamedObject;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
@@ -22,7 +22,7 @@ import java.beans.ExceptionListener;
  * Mule Server instance. It is responsible for maintaining the UMOs instances and
  * their configuration.
  */
-public interface UMOModel extends Lifecycle, ManagementContextAware, NamedObject
+public interface UMOModel extends Lifecycle, MuleContextAware, NamedObject
 {
     /**
      * Returns the model type name. This is a friendly identifier that is used to

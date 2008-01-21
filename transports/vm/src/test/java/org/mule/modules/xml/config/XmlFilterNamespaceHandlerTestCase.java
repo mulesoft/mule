@@ -33,7 +33,7 @@ public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
      */
     public void testIsXmlFilter()
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("test for xml");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("test for xml");
         List routers = component.getOutboundRouter().getRouters();
         assertEquals(2, routers.size());
         assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
@@ -45,7 +45,7 @@ public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testJXPathFilter()
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("filter xml for content");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("filter xml for content");
         List routers = component.getOutboundRouter().getRouters();
         assertEquals(1, routers.size());
         assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);

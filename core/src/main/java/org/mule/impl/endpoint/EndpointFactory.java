@@ -11,9 +11,9 @@
 package org.mule.impl.endpoint;
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointFactory;
@@ -33,7 +33,7 @@ public class EndpointFactory implements UMOEndpointFactory
     public static final int NEVER_CREATE_CONNECTOR = 2;
     public static final int USE_CONNECTOR = 3;
 
-    protected UMOManagementContext managementContext;
+    protected MuleContext muleContext;
     
     public UMOImmutableEndpoint getInboundEndpoint(String uri)
         throws UMOException
@@ -43,7 +43,7 @@ public class EndpointFactory implements UMOEndpointFactory
         if (endpointBuilder == null)
         {
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+            endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
         }
         return getInboundEndpoint(endpointBuilder);
     }
@@ -56,7 +56,7 @@ public class EndpointFactory implements UMOEndpointFactory
         if (endpointBuilder == null)
         {
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+            endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
             
         }
         return getOutboundEndpoint(endpointBuilder);
@@ -81,7 +81,7 @@ public class EndpointFactory implements UMOEndpointFactory
         else
         {
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+            endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
         }
         if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
@@ -143,13 +143,13 @@ public class EndpointFactory implements UMOEndpointFactory
         else
         {
             logger.debug("Named EndpointBuilder not found, creating endpoint builder for uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+            endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
         }
         return endpointBuilder;
     }
     
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 }

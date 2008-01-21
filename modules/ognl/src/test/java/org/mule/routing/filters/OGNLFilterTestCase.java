@@ -67,7 +67,7 @@ public class OGNLFilterTestCase extends FunctionalTestCase
     public void testNamespaceHandler()
     {
         String expression =
-                ((OGNLFilter) ((FilteringOutboundRouter) managementContext.getRegistry().
+                ((OGNLFilter) ((FilteringOutboundRouter) muleContext.getRegistry().
                         lookupComponent(SERVICE_NAME).getOutboundRouter().getRouters().get(0)).
                         getFilter()).getExpression();
 

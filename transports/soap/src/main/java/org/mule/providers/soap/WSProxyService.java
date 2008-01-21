@@ -11,13 +11,13 @@
 package org.mule.providers.soap;
 
 import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.UMOComponentAware;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -134,8 +134,8 @@ public class WSProxyService implements Callable, UMOComponentAware, Initialisabl
                 eventContext.setStopFurtherProcessing(true);
                 return wsdlFileContents;
             }
-            UMOManagementContext managementContext = MuleServer.getManagementContext();
-            UMOImmutableEndpoint webServiceEndpoint = managementContext.getRegistry()
+            MuleContext muleContext = MuleServer.getMuleContext();
+            UMOImmutableEndpoint webServiceEndpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getOutboundEndpoint(this.wsdlEndpoint);
 

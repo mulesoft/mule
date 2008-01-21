@@ -30,7 +30,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
     public void testServiceOverrides() throws InterruptedException
     {
-        FileConnector c = (FileConnector) managementContext.getRegistry().lookupConnector("fileConnector2");
+        FileConnector c = (FileConnector) muleContext.getRegistry().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
         assertEquals("org.mule.transformers.simple.ByteArrayToSerializable", c.getServiceOverrides().get(
@@ -43,15 +43,15 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 
     public void testServiceOverrides2() throws InterruptedException
     {
-        FileConnector c = (FileConnector) managementContext.getRegistry().lookupConnector("fileConnector1");
+        FileConnector c = (FileConnector) muleContext.getRegistry().lookupConnector("fileConnector1");
         assertNotNull(c);
         assertNull(c.getServiceOverrides());
 
-        c = (FileConnector) managementContext.getRegistry().lookupConnector("fileConnector2");
+        c = (FileConnector) muleContext.getRegistry().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
 
-        c = (FileConnector) managementContext.getRegistry().lookupConnector("fileConnector3");
+        c = (FileConnector) muleContext.getRegistry().lookupConnector("fileConnector3");
         assertNotNull(c);
         assertNull(c.getServiceOverrides());
     }
@@ -59,33 +59,33 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
     public void testServiceOverrides3() throws InterruptedException, UMOException
     {
         // UMOEndpointURI uri = new MuleEndpointURI("file:///temp?connector=fileConnector1");
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "file:///temp?connector=fileConnector1");
 
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
-        FileConnector c = (FileConnector) managementContext.getRegistry().lookupConnector("fileConnector2");
+        FileConnector c = (FileConnector) muleContext.getRegistry().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
 
         UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector1",
-            managementContext);
+            muleContext);
         builder.setConnector(c);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+        endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
         assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
         UMOEndpointBuilder builder2 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector3",
-            managementContext);
+            muleContext);
         builder.setConnector(c);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder2);
+        endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder2);
         assertNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
         UMOEndpointBuilder builder3 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector2",
-            managementContext);
+            muleContext);
         builder.setConnector(c);
-        endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder3);
+        endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder3);
         assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
     }

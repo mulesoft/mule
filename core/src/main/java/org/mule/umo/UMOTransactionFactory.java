@@ -10,6 +10,8 @@
 
 package org.mule.umo;
 
+import org.mule.api.MuleContext;
+
 /**
  * <code>UMOTransactionFactory</code> creates a transaction.
  *
@@ -21,9 +23,9 @@ public interface UMOTransactionFactory
      * 
      * @return a new Transaction
      * @throws TransactionException if the transaction cannot be created or begun
-     * @param managementContext
+     * @param muleContext
      */
-    UMOTransaction beginTransaction(UMOManagementContext managementContext) throws TransactionException;
+    UMOTransaction beginTransaction(MuleContext muleContext) throws TransactionException;
 
     /**
      * Determines whether this transaction factory creates transactions that are

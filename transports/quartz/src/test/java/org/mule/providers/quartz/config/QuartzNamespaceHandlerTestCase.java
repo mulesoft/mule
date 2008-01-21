@@ -27,7 +27,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testDefaultConfig() throws Exception
     {
-        QuartzConnector c = (QuartzConnector)managementContext.getRegistry().lookupConnector("quartzConnectorDefaults");
+        QuartzConnector c = (QuartzConnector)muleContext.getRegistry().lookupConnector("quartzConnectorDefaults");
         assertNotNull(c);
         
         assertNotNull(c.getQuartzScheduler());
@@ -41,7 +41,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testInjectedSchedulerBean() throws Exception
     {
-        QuartzConnector c = (QuartzConnector)managementContext.getRegistry().lookupConnector("quartzConnector1");
+        QuartzConnector c = (QuartzConnector)muleContext.getRegistry().lookupConnector("quartzConnector1");
         assertNotNull(c);
         
         assertNotNull(c.getQuartzScheduler());
@@ -55,7 +55,7 @@ public class QuartzNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testFactoryProperties() throws Exception
     {
-        QuartzConnector c = (QuartzConnector)managementContext.getRegistry().lookupConnector("quartzConnector2");
+        QuartzConnector c = (QuartzConnector)muleContext.getRegistry().lookupConnector("quartzConnector2");
         assertNotNull(c);
         
         assertNotNull(c.getQuartzScheduler());

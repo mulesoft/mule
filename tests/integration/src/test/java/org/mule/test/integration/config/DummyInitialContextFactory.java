@@ -33,7 +33,7 @@ public class DummyInitialContextFactory implements ObjectFactory
         c.bind("endpointRef", "vm://my.object");
         c.bind("Log4JAgent", new Log4jAgent());
         c.bind("XmlToObject", new XmlToObject());
-        UMOComponent d = MuleTestUtils.getTestComponent("EchoUMO", EchoComponent.class, MuleServer.getManagementContext());
+        UMOComponent d = MuleTestUtils.getTestComponent("EchoUMO", EchoComponent.class, MuleServer.getMuleContext());
         c.bind("EchoUMO", d);
         return c;
     }

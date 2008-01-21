@@ -70,8 +70,8 @@ public interface Registry extends Initialisable, Disposable
      * specific endpoint lookup methods should be used instead.<br/><br/>
      *
      * @param name the idendtifer/name used to register endpoint in registry
-     * @see #lookupInboundEndpoint(String, org.mule.umo.UMOManagementContext)
-     * @see #lookupResponseEndpoint(String, org.mule.umo.UMOManagementContext)
+     * @see #lookupInboundEndpoint(String, org.mule.umo.MuleContext)
+     * @see #lookupResponseEndpoint(String, org.mule.umo.MuleContext)
      */
     UMOImmutableEndpoint lookupEndpoint(String name);
 
@@ -118,7 +118,7 @@ public interface Registry extends Initialisable, Disposable
 
     UMOAgent lookupAgent(String agentName);
 
-    // TODO MULE-2162 MuleConfiguration belongs in the ManagementContext rather than the Registry
+    // TODO MULE-2162 MuleConfiguration belongs in the MuleContext rather than the Registry
     MuleConfiguration getConfiguration();
 
     /** @deprecated Use lookupModel() instead */
@@ -179,7 +179,7 @@ public interface Registry extends Initialisable, Disposable
 
     void unregisterAgent(String agentName) throws UMOException;
 
-    // TODO MULE-2162 MuleConfiguration belongs in the ManagementContext rather than the Registry
+    // TODO MULE-2162 MuleConfiguration belongs in the MuleContext rather than the Registry
     void setConfiguration(MuleConfiguration config);
 
     // /////////////////////////////////////////////////////////////////////////

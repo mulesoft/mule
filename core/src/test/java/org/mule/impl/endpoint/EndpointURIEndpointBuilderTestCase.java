@@ -30,7 +30,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     public void testBuildInboundEndpoint() throws UMOException
     {
         String uri = "test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
         try
         {
             UMOImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
@@ -52,7 +52,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     public void testBuildOutboundEndpoint() throws UMOException
     {
         String uri = "test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
         try
         {
             UMOImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
@@ -76,9 +76,9 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     public void testDefaultCommonEndpointAttributes(UMOImmutableEndpoint ep)
     {
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-        assertEquals(managementContext.getRegistry().getConfiguration().getDefaultSynchronousEventTimeout(),
+        assertEquals(muleContext.getRegistry().getConfiguration().getDefaultSynchronousEventTimeout(),
             ep.getRemoteSyncTimeout());
-        assertEquals(managementContext.getRegistry().getConfiguration().isDefaultSynchronousEndpoints(),
+        assertEquals(muleContext.getRegistry().getConfiguration().isDefaultSynchronousEndpoints(),
             ep.isSynchronous());
         assertEquals(false, ep.isRemoteSync());
         assertTrue(ep.getConnectionStrategy() instanceof SingleAttemptConnectionStrategy);
@@ -88,7 +88,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertTrue(ep.getConnector() instanceof TestConnector);
         assertEquals(ObjectNameHelper.getEndpointName(ep), ep.getName());
         assertFalse(ep.isDeleteUnacceptedMessages());
-        assertEquals(managementContext.getRegistry().getConfiguration().getDefaultEncoding(), ep.getEncoding());
+        assertEquals(muleContext.getRegistry().getConfiguration().getDefaultEncoding(), ep.getEncoding());
         assertEquals(null, ep.getFilter());
         assertEquals(UMOImmutableEndpoint.INITIAL_STATE_STARTED, ep.getInitialState());
     }
@@ -96,7 +96,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     public void testHasSetEncodingMethod() throws EndpointException, SecurityException, NoSuchMethodException
     {
         String uri = "test://address";
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
         assertNotNull(endpointBuilder.getClass().getMethod("setEncoding", new Class[]{String.class}));
     }
     

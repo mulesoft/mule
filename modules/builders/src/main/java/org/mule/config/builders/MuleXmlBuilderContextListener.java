@@ -11,10 +11,13 @@
 package org.mule.config.builders;
 
 import org.mule.MuleServer;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleContextFactory;
 import org.mule.config.ConfigurationException;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.impl.DefaultMuleContextFactory;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.StringUtils;
 
 import javax.servlet.ServletContext;
@@ -31,10 +34,10 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * The location of the configuration file can be specified in a init parameter called
  * <i>org.mule.config</i>, the value can be a path on the local file system or on
- * the classpath. If a config parameter is not specified a default
- * <i>mule-config.xml</i> will be used.
+ * the classpath. If a config parameter is not specified a default <i>mule-config.xml</i>
+ * will be used.
  * </p>
- *
+ * 
  * @see SpringXmlConfigurationBuilder
  */
 
@@ -45,16 +48,17 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
      */
     public static final String INIT_PARAMETER_MULE_CONFIG = "org.mule.config";
 
-   /**
-     * Classpath within the servlet context (e.g., "WEB-INF/classes").  Mule will attempt to load config
-     * files from here first, and then from the remaining classpath.
+    /**
+     * Classpath within the servlet context (e.g., "WEB-INF/classes"). Mule will
+     * attempt to load config files from here first, and then from the remaining
+     * classpath.
      */
     public static final String INIT_PARAMETER_WEBAPP_CLASSPATH = "org.mule.webapp.classpath";
 
-    private UMOManagementContext managementContext;
-    
+    private MuleContext muleContext;
+
     protected transient final Log logger = LogFactory.getLog(MuleXmlBuilderContextListener.class);
-    
+
     public void contextInitialized(ServletContextEvent event)
     {
         initialize(event.getServletContext());
@@ -81,20 +85,22 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
 
         try
         {
-            managementContext = createManager(config, webappClasspath, context);
-            managementContext.start();
+            muleContext = createManager(config, webappClasspath, context);
+            muleContext.start();
         }
         catch (UMOException ex)
         {
             context.log(ex.getMessage(), ex);
-            // Logging is not configured OOTB for Tomcat, so we'd better make a start-up failure plain to see.
+            // Logging is not configured OOTB for Tomcat, so we'd better make a
+            // start-up failure plain to see.
             ex.printStackTrace();
         }
         catch (Error error)
         {
             // WSAD doesn't always report the java.lang.Error, log it
             context.log(error.getMessage(), error);
-            // Logging is not configured OOTB for Tomcat, so we'd better make a start-up failure plain to see.
+            // Logging is not configured OOTB for Tomcat, so we'd better make a
+            // start-up failure plain to see.
             error.printStackTrace();
             throw error;
         }
@@ -102,22 +108,24 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
 
     /**
      * Used to actually construct the UMOManager instance
-     *
+     * 
      * @param configResource the location of the config resource, this can be on the
      *            local file system or on the classpath.
      * @return A configured UMOManager instance
+     * @throws InitialisationException 
      */
-    protected UMOManagementContext createManager(String configResource, String webappClasspath, ServletContext context)
-        throws ConfigurationException
+    protected MuleContext createManager(String configResource, String webappClasspath, ServletContext context)
+        throws ConfigurationException, InitialisationException
     {
-        WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context, webappClasspath);
-        return builder.configure(configResource);
+        WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context, configResource);
+        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+        return muleContextFactory.createMuleContext(builder);
     }
 
     /**
      * If no config location resource is configured on the servlet context, the value
      * returned from this method will be used to initialise the MuleManager.
-     *
+     * 
      * @return the default config resource location
      */
     protected String getDefaultConfigResource()
@@ -132,11 +140,11 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
 
     public void destroy()
     {
-        if (managementContext != null)
+        if (muleContext != null)
         {
-            if (!managementContext.isDisposing() || !managementContext.isDisposed())
+            if (!muleContext.isDisposing() || !muleContext.isDisposed())
             {
-                managementContext.dispose();
+                muleContext.dispose();
             }
         }
     }

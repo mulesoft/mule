@@ -9,7 +9,7 @@
  */
 package org.mule.extras.spring;
 
-import org.mule.config.ConfigurationBuilder;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -27,11 +27,11 @@ public class SpringMultipleConfigs2871TestCase extends FunctionalTestCase
 
     public void testAdditionalSpringConfigs() throws Exception
     {
-        Apple apple = (Apple) managementContext.getRegistry().lookupObject("apple");
+        Apple apple = (Apple) muleContext.getRegistry().lookupObject("apple");
         assertNotNull("Bean 'apple' should exist in container", apple);
         assertTrue("Apple object is misconfigured", apple.isWashed());
 
-        Orange orange = (Orange) managementContext.getRegistry().lookupObject("orange");
+        Orange orange = (Orange) muleContext.getRegistry().lookupObject("orange");
         assertNotNull("Bean 'orange' should exist in container", orange);
         assertEquals("Orange object is misconfigured", "mule", orange.getBrand());
     }
@@ -39,6 +39,9 @@ public class SpringMultipleConfigs2871TestCase extends FunctionalTestCase
     protected ConfigurationBuilder getBuilder() throws Exception
     {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("test-application-context.xml");
-        return new SpringXmlConfigurationBuilder(ctx);
+        SpringXmlConfigurationBuilder springXmlConfigurationBuilder = new SpringXmlConfigurationBuilder(getConfigResources());
+        springXmlConfigurationBuilder.setParentContext(ctx);
+        return springXmlConfigurationBuilder;
+        
     }
 }

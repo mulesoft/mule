@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.umo;
+package org.mule.api;
 
 import org.mule.config.MuleConfiguration;
 import org.mule.impl.Directories;
@@ -16,6 +16,7 @@ import org.mule.impl.internal.notifications.manager.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
+import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.UMOLifecycleManager;
@@ -28,7 +29,7 @@ import org.mule.util.queue.QueueManager;
 
 import javax.transaction.TransactionManager;
 
-public interface UMOManagementContext extends Lifecycle
+public interface MuleContext extends Lifecycle
 {
 
     String getSystemName();

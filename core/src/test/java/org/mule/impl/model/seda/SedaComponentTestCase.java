@@ -28,9 +28,9 @@ public class SedaComponentTestCase extends AbstractMuleTestCase // AbstractCompo
     // component = new SedaComponent();
     // component.setName("seda");
     // component.setServiceFactory(new PrototypeObjectFactory(Object.class));
-    // component.setManagementContext(managementContext);
+    // component.setMuleContext(muleContext);
     // component.setModel(new SedaModel());
-    // component.getModel().setManagementContext(managementContext);
+    // component.getModel().setMuleContext(muleContext);
     // component.getModel().initialise();
     // }
     //
@@ -45,8 +45,8 @@ public class SedaComponentTestCase extends AbstractMuleTestCase // AbstractCompo
         component.setName("test");
         component.setServiceFactory(new PrototypeObjectFactory(Object.class));
         component.setModel(new SedaModel());
-        component.setManagementContext(managementContext);
-        component.getModel().setManagementContext(managementContext);
+        component.setMuleContext(muleContext);
+        component.getModel().setMuleContext(muleContext);
 
         component.getModel().initialise();
         component.initialise();

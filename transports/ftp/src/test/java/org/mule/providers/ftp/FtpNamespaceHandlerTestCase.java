@@ -22,7 +22,7 @@ public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testConfig() throws Exception
     {
-        FtpConnector c = (FtpConnector)managementContext.getRegistry().lookupConnector("ftpConnector");
+        FtpConnector c = (FtpConnector)muleContext.getRegistry().lookupConnector("ftpConnector");
         assertNotNull(c);
 
         assertEquals("abc", c.getOutputPattern());

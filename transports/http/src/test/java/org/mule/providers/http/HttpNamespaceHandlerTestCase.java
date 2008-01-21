@@ -21,7 +21,7 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
     public void testConnectorProperties()
     {
         HttpConnector connector =
-                (HttpConnector) managementContext.getRegistry().lookupConnector("httpConnector");
+                (HttpConnector) muleContext.getRegistry().lookupConnector("httpConnector");
         testBasicProperties(connector);
     }
 

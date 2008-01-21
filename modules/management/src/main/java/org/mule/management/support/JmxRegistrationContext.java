@@ -9,10 +9,10 @@
  */
 package org.mule.management.support;
 
+import org.mule.api.MuleContext;
 import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.manager.UMOServerNotification;
 
 import org.apache.commons.logging.Log;
@@ -46,7 +46,7 @@ public class JmxRegistrationContext
     private String resolvedDomain;
 
     /** Do not instantiate JmxRegistrationContext. */
-    private JmxRegistrationContext(UMOManagementContext context)
+    private JmxRegistrationContext(MuleContext context)
     {
         try
         {
@@ -76,7 +76,7 @@ public class JmxRegistrationContext
      * Get current context or create one if none exist for the current startup cycle.
      * @return jmx registration context
      */
-    public static JmxRegistrationContext getCurrent(UMOManagementContext context)
+    public static JmxRegistrationContext getCurrent(MuleContext context)
     {
         JmxRegistrationContext ctx = (JmxRegistrationContext) contexts.get();
         if (ctx == null)

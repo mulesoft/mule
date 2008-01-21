@@ -21,7 +21,7 @@ public class SslNamespaceHandlerTestCase extends FunctionalTestCase
     public void testConnectorProperties() throws Exception
     {
         SslConnector connector =
-                (SslConnector) managementContext.getRegistry().lookupConnector("sslConnector");
+                (SslConnector) muleContext.getRegistry().lookupConnector("sslConnector");
         assertNotNull(connector);
         assertEquals(1024, connector.getSendBufferSize());
         assertEquals(2048, connector.getReceiveBufferSize());

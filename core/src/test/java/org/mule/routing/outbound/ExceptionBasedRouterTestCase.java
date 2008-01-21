@@ -44,15 +44,15 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
  
-        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy1");
 
-        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy2");
 
-        UMOImmutableEndpoint endpoint3 = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint3 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy3");
 
@@ -97,11 +97,11 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         OutboundRouterCollection messageRouter = new OutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOImmutableEndpoint endpoint1 = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://AlwaysFail");
 
-        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://AlwaysFail");
 

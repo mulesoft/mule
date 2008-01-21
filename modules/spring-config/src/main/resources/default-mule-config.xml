@@ -90,7 +90,7 @@
 
     <bean name="_muleEndpointFactory" class="org.mule.impl.endpoint.EndpointFactory"/>
 
-    <bean name="defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+    <bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
         <property name="threadWaitTimeout" value="30"/>
         <property name="maxThreadsActive" value="10"/>
         <property name="maxThreadsIdle" value="10"/>
@@ -99,20 +99,20 @@
         <property name="poolExhaustedAction" value="4"/>
     </bean>
 
-    <bean name="defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="defaultThreadingProfile"/>
+    <bean name="_defaultMessageDispatcherThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="_defaultThreadingProfile"/>
     </bean>
 
-    <bean name="defaultMessageRequesterThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="defaultThreadingProfile"/>
+    <bean name="_defaultMessageRequesterThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="_defaultThreadingProfile"/>
     </bean>
 
-    <bean name="defaultMessageReceiverThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="defaultThreadingProfile"/>
+    <bean name="_defaultMessageReceiverThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="_defaultThreadingProfile"/>
     </bean>
 
-    <bean name="defaultComponentThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
-        <constructor-arg ref="defaultThreadingProfile"/>
+    <bean name="_defaultComponentThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
+        <constructor-arg ref="_defaultThreadingProfile"/>
     </bean>
 
     <!-- Default Transformers are now loaded from META-INF/services/org/mule/config/registry-bootstrap.properties so that

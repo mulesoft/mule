@@ -24,7 +24,7 @@ public class ${TransportName}NamespaceHandlerTestCase extends FunctionalTestCase
 
     public void test${TransportName}Config() throws Exception
     {
-        ${TransportName}Connector c = (${TransportName}Connector)managementContext.getRegistry().lookupConnector("${TransportNameLower}Connector");
+        ${TransportName}Connector c = (${TransportName}Connector) muleContext.getRegistry().lookupConnector("${TransportNameLower}Connector");
         assertNotNull(c);
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());

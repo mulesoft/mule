@@ -73,7 +73,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
     protected AbstractTransformer getAndTestTransformer(String name, Class clazz)
     {
         assertTrue(AbstractTransformer.class.isAssignableFrom(clazz));
-        UMOTransformer object= managementContext.getRegistry().lookupTransformer(name);
+        UMOTransformer object= muleContext.getRegistry().lookupTransformer(name);
         assertNotNull(object);
         assertTrue(clazz.isAssignableFrom(object.getClass()));
         AbstractTransformer transformer = (AbstractTransformer) object;

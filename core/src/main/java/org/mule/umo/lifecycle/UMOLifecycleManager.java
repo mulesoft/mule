@@ -9,8 +9,8 @@
  */
 package org.mule.umo.lifecycle;
 
+import org.mule.api.MuleContext;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 
 import java.util.Set;
 
@@ -27,7 +27,7 @@ public interface UMOLifecycleManager
 
     void registerLifecycle(UMOLifecyclePhase lci);
 
-    void firePhase(UMOManagementContext managementContext, String phase) throws UMOException;
+    void firePhase(MuleContext muleContext, String phase) throws UMOException;
 
     String getCurrentPhase();
 
@@ -37,7 +37,7 @@ public interface UMOLifecycleManager
 
     boolean isPhaseComplete(String phaseName);
 
-    void applyLifecycle(UMOManagementContext managementContext, Object object) throws UMOException;
+    void applyLifecycle(MuleContext muleContext, Object object) throws UMOException;
 
     void checkPhase(String name) throws IllegalStateException;
 }

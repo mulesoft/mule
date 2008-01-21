@@ -10,10 +10,10 @@
 package org.mule.config.spring.processors;
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.PropertyFactory;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.ManagementContextAware;
-import org.mule.umo.UMOManagementContext;
+import org.mule.impl.MuleContextAware;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,9 +26,9 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 /**
  * TODO
  */
-public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer implements ManagementContextAware
+public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer implements MuleContextAware
 {
-    private UMOManagementContext managementContext;
+    private MuleContext muleContext;
     private Map factories = new HashMap();
     
 
@@ -38,8 +38,8 @@ public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer 
         RegistryProperties props = new RegistryProperties();
         props.putAll(super.mergeProperties());
 
-        // Mule ManagementContext/MuleConfiguration properties
-        props.put("mule.working.dir", managementContext.getConfiguration().getWorkingDirectory());
+        // MuleContext/MuleConfiguration properties
+        props.put("mule.working.dir", muleContext.getConfiguration().getWorkingDirectory());
         
         if (factories != null)
         {
@@ -91,9 +91,9 @@ public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer 
         }
     }
 
-    public void setManagementContext(UMOManagementContext managementContext)
+    public void setMuleContext(MuleContext muleContext)
     {
-        this.managementContext = managementContext;
+        this.muleContext = muleContext;
         
     }
 

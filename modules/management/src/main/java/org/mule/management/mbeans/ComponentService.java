@@ -211,7 +211,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     private AbstractComponent getComponent()
     {
-        return (AbstractComponent)MuleServer.getManagementContext().getRegistry().lookupComponent(getName());
+        return (AbstractComponent)MuleServer.getMuleContext().getRegistry().lookupComponent(getName());
     }
 
     // ///// Component stats impl /////////

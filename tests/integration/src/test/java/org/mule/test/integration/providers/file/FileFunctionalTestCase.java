@@ -39,14 +39,14 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        managementContext.registerListener(this);
+        muleContext.registerListener(this);
     }
 
     // @Override
     protected void doTearDown() throws Exception
     {
         super.doTearDown();
-        managementContext.unregisterListener(this);
+        muleContext.unregisterListener(this);
     }
 
     // @Override

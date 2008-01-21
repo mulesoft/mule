@@ -35,7 +35,7 @@ public class PgpNamespaceHandlerTestCase extends FunctionalTestCase
 
     protected UMOSecurityProvider getProvider(String name)
     {
-        UMOSecurityManager securityManager = managementContext.getSecurityManager();
+        UMOSecurityManager securityManager = muleContext.getSecurityManager();
         return securityManager.getProvider(name);
     }
 
@@ -50,7 +50,7 @@ public class PgpNamespaceHandlerTestCase extends FunctionalTestCase
     
     protected UMOEncryptionStrategy getEncryptionStrategy(String name)
     {
-        UMOSecurityManager securityManager = managementContext.getSecurityManager();
+        UMOSecurityManager securityManager = muleContext.getSecurityManager();
         return securityManager.getEncryptionStrategy(name);
     }
     

@@ -10,9 +10,9 @@
 
 package org.mule.ra;
 
+import org.mule.api.MuleContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.impl.ManagementContextAware;
-import org.mule.umo.UMOManagementContext;
+import org.mule.impl.MuleContextAware;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ import javax.resource.spi.ConnectionRequestInfo;
 /**
  * <code>MuleConnectionRequestInfo</code> TODO
  */
-public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneable, Serializable, ManagementContextAware
+public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneable, Serializable, MuleContextAware
 {
     /**
      * Serial version
@@ -37,7 +37,7 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
     private String username;
     private String password;
 
-    private UMOManagementContext managementContext;
+    private MuleContext muleContext;
 
     public MuleConnectionRequestInfo()
     {
@@ -94,14 +94,14 @@ public class MuleConnectionRequestInfo implements ConnectionRequestInfo, Cloneab
         this.password = password;
     }
 
-    public UMOManagementContext getManagementContext()
+    public MuleContext getMuleContext()
     {
-        return managementContext;
+        return muleContext;
     }
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 
     public boolean equals(Object obj)

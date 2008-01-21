@@ -42,7 +42,7 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
             }
         }
         
-        UMOComponent c = managementContext.getRegistry().lookupComponent(component);
+        UMOComponent c = muleContext.getRegistry().lookupComponent(component);
         c.start();
 
         UMOMessage message = client.send(endpoint, "Test Client Send message", null);
@@ -50,7 +50,7 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
         assertEquals("Received: Test Client Send message", message.getPayloadAsString());
 
         // The SpringRegistry is read-only so we can't unregister the component!
-        //managementContext.getRegistry().unregisterComponent("vmComponent");
+        //muleContext.getRegistry().unregisterComponent("vmComponent");
         c.stop();
 
         if (!canSendWithoutReceiver)

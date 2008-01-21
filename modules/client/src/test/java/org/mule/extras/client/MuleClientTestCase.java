@@ -10,14 +10,14 @@ public class MuleClientTestCase extends AbstractMuleTestCase
     public void testCreateMuleClient() throws UMOException
     {
         MuleClient muleClient = new MuleClient();
-        assertEquals(managementContext, muleClient.getManagementContext());
-        assertTrue(managementContext.isInitialised());
-        assertTrue(managementContext.isStarted());
+        assertEquals(muleContext, muleClient.getMuleContext());
+        assertTrue(muleContext.isInitialised());
+        assertTrue(muleContext.isStarted());
         muleClient.dispatch("test://test", "message", null);
         muleClient.send("test://test", "message", null);
         muleClient.dispose();
-        assertTrue(muleClient.getManagementContext().isInitialised());
-        assertTrue(muleClient.getManagementContext().isStarted());
+        assertTrue(muleClient.getMuleContext().isInitialised());
+        assertTrue(muleClient.getMuleContext().isStarted());
     }
 
 }

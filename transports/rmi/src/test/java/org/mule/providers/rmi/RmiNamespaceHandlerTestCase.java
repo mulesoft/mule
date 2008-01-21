@@ -21,7 +21,7 @@ public class RmiNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testConfig() throws Exception
     {
-        RmiConnector c = (RmiConnector) managementContext.getRegistry().lookupConnector("rmiConnector");
+        RmiConnector c = (RmiConnector) muleContext.getRegistry().lookupConnector("rmiConnector");
         assertNotNull(c);
         assertEquals(1234, c.getPollingFrequency());
         assertEquals(DummySecurityManager.class, c.getSecurityManager().getClass());
@@ -40,7 +40,7 @@ public class RmiNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testConfig2() throws Exception
     {
-        RmiConnector c = (RmiConnector) managementContext.getRegistry().lookupConnector("rmiConnector2");
+        RmiConnector c = (RmiConnector) muleContext.getRegistry().lookupConnector("rmiConnector2");
         assertNotNull(c);
         assertEquals(1234, c.getPollingFrequency());
         assertEquals(DummySecurityManager.class, c.getSecurityManager().getClass());

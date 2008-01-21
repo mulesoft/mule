@@ -21,7 +21,7 @@ import org.mule.routing.ForwardingCatchAllStrategy
 import org.mule.routing.nested.NestedRouterCollection
 import org.mule.routing.nested.NestedRouter
 import org.mule.routing.response.ResponseRouterCollection
-import org.mule.umo.UMOManagementContext
+import org.mule.umo.MuleContext
 import org.mule.tck.testmodels.mule.TestResponseAggregator
 import org.mule.routing.outbound.OutboundPassThroughRouter
 import org.mule.impl.DefaultComponentExceptionStrategy
@@ -29,30 +29,30 @@ import org.mule.routing.inbound.InboundRouterCollection
 
 // TODO: MULE-2520 Management context binding is not working in ScriptConfigurationBuilder
 // remove this string when fixed
-UMOManagementContext managementContext = MuleServer.managementContext
+MuleContext muleContext = MuleServer.muleContext
 
-managementContext.registry.registerObject("doCompression", "true", managementContext);
+muleContext.registry.registerObject("doCompression", "true", muleContext);
 
 UMOImmutableEndpoint lookupEndpoint(String url, Boolean receiver)
 {
     if (receiver)
     {
-        return managementContext.registry.lookupInboundEndpoint(url, managementContext)
+        return muleContext.registry.lookupInboundEndpoint(url, muleContext)
     }
     else
     {
-        return managementContext.registry.lookupOutboundEndpoint(url, managementContext)
+        return muleContext.registry.lookupOutboundEndpoint(url, muleContext)
     }
 }
 
 //Set a dummy TX manager
-managementContext.transactionManager = new TestTransactionManagerFactory().create()
+muleContext.transactionManager = new TestTransactionManagerFactory().create()
 
 //register connector
 TestConnector c = new TestConnector();
 c.name = "dummyConnector"
 c.exceptionListener = new TestExceptionStrategy()
-managementContext.registry.registerConnector(c);
+muleContext.registry.registerConnector(c);
 
 //Register transformers
 TestCompressionTransformer testCompressionTransformer = new TestCompressionTransformer();
@@ -60,37 +60,37 @@ testCompressionTransformer.name = "TestCompressionTransformer"
 testCompressionTransformer.returnClass = String.class
 testCompressionTransformer.beanProperty2 = 12
 testCompressionTransformer.containerProperty = "myString"
-managementContext.registry.registerTransformer(testCompressionTransformer);
+muleContext.registry.registerTransformer(testCompressionTransformer);
 
 //Register endpoints
 filter = new JXPathFilter("name");
 filter.value = "bar"
 filter.namespaces = [foo: "http://foo.com"]
 
-ep = new EndpointURIEndpointBuilder("test://fruitBowlPublishQ", managementContext)
+ep = new EndpointURIEndpointBuilder("test://fruitBowlPublishQ", muleContext)
 ep.filter = filter
-managementContext.registry.registerEndpointBuilder("fruitBowlEndpoint", ep, managementContext);
+muleContext.registry.registerEndpointBuilder("fruitBowlEndpoint", ep, muleContext);
 
-ep = new EndpointURIEndpointBuilder("test://test.queue", managementContext)
-managementContext.registry.registerEndpointBuilder("waterMelonEndpoint", ep, managementContext);
+ep = new EndpointURIEndpointBuilder("test://test.queue", muleContext)
+muleContext.registry.registerEndpointBuilder("waterMelonEndpoint", ep, muleContext);
 
-ep = new EndpointURIEndpointBuilder("test://AppleQueue", managementContext)
+ep = new EndpointURIEndpointBuilder("test://AppleQueue", muleContext)
 ep.name = "appleInEndpoint"
-managementContext.registry.registerEndpointBuilder("appleInEndpoint", ep, managementContext);
+muleContext.registry.registerEndpointBuilder("appleInEndpoint", ep, muleContext);
 
-ep = new EndpointURIEndpointBuilder("test://AppleResponseQueue", managementContext)
+ep = new EndpointURIEndpointBuilder("test://AppleResponseQueue", muleContext)
 ep.name = "appleResponseEndpoint"
-managementContext.registry.registerEndpoint(ep.buildResponseEndpoint(), managementContext);
+muleContext.registry.registerEndpoint(ep.buildResponseEndpoint(), muleContext);
 
-ep = new EndpointURIEndpointBuilder("test://orangeQ", managementContext)
+ep = new EndpointURIEndpointBuilder("test://orangeQ", muleContext)
 ep.name = "orangeEndpoint"
 ep.setProperty("testGlobal", "value1")
-managementContext.registry.registerEndpointBuilder("orangeEndpoint", ep, managementContext);
+muleContext.registry.registerEndpointBuilder("orangeEndpoint", ep, muleContext);
 
-ep = new EndpointURIEndpointBuilder("test://orange", managementContext)
+ep = new EndpointURIEndpointBuilder("test://orange", muleContext)
 ep.name = "Orange"
-ep.responseTransformers = [ managementContext.registry.lookupTransformer("TestCompressionTransformer") ]
-managementContext.registry.registerEndpoint(ep.buildInboundEndpoint(), managementContext);
+ep.responseTransformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
+muleContext.registry.registerEndpoint(ep.buildInboundEndpoint(), muleContext);
 
 //register model
 UMOModel model = new SedaModel();
@@ -99,18 +99,18 @@ exceptionStrategy.addEndpoint(lookupEndpoint("test://component.exceptions", fals
 model.exceptionListener = exceptionStrategy
 model.lifecycleAdapterFactory = new TestDefaultLifecycleAdapterFactory()
 model.entryPointResolverSet = new TestEntryPointResolverSet()
-managementContext.registry.registerModel(model, managementContext)
+muleContext.registry.registerModel(model, muleContext)
 
 // building service
 MuleDescriptor descriptor = new MuleDescriptor("orangeComponent");
 descriptor.serviceFactory = new SingletonObjectFactory(Orange.class.name);
-ep = new EndpointURIEndpointBuilder(managementContext.registry.lookupEndpoint("orangeEndpoint"), managementContext)
+ep = new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpoint("orangeEndpoint"), muleContext)
 ep.setProperty("testLocal", "value1")
 ep.filter = new PayloadTypeFilter(String.class)
-ep.transformers = [ managementContext.registry.lookupTransformer("TestCompressionTransformer") ]
+ep.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
 descriptor.inboundRouter = new InboundRouterCollection()
 descriptor.inboundRouter.addEndpoint(ep.buildInboundEndpoint())
-descriptor.inboundRouter.addEndpoint(managementContext.registry.lookupEndpoint("Orange", managementContext))
+descriptor.inboundRouter.addEndpoint(muleContext.registry.lookupEndpoint("Orange", muleContext))
 
 catchAllStrategy = new ForwardingCatchAllStrategy()
 catchAllStrategy.endpoint = lookupEndpoint("test://catch.all", false)
@@ -132,15 +132,15 @@ descriptor.nestedRouter = nestedRouter
 
 //Outbound Router
 outboundRouter = new OutboundPassThroughRouter()
-ep = new EndpointURIEndpointBuilder(managementContext.registry.lookupEndpoint("appleInEndpoint"), managementContext)
-ep.transformers = [ managementContext.registry.lookupTransformer("TestCompressionTransformer") ]
+ep = new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpoint("appleInEndpoint"), muleContext)
+ep.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
 outboundRouter.addEndpoint(ep.buildOutboundEndpoint())
 descriptor.outboundRouter.addRouter(outboundRouter)
 
 //Response Router
 responseRouter = new ResponseRouterCollection();
-responseRouter.addEndpoint(managementContext.registry.lookupResponseEndpoint("test://response1", managementContext));
-responseRouter.addEndpoint(managementContext.registry.lookupEndpoint("appleResponseEndpoint", managementContext));
+responseRouter.addEndpoint(muleContext.registry.lookupResponseEndpoint("test://response1", muleContext));
+responseRouter.addEndpoint(muleContext.registry.lookupEndpoint("appleResponseEndpoint", muleContext));
 responseRouter.addRouter(new TestResponseAggregator());
 responseRouter.timeout = 10001
 descriptor.responseRouter = responseRouter
@@ -161,4 +161,4 @@ descriptor.properties = [
         ]
 
 //register components
-managementContext.registry.registerService(descriptor);
+muleContext.registry.registerService(descriptor);

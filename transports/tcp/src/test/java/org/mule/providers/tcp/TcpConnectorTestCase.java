@@ -42,7 +42,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
     {
         UMOComponent component = getTestComponent("orange", Orange.class);
         
-        UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry()
+        UMOEndpoint endpoint = (UMOEndpoint) muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(getTestEndpointURI());
 

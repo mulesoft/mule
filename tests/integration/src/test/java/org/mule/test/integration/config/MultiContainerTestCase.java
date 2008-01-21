@@ -32,7 +32,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
     
     public void testContainer() throws Exception
     {
-//        Registry registry = managementContext.getRegistry();
+//        Registry registry = muleContext.getRegistry();
 //        assertNotNull(registry);
 //        assertNotNull(registry.lookupObject("spring2-Apple"));
 //        assertNotNull(registry.lookupObject("spring-Apple"));
@@ -44,7 +44,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
 
 //    public void testSpecificContainerAddressing() throws Exception
 //    {
-//        Registry registry = managementContext.getRegistry();
+//        Registry registry = muleContext.getRegistry();
 //        assertNotNull(registry);
 //        Orange o = (Orange)registry.lookupObject(new ContainerKeyPair("spring1", "Orange"));
 //        assertNotNull(o);
@@ -66,7 +66,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
 //        UMODescriptor d = builder.createDescriptor("Orange", "myOrange", "test://foo", null, null);
 //        //d.setContainer("spring2");
 //        builder.registerComponent(d);
-//        UMOComponent c = builder.getManagementContext().getRegistry().lookupModel("main").getComponent("myOrange");
+//        UMOComponent c = builder.getMuleContext().getRegistry().lookupModel("main").getComponent("myOrange");
 //        assertNotNull(c);
 //        Object o = c.getInstance();
 //        assertTrue(o instanceof Orange);
@@ -76,7 +76,7 @@ public class MultiContainerTestCase extends FunctionalTestCase
 //        d = builder.createDescriptor("Orange", "myOrange2", "test://bar", null, null);
 //        //d.setContainer("spring1");
 //        builder.registerComponent(d);
-//        c = builder.getManagementContext().getRegistry().lookupModel("main").getComponent("myOrange2");
+//        c = builder.getMuleContext().getRegistry().lookupModel("main").getComponent("myOrange2");
 //        assertNotNull(c);
 //        o = c.getInstance();
 //        assertTrue(o instanceof Orange);

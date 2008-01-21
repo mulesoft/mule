@@ -50,7 +50,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
 
     public void testEventMetaDataPropagation() throws UMOException
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("component1");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("component1");
         UMOOutboundRouter outboundRouter = (UMOOutboundRouter) component.getOutboundRouter().getRouters().get(0);
         UMOEndpoint endpoint = (UMOEndpoint) outboundRouter.getEndpoints().get(0);
         List transformers = new ArrayList();

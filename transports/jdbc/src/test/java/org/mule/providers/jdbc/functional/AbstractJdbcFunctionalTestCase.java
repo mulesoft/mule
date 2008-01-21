@@ -37,7 +37,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends FunctionalTestCase
     {
         super.doSetUp();
 
-        jdbcConnector = (JdbcConnector) managementContext.getRegistry().lookupConnector("jdbcConnector");
+        jdbcConnector = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector");
 
         try
         {

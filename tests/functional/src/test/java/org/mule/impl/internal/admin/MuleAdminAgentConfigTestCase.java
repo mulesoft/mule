@@ -21,7 +21,7 @@ public class MuleAdminAgentConfigTestCase extends FunctionalTestCase
 
     public void testNonEmptyProperties() throws Exception
     {
-        MuleAdminAgent agent = (MuleAdminAgent) managementContext.getRegistry().lookupAgent("MuleAdmin");
+        MuleAdminAgent agent = (MuleAdminAgent) muleContext.getRegistry().lookupAgent("MuleAdmin");
         assertNotNull(agent.getServerUri());
         assertEquals("test://12345",agent.getServerUri());
         assertNotNull(agent.getWireFormat());

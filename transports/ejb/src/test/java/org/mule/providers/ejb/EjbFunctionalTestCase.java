@@ -89,12 +89,12 @@ public class EjbFunctionalTestCase extends FunctionalTestCase
         // moving this to xml config requires endpoint properties
         // MULE-1790
         UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("ejb://localhost/TestService?method=reverseString",
-            managementContext);
+            muleContext);
         Properties props = new Properties();
         props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
         builder.setProperties(props);
 
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             builder);
         try
         {
@@ -111,12 +111,12 @@ public class EjbFunctionalTestCase extends FunctionalTestCase
         // moving this to xml config requires endpoint properties
         // MULE-1790
         UMOEndpointBuilder builder = new EndpointURIEndpointBuilder("ejb://localhost/TestService?method=reverseString",
-            managementContext);
+            muleContext);
         Properties props = new Properties();
         props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
         builder.setProperties(props);
         
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             builder);
         
         try

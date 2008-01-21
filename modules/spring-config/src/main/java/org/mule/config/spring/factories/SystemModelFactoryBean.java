@@ -10,11 +10,11 @@
 package org.mule.config.spring.factories;
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.impl.model.ModelFactory;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.model.UMOModel;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
@@ -23,14 +23,14 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
  * TODO
  * @deprecated Do we really need a special factory to create this?  It's just a SEDA model.
  */
-public class SystemModelFactoryBean extends AbstractFactoryBean implements ManagementContextAware
+public class SystemModelFactoryBean extends AbstractFactoryBean implements MuleContextAware
 {
 
     private String type;
 
     private UMOModel model;
 
-    private UMOManagementContext managementContext;
+    private MuleContext muleContext;
 
     public Class getObjectType()
     {
@@ -52,15 +52,15 @@ public class SystemModelFactoryBean extends AbstractFactoryBean implements Manag
         model = ModelFactory.createModel(type);
         model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
 
-        model.setManagementContext(managementContext);
+        model.setMuleContext(muleContext);
        // model.initialise();
         
         return model;
     }
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        managementContext = context;
+        muleContext = context;
 
 
     }

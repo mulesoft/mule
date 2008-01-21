@@ -11,13 +11,13 @@
 package org.mule.routing.inbound;
 
 import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.AggregationException;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -98,12 +98,12 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
 
                         try
                         {
-                            UMOManagementContext managementContext = MuleServer.getManagementContext();
-                            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(event.getEndpoint(), managementContext);
+                            MuleContext muleContext = MuleServer.getMuleContext();
+                            UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(event.getEndpoint(), muleContext);
                             // TODO - is this correct? it stops other transformers from being used
                             builder.setTransformers(new LinkedList());
                             builder.setName(this.getClass().getName());
-                            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
                         }
                         catch (UMOException e)
                         {

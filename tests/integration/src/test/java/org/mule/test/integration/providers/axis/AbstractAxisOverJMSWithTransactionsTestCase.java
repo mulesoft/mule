@@ -21,7 +21,7 @@ public abstract class AbstractAxisOverJMSWithTransactionsTestCase extends Functi
 {
 
     public void testTransactionPropertiesOnEndpoint() throws Exception {
-        Object[] connectorArray = managementContext.getRegistry().getConnectors().toArray();
+        Object[] connectorArray = muleContext.getRegistry().getConnectors().toArray();
         AxisConnector connector = null;
         for (int i = 0; i < connectorArray.length; i++)
         {

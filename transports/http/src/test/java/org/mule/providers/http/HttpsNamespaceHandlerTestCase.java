@@ -21,7 +21,7 @@ public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
     public void testConnectorProperties()
     {
         HttpsConnector connector =
-                (HttpsConnector) managementContext.getRegistry().lookupConnector("httpsConnector");
+                (HttpsConnector) muleContext.getRegistry().lookupConnector("httpsConnector");
         testBasicProperties(connector);
 
         //The full path gets resolved, we're just checkng that the property got set

@@ -22,7 +22,7 @@ public class StdioNamespaceHandlerTestCase extends FunctionalTestCase
     public void testConfig() throws Exception
     {
         PromptStdioConnector c =
-                (PromptStdioConnector) managementContext.getRegistry().lookupConnector("stdioConnector");
+                (PromptStdioConnector) muleContext.getRegistry().lookupConnector("stdioConnector");
         assertNotNull(c);
 
         assertEquals(1234, c.getMessageDelayTime());
@@ -38,7 +38,7 @@ public class StdioNamespaceHandlerTestCase extends FunctionalTestCase
     public void testNoBundle() throws Exception
     {
         PromptStdioConnector c =
-                (PromptStdioConnector)managementContext.getRegistry().lookupConnector("noBundleConnector");
+                (PromptStdioConnector)muleContext.getRegistry().lookupConnector("noBundleConnector");
         assertNotNull(c);
 
         assertEquals(1234, c.getMessageDelayTime());
@@ -58,7 +58,7 @@ public class StdioNamespaceHandlerTestCase extends FunctionalTestCase
 
     protected void testEndpointAttribute(String name, String address)
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpoint(name);
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpoint(name);
         assertNotNull("Null " + name, endpoint);
         assertEquals(address, endpoint.getEndpointURI().getAddress());
     }

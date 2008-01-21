@@ -23,7 +23,7 @@ public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase
 
     public void testPrettyPrinter()
     {
-        XmlPrettyPrinter pp = (XmlPrettyPrinter) managementContext.getRegistry().lookupTransformer(
+        XmlPrettyPrinter pp = (XmlPrettyPrinter) muleContext.getRegistry().lookupTransformer(
             "MyXMLPrettyPrinter");
 
         assertNotNull(pp);

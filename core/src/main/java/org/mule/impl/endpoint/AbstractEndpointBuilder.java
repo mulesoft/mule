@@ -12,6 +12,7 @@ package org.mule.impl.endpoint;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleTransactionConfig;
@@ -25,7 +26,6 @@ import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
@@ -85,7 +85,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     // not included in equality/hash
     protected String registryId = null;
-    protected UMOManagementContext managementContext;
+    protected MuleContext muleContext;
 
     public UMOImmutableEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
     {
@@ -130,7 +130,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         {
             ep.setSynchronous(getSynchronous(connector, ep));
         }
-        ep.setManagementContext(managementContext);
+        ep.setMuleContext(muleContext);
     }
 
     protected UMOImmutableEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException
@@ -205,7 +205,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected UMOConnector getDefaultConnector() throws EndpointException
     {
-        return getConnector(uriBuilder.getEndpoint(), managementContext);
+        return getConnector(uriBuilder.getEndpoint(), muleContext);
     }
 
     protected String getName(UMOImmutableEndpoint endpoint)
@@ -274,9 +274,9 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected String getDefaultEndpointEncoding(UMOConnector connector)
     {
-        if (managementContext != null)
+        if (muleContext != null)
         {
-            return managementContext.getRegistry().getConfiguration().getDefaultEncoding();
+            return muleContext.getRegistry().getConfiguration().getDefaultEncoding();
         }
         else
         {
@@ -314,7 +314,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     protected int getDefaultRemoteSyncTimeout(UMOConnector connector)
     {
-        return managementContext.getRegistry().getConfiguration().getDefaultSynchronousEventTimeout();
+        return muleContext.getRegistry().getConfiguration().getDefaultSynchronousEventTimeout();
     }
 
     protected List getInboundTransformers(UMOConnector connector, UMOEndpointURI endpointURI)
@@ -458,7 +458,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         }
     }
 
-    private UMOConnector getConnector(UMOEndpointURI endpointURI, UMOManagementContext managementContext)
+    private UMOConnector getConnector(UMOEndpointURI endpointURI, MuleContext muleContext)
         throws EndpointException
     {
         String scheme = uriBuilder.getEndpoint().getFullScheme();
@@ -467,7 +467,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         {
             if (uriBuilder.getEndpoint().getConnectorName() != null)
             {
-                connector = managementContext.getRegistry().lookupConnector(uriBuilder.getEndpoint().getConnectorName());
+                connector = muleContext.getRegistry().lookupConnector(uriBuilder.getEndpoint().getConnectorName());
                 if (connector == null)
                 {
                     throw new TransportFactoryException(CoreMessages.objectNotRegistered("Connector",
@@ -479,8 +479,8 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
                 connector = TransportFactory.getConnectorByProtocol(scheme);
                 if (connector == null)
                 {
-                    connector = TransportFactory.createConnector(endpointURI, managementContext);
-                    managementContext.getRegistry().registerConnector(connector);
+                    connector = TransportFactory.createConnector(endpointURI, muleContext);
+                    muleContext.getRegistry().registerConnector(connector);
                 }
             }
         }
@@ -620,9 +620,9 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
 
     }
 
-    public void setManagementContext(UMOManagementContext managementContext)
+    public void setMuleContext(MuleContext muleContext)
     {
-        this.managementContext = managementContext;
+        this.muleContext = muleContext;
 
     }
 
@@ -712,7 +712,7 @@ public abstract class AbstractEndpointBuilder implements UMOEndpointBuilder
         builder.setInitialState(initialState);
         builder.setEncoding(encoding);
         builder.setRegistryId(registryId);
-        builder.setManagementContext(managementContext);
+        builder.setMuleContext(muleContext);
         builder.setConnectionStrategy(connectionStrategy);
 
         if (deleteUnacceptedMessages != null)

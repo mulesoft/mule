@@ -35,7 +35,7 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
         // Create and register JcaModel
         workManager = new TestJCAWorkManager();
         JcaModel jcaModel = (JcaModel) ModelFactory.createModel(JcaModel.JCA_MODEL_TYPE);
-        managementContext.getRegistry().registerModel(jcaModel);
+        muleContext.getRegistry().registerModel(jcaModel);
 
         // Create, register, initialise and start JcaComponent
         String name = "JcaComponent#";
@@ -43,7 +43,7 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
         component.setName(name);
         component.setModel(jcaModel);
         component.setServiceFactory(new SingletonObjectFactory(new EchoComponent()));
-        managementContext.getRegistry().registerComponent(component);
+        muleContext.getRegistry().registerComponent(component);
 
         assertNotNull(component);
     }

@@ -49,7 +49,7 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
 
     protected URI getUri() throws UMOException
     {
-        return managementContext.getRegistry()
+        return muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("in")
             .getEndpointURI()
@@ -58,7 +58,7 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
 
     protected Socket createSocket(URI uri) throws Exception
     {
-        SslConnector connector = (SslConnector) managementContext.getRegistry().lookupConnector("SslConnector");
+        SslConnector connector = (SslConnector) muleContext.getRegistry().lookupConnector("SslConnector");
         SSLContext context;
         context = SSLContext.getInstance(connector.getProtocol());
         context.init(connector.getKeyManagerFactory().getKeyManagers(), connector.getTrustManagerFactory()

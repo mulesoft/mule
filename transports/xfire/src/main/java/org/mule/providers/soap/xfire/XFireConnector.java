@@ -17,9 +17,9 @@ import org.mule.impl.internal.notifications.ManagerNotification;
 import org.mule.impl.internal.notifications.ManagerNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.model.seda.SedaComponent;
+import org.mule.providers.AbstractConnectable;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.FatalConnectException;
-import org.mule.providers.AbstractConnectable;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.xfire.i18n.XFireMessages;
@@ -48,12 +48,12 @@ import java.util.List;
 
 import org.codehaus.xfire.DefaultXFire;
 import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.handler.Handler;
-import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.aegis.AegisBindingProvider;
 import org.codehaus.xfire.aegis.type.TypeMappingRegistry;
 import org.codehaus.xfire.annotations.AnnotationServiceFactory;
 import org.codehaus.xfire.annotations.WebAnnotations;
+import org.codehaus.xfire.client.Client;
+import org.codehaus.xfire.handler.Handler;
 import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.service.ServiceFactory;
 import org.codehaus.xfire.service.binding.BindingProvider;
@@ -126,7 +126,7 @@ public class XFireConnector extends AbstractConnector
     {
         try
         {
-            managementContext.registerListener(this);
+            muleContext.registerListener(this);
         }
         catch (NotificationException e)
         {
@@ -364,8 +364,8 @@ public class XFireConnector extends AbstractConnector
     	 // TODO MULE-2228 Simplify this API
     	SedaComponent c = new SedaComponent();
         c.setName(XFIRE_SERVICE_COMPONENT_NAME + receiver.getComponent().getName());            
-        c.setModel(managementContext.getRegistry().lookupSystemModel());
-        //c.setManagementContext(managementContext);
+        c.setModel(muleContext.getRegistry().lookupSystemModel());
+        //c.setMuleContext(muleContext);
         //c.initialise();
         
         XFireServiceComponent svcComponent = new XFireServiceComponent(((XFireMessageReceiver)receiver));
@@ -417,7 +417,7 @@ public class XFireConnector extends AbstractConnector
         }
         
         UMOEndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint,
-            managementContext);
+            muleContext);
         serviceEndpointbuilder.setSynchronous(sync);
         serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName);
         // Set the transformers on the endpoint too
@@ -432,7 +432,7 @@ public class XFireConnector extends AbstractConnector
         // TODO Do we really need to modify the existing receiver endpoint? What happnes if we don't security,
         // filters and transformers will get invoked twice?
         UMOEndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint(),
-            managementContext);
+            muleContext);
         receiverEndpointBuilder.setTransformers(TransformerUtils.UNDEFINED);
         receiverEndpointBuilder.setResponseTransformers(TransformerUtils.UNDEFINED);
         // Remove the Axis filter now
@@ -440,11 +440,11 @@ public class XFireConnector extends AbstractConnector
         // Remove the Axis Receiver Security filter now
         receiverEndpointBuilder.setSecurityFilter(null);
 
-        UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint serviceEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(serviceEndpointbuilder);
 
-        UMOImmutableEndpoint receiverEndpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint receiverEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(receiverEndpointBuilder);
 
@@ -586,7 +586,7 @@ public class XFireConnector extends AbstractConnector
 
                 try
                 {
-                    managementContext.getRegistry().registerComponent(c);
+                    muleContext.getRegistry().registerComponent(c);
                 }
                 catch (UMOException e)
                 {

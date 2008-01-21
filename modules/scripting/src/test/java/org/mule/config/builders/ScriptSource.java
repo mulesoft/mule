@@ -9,33 +9,33 @@
  */
 package org.mule.config.builders;
 
-import org.mule.umo.UMOManagementContext;
+import org.mule.api.MuleContext;
 
 public class ScriptSource
 {
-    UMOManagementContext managementContext;
+    MuleContext muleContext;
 
     // TODO MULE-2205 Reimplement this using the registry instead of the QuickConfigurationBuilder.
     public ScriptSource() throws Exception
     {
 //        // need this when running with JMX
 //        //TODO MULE-1988 
-//        managementContext.stop();
-//        managementContext.setId("GroovyScriptTestCase");
-//        managementContext.start();
+//        muleContext.stop();
+//        muleContext.setId("GroovyScriptTestCase");
+//        muleContext.start();
 //
 //        //set global properties
-//        managementContext.getRegistry().registerProperty("doCompression", "true");
+//        muleContext.getRegistry().registerProperty("doCompression", "true");
 //        //disable the admin agent
 //        //manager.getConfiguration().setServerUrl("");
 //
 //        //Set a dummy TX manager
-//        managementContext.setTransactionManager(new TestTransactionManagerFactory().create());
+//        muleContext.setTransactionManager(new TestTransactionManagerFactory().create());
 //
 //        //register agents
 //        RmiRegistryAgent rmiAgent = new RmiRegistryAgent();
 //        rmiAgent.setName("rmiAgent");
-//        managementContext.getRegistry().registerAgent(rmiAgent);
+//        muleContext.getRegistry().registerAgent(rmiAgent);
 //
 //        JmxAgent agent = new JmxAgent();
 //        agent.setName("jmxAgent");
@@ -43,13 +43,13 @@ public class ScriptSource
 //        Map p = new HashMap();
 //        p.put("jmx.remote.jndi.rebind", "true");
 //        agent.setConnectorServerProperties(p);
-//        managementContext.getRegistry().registerAgent(agent);
+//        muleContext.getRegistry().registerAgent(agent);
 //
 //        //register connector
 //        TestConnector c = new TestConnector();
 //        c.setName("dummyConnector");
 //        c.setExceptionListener(new TestExceptionStrategy());
-//        managementContext.getRegistry().registerConnector(c);
+//        muleContext.getRegistry().registerConnector(c);
 //
 //        //Register transformers
 //        TestCompressionTransformer t = new TestCompressionTransformer();
@@ -57,7 +57,7 @@ public class ScriptSource
 //        t.setBeanProperty2(12);
 //        t.setContainerProperty("");
 //        t.setBeanProperty1("this was set from the manager properties!");
-//        managementContext.getRegistry().registerTransformer(t);
+//        muleContext.getRegistry().registerTransformer(t);
 //
 //        //Register endpoints
 //        JXPathFilter filter = new JXPathFilter("name");
@@ -77,7 +77,7 @@ public class ScriptSource
 //        cs.setRetryCount(4);
 //        cs.setRetryFrequency(3000);
 //        ep.setConnectionStrategy(cs);
-//        builder.getManagementContext().getRegistry().registerEndpoint(ep);
+//        builder.getMuleContext().getRegistry().registerEndpoint(ep);
 //
 //        Map props = new HashMap();
 //        props.put("testGlobal", "value1");
@@ -91,11 +91,11 @@ public class ScriptSource
 //        model.setExceptionListener(es);
 //        model.setLifecycleAdapterFactory(new TestDefaultLifecycleAdapterFactory());
 //        model.setEntryPointResolver(new TestEntryPointResolver());
-//        managementContext.getRegistry().registerModel(model);
+//        muleContext.getRegistry().registerModel(model);
 //
 //        //register components
-//        UMOEndpoint ep1 = managementContext.getRegistry().lookupEndpoint("appleInEndpoint");
-//        ep1.setTransformer(managementContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
+//        UMOEndpoint ep1 = muleContext.getRegistry().lookupEndpoint("appleInEndpoint");
+//        ep1.setTransformer(muleContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 //        UMODescriptor d = builder.createDescriptor(Orange.class.getName(), "orangeComponent", null, ep1, props);
 //
 //        DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
@@ -106,11 +106,11 @@ public class ScriptSource
 //        inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
 //        inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test2://catch.all", false));
 //        UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true, "TestCompressionTransformer");
-//        ep2.setResponseTransformer(managementContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
+//        ep2.setResponseTransformer(muleContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 //        inRouter.addEndpoint(ep2);
-//        UMOEndpoint ep3 = managementContext.getRegistry().lookupEndpoint("orangeEndpoint");
+//        UMOEndpoint ep3 = muleContext.getRegistry().lookupEndpoint("orangeEndpoint");
 //        ep3.setFilter(new PayloadTypeFilter(String.class));
-//        ep3.setTransformer(managementContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
+//        ep3.setTransformer(muleContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 //        Map props2 = new HashMap();
 //        props2.put("testLocal", "value1");
 //        ep3.setProperties(props2);
@@ -134,7 +134,7 @@ public class ScriptSource
 ////Response Router
 //        UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
 //        responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
-//        responseRouter.addEndpoint(managementContext.getRegistry().lookupEndpoint("appleResponseEndpoint"));
+//        responseRouter.addEndpoint(muleContext.getRegistry().lookupEndpoint("appleResponseEndpoint"));
 //        responseRouter.addRouter(new TestResponseAggregator());
 //        responseRouter.setTimeout(10001);
 //        d.setResponseRouter(responseRouter);
@@ -164,6 +164,6 @@ public class ScriptSource
 //        d.setModelName("main");
 //
 //        //register components
-//        managementContext.getRegistry().registerService(d);
+//        muleContext.getRegistry().registerService(d);
     }
 }

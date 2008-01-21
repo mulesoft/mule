@@ -10,13 +10,13 @@
 
 package org.mule.impl.endpoint;
 
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.ImmutableMuleEndpoint;
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.transformers.TransformerUtils;
 import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -34,7 +34,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
  * <code>MuleEndpoint</code> describes a Provider in the Mule Server. A endpoint is
  * a grouping of an endpoint, an endpointUri and a transformer.
  */
-public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, ManagementContextAware
+public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, MuleContextAware
 {
     private static final long serialVersionUID = 3883445445846168147L;
     
@@ -244,8 +244,8 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint, 
     }
 
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 }

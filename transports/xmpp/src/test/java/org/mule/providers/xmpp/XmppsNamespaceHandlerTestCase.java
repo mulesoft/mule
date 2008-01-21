@@ -20,8 +20,8 @@ public class XmppsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
 
     public void testSubclassConfig() throws Exception
     {
-        XmppsConnector connector =
-            (XmppsConnector)managementContext.getRegistry().lookupConnector("xmppsConnector");
+        XmppsConnector connector = (XmppsConnector) muleContext.getRegistry().lookupConnector(
+            "xmppsConnector");
         assertNotNull(connector);
     }
 

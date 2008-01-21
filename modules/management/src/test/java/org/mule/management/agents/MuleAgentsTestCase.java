@@ -26,13 +26,13 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
 
     public void testRemoveNonExistentAgent() throws Exception
     {
-        managementContext.getRegistry().unregisterAgent("DOES_NOT_EXIST");
+        muleContext.getRegistry().unregisterAgent("DOES_NOT_EXIST");
         // should not throw NPE
     }
 
     public void testAgentsRegistrationOrder() throws Exception
     {
-        managementContext.getRegistry().getConfiguration().setId("MuleAgentsTestCase.agentsRegistrationOrder");
+        muleContext.getRegistry().getConfiguration().setId("MuleAgentsTestCase.agentsRegistrationOrder");
         JmxAgent agentFirst = new JmxAgent();
         // If you specified "JmxAgent", it was the first one in the map,
         // but for "jmxAgent" the order was not preserved.
@@ -40,11 +40,11 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         // before proceeding, otherwise it is not able to find any
         // MBeanServer.
         agentFirst.setName("jmxAgent");
-        managementContext.getRegistry().registerAgent(agentFirst);
+        muleContext.getRegistry().registerAgent(agentFirst);
 
         Mx4jAgent agentSecond = new Mx4jAgent();
         agentSecond.setName("mx4jAgent");
-        managementContext.getRegistry().registerAgent(agentSecond);
+        muleContext.getRegistry().registerAgent(agentSecond);
 
         // should not throw an exception
     }
@@ -56,7 +56,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
      */
     public void testJmxAgentInjectedMBeanServer() throws Exception
     {
-        managementContext.getRegistry().getConfiguration().setId("MuleAgentsTestCase.jmxAgentInjectedMBeanServer");
+        muleContext.getRegistry().getConfiguration().setId("MuleAgentsTestCase.jmxAgentInjectedMBeanServer");
         JmxAgent jmxAgent = new JmxAgent();
         List servers = MBeanServerFactory.findMBeanServer(null);
         MBeanServer server;
@@ -66,6 +66,6 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         jmxAgent.setCreateServer(false);
         jmxAgent.setLocateServer(false);
         jmxAgent.setMBeanServer(server);
-        managementContext.getRegistry().registerAgent(jmxAgent);
+        muleContext.getRegistry().registerAgent(jmxAgent);
     }
 }

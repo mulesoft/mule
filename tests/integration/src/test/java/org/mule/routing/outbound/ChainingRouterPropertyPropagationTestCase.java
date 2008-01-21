@@ -17,7 +17,6 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.model.UMOModel;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -31,8 +30,8 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
 
     public void testPropertiesPropagation() throws Exception
     {
-        FunctionalTestComponent hop1 = (FunctionalTestComponent) managementContext.getRegistry().lookupComponent("hop1Service").getServiceFactory().getOrCreate();
-        FunctionalTestComponent hop2 = (FunctionalTestComponent) managementContext.getRegistry().lookupComponent("hop2Service").getServiceFactory().getOrCreate();
+        FunctionalTestComponent hop1 = (FunctionalTestComponent) muleContext.getRegistry().lookupComponent("hop1Service").getServiceFactory().getOrCreate();
+        FunctionalTestComponent hop2 = (FunctionalTestComponent) muleContext.getRegistry().lookupComponent("hop2Service").getServiceFactory().getOrCreate();
         assertNotNull(hop1);
 
         final AtomicBoolean hop1made = new AtomicBoolean(false);

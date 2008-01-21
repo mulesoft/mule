@@ -56,16 +56,16 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", managementContext);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", muleContext);
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
-        UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getOutboundEndpoint(endpointBuilder);
-        client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
+        client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
 
-        TransactionTemplate tt = new TransactionTemplate(tc, null, managementContext);
+        TransactionTemplate tt = new TransactionTemplate(tc, null, muleContext);
         tt.execute(new TransactionCallback()
         {
             public Object doInTransaction() throws Exception
@@ -105,15 +105,15 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", managementContext);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", muleContext);
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
-        UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getOutboundEndpoint(endpointBuilder);
-        client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
+        client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
-        TransactionTemplate tt = new TransactionTemplate(tc, null, managementContext);
+        TransactionTemplate tt = new TransactionTemplate(tc, null, muleContext);
         try
         {
             tt.execute(new TransactionCallback()
@@ -159,16 +159,16 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         // This enpoint needs to be registered prior to use cause we need to set
         // the transaction config so that the endpoint will "know" it is transacted
         // and not close the session itself but leave it up to the transaction.
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", managementContext);
+        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jms://test.queue", muleContext);
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
-        UMOImmutableEndpoint inboundEndpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getOutboundEndpoint(endpointBuilder);
-        client.getManagementContext().getRegistry().registerEndpoint(inboundEndpoint);
+        client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
 
-        TransactionTemplate tt = new TransactionTemplate(tc, null, managementContext);
+        TransactionTemplate tt = new TransactionTemplate(tc, null, muleContext);
         tt.execute(new TransactionCallback()
         {
             public Object doInTransaction() throws Exception
@@ -196,7 +196,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
         MuleTransactionConfig tc = new MuleTransactionConfig();
         tc.setFactory(new JmsTransactionFactory());
         tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
-        TransactionTemplate tt = new TransactionTemplate(tc, null, managementContext);
+        TransactionTemplate tt = new TransactionTemplate(tc, null, muleContext);
         tt.execute(new TransactionCallback()
         {
             public Object doInTransaction() throws Exception

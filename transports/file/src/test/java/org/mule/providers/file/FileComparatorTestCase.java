@@ -45,17 +45,17 @@ public class FileComparatorTestCase extends FunctionalTestCase
             }
         };
 
-        ((FunctionalTestComponent) managementContext.getRegistry().lookupComponent(COMPONENT_NAME).getServiceFactory().getOrCreate()).
+        ((FunctionalTestComponent) muleContext.getRegistry().lookupComponent(COMPONENT_NAME).getServiceFactory().getOrCreate()).
                 setEventCallback(callback);
 
-        managementContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).stop();
+        muleContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).stop();
         File f1 = FileUtils.newFile(PATH + FILE_NAMES[0]);
         assertTrue(f1.createNewFile());
         Thread.sleep(1000);
         File f2 = FileUtils.newFile(PATH + FILE_NAMES[1]);
         assertTrue(f2.createNewFile());
         Thread.sleep(1000);
-        managementContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).start();
+        muleContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).start();
         assertTrue(countDown.await(TIMEOUT, TimeUnit.MILLISECONDS));
     }
 

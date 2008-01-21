@@ -14,7 +14,7 @@ import org.mule.umo.manager.UMOServerNotificationListener;
 
 /**
  * <code>RegistryNotificationListener</code> is an observer interface that objects
- * can implement and then register themselves with the Mule MAnagementContext to be notified
+ * can implement and then register themselves with the MuleContext to be notified
  * when a Registry event occurs.
  */
 public interface RegistryNotificationListener extends UMOServerNotificationListener

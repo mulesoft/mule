@@ -160,7 +160,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
 
             // remove this agent once it has registered the other agents
             //TODO RM* this currently does nothing!!!
-            managementContext.getRegistry().unregisterAgent(name);
+            muleContext.getRegistry().unregisterAgent(name);
         }
         catch (UMOException e)
         {
@@ -241,7 +241,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
 
     protected boolean isAgentRegistered(UMOAgent agent)
     {
-        return managementContext.getRegistry().lookupAgent(agent.getName()) != null;
+        return muleContext.getRegistry().lookupAgent(agent.getName()) != null;
     }
 
     /**

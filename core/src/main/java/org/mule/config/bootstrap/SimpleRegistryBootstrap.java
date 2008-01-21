@@ -9,11 +9,11 @@
  */
 package org.mule.config.bootstrap;
 
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.DiscoverableTransformer;
@@ -69,9 +69,9 @@ import java.util.Properties;
  * parameter is specified. If no 'returnClass' is specified the defualt in the transformer will be used.
  * <p/>
  * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
- * {@link org.mule.impl.ManagementContextAware} and lifecylce interfaces such as {@link org.mule.umo.lifecycle.Initialisable}.
+ * {@link org.mule.impl.MuleContextAware} and lifecylce interfaces such as {@link org.mule.umo.lifecycle.Initialisable}.
  */
-public class SimpleRegistryBootstrap implements Initialisable, ManagementContextAware
+public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 {
     public static final String SERVICE_PATH = "META-INF/services/org/mule/config/";
 
@@ -81,10 +81,10 @@ public class SimpleRegistryBootstrap implements Initialisable, ManagementContext
     public String OBJECT_PREFIX = "object.";
 
 
-    protected UMOManagementContext context;
+    protected MuleContext context;
 
     /** {@inheritDoc} */
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
         this.context = context;
     }

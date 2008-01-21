@@ -92,7 +92,7 @@ public class ErrorManager
             else if (eh instanceof FatalHandler)
             {
                 logger.fatal(LocaleMessage.fatalHandling(e));
-                MuleServer.getManagementContext().dispose();
+                MuleServer.getMuleContext().dispose();
                 System.exit(-1);
             }
             else
@@ -134,7 +134,7 @@ public class ErrorManager
         // If this method has been called, all other handlers failed
         // this is all we can do
         logger.fatal(LocaleMessage.fatalException(t), t);
-        MuleServer.getManagementContext().dispose();
+        MuleServer.getMuleContext().dispose();
         System.exit(-1);
     }
 }

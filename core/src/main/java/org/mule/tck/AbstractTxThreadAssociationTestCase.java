@@ -112,7 +112,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
      */
     public void testXaTransactionTermination() throws Exception
     {
-        managementContext.setTransactionManager(tm);
+        muleContext.setTransactionManager(tm);
         assertNull("There sould be no current transaction associated.", tm.getTransaction());
         
         // don't wait for ages, has to be set before TX is begun
@@ -139,7 +139,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
      */
     public void testNoNestedTxStarted() throws Exception
     {
-        managementContext.setTransactionManager(tm);
+        muleContext.setTransactionManager(tm);
         assertNull("There sould be no current transaction associated.", tm.getTransaction());
 
         // don't wait for ages, has to be set before TX is begun
@@ -149,7 +149,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
         UMOTransactionConfig config = new MuleTransactionConfig();
         config.setFactory(new XaTransactionFactory());
         config.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
-        TransactionTemplate template = new TransactionTemplate(config, new DefaultExceptionStrategy(), managementContext);
+        TransactionTemplate template = new TransactionTemplate(config, new DefaultExceptionStrategy(), muleContext);
 
         // and the callee component which should join the current XA transaction, not begin a nested one
         final UMOTransactionConfig nestedConfig = new MuleTransactionConfig();
@@ -164,7 +164,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
                 // the callee executes within its own TX template, but uses the same global XA transaction,
                 // bound to the current thread of execution via a ThreadLocal
                 TransactionTemplate nestedTemplate =
-                        new TransactionTemplate(nestedConfig, new DefaultExceptionStrategy(), managementContext);
+                        new TransactionTemplate(nestedConfig, new DefaultExceptionStrategy(), muleContext);
                 return nestedTemplate.execute(new TransactionCallback()
                 {
                     public Object doInTransaction() throws Exception

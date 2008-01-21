@@ -33,7 +33,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
     protected UMOMessage send(Object payload) throws Exception
     {
         UMOMessage message = new MuleMessage(payload);
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointUri);
         MuleSession session = new MuleSession(message, new NullSessionHandler());
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
@@ -51,7 +51,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
 
     public void testSyncResponseOfBufferSize() throws Exception
     {
-        TcpConnector tcp = (TcpConnector)managementContext.getRegistry().lookupConnector("tcpConnector");
+        TcpConnector tcp = (TcpConnector)muleContext.getRegistry().lookupConnector("tcpConnector");
         tcp.setBufferSize(1024 * 16);
         byte[] data = fillBuffer(new byte[tcp.getBufferSize()]);
         UMOMessage message = send(data);
@@ -63,7 +63,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
 
     public void testManySyncResponseOfBufferSize() throws Exception
     {
-        TcpConnector tcp = (TcpConnector)managementContext.getRegistry().lookupConnector("tcpConnector");
+        TcpConnector tcp = (TcpConnector)muleContext.getRegistry().lookupConnector("tcpConnector");
         tcp.setBufferSize(1024 * 16);
         byte[] data = fillBuffer(new byte[tcp.getBufferSize()]);
         for (int i = 0; i < 20; ++i)

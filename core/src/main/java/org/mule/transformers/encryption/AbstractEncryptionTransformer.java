@@ -105,7 +105,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
     {
         if (strategyName != null)
         {
-            if (endpoint.getManagementContext().getSecurityManager() == null)
+            if (endpoint.getMuleContext().getSecurityManager() == null)
             {
                 if (strategy == null)
                 {
@@ -114,7 +114,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
             }
             else
             {
-                strategy = endpoint.getManagementContext().getSecurityManager().getEncryptionStrategy(strategyName);
+                strategy = endpoint.getMuleContext().getSecurityManager().getEncryptionStrategy(strategyName);
             }
         }
         if (strategy == null)

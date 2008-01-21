@@ -23,7 +23,7 @@ public class MulticastNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testConfig() throws Exception
     {
-        MulticastConnector c = (MulticastConnector)managementContext.getRegistry().lookupConnector("multicastConnector");
+        MulticastConnector c = (MulticastConnector)muleContext.getRegistry().lookupConnector("multicastConnector");
         assertNotNull(c);
 
         assertEquals(1234, c.getReceiveBufferSize());

@@ -33,12 +33,12 @@ public class JmsXATransactionComponentTestCase extends AbstractJmsFunctionalTest
         result = client.request("vm://out", SMALL_TIMEOUT);
         assertNull(result);
 
-        managementContext.getRegistry().lookupConnector(CONNECTOR1_NAME).stop();
-        assertEquals(managementContext.getRegistry().lookupConnector(CONNECTOR1_NAME).isStarted(), false);
+        muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).stop();
+        assertEquals(muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).isStarted(), false);
         logger.info(CONNECTOR1_NAME + " is stopped");
         client.dispatch("vm://in", DEFAULT_INPUT_MESSAGE, null);
         Thread.sleep(1000);
-        managementContext.getRegistry().lookupConnector(CONNECTOR1_NAME).start();
+        muleContext.getRegistry().lookupConnector(CONNECTOR1_NAME).start();
         Thread.sleep(1000);
         logger.info(CONNECTOR1_NAME + " is started");
         result = client.request("vm://out", TIMEOUT);

@@ -87,7 +87,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
         {
             UMOServerNotificationListener listener = (UMOServerNotificationListener) iterator.next();
-            managementContext.unregisterListener(listener);
+            muleContext.unregisterListener(listener);
         }
     }
 
@@ -195,7 +195,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             };
             try
             {
-               managementContext.registerListener(l);
+               muleContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -214,7 +214,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             };
             try
             {
-               managementContext.registerListener(l);
+               muleContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -233,7 +233,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             };
             try
             {
-               managementContext.registerListener(l);
+               muleContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -252,7 +252,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             };
             try
             {
-               managementContext.registerListener(l);
+               muleContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -272,7 +272,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             };
             try
             {
-               managementContext.registerListener(l);
+               muleContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -292,7 +292,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             };
             try
             {
-               managementContext.registerListener(l);
+               muleContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -312,7 +312,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             };
             try
             {
-               managementContext.registerListener(l);
+               muleContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -332,7 +332,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             };
             try
             {
-               managementContext.registerListener(l);
+               muleContext.registerListener(l);
             }
             catch (NotificationException e)
             {
@@ -356,7 +356,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             };
             try
             {
-               managementContext.registerListener(l);
+               muleContext.registerListener(l);
             }
             catch (NotificationException e)
             {

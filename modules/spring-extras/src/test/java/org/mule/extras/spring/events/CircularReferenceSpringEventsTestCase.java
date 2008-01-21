@@ -24,8 +24,8 @@ public class CircularReferenceSpringEventsTestCase extends FunctionalTestCase
 
     public void testManagerIsInstanciated() throws Exception
     {
-        assertTrue(managementContext.isInitialised());
-        assertTrue(managementContext.isStarted());
-        assertNotNull(managementContext.getRegistry().lookupObject(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME));
+        assertTrue(muleContext.isInitialised());
+        assertTrue(muleContext.isStarted());
+        assertNotNull(muleContext.getRegistry().lookupObject(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME));
     }
 }

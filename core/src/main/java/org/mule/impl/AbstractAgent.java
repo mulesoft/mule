@@ -9,7 +9,7 @@
  */
 package org.mule.impl;
 
-import org.mule.umo.UMOManagementContext;
+import org.mule.api.MuleContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 
@@ -17,10 +17,10 @@ import org.mule.umo.manager.UMOAgent;
  * Implements common methods for all Agents. Importantly, the Management context is made available to Agents that
  * extend this.
  */
-public abstract class AbstractAgent implements UMOAgent, ManagementContextAware
+public abstract class AbstractAgent implements UMOAgent, MuleContextAware
 {
 
-    protected UMOManagementContext managementContext;
+    protected MuleContext muleContext;
 
     protected String name;
 
@@ -45,9 +45,9 @@ public abstract class AbstractAgent implements UMOAgent, ManagementContextAware
     }
 
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 
     public void initialise() throws InitialisationException

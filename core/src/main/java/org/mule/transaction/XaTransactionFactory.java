@@ -10,9 +10,9 @@
 
 package org.mule.transaction;
 
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.umo.TransactionException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
 
@@ -22,11 +22,11 @@ import org.mule.umo.UMOTransactionFactory;
  */
 public class XaTransactionFactory implements UMOTransactionFactory
 {
-    public UMOTransaction beginTransaction(UMOManagementContext managementContext) throws TransactionException
+    public UMOTransaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
         try
         {
-            XaTransaction xat = new XaTransaction(managementContext.getTransactionManager());
+            XaTransaction xat = new XaTransaction(muleContext.getTransactionManager());
             xat.begin();
             return xat;
         }

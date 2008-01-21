@@ -10,13 +10,13 @@
 
 package org.mule.umo.provider;
 
-import org.mule.impl.ManagementContextAware;
+import org.mule.api.MuleContext;
+import org.mule.impl.MuleContextAware;
 import org.mule.umo.MessagingException;
 import org.mule.umo.NamedObject;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Lifecycle;
@@ -28,7 +28,7 @@ import java.io.OutputStream;
  * <code>UMOConnector</code> is the mechanism used to connect to external systems
  * and protocols in order to send and receive data.
  */
-public interface UMOConnector extends Lifecycle, ManagementContextAware, NamedObject
+public interface UMOConnector extends Lifecycle, MuleContextAware, NamedObject
 {
     int INT_VALUE_NOT_SET = -1;
 
@@ -215,5 +215,5 @@ public interface UMOConnector extends Lifecycle, ManagementContextAware, NamedOb
      */
     OutputStream getOutputStream(UMOImmutableEndpoint endpoint, UMOMessage message) throws UMOException;
 
-    UMOManagementContext getManagementContext();
+    MuleContext getMuleContext();
 }

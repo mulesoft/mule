@@ -29,6 +29,6 @@ public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public UMOImmutableEndpoint getEndpoint() throws Exception
     {
-        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ssl://localhost:1234");
+        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ssl://localhost:1234");
     }
 }

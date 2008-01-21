@@ -12,13 +12,13 @@ package org.mule.impl;
 
 import org.mule.MuleException;
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -642,7 +642,7 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         try
         {
             //TODO DF: Lookup existing endpoint from registry of correct type.
-            endpoint = getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+            endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
 
             //TODO DF: No need to unmarshall tranformers
             //if (TransformerUtils.isUndefined(endpoint.getTransformers()))
@@ -676,9 +676,9 @@ public class MuleEvent extends EventObject implements UMOEvent, ThreadSafeAccess
         return encoding;
     }
 
-    public UMOManagementContext getManagementContext()
+    public MuleContext getMuleContext()
     {
-        return endpoint.getManagementContext();
+        return endpoint.getMuleContext();
     }
 
     public ThreadSafeAccess newThreadCopy()

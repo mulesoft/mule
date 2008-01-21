@@ -18,7 +18,7 @@ public class SedaPipelineNoPoolingTestCase extends SedaPipelineTestCase
     protected void doPostFunctionalSetUp() throws Exception
     {
         //TODO: this should be configurable from the XML in Mule 2.0
-        SedaModel model = (SedaModel) managementContext.getRegistry().lookupModel("main");
+        SedaModel model = (SedaModel) muleContext.getRegistry().lookupModel("main");
         model.setEnablePooling(false);
     }
 

@@ -10,8 +10,9 @@
 
 package org.mule.config.spring.parsers;
 
-import org.mule.config.ConfigurationBuilder;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.impl.DefaultMuleContextFactory;
 
 import junit.framework.TestCase;
 
@@ -39,13 +40,12 @@ public abstract class AbstractBadConfigTestCase extends TestCase
 
     protected void parseConfig() throws Exception
     {
-        ConfigurationBuilder builder = getBuilder();
-        builder.configure(getConfigResources());
+        new DefaultMuleContextFactory().createMuleContext(getBuilder());
     }
 
     protected ConfigurationBuilder getBuilder() throws Exception
     {
-        return new SpringXmlConfigurationBuilder();
+        return new SpringXmlConfigurationBuilder(getConfigResources());
     }
 
     protected abstract String getConfigResources();

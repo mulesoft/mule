@@ -10,12 +10,12 @@
 
 package org.mule.config.spring;
 
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 
 public class DummyComponent
 {
 
-    public void setProperty(ManagementContextAware dummy)
+    public void setProperty(MuleContextAware dummy)
     {
         // empty
     }

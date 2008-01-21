@@ -11,6 +11,7 @@ package org.mule.impl.registry;
 
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.lifecycle.GenericLifecycleManager;
@@ -24,7 +25,6 @@ import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -324,7 +324,7 @@ public class TransientRegistry extends AbstractRegistry
             objectMap.put(key, value);
             try
             {
-                UMOManagementContext mc = MuleServer.getManagementContext();
+                MuleContext mc = MuleServer.getMuleContext();
                 if (mc != null)
                 {
                     mc.applyLifecycle(value);
@@ -333,7 +333,7 @@ public class TransientRegistry extends AbstractRegistry
                 {
                     throw new RegistrationException("Unable to register object (\""
                             + key + ":" + ClassUtils.getSimpleName(value.getClass())
-                            + "\") because ManagementContext has not yet been created.");
+                            + "\") because MuleContext has not yet been created.");
                 }
             }
             catch (UMOException e)

@@ -105,49 +105,49 @@ public class MuleAdminAgent extends AbstractAgent
                             + "<mule:admin-agent serverUri=\"tcp://example.com:60504\"/> ");
 
                 // abort the agent registration process
-               managementContext.getRegistry().unregisterAgent(this.getName());
+               muleContext.getRegistry().unregisterAgent(this.getName());
 
                 return;
             }
 
             // Check for override
-            if (managementContext.getRegistry().lookupComponent(MuleManagerComponent.MANAGER_COMPONENT_NAME) != null)
+            if (muleContext.getRegistry().lookupComponent(MuleManagerComponent.MANAGER_COMPONENT_NAME) != null)
             {
                 logger.info("Mule manager component has already been initialised, ignoring server url");
             }
             else
             {
-                if (managementContext.getRegistry().lookupConnector(DEFAULT_MANAGER_ENDPOINT) != null)
+                if (muleContext.getRegistry().lookupConnector(DEFAULT_MANAGER_ENDPOINT) != null)
                 {
                     throw new AlreadyInitialisedException("Server Components", this);
                 }
 
                 // Check to see if we have an endpoint identifier
-                UMOEndpointBuilder endpointBuilder = managementContext.getRegistry().lookupEndpointBuilder(serverUri);
+                UMOEndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointBuilder(serverUri);
                 // Check to see if we have an endpoint identifier
                 if (endpointBuilder == null)
                 {
                     UMOEndpointURI uri = new MuleEndpointURI(serverUri);
-                    endpointBuilder = new EndpointURIEndpointBuilder(uri, managementContext);
+                    endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
                     endpointBuilder.setSynchronous(true);
 
                     // TODO DF: Doesn't the EndpointBuilder do this?
-                    UMOConnector connector = TransportFactory.getOrCreateConnectorByProtocol(uri, managementContext);
+                    UMOConnector connector = TransportFactory.getOrCreateConnectorByProtocol(uri, muleContext);
                     // If this connector has already been initialised i.e. it's a
                     // pre-existing connector don't reinit
-                    if (managementContext.getRegistry().lookupConnector(connector.getName()) == null)
+                    if (muleContext.getRegistry().lookupConnector(connector.getName()) == null)
                     {
                         connector.setName(DEFAULT_MANAGER_ENDPOINT);
                         //connector.initialise();
-                        managementContext.getRegistry().registerConnector(connector);
+                        muleContext.getRegistry().registerConnector(connector);
                     }
                     endpointBuilder.setConnector(connector);
                 }
                 logger.info("Registering Admin listener on: " + serverUri);
                 UMOComponent component = MuleManagerComponent.getComponent(endpointBuilder, wireFormat,
                     RegistryContext.getConfiguration().getDefaultEncoding(), RegistryContext.getConfiguration()
-                        .getDefaultSynchronousEventTimeout(), managementContext);
-                managementContext.getRegistry().registerComponent(component);
+                        .getDefaultSynchronousEventTimeout(), muleContext);
+                muleContext.getRegistry().registerComponent(component);
             }
         }
         catch (UMOException e)

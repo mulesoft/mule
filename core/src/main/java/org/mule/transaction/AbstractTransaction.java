@@ -155,7 +155,7 @@ public abstract class AbstractTransaction implements UMOTransaction
     protected void fireNotification(TransactionNotification notification)
     {
         // TODO profile this piece of code
-        MuleServer.getManagementContext().fireNotification(notification);
+        MuleServer.getMuleContext().fireNotification(notification);
     }
 
 }

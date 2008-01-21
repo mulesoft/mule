@@ -49,7 +49,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         {
             if (endpointAddress != null)
             {
-                logEndpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointAddress);
+                logEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointAddress);
             }
             else
             {

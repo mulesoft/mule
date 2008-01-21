@@ -10,8 +10,8 @@
 
 package org.mule.config.spring;
 
+import org.mule.api.MuleContext;
 import org.mule.registry.Registry;
-import org.mule.umo.UMOManagementContext;
 import org.mule.util.ClassUtils;
 
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 {
     public static final String LEGACY_BEAN_READER_CLASS = "org.mule.config.spring.MuleBeanDefinitionReader";
 
-    private UMOManagementContext managementContext;
+    private MuleContext muleContext;
     private final Resource[] configResources;
     private final String[] configLocations;
 
@@ -48,9 +48,9 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * @param configLocations
      * @see org.mule.config.spring.SpringRegistry
      */
-    public MuleApplicationContext(UMOManagementContext managementContext, Registry registry, String[] configLocations)
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, String[] configLocations)
     {
-        this(managementContext, registry, configLocations, true);
+        this(muleContext, registry, configLocations, true);
     }
     
     /**
@@ -63,11 +63,11 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * @param parent 
      * @see org.mule.config.spring.SpringRegistry
      */
-    public MuleApplicationContext(UMOManagementContext managementContext, Registry registry, String[] configLocations, ApplicationContext parent)
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, String[] configLocations, ApplicationContext parent)
     {
         super(parent);
         setupParentSpringRegistry(registry);
-        this.managementContext = managementContext;
+        this.muleContext = muleContext;
         this.configLocations = configLocations;
         this.configResources = null;
         refresh();
@@ -91,18 +91,16 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
     
     protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
         super.prepareBeanFactory(beanFactory);
-        beanFactory.addBeanPostProcessor(new ManagementContextPostProcessor(managementContext));
+        beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
     }
     
     /**
      * @param registry
      * @param configLocations
-     * @deprecated Do we need all these constructors when only our
-     *             SpringConfigurationBuilder creates this?
      */
-    public MuleApplicationContext(UMOManagementContext managementContext, Registry registry, Resource[] configResources)
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, Resource[] configResources)
     {
-        this(managementContext, registry, configResources, true);
+        this(muleContext, registry, configResources, true);
     }
 
     /**
@@ -110,13 +108,11 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * @param configLocations
      * @param refresh
      * @throws BeansException
-     * @deprecated Do we need all these constructors when only our
-     *             SpringConfigurationBuilder creates this?
      */
-    public MuleApplicationContext(UMOManagementContext managementContext, Registry registry, String[] configLocations, boolean refresh)
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, String[] configLocations, boolean refresh)
         throws BeansException
     {
-        this.managementContext = managementContext;
+        this.muleContext = muleContext;
         setupParentSpringRegistry(registry);
         this.configLocations = configLocations;
         this.configResources = null;
@@ -130,13 +126,11 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * @param registry
      * @param configLocations
      * @param parent 
-     * @deprecated Do we need all these constructors when only our
-     *             SpringConfigurationBuilder creates this?
      */
-    public MuleApplicationContext(UMOManagementContext managementContext, Registry registry, Resource[] configResources, ApplicationContext parent)
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, Resource[] configResources, ApplicationContext parent)
     {
         super(parent);
-        this.managementContext = managementContext;
+        this.muleContext = muleContext;
         setupParentSpringRegistry(registry);
         this.configLocations = null;
         this.configResources = configResources;
@@ -148,14 +142,12 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * @param configLocations
      * @param refresh
      * @throws BeansException 
-     * @deprecated Do we need all these constructors when only our
-     *             SpringConfigurationBuilder creates this?
      */
-    public MuleApplicationContext(UMOManagementContext managementContext, Registry registry, Resource[] configResources, boolean refresh)
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, Resource[] configResources, boolean refresh)
         throws BeansException
     {
         setupParentSpringRegistry(registry);
-        this.managementContext = managementContext;
+        this.muleContext = muleContext;
         this.configLocations = null;
         this.configResources = configResources;
         if (refresh)
@@ -202,7 +194,14 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
         //add error reporting
         beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
-        beanDefinitionReader.loadBeanDefinitions(configLocations);
+        if (configLocations != null)
+        {
+            beanDefinitionReader.loadBeanDefinitions(configLocations);
+        }
+        else
+        {
+            beanDefinitionReader.loadBeanDefinitions(configResources);
+        }
     }
 
     //@Override

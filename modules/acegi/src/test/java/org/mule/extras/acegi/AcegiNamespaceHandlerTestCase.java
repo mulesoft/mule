@@ -33,13 +33,13 @@ public class AcegiNamespaceHandlerTestCase extends FunctionalTestCase
 
     protected UMOSecurityProvider getProvider(String name)
     {
-        UMOSecurityManager securityManager = managementContext.getSecurityManager();
+        UMOSecurityManager securityManager = muleContext.getSecurityManager();
         return securityManager.getProvider(name);
     }
 
     public void testCustom()
     {
-        Iterator providers = managementContext.getSecurityManager().getProviders().iterator();
+        Iterator providers = muleContext.getSecurityManager().getProviders().iterator();
         while (providers.hasNext())
         {
             UMOSecurityProvider provider = (UMOSecurityProvider) providers.next();

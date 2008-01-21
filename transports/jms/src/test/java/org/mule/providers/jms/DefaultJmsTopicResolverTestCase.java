@@ -26,7 +26,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        connector = (JmsConnector) managementContext.getRegistry().lookupConnector("jmsConnector");
+        connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
         resolver = (DefaultJmsTopicResolver) connector.getTopicResolver();
     }
 
@@ -42,7 +42,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointNotTopicWithFallback() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep1");
         assertFalse(resolver.isTopic(endpoint));
@@ -50,7 +50,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointNotTopicWithFallback2() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep1");
         assertFalse(resolver.isTopic(endpoint, true));
@@ -58,7 +58,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointNotTopicNoFallback() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep1");
         assertFalse(resolver.isTopic(endpoint, false));
@@ -66,7 +66,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointTopicPropertyWithFallback() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep2");
         assertTrue(resolver.isTopic(endpoint));
@@ -74,7 +74,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointTopicPropertyWithFallback2() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep2");
         assertTrue(resolver.isTopic(endpoint, true));
@@ -82,7 +82,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointTopicPropertyNoFallback() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep2");
         assertFalse(resolver.isTopic(endpoint, false));
@@ -90,7 +90,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointTopicPrefixWithFallback() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep3");
         assertTrue(resolver.isTopic(endpoint));
@@ -98,7 +98,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointTopicPrefixWithFallback2() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep3");
         assertTrue(resolver.isTopic(endpoint, true));
@@ -106,7 +106,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointTopicPrefixNoFallback() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep3");
         assertTrue(resolver.isTopic(endpoint, false));
@@ -114,7 +114,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointTopicPrefixAndPropertyWithFallback() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep4");
         assertTrue(resolver.isTopic(endpoint));
@@ -122,7 +122,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointTopicPrefixAndPropertyWithFallback2() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep4");
         assertTrue(resolver.isTopic(endpoint, true));
@@ -130,7 +130,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointTopicPrefixAndPropertyNoFallback() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep4");
         assertTrue(resolver.isTopic(endpoint, false));
@@ -138,7 +138,7 @@ public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase
 
     public void testEndpointTopicUsesEndpointProperties() throws Exception
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint("ep5");
         assertTrue(resolver.isTopic(endpoint));

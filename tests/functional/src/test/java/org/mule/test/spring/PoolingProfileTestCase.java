@@ -53,7 +53,7 @@ public class PoolingProfileTestCase  extends FunctionalTestCase
     protected void doTest(String service, int exhausted, int initialisation,
                           int active, int idle, long wait)
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent(service);
+        UMOComponent c = muleContext.getRegistry().lookupComponent(service);
         assertNotNull(service, c);
         ObjectFactory of = c.getServiceFactory();
         assertTrue(of instanceof PooledObjectFactory);

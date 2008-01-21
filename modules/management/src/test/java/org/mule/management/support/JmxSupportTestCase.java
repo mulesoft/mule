@@ -30,12 +30,12 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         ObjectName name = ObjectName.getInstance(TEST_DOMAIN + ":name=TestDuplicates");
         mBeanServer.registerMBean(new StatisticsService(), name);
 
-        managementContext.setId(MANAGER_ID);
+        muleContext.setId(MANAGER_ID);
         JmxAgent agent = new JmxAgent();
-        agent.setManagementContext(managementContext);
+        agent.setMuleContext(muleContext);
         agent.initialise();
-        managementContext.getRegistry().registerAgent(agent);
-        managementContext.start();
+        muleContext.getRegistry().registerAgent(agent);
+        muleContext.start();
 
         List domains = Arrays.asList(mBeanServer.getDomains());
         assertTrue("Should have contained an original domain.", domains.contains(TEST_DOMAIN));
@@ -59,12 +59,12 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertEquals("Wrong number of domains created.",
                      numOriginalDomains + 2, mBeanServer.getDomains().length);
 
-        managementContext.setId(MANAGER_ID);
+        muleContext.setId(MANAGER_ID);
         JmxAgent agent = new JmxAgent();
-        agent.setManagementContext(managementContext);
+        agent.setMuleContext(muleContext);
         agent.initialise();
-        managementContext.getRegistry().registerAgent(agent);
-        managementContext.start();
+        muleContext.getRegistry().registerAgent(agent);
+        muleContext.start();
 
         List domains = Arrays.asList(mBeanServer.getDomains());
         // one extra domain created by Mule's clash resolution
@@ -79,10 +79,10 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
     public void testDomainNoManagerIdAndJmxAgentMustFail() throws Exception
     {
         JmxAgent jmxAgent = new JmxAgent();
-        managementContext.getRegistry().registerAgent(jmxAgent);
+        muleContext.getRegistry().registerAgent(jmxAgent);
         try
         {
-            managementContext.setId(null);
+            muleContext.setId(null);
             fail("Should have failed.");
         }
         catch (IllegalArgumentException e)

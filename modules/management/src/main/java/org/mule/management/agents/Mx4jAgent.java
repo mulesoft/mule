@@ -172,7 +172,7 @@ public class Mx4jAgent extends AbstractAgent
             }
 
             adaptor = createAdaptor();
-            adaptorName = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":" + HTTP_ADAPTER_OBJECT_NAME);
+            adaptorName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + HTTP_ADAPTER_OBJECT_NAME);
 
             unregisterMBeansIfNecessary();
             mBeanServer.registerMBean(adaptor, adaptorName);

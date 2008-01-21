@@ -10,46 +10,58 @@
 
 package org.mule.config.builders;
 
+import org.mule.api.MuleContext;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.builders.i18n.BuildersMessages;
+import org.mule.impl.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 
 import javax.script.Bindings;
 
-/** Configures a MuleManager from one or more script files. */
-public class ScriptConfigurationBuilder extends DefaultConfigurationBuilder
+/** Configures Mule from one or more script files. */
+public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBuilder
 {
     public static final String SCRIPT_ENGINE_NAME_PROPERTY = "org.mule.script.engine";
 
     private Scriptable scriptComponent = new Scriptable();
 
-    protected UMOManagementContext managementContext = null;
+    protected MuleContext muleContext = null;
     protected boolean initialised = false;
 
-    public ScriptConfigurationBuilder() throws UMOException
+    public ScriptConfigurationBuilder(String configResource) throws UMOException
     {
-        String scriptName = System.getProperty(SCRIPT_ENGINE_NAME_PROPERTY);
-        if (scriptName == null)
+        this(System.getProperty(SCRIPT_ENGINE_NAME_PROPERTY), configResource);
+    }
+
+    public ScriptConfigurationBuilder(String[] configResources) throws UMOException
+    {
+        this(System.getProperty(SCRIPT_ENGINE_NAME_PROPERTY), configResources);
+    }
+
+    public ScriptConfigurationBuilder(String scriptEngineName, String configResource) throws UMOException
+    {
+        super(configResource);
+        if (scriptEngineName == null)
         {
             throw new IllegalArgumentException(BuildersMessages.systemPropertyNotSet(
                 SCRIPT_ENGINE_NAME_PROPERTY).getMessage());
         }
-        else
-        {
-            scriptComponent.setScriptEngineName(scriptName);
-        }
-    }
-
-    public ScriptConfigurationBuilder(String scriptEngineName) throws UMOException
-    {
         scriptComponent.setScriptEngineName(scriptEngineName);
     }
 
-    protected void doConfigure(UMOManagementContext managementContext, String[] configResources)
-        throws Exception
+    public ScriptConfigurationBuilder(String scriptEngineName, String[] configResources) throws UMOException
     {
-        super.doConfigure(managementContext, configResources);
+        super(configResources);
+        if (scriptEngineName == null)
+        {
+            throw new IllegalArgumentException(BuildersMessages.systemPropertyNotSet(
+                SCRIPT_ENGINE_NAME_PROPERTY).getMessage());
+        }
+        scriptComponent.setScriptEngineName(scriptEngineName);
+    }
+
+    protected void doConfigure(MuleContext muleContext) throws Exception
+    {
         for (int i = 0; i < configResources.length; i++)
         {
             String configResource = configResources[i];
@@ -63,7 +75,7 @@ public class ScriptConfigurationBuilder extends DefaultConfigurationBuilder
 
     protected void populateBindings(Bindings bindings)
     {
-        bindings.put("managementContext", managementContext);
+        bindings.put("muleContext", muleContext);
     }
 
 }

@@ -246,13 +246,13 @@ public class JmxAgent extends AbstractAgent
         try
         {
 
-            if (StringUtils.isBlank(managementContext.getId()))
+            if (StringUtils.isBlank(muleContext.getId()))
             {
                 // TODO i18n the message properly
                 throw new IllegalArgumentException(
                         "Manager ID is mandatory when running with JmxAgent. Give your Mule configuration a valid ID.");
             }
-            managementContext.registerListener(l);
+            muleContext.registerListener(l);
         } catch (NotificationException e) {
             throw new InitialisationException(e, this);
         }
@@ -359,9 +359,9 @@ public class JmxAgent extends AbstractAgent
     {
         // WrapperManager to support restarts
         final WrapperManagerAgent wmAgent = new WrapperManagerAgent();
-        if (managementContext.getRegistry().lookupAgent(wmAgent.getName()) == null)
+        if (muleContext.getRegistry().lookupAgent(wmAgent.getName()) == null)
         {
-           managementContext.getRegistry().registerAgent(wmAgent);
+           muleContext.getRegistry().registerAgent(wmAgent);
         }
     }
 
@@ -369,9 +369,9 @@ public class JmxAgent extends AbstractAgent
     protected void registerStatisticsService() throws NotCompliantMBeanException, MBeanRegistrationException,
                                                       InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":type=org.mule.Statistics,name=AllStatistics");
+        ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Statistics,name=AllStatistics");
         StatisticsService mBean = new StatisticsService();
-        mBean.setManagementContext(managementContext);
+        mBean.setMuleContext(muleContext);
         mBean.setEnabled(isEnableStatistics());
         logger.debug("Registering statistics with name: " + on);
         mBeanServer.registerMBean(mBean, on);
@@ -381,13 +381,13 @@ public class JmxAgent extends AbstractAgent
     protected void registerModelServices() throws NotCompliantMBeanException, MBeanRegistrationException,
                                                   InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (Iterator iterator = managementContext.getRegistry().getModels().iterator(); iterator.hasNext();)
+        for (Iterator iterator = muleContext.getRegistry().getModels().iterator(); iterator.hasNext();)
         {
             UMOModel model = (UMOModel) iterator.next();
             ModelServiceMBean serviceMBean = new ModelService(model);
             String rawName = serviceMBean.getName() + "(" + serviceMBean.getType() + ")";
             String name = jmxSupport.escape(rawName);
-            ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":type=org.mule.Model,name=" + name);
+            ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Model,name=" + name);
             logger.debug("Registering model with name: " + on);
             mBeanServer.registerMBean(serviceMBean, on);
             registeredMBeans.add(on);
@@ -397,8 +397,8 @@ public class JmxAgent extends AbstractAgent
     protected void registerMuleService() throws NotCompliantMBeanException, MBeanRegistrationException,
                                                 InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":type=org.mule.ManagementContext,name=MuleServerInfo");
-        MuleServiceMBean serviceMBean = new MuleService(managementContext);
+        ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.MuleContext,name=MuleServerInfo");
+        MuleServiceMBean serviceMBean = new MuleService(muleContext);
         logger.debug("Registering mule with name: " + on);
         mBeanServer.registerMBean(serviceMBean, on);
         registeredMBeans.add(on);
@@ -407,7 +407,7 @@ public class JmxAgent extends AbstractAgent
     protected void registerConfigurationService() throws NotCompliantMBeanException, MBeanRegistrationException,
                                                          InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":type=org.mule.Configuration,name=GlobalConfiguration");
+        ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Configuration,name=GlobalConfiguration");
         MuleConfigurationServiceMBean serviceMBean = new MuleConfigurationService(RegistryContext.getConfiguration());
         logger.debug("Registering configuration with name: " + on);
         mBeanServer.registerMBean(serviceMBean, on);
@@ -418,11 +418,11 @@ public class JmxAgent extends AbstractAgent
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
         String rawName;
-        for (Iterator iterator = managementContext.getRegistry().lookupObjects(UMOComponent.class).iterator(); iterator.hasNext();)
+        for (Iterator iterator = muleContext.getRegistry().lookupObjects(UMOComponent.class).iterator(); iterator.hasNext();)
         {
             rawName = ((UMOComponent) iterator.next()).getName();
             final String name = jmxSupport.escape(rawName);
-            ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(managementContext) + ":type=org.mule.Component,name=" + name);
+            ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Component,name=" + name);
             ComponentServiceMBean serviceMBean = new ComponentService(rawName);
             logger.debug("Registering component with name: " + on);
             mBeanServer.registerMBean(serviceMBean, on);
@@ -434,7 +434,7 @@ public class JmxAgent extends AbstractAgent
     protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        Iterator iter = managementContext.getRegistry().getConnectors().iterator();
+        Iterator iter = muleContext.getRegistry().getConnectors().iterator();
         UMOConnector connector;
         while (iter.hasNext())
         {
@@ -447,13 +447,13 @@ public class JmxAgent extends AbstractAgent
                     final String rawName = mBean.getName();
                     final String name = jmxSupport.escape(rawName);
                     if (logger.isInfoEnabled()) {
-                        logger.info("Attempting to register service with name: " + jmxSupport.getDomainName(managementContext) +
+                        logger.info("Attempting to register service with name: " + jmxSupport.getDomainName(muleContext) +
                                                     ":type=org.mule.Endpoint,component=" +
                                                     jmxSupport.escape(mBean.getComponentName()) +
                                                     ",name=" + name);
                     }
                     ObjectName on = jmxSupport.getObjectName(
-                                                    jmxSupport.getDomainName(managementContext) +
+                                                    jmxSupport.getDomainName(muleContext) +
                                                     ":type=org.mule.Endpoint,component=" +
                                                     jmxSupport.escape(mBean.getComponentName()) +
                                                     ",name=" + name);
@@ -477,14 +477,14 @@ public class JmxAgent extends AbstractAgent
                                                 MBeanRegistrationException,
                                                 InstanceAlreadyExistsException
     {
-        Iterator iter = managementContext.getRegistry().getConnectors().iterator();
+        Iterator iter = muleContext.getRegistry().getConnectors().iterator();
         while (iter.hasNext())
         {
             UMOConnector connector = (UMOConnector) iter.next();
             ConnectorServiceMBean mBean = new ConnectorService(connector);
             final String rawName = mBean.getName();
             final String name = jmxSupport.escape(rawName);
-            final String stringName = jmxSupport.getDomainName(managementContext) + ":type=org.mule.Connector,name=" + name;
+            final String stringName = jmxSupport.getDomainName(muleContext) + ":type=org.mule.Connector,name=" + name;
             if (logger.isDebugEnabled())
             {
                 logger.debug("Attempting to register service with name: " + stringName);

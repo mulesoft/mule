@@ -34,8 +34,8 @@ public class RegistryContext
 
     public static MuleConfiguration getConfiguration()
     {
-        // TODO Migrate uses to obtain configuration from ManagementContext
-        return MuleServer.getManagementContext().getConfiguration();
+        // TODO Migrate uses to obtain configuration from MuleContext
+        return MuleServer.getMuleContext().getConfiguration();
     }
 
     public static Registry getOrCreateRegistry()

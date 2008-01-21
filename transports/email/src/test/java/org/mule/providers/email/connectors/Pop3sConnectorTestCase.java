@@ -34,7 +34,7 @@ public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCa
         connector.setServiceOverrides(newEmailToStringServiceOverrides());
         connector.setTrustStorePassword("password");
         connector.setTrustStore("greenmail-truststore");
-        connector.setManagementContext(managementContext);
+        connector.setMuleContext(muleContext);
         return connector;
     }
 

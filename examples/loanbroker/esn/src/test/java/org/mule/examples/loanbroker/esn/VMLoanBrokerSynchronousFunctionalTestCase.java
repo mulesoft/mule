@@ -31,7 +31,7 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
 
     public void testBasicParsing()
     {
-        Object objModel = managementContext.getRegistry().lookupModel("loan-broker");
+        Object objModel = muleContext.getRegistry().lookupModel("loan-broker");
         assertNotNull(objModel);
         assertTrue(objModel instanceof SedaModel);
         SedaModel model = (SedaModel)objModel;
@@ -43,7 +43,7 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
 
     protected void assertComponent(SedaModel model, String name)
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent(name);
+        UMOComponent component = muleContext.getRegistry().lookupComponent(name);
         assertNotNull(name + " missing", component);
     }
 

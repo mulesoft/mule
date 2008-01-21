@@ -11,6 +11,7 @@ package org.mule.impl;
 
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleManifest;
 import org.mule.config.MuleProperties;
@@ -22,7 +23,6 @@ import org.mule.management.stats.AllStatistics;
 import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.lifecycle.Initialisable;
@@ -59,11 +59,11 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ManagementContext implements UMOManagementContext
+public class DefaultMuleContext implements MuleContext
 {
 
     /** logger used by this class */
-    private static transient Log logger = LogFactory.getLog(ManagementContext.class);
+    private static transient Log logger = LogFactory.getLog(DefaultMuleContext.class);
 
     /** Default configuration */
     private MuleConfiguration config;
@@ -86,7 +86,7 @@ public class ManagementContext implements UMOManagementContext
     private UMOWorkManager workManager;
 
     /**
-     * LifecycleManager for the ManagementContext.  Note: this is NOT the same lifecycle manager
+     * LifecycleManager for the MuleContext.  Note: this is NOT the same lifecycle manager
      * as the one in the Registry.
      */
     protected UMOLifecycleManager lifecycleManager;
@@ -97,7 +97,7 @@ public class ManagementContext implements UMOManagementContext
     
     protected ServerNotificationManager notificationManager;
 
-    public ManagementContext(UMOLifecycleManager lifecycleManager)
+    public DefaultMuleContext(UMOLifecycleManager lifecycleManager)
     {
         if (lifecycleManager == null)
         {

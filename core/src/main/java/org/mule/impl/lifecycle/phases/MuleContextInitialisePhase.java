@@ -17,9 +17,9 @@ import org.mule.umo.lifecycle.Initialisable;
  * Since all objects are created and initialised in the registry, the Initialise lifecyclePhase is always
  * taken care of by the Registry, hence this class extends {@link org.mule.impl.lifecycle.ContainerManagedLifecyclePhase}
  */
-public class ManagementContextInitialisePhase extends ContainerManagedLifecyclePhase
+public class MuleContextInitialisePhase extends ContainerManagedLifecyclePhase
 {
-    public ManagementContextInitialisePhase()
+    public MuleContextInitialisePhase()
     {
         super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
     }

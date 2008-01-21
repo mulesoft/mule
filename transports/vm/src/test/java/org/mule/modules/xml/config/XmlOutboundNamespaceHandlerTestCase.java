@@ -44,7 +44,7 @@ public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
 
     protected Object getRouter(String name, Class clazz)
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent(name);
+        UMOComponent component = muleContext.getRegistry().lookupComponent(name);
         List routers = component.getOutboundRouter().getRouters();
         assertEquals(1, routers.size());
         assertTrue(routers.get(0).getClass().getName(), clazz.isAssignableFrom(routers.get(0).getClass()));

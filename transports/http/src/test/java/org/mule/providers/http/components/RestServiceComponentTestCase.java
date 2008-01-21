@@ -29,7 +29,7 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
     public void testResetServiceNamespaceHandler() throws Exception
     {
 
-        UMOComponent component = managementContext.getRegistry().lookupComponent(SERVICE_NAME);
+        UMOComponent component = muleContext.getRegistry().lookupComponent(SERVICE_NAME);
         Object object = component.getServiceFactory().getOrCreate();
         assertEquals(object.getClass().getName(), RestServiceWrapper.class.getName());
         RestServiceWrapper restServiceWrapper = (RestServiceWrapper) object;

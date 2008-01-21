@@ -32,7 +32,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
     public void testConfig()
     {
         AxisConnector connector = 
-            (AxisConnector)managementContext.getRegistry().lookupConnector("axisConnector");
+            (AxisConnector)muleContext.getRegistry().lookupConnector("axisConnector");
         
         assertNotNull(connector);
         assertEquals("test-axis-config.wsdd", connector.getServerConfig());
@@ -49,7 +49,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
     public void testInjectedObjects()
     {
         AxisConnector connector = 
-            (AxisConnector)managementContext.getRegistry().lookupConnector("axisConnector2");
+            (AxisConnector)muleContext.getRegistry().lookupConnector("axisConnector2");
 
         assertNotNull(connector);
         assertEquals(MockAxisServer.class, connector.getAxis().getClass());
@@ -59,7 +59,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
     public void testEndpointProperties() throws Exception
     {
         UMOImmutableEndpoint endpoint =
-                managementContext.getRegistry().lookupEndpointBuilder("endpoint").buildOutboundEndpoint();
+                muleContext.getRegistry().lookupEndpointBuilder("endpoint").buildOutboundEndpoint();
         Map props = endpoint.getProperties();
         assertEquals("[methodNamespace][method]", assertKey(props, SoapConstants.SOAP_ACTION_PROPERTY, String.class));
         assertEquals("direct", assertKey(props, SoapConstants.SOAP_ACTION_PROPERTY_CAPS, String.class));

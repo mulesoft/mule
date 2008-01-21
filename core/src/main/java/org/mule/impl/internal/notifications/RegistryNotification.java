@@ -19,7 +19,7 @@ import org.mule.umo.manager.UMOServerNotification;
  * be a reference to the Registry ID.
  *
  * @see org.mule.registry.Registry
- * @see org.mule.umo.UMOManagementContext
+ * @see org.mule.api.MuleContext
  */
 public class RegistryNotification extends UMOServerNotification
 {

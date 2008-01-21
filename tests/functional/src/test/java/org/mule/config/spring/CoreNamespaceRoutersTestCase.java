@@ -53,7 +53,7 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
 
     protected UMORouter lookupInboundRouterFromService(String serviceName) throws Exception
     {
-        UMOComponent c = managementContext.getRegistry().lookupComponent(serviceName);
+        UMOComponent c = muleContext.getRegistry().lookupComponent(serviceName);
         assertNotNull(c);
         List routers = c.getInboundRouter().getRouters();
         assertEquals(1, routers.size());

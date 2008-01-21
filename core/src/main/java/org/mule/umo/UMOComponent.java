@@ -11,7 +11,7 @@
 package org.mule.umo;
 
 import org.mule.impl.InitialisationCallback;
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.model.UMOEntryPointResolverSet;
 import org.mule.umo.model.UMOModel;
@@ -31,7 +31,7 @@ import java.util.Map;
  * the component as well as managing pooled resources.
  */
 
-public interface UMOComponent extends Serializable, Lifecycle, ManagementContextAware, NamedObject
+public interface UMOComponent extends Serializable, Lifecycle, MuleContextAware, NamedObject
 {
     /**
      * Makes an asynhronous event call to the component.

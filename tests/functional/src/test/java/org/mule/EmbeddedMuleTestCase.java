@@ -7,10 +7,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleContextFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.umo.UMOManagementContext;
+import org.mule.impl.DefaultMuleContextFactory;
 
 import junit.framework.TestCase;
 
@@ -18,9 +21,11 @@ public class EmbeddedMuleTestCase extends TestCase
 {
     public void testStartup() throws Exception
     {
-        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder();
-        UMOManagementContext context = builder.configure("org/mule/test/spring/mule-root-test.xml");
-        // ManagementContext must be started explicitly after MULE-1988
+        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(
+            "org/mule/test/spring/mule-root-test.xml");
+        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+        MuleContext context = muleContextFactory.createMuleContext(builder);
+        // MuleContext must be started explicitly after MULE-1988
         assertFalse(context.isStarted());
         context.start();
         assertTrue(context.isStarted());

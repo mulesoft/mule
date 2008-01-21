@@ -25,11 +25,11 @@ public class JndiFunctionalTestCase extends FunctionalTestCase
     {
         Object obj;
         
-        obj = managementContext.getRegistry().lookupObject(new String("apple"));
+        obj = muleContext.getRegistry().lookupObject(new String("apple"));
         assertNotNull(obj);
         assertEquals(Apple.class, obj.getClass());
 
-        obj = managementContext.getRegistry().lookupObject(new String("orange"));
+        obj = muleContext.getRegistry().lookupObject(new String("orange"));
         assertNotNull(obj);
         assertEquals(Orange.class, obj.getClass());
         assertEquals(new Integer(8), ((Orange) obj).getSegments());

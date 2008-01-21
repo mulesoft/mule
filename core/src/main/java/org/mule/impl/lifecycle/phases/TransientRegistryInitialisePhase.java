@@ -9,11 +9,11 @@
  */
 package org.mule.impl.lifecycle.phases;
 
+import org.mule.api.MuleContext;
 import org.mule.impl.lifecycle.LifecyclePhase;
 import org.mule.impl.lifecycle.NotificationLifecycleObject;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
@@ -30,7 +30,7 @@ import java.util.Set;
  * with initiate this phase via the {@link org.mule.umo.lifecycle.UMOLifecycleManager}.
  * This phase controls the order in which objects should be initialised.
  *
- * @see org.mule.umo.UMOManagementContext
+ * @see org.mule.api.MuleContext
  * @see org.mule.umo.lifecycle.UMOLifecycleManager
  * @see org.mule.impl.registry.TransientRegistry
  * @see org.mule.umo.lifecycle.Initialisable
@@ -48,7 +48,7 @@ public class TransientRegistryInitialisePhase extends LifecyclePhase
 
         setIgnorredObjectTypes(ignorredObjects);
         Set initOrderedObjects = new LinkedHashSet();
-        initOrderedObjects.add(new NotificationLifecycleObject(UMOManagementContext.class));
+        initOrderedObjects.add(new NotificationLifecycleObject(MuleContext.class));
         initOrderedObjects.add(new NotificationLifecycleObject(UMOConnector.class));
         initOrderedObjects.add(new NotificationLifecycleObject(UMOTransformer.class));
         initOrderedObjects.add(new NotificationLifecycleObject(UMOImmutableEndpoint.class));

@@ -23,7 +23,7 @@ public class EjbNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testConfig() throws Exception
     {
-        EjbConnector c = (EjbConnector) managementContext.getRegistry().lookupConnector("ejbConnector");
+        EjbConnector c = (EjbConnector) muleContext.getRegistry().lookupConnector("ejbConnector");
         assertNotNull(c);
         assertEquals(1234, c.getPollingFrequency());
         assertEquals(DummySecurityManager.class, c.getSecurityManager().getClass());
@@ -42,7 +42,7 @@ public class EjbNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testConfig2() throws Exception
     {
-        RmiConnector c = (RmiConnector) managementContext.getRegistry().lookupConnector("ejbConnector2");
+        RmiConnector c = (RmiConnector) muleContext.getRegistry().lookupConnector("ejbConnector2");
         assertNotNull(c);
         assertEquals(1234, c.getPollingFrequency());
         assertEquals(DummySecurityManager.class, c.getSecurityManager().getClass());

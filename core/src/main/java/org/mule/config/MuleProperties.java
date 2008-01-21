@@ -122,24 +122,31 @@ public interface MuleProperties
     String MULE_WORKING_DIRECTORY_PROPERTY = "mule.working.dir";
     String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
 
-    //Object Name Keys
+    // Object Name Keys
 
-    String OBJECT_MANAGEMENT_CONTEXT = "_muleManagementContext";
     String OBJECT_SYSTEM_MODEL = "_muleSystemModel";
-    String OBJECT_MANAGMENT_CONTEXT_PROCESSOR = "_muleManagementContextProcessor";
+    String OBJECT_MULE_CONTEXT_PROCESSOR = "_muleContextProcessor";
     String OBJECT_PROPERTY_PLACEHOLDER_PROCESSOR = "_mulePropertyPlaceholderProcessor";
     String OBJECT_OBJECT_NAME_PROCESSOR = "_muleObjectNameProcessor";
     String OBJECT_LIFECYCLE_MANAGER = "_muleLifecycleManager";
     String OBJECT_SECURITY_MANAGER = "_muleSecurityManager";
-    String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
-    String OBJECT_WORK_MANAGER = "_muleWorkManager";
     String OBJECT_TRANSACTION_MANAGER = "_muleTransactionManager";
     String OBJECT_QUEUE_MANAGER = "_muleQueueManager";
     String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
-    String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
     String OBJECT_MULE_ENDPOINT_FACTORY = "_muleEndpointFactory";
     String OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP = "_muleSimpleRegistryBootstrap";
+    String OBJECT_DEFAULT_THREADING_PROFILE = "_defaultThreadingProfile";
+    String OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE = "_defaultMessageDispatcherThreadingProfile";
+    String OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE = "_defaultMessageRequesterThreadingProfile";
+    String OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "_defaultMessageReceiverThreadingProfile";
+    String OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE = "_defaultComponentThreadingProfile";
 
+    // Not currently used as these are attributes of MuleContext
+    String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
+    String OBJECT_WORK_MANAGER = "_muleWorkManager";
+    String OBJECT_MULE_CONFIGURATION = "_muleConfiguration";
+    
+    
     //Debug Options
     String DEBUG_CACHE_MESSAGE_AS_BYTES = SYSTEM_PROPERTY_PREFIX + "message.cacheBytes";
     String DEBUG_CACHE_ORIGINAL_MESSAGE = SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal";

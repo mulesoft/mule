@@ -32,7 +32,7 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
     public void testPollingReceiversRestart() throws Exception
     {
 
-        managementContext.start();
+        muleContext.start();
 
         Object ftc = getPojoServiceForComponent("Test");
         assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
@@ -44,17 +44,17 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
         Thread.sleep(WAIT_TIME);
 
         // stop
-        managementContext.stop();
+        muleContext.stop();
         assertTrue("No polls performed", pollCounter.get() > 0);
 
         // and restart
-        managementContext.start();
+        muleContext.start();
 
         pollCounter.set(0);
         ((FunctionalTestComponent) ftc).setEventCallback(new CounterCallback(pollCounter));
 
         Thread.sleep(WAIT_TIME);
-        managementContext.dispose();
+        muleContext.dispose();
         assertTrue("No polls performed", pollCounter.get() > 0);
     }
 

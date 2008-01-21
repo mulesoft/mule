@@ -10,9 +10,9 @@
 
 package org.mule.umo.endpoint;
 
+import org.mule.api.MuleContext;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.provider.UMOConnector;
@@ -232,7 +232,7 @@ public interface UMOImmutableEndpoint extends Serializable, Initialisable, UMOMe
      */
     String getInitialState();
 
-    UMOManagementContext getManagementContext();
+    MuleContext getMuleContext();
 
     /**
      * Returns the connection strategy this endpoint should use when connecting to the underlying resource

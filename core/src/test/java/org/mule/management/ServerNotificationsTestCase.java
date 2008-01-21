@@ -51,26 +51,26 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
     public void testStandardNotifications() throws Exception
     {
-        managementContext.registerListener(this);
-        managementContext.stop();
+        muleContext.registerListener(this);
+        muleContext.stop();
         assertTrue(modelStopped.get());
         assertTrue(managerStopped.get());
     }
 
     public void testMultipleRegistrations() throws Exception
     {
-        managementContext.registerListener(this);
-        managementContext.registerListener(this);
-        managementContext.stop();
+        muleContext.registerListener(this);
+        muleContext.registerListener(this);
+        muleContext.stop();
         assertTrue(managerStopped.get());
         assertEquals(2, managerStoppedEvents.get());
     }
 
     public void testUnregistering() throws Exception
     {
-        managementContext.registerListener(this);
-        managementContext.unregisterListener(this);
-        managementContext.stop();
+        muleContext.registerListener(this);
+        muleContext.unregisterListener(this);
+        muleContext.stop();
         // these should still be false because we unregistered ourselves
         assertFalse(modelStopped.get());
         assertFalse(managerStopped.get());
@@ -79,12 +79,12 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     public void testMismatchingUnregistrations() throws Exception
     {
         // this has changed in 2.x.  now, unregistering removes all related entries
-        managementContext.registerListener(this);
+        muleContext.registerListener(this);
         DummyListener dummy = new DummyListener();
-        managementContext.registerListener(dummy);
-        managementContext.registerListener(dummy);
-        managementContext.unregisterListener(dummy);
-        managementContext.stop();
+        muleContext.registerListener(dummy);
+        muleContext.registerListener(dummy);
+        muleContext.unregisterListener(dummy);
+        muleContext.stop();
 
         assertTrue(managerStopped.get());
         assertEquals(1, managerStoppedEvents.get());
@@ -93,7 +93,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     public void testStandardNotificationsWithSubscription() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
-        managementContext.registerListener(new ComponentNotificationListener()
+        muleContext.registerListener(new ComponentNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -119,7 +119,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     {
         final CountDownLatch latch = new CountDownLatch(2);
 
-        managementContext.registerListener(new ComponentNotificationListener()
+        muleContext.registerListener(new ComponentNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -146,7 +146,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     {
         final CountDownLatch latch = new CountDownLatch(2);
 
-        managementContext.registerListener(new DummyNotificationListener()
+        muleContext.registerListener(new DummyNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -159,8 +159,8 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             }
         });
 
-        managementContext.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
-        managementContext.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
+        muleContext.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
+        muleContext.fireNotification(new DummyNotification("hello", DummyNotification.EVENT_RECEIVED));
 
         // Wait for the notifcation event to be fired as they are queued
         latch.await(2000, TimeUnit.MILLISECONDS);
@@ -172,7 +172,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
         final CountDownLatch latch = new CountDownLatch(2);
 
-        managementContext.registerListener(new DummyNotificationListener()
+        muleContext.registerListener(new DummyNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -185,10 +185,10 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             }
         }, "* quick brown*");
 
-        managementContext.fireNotification(new DummyNotification("the quick brown fox jumped over the lazy dog",
+        muleContext.fireNotification(new DummyNotification("the quick brown fox jumped over the lazy dog",
                                                                  DummyNotification.EVENT_RECEIVED));
-        managementContext.fireNotification(new DummyNotification("e quick bro", DummyNotification.EVENT_RECEIVED));
-        managementContext.fireNotification(new DummyNotification(" quick brown", DummyNotification.EVENT_RECEIVED));
+        muleContext.fireNotification(new DummyNotification("e quick bro", DummyNotification.EVENT_RECEIVED));
+        muleContext.fireNotification(new DummyNotification(" quick brown", DummyNotification.EVENT_RECEIVED));
 
         // Wait for the notifcation event to be fired as they are queued
         latch.await(20000, TimeUnit.MILLISECONDS);

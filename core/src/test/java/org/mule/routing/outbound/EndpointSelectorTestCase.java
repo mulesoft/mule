@@ -16,7 +16,6 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
 import com.mockobjects.dynamic.C;
@@ -68,7 +67,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
         router = new EndpointSelector();
         router.setEndpoints(endpoints);
-        router.setManagementContext(managementContext);
+        router.setMuleContext(muleContext);
     }
 
     public void testSelectEndpointDefaultProperty() throws Exception

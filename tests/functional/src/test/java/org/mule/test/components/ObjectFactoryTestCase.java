@@ -22,7 +22,7 @@ public class ObjectFactoryTestCase extends FunctionalTestCase
 
     public void testDefaultScope() throws Exception
     {
-        Registry registry = managementContext.getRegistry();
+        Registry registry = muleContext.getRegistry();
         
         Object bean1 = registry.lookupObject("default");
         assertNotNull(bean1);
@@ -37,7 +37,7 @@ public class ObjectFactoryTestCase extends FunctionalTestCase
 
     public void testSingletonScope() throws Exception
     {
-        Registry registry = managementContext.getRegistry();
+        Registry registry = muleContext.getRegistry();
         
         Object bean1 = registry.lookupObject("singleton");
         assertNotNull(bean1);
@@ -52,7 +52,7 @@ public class ObjectFactoryTestCase extends FunctionalTestCase
 
     public void testPrototypeScope() throws Exception
     {
-        Registry registry = managementContext.getRegistry();
+        Registry registry = muleContext.getRegistry();
         
         Object bean1 = registry.lookupObject("prototype");
         assertNotNull(bean1);

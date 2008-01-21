@@ -45,7 +45,7 @@ public class XFireMessageReceiverFunctionalTestCase extends FunctionalTestCase
 
     public void testQname() throws Exception
     {
-        AbstractConnector umoConnector = (AbstractConnector) managementContext.getRegistry().lookupConnector(
+        AbstractConnector umoConnector = (AbstractConnector) muleContext.getRegistry().lookupConnector(
             "xfireConnector");
         Map map = umoConnector.getReceivers();
         XFireMessageReceiver receiver = (XFireMessageReceiver) map.get("http://localhost:63081/services/echoServiceWsdlPortType");

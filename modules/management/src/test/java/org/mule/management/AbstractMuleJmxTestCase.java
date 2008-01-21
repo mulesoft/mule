@@ -38,7 +38,7 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         RmiRegistryAgent rmiRegistryAgent = new RmiRegistryAgent();
-        rmiRegistryAgent.setManagementContext(managementContext);
+        rmiRegistryAgent.setMuleContext(muleContext);
         rmiRegistryAgent.initialise();
         RegistryContext.getRegistry().registerAgent(rmiRegistryAgent);
         

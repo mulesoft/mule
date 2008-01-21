@@ -26,7 +26,7 @@ public class XFireConnectorTestCase extends AbstractConnectorTestCase
     {
         XFireConnector c = new XFireConnector();
         c.setName("xfireConnector");
-        c.setManagementContext(managementContext);
+        c.setMuleContext(muleContext);
         return c;
     }
 

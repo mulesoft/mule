@@ -31,7 +31,7 @@ public class WireTapTestCase extends FunctionalTestCase
     {
         final Latch receiverLatch = new Latch();
         final Latch tappedReceiverLatch = new Latch();
-        managementContext.registerListener(new FunctionalTestNotificationListener()
+        muleContext.registerListener(new FunctionalTestNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {

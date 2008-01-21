@@ -28,7 +28,7 @@ public class JmsConnectionFactoryTestCase extends FunctionalTestCase
      */
     public void testProviderPropertiesNotPassed() throws Exception
     {
-        JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector1");
+        JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector1");
         assertNotNull(c);
 
         ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory();
@@ -43,7 +43,7 @@ public class JmsConnectionFactoryTestCase extends FunctionalTestCase
      */
     public void testConnectionFactoryPropertiesPassed() throws Exception
     {
-        JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector2");
+        JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector2");
         assertNotNull(c);
 
         ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory();

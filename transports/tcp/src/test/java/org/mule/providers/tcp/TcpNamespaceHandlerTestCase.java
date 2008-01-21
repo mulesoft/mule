@@ -23,7 +23,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testConfig() throws Exception
     {
-        TcpConnector c = (TcpConnector)managementContext.getRegistry().lookupConnector("tcpConnector");
+        TcpConnector c = (TcpConnector)muleContext.getRegistry().lookupConnector("tcpConnector");
         assertNotNull(c);
         assertEquals(1024, c.getReceiveBufferSize());
         assertEquals(2048, c.getSendBufferSize());
@@ -41,7 +41,7 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testSeparateTimeouts() throws Exception
     {
-        TcpConnector c = (TcpConnector)managementContext.getRegistry().lookupConnector("separateTimeouts");
+        TcpConnector c = (TcpConnector)muleContext.getRegistry().lookupConnector("separateTimeouts");
         assertNotNull(c);
         assertEquals(4000, c.getServerSoTimeout());
         assertEquals(3000, c.getClientSoTimeout());

@@ -12,6 +12,7 @@ package org.mule.providers.soap.axis.extensions;
 
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -19,13 +20,12 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.soap.SoapConstants;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.extras.AxisCleanAndAddProperties;
-import org.mule.providers.soap.SoapConstants;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -45,7 +45,6 @@ import java.util.Map;
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.soap.SOAP11Constants;
 import org.apache.axis.client.Call;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -215,10 +214,10 @@ public class UniversalSender extends BasicHandler
 
             if (sync)
             {
-                UMOManagementContext managementContext = MuleServer.getManagementContext();
-                UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, managementContext);
+                MuleContext muleContext = MuleServer.getMuleContext();
+                UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, muleContext);
                 builder.setRemoteSync(true);
-                UMOImmutableEndpoint syncEndpoint = managementContext.getRegistry()
+                UMOImmutableEndpoint syncEndpoint = muleContext.getRegistry()
                     .lookupEndpointFactory()
                     .getOutboundEndpoint(builder);
                 UMOEvent dispatchEvent = new MuleEvent(message, syncEndpoint, session, sync);
@@ -263,7 +262,7 @@ public class UniversalSender extends BasicHandler
     {
         UMOComponent axis = RegistryContext.getRegistry().lookupComponent(AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
         UMOEndpointURI endpoint = new MuleEndpointURI(uri);
-        UMOManagementContext managementContext = MuleServer.getManagementContext(); 
+        MuleContext muleContext = MuleServer.getMuleContext(); 
         UMOImmutableEndpoint ep;
 
         if (axis != null)
@@ -279,7 +278,7 @@ public class UniversalSender extends BasicHandler
                     {
                         logger.debug("Dispatch Endpoint uri: " + uri
                                      + " not found on the cache. Creating the endpoint instead.");
-                        ep = managementContext.getRegistry().lookupEndpointFactory()
+                        ep = muleContext.getRegistry().lookupEndpointFactory()
                                 .getOutboundEndpoint(uri);
                     }
                     else
@@ -295,7 +294,7 @@ public class UniversalSender extends BasicHandler
         }
         else
         {
-            ep = managementContext.getRegistry().lookupEndpointFactory()
+            ep = muleContext.getRegistry().lookupEndpointFactory()
                     .getOutboundEndpoint(uri);
         }
         return ep;

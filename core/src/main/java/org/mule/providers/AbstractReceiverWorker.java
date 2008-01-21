@@ -10,12 +10,12 @@
 package org.mule.providers;
 
 import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.impl.MuleMessage;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.TransactionException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -70,13 +70,13 @@ public abstract class AbstractReceiverWorker implements Work
      */
     protected void doRun()
     {
-        // TODO Remove this call to MuleServer.getManagementContext().  The managementContext should be passed
-        // in and stored as a local variable (ManagementContextAware).  It is used down the line for
+        // TODO Remove this call to MuleServer.getMuleContext().  The muleContext should be passed
+        // in and stored as a local variable (MuleContextAware).  It is used down the line for
         // getTransactionManager() (XaTransactionFactory) and getQueueManager() (VMTransaction)
-        UMOManagementContext managementContext = MuleServer.getManagementContext();
+        MuleContext muleContext = MuleServer.getMuleContext();
         TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(),
                                                          endpoint.getConnector().getExceptionListener(),
-                                                         managementContext);
+                                                         muleContext);
 
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but serveral workers

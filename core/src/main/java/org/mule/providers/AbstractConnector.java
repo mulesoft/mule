@@ -12,6 +12,7 @@ package org.mule.providers;
 
 import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.impl.AlreadyInitialisedException;
@@ -19,8 +20,8 @@ import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
-import org.mule.impl.internal.notifications.manager.ServerNotificationHandler;
 import org.mule.impl.internal.notifications.manager.OptimisedNotificationHandler;
+import org.mule.impl.internal.notifications.manager.ServerNotificationHandler;
 import org.mule.impl.model.streaming.DelegatingInputStream;
 import org.mule.providers.service.TransportFactory;
 import org.mule.providers.service.TransportServiceDescriptor;
@@ -33,7 +34,6 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -269,7 +269,7 @@ public abstract class AbstractConnector
      */
     protected volatile UMOSessionHandler sessionHandler = new MuleSessionHandler();
 
-    protected UMOManagementContext managementContext;
+    protected MuleContext muleContext;
 
     public AbstractConnector()
     {
@@ -352,7 +352,7 @@ public abstract class AbstractConnector
         if(exceptionListener==null)
         {
             exceptionListener = new DefaultExceptionStrategy();
-            ((DefaultExceptionStrategy)exceptionListener).setManagementContext(managementContext);
+            ((DefaultExceptionStrategy)exceptionListener).setMuleContext(muleContext);
             ((DefaultExceptionStrategy)exceptionListener).initialise();
         }
 
@@ -1569,16 +1569,16 @@ public abstract class AbstractConnector
 
     protected void updateCachedNotificationHandler()
     {
-        if (null != managementContext)
+        if (null != muleContext)
         {
             if (dynamicNotification)
             {
-                cachedNotificationHandler = managementContext.getNotificationManager();
+                cachedNotificationHandler = muleContext.getNotificationManager();
             }
             else
             {
                 cachedNotificationHandler =
-                        new OptimisedNotificationHandler(managementContext.getNotificationManager(), MessageNotification.class);
+                        new OptimisedNotificationHandler(muleContext.getNotificationManager(), MessageNotification.class);
             }
         }
     }
@@ -1865,7 +1865,7 @@ public abstract class AbstractConnector
 
     public UMOMessage request(String uri, long timeout) throws Exception
     {
-        return request(getManagementContext().getRegistry().lookupEndpointFactory()
+        return request(getMuleContext().getRegistry().lookupEndpointFactory()
                 .getInboundEndpoint(uri),
                 timeout);
     }
@@ -2056,7 +2056,7 @@ public abstract class AbstractConnector
             // This provides a really convenient way to set properties on an object
             // from unit tests
 //            Map props = new HashMap();
-//            PropertiesUtils.getPropertiesWithPrefix(managementContext.getRegistry().lookupProperties(), getProtocol()
+//            PropertiesUtils.getPropertiesWithPrefix(muleContext.getRegistry().lookupProperties(), getProtocol()
 //                .toLowerCase(), props);
 //            if (props.size() > 0)
 //            {
@@ -2171,14 +2171,14 @@ public abstract class AbstractConnector
             CoreMessages.streamingNotSupported(this.getProtocol()).toString());
     }
 
-    public UMOManagementContext getManagementContext()
+    public MuleContext getMuleContext()
     {
-        return managementContext;
+        return muleContext;
     }
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
         updateCachedNotificationHandler();
     }
 

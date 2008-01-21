@@ -10,8 +10,8 @@
 
 package org.mule.providers.xmpp;
 
+import org.mule.api.MuleContext;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOManagementContext;
 
 public class NoNicknameTestCase extends FunctionalTestCase
 {
@@ -23,11 +23,11 @@ public class NoNicknameTestCase extends FunctionalTestCase
         return "no-nickname.xml";
     }
 
-    protected UMOManagementContext createManagementContext() throws Exception
+    protected MuleContext createMuleContext() throws Exception
     {
         try
         {
-            return super.createManagementContext();
+            return super.createMuleContext();
         }
         catch (Exception e)
         {

@@ -55,7 +55,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
             assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         }
 
-        UMOComponent c = managementContext.getRegistry().lookupComponent("testComponent2");
+        UMOComponent c = muleContext.getRegistry().lookupComponent("testComponent2");
         assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
         Object ftc = ((TestSedaComponent) c).getOrCreateService();
         assertNotNull("Functional Test Component not found in the model.", ftc);

@@ -11,15 +11,12 @@
 package org.mule.test.integration.message;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.providers.email.transformers.PlainTextDataSource;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointBuilder;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import javax.activation.DataHandler;
 
@@ -36,17 +33,17 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
         super.doSetUp();
 
         // TODO Convert this to an XML config
-//        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("vm://Single", managementContext);
+//        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("vm://Single", muleContext);
 //        endpointBuilder.setName("SingleEndpoint");
-//        UMOImmutableEndpoint vmSingle = managementContext.getRegistry()
+//        UMOImmutableEndpoint vmSingle = muleContext.getRegistry()
 //            .lookupEndpointFactory()
-//            .getOutboundEndpoint(endpointBuilder, managementContext);
+//            .getOutboundEndpoint(endpointBuilder, muleContext);
 //        
-//        UMOEndpointBuilder endpointBuilder2 = new EndpointURIEndpointBuilder("vm://Single", managementContext);
+//        UMOEndpointBuilder endpointBuilder2 = new EndpointURIEndpointBuilder("vm://Single", muleContext);
 //        endpointBuilder2.setName("ChainedEndpoint");
-//        UMOImmutableEndpoint vmChained = managementContext.getRegistry()
+//        UMOImmutableEndpoint vmChained = muleContext.getRegistry()
 //            .lookupEndpointFactory()
-//            .getOutboundEndpoint(endpointBuilder2, managementContext);
+//            .getOutboundEndpoint(endpointBuilder2, muleContext);
 //        
 //        FunctionalTestComponent single = new FunctionalTestComponent();
 //        single.setEventCallback(this);

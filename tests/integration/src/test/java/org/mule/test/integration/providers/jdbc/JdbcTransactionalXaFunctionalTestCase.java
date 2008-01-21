@@ -37,7 +37,7 @@ public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransacti
             txManager = Current.getCurrent();
         }
         super.doSetUp();
-       managementContext.setTransactionManager(txManager);
+       muleContext.setTransactionManager(txManager);
     }
 
     protected UMOTransactionFactory getTransactionFactory()

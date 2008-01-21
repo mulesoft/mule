@@ -10,12 +10,13 @@
 
 package org.mule.impl.model;
 
+import org.mule.api.MuleContext;
 import org.mule.components.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.InitialisationCallback;
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.impl.OptimizedRequestContext;
 import org.mule.impl.UMOComponentAware;
 import org.mule.impl.model.resolvers.DefaultEntryPointResolverSet;
@@ -32,7 +33,6 @@ import org.mule.umo.ComponentException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -104,7 +104,7 @@ public abstract class AbstractComponent implements UMOComponent
      */
     protected WaitableBoolean paused = new WaitableBoolean(false);
 
-    protected UMOManagementContext managementContext;
+    protected MuleContext muleContext;
 
     protected UMOEntryPointResolverSet entryPointResolverSet;
 
@@ -211,7 +211,7 @@ public abstract class AbstractComponent implements UMOComponent
         {
             // TODO MULE-2102 This should be configured in the default template.
             exceptionListener = new DefaultComponentExceptionStrategy(this);
-            ((ManagementContextAware) exceptionListener).setManagementContext(managementContext);
+            ((MuleContextAware) exceptionListener).setMuleContext(muleContext);
             ((Initialisable) exceptionListener).initialise();
         }
 
@@ -222,8 +222,8 @@ public abstract class AbstractComponent implements UMOComponent
         // initialise statistics
         stats = createStatistics();
 
-        stats.setEnabled(managementContext.getStatistics().isEnabled());
-        managementContext.getStatistics().add(stats);
+        stats.setEnabled(muleContext.getStatistics().isEnabled());
+        muleContext.getStatistics().add(stats);
         stats.setOutboundRouterStat(outboundRouter.getStatistics());
         stats.setInboundRouterStat(inboundRouter.getStatistics());
 
@@ -239,7 +239,7 @@ public abstract class AbstractComponent implements UMOComponent
 
     protected void fireComponentNotification(int action)
     {
-        managementContext.fireNotification(new ComponentNotification(this, action));
+        muleContext.fireNotification(new ComponentNotification(this, action));
     }
 
     public void forceStop() throws UMOException
@@ -415,7 +415,7 @@ public abstract class AbstractComponent implements UMOComponent
         }
         doDispose();
         fireComponentNotification(ComponentNotification.COMPONENT_DISPOSED);
-        managementContext.getStatistics().remove(stats);
+        muleContext.getStatistics().remove(stats);
     }
 
     public ComponentStatistics getStatistics()
@@ -753,14 +753,14 @@ public abstract class AbstractComponent implements UMOComponent
         return endpoints;
     }
 
-    public void setManagementContext(UMOManagementContext context)
+    public void setMuleContext(MuleContext context)
     {
-        this.managementContext = context;
+        this.muleContext = context;
     }
 
     protected MuleProxy createComponentProxy(Object pojoService) throws UMOException
     {
-        MuleProxy proxy = new DefaultMuleProxy(pojoService, this, managementContext);
+        MuleProxy proxy = new DefaultMuleProxy(pojoService, this, muleContext);
         proxy.setStatistics(getStatistics());
         return proxy;
     }

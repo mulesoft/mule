@@ -10,11 +10,11 @@
 
 package org.mule.providers.vm;
 
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.umo.TransactionException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueueSession;
 import org.mule.util.xa.ResourceManagerException;
@@ -22,9 +22,9 @@ import org.mule.util.xa.ResourceManagerException;
 public class VMTransaction extends AbstractSingleResourceTransaction
 {
 
-    public VMTransaction(UMOManagementContext managementContext) throws TransactionException
+    public VMTransaction(MuleContext muleContext) throws TransactionException
     {
-        QueueManager qm = managementContext.getQueueManager();
+        QueueManager qm = muleContext.getQueueManager();
         QueueSession qs = qm.getQueueSession();
         bindResource(qm, qs);
     }

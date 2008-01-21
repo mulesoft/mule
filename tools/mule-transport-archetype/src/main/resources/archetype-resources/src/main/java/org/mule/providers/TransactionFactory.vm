@@ -13,7 +13,7 @@ package org.mule.providers.${TransportNameLower};
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
-import org.mule.umo.UMOManagementContext;
+import org.mule.umo.MuleContext;
 
 /**
  * <code>${TransportName}TransactionFactory</code> Creates a
@@ -27,7 +27,7 @@ public class ${TransportName}TransactionFactory implements UMOTransactionFactory
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
-    public UMOTransaction beginTransaction(UMOManagementContext managementContext) throws TransactionException
+    public UMOTransaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
         ${TransportName}Transaction tx = new ${TransportName}Transaction();
         tx.begin();

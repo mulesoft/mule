@@ -10,13 +10,13 @@
 
 package org.mule.impl.endpoint;
 
-import org.mule.impl.ManagementContextAware;
-import org.mule.umo.UMOManagementContext;
+import org.mule.api.MuleContext;
+import org.mule.impl.MuleContextAware;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implements ManagementContextAware
+public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implements MuleContextAware
 {
 
     public EndpointURIEndpointBuilder()
@@ -45,34 +45,34 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
         connectionStrategy = global.connectionStrategy;
     }
 
-    public EndpointURIEndpointBuilder(URIBuilder URIBuilder, UMOManagementContext managementContext)
+    public EndpointURIEndpointBuilder(URIBuilder URIBuilder, MuleContext muleContext)
     {
-        this.managementContext = managementContext;
+        this.muleContext = muleContext;
         this.uriBuilder = URIBuilder;
     }
 
     /**
      * @deprecated
      */
-    public EndpointURIEndpointBuilder(String address, UMOManagementContext managementContext)
+    public EndpointURIEndpointBuilder(String address, MuleContext muleContext)
     {
-        this(new URIBuilder(address), managementContext);
+        this(new URIBuilder(address), muleContext);
     }
 
     /**
      * @deprecated
      */
-    public EndpointURIEndpointBuilder(UMOEndpointURI endpointURI, UMOManagementContext managementContext)
+    public EndpointURIEndpointBuilder(UMOEndpointURI endpointURI, MuleContext muleContext)
     {
-        this(new URIBuilder(endpointURI), managementContext);
+        this(new URIBuilder(endpointURI), muleContext);
     }
 
     /**
      * @deprecated
      */
-    public EndpointURIEndpointBuilder(UMOImmutableEndpoint source, UMOManagementContext managementContext)
+    public EndpointURIEndpointBuilder(UMOImmutableEndpoint source, MuleContext muleContext)
     {
-        this(source.getEndpointURI(), managementContext);
+        this(source.getEndpointURI(), muleContext);
         setName(source.getName());
         setEncoding(source.getEncoding());
         setConnector(source.getConnector());
@@ -88,7 +88,7 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
         setSecurityFilter(source.getSecurityFilter());
         setConnectionStrategy(source.getConnectionStrategy());
         setSynchronous(source.isSynchronous());
-        setManagementContext(source.getManagementContext());
+        setMuleContext(source.getMuleContext());
     }
 
 }

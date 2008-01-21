@@ -74,7 +74,7 @@ public class NoTransformFunctionalTestComponent implements Callable
             replyMessage = received(contents) + (appendComponentName ? " " + context.getComponent().getName() : "");
         }
 
-        context.getManagementContext().fireNotification(
+        context.getMuleContext().fireNotification(
                 new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)
@@ -130,7 +130,7 @@ public class NoTransformFunctionalTestComponent implements Callable
             replyMessage = contents + " Received";
         }
 
-        context.getManagementContext().fireNotification(
+        context.getMuleContext().fireNotification(
                 new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
         if (throwException)

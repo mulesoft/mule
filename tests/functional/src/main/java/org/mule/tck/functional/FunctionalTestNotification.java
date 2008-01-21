@@ -24,7 +24,7 @@ import org.mule.umo.transformer.TransformerException;
  * is the component name that received the message.  This means you can register to listen to Notifications from a
  * selected {@link org.mule.tck.functional.FunctionalTestComponent}. i.e.
  * <code>
- * managementContext.registerListener(this, "*JmsTestCompoennt");
+ * muleContext.registerListener(this, "*JmsTestCompoennt");
  * </code>
  * <p/>
  * This registration would only receive {@link org.mule.tck.functional.FunctionalTestNotification} objects
@@ -32,7 +32,7 @@ import org.mule.umo.transformer.TransformerException;
  *
  * @see org.mule.tck.functional.FunctionalTestComponent
  * @see org.mule.tck.functional.FunctionalTestNotificationListener
- * @see org.mule.umo.UMOManagementContext
+ * @see org.mule.api.MuleContext
  */
 public class FunctionalTestNotification extends CustomNotification
 {

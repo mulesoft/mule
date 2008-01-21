@@ -10,6 +10,7 @@
 
 package org.mule.impl.registry;
 
+import org.mule.api.MuleContext;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.ThreadSafeAccess;
@@ -21,7 +22,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.security.UMOCredentials;
@@ -216,7 +216,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
-        public UMOManagementContext getManagementContext()
+        public MuleContext getMuleContext()
         {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }

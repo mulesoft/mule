@@ -66,10 +66,10 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         assertNotNull(connector);
 
         UMOComponent component = getTestComponent("anApple", Apple.class);
-        //managementContext.getRegistry().registerComponent(component);
-        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(getTestEndpointURI(), managementContext);
+        //muleContext.getRegistry().registerComponent(component);
+        UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(getTestEndpointURI(), muleContext);
         builder.setName("test");
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             builder);
         try
         {
@@ -84,14 +84,14 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
 
     public void testSend() throws Exception
     {
-        //managementContext.getRegistry().registerConnector(createConnector(false));
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        //muleContext.getRegistry().registerConnector(createConnector(false));
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             getTestEndpointURI());
         
         UMOComponent component = getTestComponent(uniqueName("testComponent"), FunctionalTestComponent.class);
         // TODO Simplify this API for adding an outbound endpoint.
         ((OutboundPassThroughRouter) component.getOutboundRouter().getRouters().get(0)).addEndpoint(endpoint);
-        //managementContext.getRegistry().registerComponent(component);
+        //muleContext.getRegistry().registerComponent(component);
 
         UMOMessage message = new MuleMessage(MESSAGE);
         message.setStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);

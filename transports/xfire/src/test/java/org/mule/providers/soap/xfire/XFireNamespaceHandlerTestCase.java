@@ -26,7 +26,7 @@ public class XFireNamespaceHandlerTestCase extends FunctionalTestCase
     public void testConfig()
     {
         XFireConnector connector = 
-            (XFireConnector)managementContext.getRegistry().lookupConnector("xfireConnector");
+            (XFireConnector)muleContext.getRegistry().lookupConnector("xfireConnector");
         
         assertNotNull(connector);
         assertEquals("org.codehaus.xfire.service.binding.MessageBindingProvider",
@@ -62,7 +62,7 @@ public class XFireNamespaceHandlerTestCase extends FunctionalTestCase
     public void testInjected()
     {
         XFireConnector connector = 
-            (XFireConnector)managementContext.getRegistry().lookupConnector("xfireConnector2");
+            (XFireConnector)muleContext.getRegistry().lookupConnector("xfireConnector2");
         
         assertNotNull(connector);
         assertTrue(connector.getServiceFactory() instanceof MockServiceFactory);

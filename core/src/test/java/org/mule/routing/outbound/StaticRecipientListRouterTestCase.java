@@ -41,7 +41,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         List endpoints = new ArrayList();
         endpoints.add(endpoint1);
         router.setEndpoints(endpoints);
-        router.setManagementContext(managementContext);
+        router.setMuleContext(muleContext);
 
         assertEquals(2, router.getRecipients().size());
 

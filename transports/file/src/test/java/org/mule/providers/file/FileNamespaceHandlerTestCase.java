@@ -20,7 +20,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testConfig() throws Exception
     {
-        FileConnector c = (FileConnector)managementContext.getRegistry().lookupConnector("fileConnector");
+        FileConnector c = (FileConnector)muleContext.getRegistry().lookupConnector("fileConnector");
         assertNotNull(c);
         
         assertEquals(1234, c.getFileAge());
@@ -49,7 +49,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testSecondConnector() throws Exception
     {
-        FileConnector c = (FileConnector)managementContext.getRegistry().lookupConnector("secondConnector");
+        FileConnector c = (FileConnector)muleContext.getRegistry().lookupConnector("secondConnector");
         assertNotNull(c);
 
         FilenameParser parser = c.getFilenameParser();

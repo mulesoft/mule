@@ -30,7 +30,7 @@ public class CustomConfigTestCase extends FunctionalTestCase
 
     public void testCustomEndpointConfig() throws Exception
     {
-        UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "fooEndpoint");
         assertNotNull("fooEndpoint should not be null", ep);
         TestFilter tf = (TestFilter)ep.getFilter();
@@ -41,7 +41,7 @@ public class CustomConfigTestCase extends FunctionalTestCase
 
     public void testCustomConnectorConfig() throws Exception
     {
-        TestConnector cnn = (TestConnector)managementContext.getRegistry().lookupConnector("customConnector");
+        TestConnector cnn = (TestConnector)muleContext.getRegistry().lookupConnector("customConnector");
         assertNotNull("customConnector should not be null", cnn);
         assertEquals(cnn.getSomeProperty(), "foo");
 
@@ -53,7 +53,7 @@ public class CustomConfigTestCase extends FunctionalTestCase
 
     public void testCustomTransformerConfig() throws Exception
     {
-        UMOTransformer trans = managementContext.getRegistry().lookupTransformer("testTransformer");
+        UMOTransformer trans = muleContext.getRegistry().lookupTransformer("testTransformer");
         assertNotNull("testTransformer should not be null", trans);
         assertTrue("Transformer should be an instance of TestCompressionTransformer", trans instanceof TestCompressionTransformer);
         assertEquals(((TestCompressionTransformer)trans).getBeanProperty1(), "soo");

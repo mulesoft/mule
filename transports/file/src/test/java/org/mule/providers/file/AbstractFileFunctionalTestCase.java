@@ -66,7 +66,7 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
 
         // define the readFromDirectory on the connector
         FileConnector connector =
-                (FileConnector) managementContext.getRegistry().lookupConnector("receiveConnector");
+                (FileConnector) muleContext.getRegistry().lookupConnector("receiveConnector");
         connector.setReadFromDirectory(tmpDir.getAbsolutePath());
         logger.debug("Directory is " + connector.getReadFromDirectory());
 

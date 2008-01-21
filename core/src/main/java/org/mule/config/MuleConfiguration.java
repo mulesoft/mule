@@ -53,7 +53,6 @@ public class MuleConfiguration
     /** Default encoding used in OS running Mule */
     public static final String DEFAULT_OS_ENCODING = System.getProperty("file.encoding");
 
-
     /** Default value for SYNCHRONOUS_PROPERTY */
     public static final boolean DEFAULT_SYNCHRONOUS = false;
 
@@ -74,19 +73,15 @@ public class MuleConfiguration
     /** holds the value for SYNCHRONOUS */
     private boolean synchronous = DEFAULT_SYNCHRONOUS;
 
-    /** The type of model used for the internal system model where system created services are registered */
+    /**
+     * The type of model used for the internal system model where system created
+     * services are registered
+     */
     private String systemModelType = DEFAULT_SYSTEM_MODEL_TYPE;
 
     private String encoding = DEFAULT_ENCODING;
 
     private String osEncoding = DEFAULT_OS_ENCODING;
-
-    /** Names of threading profiles in the registry */
-    public static final String DEFAULT_THREADING_PROFILE = "defaultThreadingProfile";
-    public static final String DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE = "defaultMessageDispatcherThreadingProfile";
-    public static final String DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE = "defaultMessageRequesterThreadingProfile";
-    public static final String DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE = "defaultMessageReceiverThreadingProfile";
-    public static final String DEFAULT_COMPONENT_THREADING_PROFILE = "defaultComponentThreadingProfile";
 
     /**
      * When running sychonously, return events can be received over transports that
@@ -119,13 +114,13 @@ public class MuleConfiguration
      */
     private boolean clientMode = false;
 
-    /** The unique Id for this ManagementContext */
+    /** The unique Id for this MuleContext */
     private String id;
 
-    /** The cluster Id for this ManagementContext */
+    /** The cluster Id for this MuleContext */
     private String clusterId;
 
-    /** The Domain Id for this ManagementContext */
+    /** The Domain Id for this MuleContext */
     private String domainId;
 
     /**
@@ -157,33 +152,33 @@ public class MuleConfiguration
 
     public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
     {
-        return getThreadingProfile(DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
+        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
     }
 
     public ThreadingProfile getDefaultMessageRequesterThreadingProfile()
     {
-        return getThreadingProfile(DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE);
+        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE);
     }
 
     public ThreadingProfile getDefaultMessageReceiverThreadingProfile()
     {
-        return getThreadingProfile(DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
+        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
     }
 
     public ThreadingProfile getDefaultComponentThreadingProfile()
     {
-        return getThreadingProfile(DEFAULT_COMPONENT_THREADING_PROFILE);
+        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE);
     }
 
     public ThreadingProfile getDefaultThreadingProfile()
     {
-        return getThreadingProfile(DEFAULT_THREADING_PROFILE);
+        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE);
     }
 
     private ThreadingProfile getThreadingProfile(String name)
     {
         ThreadingProfile tp = null;
-    
+
         Registry registry = RegistryContext.getRegistry();
         if (registry != null)
         {
@@ -225,15 +220,15 @@ public class MuleConfiguration
     {
         return workingDirectory;
     }
-    
+
     public String getMuleHomeDirectory()
     {
         return System.getProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY);
     }
-    
+
     public String getLogDirectory()
     {
-        return getMuleHomeDirectory() + File.separator + DEFAULT_LOG_DIRECTORY; 
+        return getMuleHomeDirectory() + File.separator + DEFAULT_LOG_DIRECTORY;
     }
 
     public void setWorkingDirectory(String workingDirectory)
@@ -263,7 +258,6 @@ public class MuleConfiguration
         }
     }
 
-
     public int getDefaultTransactionTimeout()
     {
         return defaultTransactionTimeout;
@@ -283,7 +277,7 @@ public class MuleConfiguration
      * Returns a clone of the default Connection strategy. The clone ensures that the
      * connection strategy can be manipulated without affecting other connectors
      * using the same strategy
-     *
+     * 
      * @return a clone of the default Connection strategy
      */
     public ConnectionStrategy getDefaultConnectionStrategy()
@@ -301,7 +295,7 @@ public class MuleConfiguration
     /**
      * Sets the connection strategy used by all connectors managed in this Mule
      * instance if the connector has no connection strategy specifically set on it.
-     *
+     * 
      * @param connectionStrategy the default strategy to use
      */
     public void setDefaultConnectionStrategy(ConnectionStrategy connectionStrategy)

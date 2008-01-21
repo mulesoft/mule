@@ -26,7 +26,7 @@ public class JotmNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testTransactionManager() throws Exception
     {
-        TransactionManager transactionManager = AbstractMuleTestCase.managementContext.getTransactionManager();
+        TransactionManager transactionManager = AbstractMuleTestCase.muleContext.getTransactionManager();
         logger.debug(transactionManager);
         Assert.assertTrue(transactionManager instanceof Current);
     }

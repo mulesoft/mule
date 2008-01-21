@@ -11,11 +11,11 @@
 package org.mule.providers.service;
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.providers.AbstractConnector;
 import org.mule.registry.ServiceDescriptorFactory;
 import org.mule.registry.ServiceException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
@@ -55,7 +55,7 @@ public class TransportFactory
      * @return a new Connector
      * @throws TransportFactoryException
      */
-    public static UMOConnector createConnector(UMOEndpointURI url, UMOManagementContext managementContext) throws TransportFactoryException
+    public static UMOConnector createConnector(UMOEndpointURI url, MuleContext muleContext) throws TransportFactoryException
     {
 
         try
@@ -108,16 +108,16 @@ public class TransportFactory
         }
     }
 
-    public static UMOConnector getOrCreateConnectorByProtocol(UMOImmutableEndpoint endpoint, UMOManagementContext managementContext)
+    public static UMOConnector getOrCreateConnectorByProtocol(UMOImmutableEndpoint endpoint, MuleContext muleContext)
         throws TransportFactoryException
     {
-        return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), managementContext);
+        return getOrCreateConnectorByProtocol(endpoint.getEndpointURI(), muleContext);
     }
 
     /**
      * Returns an initialized connector.
      */
-    public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, UMOManagementContext managementContext)
+    public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, MuleContext muleContext)
         throws TransportFactoryException
     {
         String connectorName = uri.getConnectorName();
@@ -134,12 +134,12 @@ public class TransportFactory
         UMOConnector connector = getConnectorByProtocol(uri.getFullScheme());
         if (connector == null)
         {
-            connector = createConnector(uri, managementContext);
+            connector = createConnector(uri, muleContext);
             try
             {
                 BeanUtils.populate(connector, uri.getParams());
-                connector.setManagementContext(managementContext);
-                managementContext.getRegistry().registerConnector(connector);
+                connector.setMuleContext(muleContext);
+                muleContext.getRegistry().registerConnector(connector);
             }
             catch (Exception e)
             {

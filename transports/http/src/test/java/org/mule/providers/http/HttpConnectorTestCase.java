@@ -44,7 +44,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     public void testValidListener() throws Exception
     {
         UMOComponent component = getTestComponent("orange", Orange.class);
-        UMOEndpoint endpoint = (UMOEndpoint) managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        UMOEndpoint endpoint = (UMOEndpoint) muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             getTestEndpointURI());
 
         try

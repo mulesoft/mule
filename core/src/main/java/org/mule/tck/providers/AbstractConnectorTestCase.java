@@ -53,8 +53,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         {
             fail("You need to set the connector name on the connector before returning it");
         }
-        connector.setManagementContext(managementContext);
-        managementContext.getRegistry().registerConnector(connector);
+        connector.setMuleContext(muleContext);
+        muleContext.getRegistry().registerConnector(connector);
     }
 
     protected void doTearDown() throws Exception
@@ -71,7 +71,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
     /** Look up the connector from the Registry */
     protected UMOConnector getConnector()
     {
-        return managementContext.getRegistry().lookupConnector(connectorName);
+        return muleContext.getRegistry().lookupConnector(connectorName);
     }
     
     public void testConnectorExceptionHandling() throws Exception
@@ -115,7 +115,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         // simulate disposal as well we have to create an extra instance here.
 
         UMOConnector localConnector = this.createConnector();
-        localConnector.setManagementContext(managementContext);
+        localConnector.setMuleContext(muleContext);
         localConnector.setName(connectorName+"-temp");
         // the connector did not come from the registry, so we need to initialise manually
         localConnector.initialise();
@@ -150,7 +150,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         UMOComponent component = getTestComponent("anApple", Apple.class);
 
         UMOImmutableEndpoint endpoint = 
-            managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(getTestEndpointURI());
+            muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(getTestEndpointURI());
 
         try
         {
@@ -216,7 +216,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
             // expected
         }
         connector.unregisterListener(component, endpoint);
-        managementContext.getRegistry().unregisterComponent(component.getName());
+        muleContext.getRegistry().unregisterComponent(component.getName());
     }
 
     public void testConnectorBeanProps() throws Exception

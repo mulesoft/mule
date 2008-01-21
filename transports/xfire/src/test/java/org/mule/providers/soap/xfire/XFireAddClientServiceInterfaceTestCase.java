@@ -22,7 +22,7 @@ public class XFireAddClientServiceInterfaceTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         connector = new XFireConnector();
-        connector.setManagementContext(managementContext);
+        connector.setMuleContext(muleContext);
         List clientServices = new ArrayList();
         clientServices.add("org.mule.components.simple.EchoService");
         connector.setClientServices(clientServices);

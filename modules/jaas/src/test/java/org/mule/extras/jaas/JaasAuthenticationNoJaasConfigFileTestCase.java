@@ -43,7 +43,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = managementContext
+        UMOEncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
@@ -60,7 +60,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = managementContext
+        UMOEncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
@@ -77,7 +77,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = managementContext
+        UMOEncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "anon", "PBE", strategy);
@@ -96,7 +96,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = managementContext
+        UMOEncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Evil", "dragon", "PBE", strategy);
@@ -114,7 +114,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = managementContext
+        UMOEncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "evil", "PBE", strategy);

@@ -32,7 +32,7 @@ public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
 
     public void testReflectiveXaCleanup() throws Exception
     {
-        JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector");
+        JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");
         assertNotNull(c);
         
         ConnectionFactory cf = c.getConnectionFactory();

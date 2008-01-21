@@ -10,13 +10,12 @@
 
 package org.mule.config.builders;
 
-import org.mule.config.ConfigurationException;
-import org.mule.config.i18n.CoreMessages;
+import org.mule.api.MuleContext;
+import org.mule.config.spring.MuleApplicationContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
+import org.mule.registry.Registry;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,12 +23,19 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.access.BeanFactoryLocator;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
+import org.springframework.core.io.Resource;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.support.ServletContextResource;
 
 /**
  * <code>WebappMuleXmlConfigurationBuilder</code> will first try and load config
  * resources from the Servlet context. If this fails it fails back to the methods
  * used by the MuleXmlConfigurationBuilder.
- *
+ * 
  * @see org.mule.config.builders.SpringXmlConfigurationBuilder
  */
 public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBuilder
@@ -38,74 +44,105 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
      * Logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(getClass());
+
     private ServletContext context;
 
-    /**
-     * Classpath within the servlet context (e.g., "WEB-INF/classes").  Mule will attempt to load config
-     * files from here first, and then from the remaining classpath.
-     */
-    private String webappClasspath;
-
-    public WebappMuleXmlConfigurationBuilder(ServletContext context, String webappClasspath)
-            throws ConfigurationException
+    public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String[] configResources)
     {
-        super();
-        this.context = context;
-        this.webappClasspath = webappClasspath;
+        super(configResources);
+        context = servletContext;
     }
 
-    /**
-     * Attempt to load any resource from the Servlet Context first, then from FS and the classpath.
-     */
-    //@Override
-    protected InputStream loadConfig(String configResource) throws ConfigurationException
+    public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String configResources)
     {
-        String resourcePath = configResource;
-        InputStream is = null;
-        if (webappClasspath != null)
+        super(configResources);
+        context = servletContext;
+    }
+
+    protected void createSpringParentRegistry(MuleContext muleContext, Registry registry, String[] all)
+    {
+        Resource[] servletContextResources = new Resource[all.length];
+        for (int i = 0; i < all.length; i++)
         {
-            resourcePath = new File(webappClasspath, configResource).getPath();
-            is = context.getResourceAsStream(resourcePath);
+            servletContextResources[i] = new ServletContextOrClassPathResource(context, all[i]);
         }
-        if (is == null)
+
+        parentContext = loadParentContext(context);
+
+        try
         {
-            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(configResource);
-        }
-        if (logger.isDebugEnabled())
-        {
-            if (is != null)
+            if (parentContext != null)
             {
-                logger.debug("Resource " + configResource + " is found in Servlet Context.");
+                new MuleApplicationContext(muleContext, registry, servletContextResources, parentContext);
             }
             else
             {
-                logger.debug("Resource " + resourcePath + " is not found in Servlet Context, loading from classpath or as external file");
+                new MuleApplicationContext(muleContext, registry, servletContextResources);
             }
         }
-        if (is == null && webappClasspath != null)
+        catch (BeansException e)
         {
-            resourcePath = FileUtils.newFile(webappClasspath, configResource).getPath();
-            try
+            // If creation of MuleApplicationContext fails, remove
+            // TransientRegistry->SpringRegistry parent relationship
+            registry.setParent(null);
+            throw e;
+        }
+    }
+
+    /**
+     * Used to lookup parent spring ApplicationContext. This allows a parent spring
+     * ApplicatonContet to be provided in the same way you would configure a parent
+     * ApplicationContext for a spring WebAppplicationContext
+     * 
+     * @param servletContext
+     * @return
+     * @throws BeansException
+     */
+    protected ApplicationContext loadParentContext(ServletContext servletContext) throws BeansException
+    {
+
+        ApplicationContext parentContext = null;
+        String locatorFactorySelector = servletContext.getInitParameter(ContextLoader.LOCATOR_FACTORY_SELECTOR_PARAM);
+        String parentContextKey = servletContext.getInitParameter(ContextLoader.LOCATOR_FACTORY_KEY_PARAM);
+
+        if (parentContextKey != null)
+        {
+            // locatorFactorySelector may be null, indicating the default
+            // "classpath*:beanRefContext.xml"
+            BeanFactoryLocator locator = ContextSingletonBeanFactoryLocator.getInstance(locatorFactorySelector);
+            if (logger.isDebugEnabled())
             {
-                is = IOUtils.getResourceAsStream(resourcePath,getClass());
+                logger.debug("Getting parent context definition: using parent context key of '"
+                             + parentContextKey + "' with BeanFactoryLocator");
             }
-            catch (IOException ex)
-            {
-                logger.debug("Resource " + resourcePath + " is not found in filesystem "+ex);
-            }
+            parentContext = (ApplicationContext) locator.useBeanFactory(parentContextKey).getFactory();
+        }
+
+        return parentContext;
+    }
+
+}
+
+class ServletContextOrClassPathResource extends ServletContextResource
+{
+
+    public ServletContextOrClassPathResource(ServletContext servletContext, String path)
+    {
+        super(servletContext, path);
+    }
+
+    public InputStream getInputStream() throws IOException
+    {
+        InputStream is = getServletContext().getResourceAsStream(getPath());
+        if (is == null)
+        {
+            is = getClass().getResourceAsStream(getPath());
         }
         if (is == null)
         {
-            try
-            {
-                logger.debug("Resource " + resourcePath + " not found in Servlet Context, loading from classpath");
-                is = IOUtils.getResourceAsStream(configResource, getClass());
-            }
-            catch (IOException ioex)
-            {
-                throw new ConfigurationException(CoreMessages.cannotLoadFromClasspath(configResource), ioex);
-            }
+            throw new FileNotFoundException(getDescription() + " cannot be opened because it does not exist");
         }
         return is;
     }
+
 }

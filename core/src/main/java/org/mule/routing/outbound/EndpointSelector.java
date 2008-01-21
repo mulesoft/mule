@@ -11,7 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.ManagementContextAware;
+import org.mule.impl.MuleContextAware;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -44,7 +44,7 @@ import java.util.List;
  *
  * </pre>
  */
-public class EndpointSelector extends FilteringOutboundRouter implements ManagementContextAware
+public class EndpointSelector extends FilteringOutboundRouter implements MuleContextAware
 {
     public static final String DEFAULT_SELECTOR_PROPERTY = "endpoint";
 
@@ -139,7 +139,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements Managem
                 return ep;
             }
         }
-        return getManagementContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
+        return getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
     }
 
     public String getSelectorProperty()

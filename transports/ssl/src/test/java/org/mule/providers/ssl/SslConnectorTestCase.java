@@ -10,8 +10,6 @@
 
 package org.mule.providers.ssl;
 
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
@@ -48,7 +46,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         // can this go?!  who added it?  when was it urgent?
 //        if (initialised)
 //        {
-//            cnn.initialise(managementContext);
+//            cnn.initialise(muleContext);
 //        }
         return cnn;
     }
@@ -101,7 +99,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         }
 
         
-        UMOImmutableEndpoint endpoint2 = managementContext.getRegistry()
+        UMOImmutableEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("ssl://localhost:30303");
 

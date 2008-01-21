@@ -24,7 +24,7 @@ public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase
 
     public void testProperties()
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("service");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("service");
         assertNotNull(component);
         UMOImmutableEndpoint ep = (UMOImmutableEndpoint) component.getInboundRouter().getEndpoints().get(0);
         assertNotNull(ep);

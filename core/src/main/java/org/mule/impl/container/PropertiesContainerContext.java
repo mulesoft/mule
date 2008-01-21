@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * Provides a facade for accessing System properties and properties on the
- * ManagementContext. This container context serves 3 functions -
+ * MuleContext. This container context serves 3 functions -
  * <ol>
  * <li>Allows System properties to be set in Mule Xml (by setting the
  * #systemProperties Map)
@@ -63,7 +63,7 @@ public class PropertiesContainerContext extends AbstractContainerContext impleme
                 value = templateParser.parse(this, value);
                 try
                 {
-                    managementContext.getRegistry().registerObject(entry.getKey().toString(), value, managementContext);
+                    muleContext.getRegistry().registerObject(entry.getKey().toString(), value, muleContext);
                 }
                 catch (RegistrationException e)
                 {
@@ -76,7 +76,7 @@ public class PropertiesContainerContext extends AbstractContainerContext impleme
 
     public Object match(String token)
     {
-        return managementContext.getRegistry().lookupObject(token);
+        return muleContext.getRegistry().lookupObject(token);
     }
 
     public void configure(Reader configuration) throws ContainerException
@@ -101,7 +101,7 @@ public class PropertiesContainerContext extends AbstractContainerContext impleme
         {
             throw new ObjectNotFoundException("null");
         }
-        Object value = managementContext.getRegistry().lookupObject(key.toString());
+        Object value = muleContext.getRegistry().lookupObject(key.toString());
         if (value == null)
         {
             throw new ObjectNotFoundException(key.toString());
@@ -146,7 +146,7 @@ public class PropertiesContainerContext extends AbstractContainerContext impleme
                 value = templateParser.parse(this, value.toString());
                 try
                 {
-                    managementContext.getRegistry().registerObject(entry.getKey().toString(), value, managementContext);
+                    muleContext.getRegistry().registerObject(entry.getKey().toString(), value, muleContext);
                 }
                 catch (RegistrationException e)
                 {

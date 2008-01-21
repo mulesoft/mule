@@ -42,7 +42,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         resourceAdapter = new MuleResourceAdapter();
-        resourceAdapter.managementContext = managementContext;
+        resourceAdapter.muleContext = muleContext;
         resourceAdapter.bootstrapContext = new MockBoostrapContext();
     }
 
@@ -99,7 +99,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
     {
         UMOModel jcaModel = new JcaModel();
         jcaModel.setName("jca");
-        managementContext.getRegistry().registerModel(jcaModel);
+        muleContext.getRegistry().registerModel(jcaModel);
         JcaModel jcaModel2 = resourceAdapter.getJcaModel("jca");
         assertEquals("jca", jcaModel2.getName());
         assertEquals(jcaModel, jcaModel2);
@@ -109,7 +109,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
     {
         UMOModel sedaModel = new SedaModel();
         sedaModel.setName("jca");
-        managementContext.getRegistry().registerModel(sedaModel);
+        muleContext.getRegistry().registerModel(sedaModel);
         try
         {
             resourceAdapter.getJcaModel("jca");

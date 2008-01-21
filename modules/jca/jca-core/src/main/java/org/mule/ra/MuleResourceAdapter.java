@@ -11,15 +11,15 @@
 package org.mule.ra;
 
 import org.mule.RegistryContext;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.ConfigurationException;
+import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationBuilder;
+import org.mule.impl.DefaultMuleContextFactory;
 import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.endpoint.URIBuilder;
 import org.mule.impl.model.ModelFactory;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -60,7 +60,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
      */
     protected transient Log logger = LogFactory.getLog(this.getClass());
 
-    protected transient UMOManagementContext managementContext;
+    protected transient MuleContext muleContext;
 
     protected transient BootstrapContext bootstrapContext;
     protected MuleConnectionRequestInfo info = new MuleConnectionRequestInfo();
@@ -90,7 +90,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             try
             {
                 builder = (ConfigurationBuilder) ClassUtils.instanciateClass(info.getConfigurationBuilder(),
-                    ClassUtils.NO_ARGS);
+                    new Object[]{info.getConfigurations()});
             }
             catch (Exception e)
             {
@@ -101,9 +101,9 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             try
             {
                 logger.info("Initializing Mule...");
-                managementContext = builder.configure(info.getConfigurations());
+                muleContext = new DefaultMuleContextFactory().createMuleContext(builder);
             }
-            catch (ConfigurationException e)
+            catch (UMOException e)
             {
                 logger.error(e);
                 throw new ResourceAdapterInternalException(
@@ -112,7 +112,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             try
             {
                 logger.info("Starting Mule...");
-                managementContext.start();
+                muleContext.start();
             }
             catch (UMOException e)
             {
@@ -128,8 +128,8 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     public void stop()
     {
         logger.info("Stopping Mule...");
-        managementContext.dispose();
-        managementContext = null;
+        muleContext.dispose();
+        muleContext = null;
         bootstrapContext = null;
     }
 
@@ -217,7 +217,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
             try
             {
-                managementContext.getRegistry().unregisterComponent(component.getName());
+                muleContext.getRegistry().unregisterComponent(component.getName());
             }
             catch (UMOException e)
             {
@@ -246,7 +246,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
     protected JcaModel getJcaModel(String modelName) throws UMOException, ResourceException
     {
-        UMOModel model = managementContext.getRegistry().lookupModel(modelName);
+        UMOModel model = muleContext.getRegistry().lookupModel(modelName);
         if (model != null)
         {
             if (model instanceof JcaModel)
@@ -262,7 +262,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         {
             JcaModel jcaModel = (JcaModel) ModelFactory.createModel(JcaModel.JCA_MODEL_TYPE);
             jcaModel.setName(modelName);
-            managementContext.getRegistry().registerModel(jcaModel);
+            muleContext.getRegistry().registerModel(jcaModel);
             return jcaModel;
         }
     }
@@ -281,7 +281,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         // JcaComponet as reccomended by JCA specification
         component.setServiceFactory(new SingletonObjectFactory(endpointFactory));
         component.setModel(model);
-        managementContext.getRegistry().registerComponent(component);
+        muleContext.getRegistry().registerComponent(component);
         return component;
     }
 
@@ -290,13 +290,13 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     {
         UMOEndpointURI uri = new MuleEndpointURI(muleActivationSpec.getEndpoint());
         UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(
-            muleActivationSpec.getEndpoint()), managementContext);
+            muleActivationSpec.getEndpoint()), muleContext);
 
         // Use asynchronous endpoint as we need to dispatch to component
         // rather than send.
         endpointBuilder.setSynchronous(false);
 
-        return managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
+        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
     }
 
     /**

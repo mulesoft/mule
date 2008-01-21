@@ -27,8 +27,8 @@ public class StartupPropertiesTestCase extends FunctionalTestCase
     }
     
     public void testStartProperties(){
-        Object property1 = managementContext.getRegistry().lookupObject(STARTUP_PROPERTY_1_KEY);
-        Object property2 = managementContext.getRegistry().lookupObject(STARTUP_PROPERTY_2_KEY);
+        Object property1 = muleContext.getRegistry().lookupObject(STARTUP_PROPERTY_1_KEY);
+        Object property2 = muleContext.getRegistry().lookupObject(STARTUP_PROPERTY_2_KEY);
         assertNotNull(property1);
         assertNotNull(property2);
         assertEquals(STARTUP_PROPERTY_1_VALUE, property1);

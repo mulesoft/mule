@@ -9,39 +9,39 @@
  */
 package org.mule.impl.registry;
 
-import org.mule.impl.ManagementContextAware;
-import org.mule.umo.UMOManagementContext;
+import org.mule.api.MuleContext;
+import org.mule.impl.MuleContextAware;
 
 /**
  * TODO
  * @deprecated This class is not being used.
  */
-public class ManagementContextDependencyProcessor implements ObjectProcessor
+public class MuleContextDependencyProcessor implements ObjectProcessor
 {
-    private UMOManagementContext context;
+    private MuleContext context;
 
-    public ManagementContextDependencyProcessor()
+    public MuleContextDependencyProcessor()
     {
     }
 
-    public ManagementContextDependencyProcessor(UMOManagementContext context)
+    public MuleContextDependencyProcessor(MuleContext context)
     {
         this.context = context;
     }
 
     public Object process(Object object)
     {
-        if(object instanceof ManagementContextAware)
+        if(object instanceof MuleContextAware)
         {
             if(context==null)
             {
-               // context= MuleServer.getManagementContext();
+               // context= MuleServer.getMuleContext();
                 if(context==null)
                 {
                     return object;
                 }
             }
-            ((ManagementContextAware)object).setManagementContext(context);
+            ((MuleContextAware)object).setMuleContext(context);
         }
         return object;
     }

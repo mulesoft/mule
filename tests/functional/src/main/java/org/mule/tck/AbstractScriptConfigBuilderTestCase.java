@@ -59,14 +59,14 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testManagerConfig() throws Exception
     {
-        assertEquals("true", managementContext.getRegistry().lookupObject("doCompression"));
-        assertNotNull(managementContext.getTransactionManager());
+        assertEquals("true", muleContext.getRegistry().lookupObject("doCompression"));
+        assertNotNull(muleContext.getTransactionManager());
     }
 
 
     public void testConnectorConfig() throws Exception
     {
-        TestConnector c = (TestConnector) managementContext.getRegistry().lookupConnector("dummyConnector");
+        TestConnector c = (TestConnector) muleContext.getRegistry().lookupConnector("dummyConnector");
         assertNotNull(c);
         assertNotNull(c.getExceptionListener());
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
@@ -74,7 +74,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testGlobalEndpointConfig() throws UMOException
     {
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "fruitBowlEndpoint");
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
@@ -84,7 +84,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("bar", filter.getExpectedValue());
         assertEquals("http://foo.com", filter.getNamespaces().get("foo"));
 
-        //UMOImmutableEndpoint ep = managementContext.getRegistry().lookupEndpoint("testEPWithCS");
+        //UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpoint("testEPWithCS");
         //assertNotNull(ep);
         //assertNotNull(ep.getConnectionStrategy());
         //assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
@@ -95,13 +95,13 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testEndpointConfig() throws UMOException
     {
         // test that endpoints have been resolved on endpoints
-        UMOImmutableEndpoint endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "waterMelonEndpoint");
         assertNotNull(endpoint);
         // aliases no longer possible
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
-        UMOComponent component = managementContext.getRegistry().lookupComponent("orangeComponent");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
         UMOImmutableEndpoint ep = component.getInboundRouter().getEndpoint("Orange");
         assertNotNull(ep);
         final List responseTransformers = ep.getResponseTransformers();
@@ -113,8 +113,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testExceptionStrategy()
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("orangeComponent");
-        assertNotNull(managementContext.getRegistry().lookupModel("main").getExceptionListener());
+        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
+        assertNotNull(muleContext.getRegistry().lookupModel("main").getExceptionListener());
         assertNotNull(component.getExceptionListener());
 
         assertTrue(((AbstractExceptionListener) component.getExceptionListener()).getEndpoints().size() > 0);
@@ -126,7 +126,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testTransformerConfig()
     {
-        UMOTransformer t = managementContext.getRegistry().lookupTransformer("TestCompressionTransformer");
+        UMOTransformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
         assertEquals(t.getReturnClass(), String.class);
@@ -135,7 +135,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testModelConfig() throws Exception
     {
-        UMOModel model = managementContext.getRegistry().lookupModel("main");
+        UMOModel model = muleContext.getRegistry().lookupModel("main");
         assertNotNull(model);
         assertEquals("main", model.getName());
         if (legacy)
@@ -160,7 +160,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     // TODO Fix this somehow after MULE-1933
 //    public void testPropertiesConfig() throws Exception
 //    {
-//        UMOComponent component = managementContext.getRegistry().lookupComponent("orangeComponent");
+//        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
 //
 //        Map props = descriptor.getProperties();
 //        assertNotNull(props);
@@ -193,7 +193,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testOutboundRouterConfig()
     {
         // test outbound message router
-        UMOComponent component = managementContext.getRegistry().lookupComponent("orangeComponent");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertNotNull(component.getOutboundRouter());
         UMOOutboundRouterCollection router = component.getOutboundRouter();
         assertNull(router.getCatchAllStrategy());
@@ -207,7 +207,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testNestedRouterConfig() throws ObjectNotFoundException
     {
         // test outbound message router
-        UMOComponent component = managementContext.getRegistry().lookupComponent("orangeComponent");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertNotNull(component.getNestedRouter());
         UMONestedRouterCollection router = component.getNestedRouter();
         assertEquals(2, router.getRouters().size());
@@ -225,7 +225,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testDescriptorEndpoints()
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("orangeComponent");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertEquals(1, component.getOutboundRouter().getRouters().size());
         UMOOutboundRouter router = (UMOOutboundRouter)component.getOutboundRouter().getRouters().get(0);
         assertEquals(1, router.getEndpoints().size());
@@ -238,7 +238,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         // check the global endpoint
         try
         {
-            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("appleInEndpoint");
+            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("appleInEndpoint");
         }
         catch (UMOException e)
         {
@@ -268,7 +268,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         // check the global endpoint
         try
         {
-            endpoint = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("orangeEndpoint");
+            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("orangeEndpoint");
         }
         catch (UMOException e)
         {
@@ -282,7 +282,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testInboundRouterConfig()
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("orangeComponent");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertNotNull(component.getInboundRouter());
         UMOInboundRouterCollection messageRouter = component.getInboundRouter();
         assertNotNull(messageRouter.getCatchAllStrategy());
@@ -293,7 +293,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testResponseRouterConfig()
     {
-        UMOComponent component = managementContext.getRegistry().lookupComponent("orangeComponent");
+        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertNotNull(component.getResponseRouter());
         UMOResponseRouterCollection messageRouter = component.getResponseRouter();
         assertNull(messageRouter.getCatchAllStrategy());
@@ -315,7 +315,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void _testAgentConfiguration() throws UMOException
     {
-        JmxAgent agent = (JmxAgent)managementContext.getRegistry().lookupAgent("jmxAgent");
+        JmxAgent agent = (JmxAgent)muleContext.getRegistry().lookupAgent("jmxAgent");
         assertNotNull(agent);
         //TODO RM* Add this back in. Currently failing because of a JMX issue where the AllStatistics MBean is registered twice
 //        assertNotNull(agent.getConnectorServerUrl());

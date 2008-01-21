@@ -25,7 +25,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
     public void testExceptions() throws Exception
     {
         InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy();
-        strategy.setManagementContext(managementContext);
+        strategy.setMuleContext(muleContext);
         strategy.exceptionThrown(new IllegalArgumentException("boom"));
         assertEquals(1, strategy.getCount());
     }
@@ -36,7 +36,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicInteger notificationCount = new AtomicInteger(0);
 
-        managementContext.registerListener(new ExceptionNotificationListener()
+        muleContext.registerListener(new ExceptionNotificationListener()
         {
             public void onNotification(UMOServerNotification notification)
             {
@@ -52,7 +52,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
 
         // throwing exception
         InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy();
-        strategy.setManagementContext(managementContext);
+        strategy.setMuleContext(muleContext);
         strategy.exceptionThrown(new IllegalArgumentException("boom"));
 
         // Wait for the notifcation event to be fired as they are queue

@@ -10,7 +10,8 @@
 
 package org.mule.tck;
 
-import org.mule.impl.ManagementContext;
+import org.mule.api.MuleContext;
+import org.mule.impl.DefaultMuleContext;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -28,7 +29,6 @@ import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOManagementContext;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
@@ -55,7 +55,7 @@ import java.util.Map;
  */
 public final class MuleTestUtils
 {
-    public static UMOEndpoint getTestEndpoint(String name, String type, UMOManagementContext context) throws Exception
+    public static UMOEndpoint getTestEndpoint(String name, String type, MuleContext context) throws Exception
     {
         Map props = new HashMap();
         props.put("name", name);
@@ -68,7 +68,7 @@ public final class MuleTestUtils
             AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");
-        connector.setManagementContext(context);
+        connector.setMuleContext(context);
         context.applyLifecycle(connector);
 
         UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://test", context);
@@ -89,7 +89,7 @@ public final class MuleTestUtils
         }
     }
     
-    public static UMOEndpoint getTestSchemeMetaInfoEndpoint(String name, String type, String protocol, UMOManagementContext context)
+    public static UMOEndpoint getTestSchemeMetaInfoEndpoint(String name, String type, String protocol, MuleContext context)
         throws Exception
     {
         // need to build endpoint this way to avoid depenency to any endpoint jars
@@ -98,7 +98,7 @@ public final class MuleTestUtils
             AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");
-        connector.setManagementContext(context);
+        connector.setMuleContext(context);
         context.applyLifecycle(connector);
         connector.registerSupportedProtocol(protocol);
 
@@ -121,30 +121,30 @@ public final class MuleTestUtils
     }
 
     /** Supply no component, no endpoint */
-    public static UMOEvent getTestEvent(Object data, UMOManagementContext context) throws Exception
+    public static UMOEvent getTestEvent(Object data, MuleContext context) throws Exception
     {
         return getTestEvent(data, getTestComponent(context), context);
     }
 
     /** Supply component but no endpoint */
-    public static UMOEvent getTestEvent(Object data, UMOComponent component, UMOManagementContext context) throws Exception
+    public static UMOEvent getTestEvent(Object data, UMOComponent component, MuleContext context) throws Exception
     {
         return getTestEvent(data, component, getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER, context), context);
     }
 
     /** Supply endpoint but no component */
-    public static UMOEvent getTestEvent(Object data, UMOImmutableEndpoint endpoint, UMOManagementContext context) throws Exception
+    public static UMOEvent getTestEvent(Object data, UMOImmutableEndpoint endpoint, MuleContext context) throws Exception
     {
         return getTestEvent(data, getTestComponent(context), endpoint, context);
     }
 
-    public static UMOEvent getTestEvent(Object data, UMOComponent component, UMOImmutableEndpoint endpoint, UMOManagementContext context) throws Exception
+    public static UMOEvent getTestEvent(Object data, UMOComponent component, UMOImmutableEndpoint endpoint, MuleContext context) throws Exception
     {
         UMOSession session = getTestSession(component);
         return new MuleEvent(new MuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
-    public static UMOEventContext getTestEventContext(Object data, UMOManagementContext context) throws Exception
+    public static UMOEventContext getTestEventContext(Object data, MuleContext context) throws Exception
     {
         try
         {
@@ -175,34 +175,34 @@ public final class MuleTestUtils
         return getTestSession(null);
     }
 
-    public static TestConnector getTestConnector(UMOManagementContext context) throws Exception
+    public static TestConnector getTestConnector(MuleContext context) throws Exception
     {
         TestConnector testConnector = new TestConnector();
         testConnector.setName("testConnector");
-        testConnector.setManagementContext(context);
+        testConnector.setMuleContext(context);
         context.applyLifecycle(testConnector);
         return testConnector;
     }
 
-    public static UMOComponent getTestComponent(UMOManagementContext context) throws Exception
+    public static UMOComponent getTestComponent(MuleContext context) throws Exception
     {
         return getTestComponent("appleService", Apple.class, context);
     }
 
-    public static UMOComponent getTestComponent(String name, Class clazz, UMOManagementContext context) throws Exception
+    public static UMOComponent getTestComponent(String name, Class clazz, MuleContext context) throws Exception
     {
         return getTestComponent(name, clazz, null, context);
     }
 
-    public static UMOComponent getTestComponent(String name, Class clazz, Map props, UMOManagementContext context) throws Exception
+    public static UMOComponent getTestComponent(String name, Class clazz, Map props, MuleContext context) throws Exception
     {
         return getTestComponent(name, clazz, props, context, true);        
     }
 
-    public static UMOComponent getTestComponent(String name, Class clazz, Map props, UMOManagementContext context, boolean initialize) throws Exception
+    public static UMOComponent getTestComponent(String name, Class clazz, Map props, MuleContext context, boolean initialize) throws Exception
     {
         SedaModel model = new SedaModel();
-        model.setManagementContext(context);
+        model.setMuleContext(context);
         context.applyLifecycle(model);
         
         UMOComponent c = new SedaComponent();
@@ -254,9 +254,9 @@ public final class MuleTestUtils
         return new Mock(UMOEvent.class, "umoEvent");
     }
 
-    public static Mock getMockManagementContext()
+    public static Mock getMockMuleContext()
     {
-        return new Mock(ManagementContext.class, "muleManagementContext");
+        return new Mock(DefaultMuleContext.class, "muleMuleContext");
     }
 
     public static Mock getMockEndpoint()

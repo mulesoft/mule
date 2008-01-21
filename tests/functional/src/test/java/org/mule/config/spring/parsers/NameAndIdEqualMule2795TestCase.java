@@ -22,11 +22,11 @@ public class NameAndIdEqualMule2795TestCase extends FunctionalTestCase
 
     public void testNames()
     {
-        assertNotNull(managementContext.getRegistry().lookupObject("id"));
-        assertNull(managementContext.getRegistry().lookupObject(".:no-name"));
-        assertNull(managementContext.getRegistry().lookupObject("org.mule.autogen.bean.1"));
-        assertNotNull(managementContext.getRegistry().lookupObject("id2"));
-        assertNull(managementContext.getRegistry().lookupObject(".:no-name-2"));
+        assertNotNull(muleContext.getRegistry().lookupObject("id"));
+        assertNull(muleContext.getRegistry().lookupObject(".:no-name"));
+        assertNull(muleContext.getRegistry().lookupObject("org.mule.autogen.bean.1"));
+        assertNotNull(muleContext.getRegistry().lookupObject("id2"));
+        assertNull(muleContext.getRegistry().lookupObject(".:no-name-2"));
     }
 
 }
