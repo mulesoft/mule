@@ -134,7 +134,8 @@
             <xsd:extension base="mule:abstractTransformerType">
                 <xsd:attribute name="encoding" type="xsd:string"/>
                 <xsd:attribute name="expandEmptyElements" type="mule:substitutableBoolean"/>
-                <xsd:attribute name="indent" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="indentEnabled" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="indentString" type="xsd:string"/>
                 <xsd:attribute name="indentSize" type="mule:substitutableInt"/>
                 <xsd:attribute name="lineSeparator" type="xsd:string"/>
                 <xsd:attribute name="newLineAfterNTags" type="mule:substitutableInt"/>

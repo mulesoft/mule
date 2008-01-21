@@ -12,6 +12,7 @@ package org.mule.transformers.xml;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.StringUtils;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dom4j.Document;
@@ -84,7 +85,23 @@ public class XmlPrettyPrinter extends AbstractTransformer
     /**
      * @see OutputFormat#getIndent()
      */
-    public synchronized String getIndent()
+    public synchronized boolean getIndentEnabled()
+    {
+        return outputFormat.getIndent() != null;
+    }
+
+    /**
+     * @see OutputFormat#setIndent(boolean)
+     */
+    public synchronized void setIndentEnabled(boolean doIndent)
+    {
+        outputFormat.setIndent(doIndent);
+    }
+
+    /**
+     * @see OutputFormat#getIndent()
+     */
+    public synchronized String getIndentString()
     {
         return outputFormat.getIndent();
     }
@@ -92,9 +109,17 @@ public class XmlPrettyPrinter extends AbstractTransformer
     /**
      * @see OutputFormat#setIndent(boolean)
      */
-    public synchronized void setIndent(boolean doIndent)
+    public synchronized void setIndentString(String indentString)
     {
-        outputFormat.setIndent(doIndent);
+        outputFormat.setIndent(indentString);
+    }
+
+    /**
+     * @see OutputFormat#setIndentSize(int)
+     */
+    public synchronized int getIndentSize()
+    {
+        return StringUtils.defaultIfEmpty(outputFormat.getIndent(), "").length();
     }
 
     /**
