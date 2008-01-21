@@ -8,10 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.providers.vm;
+package org.mule.test.integration.resolvers;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.TooManySatisfiableMethodsException;
+import org.mule.impl.model.resolvers.EntryPointNotFoundException;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
@@ -20,7 +21,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/providers/vm/method-entrypoints-config.xml";
+        return "org/mule/test/integration/resolvers/method-entrypoints-config.xml";
     }
 
     public void testTooManySatifiableMethods() throws Exception
@@ -28,7 +29,8 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         UMOMessage message = client.send("vm://service", "hello", null);
         assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getException().getCause() instanceof TooManySatisfiableMethodsException);
+        assertTrue(message.getExceptionPayload().getException().getCause() instanceof EntryPointNotFoundException);
+        assertTrue(message.getExceptionPayload().getException().getCause().getMessage().indexOf("Found too many possible methods on object") > -1);
     }
 
     public void testBadMethodName() throws Exception
@@ -36,7 +38,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         UMOMessage message = client.send("vm://service?method=foo", "hello", null);
         assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getException().getCause() instanceof NoSuchMethodException);
+        assertTrue(message.getExceptionPayload().getException().getCause() instanceof EntryPointNotFoundException);
     }
 
     public void testValidCallToReverse() throws Exception

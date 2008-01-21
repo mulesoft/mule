@@ -50,7 +50,6 @@ org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
 
 org.mule.test.integration.EventMetaDataPropagationTestCase
 org.mule.test.integration.message.AttachmentsPropagationTestCase
-org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
 org.mule.test.integration.transaction.XATransactionsWithSpringDAO
 # Convert transacted endpoint to XML config
 org.mule.test.integration.client.MuleClientTransactionTestCase
