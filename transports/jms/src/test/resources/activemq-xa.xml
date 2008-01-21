@@ -8,12 +8,6 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <jms:transaction-factory name="txFactory"/>
-
-    <!-- 
-    <jms:activemq-connection-factory name="senderConnection" />
-    -->    
-        
     <jms:activemq-xa-connector name="jmsConnector" maxRedelivery="1">
         <dispatcher-threading-profile doThreading="false"/>
     </jms:activemq-xa-connector>

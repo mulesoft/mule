@@ -8,8 +8,6 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <jms:transaction-factory name="txFactory"/>
-    
     <jms:activemq-connector name="jmsConnector" maxRedelivery="1">
         <dispatcher-threading-profile doThreading="false"/>
     </jms:activemq-connector>
@@ -30,4 +28,5 @@
                             redeliveryHandler-ref="redeliveryHandler"/>
 
      <spring:bean name="redeliveryHandler" class="org.mule.providers.jms.test.TestRedeliveryHandler"/>
+
 </mule>

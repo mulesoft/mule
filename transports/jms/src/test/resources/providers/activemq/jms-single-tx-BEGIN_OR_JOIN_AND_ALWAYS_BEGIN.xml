@@ -15,8 +15,6 @@
     <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector"/>
     <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
 
-    <jms:transaction-factory name="txFactory"/>
-
     <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
 
     <model name="jmsTest">
@@ -24,9 +22,7 @@
         <service name="InputPart">
             <inbound-router>
                 <inbound-endpoint ref="in">
-                    <transaction action="ALWAYS_BEGIN">
-                        <transaction-factory ref="txFactory" />
-                    </transaction>
+                    <jms:transaction action="ALWAYS_BEGIN"/>
                 </inbound-endpoint>
             </inbound-router>
             <component>
@@ -42,9 +38,7 @@
         <service name="OutputPart">
             <inbound-router>
                 <inbound-endpoint ref="middle">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
                 </inbound-endpoint>
             </inbound-router>
             <component>

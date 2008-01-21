@@ -14,9 +14,7 @@
         <service name="TestComponent">
             <inbound-router>
                 <inbound-endpoint address="axis:jms://TestComponent">
-                    <transaction action="ALWAYS_BEGIN">
-                        <jms:transaction-factory/>
-                    </transaction>
+                    <jms:transaction action="ALWAYS_BEGIN"/>
                 </inbound-endpoint>
             </inbound-router>
             <echo-component/>

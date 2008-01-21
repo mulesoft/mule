@@ -29,8 +29,6 @@
     <vm:endpoint name="in" path="in" connector-ref="vm"/>
     <vm:endpoint name="out" path="out" connector-ref="vm"/>
 
-    <jms:xa-transaction-factory name="txFactory"/>
-
     <model name="TEST">
 
         <service name="InputPart">
@@ -49,9 +47,7 @@
                         There's no inbound TX, so make sure XA is happy by starting it via router
                         on the outbound. Such problems are now nicely detected and reported via an error.
                     -->
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </outbound-pass-through-router>
             </outbound-router>
         </service>
@@ -59,9 +55,7 @@
         <service name="Part1">
             <inbound-router>
                 <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC1">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound-router>
             <component>
@@ -79,9 +73,7 @@
         <service name="Part3">
             <inbound-router>
                 <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC2">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound-router>
             <component>

@@ -20,9 +20,7 @@
         <service name="InputPart">
             <inbound-router>
                 <inbound-endpoint ref="in">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <jms:transaction-factory/>
-                    </transaction>
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
                 </inbound-endpoint>
             </inbound-router>
             <component>

@@ -11,15 +11,11 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <jms:transaction-factory name="txFactory"/>
-
     <model name="jmsTest">
         <service name="Part1">
             <inbound-router>
                 <jms:inbound-endpoint queue="in">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory" />
-                    </transaction>
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound-router>
             <component>
@@ -35,9 +31,7 @@
         <service name="Part2">
             <inbound-router>
                 <jms:inbound-endpoint queue="middle">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound-router>
             <component>
@@ -46,9 +40,7 @@
             <outbound-router>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q1">
-                        <transaction action="BEGIN_OR_JOIN">
-                            <transaction-factory ref="txFactory"/>
-                        </transaction>
+                        <jms:transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
@@ -57,9 +49,7 @@
         <service name="Part3">
             <inbound-router>
                 <jms:inbound-endpoint queue="q1">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound-router>
             <component>
@@ -68,9 +58,7 @@
             <outbound-router>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q2">
-                        <transaction action="BEGIN_OR_JOIN">
-                            <transaction-factory ref="txFactory"/>
-                        </transaction>
+                        <jms:transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
@@ -79,9 +67,7 @@
         <service name="Part4">
             <inbound-router>
                 <jms:inbound-endpoint queue="q2">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
             </inbound-router>
             <component>
@@ -92,9 +78,7 @@
             <outbound-router>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="out">
-                        <transaction action="BEGIN_OR_JOIN">
-                            <transaction-factory ref="txFactory"/>
-                        </transaction>
+                        <jms:transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>

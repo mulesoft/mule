@@ -9,15 +9,12 @@
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector"/>
-    <jms:transaction-factory name="txFactory"/>
-    
+
     <model name="Test-Case">
         <service name="TestComponent">
             <inbound-router>
                 <inbound-endpoint address="axis:jms://TestComponent">
-                    <transaction action="ALWAYS_BEGIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:transaction action="ALWAYS_BEGIN"/>
                 </inbound-endpoint>
             </inbound-router>
             <echo-component/>
@@ -28,4 +25,5 @@
             </outbound-router>
         </service>
     </model>
+    
 </mule>

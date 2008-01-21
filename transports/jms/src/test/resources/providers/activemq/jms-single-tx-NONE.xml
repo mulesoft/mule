@@ -13,16 +13,12 @@
     <jms:endpoint name="middle" queue="middle" connector-ref="jmsConnector"/>
     <jms:endpoint name="out" queue="out" connector-ref="jmsConnector"/>
 
-    <jms:transaction-factory name="txFactory"/>
-
     <model name="jmsTest">
 
         <service name="InputPart">
             <inbound-router>
                 <inbound-endpoint ref="in">
-                    <transaction action="NONE">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:transaction action="NONE"/>
                 </inbound-endpoint>
             </inbound-router>
             <component>

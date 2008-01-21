@@ -129,13 +129,6 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }
 
-    public void testTransactionFactory()
-    {
-        TestTransactionFactory factory = (TestTransactionFactory) managementContext.getRegistry().lookupObject("txFactory");
-        assertNotNull(factory);
-        assertEquals("foo", factory.getValue());
-    }
-
     public void testEndpointConfig() throws EndpointException, InitialisationException
     {
         UMOImmutableEndpoint endpoint1 = managementContext.getRegistry().lookupEndpointBuilder("endpoint1").buildInboundEndpoint();
@@ -151,6 +144,15 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         UMOFilter filter3 = ((NotFilter) filter2).getFilter();
         assertNotNull(filter3);
         assertTrue(filter3 instanceof JmsPropertyFilter);
+    }
+
+    public void testCustomTransactions() throws EndpointException, InitialisationException
+    {
+        UMOImmutableEndpoint endpoint3 = managementContext.getRegistry().lookupEndpointBuilder("endpoint3").buildInboundEndpoint();
+        assertNotNull(endpoint3);
+        TestTransactionFactory factory = (TestTransactionFactory) endpoint3.getTransactionConfig().getFactory();
+        assertNotNull(factory);
+        assertEquals("foo", factory.getValue());
     }
 
 }

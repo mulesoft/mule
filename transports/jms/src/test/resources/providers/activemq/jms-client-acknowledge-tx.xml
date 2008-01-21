@@ -18,16 +18,12 @@
 
     <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage"/>
 
-    <jms:client-ack-transaction-factory name="txFactory"/>
-
     <model name="jmsTest">
 
         <service name="InputPart">
             <inbound-router>
                 <inbound-endpoint ref="in">
-                    <transaction action="BEGIN_OR_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:transaction action="BEGIN_OR_JOIN"/>
                 </inbound-endpoint>
             </inbound-router>
             <component>
@@ -45,9 +41,7 @@
         <service name="JmsClientAcknowledgeTransactionFactory">
             <inbound-router>
                 <inbound-endpoint ref="middle">
-                    <transaction action="ALWAYS_BEGIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:transaction action="ALWAYS_BEGIN"/>
                 </inbound-endpoint>
             </inbound-router>
             <component>

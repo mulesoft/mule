@@ -69,10 +69,10 @@
         <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
     </xsd:attributeGroup>
 
-    <xsd:element name="transaction-factory" type="jdbcTransactionFactoryType" substitutionGroup="mule:abstract-transaction-factory"/>
-    <xsd:complexType name="jdbcTransactionFactoryType">
+    <xsd:element name="transaction" type="jdbcTransactionType" substitutionGroup="mule:abstract-transaction"/>
+    <xsd:complexType name="jdbcTransactionType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractTransactionFactoryType"/>
+            <xsd:extension base="mule:abstractTransactionType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

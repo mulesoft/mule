@@ -60,7 +60,6 @@
             <xsd:element ref="abstract-extension"/>
             <xsd:element ref="abstract-security-manager"/>
             <xsd:element ref="abstract-transaction-manager"/>
-            <xsd:element ref="abstract-transaction-factory"/>
             <xsd:element ref="abstract-connector"/>
             <xsd:element ref="abstract-global-endpoint"/>
             <xsd:element ref="abstract-transformer"/>
@@ -208,11 +207,6 @@
 
     <xsd:element name="abstract-transaction-manager" abstract="true" type="abstractTransactionManagerType"/>
     <xsd:complexType name="abstractTransactionManagerType"/>
-
-    <xsd:element name="abstract-transaction-factory" abstract="true" type="abstractTransactionFactoryType"/>
-    <xsd:complexType name="abstractTransactionFactoryType">
-        <xsd:attribute name="name" type="substitutableName"/>
-    </xsd:complexType>
 
     <xsd:complexType name="abstractAgentType">
         <xsd:complexContent>
@@ -424,7 +418,20 @@
     <xsd:complexType name="abstractStorageType"/>
 
     <xsd:element name="abstract-transaction" abstract="true" type="abstractTransactionType"/>
-    <xsd:complexType name="abstractTransactionType"/>
+    <xsd:complexType name="abstractTransactionType">
+        <xsd:attribute name="action">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="NONE"/>
+                    <xsd:enumeration value="ALWAYS_BEGIN"/>
+                    <xsd:enumeration value="BEGIN_OR_JOIN"/>
+                    <xsd:enumeration value="ALWAYS_JOIN"/>
+                    <xsd:enumeration value="JOIN_IF_POSSIBLE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="timeout" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
 
     <xsd:element name="abstract-connection-strategy" abstract="true" type="abstractConnectionStrategyType"/>
     <xsd:complexType name="abstractConnectionStrategyType"/>
@@ -713,58 +720,12 @@
         <xsd:attribute name="responseTransformer-refs" type="xsd:NMTOKENS"/>
     </xsd:attributeGroup>
 
-    <xsd:element name="transaction" type="transactionType" substitutionGroup="abstract-transaction"/>
-    <xsd:complexType name="transactionType">
+    <xsd:element name="custom-transaction" type="customTransactionType" substitutionGroup="abstract-transaction"/>
+    <xsd:complexType name="customTransactionType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransactionType">
-                <xsd:choice>
-                    <xsd:element ref="abstract-transaction-factory" minOccurs="0"/>
-                    <xsd:element ref="transaction-factory" minOccurs="0"/>
-                </xsd:choice>
-                <xsd:attribute name="action">
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="NONE"/>
-                            <xsd:enumeration value="ALWAYS_BEGIN"/>
-                            <xsd:enumeration value="BEGIN_OR_JOIN"/>
-                            <xsd:enumeration value="ALWAYS_JOIN"/>
-                            <xsd:enumeration value="JOIN_IF_POSSIBLE"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="timeout" type="xsd:NMTOKEN"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="custom-transaction-factory" type="customTransactionFactoryType"
-                 substitutionGroup="abstract-transaction-factory">
-        <xsd:annotation>
-            <xsd:documentation>
-                This can be used at the top level with a name, and then referenced with
-                &lt;transaction-factory&gt;, or embedded directly in a &lt;transaction&gt;
-                (in which case name cannot be given).
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customTransactionFactoryType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransactionFactoryType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!-- this doesn't extend abstract-transaction-factory because we don't allow it at the
-         top level -->
-    <xsd:element name="transaction-factory" type="transactionRefFactoryType"/>
-    <xsd:complexType name="transactionRefFactoryType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransactionFactoryType">
-                <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="factory-class" type="substitutableClass"/>
+                <xsd:attribute name="factory-ref" type="xsd:NMTOKEN"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

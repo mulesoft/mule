@@ -9,15 +9,11 @@
 
     <jms:activemq-connector name="jmsConnector"/>
 
-    <jms:transaction-factory name="txFactory"/>
-    
     <model name="test">
         <service name="DeadLetter">
             <inbound-router>
                 <jms:inbound-endpoint queue="in">
-                    <transaction action="ALWAYS_BEGIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>
+                    <jms:transaction action="ALWAYS_BEGIN"/>
                 </jms:inbound-endpoint>
             </inbound-router>
             <component>
@@ -29,17 +25,13 @@
             <outbound-router>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="out">
-                        <transaction action="ALWAYS_JOIN">
-                            <transaction-factory ref="txFactory"/>
-                        </transaction>                    
+                        <jms:transaction action="ALWAYS_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound-router>
             <default-service-exception-strategy>
                 <jms:outbound-endpoint queue="dead.letter">
-                    <transaction action="ALWAYS_JOIN">
-                        <transaction-factory ref="txFactory"/>
-                    </transaction>                    
+                    <jms:transaction action="ALWAYS_JOIN"/>
                 </jms:outbound-endpoint>
             </default-service-exception-strategy>
         </service>
