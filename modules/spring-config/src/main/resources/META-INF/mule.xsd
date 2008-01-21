@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>                                        "inb
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -1410,9 +1410,9 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="idempotent-receiver-router" type="idempotentReceiverType"
+    <xsd:element name="idempotent-receiver-router" type="idempotentReceiverRouterType"
                  substitutionGroup="abstract-inbound-router"/>
-    <xsd:complexType name="idempotentReceiverType">
+    <xsd:complexType name="idempotentReceiverRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
                 <xsd:sequence>
@@ -1435,6 +1435,8 @@
 
     <xsd:element name="selective-consumer-router" type="selectiveConsumerRouterType"
                  substitutionGroup="abstract-inbound-router"/>
+    <xsd:element name="correlation-resequencer-router" type="selectiveConsumerRouterType"
+                 substitutionGroup="abstract-inbound-router"/>
     <xsd:complexType name="selectiveConsumerRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
@@ -1447,11 +1449,9 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="message-chunking-aggregator-router" type="correlationRouterType"
+    <xsd:element name="message-chunking-aggregator-router" type="messageChunkingAggregatorRouterType"
                  substitutionGroup="abstract-inbound-router"/>
-    <xsd:element name="correlation-resequencer-router" type="correlationRouterType"
-                 substitutionGroup="abstract-inbound-router"/>
-    <xsd:complexType name="correlationRouterType">
+    <xsd:complexType name="messageChunkingAggregatorRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
                 <xsd:attribute name="correlationExpression" type="xsd:string"/>
@@ -1459,11 +1459,11 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="correlation-aggregator-router" type="correlationAggregatorRouterType"
+    <xsd:element name="custom-correlation-aggregator-router" type="customCorrelationAggregatorRouterType"
                  substitutionGroup="abstract-inbound-router"/>
-    <xsd:complexType name="correlationAggregatorRouterType">
+    <xsd:complexType name="customCorrelationAggregatorRouterType">
         <xsd:complexContent>
-            <xsd:extension base="correlationRouterType">
+            <xsd:extension base="messageChunkingAggregatorRouterType">
                 <xsd:attribute name="class" type="substitutableClass" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
