@@ -10,8 +10,6 @@
 
 package org.mule.providers.jms;
 
-import java.text.MessageFormat;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
@@ -22,7 +20,6 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.naming.NamingException;
 
 /**
  * <code>Jms11Support</code> is a template class to provide an abstraction to to
@@ -122,19 +119,6 @@ public class Jms11Support implements JmsSupport
             throw new IllegalArgumentException("Destination name cannot be null when creating a destination");
         }
 
-        if (connector.isJndiDestinations())
-        {
-            Destination dest = getJndiDestination(name);
-            if (dest != null)
-            {
-                return dest;
-            }
-            else if (connector.isForceJndiDestinations())
-            {
-                throw new JMSException("JNDI destination not found with name: " + name);
-            }
-        }
-
         if (topic)
         {
             return session.createTopic(name);
@@ -143,36 +127,6 @@ public class Jms11Support implements JmsSupport
         {
             return session.createQueue(name);
         }
-    }
-
-    protected Destination getJndiDestination(String name) throws JMSException
-    {
-        Object temp;
-        try
-        {
-            if (connector.getJndiContext() == null)
-            {
-                throw new IllegalArgumentException("Jndi Context has not been configured correctly on the connector.");
-            }
-            temp = connector.getJndiContext().lookup(name);
-        }
-        catch (NamingException e)
-        {
-            throw new JMSException(MessageFormat.format("Failed to look up destination {0}. Reason: {1}",
-                                                        new Object[] {name, e.getMessage()}));
-        }
-        if (temp != null)
-        {
-            if (temp instanceof Destination)
-            {
-                return (Destination) temp;
-            }
-            else if (connector.isForceJndiDestinations())
-            {
-                throw new JMSException("JNDI destination not found with name: " + name);
-            }
-        }
-        return null;
     }
 
     public Destination createTemporaryDestination(Session session, boolean topic) throws JMSException

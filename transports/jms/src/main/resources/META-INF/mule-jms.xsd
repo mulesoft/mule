@@ -15,30 +15,10 @@
     <xsd:complexType name="genericConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:sequence>
-                    <!-- The ConnectionFactory is required for non-vendor JMS configs -->
-                    <xsd:element ref="abstract-connection-factory" minOccurs="1" maxOccurs="1"/>
-                    <xsd:group ref="jmsConnectorElements"/>
-                </xsd:sequence>
+                <!-- The ConnectionFactory is required for non-vendor JMS configs -->
+                <xsd:attribute name="connectionFactory-ref" type="xsd:NMTOKEN" use="required"/>
                 <xsd:attributeGroup ref="jmsConnectorAttributes"/>
             </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="abstract-connection-factory" abstract="true" type="abstractConnectionFactoryType"/>
-    <xsd:complexType name="abstractConnectionFactoryType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:genericObjectFactoryType">
-                <xsd:attribute name="username" type="xsd:string"/>
-                <xsd:attribute name="password" type="xsd:string"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="connection-factory" type="genericConnectionFactoryType" substitutionGroup="abstract-connection-factory"/>
-    <xsd:complexType name="genericConnectionFactoryType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractConnectionFactoryType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -47,24 +27,14 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="mule:customConnectorType">
-                    <xsd:sequence>
-                        <!-- The ConnectionFactory is required for non-vendor JMS configs -->
-                        <xsd:element ref="abstract-connection-factory" minOccurs="1" maxOccurs="1"/>
-                        <xsd:group ref="jmsConnectorElements"/>
-                    </xsd:sequence>
                     <xsd:attributeGroup ref="jmsConnectorAttributes"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
 
-    <xsd:group name="jmsConnectorElements">
-        <xsd:sequence>
-            <xsd:element name="redelivery-handler" type="mule:genericObjectFactoryType" minOccurs="0" maxOccurs="1"/>
-        </xsd:sequence>
-    </xsd:group>
-
     <xsd:attributeGroup name="jmsConnectorAttributes">
+        <xsd:attribute name="redeliveryHandler-ref" type="xsd:NMTOKEN"/>
         <xsd:attribute name="acknowledgementMode" default="AUTO_ACKNOWLEDGE">
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
@@ -83,8 +53,6 @@
         <xsd:attribute name="cacheJmsSessions" type="mule:substitutableBoolean"/>
         <xsd:attribute name="recoverJmsConnections" type="mule:substitutableBoolean"/>
         <xsd:attribute name="eagerConsumer" type="mule:substitutableBoolean"/>
-        <xsd:attribute name="jndiDestinations" type="mule:substitutableBoolean"/>
-        <xsd:attribute name="forceJndiDestinations" type="mule:substitutableBoolean"/>
         <!-- Defaults to org.mule.providers.jms.JmsConstants.JMS_SPECIFICATION_102B  -->
         <xsd:attribute name="specification" default="1.0.2b">
             <xsd:simpleType>
@@ -94,6 +62,8 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="username" type="xsd:string"/>
+        <xsd:attribute name="password" type="xsd:string"/>
     </xsd:attributeGroup>
 
 
@@ -102,11 +72,8 @@
     <xsd:complexType name="vendorJmsConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:sequence>
-                    <!-- Optional, a default ConnectionFactory is provided for vendor JMS configs -->
-                    <xsd:element name="connection-factory" type="genericConnectionFactoryType" minOccurs="0" maxOccurs="1"/>
-                    <xsd:group ref="jmsConnectorElements"/>
-                </xsd:sequence>
+                <!-- Optional, a default ConnectionFactory is provided for vendor JMS configs -->
+                <xsd:attribute name="connectionFactory-ref" type="xsd:NMTOKEN" use="optional"/>
                 <xsd:attributeGroup ref="jmsConnectorAttributes"/>
             </xsd:extension>
         </xsd:complexContent>

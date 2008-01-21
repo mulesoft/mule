@@ -120,7 +120,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
 
         try
         {
-            redeliveryHandler = (RedeliveryHandler) this.connector.getRedeliveryHandler().getOrCreate();
+            redeliveryHandler = this.connector.getRedeliveryHandler();
             redeliveryHandler.setConnector(this.connector);
         }
         catch (Exception e)

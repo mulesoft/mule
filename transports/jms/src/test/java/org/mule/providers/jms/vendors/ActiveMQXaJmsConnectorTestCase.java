@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 
@@ -34,7 +35,7 @@ public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
         JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector");
         assertNotNull(c);
         
-        Object cf = c.getConnectionFactory().getOrCreate();
+        ConnectionFactory cf = c.getConnectionFactory();
         assertTrue(cf instanceof ActiveMQXAConnectionFactory);
 
         ConnectionFactoryWrapper wrapper = new ConnectionFactoryWrapper(cf);

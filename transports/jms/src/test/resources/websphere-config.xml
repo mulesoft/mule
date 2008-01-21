@@ -8,10 +8,8 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <jms:websphere-connector name="jmsConnector">
-        <jms:connection-factory>
-            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
-        </jms:connection-factory>
-    </jms:websphere-connector>
+    <spring:bean name="connectionFactory" class="org.mule.providers.jms.test.TestConnectionFactory"/>
+
+    <jms:websphere-connector name="jmsConnector" connectionFactory-ref="connectionFactory"/>
     
 </mule>

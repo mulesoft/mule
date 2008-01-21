@@ -8,12 +8,10 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
+    <spring:bean name="connectionFactory" class="org.mule.providers.jms.test.TestConnectionFactory"/>
+
     <!-- Default config -->
-    <jms:connector name="jmsConnector">
-        <jms:connection-factory>
-            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
-        </jms:connection-factory>
-    </jms:connector>
+    <jms:connector name="jmsConnector" connectionFactory-ref="connectionFactory"/>
 
     <!-- DON'T use jms:endpoints here as we are testing for resolution from uri
          (all that the jms topic attribute does is make an address using "jms://topic:") -->

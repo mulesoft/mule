@@ -11,17 +11,17 @@ package org.mule.providers.jms.config;
 
 import org.mule.providers.jms.DefaultRedeliveryHandler;
 import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.filters.JmsSelectorFilter;
 import org.mule.providers.jms.filters.JmsPropertyFilter;
+import org.mule.providers.jms.filters.JmsSelectorFilter;
 import org.mule.providers.jms.test.TestConnectionFactory;
 import org.mule.providers.jms.test.TestRedeliveryHandler;
+import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.routing.filters.logic.NotFilter;
 
 import javax.jms.Session;
 
@@ -47,13 +47,13 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
 
         assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory().getOrCreate() instanceof TestConnectionFactory);
+        assertTrue(c.getConnectionFactory() instanceof TestConnectionFactory);
         assertEquals(Session.AUTO_ACKNOWLEDGE, c.getAcknowledgementMode());
         assertNull(c.getUsername());
         assertNull(c.getPassword());
 
         assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler().getOrCreate() instanceof DefaultRedeliveryHandler);
+        assertTrue(c.getRedeliveryHandler() instanceof DefaultRedeliveryHandler);
         
         assertNull(c.getClientId());
         assertFalse(c.isDurable());
@@ -63,8 +63,6 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(c.isCacheJmsSessions());
         assertTrue(c.isRecoverJmsConnections());
         assertTrue(c.isEagerConsumer());
-        assertFalse(c.isJndiDestinations());
-        assertFalse(c.isForceJndiDestinations());
     }
     
     public void testConnectorConfig() throws Exception
@@ -74,13 +72,13 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertNotNull(c.getConnectionFactory());
         
-        assertTrue(c.getConnectionFactory().getOrCreate() instanceof TestConnectionFactory);
+        assertTrue(c.getConnectionFactory() instanceof TestConnectionFactory);
         assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
         assertEquals("myuser", c.getUsername());
         assertEquals("mypass", c.getPassword());
 
         assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler().getOrCreate() instanceof TestRedeliveryHandler);
+        assertTrue(c.getRedeliveryHandler() instanceof TestRedeliveryHandler);
         
         assertEquals("myClient", c.getClientId());
         assertTrue(c.isDurable());
@@ -90,8 +88,6 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isCacheJmsSessions());
         assertFalse(c.isRecoverJmsConnections());
         assertFalse(c.isEagerConsumer());
-        assertTrue(c.isJndiDestinations());
-        assertTrue(c.isForceJndiDestinations());
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
         //test properties, default is 4
@@ -115,11 +111,11 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertNotNull(c.getConnectionFactory());
 
-        assertTrue(c.getConnectionFactory().getOrCreate() instanceof TestConnectionFactory);
+        assertTrue(c.getConnectionFactory() instanceof TestConnectionFactory);
         assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
 
         assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler().getOrCreate() instanceof TestRedeliveryHandler);
+        assertTrue(c.getRedeliveryHandler() instanceof TestRedeliveryHandler);
 
         assertEquals("myClient", c.getClientId());
         assertTrue(c.isDurable());
@@ -129,21 +125,9 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isCacheJmsSessions());
         assertFalse(c.isRecoverJmsConnections());
         assertFalse(c.isEagerConsumer());
-        assertTrue(c.isJndiDestinations());
-        assertTrue(c.isForceJndiDestinations());
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }
-
-//    public void testJndi() throws Exception
-//    {
-//        JmsConnector c = (JmsConnector)managementContext.getRegistry().lookupConnector("jmsConnector2");
-//        assertNotNull(c);
-//
-//        assertNotNull(c.getConnectionFactory());
-//        assertTrue(c.getConnectionFactory().create() instanceof TestConnectionFactory);
-//        assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
-//    }
 
     public void testTransactionFactory()
     {

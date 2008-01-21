@@ -28,17 +28,12 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.StartException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.object.JndiObjectFactory;
-import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.PrototypeObjectFactory;
 
 import java.text.MessageFormat;
-import java.util.Map;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -50,7 +45,6 @@ import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 import javax.jms.XAConnectionFactory;
-import javax.naming.Context;
 import javax.naming.NamingException;
 
 import org.apache.commons.lang.UnhandledException;
@@ -95,9 +89,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     // JMS Connection
     ////////////////////////////////////////////////////////////////////////
 
-    /** Factory used to get an instance of the ConnectionFactory. */
-    // TODO type-checking with JDK 5
-    private ObjectFactory/*<ConnectionFactory>*/ connectionFactory;
+    private ConnectionFactory connectionFactory;
 
     public String username = null;
 
@@ -118,51 +110,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
 
     private JmsTopicResolver topicResolver;
 
-    /** Factory used to get an instance of the RedeliveryHandler. */
-    // TODO type-checking with JDK 5
-    private ObjectFactory/*<RedeliveryHandler>*/ redeliveryHandler;
-
-    ////////////////////////////////////////////////////////////////////////
-    // JNDI
-    ////////////////////////////////////////////////////////////////////////
-
-    /**
-     * The JNDI Context can be configured on its own or, if a JndiObjectFactory is used for
-     * <code>connectionFactory</code>, it will get configured from there.
-     */
-    private Context jndiContext;
-
-    private boolean jndiDestinations = false;
-
-    private boolean forceJndiDestinations = false;
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    private String connectionFactoryJndiName;
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    private String jndiInitialFactory;
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    private String jndiProviderUrl;
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    private Map jndiProviderProperties;
+    private RedeliveryHandler redeliveryHandler;
 
     ////////////////////////////////////////////////////////////////////////
     // Methods
@@ -183,21 +131,11 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     {
         if (connectionFactory == null)
         {
-            if (jndiInitialFactory != null)
-            {
-                connectionFactory = new JndiObjectFactory(connectionFactoryJndiName, jndiInitialFactory, jndiProviderUrl, jndiProviderProperties);
-                connectionFactory.initialise();
-                jndiContext = ((JndiObjectFactory) connectionFactory).getContext();
-            }
-            else if (getDefaultConnectionFactory() != null)
-            {
-                connectionFactory = getDefaultConnectionFactory();
-                connectionFactory.initialise();
-            }
-            else
-            {
-                throw new InitialisationException(JmsMessages.noConnectionFactorySet(), this);
-            }
+            connectionFactory = getDefaultConnectionFactory();
+        }
+        if (connectionFactory == null)
+        {
+            throw new InitialisationException(JmsMessages.noConnectionFactorySet(), this);
         }
 
         if (topicResolver == null)
@@ -206,8 +144,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         }
         if (redeliveryHandler == null)
         {
-            redeliveryHandler = new PrototypeObjectFactory(DefaultRedeliveryHandler.class);
-            redeliveryHandler.initialise();
+            redeliveryHandler = new DefaultRedeliveryHandler();
         }
 
         try
@@ -221,7 +158,7 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
     }
 
     /** Override this method to provide a default ConnectionFactory for a vendor-specific JMS Connector. */
-    protected ObjectFactory/*<ConnectionFactory>*/ getDefaultConnectionFactory()
+    protected ConnectionFactory getDefaultConnectionFactory()
     {
         return null;
     }
@@ -240,21 +177,15 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
             }
             connection = null;
         }
-
-        if (connectionFactory != null && connectionFactory instanceof Disposable)
-        {
-            connectionFactory.dispose();
-        }
     }
 
     protected Connection createConnection() throws NamingException, JMSException, InitialisationException
     {
-        ConnectionFactory cf;
+        ConnectionFactory cf = this.connectionFactory;
         Connection connection;
 
         try
         {
-            cf = (ConnectionFactory) connectionFactory.getOrCreate();
             if (cf instanceof XAConnectionFactory && managementContext.getTransactionManager() != null)
             {
                 cf = new ConnectionFactoryWrapper(cf);
@@ -916,54 +847,24 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         this.cacheJmsSessions = cacheJmsSessions;
     }
 
-    public ObjectFactory getConnectionFactory()
+    public ConnectionFactory getConnectionFactory()
     {
         return connectionFactory;
     }
 
-    public void setConnectionFactory(ObjectFactory connectionFactory)
+    public void setConnectionFactory(ConnectionFactory connectionFactory)
     {
         this.connectionFactory = connectionFactory;
     }
 
-    public ObjectFactory getRedeliveryHandler()
+    public RedeliveryHandler getRedeliveryHandler()
     {
         return redeliveryHandler;
     }
 
-    public void setRedeliveryHandler(ObjectFactory redeliveryHandler)
+    public void setRedeliveryHandler(RedeliveryHandler redeliveryHandler)
     {
         this.redeliveryHandler = redeliveryHandler;
-    }
-
-    public boolean isJndiDestinations()
-    {
-        return jndiDestinations;
-    }
-
-    public void setJndiDestinations(boolean jndiDestinations)
-    {
-        this.jndiDestinations = jndiDestinations;
-    }
-
-    public Context getJndiContext()
-    {
-        return jndiContext;
-    }
-
-    public void setJndiContext(Context jndiContext)
-    {
-        this.jndiContext = jndiContext;
-    }
-
-    public boolean isForceJndiDestinations()
-    {
-        return forceJndiDestinations;
-    }
-
-    public void setForceJndiDestinations(boolean forceJndiDestinations)
-    {
-        this.forceJndiDestinations = forceJndiDestinations;
     }
 
     /**
@@ -988,85 +889,4 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
    {
        return honorQosHeaders;
    }
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see <a href="http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee"/>
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    public String getConnectionFactoryJndiName()
-    {
-        return connectionFactoryJndiName;
-    }
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    public void setConnectionFactoryJndiName(String connectionFactoryJndiName)
-    {
-        this.connectionFactoryJndiName = connectionFactoryJndiName;
-    }
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    public String getJndiInitialFactory()
-    {
-        return jndiInitialFactory;
-    }
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    public void setJndiInitialFactory(String jndiInitialFactory)
-    {
-        this.jndiInitialFactory = jndiInitialFactory;
-    }
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    public String getJndiProviderUrl()
-    {
-        return jndiProviderUrl;
-    }
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    public void setJndiProviderUrl(String jndiProviderUrl)
-    {
-        this.jndiProviderUrl = jndiProviderUrl;
-    }
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    public Map getJndiProviderProperties()
-    {
-        return jndiProviderProperties;
-    }
-
-    /**
-     * @deprecated Mule 2.x configs should use Spring's <jee:jndi-lookup> or Mule's JndiObjectFactory instead.
-     * @see http://www.springframework.org/docs/reference/xsd-config.html#xsd-config-body-schemas-jee
-     * @see org.mule.util.object.JndiObjectFactory
-     */
-    public void setJndiProviderProperties(final Map jndiProviderProperties)
-    {
-        this.jndiProviderProperties = jndiProviderProperties;
-    }
-
 }

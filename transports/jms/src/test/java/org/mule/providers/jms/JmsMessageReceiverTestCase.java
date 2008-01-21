@@ -18,7 +18,6 @@ import org.mule.umo.endpoint.UMOEndpointBuilder;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
-import org.mule.util.object.SingletonObjectFactory;
 
 import com.mockobjects.dynamic.AnyConstraintMatcher;
 import com.mockobjects.dynamic.Mock;
@@ -43,7 +42,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         connection.expect("close");
         connection.expect("start");
         connection.expect("stop");
-        connector.setConnectionFactory(new SingletonObjectFactory(connectionFactory.proxy()));
+        connector.setConnectionFactory((ConnectionFactory) connectionFactory.proxy());
         
         connector.setManagementContext(managementContext);
         //managementContext.applyLifecycle(connector);

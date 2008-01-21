@@ -12,17 +12,11 @@ package org.mule.providers.jms.test;
 
 import org.mule.providers.jms.JmsConnector;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.PrototypeObjectFactory;
 
 public class TestJmsConnector extends JmsConnector
 {
-
     public TestJmsConnector() throws InitialisationException
     {
-        ObjectFactory factory = new PrototypeObjectFactory(TestConnectionFactory.class);
-        factory.initialise();
-        setConnectionFactory(factory);
+        setConnectionFactory(new TestConnectionFactory());
     }
-
 }

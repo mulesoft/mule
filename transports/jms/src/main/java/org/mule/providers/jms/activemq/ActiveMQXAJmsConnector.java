@@ -9,20 +9,25 @@
  */
 package org.mule.providers.jms.activemq;
 
-import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.PrototypeObjectFactory;
+import org.mule.util.ClassUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.jms.ConnectionFactory;
 
 public class ActiveMQXAJmsConnector extends ActiveMQJmsConnector
 {
     public static final String ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS = "org.apache.activemq.ActiveMQXAConnectionFactory";
 
-    protected ObjectFactory/*<ConnectionFactory>*/ getDefaultConnectionFactory()
+    protected ConnectionFactory getDefaultConnectionFactory()
     {
-        Map props = new HashMap();
-        props.put("brokerURL", getBrokerURL());
-        return new PrototypeObjectFactory(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, props);
+        try
+        {
+            return (ConnectionFactory) 
+                ClassUtils.instanciateClass(ACTIVEMQ_XA_CONNECTION_FACTORY_CLASS, new Object[]{getBrokerURL()});
+        }
+        catch (Exception e)
+        {
+            logger.warn(e);
+            return null;
+        }
     }
 }

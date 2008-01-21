@@ -36,7 +36,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
 
         assertFalse(c.isEagerConsumer());
         
-        ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory().getOrCreate();
+        ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory();
         assertTrue(cf instanceof ActiveMQConnectionFactory);
         assertEquals(ActiveMQJmsConnector.DEFAULT_BROKER_URL, ((ActiveMQConnectionFactory) cf).getBrokerURL());
         
@@ -53,13 +53,13 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertTrue(c instanceof ActiveMQJmsConnector);
         
         assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory().getOrCreate() instanceof ActiveMQConnectionFactory);
+        assertTrue(c.getConnectionFactory() instanceof ActiveMQConnectionFactory);
         assertEquals(Session.AUTO_ACKNOWLEDGE, c.getAcknowledgementMode());
         assertNull(c.getUsername());
         assertNull(c.getPassword());
 
         assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler().getOrCreate() instanceof DefaultRedeliveryHandler);
+        assertTrue(c.getRedeliveryHandler() instanceof DefaultRedeliveryHandler);
         
         assertFalse(c.isDurable());
         assertFalse(c.isNoLocal());
@@ -68,8 +68,6 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertFalse(c.isCacheJmsSessions());
         assertTrue(c.isRecoverJmsConnections());
         assertFalse(c.isEagerConsumer());
-        assertFalse(c.isJndiDestinations());
-        assertFalse(c.isForceJndiDestinations());
 
         assertEquals("1.0.2b", c.getSpecification());
     }
@@ -82,13 +80,13 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertTrue(c instanceof ActiveMQJmsConnector);
         
         assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory().getOrCreate() instanceof ActiveMQConnectionFactory);
+        assertTrue(c.getConnectionFactory() instanceof ActiveMQConnectionFactory);
         assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
         assertNull(c.getUsername());
         assertNull(c.getPassword());
 
         assertNotNull(c.getRedeliveryHandler());
-        assertTrue(c.getRedeliveryHandler().getOrCreate() instanceof TestRedeliveryHandler);
+        assertTrue(c.getRedeliveryHandler() instanceof TestRedeliveryHandler);
 
         assertEquals("myClient", c.getClientId());
         assertTrue(c.isDurable());
@@ -98,8 +96,6 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertTrue(c.isCacheJmsSessions());
         assertFalse(c.isRecoverJmsConnections());
         assertFalse(c.isEagerConsumer());
-        assertTrue(c.isJndiDestinations());
-        assertTrue(c.isForceJndiDestinations());
 
         assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
     }

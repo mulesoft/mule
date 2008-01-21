@@ -8,12 +8,12 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
+    <spring:bean name="connectionFactory" class="org.mule.providers.jms.test.TestConnectionFactory"/>
+
+    <spring:bean name="redeliveryHandler" class="org.mule.providers.jms.test.TestRedeliveryHandler"/>
+    
     <!-- Default config -->
-    <jms:connector name="jmsConnectorDefaults">
-        <jms:connection-factory>
-            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
-        </jms:connection-factory>
-    </jms:connector>
+    <jms:connector name="jmsConnectorDefaults" connectionFactory-ref="connectionFactory"/>
 
     <jms:connector name="jmsConnector1"
                    acknowledgementMode="DUPS_OK_ACKNOWLEDGE"
@@ -25,27 +25,16 @@
                    cacheJmsSessions="true"
                    recoverJmsConnections="false"
                    eagerConsumer="false"
-                   jndiDestinations="true"
-                   forceJndiDestinations="true"
                    specification="1.1"
-                   numberOfConcurrentTransactedReceivers="7">
-        <jms:connection-factory username="myuser" password="mypass">
-            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory">
-                <properties>
-                    <!-- just testing to see if this validates -->
-                </properties>
-            </prototype-object>
-        </jms:connection-factory>
-        <jms:redelivery-handler>
-            <prototype-object class="org.mule.providers.jms.test.TestRedeliveryHandler"/>
-        </jms:redelivery-handler>
-    </jms:connector>
+                   numberOfConcurrentTransactedReceivers="7"
+                   connectionFactory-ref="connectionFactory"
+                   redeliveryHandler-ref="redeliveryHandler"
+                   username="myuser"
+                   password="mypass"/>
 
     <jms:custom-connector name="jmsConnector2" class="org.mule.providers.jms.JmsConnector"
                           specification="1.1">
-        <jms:connection-factory>
-            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
-        </jms:connection-factory>
+         <spring:property name="connectionFactory" ref="connectionFactory"/>
     </jms:custom-connector>
 
     <jms:connector name="jmsConnector3"
@@ -58,16 +47,9 @@
                     cacheJmsSessions="true"
                     recoverJmsConnections="false"
                     eagerConsumer="false"
-                    jndiDestinations="true"
-                    forceJndiDestinations="true"
-                    specification="1.1">
-        <jms:connection-factory>
-            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
-        </jms:connection-factory>
-        <jms:redelivery-handler>
-            <prototype-object class="org.mule.providers.jms.test.TestRedeliveryHandler"/>
-        </jms:redelivery-handler>
-    </jms:connector>
+                    specification="1.1"
+                    connectionFactory-ref="connectionFactory"
+                    redeliveryHandler-ref="redeliveryHandler"/>
 
     <custom-transaction-factory name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory">
         <spring:property name="value" value="foo"/>

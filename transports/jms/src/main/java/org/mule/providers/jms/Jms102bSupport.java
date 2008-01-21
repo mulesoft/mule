@@ -170,23 +170,6 @@ public class Jms102bSupport extends Jms11Support
             throw new IllegalArgumentException("Destination name cannot be null when creating a destination");
         }
 
-        if (connector.isJndiDestinations())
-        {
-            if (connector.getJndiContext() == null)
-            {
-                throw new IllegalArgumentException("Jndi Context name cannot be null when looking up a destination");
-            }
-            Destination dest = getJndiDestination(name);
-            if (dest != null)
-            {
-                return dest;
-            }
-            else if (connector.isForceJndiDestinations())
-            {
-                throw new JMSException("JNDI destination not found with name: " + name);
-            }
-        }
-
         if (topic)
         {
             // DO NOT REMOVE THE CAST, BREAKS WEBLOGIC 8.X

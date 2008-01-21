@@ -13,15 +13,13 @@ package org.mule.providers.jms.activemq;
 import org.mule.providers.ConnectException;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.xa.ConnectionInvocationHandler;
-import org.mule.util.object.ObjectFactory;
-import org.mule.util.object.PrototypeObjectFactory;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 
 /**
  * ActiveMQ 4.x-specific JMS connector.
@@ -42,11 +40,18 @@ public class ActiveMQJmsConnector extends JmsConnector
         // TODO MULE-1409 better support for ActiveMQ 4.x temp destinations
     }
 
-    protected ObjectFactory/*<ConnectionFactory>*/ getDefaultConnectionFactory()
+    protected ConnectionFactory getDefaultConnectionFactory()
     {
-        Map props = new HashMap();
-        props.put("brokerURL", getBrokerURL());
-        return new PrototypeObjectFactory(ACTIVEMQ_CONNECTION_FACTORY_CLASS, props);
+        try
+        {
+            return (ConnectionFactory) 
+                ClassUtils.instanciateClass(ACTIVEMQ_CONNECTION_FACTORY_CLASS, new Object[]{getBrokerURL()});
+        }
+        catch (Exception e)
+        {
+            logger.warn(e);
+            return null;
+        }
     }
 
     /**

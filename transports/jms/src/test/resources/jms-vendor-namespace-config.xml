@@ -13,16 +13,9 @@
     <jms:activemq-connector name="activeMqConnectorDefaults"/>
     <jms:activemq-connector name="activeMqConnectorBroker" brokerURL="tcp://localhost:1234"/>
     
-    <jms:weblogic-connector name="weblogicConnector">
-        <jms:connection-factory>
-            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
-        </jms:connection-factory>
-    </jms:weblogic-connector>
+    <spring:bean name="connectionFactory" class="org.mule.providers.jms.test.TestConnectionFactory"/>
 
-    <jms:websphere-connector name="websphereConnector">
-        <jms:connection-factory>
-            <prototype-object class="org.mule.providers.jms.test.TestConnectionFactory"/>
-        </jms:connection-factory>
-    </jms:websphere-connector>
+    <jms:weblogic-connector name="weblogicConnector" connectionFactory-ref="connectionFactory"/>
 
+    <jms:websphere-connector name="websphereConnector" connectionFactory-ref="connectionFactory"/>
 </mule>
