@@ -10,7 +10,6 @@
 
 package org.mule.providers.cxf.jaxws;
 
-import org.mule.RegistryContext;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
@@ -24,7 +23,7 @@ public class ClientTestCase extends FunctionalTestCase
 {
     public void testGeneratedClient() throws Exception
     {
-        GreeterImpl impl = (GreeterImpl) managementContext.getRegistry().lookupObject("greeterService");
+        GreeterImpl impl = (GreeterImpl) muleContext.getRegistry().lookupObject("greeterService");
         
         Thread.sleep(2000);
         
@@ -39,7 +38,7 @@ public class ClientTestCase extends FunctionalTestCase
         UMOMessage result = client.send("clientEndpoint", "Dan", props);
         assertEquals("Hello Dan", result.getPayload());
         
-        GreeterImpl impl = (GreeterImpl) managementContext.getRegistry().lookupObject("greeterService");
+        GreeterImpl impl = (GreeterImpl) muleContext.getRegistry().lookupObject("greeterService");
         
         Thread.sleep(2000);
         

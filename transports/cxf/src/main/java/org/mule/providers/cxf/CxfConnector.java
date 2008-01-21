@@ -101,7 +101,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         
         // Registers the listener
         try{
-        	managementContext.registerListener(this);
+        	muleContext.registerListener(this);
         }
         catch (Exception e)
         {
@@ -174,7 +174,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         // TODO MULE-2228 Simplify this API
         SedaComponent c = new SedaComponent();
         c.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName());            
-        c.setModel(managementContext.getRegistry().lookupSystemModel());
+        c.setModel(muleContext.getRegistry().lookupSystemModel());
         
         CxfServiceComponent svcComponent = new CxfServiceComponent((CxfMessageReceiver)receiver);
         svcComponent.setBus(bus);
@@ -204,7 +204,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
 
         QName serviceName = server.getEndpoint().getEndpointInfo().getName();
 
-        UMOEndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint, managementContext);
+        UMOEndpointBuilder serviceEndpointbuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
         serviceEndpointbuilder.setSynchronous(sync);
         serviceEndpointbuilder.setName(ep.getScheme() + ":" + serviceName.getLocalPart());
         // Set the transformers on the endpoint too
@@ -219,7 +219,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         // TODO Do we really need to modify the existing receiver endpoint? What happnes if we don't security,
         // filters and transformers will get invoked twice?
         UMOEndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint(),
-            managementContext);
+            muleContext);
         receiverEndpointBuilder.setTransformers(TransformerUtils.UNDEFINED);
         receiverEndpointBuilder.setResponseTransformers(TransformerUtils.UNDEFINED);
         // Remove the Axis filter now
@@ -227,11 +227,11 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         // Remove the Axis Receiver Security filter now
         receiverEndpointBuilder.setSecurityFilter(null);
 
-        UMOImmutableEndpoint serviceEndpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint serviceEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(serviceEndpointbuilder);
 
-        UMOImmutableEndpoint receiverEndpoint = managementContext.getRegistry()
+        UMOImmutableEndpoint receiverEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(receiverEndpointBuilder);
 
@@ -281,7 +281,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
             {
                 try
                 {
-                    managementContext.getRegistry().registerComponent(c);
+                    muleContext.getRegistry().registerComponent(c);
                 }
                 catch (UMOException e)
                 {

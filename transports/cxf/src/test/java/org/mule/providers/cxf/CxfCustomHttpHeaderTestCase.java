@@ -10,9 +10,6 @@
 
 package org.mule.providers.cxf;
 
-import java.util.HashMap;
-import java.util.concurrent.CountDownLatch;
-
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.internal.notifications.MessageNotification;
@@ -20,6 +17,9 @@ import org.mule.impl.internal.notifications.MessageNotificationListener;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.manager.UMOServerNotification;
+
+import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
 
 public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements MessageNotificationListener
 {
@@ -31,12 +31,12 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements M
     protected void doSetUp() throws Exception
     {
         latch = new CountDownLatch(1);
-        managementContext.registerListener(this);
+        muleContext.registerListener(this);
     }
 
     protected void doTearDown() throws Exception
     {
-        managementContext.unregisterListener(this);
+        muleContext.unregisterListener(this);
     }
 
     public void testCxf() throws Exception

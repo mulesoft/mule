@@ -10,7 +10,6 @@
 
 package org.mule.providers.cxf;
 
-import org.mule.providers.cxf.CxfConnector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
@@ -32,7 +31,7 @@ public class CxfConnectorTestCase extends AbstractConnectorTestCase
     public UMOConnector createConnector() throws Exception
     {
         CxfConnector c = new CxfConnector();
-        c.setManagementContext(managementContext);
+        c.setMuleContext(muleContext);
         c.setName("cxfConnector");
         return c;
     }

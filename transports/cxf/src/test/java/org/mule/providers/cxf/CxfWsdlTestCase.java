@@ -10,7 +10,6 @@
 
 package org.mule.providers.cxf;
 
-import org.custommonkey.xmlunit.XMLAssert;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -22,6 +21,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 
+import org.custommonkey.xmlunit.XMLAssert;
 import org.w3c.dom.Document;
 
 public class CxfWsdlTestCase extends AbstractMuleTestCase
@@ -53,7 +53,7 @@ public class CxfWsdlTestCase extends AbstractMuleTestCase
     public void testCxfWsdlServiceWithEndpointParam() throws Exception
     {
 
-        Registry registry = managementContext.getRegistry();
+        Registry registry = muleContext.getRegistry();
 
         UMOEndpoint endpoint = (UMOEndpoint) registry.lookupEndpointFactory().getOutboundEndpoint(TEST_URL_NOWSDL);
         endpoint.setProperty("wsdlUrl", TEST_URL_WSDL);

@@ -10,6 +10,9 @@
 
 package org.mule.providers.cxf;
 
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.provider.UMOConnector;
+
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -17,16 +20,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 
-import org.mule.providers.cxf.CxfConnector;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.provider.UMOConnector;
-
 public class ConfigurationTestCase extends FunctionalTestCase
 {
     public void testBusConfiguration() throws Exception
     {
         boolean found = false;
-        Collection connectors = managementContext.getRegistry().lookupObjects(UMOConnector.class);
+        Collection connectors = muleContext.getRegistry().lookupObjects(UMOConnector.class);
         for (Iterator itr = connectors.iterator(); itr.hasNext();)
         {
             UMOConnector c = (UMOConnector) itr.next();
