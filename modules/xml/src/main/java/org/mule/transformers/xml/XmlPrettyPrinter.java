@@ -19,11 +19,11 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-public class XmlPrettyPrinterTransformer extends AbstractTransformer
+public class XmlPrettyPrinter extends AbstractTransformer
 {
     protected OutputFormat outputFormat = OutputFormat.createPrettyPrint();
 
-    public XmlPrettyPrinterTransformer()
+    public XmlPrettyPrinter()
     {
         super();
         this.registerSourceType(String.class);

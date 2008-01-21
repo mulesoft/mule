@@ -128,6 +128,26 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="xml-prettyprinter-transformer" type="xmlPrettyPrinterType" substitutionGroup="mule:abstract-transformer"/>
+    <xsd:complexType name="xmlPrettyPrinterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransformerType">
+                <xsd:attribute name="encoding" type="xsd:string"/>
+                <xsd:attribute name="expandEmptyElements" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="indent" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="indentSize" type="mule:substitutableInt"/>
+                <xsd:attribute name="lineSeparator" type="xsd:string"/>
+                <xsd:attribute name="newLineAfterNTags" type="mule:substitutableInt"/>
+                <xsd:attribute name="newlines" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="omitEncoding" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="padText" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="suppressDeclaration" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="trimText" type="mule:substitutableBoolean"/>
+                <xsd:attribute name="XHTML" type="mule:substitutableBoolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <!-- xml property extractors -->
 
     <xsd:element name="jxpath-property-extractor" type="mule:abstractPropertyExtractorType" substitutionGroup="mule:abstract-property-extractor"/>
