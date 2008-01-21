@@ -14,21 +14,21 @@
 
     <model name="main">
         <service name="test">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://complexRequest" synchronous="true"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="axis:http://localhost:8002/axisService/doSomeWork?method=executeComplexity"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="doSomeWork">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="axis:http://localhost:8002/axisService"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.usecases.axis.clientbridge.DoSomeWork"/>
         </service>
     </model>

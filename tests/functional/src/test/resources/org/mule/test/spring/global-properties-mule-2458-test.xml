@@ -12,11 +12,11 @@
 
     <model name="model">
         <service name="service">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="foo">
                     <property key="local" value="local"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <null-component/>
         </service>
     </model>

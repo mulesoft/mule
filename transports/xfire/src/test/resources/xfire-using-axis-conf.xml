@@ -16,19 +16,19 @@
 
         <!--Hosting the XFire service-->
         <service name="XfireService">
-            <inbound-router>
+            <inbound>
                 <xfire:inbound-endpoint address="http://localhost:63382/services"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
         <!--Accessing an XFire hosted web-service using Axis-->
         <service name="BridgeToXfireHello">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="xfire.in"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <!-- assume this can be translated to the new config, but since test is currently blocked
                          i haven't tried (need to run test to be sure translation ok) -->
@@ -52,7 +52,7 @@
                         </properties>
                     </outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
         
     </model>

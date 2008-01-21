@@ -94,7 +94,7 @@
             file:///usr/test-data/samples/errorhandler/in
         -->
         <service name="Error Manager">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="file://./test-data/in"
                                transformer-refs="XMLToExceptionBean ExceptionBeanToErrorMessage">
                     <!-- Ignore other files than our XML error input. When running this example from
@@ -103,7 +103,7 @@
                     -->
                     <file:filter-filename-wildcard pattern="*.xml"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             
             <component>
                 <pooled-object class="org.mule.samples.errorhandler.ErrorManager">
@@ -119,7 +119,7 @@
                  </pooled-object>
             </component>
 
-            <outbound-router>
+            <outbound>
                 <custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>
                 
                 <filtering-router transformer-refs="ErrorMessageToException">
@@ -142,14 +142,14 @@
                                    transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
                     <payload-type-filter expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
         
         <service name="Business Error Manager">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jms://exception.queue"
                                transformer-refs="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.samples.errorhandler.BusinessErrorManager"/>
         </service>
     </model>

@@ -9,9 +9,9 @@
 
   <model name="TestCxfModel">
     <service name="echoService">
-      <inbound-router>
+      <inbound>
           <cxf:inbound-endpoint address="http://localhost:63081/services/Echo" />
-      </inbound-router>
+      </inbound>
       <component class="org.mule.providers.cxf.testmodels.Echo"/>
     </service>
   </model>

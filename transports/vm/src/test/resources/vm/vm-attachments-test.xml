@@ -12,9 +12,9 @@
 
     <model name="main">
         <service name="test">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="vm-in"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.vm.functional.AttachmentsComponent"/>
         </service>
     </model>

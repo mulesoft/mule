@@ -11,13 +11,13 @@
 
     <model name="MultilpleConnectorsTestModel">
         <service name="testService">
-            <inbound-router>
+            <inbound>
                 <!--
                     Removing the connector name from endpoint will fail initialisation,
                     as there are multiple connectors available for the same transport.
                  -->
                 <inbound-endpoint address="test://endpoint1" connector-ref="testConnector1"/>
-            </inbound-router>
+            </inbound>
             <null-component/>
         </service>
     </model>

@@ -26,11 +26,11 @@
     <model name="ESTest">
 
         <service name="FolderTO">
-            <inbound-router>
+            <inbound>
                 <file:inbound-endpoint ref="get" transformer-refs="FileToByteArray"
                     comparator="org.mule.providers.file.comparator.OlderFirstComparator"
                     reverseOrder="true"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>

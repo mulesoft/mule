@@ -16,21 +16,21 @@
     <model name="Model">
 
         <service name="JmsQueueComponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://in" />
-            </inbound-router>
+            </inbound>
             <bridge-component />
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://echo.in" remoteSync="true" />
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="EchoComponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jms://echo.in" />
-            </inbound-router>
+            </inbound>
             <echo-component />
         </service>
 

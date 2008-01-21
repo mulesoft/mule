@@ -26,11 +26,11 @@
 
     <model name="main">
         <service name="ScriptService">
-            <inbound-router>
+            <inbound>
                 <stdio:inbound-endpoint system="IN"/>
                 <!-- For unit testing -->
                 <inbound-endpoint address="vm://scripting"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
                     <property key="scriptEngineName" value="groovy"/>

@@ -26,11 +26,11 @@
 
     <model name="http secured test model">
         <service name="SecureUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:4567" connector-ref="HttpConnector">
                     <acegi:http-security-filter realm="mule-realm"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
     </model>

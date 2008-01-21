@@ -13,21 +13,21 @@
     <mule:model name="BridgeTest">
     
         <mule:service name="receiver">
-            <mule:inbound-router>
+            <mule:inbound>
                 <cxf:inbound-endpoint address="http://localhost:63081/services/Echo" bridge="true"/>
-            </mule:inbound-router>
+            </mule:inbound>
             <mule:bridge-component/>
-            <mule:outbound-router>
+            <mule:outbound>
                 <mule:outbound-pass-through-router>
                     <vm:outbound-endpoint path="test" />
                 </mule:outbound-pass-through-router>
-            </mule:outbound-router>
+            </mule:outbound>
         </mule:service>
         
         <mule:service name="echoService">
-            <mule:inbound-router>
+            <mule:inbound>
                 <mule:inbound-endpoint address="vm://test" />
-            </mule:inbound-router>
+            </mule:inbound>
             <mule:component class="org.mule.providers.cxf.bridge.EchoComponent"/>
         </mule:service>
         

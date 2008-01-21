@@ -18,16 +18,16 @@
 
     <model name="main">
         <service name="default config">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="in-default" connector-ref="defaultVm"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <exception-based-router>
                     <!-- this doesn't exist -->
                     <smtp:outbound-endpoint user="error" host="localhost" port="65040" connector-ref="smtp"/>
                     <vm:outbound-endpoint path="out-default" connector-ref="queue"/>
                 </exception-based-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 

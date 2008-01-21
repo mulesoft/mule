@@ -13,39 +13,39 @@
     <model name="Testing_an_axis_service_using_xfire_dynamic_client">
         <!-- hosting the Axis Service -->
         <service name="AxisService">
-            <inbound-router>
+            <inbound>
                 <axis:inbound-endpoint address="http://localhost:63381/services"
                         style="WRAPPED" use="LITERAL"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
         <!-- Bridge Component used to test the ExceptionBasedRouting on Axis -->
         <service name="test">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://localhost.test"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <exception-based-router>
                     <outbound-endpoint address="axis:http://localhost:63380/services/AxisService?method=receive"/>
                     <outbound-endpoint address="axis:http://localhost:63381/services/AxisService?method=receive"/>
                 </exception-based-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <!-- Accessing an Axis hosted web-service using XFire dynamic client -->
         <service name="BridgeToAxisService">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://axis.in"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint
                             address="wsdl-xfire:http://localhost:63381/services/AxisService?WSDL&amp;method=receive"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

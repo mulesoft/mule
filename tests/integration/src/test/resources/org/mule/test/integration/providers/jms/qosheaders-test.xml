@@ -16,27 +16,27 @@
 
     <model name="QoSHeadersTest">
         <service name="Bridge1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jms://test.in.kind" connector-ref="kindConnector"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://test.out.kind" connector-ref="kindConnector"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Bridge2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jms://test.in.selfish" connector-ref="selfishConnector"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://test.out.selfish" connector-ref="selfishConnector"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

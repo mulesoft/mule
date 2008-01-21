@@ -8,35 +8,35 @@
 
     <model name="main">
         <service name="ForwardingRouter">
-            <inbound-router>
+            <inbound>
                 <forwarding-router/>
-            </inbound-router>
+            </inbound>
         </service>
         
         <service name="IdempotentSecureHashReceiverRouter">
-            <inbound-router>
+            <inbound>
                 <idempotent-secure-hash-receiver-router>
                     <!-- TODO 
                     <xsd:element ref="abstract-property-extractor"/>
                     -->
                 </idempotent-secure-hash-receiver-router>
-            </inbound-router>
+            </inbound>
         </service>
         
         <service name="InboundPassThroughRouter">
-            <inbound-router>
+            <inbound>
                 <inbound-pass-through-router>
                     <!-- TODO 
                     <xsd:element ref="abstract-property-extractor"/>
                     -->
                 </inbound-pass-through-router>
-            </inbound-router>
+            </inbound>
         </service>
         
         <service name="SelectiveConsumerRouter">
-            <inbound-router>
+            <inbound>
                 <selective-consumer-router transformFirst="false"/>
-            </inbound-router>
+            </inbound>
         </service>
     </model>
 </mule>

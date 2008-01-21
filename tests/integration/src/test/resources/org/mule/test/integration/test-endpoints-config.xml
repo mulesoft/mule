@@ -35,31 +35,31 @@
             used from the above config and the stdio connector will be create dymanically
         -->
         <service name="TestComponent1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="test://localhost/test.queue" connector-ref="testConnector1" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.integration.service.TestComponent"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out" />
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="TestComponent2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="test://localhost/test.queue" transformer-refs="XmlToObject" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.integration.service.TestComponent"/>
         </service>
 
         <!-- Test uri endpoints for send and receive and Uri endpoints on the outbound router -->
         <service name="TestComponent3">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="testEndpoint" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.integration.service.TestComponent"/>
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint name="tcp1" address="tcp://localhost:60201" />
                 </filtering-router>
@@ -67,46 +67,46 @@
                     <outbound-endpoint address="udp://localhost:56731" />
                     <outbound-endpoint address="test:/test.queue2" connector-ref="testConnector1" />
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <!-- test Uri receiver endpoint specifying a provider with endpoint overrriden and
              test outbound router config combining endpoints -->
         <service name="TestComponent4">
-            <inbound-router>
+            <inbound>
                 <!-- this didn't make sense? -->
                 <!-- inbound-endpoint address="vm://queue4" connector-ref="testConnector1" / -->
                 <inbound-endpoint address="vm://queue4"  connector-ref="vmConnector2"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.integration.service.TestComponent"/>
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint address="udp://localhost:56731" />
                     <outbound-endpoint ref="testEndpoint2" />
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="TestComponent5">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://some.queue" connector-ref="vmConnector2" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.integration.service.TestComponent"/>
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint ref="server1" />
                     <outbound-endpoint ref="server2" />
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="TestComponent6">
             <component class="org.mule.test.integration.service.TestComponent"/>
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint ref="server3" />
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

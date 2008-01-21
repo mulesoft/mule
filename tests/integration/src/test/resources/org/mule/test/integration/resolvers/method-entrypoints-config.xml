@@ -12,9 +12,9 @@
 
     <model name="Model">
         <service name="Service">
-           <inbound-router>
+           <inbound>
                 <vm:inbound-endpoint path="service"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object instance-ref="target"/>
             </component>

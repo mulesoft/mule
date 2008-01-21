@@ -24,11 +24,11 @@
 
     <model name="main">
         <service name="service">
-            <inbound-router>
+            <inbound>
                 <tcp:inbound-endpoint ref="safe"/>
                 <!-- legacy style -->
                 <inbound-endpoint ref="length"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="addReceived" value="false"/>

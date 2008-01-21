@@ -20,35 +20,35 @@
     <model name="TEST">
 
         <service name="Part1">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC1"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Part3">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint address="jms://topic:durable.broadcast" connector-ref="jmsConnectorC2"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

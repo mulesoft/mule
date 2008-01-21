@@ -20,24 +20,24 @@
 
         <!-- singleton for easier testing only -->
         <service name="Test" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
                                   address="http://localhost:60206/TestServer"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="TestServer">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:60206" connector-ref="HttpConnector"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.components.simple.StaticComponent">
                     <property key="data" value="Here's your content."/>

@@ -15,37 +15,37 @@
     <model name="main">
 
         <service name="WORMS">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://in" connector-ref="VmConnector"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
                     <include-entry-point method="toString"/>
                 </no-arguments-entry-point-resolver>
                 <singleton-object class="org.mule.tck.testmodels.fruit.Apple"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out" connector-ref="VmConnector"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="TIRANA">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://invokeWithInjected" connector-ref="VmConnector"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
                     <include-entry-point method="wash"/>
                 </no-arguments-entry-point-resolver>
                 <singleton-object instance-ref="containerDelegate"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://outWithInjected" connector-ref="VmConnector"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

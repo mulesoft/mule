@@ -12,10 +12,10 @@
 
     <model name="test">
         <service name="Bridge">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="in" transformer-refs="StringtoByteArray"/>
                 <forwarding-router/>
-            </inbound-router>
+            </inbound>
         </service>
     </model>
 </mule>

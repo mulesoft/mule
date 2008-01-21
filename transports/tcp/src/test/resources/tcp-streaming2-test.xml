@@ -20,23 +20,23 @@
     <model name="echoModel">
 
         <service name="echo">
-            <inbound-router>
+            <inbound>
                 <tcp:inbound-endpoint host="localhost" port="65432" synchronous="false"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <tcp:outbound-endpoint host="localhost" port="65433" synchronous="false"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="testComponent">
-            <inbound-router>
+            <inbound>
                 <tcp:inbound-endpoint host="localhost" port="65433" synchronous="false"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <!-- This component knows how to look for EOF -->
                 <singleton-object class="org.mule.providers.tcp.integration.EOFStreamingTestComponent"/>

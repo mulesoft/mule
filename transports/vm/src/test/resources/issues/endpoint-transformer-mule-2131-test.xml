@@ -23,10 +23,10 @@
     <model name="endpoint transformer tests">
 
         <service name="main">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="in"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <multicasting-router>
                     <outbound-endpoint ref="direct"/>
                     <outbound-endpoint ref="global-name-global-transformer"/>
@@ -37,7 +37,7 @@
                     <vm:outbound-endpoint path="no-name-local-transformer" connector-ref="queue"
                                           transformer-refs="transformer"/>
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

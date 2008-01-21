@@ -12,19 +12,19 @@
 
     <model name="model1">
         <service name="service1">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="test1-in">
                     <append-string-transformer message="1"/>
                     <append-string-transformer message="2"/>
                     <append-string-transformer message="3"/>
                 </vm:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <pass-through-component/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="test1-out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 
@@ -34,34 +34,34 @@
 
     <model name="model2">
         <service name="service2">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="test2-in">
                     <!-- TODO Travis had better syntax -->
                     <transformer ref="1"/>
                     <transformer ref="2"/>
                     <transformer ref="3"/>
                 </vm:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <pass-through-component/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="test2-out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 
     <model name="model3">
         <service name="service3">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="test3-in">
                     <append-string-transformer message="1"/>
                     <append-string-transformer message="2"/>
                     <append-string-transformer message="3"/>
                 </vm:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <pass-through-component/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="test3-out">
                         <append-string-transformer message="a"/>
@@ -69,7 +69,7 @@
                         <append-string-transformer message="c"/>
                     </vm:outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 

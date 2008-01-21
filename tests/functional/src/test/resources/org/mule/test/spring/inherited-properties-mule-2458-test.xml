@@ -18,7 +18,7 @@
 
     <model name="model">
         <service name="service">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="endpoint">
                     <property key="all" value="local"/>
                     <property key="local-only" value="local"/>
@@ -27,7 +27,7 @@
                         <spring:entry key="local-and-url" value="local"/>
                     </properties>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <null-component/>
         </service>
     </model>

@@ -25,19 +25,19 @@
     <model name="samples">
 
         <service name="restTest">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint transformer-refs="HttpRequestToParameter2" address="servlet://restPUTTest"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.samples.rest.RestTester">
                     <property key="prefix" value="Received "/>
                 </pooled-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="restFileEndpoint"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

@@ -12,15 +12,15 @@
     
     <model name="model">
         <service name="TestReceiverUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jms://test.queue"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.integration.service.TestReceiver"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

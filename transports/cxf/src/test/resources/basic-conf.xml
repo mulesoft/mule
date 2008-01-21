@@ -13,26 +13,26 @@
   <model name="BasicCxfTest">
 
     <service name="echoService">
-      <inbound-router>
+      <inbound>
         <cxf:inbound-endpoint
           address="http://localhost:63081/services/Echo" frontend="simple"/>
-      </inbound-router>
+      </inbound>
       <component class="org.mule.components.simple.EchoComponent" />
     </service>
     
     <service name="echoService2">
-      <inbound-router>
+      <inbound>
         <cxf:inbound-endpoint
           address="http://localhost:63082/services/Echo2" frontend="simple"/>
-      </inbound-router>
+      </inbound>
       <component class="org.mule.components.simple.EchoComponent" />
     </service>
 
     <service name="echoService3">
-      <inbound-router>
+      <inbound>
         <cxf:inbound-endpoint
           address="http://localhost:63083/services/Echo3" frontend="simple"/>
-      </inbound-router>
+      </inbound>
       <component class="org.mule.components.simple.EchoComponent" />
     </service>
   </model>

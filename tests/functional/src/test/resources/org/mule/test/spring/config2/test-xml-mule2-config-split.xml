@@ -14,7 +14,7 @@
 
             <mule:service name="appleComponent2">
                                                                
-                <mule:inbound-router>
+                <mule:inbound>
                     <mule:inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
                     <mule:inbound-endpoint name="transactedInboundEndpoint" address="test://endpoint.in2">
                         <!-- mule:transaction action="ALWAYS_BEGIN" -->
@@ -33,7 +33,7 @@
                         <property name="testEndpointProperty" value="Prop1"/>
                     </properties>
                 </endpoint -->
-                </mule:inbound-router>
+                </mule:inbound>
 
                 <mule:component>
                     <mule:pooled-object class="org.mule.tck.testmodels.fruit.Apple">
@@ -41,7 +41,7 @@
                     </mule:pooled-object>
                 </mule:component>
 
-                <mule:outbound-router>
+                <mule:outbound>
                     <mule:filtering-router>
                         <mule:outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out">
                             <!-- mule:transaction action="ALWAYS_BEGIN" -->
@@ -51,7 +51,7 @@
                             <!-- /mule:transaction -->
                         </mule:outbound-endpoint>
                     </mule:filtering-router>
-                </mule:outbound-router>
+                </mule:outbound>
                 <!-- outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint name="transactedOutboundEndpoint" type="sender" address="test://endpoint.out">

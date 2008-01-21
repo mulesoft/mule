@@ -50,27 +50,27 @@
     <model name="main">
 
         <service name="GroovyUMO_Callable">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://groovy_refresh_callable"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object instance-ref="groovyRefreshableCallable"/>
             </component>
         </service>
 
         <service name="GroovyUMO_Bean">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://groovy_refresh_bean"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object instance-ref="groovyRefreshableBean"/>
             </component>
         </service>
 
         <service name="GroovyUMO_ChangeIntefaces">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://groovy_refresh_changeInterfaces"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object instance-ref="groovyRefreshableBeanChangeInterfaces"/>
             </component>

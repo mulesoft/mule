@@ -26,7 +26,7 @@
 
     <model name="model">
         <service name="HttpService">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="httpEndpoint">
                     <transformers>
                         <transformer ref="ByteArrayToString"/>
@@ -37,27 +37,27 @@
                         <transformer ref="ToHttpResponse"/>
                     </responseTransformers>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
 
         <service name="HttpService2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="httpEndpoint2" transformer-refs="ByteArrayToSerializable"
                           responseTransformer-refs="SerializableToByteArray ToHttpResponse"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
 
         <service name="LocalService">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="vmEndpoint"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="httpEndpoint2" transformer-refs="SerializableToByteArray"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

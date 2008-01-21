@@ -20,16 +20,16 @@
         <pooling-profile maxActive="1" exhaustedAction="WAIT"/>
 
         <service name="quartzService1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="quartz.in.1"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.quartz.TestComponent1"/>
         </service>
 
         <service name="quartzService2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="quartz.in.2"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.quartz.TestComponent1"/>
         </service>
     </model>

@@ -12,9 +12,9 @@
 
     <model name="loan-broker">
         <service name="LenderService">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="LenderService"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
     </model>

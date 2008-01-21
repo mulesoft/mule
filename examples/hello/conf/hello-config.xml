@@ -68,13 +68,13 @@
         -->
         <service name="GreeterUMO">
             
-            <inbound-router>
+            <inbound>
                 <stdio:inbound-endpoint system="IN" transformer-refs="StdinToNameString"/>
-            </inbound-router>
+            </inbound>
             
             <component class="org.mule.samples.hello.Greeter"/>
 
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <vm:outbound-endpoint path="chitchatter"/>
                     <payload-type-filter expectedType="org.mule.samples.hello.NameString"/>
@@ -84,7 +84,7 @@
                     <vm:outbound-endpoint path="userErrorHandler"/>
                     <payload-type-filter expectedType="java.lang.Exception"/>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
 
             <!--
             Here we tell this component to use the interceptor stack defined above
@@ -101,17 +101,17 @@
 
         <service name="ChitChatUMO">
 
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString"/>
-            </inbound-router>
+            </inbound>
                 
             <component class="org.mule.samples.hello.ChitChatter"/>
 
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <stdio:outbound-endpoint system="OUT" transformer-refs="ChatStringToString" />
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
 
             <!-- TODO: MULE-2285 - How does this work in 2.0?                
             <interceptor name="default"/>
@@ -121,29 +121,29 @@
         <!-- This error handler returns user error messages to caller. Errors could also be routed elsewhere,
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="userErrorHandler" transformer-refs="ExceptionToString"/>
-            </inbound-router>
+            </inbound>
             
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <stdio:outbound-endpoint system="OUT"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
                 
         <!-- Handle any unexpected errors. Errors could also be routed elsewhere,
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="SystemErrorHandler">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="systemErrorHandler"/>
-            </inbound-router>
+            </inbound>
                 
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <stdio:outbound-endpoint system="ERR"/>
                 </outbound-pass-through-router>
-            </outbound-router>            
+            </outbound>
         </service>        
     </model>
 

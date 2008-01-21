@@ -25,11 +25,11 @@
 
     <model name="test">
         <service name="BridgeUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://testin"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint
                             address="xfire:http://localhost:64484/MySecuredUMO?method=echo"><!-- type="sender"-->
@@ -37,16 +37,16 @@
                                                     decryptionFile="out-encrypted-security.properties"/>
                     </outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="MySecuredUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="xfire:http://localhost:64484">
                     <wssecurity:security-filter signatureFile="in-signed-security.properties"
                                                 decryptionFile="in-encrypted-security.properties"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>

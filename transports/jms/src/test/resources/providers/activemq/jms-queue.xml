@@ -11,47 +11,47 @@
 
     <model name="test">
         <service name="InputPart">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint queue="in"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q1"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="MiddlePart">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint queue="q1"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q2"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="OutputPart">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint queue="q2"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

@@ -17,38 +17,38 @@
     <model name="Proxy_Test">
 
         <service name="WebService">
-            <inbound-router>
+            <inbound>
                 <xfire:inbound-endpoint address="http://localhost:6065"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
 
         <service name="webServiceProxy">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:6070/webServiceProxy"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.soap.WSProxyService"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="http://localhost:6065/WebService"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="webServiceProxyWithWsdlFromFile">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:6075/webServiceProxy"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.providers.soap.WSProxyService">
                     <property key="wsdlFile" value="localWsdl.wsdl"/>
                 </pooled-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="http://localhost:6065/WebService"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

@@ -25,16 +25,16 @@
     <model name="receiveModel">
 
         <service name="relay">
-            <inbound-router>
+            <inbound>
                 <!-- will be set at runtime, once connector has readFromDirectory -->
                 <!-- mule:endpoint address="file:///tmp/foo"/ -->
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="receive"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

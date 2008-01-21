@@ -8,29 +8,29 @@
 
     <model name="model">
         <service name="HttpAsync">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:8990">
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
 
         <service name="HttpWithoutRemoteSynch">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:8999" synchronous="true">
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
 
         <service name="HttpWithRemoteSynch">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:8989" remoteSync="true">
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
     </model>

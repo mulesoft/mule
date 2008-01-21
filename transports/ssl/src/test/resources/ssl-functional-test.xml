@@ -24,9 +24,9 @@
     <model name="main">
 
         <service name="testComponent1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <inbound-router>
+            <inbound>
                 <ssl:inbound-endpoint ref="sendEndpoint"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -39,9 +39,9 @@
         </service>
 
         <service name="testComponent2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <inbound-router>
+            <inbound>
                 <ssl:inbound-endpoint ref="sendManyEndpoint"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -54,9 +54,9 @@
         </service>
 
         <service name="testComponent3" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="asyncEndpoint"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>

@@ -46,27 +46,27 @@
 
         <!-- Messages sent to the process engine -->
         <service name="ToBPMS">
-            <inbound-router>
+            <inbound>
                 <!-- Incoming message = CustomerRequest -->
                 <inbound-endpoint ref="CustomerRequests" />
                 <!-- Incoming message = CreditProfile -->
                 <inbound-endpoint ref="CreditProfiles" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.examples.loanbroker.DefaultLoanBroker" />
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint ref="ProcessEngine" synchronous="false" />
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <!-- Messages generated from the process engine -->
         <service name="FromBPMS">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="ProcessEngine" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.examples.loanbroker.DefaultLoanBroker" />
-            <outbound-router>
+            <outbound>
                 <endpoint-selector-router selectorProperty="endpoint">
                     <!-- Outgoing message = Customer -->
                     <outbound-endpoint ref="CreditAgency" />
@@ -85,7 +85,7 @@
                         <property key="method" value="getLoanQuote"/>
                     </outbound-endpoint>
                 </endpoint-selector-router>
-            </outbound-router>
+            </outbound>
         </service>
 
 
@@ -94,34 +94,34 @@
             *************************************************** -->
         <!-- The credit agency service will get the credit profile for a customer -->
         <service name="ACreditAgency">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="CreditAgency" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency" />
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint ref="CreditProfiles" />
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <!-- These are mock bank services that represent remote bank loan services -->
         <service name="ABigBank">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="BigBank" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.examples.loanbroker.bank.Bank" />
         </service>
         <service name="AMediumBank">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="MediumBank" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.examples.loanbroker.bank.Bank" />
         </service>
         <service name="ASmallBank">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="SmallBank" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.examples.loanbroker.bank.Bank" />
         </service>
     </model>

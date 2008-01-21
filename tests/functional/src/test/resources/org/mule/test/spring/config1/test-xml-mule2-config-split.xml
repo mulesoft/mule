@@ -14,7 +14,7 @@
     <!-- model-inherited name="main" -->
     <model name="main" inherit="true">
         <service name="appleComponent2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint name="nonTransactedInboundEndpoint" address="test://endpoint.in3"/>
                 <inbound-endpoint name="transactedInboundEndpoint" address="test://endpoint.in2">
                     <!-- Transactions not quite working yet  
@@ -24,13 +24,13 @@
                     -->
                     <property key="testEndpointProperty" value="Prop1"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.fruit.Apple"/>
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint name="transactedOutboundEndpoint" address="test://endpoint.out"/>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
             <component-threading-profile maxBufferSize="6" maxThreadsActive="12" maxThreadsIdle="6" poolExhaustedAction="DISCARD"/>
             <!--<pooling-profile exhaustedAction="WAIT" initialisationPolicy="INITIALISE_ALL"/>-->
             <!--<queue-profile maxOutstandingMessages="102"/>-->

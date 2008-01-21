@@ -19,16 +19,16 @@
 
     <model name="TestXFireComponentExceptionStrategy">
         <service name="XFireWithExceptionStrategy">
-            <inbound-router>
+            <inbound>
                 <xfire:inbound-endpoint address="http://localhost:63181/services"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
             <custom-exception-strategy class="org.mule.providers.soap.xfire.XFireComponentExceptionStrategy"/>
         </service>
         <service name="XFireDefault">
-            <inbound-router>
+            <inbound>
                 <xfire:inbound-endpoint address="http://localhost:63181/services"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
         </service>
     </model>

@@ -12,12 +12,12 @@
 
     <model name="WebService_Test">
         <service name="ServiceEntryPoint">
-            <inbound-router>
+            <inbound>
                 <axis:inbound-endpoint address="http://localhost:63080"
                     style="MESSAGE" serviceNamespace="http://muleumo.org">
                     <axis:options wsdlServiceElement="testService"/>
                 </axis:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
         </service>
     </model>

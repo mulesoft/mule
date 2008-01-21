@@ -11,7 +11,7 @@
 
     <model name="model">
         <service name="service">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint name="endpoint" address="test://foo">
                     <transformers>
                         <transformer ref="normal1"/>
@@ -22,7 +22,7 @@
                         <string-to-byte-array-transformer name="response2"/>
                     </responseTransformers>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
         </service>
     </model>
 </mule>

@@ -30,11 +30,11 @@
     <model name="sample">
 
         <service name="TestUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://testin"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <filtering-router>
                     <jnp:outbound-endpoint ref="Sender"/>
                     <payload-type-filter expectedType="java.lang.Integer"/>
@@ -43,7 +43,7 @@
                     <outbound-endpoint ref="Sender2"/>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

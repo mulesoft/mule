@@ -29,11 +29,11 @@
 
     <model name="test">
         <service name="echo">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:4567">
                     <acegi:http-security-filter realm="mule-realm"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>

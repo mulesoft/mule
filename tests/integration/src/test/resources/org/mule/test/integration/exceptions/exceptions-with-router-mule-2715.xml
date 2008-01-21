@@ -19,26 +19,26 @@
     <model name="test">
 
         <service name="with-router">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="with-router-in" transformer-refs="fail"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="with-router-out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="without-router">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="without-router-in" transformer-refs="fail"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="without-router-out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
             <!-- need this instead -->
             <default-service-exception-strategy>
                 <vm:outbound-endpoint path="error"/>

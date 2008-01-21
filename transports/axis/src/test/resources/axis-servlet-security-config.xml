@@ -33,12 +33,12 @@
 
     <model name="test">
         <service name="mycomponent">
-            <inbound-router>
+            <inbound>
                 <axis:inbound-endpoint address="servlet://mycomponent"
                                        responseTransformer-refs="ByteArrayToString">
                     <acegi:http-security-filter realm="mule-realm"/>
                 </axis:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>

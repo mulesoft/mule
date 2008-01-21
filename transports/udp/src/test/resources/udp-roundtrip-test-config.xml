@@ -15,15 +15,15 @@
     <model name="main">
 
         <service name="PassingThrough">
-            <inbound-router>
+            <inbound>
                 <udp:inbound-endpoint host="${hostname}" port="61000"/>
-            </inbound-router>
+            </inbound>
             <pass-through-component/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <udp:outbound-endpoint host="${hostname}" port="61001"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

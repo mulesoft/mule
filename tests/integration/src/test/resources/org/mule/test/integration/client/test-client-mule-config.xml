@@ -10,15 +10,15 @@
 
     <model name="model">
         <service name="TestReceiverUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="vmEndpoint"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

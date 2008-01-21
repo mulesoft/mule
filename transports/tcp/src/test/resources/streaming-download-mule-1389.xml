@@ -17,13 +17,13 @@
 
     <model name="main">
         <service name="testComponent">
-            <inbound-router>
+            <inbound>
                 <!-- We have to set the synchronicity explicitly here (in the http version of this we do not) Since
                 we can't send any headers with the TCP transport unless we use a customised protocol. In http the
                 REMOTE_SYNC header is set since the MuleClient.send(...) will automatically set it for us.
                  (REMOTE_SYNC from the client implies 'synchronsous' on the server)-->
                 <tcp:inbound-endpoint host="localhost" port="65432" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.providers.tcp.issues.InputStreamSource"/>
             </component>

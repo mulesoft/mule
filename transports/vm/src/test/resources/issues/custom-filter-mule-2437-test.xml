@@ -21,11 +21,11 @@
     <model name="model">
 
         <service name="service">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="in" connector-ref="default"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <filtering-router>
                     <vm:outbound-endpoint path="vowels" connector-ref="queue"/>
                     <custom-filter class="org.mule.routing.filters.RegExFilter">
@@ -36,7 +36,7 @@
                     <vm:outbound-endpoint path="consonants" connector-ref="queue"/>
                     <filter ref="consonant-filter"/>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

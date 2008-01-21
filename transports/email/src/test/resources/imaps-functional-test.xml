@@ -21,16 +21,16 @@
     <model name="test">
 
         <service name="relay">
-            <inbound-router>
+            <inbound>
                 <imaps:inbound-endpoint user="bob" password="password" host="localhost" port="65444">
                     <retry-connection-strategy retryCount="3" retryFrequency="1000"/>
                 </imaps:inbound-endpoint>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="receive"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

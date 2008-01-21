@@ -19,11 +19,11 @@
 
     <model name="main">
         <service name="service">
-            <inbound-router>
+            <inbound>
                 <!-- legacy style -->
                 <inbound-endpoint address="tcp://localhost:65432" connector-ref="safe" synchronous="true"/>
                 <tcp:inbound-endpoint host="localhost" port="65433" connector-ref="unsafe" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
     </model>

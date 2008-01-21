@@ -24,16 +24,16 @@
     <model name="TestXfireConnectors">
         <!-- Two separate components are created instead of 1 with 2 endpoints so that exceptions are not compomised -->
         <service name="TestComponent1">
-            <inbound-router>
+            <inbound>
                 <xfire:inbound-endpoint address="http://localhost:61081/services" connector-ref="XFireConnector1"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
         <service name="TestComponent2">
-            <inbound-router>
+            <inbound>
                 <xfire:inbound-endpoint address="http://localhost:61082/services" connector-ref="XFireConnector2"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
     </model>

@@ -24,12 +24,12 @@
 
     <model name="test">
         <service name="test service">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jms://in"
                                   connector-ref="noOutbound"
                                   synchronous="true"
                                   transformer-refs="JMSMessageToObject SetLendersAsRecipients ObjectToJMSMessage"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.examples.loanbroker.issues.SimpleEchoComponent"/>
         </service>
     </model>

@@ -12,14 +12,14 @@
     
     <model name="fileAppend">
         <service name="Bridge">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://fileappend"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="file://myout"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

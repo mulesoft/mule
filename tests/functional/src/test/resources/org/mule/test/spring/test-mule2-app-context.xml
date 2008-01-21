@@ -35,9 +35,9 @@
     <model name="main">
 
         <service name="LoanBroker">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://LoanBrokerRequests"/>
-            </inbound-router>
+            </inbound>
 
             <component instance-ref="apple"/>
 

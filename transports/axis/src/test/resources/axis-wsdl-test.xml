@@ -11,29 +11,29 @@
     <model name="test">
 
         <service name="EchoService1">
-            <inbound-router>
+            <inbound>
                 <axis:inbound-endpoint address="http://localhost:62081/services"
                     serviceNamespace="http://foo"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
         <service name="EchoService2">
-            <inbound-router>
+            <inbound>
                 <axis:inbound-endpoint address="http://localhost:62082/services">
                     <axis:options wsdlPortType="mulePortType"
                                   wsdlServiceElement="muleService"
                                   wsdlServicePort="muleServicePort"/>
                 </axis:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
         <service name="EchoService3">
-            <inbound-router>
+            <inbound>
                 <axis:inbound-endpoint address="http://localhost:62083/services"
                         wsdlFile="test-service.wsdl"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 

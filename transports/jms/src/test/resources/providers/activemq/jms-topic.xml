@@ -15,49 +15,49 @@
 
     <model name="echoSample">
         <service name="InputPart">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="in"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="topic"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Topic1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="topic"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Topic2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="topic"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

@@ -12,38 +12,38 @@
 
     <model name="test">
         <service name="mycomponent">
-            <inbound-router>
+            <inbound>
                 <xfire:inbound-endpoint address="http://localhost:62108/mule"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>
         </service>
 
         <service name="mycomponent2">
-            <inbound-router>
+            <inbound>
                 <xfire:inbound-endpoint address="http://localhost:62109/mule/services"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>
         </service>
 
         <service name="mycomponent3">
-            <inbound-router>
+            <inbound>
                 <!-- legacy style -->
                 <inbound-endpoint address="xfire:http://localhost:62109"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>
         </service>
 
         <service name="mycomponent4">
-            <inbound-router>
+            <inbound>
                 <!-- legacy style -->
                 <inbound-endpoint address="xfire:http://localhost:62110" synchronous="false"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>

@@ -53,11 +53,11 @@
             For this example we use Vm.
         -->
         <service name="serviceProxy">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="stockquote"
                                      responseTransformer-refs="ToString XmlDecoder Xslt XmlToObject"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <axis:outbound-endpoint
                             address="http://www.webservicex.net/stockquote.asmx?method=GetQuote"
@@ -69,7 +69,7 @@
                         </axis:soap-method>
                     </axis:outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

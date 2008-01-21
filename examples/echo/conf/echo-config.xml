@@ -37,10 +37,10 @@
         -->
         <service name="EchoUMO">
             <!-- any number of endpoints can be added to an inbound router -->
-            <inbound-router>
+            <inbound>
                 <stdio:inbound-endpoint system="IN"/>
                 <vm:inbound-endpoint address="vm://echo"/>
-            </inbound-router>
+            </inbound>
 
             <component class="org.mule.components.simple.EchoComponent"/>
 
@@ -50,11 +50,11 @@
                 criteria. The pass-through-router is a router that automically passes
                 on every message it receives
             -->
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <stdio:outbound-endpoint system="OUT"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

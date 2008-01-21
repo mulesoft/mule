@@ -12,11 +12,11 @@
 
     <model name="test" >
         <service name="forwardingSplitter">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://in.queue"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <list-message-splitter-router>
                     <outbound-endpoint address="vm://component.1">
                         <payload-type-filter expectedType="java.lang.String"/>
@@ -28,7 +28,7 @@
                         <payload-type-filter expectedType="java.lang.Exception"/>
                     </outbound-endpoint>
                 </list-message-splitter-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

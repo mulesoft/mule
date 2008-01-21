@@ -15,21 +15,21 @@
 
     <model name="quartz-dispatcher">
         <service name="quartzSchedulingService">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://quartz.scheduler"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="schedulerEndpoint"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="scheduledService">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://quartz.in"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.quartz.TestComponent2"/>
         </service>
     </model>

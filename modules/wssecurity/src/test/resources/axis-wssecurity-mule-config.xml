@@ -29,12 +29,12 @@
 
     <model name="test">
         <service name="MySecuredUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="axis:http://localhost:64282" connector-ref="axisConnector">
                     <wssecurity:security-filter signatureFile="in-signed-security.properties"
                                                 decryptionFile="in-encrypted-security.properties"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
     </model>

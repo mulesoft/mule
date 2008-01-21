@@ -8,11 +8,11 @@
 
     <model name="model">
         <service name="TestUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://filesend"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <chaining-router>
                     <outbound-endpoint address="file://FirstWrite">
                         <property key="outputPattern" value="export.txt"/>
@@ -21,7 +21,7 @@
                         <property key="outputPattern" value="export.txt.OK"/>
                     </outbound-endpoint>
                 </chaining-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

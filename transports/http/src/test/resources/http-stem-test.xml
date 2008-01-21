@@ -10,15 +10,15 @@
 
     <model name="main">
         <service name="httpIn">
-            <inbound-router>
+            <inbound>
                 <http:inbound-endpoint host="localhost" port="60200" path="foo" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
         <service name="jettyIn">
-            <inbound-router>
+            <inbound>
                 <http:inbound-endpoint host="localhost" port="60201" path="foo" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
     </model>

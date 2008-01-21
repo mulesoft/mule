@@ -30,12 +30,12 @@
 
     <model name="test">
         <service name="MySecuredUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="xfire:http://localhost:64282" connector-ref="xfireConnector">
                     <wssecurity:security-filter signatureFile="in-signed-security.properties"
                                                 decryptionFile="in-encrypted-security.properties"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>

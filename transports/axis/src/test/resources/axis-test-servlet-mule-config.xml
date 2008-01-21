@@ -14,9 +14,9 @@
 
     <model name="test">
         <service name="mycomponent">
-            <inbound-router>
+            <inbound>
                 <axis:inbound-endpoint address="servlet://mycomponent"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
     </model>

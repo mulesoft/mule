@@ -8,18 +8,18 @@
        
     <model name="fileAppend">
         <service name="Bridge">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://fileappend"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="file://myout">
                         <property key="outputAppend" value="true"/>
                         <property key="outputPattern" value="out.txt"/>
                     </outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

@@ -10,28 +10,28 @@
 
     <model name="JdbcSelectOnOutbound">
         <service name="bridge">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://jdbc.test"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <jdbc:outbound-endpoint queryKey="getTest">
                         <!-- this is substituted in the SQL template defined in jdbc-connector.xml -->
                         <property key="type" value="1"/>
                     </jdbc:outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="bridgeA">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://terra"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <jdbc:outbound-endpoint address="jdbc://getTestPayload"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

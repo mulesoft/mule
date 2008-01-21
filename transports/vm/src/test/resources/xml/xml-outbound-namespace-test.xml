@@ -13,29 +13,29 @@
     <model name="xml outbound namespace tests">
 
         <service name="fancy config splitter">
-            <inbound-router>
+            <inbound>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <mxml:message-splitter splitExpression="/expression" enableCorrelation="ALWAYS"
                                        externalSchemaLocation="external" honorSynchronicity="true"
                                        validateSchema="true">
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:message-splitter>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="fancy config round robin">
-            <inbound-router>
+            <inbound>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <mxml:round-robin-splitter splitExpression="/expression" enableCorrelation="IF_NOT_SET"
                                            externalSchemaLocation="external" honorSynchronicity="true"
                                            validateSchema="true" endpointFiltering="true">
                     <mxml:namespace prefix="bar" uri="foo"/>
                 </mxml:round-robin-splitter>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

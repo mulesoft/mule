@@ -21,12 +21,12 @@
 
     <model name="echoSample">
         <service name="EchoUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="xfire:http://localhost:65081/services">
                     <soap:http-to-soap-request-transformer/>
                 </inbound-endpoint>
                 <inbound-endpoint address="xfire:http://localhost:65082/services"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>

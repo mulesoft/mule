@@ -19,15 +19,15 @@
 
     <model name="main">
         <service name="TestComponent" initialState="stopped">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://test.queue" connector-ref="vmQueue"/>
-            </inbound-router>
+            </inbound>
             <pass-through-component/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
             <queue-profile persistent="true" maxOutstandingMessages="1000"/>
         </service>
     </model>

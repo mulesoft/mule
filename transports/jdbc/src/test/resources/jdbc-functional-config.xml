@@ -10,17 +10,17 @@
 
     <model name="test">
         <service name="bridgeB">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jdbc://getTest?type=1"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.providers.jdbc.test.JdbcFunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jdbc:outbound-endpoint address="jdbc://writeTest?type=2"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

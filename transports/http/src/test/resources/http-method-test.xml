@@ -10,9 +10,9 @@
 
     <model name="main">
         <service name="httpIn">
-            <inbound-router>
+            <inbound>
                 <http:inbound-endpoint host="localhost" port="60200" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
     </model>

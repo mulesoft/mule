@@ -45,11 +45,11 @@
 
     <model name="fo">
         <service name="getLaszloW10">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:28081"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
-            <outbound-router matchAll="false">
+            <outbound matchAll="false">
                 <multicasting-router>
                     <outbound-endpoint address="vm://getReportW10"/>
                     <!--                    <properties>-->
@@ -57,19 +57,19 @@
                     <!--                        <property name="correlationId" value="true"/>-->
                     <!--                    </properties>-->
                 </multicasting-router>
-            </outbound-router>
-            <async-reply-router>
+            </outbound>
+            <async-reply>
                 <inbound-endpoint address="vm://W10Response"/>
                 <custom-async-reply-router class="org.mule.test.usecases.service.DummyResponseAggregator"/>
-            </async-reply-router>
+            </async-reply>
         </service>
 
         <service name="W10Report">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://getReportW10"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
-            <outbound-router>
+            <outbound>
                 <multicasting-router>
                     <!--                    <endpoint address="file://home/bkalbfu/workspace31/test-data/out" connector="MidFileConnector"/>-->
                     <outbound-endpoint address="vm://getFO"/>
@@ -77,17 +77,17 @@
                     <!--                        <property name="correlationId" value="false"/>-->
                     <!--                    </properties>-->
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="W10FO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://getFO">
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.integration.service.TestReceiver"/>
-            <outbound-router>
+            <outbound>
                 <multicasting-router>
                     <outbound-endpoint address="file://temp/test-data/out"/>
                     <outbound-endpoint address="vm://W10Response"/>
@@ -95,7 +95,7 @@
                     <!--                        <property name="correlationId" value="false"/>-->
                     <!--                    </properties>-->
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

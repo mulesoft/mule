@@ -14,9 +14,9 @@
 
     <model name="synchTestModel">
         <service name="mySynchService">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="s-in" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="Polo"/>

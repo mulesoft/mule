@@ -84,7 +84,7 @@
         <custom-entry-point-resolver-set class="org.mule.tck.testmodels.mule.TestEntryPointResolverSet"/>
 
         <service name="orangeComponent">
-            <inbound-router>
+            <inbound>
 
                 <forwarding-catch-all-strategy>
                     <outbound-endpoint address="test://catch.all"/>
@@ -95,7 +95,7 @@
                     <payload-type-filter expectedType="java.lang.String"/>
                     <property key="testLocal" value="value1"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
 
             <component>
                 <singleton-object instance-ref="orange">
@@ -134,17 +134,17 @@
                 </binding>
             </component>            
 
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="appleInEndpoint" transformer-refs="TestCompressionTransformer"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
 
-            <async-reply-router timeout="10001">
+            <async-reply timeout="10001">
                 <inbound-endpoint address="test://response1"/>
                 <inbound-endpoint ref="appleResponseEndpoint"/>
                 <custom-async-reply-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
-            </async-reply-router>
+            </async-reply>
 
             <default-service-exception-strategy>
                 <outbound-endpoint address="test://orange.exceptions"/>
@@ -152,7 +152,7 @@
         </service>
 
         <service name="appleComponent">
-            <inbound-router>
+            <inbound>
                 <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <inbound-endpoint ref="appleInEndpoint"/>
                 <selective-consumer-router>
@@ -160,13 +160,13 @@
                 </selective-consumer-router>
                 <idempotent-receiver-router>
                 </idempotent-receiver-router>
-            </inbound-router>
+            </inbound>
 
             <component>
                 <singleton-object instance-ref="apple"/>
             </component>
 
-            <outbound-router>
+            <outbound>
                 <custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                 <filtering-router transformer-refs="TestCompressionTransformer">
                     <outbound-endpoint address="test://appleQ2" name="TestApple-Out"/>
@@ -180,7 +180,7 @@
                         <regex-filter pattern="(.*) brown (.*)"/>
                     </and-filter>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
 
             <!--<custom-exception-strategy class="org.mule.impl.DefaultExceptionStrategy"/>-->
             <default-connector-exception-strategy/>

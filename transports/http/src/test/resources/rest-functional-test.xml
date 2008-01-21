@@ -13,9 +13,9 @@
     <model name="REST Functional TestCase">
 
         <service name="RESTServiceWrapper1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://in1"/>
-            </inbound-router>
+            </inbound>
             <http:rest-service-component
                     serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
                     httpMethod="POST">
@@ -24,9 +24,9 @@
         </service>
 
         <service name="RESTServiceWrapper2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://in2"/>
-            </inbound-router>
+            </inbound>
             <http:rest-service-component
                     serviceUrl="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"
                     httpMethod="POST">
@@ -36,9 +36,9 @@
         </service>
 
         <service name="RESTServiceWrapper3">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://in3"/>
-            </inbound-router>
+            </inbound>
             <http:rest-service-component
                     serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
                     httpMethod="GET">
@@ -47,9 +47,9 @@
         </service>
 
         <service name="RESTServiceWrapper4">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://in4"/>
-            </inbound-router>
+            </inbound>
             <http:rest-service-component
                     serviceUrl="http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate"
                     httpMethod="GET">

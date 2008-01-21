@@ -14,21 +14,21 @@
 
     <model name="main">
         <service name="testService">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint address="vm://in">
                     <transaction action="BEGIN_OR_JOIN">
                         <transaction-factory ref="txFactory"/>
                     </transaction>
                 </vm:inbound-endpoint>
-            </inbound-router>
+            </inbound>
 
             <component class="org.mule.providers.vm.functional.VmTransactionTestCase$TestComponent"/>
 
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 

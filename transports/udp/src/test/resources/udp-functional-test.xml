@@ -22,15 +22,15 @@
 
     <model name="main">
         <service name="testUDP1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="serverEndpoint"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://foo"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 

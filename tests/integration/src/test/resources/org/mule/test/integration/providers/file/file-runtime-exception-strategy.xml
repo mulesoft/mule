@@ -16,19 +16,19 @@
 
     <model name="ESTest">
         <service name="FolderToVM">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="file://./.mule/in">
                     <custom-transformer name="failPoint" class="org.mule.test.transformers.FailingRuntimeTransformer"/>
                 </inbound-endpoint>
                 <forwarding-router/>
-            </inbound-router>
+            </inbound>
 
-            <outbound-router>
+            <outbound>
                 <chaining-router>
                     <!--<endpoint address="stdio://System.out"/>-->
                     <outbound-endpoint address="file://./.mule/out"/>
                 </chaining-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

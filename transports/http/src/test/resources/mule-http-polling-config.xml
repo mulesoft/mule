@@ -21,26 +21,26 @@
     <model name="http polling test model">
 
         <service name="pollingUMO">
-            <inbound-router>
+            <inbound>
                 <http:inbound-endpoint user="marie" password="marie" host="localhost" port="61205"
                                        connector-ref="PollingHttpConnector">
                     <property key="pollingFrequency" value="30000"/>
                 </http:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://toclient"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="polledUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:61205" connector-ref="HttpConnector"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>

@@ -22,108 +22,108 @@
     
     <model name="TEST">
         <service name="Pre">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="in"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q1"/>
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Part1">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint queue="q1">
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q2">
                         <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Part2">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint queue="q2">
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q3">
                         <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Part3">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint queue="q3">
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q4">
                         <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Part4">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint queue="q4">
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="q5">
                         <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Outbound">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint queue="q5">
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 

@@ -16,15 +16,15 @@
 
     <model name="main">
         <service name="testService">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="entry" connector-ref="vm-normal"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="queue"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 

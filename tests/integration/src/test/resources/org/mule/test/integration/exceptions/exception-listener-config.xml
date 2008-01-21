@@ -12,19 +12,19 @@
 
     <model name="test">
         <service name="mycomponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://component.in"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="throwException" value="true"/>
                 </pooled-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://component.out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
             <default-service-exception-strategy>
                 <outbound-endpoint address="vm://error.queue"/>
             </default-service-exception-strategy>

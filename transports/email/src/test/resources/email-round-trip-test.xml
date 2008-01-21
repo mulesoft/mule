@@ -21,30 +21,30 @@
     <model name="main">
 
         <service name="source">
-            <inbound-router>
+            <inbound>
                 <pop3:inbound-endpoint user="bob" password="secret" host="localhost" port="62002">
                     <transformer ref="mime-rfc822"/>
                 </pop3:inbound-endpoint>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint connector-ref="default" path="sink"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="sink">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint connector-ref="default" path="sink"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <multicasting-router>
                     <vm:outbound-endpoint connector-ref="queue" path="rfc822"/>
                     <smtp:outbound-endpoint user="alice" password="secret" host="localhost" port="62000">
                         <transformer ref="rfc822-mime"/>
                     </smtp:outbound-endpoint>
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

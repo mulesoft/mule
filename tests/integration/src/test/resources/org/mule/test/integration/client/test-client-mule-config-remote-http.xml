@@ -15,9 +15,9 @@
 
     <model name="model">
         <service name="remoteUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="vmRemoteEndpoint" remoteSync="true" />
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.components.simple.StaticComponent">
                     <properties>

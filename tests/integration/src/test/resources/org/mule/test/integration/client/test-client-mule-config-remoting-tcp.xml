@@ -17,21 +17,21 @@
     
     <model name="model">
         <service name="TestReceiverUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://test.queue" connector-ref="vmRemoteQueueConnector"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="remoteUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://remote.endpoint" connector-ref="vmRemoteConnector" remoteSync="true"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.components.simple.StaticComponent">
                     <property key="data" value="received from remote"/>

@@ -12,9 +12,9 @@
 
     <model name="model">
         <service name="service">
-            <inbound-router>
+            <inbound>
                 <parsers-test:addressed-child-endpoint address="foo" ref="bar" name="error"/>
-            </inbound-router>
+            </inbound>
         </service>
     </model>
 

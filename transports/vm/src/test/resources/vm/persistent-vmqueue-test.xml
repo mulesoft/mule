@@ -19,27 +19,27 @@
     <model name="test">
 
         <service name="ReceiverUMO">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="receiver"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="echo">
                         <transformer ref="testTransformer"/>
                     </vm:outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="EchoUMO">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="echo"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

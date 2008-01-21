@@ -25,27 +25,27 @@
     <model name="mule-2136">
 
         <service name="xml to ...">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="xml-in"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <multicasting-router>
                     <vm:outbound-endpoint ref="xml-object-out" transformer-refs="xmlToObject"/>
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="object to xml">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="object-in"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <multicasting-router>
                     <vm:outbound-endpoint ref="object-out"/>
                     <vm:outbound-endpoint ref="object-xml-out" transformer-refs="objectToXml"/>
                     <vm:outbound-endpoint ref="xml-in" transformer-refs="objectToXml"/>
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

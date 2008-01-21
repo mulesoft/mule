@@ -14,9 +14,9 @@
 
      <model name="TestCxfHeaders">
         <service name="TestComponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="cxf:http://localhost:63181/services/TestComponent"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
      </model>

@@ -20,32 +20,32 @@
     <model name="model">
 
         <service name="TcpReceiver">
-            <inbound-router>
+            <inbound>
                 <!-- Response transformer set here is a workaround because async-reply-router does not apply
                      default inbound jms transformer.  See MULE-2869  -->
                 <inbound-endpoint address="tcp://localhost:4444" remoteSync="true"
                     responseTransformer-refs="jmsmessage-to-object" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent" />
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://queue_in" />
                     <reply-to address="jms://queue_out" />
                 </outbound-pass-through-router>
-            </outbound-router>
-            <async-reply-router>
+            </outbound>
+            <async-reply>
                 <inbound-endpoint address="jms://queue_out" />
                 <custom-async-reply-router class="org.mule.test.usecases.service.DummyResponseAggregator" />
-            </async-reply-router>
+            </async-reply>
         </service>
 
         <service name="JMSReplyProvider">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jms://queue_in">
                     <transformer ref="jmsmessage-to-object" />
                     <transformer ref="bytearray-to-object" />
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.service.TestReceiver" />
             </component>

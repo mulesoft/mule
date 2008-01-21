@@ -82,35 +82,35 @@
 
     <model name="model">
         <service name="JdbcToJms">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jdbc://getTest?type=1">
                     <transaction action="ALWAYS_BEGIN">
                         <transaction-factory ref="xaTxFactory"/>
                     </transaction>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://my.queue" />
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="JmsToJdbc">
             <component class="org.mule.test.integration.transaction.XABridgeComponent"/>
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jms://my.queue?frequency=60000&amp;reuseSession=false">
                     <transaction action="ALWAYS_BEGIN">
                         <transaction-factory ref="xaTxFactory"/>
                     </transaction>
                 </inbound-endpoint>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jdbc://writeTest?type=2" />
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

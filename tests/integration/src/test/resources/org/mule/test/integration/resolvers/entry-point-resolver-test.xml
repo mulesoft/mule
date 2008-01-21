@@ -16,9 +16,9 @@
             <include-entry-point method="methodString"/>
         </method-entry-point-resolver>
         <service name="Legacy">
-           <inbound-router>
+           <inbound>
                 <vm:inbound-endpoint path="legacy"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <legacy-entry-point-resolver-set/>
                 <singleton-object instance-ref="target"/>
@@ -29,9 +29,9 @@
     <model name="ArrayModel">
         <array-entry-point-resolver/>
         <service name="Array">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="array"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object instance-ref="target"/>
             </component>
@@ -41,9 +41,9 @@
     <model name="MultipleModel">
 
         <service name="Callable">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="callable"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <callable-entry-point-resolver/>
                 <singleton-object instance-ref="target"/>
@@ -51,9 +51,9 @@
         </service>
 
         <service name="Custom">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="custom"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <custom-entry-point-resolver class="org.mule.test.integration.resolvers.CustomEntryPointResolver"/>
                 <singleton-object instance-ref="target"/>
@@ -61,9 +61,9 @@
         </service>
         
         <service name="Method">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="method"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <method-entry-point-resolver>
                     <include-entry-point method="methodString"/>
@@ -75,9 +75,9 @@
 
         <!-- this lets us simulate the no-args-component -->
         <service name="NoArguments">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="no-arguments"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <no-arguments-entry-point-resolver/>
                 <singleton-object instance-ref="target"/>
@@ -85,9 +85,9 @@
         </service>
 
         <service name="Property">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="property"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <property-entry-point-resolver property="propertyName"/>
                 <singleton-object instance-ref="target"/>
@@ -95,9 +95,9 @@
         </service>
 
         <service name="Reflection">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="reflection"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <reflection-entry-point-resolver>
                     <exclude-entry-point method="methodInteger"/>
@@ -107,9 +107,9 @@
         </service>
 
         <service name="Ordered">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="ordered"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <entry-point-resolver-set>
                     <method-entry-point-resolver>

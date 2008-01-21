@@ -11,24 +11,24 @@
 
     <model name="test">
         <service name="DeadLetter">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint queue="in">
                     <jms:transaction action="ALWAYS_BEGIN"/>
                 </jms:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE"/>
                     <property key="throwException" value="true"/>                    
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint queue="out">
                         <jms:transaction action="ALWAYS_JOIN"/>
                     </jms:outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
             <default-service-exception-strategy>
                 <jms:outbound-endpoint queue="dead.letter">
                     <jms:transaction action="ALWAYS_JOIN"/>

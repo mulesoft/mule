@@ -12,21 +12,21 @@
 
     <model name="main">
         <service name="Receiver">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://inbound.channel" />
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <message-chunking-router messageSize="2">
                     <outbound-endpoint address="vm://chunking.channel" />
                 </message-chunking-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="ChunkingReceiver">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://chunking.channel" />
                 <message-chunking-aggregator-router/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent" />
             </component>

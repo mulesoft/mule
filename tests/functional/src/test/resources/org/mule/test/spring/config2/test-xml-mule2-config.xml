@@ -117,7 +117,7 @@
 
             <mule:service name="orangeComponent">
                 
-                <mule:inbound-router>
+                <mule:inbound>
                     <mule:forwarding-catch-all-strategy>
                         <mule:outbound-endpoint
                                 address="test://catch.all"/>
@@ -132,7 +132,7 @@
                             <entry key="testLocal" value="value1"/>
                         </mule:properties>
                     </mule:inbound-endpoint>
-                </mule:inbound-router>
+                </mule:inbound>
 
                 <mule:component>
                     <mule:singleton-object instance-ref="orange">
@@ -170,18 +170,18 @@
                     </mule:binding>
                 </mule:component>
 
-                <mule:outbound-router>
+                <mule:outbound>
                     <mule:outbound-pass-through-router>
                         <mule:outbound-endpoint ref="appleInEndpoint"
                                                 transformer-refs="TestCompressionTransformer"/>
                     </mule:outbound-pass-through-router>
-                </mule:outbound-router>
+                </mule:outbound>
 
-                <mule:async-reply-router timeout="10001">
+                <mule:async-reply timeout="10001">
                     <mule:inbound-endpoint address="test://response1"/>
                     <mule:inbound-endpoint ref="appleResponseEndpoint"/>
                     <mule:custom-async-reply-router class="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
-                </mule:async-reply-router>
+                </mule:async-reply>
 
                 <mule:default-connector-exception-strategy>
                     <mule:outbound-endpoint address="test://orange.exceptions"/>
@@ -190,18 +190,18 @@
 
             <mule:service name="appleComponent">
 
-                <mule:inbound-router>
+                <mule:inbound>
                     <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                     <mule:inbound-endpoint ref="appleInEndpoint"/>
                     <mule:selective-consumer-router>
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                     </mule:selective-consumer-router>
                     <mule:idempotent-receiver-router/>
-                </mule:inbound-router>
+                </mule:inbound>
 
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
 
-                <mule:outbound-router>
+                <mule:outbound>
                     <mule:custom-catch-all-strategy class="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
                     <mule:filtering-router>
                         <mule:outbound-endpoint name="TestApple-Out" address="test://appleQ2"/>
@@ -215,30 +215,30 @@
                             <mule:regex-filter pattern="(.*) brown (.*)"/>
                         </mule:and-filter>
                     </mule:filtering-router>
-                </mule:outbound-router>
+                </mule:outbound>
 
                 <mule:default-service-exception-strategy/>
 
             </mule:service>
 
             <mule:service name="propertyExtractorTestComponent">
-                <mule:inbound-router/>
+                <mule:inbound/>
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
-                <mule:outbound-router>
+                <mule:outbound>
                     <mule:filtering-router>
                         <mxml:jxpath-property-extractor/>
                     </mule:filtering-router>
-                </mule:outbound-router>
+                </mule:outbound>
             </mule:service>
 
             <mule:service name="propertyExtractorResponseRouterTestComponent">
-                <mule:inbound-router/>
+                <mule:inbound/>
                 <mule:component class="org.mule.tck.testmodels.fruit.Apple"/>
-                <mule:async-reply-router>
+                <mule:async-reply>
                     <mule:single-async-reply-router>
                         <mule:custom-property-extractor class="org.mule.xml.util.properties.JXPathPropertyExtractor"/>
                     </mule:single-async-reply-router>
-                </mule:async-reply-router>
+                </mule:async-reply>
             </mule:service>
 
         </mule:model>

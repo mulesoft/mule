@@ -16,17 +16,17 @@
     <model name="OGNL Functional TestCase">
 
         <service name="OGNLServiceWrapper1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://in" connector-ref="VMConnector"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint address="vm://out" connector-ref="VMConnector"/>
                     <ognl:filter>
                         <ognl:expression><![CDATA[ equals("foo") || content.endsWith("bar") ]]></ognl:expression>
                     </ognl:filter>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

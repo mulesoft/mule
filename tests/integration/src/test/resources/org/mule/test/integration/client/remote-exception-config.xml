@@ -13,20 +13,20 @@
     <model name="model">
 
         <service name="testComponent1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://test.queue.1">
                     <custom-transformer class="org.mule.test.transformers.FailingTransformer"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent" />
             </component>
         </service>
 
         <service name="testComponent2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://test.queue.2" />
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>

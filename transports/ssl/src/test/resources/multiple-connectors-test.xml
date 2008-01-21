@@ -19,9 +19,9 @@
     <model name="main">
 
         <service name="testComponent1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="clientEndpoint"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 

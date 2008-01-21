@@ -14,9 +14,9 @@
     <model name="test">
 
         <service name="mycomponent1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:60211/mycomponent1" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="mycomponent1"/>
@@ -26,9 +26,9 @@
         </service>
 
         <service name="mycomponent2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:60211/mycomponent2" synchronous="true"/>
-            </inbound-router>
+            </inbound>
 
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">

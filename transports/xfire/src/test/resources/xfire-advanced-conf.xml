@@ -14,11 +14,11 @@
 
     <model name="TestXfire">
         <service name="echoServiceWsdlPortType">
-            <inbound-router>
+            <inbound>
                 <xfire:inbound-endpoint address="http://localhost:63081/services"
                                         wsdlUrl="file://xfire-advanced-echo-service.wsdl"
                                         portType="qname{http://www.muleumo.org:echoServiceCustomPortType}"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
     </model>

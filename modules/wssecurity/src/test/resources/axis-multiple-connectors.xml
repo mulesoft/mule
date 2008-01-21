@@ -38,78 +38,78 @@
     <model name="WebServiceExample">
 
         <service name="SecureBridge">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://secured"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint name="secured"
                                        address="axis:http://localhost:64070/services/SecuredWS?method=echo"
                                        connector-ref="SecuredConnector"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="UnSecureBridge1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://unsecured1"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="axis:http://localhost:64077/services/UnsecuredWS1?method=echo"
                                        connector-ref="UnsecuredConnector"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="UnSecureBridge2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://unsecured2"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="axis:http://localhost:64078/services/UnsecuredWS2?method=echo"
                                        connector-ref="UnsecuredConnector"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="SecuredWS">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="axis:http://localhost:64070/services" connector-ref="SecuredConnector">
                     <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <echo-component/>
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint address="stdio://System.out"/>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="UnsecuredWS1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="axis:http://localhost:64077/services" connector-ref="UnsecuredConnector"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint address="stdio://System.out"/>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="UnsecuredWS2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="axis:http://localhost:64078/services" connector-ref="UnsecuredConnector"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint address="stdio://System.out"/>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

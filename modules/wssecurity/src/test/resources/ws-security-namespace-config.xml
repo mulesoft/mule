@@ -33,9 +33,9 @@
 
     <model name="test">
         <service name="MySecuredUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="endpoint"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>

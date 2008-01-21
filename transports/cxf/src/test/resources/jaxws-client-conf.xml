@@ -28,17 +28,17 @@
   
     <service name="greeterService">
       <component class="org.apache.hello_world_soap_http.GreeterImpl"/>
-      <inbound-router>
+      <inbound>
           <cxf:inbound-endpoint address="http://localhost:63081/services/greeter" />
-      </inbound-router>
+      </inbound>
     </service>
     
     <service name="cxfClient">
       <singleton-object class="org.mule.providers.cxf.jaxws.ClientMessageGenerator"/>
-      <inbound-router>
+      <inbound>
         <inbound-endpoint ref="quartz.in"/>
-      </inbound-router>
-	  <outbound-router>
+      </inbound>
+	  <outbound>
 	    <outbound-pass-through-router>
 	       <outbound-endpoint address="cxf:http://localhost:63081/services/greeter">
 	         <properties>
@@ -49,7 +49,7 @@
 	         </properties>
 	       </outbound-endpoint>
 	     </outbound-pass-through-router>
-	   </outbound-router>
+	   </outbound>
     </service>
   </model>
 </mule>

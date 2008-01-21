@@ -14,31 +14,31 @@
 
     <model name="main">
         <service name="multicastComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint ref="inbound" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <pass-through-component/>
-            <outbound-router>
+            <outbound>
                 <multicasting-router>
                     <vm:outbound-endpoint ref="endpointHop1"/>
                     <vm:outbound-endpoint ref="endpointHop2"/>
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="hop1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint ref="endpointHop1"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
         </service>
 
         <service name="hop2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint ref="endpointHop2"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>

@@ -27,21 +27,21 @@
     <model name="baseModel">
 
         <service name="baseService1">
-            <inbound-router>
+            <inbound>
                 <http:inbound-endpoint ref="base"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://echo1" synchronous="true"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="baseService2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://echo1" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 
@@ -54,21 +54,21 @@
     <model name="adaptedModel">
 
         <service name="adaptedService1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="adapted"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://echo2" synchronous="true"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="adaptedService2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://echo2" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
         </service>
 
@@ -80,21 +80,21 @@
     <model name="ignoredModel">
 
         <service name="ignoredService1">
-            <inbound-router>
+            <inbound>
                 <http:inbound-endpoint ref="ignored" transformer-refs="appendString"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://echo3" synchronous="true"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="ignoredService2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://echo3" synchronous="true" transformer-refs="appendString2"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
         </service>
 
@@ -105,27 +105,27 @@
     <model name="inboundModel">
 
         <service name="inboundService1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="inbound">
                     <object-to-string-transformer/>
                     <transformer ref="appendString"/>
                 </inbound-endpoint>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://echo4" synchronous="true"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="inboundService2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://echo4" synchronous="true">
                   <object-to-string-transformer/>
                   <transformer ref="appendString2" />
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 

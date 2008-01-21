@@ -47,16 +47,16 @@
             For this example we use Vm.
         -->
         <service name="serviceProxy">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="stockquote"
                                      responseTransformer-refs="XmlDecoder Xslt XmlToObject"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="wsdl-xfire:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

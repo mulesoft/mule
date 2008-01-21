@@ -15,9 +15,9 @@
 
     <model name="XfireSoapRequest">
         <service name="TestComponent">
-            <inbound-router>
+            <inbound>
                 <xfire:inbound-endpoint address="http://localhost:63381/services"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
     </model>

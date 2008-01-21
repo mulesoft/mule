@@ -17,23 +17,23 @@
     <model name="PSMaxIntegration">
         
         <service name="PSMaxMsg1">
-            <inbound-router>
+            <inbound>
                 <http:inbound-endpoint name="httpEndpoint" host="localhost" port="8085"
                                        transformer-refs="Xslt" contentType="text/xml"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <http:outbound-endpoint host="localhost" port="8087"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="PSMaxMsg2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:8087"/>
                 <forwarding-router/>
-            </inbound-router>
+            </inbound>
         </service>
 
     </model>

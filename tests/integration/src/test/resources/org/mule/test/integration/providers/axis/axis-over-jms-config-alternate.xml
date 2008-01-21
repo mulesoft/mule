@@ -12,17 +12,17 @@
 
     <model name="Test-Case">
         <service name="TestComponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="axis:jms://TestComponent">
                     <jms:transaction action="ALWAYS_BEGIN"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <echo-component/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://testout"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

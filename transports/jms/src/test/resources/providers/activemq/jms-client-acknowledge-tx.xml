@@ -21,39 +21,39 @@
     <model name="jmsTest">
 
         <service name="InputPart">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="in">
                     <jms:transaction action="BEGIN_OR_JOIN"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="middle" transformer-refs="ObjectToJMSMessage"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="JmsClientAcknowledgeTransactionFactory">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="middle">
                     <jms:transaction action="ALWAYS_BEGIN"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out" transformer-refs="ObjectToJMSMessage"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

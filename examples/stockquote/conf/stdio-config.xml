@@ -17,11 +17,11 @@
 
     <model name="Sample">
         <service name="Console I/O">
-            <inbound-router>
+            <inbound>
                 <stdio:inbound-endpoint system="IN"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <!--
                     We use a chaining router to send the results of one endpoint execution as the
                     input for the next endpoint. In this case it writes it out to System.out
@@ -30,7 +30,7 @@
                     <vm:outbound-endpoint path="stockquote"/>
                     <stdio:outbound-endpoint system="OUT"/>
                 </chaining-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

@@ -11,54 +11,54 @@
             Both first and last link elements succeed
         -->
         <service name="bridge1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://incomingPass"/>
-            </inbound-router>
+            </inbound>
 
-            <outbound-router>
+            <outbound>
                 <chaining-router>
                     <outbound-endpoint address="vm://component1"/>
                     <outbound-endpoint address="vm://component2Pass"/>
                 </chaining-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <!--
             First passes and tags the message, but the last one fails
         -->
         <service name="bridge2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://incomingLastFail"/>
-            </inbound-router>
+            </inbound>
 
-            <outbound-router>
+            <outbound>
                 <chaining-router>
                     <outbound-endpoint address="vm://component1"/>
                     <outbound-endpoint address="vm://component2Fail"/>
                 </chaining-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <!--
             First chain component fails, second never fires
         -->
         <service name="bridge3">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://incomingFirstFail"/>
-            </inbound-router>
+            </inbound>
 
-            <outbound-router>
+            <outbound>
                 <chaining-router>
                     <outbound-endpoint address="vm://component1Fail"/>
                     <outbound-endpoint address="vm://component2Pass"/>
                 </chaining-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="component1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://component1"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="appendComponentName" value="true"/>
@@ -67,9 +67,9 @@
         </service>
 
         <service name="component1Fail">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://component1Fail"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="throwException" value="true"/>
@@ -79,9 +79,9 @@
         </service>
 
         <service name="component2Pass">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://component2Pass"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="appendComponentName" value="true"/>
@@ -90,9 +90,9 @@
         </service>
 
         <service name="component2Fail">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://component2Fail"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="throwException" value="true"/>

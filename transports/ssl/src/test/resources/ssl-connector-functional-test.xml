@@ -20,20 +20,20 @@
     <model name="main">
 
         <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="in"/>
-            </inbound-router>
+            </inbound>
 
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
             
             <!-- This is just to avoid matching router warnings -->
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint name="test1" address="test://test"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
 

@@ -21,11 +21,11 @@
 
     <model name="test">
         <service name="TestUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://test">
                     <jaas:jaas-security-filter/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
     </model>

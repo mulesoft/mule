@@ -279,9 +279,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("spring-factory-bean", new SpringFactoryBeanDefinitionParser());
 
         //Routers
-        registerBeanDefinitionParser("inbound-router", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
-        registerBeanDefinitionParser("outbound-router", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
-        registerBeanDefinitionParser("async-reply-router", new ChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
+        registerBeanDefinitionParser("inbound", new ChildDefinitionParser("inboundRouter", InboundRouterCollection.class));
+        registerBeanDefinitionParser("outbound", new ChildDefinitionParser("outboundRouter", OutboundRouterCollection.class));
+        registerBeanDefinitionParser("async-reply", new ChildDefinitionParser("responseRouter", ResponseRouterCollection.class));
 
         //Inbound Routers
         registerBeanDefinitionParser("forwarding-router", new ForwardingRouterDefinitionParser());

@@ -12,11 +12,11 @@
 
     <model name="CollationError">
         <service name="Distributor">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://distributor.queue"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
-            <outbound-router>
+            <outbound>
                 <static-recipient-list-router>
                     <reply-to address="vm://Aggregator.queue"/>
                     <recipients>
@@ -24,25 +24,25 @@
                         <spring:value>vm://quoteprovider2.queue</spring:value>
                     </recipients>
                 </static-recipient-list-router>
-            </outbound-router>
-            <async-reply-router>
+            </outbound>
+            <async-reply>
                 <inbound-endpoint address="vm://Aggregator.queue"/>
                 <custom-async-reply-router class="org.mule.test.integration.routing.TestAggregator"/>
-            </async-reply-router>
+            </async-reply>
         </service>
 
         <service name="QuoteProviderOne">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://quoteprovider1.queue"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
 
         <!-- This is a quotation system -->
         <service name="QuoteProviderTwo">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://quoteprovider2.queue"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
     </model>

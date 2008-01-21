@@ -20,18 +20,18 @@
     <model name="main">
 
         <service name="testComponent1">
-            <inbound-router>
+            <inbound>
                 <tcp:inbound-endpoint ref="clientEndpoint"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 
         <!-- this doesn't work because it uses the output stream and length encoding doesn't
              support streams -->
         <service name="testComponent2">
-            <inbound-router>
+            <inbound>
                 <tcp:inbound-endpoint ref="asyncClientEndpoint1"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <properties>
@@ -46,17 +46,17 @@
         <!-- this doesn't work because, in essence, the existing socket is opened in the wrong
              direction.  so it keeps sending the reply to itself... -->
         <service name="testComponent3">
-            <inbound-router>
+            <inbound>
                 <tcp:inbound-endpoint ref="asyncClientEndpoint2"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <tcp:outbound-endpoint ref="asyncClientEndpoint2"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

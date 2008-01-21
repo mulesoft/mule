@@ -12,7 +12,7 @@
 
     <model name="test" >
         <service name="BridgeNoTransformer">
-            <inbound-router matchAll="true">
+            <inbound matchAll="true">
                 <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
                     <outbound-endpoint address="vm://catchall" connector-ref="vmQueue"/>
                 </custom-forwarding-catch-all-strategy>
@@ -22,17 +22,17 @@
                 <selective-consumer-router>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </selective-consumer-router>
-            </inbound-router>
+            </inbound>
             <pass-through-component/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="BridgeTransformed">
-            <inbound-router matchAll="true">
+            <inbound matchAll="true">
                 <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
                     <outbound-endpoint address="vm://catchall" connector-ref="vmQueue">
                         <string-to-byte-array-transformer/>
@@ -46,13 +46,13 @@
                 <selective-consumer-router>
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </selective-consumer-router>
-            </inbound-router>
+            </inbound>
             <pass-through-component/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

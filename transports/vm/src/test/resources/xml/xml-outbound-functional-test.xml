@@ -30,11 +30,11 @@
              services via message-splitter.  the service name is then used in the
              jxpath-filter to send each service to a separate endpoint -->
         <service name="service splitter">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="split"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <mxml:message-splitter splitExpression="/mule:mule/mule:model/mule:service">
                     <outbound-endpoint ref="service1">
                         <mxml:jxpath-filter pattern="/mule:service/@name" expectedValue="service splitter">
@@ -50,37 +50,37 @@
                     <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
                     <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
                 </mxml:message-splitter>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="round robin deterministic">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="roundrobin-det"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <mxml:round-robin-splitter splitExpression="/mule:mule/mule:model/mule:service">
                     <outbound-endpoint ref="robin1"/>
                     <outbound-endpoint ref="robin2"/>
                     <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
                     <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
                 </mxml:round-robin-splitter>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="round robin indeterministic">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="roundrobin-indet"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <mxml:round-robin-splitter splitExpression="/mule:mule/mule:model/mule:service" deterministic="false">
                     <outbound-endpoint ref="robin1"/>
                     <outbound-endpoint ref="robin2"/>
                     <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
                     <mxml:namespace prefix="mule" uri="http://www.mulesource.org/schema/mule/core/2.0"/>
                 </mxml:round-robin-splitter>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

@@ -17,21 +17,21 @@
     <model name="main">
 
         <service name="Receiver">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="inbound.channel"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <message-chunking-router messageSize="2">
                     <vm:outbound-endpoint path="chunking.channel"/>
                 </message-chunking-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="ChunkingReceiver">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="chunking.channel"/>
                 <message-chunking-aggregator-router/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.functional.FunctionalTestComponent"/>
         </service>
 
@@ -39,21 +39,21 @@
              converting response to a string -->
 
         <service name="ObjectReceiver">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="inbound.object.channel"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <message-chunking-router messageSize="2">
                     <vm:outbound-endpoint path="chunking.object.channel"/>
                 </message-chunking-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="ChunkingObjectReceiver">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="chunking.object.channel"/>
                 <message-chunking-aggregator-router/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="asString" value="false"/>

@@ -13,9 +13,9 @@
     <model name="Model">
 
         <service name="NotIgnored">
-           <inbound-router>
+           <inbound>
                 <vm:inbound-endpoint path="not-ignored"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
                     <exclude-object-methods/>
@@ -27,9 +27,9 @@
         </service>
 
         <service name="Selected">
-           <inbound-router>
+           <inbound>
                 <vm:inbound-endpoint path="selected"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
                     <include-entry-point method="selected"/>

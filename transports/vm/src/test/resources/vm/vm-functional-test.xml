@@ -13,9 +13,9 @@
     <model name="asynchTestModel">
 
         <service name="myAsynchService">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="in" connector-ref="asynchVm"/>
-            </inbound-router>
+            </inbound>
 
             <component>
                 <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
@@ -23,11 +23,11 @@
                 </pooled-object>
             </component>
 
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="out" connector-ref="asynchVm"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

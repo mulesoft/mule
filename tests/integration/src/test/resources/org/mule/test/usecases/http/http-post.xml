@@ -20,9 +20,9 @@
 
     <model name="model">
         <service name="HttpService">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="httpService"/>
-            </inbound-router>
+            </inbound>
             <echo-component/>
         </service>
     </model>

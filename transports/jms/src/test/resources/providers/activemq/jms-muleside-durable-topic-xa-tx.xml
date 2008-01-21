@@ -32,15 +32,15 @@
     <model name="TEST">
 
         <service name="InputPart">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="in"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <jms:outbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorTestDriver"/>
                     <!--
@@ -49,43 +49,43 @@
                     -->
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Part1">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC1">
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE-1"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="Part3">
-            <inbound-router>
+            <inbound>
                 <jms:inbound-endpoint topic="durable.broadcast" connector-ref="jmsConnectorC2">
                     <jms:xa-transaction action="BEGIN_OR_JOIN"/>
                 </jms:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent">
                     <property key="returnMessage" value="OUTPUT MESSAGE-2"/>
                 </singleton-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint ref="out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

@@ -11,21 +11,21 @@
     <model name="main">
 
         <service name="httpIn">
-            <inbound-router>
+            <inbound>
                 <http:inbound-endpoint host="localhost" port="60201" synchronous="true">
                     <not-filter>
                         <wildcard-filter pattern="*xyz*"/>
                     </not-filter>
                 </http:inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 
         <service name="reference">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="http://localhost:60199" synchronous="true">
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 

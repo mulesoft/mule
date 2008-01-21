@@ -8,29 +8,29 @@
     
     <model name="main">
         <service name="bridge1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="file://${mule.working.dir}/test-data/in"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="tcp://localhost:34561"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="bridge2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="tcp://localhost:34561"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.integration.streaming.SimpleStreamingBean"/>
-            <outbound-router>
+            <outbound>
                 <multicasting-router>
                     <!--<outbound-endpoint address="stdio://System.out" streaming="true"/>-->
                     <outbound-endpoint address="file://${mule.working.dir}/test-data/out" encoding="UTF8">
                         <property key="outputPattern" value="foo.txt.processed"/>
                     </outbound-endpoint>
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

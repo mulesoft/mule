@@ -32,10 +32,10 @@
     <model name="test">
 
         <service name="BridgeUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://testin"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="axis:http://localhost:64484/MySecuredUMO?method=echo"
                                        connector-ref="axisConnector">
@@ -48,15 +48,15 @@
                         </wssecurity:security-filter>
                     </outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="MySecuredUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="axis:http://localhost:64484" connector-ref="axisConnector">
                     <wssecurity:security-filter decryptionFile="in-encrypted-security.properties"/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
     </model>

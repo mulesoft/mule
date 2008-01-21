@@ -70,11 +70,11 @@
     <model name="xml transformer tests">
 
         <service name="xml to ...">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="xml-in"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <multicasting-router>
                     <outbound-endpoint ref="xml-out" address="vm://xml-out" connector-ref="queue"/>
                     <vm:outbound-endpoint ref="xml-xslt-out" transformer-refs="xslt"/>
@@ -84,33 +84,33 @@
                     <vm:outbound-endpoint ref="xml-object-out" transformer-refs="xmlToObject"/>
                     <vm:outbound-endpoint ref="dom-in"/>
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="object to xml">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="object-in"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <multicasting-router>
                     <outbound-endpoint ref="object-out"/>
                     <vm:outbound-endpoint ref="object-xml-out" transformer-refs="objectToXml"/>
                     <outbound-endpoint ref="xml-in" transformer-refs="objectToXml"/>
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="dom to xml">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint ref="dom-in"/>
                 <forwarding-router/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <multicasting-router>
                     <outbound-endpoint ref="dom-xml-out" transformer-refs="domToXml"/>
                 </multicasting-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

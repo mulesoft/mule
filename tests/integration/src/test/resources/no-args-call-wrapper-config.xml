@@ -17,33 +17,33 @@
 
     <model name="NoArgsWrapperModel">
         <service name="WrapperUMO">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://invoke"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
                     <include-entry-point method="toString"/>
                 </no-arguments-entry-point-resolver>
                 <singleton-object class="org.mule.tck.testmodels.fruit.Apple"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="WrapperUMOInjected">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://invokeWithInjected"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <no-arguments-entry-point-resolver>
                     <include-entry-point method="wash"/>
                 </no-arguments-entry-point-resolver>
                 <singleton-object instance-ref="containerDelegate"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <!--
                         don't reuse the output queue, ensure we're the only sender
@@ -51,7 +51,7 @@
                     -->
                     <outbound-endpoint address="vm://outWithInjected"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 </mule>

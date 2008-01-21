@@ -10,11 +10,11 @@
 
     <model name="test">
         <service name="proxy">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://proxy" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <bridge-component/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <axis:outbound-endpoint address="http://localhost:62080/mule-tests-external-xfire/services/TestService?method=getTest"
                         soapAction="[methodNamespace][method]">
@@ -43,7 +43,7 @@
                         </properties -->
                     </axis:outbound-endpoint>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
     </model>
 

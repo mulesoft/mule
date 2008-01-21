@@ -14,14 +14,14 @@
     
     <model name="test">
         <service name="mycomponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="cxf:vm://mycomponent"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
         <service name="mycomponent2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="cxf:vm://mycomponent2">
                     <properties>
                         <spring:entry key="serviceInterfaces">
@@ -32,21 +32,21 @@
                         </spring:entry>
                     </properties>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
         <service name="mycomponent3">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="cxf:vm://mycomponent3"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
 
         <service name="mycomponent4">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="cxf:vm://mycomponent4" synchronous="false"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>
     </model>

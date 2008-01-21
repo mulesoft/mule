@@ -8,21 +8,21 @@
 
     <model name="test">
        <service name="bridge">
-           <inbound-router>
+           <inbound>
                <inbound-endpoint address="vm://bridge.inbound"/>
                <forwarding-router/>
-           </inbound-router>
-           <outbound-router>
+           </inbound>
+           <outbound>
                <outbound-pass-through-router>
                    <outbound-endpoint address="vm://bridge.outbound"/>
                </outbound-pass-through-router>
-           </outbound-router>
+           </outbound>
         </service>
 
        <service name="Receiver">
-           <inbound-router>
+           <inbound>
                <inbound-endpoint address="vm://bridge.outbound"/>
-           </inbound-router>
+           </inbound>
            <component class="org.mule.test.integration.service.TestReceiver"/>
         </service>
     </model>

@@ -15,28 +15,28 @@
     <model name="processModel">
 
         <service name="fromSimpleProcess">
-            <inbound-router>
+            <inbound>
                 <bpm:inbound-endpoint process="simple"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.LogComponent"/>
         </service>
 
         <service name="fromMessageProcess">
-            <inbound-router>
+            <inbound>
                 <bpm:inbound-endpoint process="message"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.LogComponent"/>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="echo"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="echoService">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="echo"/>
-            </inbound-router>
+            </inbound>
             <component class="org.mule.components.simple.EchoComponent"/>
         </service>
 

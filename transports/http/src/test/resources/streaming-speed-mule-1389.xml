@@ -14,23 +14,23 @@
 
     <model name="echoModel">
         <service name="echo">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="tcp://localhost:60209"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.components.simple.BridgeComponent"/>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="http://localhost:60210"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="testComponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="tcp://localhost:60210"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalStreamingTestComponent"/>
             </component>

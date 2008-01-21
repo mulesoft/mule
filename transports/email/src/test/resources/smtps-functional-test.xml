@@ -18,14 +18,14 @@
     <model name="test">
 
         <service name="relay">
-            <inbound-router>
+            <inbound>
                 <vm:inbound-endpoint path="send"/>
-            </inbound-router>
-            <outbound-router>
+            </inbound>
+            <outbound>
                 <outbound-pass-through-router>
                     <smtps:outbound-endpoint host="localhost" port="65439" to="bob@example.com"/>
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

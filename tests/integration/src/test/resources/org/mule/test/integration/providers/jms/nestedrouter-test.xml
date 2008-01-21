@@ -14,27 +14,27 @@
     <model name="NestedRouter">
 
         <service name="HelloComponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jms://hello.in" />
-            </inbound-router>
+            </inbound>
             <component class="org.mule.test.integration.routing.nested.HelloService" />
         </service>
 
         <service name="InvokerComponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="jms://invoker.in" />
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.routing.nested.Invoker" />
                 <binding interface="org.mule.test.integration.routing.nested.HelloInterface">
                     <outbound-endpoint address="jms://hello.in" remoteSync="true" />
                 </binding>
             </component>
-            <outbound-router>
+            <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://invoker.out" />
                 </outbound-pass-through-router>
-            </outbound-router>
+            </outbound>
         </service>
 
     </model>

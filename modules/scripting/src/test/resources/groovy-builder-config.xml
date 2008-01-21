@@ -24,27 +24,27 @@
     <model name="main">
 
         <service name="GroovyUMO1">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://groovy.1"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.components.script.jsr223.ScriptMessageBuilder">
                     <property key="scriptEngineName" value="groovy"/>
                     <property key="scriptText" value-ref="scriptText1"/>
                 </pooled-object>
             </component>
-            <outbound-router>
+            <outbound>
                 <filtering-router>
                     <outbound-endpoint address="vm://groovy.2"/>
                     <outbound-endpoint address="vm://groovy.3"/>
                 </filtering-router>
-            </outbound-router>
+            </outbound>
         </service>
 
         <service name="GroovyUMO2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://groovy.2"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
                     <property key="scriptEngineName" value="groovy"/>
@@ -54,9 +54,9 @@
         </service>
 
         <service name="GroovyUMO3">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://groovy.3"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <pooled-object class="org.mule.components.script.jsr223.ScriptComponent">
                     <property key="scriptEngineName" value="groovy"/>

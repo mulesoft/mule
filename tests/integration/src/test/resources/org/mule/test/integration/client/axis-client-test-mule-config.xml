@@ -14,18 +14,18 @@
     
     <model name="test">
         <service name="mycomponent">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="axis:http://localhost:38103/mule/services"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
             </component>
         </service>
 
         <service name="mycomponent2">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="axis:http://localhost:38104/mule/services"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.service.TestServiceComponent">
                     <property key="serviceInterfaces" value="org.mule.components.simple.EchoService"/>
@@ -34,9 +34,9 @@
         </service>
 
         <service name="mycomponent3">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="axis:http://localhost:38104/mule/services"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
             </component>

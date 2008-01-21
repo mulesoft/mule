@@ -8,20 +8,20 @@
 
     <model name="model">
         <service name="vmComponent" initialState="stopped">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="vm://test.queue" synchronous="true"/>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.service.TestReceiver"/>
             </component>
         </service>
 
         <service name="tcpComponent" initialState="stopped">
-            <inbound-router>
+            <inbound>
                 <inbound-endpoint address="tcp://localhost:56324" synchronous="true">
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
-            </inbound-router>
+            </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.service.TestReceiver"/>
             </component>
