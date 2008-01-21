@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>                                        "inb
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -151,7 +151,7 @@
     </xsd:complexType>
 
     <!-- seemed pointless making these simple container types abstract -->
-    <xsd:complexType name="inboundRouterCollectionType">
+    <xsd:complexType name="inboundCollectionType">
         <xsd:sequence>
             <xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/>
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
@@ -175,7 +175,7 @@
     <xsd:element name="abstract-binding" abstract="true" type="abstractBindingType"/>
     <xsd:complexType name="abstractBindingType"/>
 
-    <xsd:complexType name="outboundRouterCollectionType">
+    <xsd:complexType name="outboundCollectionType">
         <xsd:sequence>
             <xsd:element ref="abstract-catch-all-strategy" minOccurs="0"/>
             <xsd:element ref="abstract-outbound-router" maxOccurs="unbounded"/>
@@ -186,7 +186,7 @@
     <xsd:element name="abstract-outbound-router" abstract="true" type="abstractOutboundRouterType"/>
     <xsd:complexType name="abstractOutboundRouterType"/>
 
-    <xsd:complexType name="asyncReplyRouterCollectionType">
+    <xsd:complexType name="asyncReplyCollectionType">
         <xsd:sequence>
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-async-reply-router" minOccurs="0" maxOccurs="unbounded"/>
@@ -460,11 +460,11 @@
         <xsd:complexContent>
             <xsd:extension base="abstractServiceType">
                 <xsd:sequence>
-                    <xsd:element name="inbound" type="inboundRouterCollectionType" minOccurs="0"/>
+                    <xsd:element name="inbound" type="inboundCollectionType" minOccurs="0"/>
                     <!-- minOccurs="0" to allow for <forwarding-router/> and/or default component -->
                     <xsd:element ref="abstract-component" minOccurs="0"/>
-                    <xsd:element name="outbound" type="outboundRouterCollectionType" minOccurs="0"/>
-                    <xsd:element name="async-reply" type="asyncReplyRouterCollectionType" minOccurs="0"/>
+                    <xsd:element name="outbound" type="outboundCollectionType" minOccurs="0"/>
+                    <xsd:element name="async-reply" type="asyncReplyCollectionType" minOccurs="0"/>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass"/>
