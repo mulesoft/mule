@@ -40,13 +40,17 @@ org.mule.test.usecases.sync.TcpToFileTestCase
 # Convert to XML-based config
 ##########################################################################
 
-org.mule.test.integration.EventMetaDataPropagationTestCase
-org.mule.test.integration.message.AttachmentsPropagationTestCase
-org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
-org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
+# MULE-2749
 org.mule.test.integration.providers.jdbc.JdbcConnectionTestCase
 org.mule.test.integration.providers.jdbc.JdbcTransactionalJdbcFunctionalTestCase
 org.mule.test.integration.providers.jdbc.JdbcTransactionalXaFunctionalTestCase
+
+# MULE-2747
+org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
+
+org.mule.test.integration.EventMetaDataPropagationTestCase
+org.mule.test.integration.message.AttachmentsPropagationTestCase
+org.mule.test.integration.providers.vm.MethodEntrypointsTestCase
 org.mule.test.integration.transaction.XATransactionsWithSpringDAO
 # Convert transacted endpoint to XML config
 org.mule.test.integration.client.MuleClientTransactionTestCase
@@ -59,19 +63,11 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # probably a duplicate of MessageChunkingMule2192TestCase?
 org.mule.test.integration.routing.MessageChunkingTestCase
 
-# MULE-2745
-# How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
-org.mule.test.integration.persistence.FilePersistenceTestCase
-
 # MULE-2881
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 
 # MULE-2740
 org.mule.test.integration.MuleEndpointConfigurationTestCase
-
-# MULE-2739
-# Does this still need to work for 2.x?
-org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 
 ##########################################################################
 # Mule 2.x-specific failures
@@ -118,4 +114,13 @@ org.mule.test.integration.models.SedaPipelineTestCase
 
 # MULE-1789
 org.mule.test.integration.config.MultiContainerTestCase
+
+# MULE-2739
+# Does this still need to work for 2.x?
+org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
+
+# MULE-2745
+# How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
+org.mule.test.integration.persistence.FilePersistenceTestCase
+
 
