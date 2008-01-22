@@ -76,7 +76,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
             applyTransaction(session);
             return message;
         }
-    };
+    }
     
     Scenario scenarioDeadLetterRollback = new ScenarioDeadLetterRollback();
     class ScenarioDeadLetterRollback extends ScenarioDeadLetter
@@ -85,7 +85,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
         {
             session.rollback();
         }
-    };
+    }
 
     Scenario scenarioDeadLetterNotReceive = new ScenarioDeadLetterNotReceive();
     class ScenarioDeadLetterNotReceive extends ScenarioDeadLetter
@@ -96,5 +96,5 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
             assertNull(message);
             return message;
         }
-    };
+    }
 }

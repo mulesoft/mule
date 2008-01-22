@@ -95,7 +95,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
     protected ConnectionStrategy connectionStrategy;
 
-    protected boolean responseEndpoint = false;;
+    protected boolean responseEndpoint = false;
 
     
     /**
