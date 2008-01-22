@@ -9,11 +9,7 @@
  */
 package org.mule.config.support;
 
-import org.mule.impl.model.AbstractComponent;
 import org.mule.impl.model.AbstractModel;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
 
 /**
  * TODO
@@ -26,11 +22,6 @@ public class InheritedModel extends AbstractModel
     }
 
 
-    /*
-    * (non-Javadoc)
-    *
-    * @see org.mule.umo.UMOModel#getName()
-    */
     //@Override
     public String getName()
     {
@@ -40,24 +31,6 @@ public class InheritedModel extends AbstractModel
     public String getParentName()
     {
         return super.getName();
-    }
-
-    private class InheritedComponent extends AbstractComponent
-    {
-        public InheritedComponent()
-        {
-            super();
-        }
-
-        protected UMOMessage doSend(UMOEvent event) throws UMOException
-        {
-            throw new UnsupportedOperationException("doSend()");
-        }
-
-        protected void doDispatch(UMOEvent event) throws UMOException
-        {
-            throw new UnsupportedOperationException("doDispatch()");
-        }
     }
 
 }
