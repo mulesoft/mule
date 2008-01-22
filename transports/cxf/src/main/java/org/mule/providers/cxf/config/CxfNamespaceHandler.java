@@ -10,15 +10,9 @@
 
 package org.mule.providers.cxf.config;
 
-import org.mule.config.spring.factories.InboundEndpointFactoryBean;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportGlobalEndpointDefinitionParser;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.providers.cxf.CxfConnector;
-
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
 {

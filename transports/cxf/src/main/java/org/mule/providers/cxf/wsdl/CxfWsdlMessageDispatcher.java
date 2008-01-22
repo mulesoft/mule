@@ -10,13 +10,15 @@
 
 package org.mule.providers.cxf.wsdl;
 
+import org.mule.providers.cxf.ClientWrapper;
 import org.mule.providers.cxf.CxfMessageDispatcher;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.StringUtils;
 
+import java.io.IOException;
+
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 
 /**
@@ -36,32 +38,42 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
     {
         try
         {
-            Bus cxfBus = connector.getCxfBus();
-            String wsdlUrl = endpoint.getEndpointURI().getAddress();
-            String serviceName = endpoint.getEndpointURI().getAddress();
+            wrapper = new ClientWrapper() {
 
-            // If the property specified an alternative WSDL url, use it
-            if (endpoint.getProperty("wsdlUrl") != null
-                && StringUtils.isNotBlank(endpoint.getProperty("wsdlUrl").toString()))
-            {
-                wsdlUrl = (String) endpoint.getProperty("wsdlUrl");
-            }
+                @Override
+                public void initialize() throws Exception, IOException
+                {
 
-            if (serviceName.indexOf("?") > -1)
-            {
-                serviceName = serviceName.substring(0, serviceName.lastIndexOf('?'));
-            }
+                    String wsdlUrl = endpoint.getEndpointURI().getAddress();
+                    String serviceName = endpoint.getEndpointURI().getAddress();
+                    
+                    // If the property specified an alternative WSDL url, use it
+                    if (endpoint.getProperty("wsdlUrl") != null
+                        && StringUtils.isNotBlank(endpoint.getProperty("wsdlUrl").toString()))
+                    {
+                        wsdlUrl = (String) endpoint.getProperty("wsdlUrl");
+                    }
 
-            try
-            {
-                DynamicClientFactory cf = DynamicClientFactory.newInstance(cxfBus);
-                this.client = cf.createClient(wsdlUrl, new QName(serviceName));
-            }
-            catch (Exception ex)
-            {
-                disconnect();
-                throw ex;
-            }
+                    if (serviceName.indexOf("?") > -1)
+                    {
+                        serviceName = serviceName.substring(0, serviceName.lastIndexOf('?'));
+                    }
+
+                    try
+                    {
+                        DynamicClientFactory cf = DynamicClientFactory.newInstance(bus);
+                        this.client = cf.createClient(wsdlUrl, new QName(serviceName));
+                    }
+                    catch (Exception ex)
+                    {
+                        disconnect();
+                        throw ex;
+                    }
+                }
+            };
+            wrapper.setBus(connector.getCxfBus());
+            wrapper.setEndpoint(endpoint);
+            wrapper.initialize();
         }
         catch (Exception ex)
         {

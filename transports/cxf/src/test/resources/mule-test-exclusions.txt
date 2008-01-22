@@ -14,14 +14,9 @@ org.mule.providers.cxf.ServiceUsingAxisEndpointTestCase
 
 # Not working yet...
 org.mule.providers.cxf.client.GeneratedClientTestCase
-org.mule.providers.cxf.jaxws.ClientTestCase
 org.mule.providers.cxf.bridge.BridgeTest
 
-# Only works for Dan D
-org.mule.providers.cxf.WsdlCallTestCase
-
-# these fail in the jdk-1.5 compile branch
-org.mule.providers.cxf.CxfConnectorTestCase
-org.mule.providers.cxf.CxfConnectorVMFunctionalTestCase
+# Weird serialization issues.. We shouldn't be using
+# FunctionalTestComponent as the basis for a service...
 org.mule.providers.cxf.CxfCustomHttpHeaderTestCase
-org.mule.providers.cxf.CxfConnectorHttpFunctionalTestCase
+

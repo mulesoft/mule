@@ -23,7 +23,6 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointNotFoundException;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
@@ -34,7 +33,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Properties;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -128,6 +126,11 @@ public class CxfServiceComponent implements Callable, Lifecycle
             req = req.substring(qIdx);
         }
         
+        qIdx = req.indexOf('&');
+        if (qIdx > -1) {
+            req = req.substring(0, qIdx);
+        }
+        
         String uri = uriBase + req;
         
         String ctxUri = eventContext.getEndpointURI().getPath();
@@ -141,7 +144,6 @@ public class CxfServiceComponent implements Callable, Lifecycle
         {
             if (qh.isRecognizedQuery(uri, ctxUri, ei))
             {
-
                 ct = qh.getResponseContentType(uri, ctxUri);
                 qh.writeResponse(uri, ctxUri, ei, out);
                 out.flush();

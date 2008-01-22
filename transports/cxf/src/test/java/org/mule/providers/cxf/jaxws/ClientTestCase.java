@@ -23,11 +23,18 @@ public class ClientTestCase extends FunctionalTestCase
 {
     public void testGeneratedClient() throws Exception
     {
-        GreeterImpl impl = (GreeterImpl) muleContext.getRegistry().lookupObject("greeterService");
+        GreeterImpl impl = getGreeter();
         
         Thread.sleep(2000);
         
         assertEquals(1, impl.getInvocationCount());
+    }
+
+    private GreeterImpl getGreeter() throws Exception
+    {
+        Object instance = getPojoServiceForComponent("greeterService");
+        
+        return (GreeterImpl) instance;
     }
 
     public void testClientWithMuleClient() throws Exception
@@ -38,7 +45,7 @@ public class ClientTestCase extends FunctionalTestCase
         UMOMessage result = client.send("clientEndpoint", "Dan", props);
         assertEquals("Hello Dan", result.getPayload());
         
-        GreeterImpl impl = (GreeterImpl) muleContext.getRegistry().lookupObject("greeterService");
+        GreeterImpl impl = getGreeter();
         
         Thread.sleep(2000);
         

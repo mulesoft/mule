@@ -36,6 +36,9 @@ public class CxfConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointF
         return "cxf";
     }
     
+    /**
+     * @throws Exception
+     */
     @SuppressWarnings("unchecked")
     public void testBinding() throws Exception
     {
@@ -58,7 +61,7 @@ public class CxfConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointF
         nodes = document.selectNodes("//wsdl:definitions/wsdl:service");
 
         Element element = (Element) nodes.get(0);
-        assertEquals(componentName, element.attribute("name").getStringValue());
+        assertEquals("TestServiceComponent", element.attribute("name").getStringValue());
 
         nodes = document.selectNodes("//wsdl:definitions/wsdl:service/wsdl:port");
 

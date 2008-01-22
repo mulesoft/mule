@@ -175,7 +175,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
 
         // TODO MULE-2228 Simplify this API
         SedaComponent c = new SedaComponent();
-        c.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName());            
+        c.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName() + c.hashCode());            
         c.setModel(muleContext.getRegistry().lookupSystemModel());
         
         CxfServiceComponent svcComponent = new CxfServiceComponent((CxfMessageReceiver)receiver);
@@ -306,5 +306,4 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
             return super.isSyncEnabled(endpoint);
         }
     }
-
 }

@@ -14,28 +14,36 @@
             <inbound>
                 <inbound-endpoint address="cxf:http://localhost:62108/mule/mycomponent"/>
             </inbound>
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
         </service>
 
         <service name="mycomponent2">
             <inbound>
                 <inbound-endpoint address="cxf:http://localhost:62109/mule/services/mycomponent2"/>
             </inbound>
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
         </service>
 
         <service name="mycomponent3">
             <inbound>
                 <inbound-endpoint address="cxf:http://localhost:62109/mycomponent3"/>
             </inbound>
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
         </service>
 
         <service name="mycomponent4">
             <inbound>
                 <inbound-endpoint address="cxf:http://localhost:62110/mycomponent4" synchronous="false"/>
             </inbound>
-            <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
+            </component>
         </service>
     </model>
 
