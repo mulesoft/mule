@@ -46,10 +46,12 @@ import org.apache.cxf.transport.DestinationFactoryManager;
  */
 public class CxfConnector extends AbstractConnector implements ManagerNotificationListener
 {
+
+    public static final String CXF = "cxf";
     public static final String CXF_SERVICE_COMPONENT_NAME = "_cxfServiceComponent";
     public static final String CONFIGURATION_LOCATION = "configurationLocation";
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
-    public static final String BUS_PROPERTY = "cxf";
+    public static final String BUS_PROPERTY = CXF;
 
     // The CXF Bus object
     private Bus bus;
@@ -74,7 +76,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
 
     public String getProtocol()
     {
-        return "cxf";
+        return CXF;
     }
 
     protected void doInitialise() throws InitialisationException
