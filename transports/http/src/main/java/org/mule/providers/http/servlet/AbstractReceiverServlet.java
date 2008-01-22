@@ -108,9 +108,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     {
         if (message == null)
         {
-            int status = message.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 
-                HttpServletResponse.SC_NO_CONTENT);
-            servletResponse.setStatus(status);
+            servletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
             if (feedback)
             {
                 servletResponse.setStatus(HttpServletResponse.SC_OK);
