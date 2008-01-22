@@ -14,11 +14,9 @@
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
 
     <xsd:element name="connector" type="cxfConnectorType" substitutionGroup="mule:abstract-connector"/>
-    
     <xsd:complexType name="cxfConnectorType">
       <xsd:complexContent>        
         <xsd:extension base="mule:connectorType">
-           <xsd:sequence/>
            <xsd:attribute name="defaultFrontend" type="xsd:string" default="jaxws"/>
            <xsd:attribute name="configurationLocation" type="xsd:string"/>
         </xsd:extension>
@@ -29,10 +27,8 @@
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractInboundEndpointType">
-                <xsd:group ref="mule:defaultEndpointElements"/>
-                <xsd:attribute name="ref" type="xsd:NMTOKEN"/>
                 <xsd:attributeGroup ref="endpointAttributes"/>
-                <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -42,13 +38,12 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractGlobalEndpointType">
                 <xsd:attributeGroup ref="endpointAttributes"/>
-                <xsd:attributeGroup ref="mule:restrictedEndpointAttributes"/>
+                <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
     
     <xsd:attributeGroup name="endpointAttributes">
-        <xsd:attribute name="address" type="xsd:string"/>
         <xsd:attribute name="bridge" type="xsd:boolean"/>
         <xsd:attribute name="frontend" type="xsd:string"/>
         <xsd:attribute name="bindingUri" type="xsd:string"/>
@@ -59,25 +54,25 @@
     </xsd:attributeGroup>
     
     <xsd:group name="endpointElements">
-      <xsd:sequence>
-        <xsd:element name="binding" type="xsd:anyType" minOccurs="0"/>
-        <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0"/>
-        <xsd:element name="executor" type="xsd:anyType" minOccurs="0"/>
-        <xsd:element name="features" type="xsd:anyType" minOccurs="0"/>
-        <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0"/>
-        <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
-        <xsd:element name="invoker" type="xsd:anyType" minOccurs="0"/>
-        <xsd:element name="outInterceptors" type="xsd:anyType" minOccurs="0"/>
-        <xsd:element name="outFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
-        <xsd:element name="properties" type="beans:mapType" minOccurs="0"/>
-        <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
-      </xsd:sequence>
+        <xsd:sequence>
+            <xsd:element name="binding" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="executor" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="features" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="invoker" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="outInterceptors" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="outFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="properties" type="beans:mapType" minOccurs="0"/>
+            <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
+        </xsd:sequence>
     </xsd:group>
     
-  <xsd:complexType name="schemasType">
-    <xsd:sequence>
-      <xsd:element name="schemaLocation" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-    </xsd:sequence>
-  </xsd:complexType>
-  
+    <xsd:complexType name="schemasType">
+        <xsd:sequence>
+            <xsd:element name="schemaLocation" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
 </xsd:schema>
