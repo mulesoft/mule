@@ -279,7 +279,7 @@ public class UMOMessageToHttpResponse extends AbstractMessageAwareTransformer
         {
             try
             {
-                response.setBody(new ByteArrayInputStream((byte[])msg.getPayloadAsBytes()));
+                response.setBody(new ByteArrayInputStream(msg.getPayloadAsBytes()));
             }
             catch (Exception e)
             {

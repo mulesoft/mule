@@ -275,12 +275,12 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         of.initialise();        
 
         String id = UUID.getUUID();
-        Object obj = ((PooledObjectFactory) of).makeObject(id);
+        Object obj = of.makeObject(id);
         assertNotNull(obj);
-        assertTrue(((PooledObjectFactory) of).validateObject(id, obj));
-        ((PooledObjectFactory) of).activateObject(id, obj);
-        ((PooledObjectFactory) of).passivateObject(id, obj);
-        ((PooledObjectFactory) of).destroyObject(id, obj);
+        assertTrue(of.validateObject(id, obj));
+        of.activateObject(id, obj);
+        of.passivateObject(id, obj);
+        of.destroyObject(id, obj);
     }
     
     public void testLookupObject() throws Exception

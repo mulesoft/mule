@@ -42,7 +42,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c instanceof ActiveMQJmsConnector);
 
         assertNotNull(c.getConnectionFactory());
-        ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory();
+        ConnectionFactory cf = c.getConnectionFactory();
         assertTrue(cf instanceof ActiveMQConnectionFactory);
         assertEquals(ActiveMQJmsConnector.DEFAULT_BROKER_URL, ((ActiveMQConnectionFactory) cf).getBrokerURL());
     }
@@ -54,7 +54,7 @@ public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c instanceof ActiveMQJmsConnector);
 
         assertNotNull(c.getConnectionFactory());
-        ConnectionFactory cf = (ConnectionFactory) c.getConnectionFactory();
+        ConnectionFactory cf = c.getConnectionFactory();
         assertTrue(cf instanceof ActiveMQConnectionFactory);
         assertEquals("tcp://localhost:1234", ((ActiveMQConnectionFactory) cf).getBrokerURL());
     }

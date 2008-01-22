@@ -51,7 +51,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         super.doSetUp();
         
         JmsConnector connector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
-        ConnectionFactory cf = (ConnectionFactory) connector.getConnectionFactory();
+        ConnectionFactory cf = connector.getConnectionFactory();
         
         session = cf.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);                
     }

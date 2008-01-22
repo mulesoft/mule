@@ -226,8 +226,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         // TestConfigurationBuilder
         assertEquals(TEST_STRING_VALUE, muleContext.getRegistry().lookupObject(TEST_STRING_KEY));
         assertNotNull(muleContext.getRegistry().lookupConnector(TEST_CONNECTOR_NAME));
-        assertEquals(TEST_CONNECTOR_NAME, ((UMOConnector) muleContext.getRegistry().lookupConnector(
-            TEST_CONNECTOR_NAME)).getName());
+        assertEquals(TEST_CONNECTOR_NAME, muleContext.getRegistry().lookupConnector(TEST_CONNECTOR_NAME).getName());
     }
 
     private void testConfigurationBuilder2Objects(MuleContext muleContext)
@@ -236,8 +235,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         // TestConfigurationBuilder2
         assertEquals(TEST_STRING_VALUE2, muleContext.getRegistry().lookupObject(TEST_STRING_KEY2));
         assertNotNull(muleContext.getRegistry().lookupModel(TEST_MODEL_NAME));
-        assertEquals(TEST_MODEL_NAME,
-            ((UMOModel) muleContext.getRegistry().lookupModel(TEST_MODEL_NAME)).getName());
+        assertEquals(TEST_MODEL_NAME, muleContext.getRegistry().lookupModel(TEST_MODEL_NAME).getName());
     }
 
     /**

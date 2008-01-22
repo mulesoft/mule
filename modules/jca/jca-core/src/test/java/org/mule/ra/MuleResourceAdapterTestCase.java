@@ -169,7 +169,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         resourceAdapter.endpointActivation(endpointFactory, activationSpec);
         assertEquals(1, resourceAdapter.endpoints.size());
 
-        MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec) activationSpec);
+        MuleEndpointKey key = new MuleEndpointKey(endpointFactory, activationSpec);
         UMOComponent component = (UMOComponent) resourceAdapter.endpoints.get(key);
 
         assertEquals("JcaComponent#" + endpointFactory.hashCode(), component.getName());
