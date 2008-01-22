@@ -18,6 +18,7 @@ import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 
 import java.util.Set;
@@ -44,6 +45,17 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
     protected final void registerIgnoredElement(String name)
     {
         registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
+    }
+
+    protected MuleDefinitionParserConfiguration registerConnector(Class connectorClass)
+    {
+        return registerConnector( new MuleOrphanDefinitionParser(connectorClass, true));
+    }
+
+    protected MuleDefinitionParserConfiguration registerConnector(MuleDefinitionParser parser)
+    {
+        registerBeanDefinitionParser("connector", parser);
+        return parser;
     }
 
     protected MuleDefinitionParserConfiguration registerMuleBeanDefinitionParser(String name, MuleDefinitionParser parser)
@@ -183,6 +195,15 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
             for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
             {
                 ((MuleDefinitionParserConfiguration) bdp.next()).setIgnoredDefault(ignoreAll);
+            }
+            return this;
+        }
+
+        public MuleDefinitionParserConfiguration addBeanFlag(String flag)
+        {
+            for (Iterator bdp = bdps.iterator(); bdp.hasNext();)
+            {
+                ((MuleDefinitionParserConfiguration) bdp.next()).addBeanFlag(flag);
             }
             return this;
         }

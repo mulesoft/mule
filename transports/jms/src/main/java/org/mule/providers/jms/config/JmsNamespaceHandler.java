@@ -48,7 +48,7 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerJmsTransportEndpoints();
 
-        registerBeanDefinitionParser("connector", new JmsConnectorDefinitionParser());
+        registerConnector(new JmsConnectorDefinitionParser());
         registerBeanDefinitionParser("custom-connector", new JmsConnectorDefinitionParser());
         registerBeanDefinitionParser("activemq-connector", new JmsConnectorDefinitionParser(ActiveMQJmsConnector.class));
         registerBeanDefinitionParser("activemq-xa-connector", new JmsConnectorDefinitionParser(ActiveMQXAJmsConnector.class));

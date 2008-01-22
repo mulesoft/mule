@@ -23,7 +23,7 @@ public class ServletNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(ServletConnector.SERVLET, URIBuilder.SOCKET_ATTRIBUTES);
-        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(ServletConnector.class, true));
+        registerConnector(ServletConnector.class);
     }
 
 }

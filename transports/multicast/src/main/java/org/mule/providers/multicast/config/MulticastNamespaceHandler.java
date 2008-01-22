@@ -24,7 +24,7 @@ public class MulticastNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(MulticastConnector.MULTICAST, URIBuilder.SOCKET_ATTRIBUTES);
-        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(MulticastConnector.class, true));
+        registerConnector(MulticastConnector.class);
     }
 
 }

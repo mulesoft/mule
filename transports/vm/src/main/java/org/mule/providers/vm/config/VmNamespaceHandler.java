@@ -26,7 +26,7 @@ public class VmNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(VMConnector.VM, URIBuilder.PATH_ATTRIBUTES);
-        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(VMConnector.class, true));
+        registerConnector(VMConnector.class);
         registerBeanDefinitionParser("queueProfile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
     }
 

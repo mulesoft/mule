@@ -35,8 +35,7 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerStandardTransportEndpoints(HttpConnector.HTTP, URIBuilder.SOCKET_ATTRIBUTES)
                 .addAlias("contentType", HttpConstants.HEADER_CONTENT_TYPE);
-        
-        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(HttpConnector.class, true));
+        registerConnector(HttpConnector.class);
 
         registerBeanDefinitionParser("rest-service-component", new ComplexComponentDefinitionParser(RestServiceWrapper.class));
         registerBeanDefinitionParser("payloadParameterName", new ChildListEntryDefinitionParser("payloadParameterNames", ChildMapEntryDefinitionParser.VALUE));

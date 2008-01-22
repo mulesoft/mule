@@ -24,7 +24,7 @@ public class ImapNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(ImapConnector.IMAP, URIBuilder.USERHOST_ATTRIBUTES);
-        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(ImapConnector.class, true));
+        registerConnector(ImapConnector.class);
     }
 
 }

@@ -258,7 +258,7 @@ public abstract class AbstractConnector
     protected volatile TransportServiceDescriptor serviceDescriptor;
 
     /**
-     * The map of service overrides that can e used to extend the capabilities of the
+     * The map of service overrides that can be used to extend the capabilities of the
      * connector
      */
     protected volatile Properties serviceOverrides;

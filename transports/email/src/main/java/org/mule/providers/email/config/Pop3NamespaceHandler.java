@@ -23,6 +23,6 @@ public class Pop3NamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(Pop3Connector.POP3, URIBuilder.USERHOST_ATTRIBUTES);
-        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(Pop3Connector.class, true));
+        registerConnector(Pop3Connector.class);
     }
 }

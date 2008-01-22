@@ -34,7 +34,7 @@ public class XmppNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(XmppConnector.XMPP, REQUIRED_ADDRESS_ATTRIBUTES).addAlias(RECIPIENT, URIBuilder.PATH).registerPreProcessor(new RequireNickname());
-        this.registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(XmppConnector.class, true));
+        registerConnector(XmppConnector.class);
     }
 
     public static class RequireNickname implements PreProcessor

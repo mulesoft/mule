@@ -31,7 +31,7 @@ public class XmppsNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(XmppsConnector.XMPPS, XmppNamespaceHandler.REQUIRED_ADDRESS_ATTRIBUTES).addAlias(XmppNamespaceHandler.RECIPIENT, URIBuilder.PATH).registerPreProcessor(new XmppNamespaceHandler.RequireNickname());
-        this.registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(XmppsConnector.class, true));
+        registerConnector(XmppsConnector.class);
     }
 
 }

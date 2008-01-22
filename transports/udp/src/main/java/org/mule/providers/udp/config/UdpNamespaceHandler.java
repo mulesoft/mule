@@ -24,7 +24,7 @@ public class UdpNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(UdpConnector.UDP, URIBuilder.SOCKET_ATTRIBUTES);
-        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(UdpConnector.class, true));
+        registerConnector(UdpConnector.class);
     }
 
 }

@@ -489,7 +489,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         return AutoIdUtils.getUniqueName(element, "mule-bean");
     }
 
-    public MuleDefinitionParser addBeanFlag(String flag)
+    public MuleDefinitionParserConfiguration addBeanFlag(String flag)
     {
         beanAttributes.add(flag);
         return this;

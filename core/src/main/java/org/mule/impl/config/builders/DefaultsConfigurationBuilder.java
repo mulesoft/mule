@@ -9,7 +9,6 @@ import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.impl.endpoint.EndpointFactory;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
-import org.mule.registry.RegistrationException;
 import org.mule.registry.Registry;
 import org.mule.umo.UMOException;
 import org.mule.umo.model.UMOModel;
@@ -44,7 +43,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         configureDefaults(muleContext.getRegistry());
     }
 
-    protected void configureDefaults(Registry registry) throws RegistrationException, UMOException
+    protected void configureDefaults(Registry registry) throws UMOException
     {
         registry.registerObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP,
             new SimpleRegistryBootstrap());

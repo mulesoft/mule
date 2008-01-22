@@ -26,7 +26,7 @@ public class QuartzNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(QuartzConnector.QUARTZ, URIBuilder.PATH_ATTRIBUTES);
-        registerMuleBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(QuartzConnector.class, true)).addAlias("scheduler", "quartzScheduler");
+        registerConnector(QuartzConnector.class).addAlias("scheduler", "quartzScheduler");
         // note that we use the singular (factoryProperty) for the setter so that we auto-detect a collection
         registerBeanDefinitionParser("factory-property", new ChildSingletonMapDefinitionParser("factoryProperty"));
         registerBeanDefinitionParser("factory-properties", new ChildMapDefinitionParser("factoryProperty"));

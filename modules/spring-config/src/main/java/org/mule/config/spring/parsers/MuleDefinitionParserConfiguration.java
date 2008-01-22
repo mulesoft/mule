@@ -50,4 +50,6 @@ public interface MuleDefinitionParserConfiguration
 
     MuleDefinitionParserConfiguration setIgnoredDefault(boolean ignoreAll);
 
+    MuleDefinitionParserConfiguration addBeanFlag(String flag);
+
 }

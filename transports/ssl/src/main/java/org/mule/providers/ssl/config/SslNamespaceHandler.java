@@ -24,7 +24,7 @@ public class SslNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(SslConnector.SSL, URIBuilder.SOCKET_ATTRIBUTES);
-        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(SslConnector.class, true));
+        registerConnector(SslConnector.class);
         registerBeanDefinitionParser("ssl-key-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("ssl-client", new ParentDefinitionParser());
         registerBeanDefinitionParser("ssl-server", new ParentDefinitionParser());

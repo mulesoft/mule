@@ -26,7 +26,7 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerMetaTransportEndpoints(CxfConnector.CXF);
-        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(CxfConnector.class, true));
+        registerConnector(CxfConnector.class);
     }
 
 }

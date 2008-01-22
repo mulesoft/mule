@@ -24,6 +24,7 @@ import org.w3c.dom.Element;
  */
 public class ModelDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
+
     private String type;
 
     public ModelDefinitionParser(String type)
@@ -37,7 +38,6 @@ public class ModelDefinitionParser extends AbstractMuleBeanDefinitionParser
         return ModelFactoryBean.class;
     }
 
-    
 
     public class ModelFactoryBean extends AbstractFactoryBean
     {
@@ -77,6 +77,5 @@ public class ModelDefinitionParser extends AbstractMuleBeanDefinitionParser
             model.dispose();
         }
     }
-
 
 }
