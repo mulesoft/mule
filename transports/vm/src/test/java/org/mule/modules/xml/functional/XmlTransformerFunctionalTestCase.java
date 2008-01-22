@@ -135,7 +135,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 
     public static class Child
     {
-
+        // nothing here
     }
 
 }

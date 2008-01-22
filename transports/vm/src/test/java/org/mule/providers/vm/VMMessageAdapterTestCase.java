@@ -33,7 +33,7 @@ public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     {
         if (payload instanceof UMOMessage)
         {
-            return new DefaultMessageAdapter((UMOMessage)payload);
+            return new DefaultMessageAdapter(payload);
         }
         else
         {

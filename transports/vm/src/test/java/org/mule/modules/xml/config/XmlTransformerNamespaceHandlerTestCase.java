@@ -36,8 +36,8 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testJXPathExtractor()
     {
-        JXPathExtractor extractor =
-                (JXPathExtractor) getAndTestTransformer("jxpathExtractor", JXPathExtractor.class);
+        JXPathExtractor extractor = (JXPathExtractor) getAndTestTransformer("jxpathExtractor",
+            JXPathExtractor.class);
         assertEquals("/expression", extractor.getExpression());
         assertFalse(extractor.isSingleResult());
     }
@@ -63,7 +63,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
         XsltTransformer xslt = (XsltTransformer) getAndTestTransformer("xslt", XsltTransformer.class);
         assertEquals(10, xslt.getMaxActiveTransformers());
         assertEquals(10, xslt.getMaxIdleTransformers());
-        assertEquals("org.apache.xalan.processor.TransformerFactoryImpl", xslt.getXslTransformerFactory());
+        assertEquals(CustomXsltTransformerFactory.class.getName(), xslt.getXslTransformerFactory());
         assertEquals("file", xslt.getXslFile());
         assertNotNull(xslt.getXslt());
         String transform = xslt.getXslt();
@@ -73,7 +73,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
     protected AbstractTransformer getAndTestTransformer(String name, Class clazz)
     {
         assertTrue(AbstractTransformer.class.isAssignableFrom(clazz));
-        UMOTransformer object= muleContext.getRegistry().lookupTransformer(name);
+        UMOTransformer object = muleContext.getRegistry().lookupTransformer(name);
         assertNotNull(object);
         assertTrue(clazz.isAssignableFrom(object.getClass()));
         AbstractTransformer transformer = (AbstractTransformer) object;

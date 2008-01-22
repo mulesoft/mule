@@ -112,7 +112,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
 
     public static class Child
     {
-
+        // nothing here
     }
 
 }

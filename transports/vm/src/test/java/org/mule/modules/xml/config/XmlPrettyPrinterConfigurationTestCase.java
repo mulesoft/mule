@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.xml;
+package org.mule.modules.xml.config;
 
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformers.xml.XmlPrettyPrinter;
@@ -18,7 +18,7 @@ public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/xml/xml-prettyprinter-config.xml";
+        return "xml/xml-prettyprinter-config.xml";
     }
 
     public void testPrettyPrinter()
