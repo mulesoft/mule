@@ -9,10 +9,10 @@
  */
 package org.mule.transformers.xml;
 
-import org.mule.umo.UMOEvent;
-import org.mule.umo.provider.OutputHandler;
-import org.mule.umo.transformer.DiscoverableTransformer;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.api.MuleEvent;
+import org.mule.api.transformer.DiscoverableTransformer;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,7 +35,7 @@ public class DocumentToOutputHandler extends AbstractXmlTransformer implements D
     {
         return new OutputHandler()
         {
-            public void write(UMOEvent event, OutputStream out) throws IOException
+            public void write(MuleEvent event, OutputStream out) throws IOException
             {
                 try
                 {

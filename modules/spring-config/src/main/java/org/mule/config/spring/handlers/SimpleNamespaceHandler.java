@@ -12,8 +12,8 @@ package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
-import org.mule.impl.model.direct.DirectComponent;
-import org.mule.impl.model.direct.DirectModel;
+import org.mule.model.direct.DirectComponent;
+import org.mule.model.direct.DirectModel;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 

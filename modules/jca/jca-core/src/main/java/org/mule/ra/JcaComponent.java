@@ -10,27 +10,26 @@
 
 package org.mule.ra;
 
-import org.mule.MuleException;
+import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MessagingException;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.component.ComponentException;
+import org.mule.api.context.ObjectNotFoundException;
+import org.mule.api.context.WorkManager;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.component.AbstractComponent;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.OptimizedRequestContext;
-import org.mule.impl.RequestContext;
-import org.mule.impl.model.AbstractComponent;
 import org.mule.ra.i18n.JcaMessages;
-import org.mule.umo.ComponentException;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.UMOWorkManager;
 
 import javax.resource.spi.UnavailableException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
-import javax.resource.spi.work.WorkManager;
 
 /**
  * <code>JcaComponent</code> Is the type of component used in Mule when embedded inside an app server using
@@ -44,9 +43,9 @@ public class JcaComponent extends AbstractComponent implements WorkListener
      */
     private static final long serialVersionUID = -1510441245219710451L;
 
-    protected UMOWorkManager workManager;
+    protected WorkManager workManager;
 
-    public JcaComponent(UMOWorkManager workManager)
+    public JcaComponent(WorkManager workManager)
     {
         super();
         this.workManager = workManager;
@@ -57,9 +56,9 @@ public class JcaComponent extends AbstractComponent implements WorkListener
      * 
      * @param event
      * @return
-     * @throws UMOException
+     * @throws MuleException
      */
-    public UMOMessage sendEvent(UMOEvent event) throws UMOException
+    public MuleMessage sendEvent(MuleEvent event) throws MuleException
     {
         throw new UnsupportedOperationException("sendEvent()");
     }
@@ -71,18 +70,18 @@ public class JcaComponent extends AbstractComponent implements WorkListener
         return false;
     }
 
-    protected void waitIfPaused(UMOEvent event) throws InterruptedException
+    protected void waitIfPaused(MuleEvent event) throws InterruptedException
     {
         // JcaComponent is a wrapper for a hosted component implementation and
         // therefore cannot be paused by mule
     }
 
-    protected void doPause() throws UMOException
+    protected void doPause() throws MuleException
     {
         throw new ComponentException(JcaMessages.cannotPauseResumeJcaComponent(), null, this);
     }
 
-    protected void doResume() throws UMOException
+    protected void doResume() throws MuleException
     {
         throw new ComponentException(JcaMessages.cannotPauseResumeJcaComponent(), null, this);
     }
@@ -95,7 +94,7 @@ public class JcaComponent extends AbstractComponent implements WorkListener
         }
     }
 
-    protected void doDispatch(UMOEvent event) throws UMOException
+    protected void doDispatch(MuleEvent event) throws MuleException
     {
         try
         {
@@ -103,14 +102,14 @@ public class JcaComponent extends AbstractComponent implements WorkListener
         }
         catch (Exception e)
         {
-            throw new MuleException(CoreMessages.failedToInvoke("UMO Component: " + getName()), e);
+            throw new DefaultMuleException(CoreMessages.failedToInvoke("UMO Component: " + getName()), e);
         }
     }
 
     /**
      * Implementation of template method which is never call because send() is overwritten
      */
-    protected UMOMessage doSend(UMOEvent event) throws UMOException
+    protected MuleMessage doSend(MuleEvent event) throws MuleException
     {
         return null;
     }
@@ -121,7 +120,7 @@ public class JcaComponent extends AbstractComponent implements WorkListener
      * the container. The container might create a Proxy object to intercept the actual method call to
      * implement transaction,security related functionalities
      */
-    public Object getManagedInstance() throws UMOException
+    public Object getManagedInstance() throws MuleException
     {
         Object managedInstance = null;
         try
@@ -142,9 +141,9 @@ public class JcaComponent extends AbstractComponent implements WorkListener
     public class MuleJcaWorker implements Work
     {
 
-        private UMOEvent event;
+        private MuleEvent event;
 
-        MuleJcaWorker(UMOEvent event)
+        MuleJcaWorker(MuleEvent event)
         {
             this.event = event;
         }
@@ -159,7 +158,7 @@ public class JcaComponent extends AbstractComponent implements WorkListener
 
             if (logger.isTraceEnabled())
             {
-                logger.trace("MuleJcaWorker: async Event for Mule  JCA EndPoint " + getName());
+                logger.trace("MuleJcaWorker: async MuleEvent for Mule  JCA EndPoint " + getName());
             }
             try
             {

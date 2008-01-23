@@ -13,7 +13,7 @@
     <jms:activemq-connector name="activeMqConnectorDefaults"/>
     <jms:activemq-connector name="activeMqConnectorBroker" brokerURL="tcp://localhost:1234"/>
     
-    <spring:bean name="connectionFactory" class="org.mule.providers.jms.test.TestConnectionFactory"/>
+    <spring:bean name="connectionFactory" class="org.mule.transport.jms.test.TestConnectionFactory"/>
 
     <jms:weblogic-connector name="weblogicConnector" connectionFactory-ref="connectionFactory"/>
 

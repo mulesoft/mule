@@ -9,9 +9,9 @@
  */
 package org.mule.mule.model;
 
-import org.mule.impl.model.resolvers.ExplicitMethodEntryPointResolver;
+import org.mule.api.model.InvocationResult;
+import org.mule.model.resolvers.ExplicitMethodEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.model.InvocationResult;
 
 public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCase
 {

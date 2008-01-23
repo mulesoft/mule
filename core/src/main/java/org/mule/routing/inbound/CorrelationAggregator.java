@@ -10,11 +10,11 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.umo.UMOEvent;
+import org.mule.api.MuleEvent;
 
 /**
  * <code>CorrelationAggregator</code> uses the CorrelationID and
- * CorrelationGroupSize properties of the {@link org.mule.umo.UMOMessage} to manage
+ * CorrelationGroupSize properties of the {@link org.mule.api.MuleMessage} to manage
  * message groups.
  */
 public abstract class CorrelationAggregator extends AbstractEventAggregator
@@ -22,10 +22,10 @@ public abstract class CorrelationAggregator extends AbstractEventAggregator
 
     /**
      * Creates a new EventGroup that will expect the number of events as returned by
-     * {@link org.mule.umo.provider.UMOMessageAdapter#getCorrelationGroupSize()}.
+     * {@link org.mule.api.transport.MessageAdapter#getCorrelationGroupSize()}.
      */
     // //@Override
-    protected EventGroup createEventGroup(UMOEvent event, Object groupId)
+    protected EventGroup createEventGroup(MuleEvent event, Object groupId)
     {
         return new EventGroup(groupId, event.getMessage().getCorrelationGroupSize());
     }

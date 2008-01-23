@@ -10,7 +10,7 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.umo.UMOEvent;
+import org.mule.api.MuleEvent;
 
 
 /**
@@ -31,7 +31,7 @@ public class CorrelationEventResequencer extends AbstractEventResequencer
 
     protected boolean shouldResequenceEvents(EventGroup events)
     {
-        UMOEvent event = (UMOEvent) events.iterator().next();
+        MuleEvent event = (MuleEvent) events.iterator().next();
 
         if (event == null)
         {

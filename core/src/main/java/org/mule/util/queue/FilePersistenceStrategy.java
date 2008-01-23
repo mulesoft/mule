@@ -12,8 +12,8 @@ package org.mule.util.queue;
 
 import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.config.MuleConfiguration;
-import org.mule.impl.MuleContextAware;
 import org.mule.util.FileUtils;
 import org.mule.util.file.DeleteException;
 

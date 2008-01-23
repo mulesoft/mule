@@ -10,10 +10,10 @@
 
 package org.mule.util.object;
 
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
 
 import java.util.Hashtable;
 import java.util.Map;

@@ -18,14 +18,14 @@
             <inbound>
                 <bpm:inbound-endpoint process="simple"/>
             </inbound>
-            <component class="org.mule.components.simple.LogComponent"/>
+            <component class="org.mule.component.simple.LogComponent"/>
         </service>
 
         <service name="fromMessageProcess">
             <inbound>
                 <bpm:inbound-endpoint process="message"/>
             </inbound>
-            <component class="org.mule.components.simple.LogComponent"/>
+            <component class="org.mule.component.simple.LogComponent"/>
             <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="echo"/>
@@ -37,7 +37,7 @@
             <inbound>
                 <vm:inbound-endpoint path="echo"/>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
 
     </model>
@@ -53,7 +53,7 @@
     </spring:bean>
     
     <!-- BPMS object for Mule's BPM Connector -->
-    <spring:bean id="jbpm" class="org.mule.providers.bpm.jbpm.Jbpm" destroy-method="destroy">
+    <spring:bean id="jbpm" class="org.mule.transport.bpm.jbpm.Jbpm" destroy-method="destroy">
         <spring:property name="jbpmConfiguration">
             <spring:ref local="jbpmConfig"/>
         </spring:property>

@@ -10,14 +10,14 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.impl.MuleMessage;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.Endpoint;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -30,13 +30,13 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
     public void testMulticastingRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
+        DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
         assertNotNull(endpoint1);
 
-        UMOEndpoint endpoint2 = getTestEndpoint("Test2Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestEndpoint("Test2Provider", Endpoint.ENDPOINT_TYPE_SENDER);
         assertNotNull(endpoint2);
 
         MulticastingRouter router = new MulticastingRouter();
@@ -49,20 +49,20 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        UMOMessage message = new MuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event");
 
         assertTrue(router.isMatch(message));
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
-        router.route(message, (UMOSession)session.proxy(), false);
+        router.route(message, (MuleSession)session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage("test event");
+        message = new DefaultMuleMessage("test event");
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
         session.expectAndReturn("sendEvent", C.eq(message, endpoint2), message);
-        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
+        MuleMessage result = router.route(message, (MuleSession)session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();

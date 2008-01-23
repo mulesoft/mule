@@ -10,9 +10,9 @@
 
 package org.mule.examples.loanbroker.transformers;
 
+import org.mule.api.transformer.TransformerException;
 import org.mule.examples.loanbroker.messages.CreditProfile;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.transformer.AbstractTransformer;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;

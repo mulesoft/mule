@@ -11,17 +11,18 @@
 package org.mule.test.integration.routing;
 
 
+import org.mule.api.context.notification.MessageNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.context.notification.MessageNotification;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.internal.notifications.MessageNotification;
-import org.mule.impl.internal.notifications.MessageNotificationListener;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.umo.manager.UMOServerNotification;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.lang.SerializationUtils;
 
 public class MessageChunkingTestCase extends FunctionalTestCase
@@ -68,7 +69,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         // Listen to events fired by the ChunkingReceiver component
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
-            public void onNotification(UMOServerNotification notification)
+            public void onNotification(ServerNotification notification)
             {
                 // Not strictly necessary to test for this as when we register the
                 // listener we
@@ -93,7 +94,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         // many message parts have been received
         muleContext.registerListener(new MessageNotificationListener()
         {
-            public void onNotification(UMOServerNotification notification)
+            public void onNotification(ServerNotification notification)
             {
                 if (notification.getAction() == MessageNotification.MESSAGE_RECEIVED)
                 {
@@ -119,7 +120,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         // Listen to events fired by the ChunkingReceiver component
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
-            public void onNotification(UMOServerNotification notification)
+            public void onNotification(ServerNotification notification)
             {
                 // Not strictly necessary to test for this as when we register the
                 // listener we
@@ -137,7 +138,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         // many message parts have been received
         muleContext.registerListener(new MessageNotificationListener()
         {
-            public void onNotification(UMOServerNotification notification)
+            public void onNotification(ServerNotification notification)
             {
                 if (notification.getAction() == MessageNotification.MESSAGE_RECEIVED)
                 {

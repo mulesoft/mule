@@ -10,8 +10,8 @@
 
 package org.mule.test.integration.transaction;
 
+import org.mule.api.transaction.Transaction;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.UMOTransaction;
 
 import java.util.Map;
 
@@ -34,7 +34,7 @@ public class XABridgeComponent
     {
         if (mayRollback)
         {
-            UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+            Transaction tx = TransactionCoordination.getInstance().getTransaction();
             if (tx != null)
             {
                 if (Math.random() < 0.3)

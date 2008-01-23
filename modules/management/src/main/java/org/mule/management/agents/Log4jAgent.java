@@ -10,13 +10,13 @@
 
 package org.mule.management.agents;
 
+import org.mule.AbstractAgent;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.AbstractAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -53,7 +53,7 @@ public class Log4jAgent extends AbstractAgent
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.lifecycle.Initialisable#initialise()
+     * @see org.mule.api.lifecycle.Initialisable#initialise()
      */
     public void initialise() throws InitialisationException    
     {
@@ -93,9 +93,9 @@ public class Log4jAgent extends AbstractAgent
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.lifecycle.Startable#start()
+     * @see org.mule.api.lifecycle.Startable#start()
      */
-    public void start() throws UMOException
+    public void start() throws MuleException
     {
         // nothing to do
     }
@@ -103,9 +103,9 @@ public class Log4jAgent extends AbstractAgent
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.lifecycle.Stoppable#stop()
+     * @see org.mule.api.lifecycle.Stoppable#stop()
      */
-    public void stop() throws UMOException
+    public void stop() throws MuleException
     {
         // nothing to do
     }
@@ -113,7 +113,7 @@ public class Log4jAgent extends AbstractAgent
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.lifecycle.Disposable#dispose()
+     * @see org.mule.api.lifecycle.Disposable#dispose()
      */
     public void dispose()
     {
@@ -123,7 +123,7 @@ public class Log4jAgent extends AbstractAgent
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.manager.UMOAgent#registered()
+     * @see org.mule.api.context.Agent#registered()
      */
     public void registered()
     {
@@ -133,7 +133,7 @@ public class Log4jAgent extends AbstractAgent
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.manager.UMOAgent#unregistered()
+     * @see org.mule.api.context.Agent#unregistered()
      */
     public void unregistered()
     {

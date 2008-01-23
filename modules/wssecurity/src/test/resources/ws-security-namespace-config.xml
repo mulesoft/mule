@@ -36,7 +36,7 @@
             <inbound>
                 <inbound-endpoint ref="endpoint"/>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
     </model>
 </mule>

@@ -94,7 +94,7 @@
         <inbound-resourceadapter>
             <messageadapter>
                 <messagelistener>
-                    <messagelistener-type>org.mule.umo.lifecycle.Callable</messagelistener-type>
+                    <messagelistener-type>org.mule.api.lifecycle.Callable</messagelistener-type>
                     <activationspec>
                         <activationspec-class>org.mule.ra.MuleActivationSpec</activationspec-class>
                         <required-config-property>

@@ -10,14 +10,14 @@
 
 package org.mule.extras.jaas;
 
-import org.mule.umo.security.UMOAuthentication;
-import org.mule.umo.security.UMOCredentials;
+import org.mule.api.security.Authentication;
+import org.mule.api.security.Credentials;
 
 import java.util.Map;
 
 import javax.security.auth.Subject;
 
-public class JaasAuthentication implements UMOAuthentication
+public class JaasAuthentication implements Authentication
 {
     private boolean authenticated;
     private char[] credentials;
@@ -25,7 +25,7 @@ public class JaasAuthentication implements UMOAuthentication
     private Map properties;
     private Subject subject;
   
-    public JaasAuthentication(UMOCredentials credentials)
+    public JaasAuthentication(Credentials credentials)
     {
         this.user = credentials.getUsername();
         this.credentials = credentials.getPassword();

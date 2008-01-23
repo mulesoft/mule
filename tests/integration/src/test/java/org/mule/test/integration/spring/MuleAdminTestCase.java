@@ -10,10 +10,10 @@
 
 package org.mule.test.integration.spring;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class MuleAdminTestCase extends FunctionalTestCase
 {
@@ -26,7 +26,7 @@ public class MuleAdminTestCase extends FunctionalTestCase
     {
         MuleClient mc = new MuleClient();
         RemoteDispatcher rd = mc.getRemoteDispatcher("tcp://localhost:60504");
-        UMOMessage result = rd.sendToRemoteComponent("appleComponent", "string", null);
+        MuleMessage result = rd.sendToRemoteComponent("appleComponent", "string", null);
         assertNotNull(result);
     }
 }

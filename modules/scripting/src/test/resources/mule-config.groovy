@@ -6,25 +6,25 @@ import org.mule.tck.testmodels.mule.TestConnector
 import org.mule.tck.testmodels.mule.TestExceptionStrategy
 import org.mule.tck.testmodels.mule.TestCompressionTransformer
 import org.mule.routing.filters.xml.JXPathFilter
-import org.mule.impl.endpoint.EndpointURIEndpointBuilder
-import org.mule.umo.model.UMOModel
-import org.mule.impl.model.seda.SedaModel
-import org.mule.umo.endpoint.UMOImmutableEndpoint
+import org.mule.endpoint.EndpointURIEndpointBuilder
+import org.mule.api.model.UMOModel
+import org.mule.model.seda.SedaModel
+import org.mule.api.endpoint.UMOImmutableEndpoint
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory
 import org.mule.tck.testmodels.mule.TestEntryPointResolverSet
-import org.mule.impl.MuleDescriptor
+import org.mule.MuleDescriptor
 import org.mule.util.object.SingletonObjectFactory
 import org.mule.routing.filters.PayloadTypeFilter
 import org.mule.routing.ForwardingCatchAllStrategy
 import org.mule.routing.nested.NestedRouterCollection
 import org.mule.routing.nested.NestedRouter
 import org.mule.routing.response.ResponseRouterCollection
-import org.mule.umo.MuleContext
+import org.mule.api.MuleContext
 import org.mule.tck.testmodels.mule.TestResponseAggregator
 import org.mule.routing.outbound.OutboundPassThroughRouter
-import org.mule.impl.DefaultComponentExceptionStrategy
+import org.mule.DefaultComponentExceptionStrategy
 import org.mule.routing.inbound.InboundRouterCollection
 
 // TODO: MULE-2520 Management context binding is not working in ScriptConfigurationBuilder

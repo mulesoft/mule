@@ -229,7 +229,7 @@
                                 <!-- TODO This module needs reorganization in order to properly export its packages. -->
                                 <Export-Package>
                                     org.mule.components.script.*,
-                                    org.mule.transformers.script.*
+                                    org.mule.transformer.script.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

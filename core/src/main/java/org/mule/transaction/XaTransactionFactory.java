@@ -11,18 +11,18 @@
 package org.mule.transaction;
 
 import org.mule.api.MuleContext;
+import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionException;
+import org.mule.api.transaction.TransactionFactory;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.TransactionException;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionFactory;
 
 /**
  * <code>XaTransactionFactory</code> Is used to create/retrieve a Transaction from
  * a transaction manager configured on the MuleManager.
  */
-public class XaTransactionFactory implements UMOTransactionFactory
+public class XaTransactionFactory implements TransactionFactory
 {
-    public UMOTransaction beginTransaction(MuleContext muleContext) throws TransactionException
+    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
         try
         {

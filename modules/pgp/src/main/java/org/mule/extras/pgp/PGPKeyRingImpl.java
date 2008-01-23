@@ -10,9 +10,9 @@
 
 package org.mule.extras.pgp;
 
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;

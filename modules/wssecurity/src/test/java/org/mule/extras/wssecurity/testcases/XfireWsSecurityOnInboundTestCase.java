@@ -10,9 +10,9 @@
 
 package org.mule.extras.wssecurity.testcases;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 import java.util.Properties;
 
@@ -36,7 +36,7 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             // Callback used to retrive password for given user.
             props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
             
-            UMOMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
+            MuleMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             assertNotNull(m);
             assertTrue(m.getPayload() instanceof String);
             assertTrue(((String) m.getPayload()).equals("Test"));
@@ -79,7 +79,7 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             // Property file containing the Encryption properties
             props.setProperty(WSHandlerConstants.ENC_PROP_FILE,"out-encrypted-security.properties");
             
-            UMOMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
+            MuleMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             assertNotNull(m);
             assertTrue(m.getPayload() instanceof String);
             assertTrue(((String) m.getPayload()).equals("Test"));
@@ -124,7 +124,7 @@ public class XfireWsSecurityOnInboundTestCase extends FunctionalTestCase
             // possible values are : "IssuerSerial" ( recommended ) and "DirectReference"
             props.setProperty(WSHandlerConstants.SIG_KEY_ID,"IssuerSerial");
             
-            UMOMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
+            MuleMessage m = client.send("xfire:http://localhost:64282/MySecuredUMO?method=echo","Test",props);
             assertNotNull(m);
             assertTrue(m.getPayload() instanceof String);
             assertTrue(((String) m.getPayload()).equals("Test"));

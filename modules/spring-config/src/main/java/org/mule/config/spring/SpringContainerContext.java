@@ -11,14 +11,14 @@
 package org.mule.config.spring;
 
 import org.mule.RegistryContext;
-import org.mule.config.ConfigurationException;
+import org.mule.api.config.ConfigurationException;
+import org.mule.api.context.ContainerException;
+import org.mule.api.context.ObjectNotFoundException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.ReaderInputStream;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.util.CachedResource;
-import org.mule.impl.container.AbstractContainerContext;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.container.AbstractContainerContext;
 import org.mule.util.ClassUtils;
 
 import java.io.Reader;
@@ -90,7 +90,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.model.UMOContainerContext#getComponent(java.lang.Object)
+     * @see org.mule.api.model.UMOContainerContext#getComponent(java.lang.Object)
      */
     public Object getComponent(Object key) throws ObjectNotFoundException
     {

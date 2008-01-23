@@ -10,8 +10,8 @@
 
 package org.mule.transformers.script;
 
+import org.mule.api.transformer.Transformer;
 import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
 {
 
-    public UMOTransformer getTransformer() throws Exception
+    public Transformer getTransformer() throws Exception
     {
         ScriptTransformer transformer = new ScriptTransformer();
         transformer.setScriptEngineName("groovy");
@@ -29,7 +29,7 @@ public class GroovyScriptTransformerTestCase extends AbstractTransformerTestCase
         return transformer;
     }
 
-    public UMOTransformer getRoundTripTransformer() throws Exception
+    public Transformer getRoundTripTransformer() throws Exception
     {
         ScriptTransformer transformer = new ScriptTransformer();
         transformer.setName("ListToStringTransformer");

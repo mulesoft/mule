@@ -10,29 +10,29 @@
 
 package org.mule.config.spring;
 
+import org.mule.api.MuleException;
+import org.mule.api.agent.Agent;
+import org.mule.api.component.Component;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.model.Model;
+import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.ServiceDescriptor;
+import org.mule.api.registry.ServiceDescriptorFactory;
+import org.mule.api.registry.ServiceException;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transport.Connector;
 import org.mule.config.MuleConfiguration;
-import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.impl.container.MultiContainerContext;
-import org.mule.impl.lifecycle.ContainerManagedLifecyclePhase;
-import org.mule.impl.lifecycle.GenericLifecycleManager;
-import org.mule.impl.registry.AbstractRegistry;
-import org.mule.registry.RegistrationException;
-import org.mule.registry.ServiceDescriptor;
-import org.mule.registry.ServiceDescriptorFactory;
-import org.mule.registry.ServiceException;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpointBuilder;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.UMOLifecycleManager;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.container.MultiContainerContext;
+import org.mule.lifecycle.ContainerManagedLifecyclePhase;
+import org.mule.lifecycle.GenericLifecycleManager;
+import org.mule.registry.AbstractRegistry;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 
@@ -81,7 +81,7 @@ public class SpringRegistry extends AbstractRegistry
         this.applicationContext = applicationContext;
     }
 
-    protected UMOLifecycleManager createLifecycleManager()
+    protected LifecycleManager createLifecycleManager()
     {
         GenericLifecycleManager lcm = new GenericLifecycleManager();
         lcm.registerLifecycle(new ContainerManagedLifecyclePhase(Initialisable.PHASE_NAME,
@@ -158,30 +158,30 @@ public class SpringRegistry extends AbstractRegistry
 
     public Collection getModels()
     {
-        return applicationContext.getBeansOfType(UMOModel.class).values();
+        return applicationContext.getBeansOfType(Model.class).values();
     }
 
     /** {@inheritDoc} */
     public Collection getConnectors()
     {
-        return applicationContext.getBeansOfType(UMOConnector.class).values();
+        return applicationContext.getBeansOfType(Connector.class).values();
     }
 
     public Collection getAgents()
     {
-        return applicationContext.getBeansOfType(UMOAgent.class).values();
+        return applicationContext.getBeansOfType(Agent.class).values();
     }
 
     /** {@inheritDoc} */
     public Collection getEndpoints()
     {
-        return applicationContext.getBeansOfType(UMOImmutableEndpoint.class).values();
+        return applicationContext.getBeansOfType(ImmutableEndpoint.class).values();
     }
 
     /** {@inheritDoc} */
     public Collection getTransformers()
     {
-        return applicationContext.getBeansOfType(UMOTransformer.class).values();
+        return applicationContext.getBeansOfType(Transformer.class).values();
     }
 
     public boolean isReadOnly()
@@ -194,19 +194,19 @@ public class SpringRegistry extends AbstractRegistry
         return false;
     }
 
-    public void registerConnector(UMOConnector connector)
-            throws UMOException
+    public void registerConnector(Connector connector)
+            throws MuleException
     {
         unsupportedOperation("registerConnector", connector);
     }
 
-    public void unregisterConnector(String connectorName) throws UMOException
+    public void unregisterConnector(String connectorName) throws MuleException
     {
         unsupportedOperation("unregisterConnector", connectorName);
     }
 
-    public void registerEndpoint(UMOImmutableEndpoint endpoint)
-            throws UMOException
+    public void registerEndpoint(ImmutableEndpoint endpoint)
+            throws MuleException
     {
         unsupportedOperation("registerEndpoint", endpoint);
     }
@@ -216,7 +216,7 @@ public class SpringRegistry extends AbstractRegistry
         unsupportedOperation("unregisterEndpoint", endpointName);
     }
 
-    protected void doRegisterTransformer(UMOTransformer transformer) throws UMOException
+    protected void doRegisterTransformer(Transformer transformer) throws MuleException
     {
         unsupportedOperation("registerTransformer", transformer);
     }
@@ -227,8 +227,8 @@ public class SpringRegistry extends AbstractRegistry
     }
 
     /** {@inheritDoc} */
-    public void registerComponent(UMOComponent component)
-            throws UMOException
+    public void registerComponent(Component component)
+            throws MuleException
     {
         unsupportedOperation("registerComponent", component);
     }
@@ -238,7 +238,7 @@ public class SpringRegistry extends AbstractRegistry
         unsupportedOperation("unregisterComponent", componentName);
     }
 
-    public void registerModel(UMOModel model) throws UMOException
+    public void registerModel(Model model) throws MuleException
     {
         unsupportedOperation("registerModel", model);
     }
@@ -248,12 +248,12 @@ public class SpringRegistry extends AbstractRegistry
         unsupportedOperation("unregisterModel", modelName);
     }
 
-    public void registerAgent(UMOAgent agent) throws UMOException
+    public void registerAgent(Agent agent) throws MuleException
     {
         unsupportedOperation("registerAgent", agent);
     }
 
-    public void unregisterAgent(String agentName) throws UMOException
+    public void unregisterAgent(String agentName) throws MuleException
     {
         unsupportedOperation("unregisterAgent", agentName);
     }
@@ -281,7 +281,7 @@ public class SpringRegistry extends AbstractRegistry
     }
 
     public void registerEndpointBuilder(String name,
-                                        UMOEndpointBuilder builder) throws UMOException
+                                        EndpointBuilder builder) throws MuleException
     {
         unsupportedOperation("registerEndpointBuilder", builder);
     }

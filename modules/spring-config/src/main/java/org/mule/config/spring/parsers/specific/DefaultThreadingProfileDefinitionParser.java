@@ -9,8 +9,8 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.api.config.ThreadingProfile;
 import org.mule.config.ChainedThreadingProfile;
-import org.mule.config.ThreadingProfile;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.IdAttribute;
 import org.mule.config.spring.parsers.processors.NameAttribute;

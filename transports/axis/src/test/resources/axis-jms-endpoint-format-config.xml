@@ -28,14 +28,14 @@
             <inbound>
                 <inbound-endpoint address="axis:jms://soap.my.queue"/>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
 
         <service name="myComponent">
             <inbound>
                 <inbound-endpoint address="axis:jms://myComponent"/>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
     </model>
 

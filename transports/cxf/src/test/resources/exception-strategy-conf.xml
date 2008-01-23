@@ -19,8 +19,8 @@
           address="cxf:http://localhost:63181/services/CxfWithExceptionStrategy" />
       </inbound>
       <component
-        class="org.mule.providers.cxf.testmodels.TestXFireComponent" />
-      <custom-exception-strategy class="org.mule.providers.cxf.CxfComponentExceptionStrategy"/>
+        class="org.mule.transport.cxf.testmodels.TestXFireComponent" />
+      <custom-exception-strategy class="org.mule.transport.cxf.CxfComponentExceptionStrategy"/>
     </service>
 
     <service name="CxfDefault">
@@ -29,7 +29,7 @@
           address="cxf:http://localhost:63181/services/CxfDefault" />
       </inbound>
       <component
-        class="org.mule.providers.cxf.testmodels.TestXFireComponent" />
+        class="org.mule.transport.cxf.testmodels.TestXFireComponent" />
     </service>
   </model>
 

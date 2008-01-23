@@ -10,11 +10,10 @@
 
 package org.mule.test.integration.resolvers;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.TooManySatisfiableMethodsException;
-import org.mule.impl.model.resolvers.EntryPointNotFoundException;
+import org.mule.model.resolvers.EntryPointNotFoundException;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class MethodEntrypointsTestCase extends FunctionalTestCase
 {
@@ -27,7 +26,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
     public void testTooManySatifiableMethods() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage message = client.send("vm://service", "hello", null);
+        MuleMessage message = client.send("vm://service", "hello", null);
         assertNotNull(message.getExceptionPayload());
         assertTrue(message.getExceptionPayload().getException().getCause() instanceof EntryPointNotFoundException);
         assertTrue(message.getExceptionPayload().getException().getCause().getMessage().indexOf("Found too many possible methods on object") > -1);
@@ -36,7 +35,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
     public void testBadMethodName() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage message = client.send("vm://service?method=foo", "hello", null);
+        MuleMessage message = client.send("vm://service?method=foo", "hello", null);
         assertNotNull(message.getExceptionPayload());
         assertTrue(message.getExceptionPayload().getException().getCause() instanceof EntryPointNotFoundException);
     }
@@ -44,7 +43,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
     public void testValidCallToReverse() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage message = client.send("vm://service?method=reverseString", "hello", null);
+        MuleMessage message = client.send("vm://service?method=reverseString", "hello", null);
         assertNotNull(message);
         assertEquals(message.getPayloadAsString(), "olleh");
     }
@@ -52,7 +51,7 @@ public class MethodEntrypointsTestCase extends FunctionalTestCase
     public void testValidCallToUpperCase() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage message = client.send("vm://service?method=upperCaseString", "hello", null);
+        MuleMessage message = client.send("vm://service?method=upperCaseString", "hello", null);
         assertNotNull(message);
         assertEquals(message.getPayloadAsString(), "HELLO");
     }

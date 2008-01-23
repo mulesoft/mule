@@ -10,13 +10,12 @@
 
 package org.mule.tck;
 
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
+import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.transformers.TransformerUtils;
 
 import java.util.Arrays;
 
@@ -84,16 +83,16 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     {
         if (this.getRoundTripTransformer() != null)
         {
-            UMOTransformer trans = this.getTransformer();
-            UMOTransformer trans2 = this.getRoundTripTransformer();
-            UMOMessage message = new MuleMessage(getTestData());
-            message.applyTransformers(Arrays.asList( new UMOTransformer[]{trans, trans2}));
+            Transformer trans = this.getTransformer();
+            Transformer trans2 = this.getRoundTripTransformer();
+            MuleMessage message = new DefaultMuleMessage(getTestData());
+            message.applyTransformers(Arrays.asList( new Transformer[]{trans, trans2}));
             Object result = message.getPayload();
             this.compareRoundtripResults(this.getTestData(), result);
         }
     }
 
-    public void doTestBadReturnType(UMOTransformer tran, Object src) throws Exception
+    public void doTestBadReturnType(Transformer tran, Object src) throws Exception
     {
         tran.setReturnClass(InvalidSatsuma.class);
         try
@@ -107,14 +106,14 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         }
     }
 
-    protected void doTestClone(UMOTransformer original, UMOTransformer clone) throws Exception
+    protected void doTestClone(Transformer original, Transformer clone) throws Exception
     {
         assertNotSame(original, clone);
     }
 
-    public abstract UMOTransformer getTransformer() throws Exception;
+    public abstract Transformer getTransformer() throws Exception;
 
-    public abstract UMOTransformer getRoundTripTransformer() throws Exception;
+    public abstract Transformer getRoundTripTransformer() throws Exception;
 
     public abstract Object getTestData();
 

@@ -10,8 +10,8 @@
 
 package org.mule.transformers.xml.wire;
 
-import org.mule.transformers.wire.AbstractWireFormatTestCase;
-import org.mule.transformers.wire.WireFormat;
+import org.mule.api.transformer.wire.WireFormat;
+import org.mule.transformer.wire.AbstractWireFormatTestCase;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToObject;
 

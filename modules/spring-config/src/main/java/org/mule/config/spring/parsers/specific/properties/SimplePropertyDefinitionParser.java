@@ -10,8 +10,8 @@
 
 package org.mule.config.spring.parsers.specific.properties;
 
-import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
 import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
+import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
 
 import org.w3c.dom.Element;
 

@@ -10,15 +10,15 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.RoutingException;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleMessage;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.RoutingException;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * Simply applies a transformer before continuing on to the next router.
@@ -26,38 +26,38 @@ import org.mule.umo.transformer.UMOTransformer;
  */
 public class TransformerRouter extends AbstractOutboundRouter
 {
-    private UMOTransformer transformer;
+    private Transformer transformer;
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws MessagingException
+    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous) throws MessagingException
     {
         if (transformer != null)
         {
             try
             {
                 Object payload = transformer.transform(message.getPayload());
-                message = new MuleMessage(payload, message);
+                message = new DefaultMuleMessage(payload, message);
             }
             catch (TransformerException e)
             {
                 throw new RoutingException(
                     CoreMessages.transformFailedBeforeFilter(),
-                    message, (UMOImmutableEndpoint)endpoints.get(0), e);
+                    message, (ImmutableEndpoint)endpoints.get(0), e);
             }
         }
         return message;
     }
 
-    public boolean isMatch(UMOMessage message) throws MessagingException
+    public boolean isMatch(MuleMessage message) throws MessagingException
     {
         return true;
     }
 
-    public UMOTransformer getTransformer()
+    public Transformer getTransformer()
     {
         return transformer;
     }
 
-    public void setTransformer(UMOTransformer transformer)
+    public void setTransformer(Transformer transformer)
     {
         this.transformer = transformer;
     }

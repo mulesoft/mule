@@ -10,20 +10,20 @@
 
 package org.mule.mule;
 
-import org.mule.components.simple.PassThroughComponent;
-import org.mule.impl.model.seda.SedaComponent;
+import org.mule.api.component.Component;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.component.simple.PassThroughComponent;
+import org.mule.model.seda.SedaComponent;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.util.object.SingletonObjectFactory;
 
 public class MuleDescriptorTestCase extends AbstractMuleTestCase
 {
     public void testDescriptorDefaults() throws Exception
     {
-        UMOComponent component = new SedaComponent();
+        Component component = new SedaComponent();
 
         //TODO RM*
 //        MuleConfiguration config = new MuleConfiguration();
@@ -49,7 +49,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
     // These validations seems a bit silly, IMHO.
 //    public void testDescriptorNullValidation() throws Exception
 //    {
-//        UMOComponent component = new SedaComponent();
+//        Component component = new SedaComponent();
 //        try
 //        {
 //            component.setExceptionListener(null);
@@ -84,18 +84,18 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
     public void testEndpointValidation() throws Exception
     {
-        UMOComponent component = getTestComponent("Terry", Orange.class);
+        Component component = getTestComponent("Terry", Orange.class);
         TestExceptionStrategy es = new TestExceptionStrategy();
         component.setExceptionListener(es);
         assertEquals(1, component.getOutboundRouter().getRouters().size());
         
         // TODO Why should there be an outbound endpoint configured?
-        //UMOEndpoint ep = (UMOEndpoint)((UMOOutboundRouter)component.getOutboundRouter().getRouters().get(0)).getEndpoints().get(0);
+        //Endpoint ep = (Endpoint)((OutboundRouter)component.getOutboundRouter().getRouters().get(0)).getEndpoints().get(0);
         //assertNotNull(ep);
         //assertNotNull(ep.getConnector().getExceptionListener());
 
         // create receive endpoint
-        UMOEndpoint endpoint = getTestEndpoint("test2", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        Endpoint endpoint = getTestEndpoint("test2", Endpoint.ENDPOINT_TYPE_RECEIVER);
         component.getInboundRouter().addEndpoint(endpoint);
         // Add receive endpoint, this shoulbe set as default
         assertNotNull(endpoint.getConnector().getExceptionListener());

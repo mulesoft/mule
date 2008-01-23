@@ -18,7 +18,7 @@
                     <axis:options wsdlServiceElement="testService"/>
                 </axis:inbound-endpoint>
             </inbound>
-            <component class="org.mule.providers.soap.axis.style.DefaultMessageService"/>
+            <component class="org.mule.transport.soap.axis.style.DefaultMessageService"/>
         </service>
     </model>
 </mule>

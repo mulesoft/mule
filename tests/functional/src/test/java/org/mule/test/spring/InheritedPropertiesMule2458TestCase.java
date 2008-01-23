@@ -10,9 +10,9 @@
 
 package org.mule.test.spring;
 
+import org.mule.api.component.Component;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
 {
@@ -24,9 +24,9 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
 
     public void testProperties()
     {
-        UMOComponent component = muleContext.getRegistry().lookupComponent("service");
+        Component component = muleContext.getRegistry().lookupComponent("service");
         assertNotNull(component);
-        UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) component.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) component.getInboundRouter().getEndpoints().get(0);
         assertNotNull(endpoint);
 
         assertProperty(endpoint, "global-only", "global");
@@ -40,7 +40,7 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
         assertProperty(endpoint, "all", "local");
     }
 
-    protected void assertProperty(UMOImmutableEndpoint endpoint, String name, String value)
+    protected void assertProperty(ImmutableEndpoint endpoint, String name, String value)
     {
         Object property = endpoint.getProperty(name);
         assertNotNull("Property " + name + " is missing", property);

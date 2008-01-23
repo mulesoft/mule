@@ -10,34 +10,34 @@
 
 package org.mule.extras.pgp;
 
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.security.SecurityException;
+import org.mule.api.security.Authentication;
+import org.mule.api.security.SecurityContext;
+import org.mule.api.security.SecurityContextFactory;
+import org.mule.api.security.SecurityProvider;
+import org.mule.api.security.UnauthorisedException;
+import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.extras.pgp.i18n.PGPMessages;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.SecurityException;
-import org.mule.umo.security.UMOAuthentication;
-import org.mule.umo.security.UMOSecurityContext;
-import org.mule.umo.security.UMOSecurityContextFactory;
-import org.mule.umo.security.UMOSecurityProvider;
-import org.mule.umo.security.UnauthorisedException;
-import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 import cryptix.message.Message;
 import cryptix.message.MessageException;
 import cryptix.message.SignedMessage;
 import cryptix.pki.KeyBundle;
 
-public class PGPSecurityProvider implements UMOSecurityProvider
+public class PGPSecurityProvider implements SecurityProvider
 {
     private String name = "PGPSecurityProvider";
 
     private PGPKeyRing keyManager;
 
-    private UMOSecurityContextFactory factory;
+    private SecurityContextFactory factory;
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.security.UMOSecurityProvider#setName(java.lang.String)
+     * @see org.mule.api.security.SecurityProvider#setName(java.lang.String)
      */
     public void setName(String name)
     {
@@ -47,7 +47,7 @@ public class PGPSecurityProvider implements UMOSecurityProvider
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.security.UMOSecurityProvider#getName()
+     * @see org.mule.api.security.SecurityProvider#getName()
      */
     public String getName()
     {
@@ -57,9 +57,9 @@ public class PGPSecurityProvider implements UMOSecurityProvider
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.security.UMOSecurityProvider#authenticate(org.mule.umo.security.UMOAuthentication)
+     * @see org.mule.api.security.SecurityProvider#authenticate(org.mule.api.security.Authentication)
      */
-    public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException
+    public Authentication authenticate(Authentication authentication) throws SecurityException
     {
         PGPAuthentication auth = (PGPAuthentication) authentication;
 
@@ -105,7 +105,7 @@ public class PGPSecurityProvider implements UMOSecurityProvider
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.security.UMOSecurityProvider#supports(java.lang.Class)
+     * @see org.mule.api.security.SecurityProvider#supports(java.lang.Class)
      */
     public boolean supports(Class aClass)
     {
@@ -115,9 +115,9 @@ public class PGPSecurityProvider implements UMOSecurityProvider
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.security.UMOSecurityProvider#createSecurityContext(org.mule.umo.security.UMOAuthentication)
+     * @see org.mule.api.security.SecurityProvider#createSecurityContext(org.mule.api.security.Authentication)
      */
-    public UMOSecurityContext createSecurityContext(UMOAuthentication auth)
+    public SecurityContext createSecurityContext(Authentication auth)
             throws UnknownAuthenticationTypeException
     {
         return factory.create(auth);
@@ -126,7 +126,7 @@ public class PGPSecurityProvider implements UMOSecurityProvider
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.lifecycle.Initialisable#initialise()
+     * @see org.mule.api.lifecycle.Initialisable#initialise()
      */
     public void initialise() throws InitialisationException
     {

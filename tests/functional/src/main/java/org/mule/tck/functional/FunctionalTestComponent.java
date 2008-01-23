@@ -10,16 +10,16 @@
 
 package org.mule.tck.functional;
 
-import org.mule.MuleException;
 import org.mule.MuleServer;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEventContext;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.lifecycle.Callable;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.impl.RequestContext;
 import org.mule.tck.exceptions.FunctionalTestException;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringMessageUtils;
 
@@ -79,7 +79,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /** {@inheritDoc} */
-    public Object onCall(UMOEventContext context) throws Exception
+    public Object onCall(MuleEventContext context) throws Exception
     {
         if (enableMessageHistory)
         {
@@ -119,7 +119,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         MuleContext muleContext = context.getMuleContext();
         if (muleContext == null)
         {
-            logger.warn("No MuleContext available from EventContext");
+            logger.warn("No MuleContext available from MuleEventContext");
             muleContext = MuleServer.getMuleContext();
         }
         muleContext.fireNotification(
@@ -147,7 +147,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
     /**
      * This method duplicates much of the functionality for the {@link #onCall} method above. This method is currently
-     * used by some WebServices tests where you don' want to be introducing the {@link org.mule.umo.UMOEventContext} as
+     * used by some WebServices tests where you don' want to be introducing the {@link org.mule.api.MuleEventContext} as
      * a complex type.
      * TODO: It would be nice to remove this method or at least refactor the methods so there is little or no duplication
      *
@@ -157,7 +157,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      */
     public Object onReceive(Object data) throws Exception
     {
-        UMOEventContext context = RequestContext.getEventContext();
+        MuleEventContext context = RequestContext.getEventContext();
         String contents = data.toString();
         String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
                 + context.getComponent().getName() + ". Content is: "
@@ -191,7 +191,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
             }
             else
             {
-                throw new MuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));
+                throw new DefaultMuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));
             }
         }
 
@@ -200,16 +200,16 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
     /**
      * An event callback is called when a message is received by the component.
-     * An Event callback isn't strictly required but it is usfal for performing assertions
+     * An MuleEvent callback isn't strictly required but it is usfal for performing assertions
      * on the current message being received.
      * Note that the FunctionalTestComponent should be made a singleton
-     * {@link org.mule.umo.UMODescriptor#setSingleton} when using Event callbacks
+     * {@link org.mule.api.UMODescriptor#setSingleton} when using MuleEvent callbacks
      * <p/>
      * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this
      * will deleiver a {@link FunctionalTestNotification} for every message received by this component
      *
      * @return the callback to call when a message is received
-     * @see org.mule.umo.UMODescriptor
+     * @see org.mule.api.UMODescriptor
      * @see org.mule.tck.functional.FunctionalTestNotification
      * @see org.mule.tck.functional.FunctionalTestNotificationListener
      */
@@ -220,16 +220,16 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
     /**
      * An event callback is called when a message is received by the component.
-     * An Event callback isn't strictly required but it is usfal for performing assertions
+     * An MuleEvent callback isn't strictly required but it is usfal for performing assertions
      * on the current message being received.
      * Note that the FunctionalTestComponent should be made a singleton
-     * {@link org.mule.umo.UMODescriptor#setSingleton} when using Event callbacks
+     * {@link org.mule.api.UMODescriptor#setSingleton} when using MuleEvent callbacks
      * <p/>
      * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this
      * will deleiver a {@link FunctionalTestNotification} for every message received by this component
      *
      * @param eventCallback the callback to call when a message is received
-     * @see org.mule.umo.UMODescriptor
+     * @see org.mule.api.UMODescriptor
      * @see org.mule.tck.functional.FunctionalTestNotification
      * @see org.mule.tck.functional.FunctionalTestNotificationListener
      */

@@ -9,13 +9,13 @@
  */
 package org.mule.config.spring.handlers;
 
+import org.mule.agent.EndpointNotificationLoggerAgent;
+import org.mule.agent.Log4jNotificationLoggerAgent;
 import org.mule.config.spring.parsers.JmxAgentDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryWrapper;
-import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
-import org.mule.impl.internal.admin.Log4jNotificationLoggerAgent;
 import org.mule.management.agents.DefaultJmxSupportAgent;
 import org.mule.management.agents.JmxServerNotificationAgent;
 import org.mule.management.agents.Log4jAgent;

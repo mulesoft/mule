@@ -18,10 +18,10 @@ import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDef
  * elements.
  *
  * <p>It generates both an endpoint (which should subclass
- * {@link org.mule.impl.endpoint.MuleEndpoint}) and a
- * {@link org.mule.impl.endpoint.URIBuilder}.  The URI is
+ * {@link org.mule.endpoint.MuleEndpoint}) and a
+ * {@link org.mule.endpoint.URIBuilder}.  The URI is
  * then injected into the endpoint.  So the associated schema can enable any of the
- * suitable {@link org.mule.impl.endpoint.URIBuilder# ALL_ATTRIBUTES}
+ * suitable {@link org.mule.endpoint.URIBuilder# ALL_ATTRIBUTES}
  * or add appropriate mappings.
  */
 public class TransportEndpointDefinitionParser extends AddressedEndpointDefinitionParser

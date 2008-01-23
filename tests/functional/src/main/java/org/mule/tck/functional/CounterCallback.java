@@ -9,7 +9,7 @@
  */
 package org.mule.tck.functional;
 
-import org.mule.umo.UMOEventContext;
+import org.mule.api.MuleEventContext;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,7 +30,7 @@ public class CounterCallback implements EventCallback
         this.callbackCount = callbackCount;
     }
 
-    public void eventReceived(UMOEventContext context, Object Component) throws Exception
+    public void eventReceived(MuleEventContext context, Object Component) throws Exception
     {
         incCallbackCount();
     }

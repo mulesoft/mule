@@ -10,12 +10,12 @@
 
 package org.mule.extras.jaas.config;
 
-import org.mule.config.MuleProperties;
+import org.mule.api.config.MuleProperties;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.extras.jaas.JaasSimpleAuthenticationProvider;
 import org.mule.extras.jaas.filters.JaasSecurityFilter;
-import org.mule.impl.security.PasswordBasedEncryptionStrategy;
+import org.mule.security.PasswordBasedEncryptionStrategy;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 

@@ -10,10 +10,10 @@
 
 package org.mule.test.integration.config;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transformer.Transformer;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transformers.TransformerUtils;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.transformer.TransformerUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -23,7 +23,7 @@ public class ResponseTransformerTestCase extends FunctionalTestCase
 
     public void testTransformers()
     {
-        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpoint("endpoint");
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpoint("endpoint");
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertEquals(2, endpoint.getTransformers().size());
         checkNames("normal", endpoint.getTransformers());
@@ -37,7 +37,7 @@ public class ResponseTransformerTestCase extends FunctionalTestCase
         Iterator iterator = transformers.iterator();
         for (int count = 1; iterator.hasNext(); count++)
         {
-            UMOTransformer transformer = (UMOTransformer) iterator.next();
+            Transformer transformer = (Transformer) iterator.next();
             logger.debug(transformer);
             assertEquals(prefix + count, transformer.getName());
         }

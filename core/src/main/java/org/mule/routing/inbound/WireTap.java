@@ -10,16 +10,16 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleSession;
-import org.mule.impl.NullSessionHandler;
-import org.mule.impl.RequestContext;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.DispatchException;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleSession;
+import org.mule.NullSessionHandler;
+import org.mule.RequestContext;
+import org.mule.api.MuleException;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.DispatchException;
 
 /**
  * An inbound router that can forward every message to another destination as defined
@@ -29,9 +29,9 @@ import org.mule.umo.provider.DispatchException;
  */
 public class WireTap extends SelectiveConsumer
 {
-    private volatile UMOImmutableEndpoint tap;
+    private volatile ImmutableEndpoint tap;
 
-    public boolean isMatch(UMOEvent event) throws MessagingException
+    public boolean isMatch(MuleEvent event) throws MessagingException
     {
         if (tap != null)
         {
@@ -44,33 +44,33 @@ public class WireTap extends SelectiveConsumer
         }
     }
 
-    public UMOEvent[] process(UMOEvent event) throws MessagingException
+    public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
         RequestContext.setEvent(null);
         try
         {
             //We have to create a new session for this dispatch, since the session may get altered
             //using this call, changing the behaviour of the request
-            UMOSession session = new MuleSession(event.getMessage(), new NullSessionHandler());
-            tap.dispatch(new MuleEvent(event.getMessage(), tap, session, false));
+            MuleSession session = new DefaultMuleSession(event.getMessage(), new NullSessionHandler());
+            tap.dispatch(new DefaultMuleEvent(event.getMessage(), tap, session, false));
         }
         catch (MessagingException e)
         {
             throw e;
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             throw new DispatchException(event.getMessage(), tap, e);
         }
         return super.process(event);
     }
 
-    public UMOImmutableEndpoint getEndpoint()
+    public ImmutableEndpoint getEndpoint()
     {
         return tap;
     }
 
-    public void setEndpoint(UMOImmutableEndpoint endpoint) throws UMOException
+    public void setEndpoint(ImmutableEndpoint endpoint) throws MuleException
     {
         this.tap = endpoint;
     }

@@ -10,9 +10,9 @@
 
 package org.mule.test.integration.exceptions;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class ExceptionsWithRouterMule2715TestCase extends FunctionalTestCase
 {
@@ -34,7 +34,7 @@ public class ExceptionsWithRouterMule2715TestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         client.dispatch("vm://" + path, MESSAGE, null);
-        UMOMessage response = client.request("vm://error", TIMEOUT);
+        MuleMessage response = client.request("vm://error", TIMEOUT);
         assertNotNull("exception null", response.getExceptionPayload());
     }
 

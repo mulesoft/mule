@@ -27,7 +27,7 @@
                 </inbound-endpoint>
             </inbound>
             <component>
-                <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
+                <singleton-object class="org.mule.component.simple.PassThroughComponent"/>
             </component>
             <outbound>
                 <outbound-pass-through-router>

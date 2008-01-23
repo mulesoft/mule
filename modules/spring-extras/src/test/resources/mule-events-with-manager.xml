@@ -22,7 +22,7 @@
     </connector>
 
     <model name="echoSample">
-        <mule-descriptor name="EchoUMO" implementation="org.mule.components.simple.EchoComponent">
+        <mule-descriptor name="EchoUMO" implementation="org.mule.component.simple.EchoComponent">
             <inbound-router>
                 <endpoint address="test://in"/>
             </inbound-router>

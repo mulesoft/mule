@@ -10,13 +10,15 @@
 
 package org.mule.config;
 
-import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.DefaultWorkListener;
+import org.mule.api.registry.Registry;
+import org.mule.api.transport.ConnectionStrategy;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.providers.ConnectionStrategy;
-import org.mule.providers.SingleAttemptConnectionStrategy;
-import org.mule.registry.Registry;
-import org.mule.umo.manager.DefaultWorkListener;
+import org.mule.transport.SingleAttemptConnectionStrategy;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;

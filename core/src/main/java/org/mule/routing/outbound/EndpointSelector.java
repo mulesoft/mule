@@ -10,14 +10,14 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleContextAware;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
-import org.mule.umo.routing.RoutingException;
 import org.mule.util.StringUtils;
 import org.mule.util.properties.PropertyExtractorManager;
 
@@ -52,7 +52,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
 
 
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
         List endpoints;
@@ -80,7 +80,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
                     getSelectorProperty(), new Class[]{String.class, List.class}, property.getClass()), message, null);
         }
 
-        UMOMessage result = null;
+        MuleMessage result = null;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             endpointName = iterator.next().toString();
@@ -90,7 +90,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
                 throw new CouldNotRouteOutboundMessageException(
                         CoreMessages.objectIsNull("Endpoint Name: " + getSelectorProperty()), message, null);
             }
-            UMOImmutableEndpoint ep = null;
+            ImmutableEndpoint ep = null;
             try
             {
                 ep = lookupEndpoint(endpointName);
@@ -109,7 +109,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
                     dispatch(session, message, ep);
                 }
             }
-            catch (UMOException e)
+            catch (MuleException e)
             {
                 throw new CouldNotRouteOutboundMessageException(message, ep, e);
             }
@@ -117,13 +117,13 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
         return result;
     }
 
-    protected UMOImmutableEndpoint lookupEndpoint(String endpointName) throws UMOException
+    protected ImmutableEndpoint lookupEndpoint(String endpointName) throws MuleException
     {
-        UMOImmutableEndpoint ep;
+        ImmutableEndpoint ep;
         Iterator iterator = endpoints.iterator();
         while (iterator.hasNext())
         {
-            ep = (UMOImmutableEndpoint) iterator.next();
+            ep = (ImmutableEndpoint) iterator.next();
             // Endpoint identifier (deprecated)
             if (endpointName.equals(ep.getEndpointURI().getEndpointName()))
             {

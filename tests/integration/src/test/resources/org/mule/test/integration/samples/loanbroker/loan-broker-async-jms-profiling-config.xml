@@ -29,7 +29,7 @@ the different components are made from the loan broker component (a la hub and s
 
 
     <!-- Testing with ActiveMq -->
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+    <connector name="jmsConnector" className="org.mule.transport.jms.JmsConnector">
         <properties>
             <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
             <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
@@ -42,7 +42,7 @@ the different components are made from the loan broker component (a la hub and s
 
 
     <!-- testing with OpenJms -->
-    <!--<connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
+    <!--<connector name="jmsConnector" className="org.mule.transport.jms.JmsConnector">-->
     <!--<properties>-->
     <!--<property name="connectionFactoryJndiName" value="JmsQueueConnectionFactory"/>-->
     <!--<property name="jndiInitialFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>-->
@@ -74,7 +74,7 @@ the different components are made from the loan broker component (a la hub and s
         <!-- by declaring the Axis service component we can overload its default
         configuration to add more threads or pooled resources -->
         <mule-descriptor name="_axisServiceComponent"
-                         implementation="org.mule.providers.soap.axis.AxisServiceComponent">
+                         implementation="org.mule.transport.soap.axis.AxisServiceComponent">
             <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20"/>
             <pooling-profile exhaustedAction="WAIT" maxActive="20" maxIdle="20" maxWait="20000"/>
         </mule-descriptor>

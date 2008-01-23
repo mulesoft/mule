@@ -10,7 +10,7 @@
 
 package org.mule.ra;
 
-import org.mule.impl.model.AbstractModel;
+import org.mule.model.AbstractModel;
 
 /**
  * Creates a model suitable for Jca execution

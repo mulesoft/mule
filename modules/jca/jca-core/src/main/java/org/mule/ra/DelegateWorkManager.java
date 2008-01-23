@@ -10,14 +10,12 @@
 
 package org.mule.ra;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.manager.UMOWorkManager;
+import org.mule.api.MuleException;
 
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
-import javax.resource.spi.work.WorkManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
 
@@ -25,13 +23,13 @@ import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException
  * <code>DelegateWorkManager</code> is a wrapper around a WorkManager provided by a
  * JCA container.
  */
-public class DelegateWorkManager implements UMOWorkManager
+public class DelegateWorkManager implements org.mule.api.context.WorkManager
 {
-    private final WorkManager workManager;
+    private final javax.resource.spi.work.WorkManager workManager;
 
-    public DelegateWorkManager(WorkManager workManager)
+    public DelegateWorkManager(javax.resource.spi.work.WorkManager workManager2)
     {
-        this.workManager = workManager;
+        this.workManager = workManager2;
     }
 
     public void doWork(Work work) throws WorkException
@@ -81,12 +79,12 @@ public class DelegateWorkManager implements UMOWorkManager
         }
     }
 
-    public void start() throws UMOException
+    public void start() throws MuleException
     {
         // nothing to do
     }
 
-    public void stop() throws UMOException
+    public void stop() throws MuleException
     {
         // nothing to do
     }

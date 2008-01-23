@@ -21,14 +21,14 @@
 
     <file:endpoint path="./.mule/in" name="get" connector-ref="fileConnector"/>
 
-    <custom-transformer class="org.mule.providers.file.transformers.FileToByteArray" name="FileToByteArray"/>
+    <custom-transformer class="org.mule.transport.file.transformers.FileToByteArray" name="FileToByteArray"/>
 
     <model name="ESTest">
 
         <service name="FolderTO">
             <inbound>
                 <file:inbound-endpoint ref="get" transformer-refs="FileToByteArray"
-                    comparator="org.mule.providers.file.comparator.OlderFirstComparator"
+                    comparator="org.mule.transport.file.comparator.OlderFirstComparator"
                     reverseOrder="true"/>
             </inbound>
             <component>

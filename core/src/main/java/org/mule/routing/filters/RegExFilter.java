@@ -10,8 +10,9 @@
 
 package org.mule.routing.filters;
 
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
+import org.mule.api.routing.filter.ObjectFilter;
 
 import java.util.regex.Pattern;
 
@@ -20,7 +21,7 @@ import java.util.regex.Pattern;
  * pattern.
  */
 
-public class RegExFilter implements UMOFilter, ObjectFilter
+public class RegExFilter implements Filter, ObjectFilter
 {
     private Pattern pattern;
 
@@ -34,7 +35,7 @@ public class RegExFilter implements UMOFilter, ObjectFilter
         this.pattern = Pattern.compile(pattern);
     }
 
-    public boolean accept(UMOMessage message)
+    public boolean accept(MuleMessage message)
     {
         return accept(message.getPayload());
     }

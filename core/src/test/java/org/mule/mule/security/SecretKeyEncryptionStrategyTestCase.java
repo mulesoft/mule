@@ -10,7 +10,7 @@
 
 package org.mule.mule.security;
 
-import org.mule.impl.security.SecretKeyEncryptionStrategy;
+import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 
 public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase

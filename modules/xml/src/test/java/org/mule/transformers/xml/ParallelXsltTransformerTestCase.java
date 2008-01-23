@@ -10,9 +10,9 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transformer.Transformer;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IOUtils;
 
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
             "UTF-8");
     }
 
-    public UMOTransformer getTransformer() throws Exception
+    public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setReturnClass(String.class);
@@ -59,7 +59,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
 
     public void testParallelTransformation() throws Exception
     {
-        final UMOTransformer transformer = getTransformer();
+        final Transformer transformer = getTransformer();
 
         long startTime = System.currentTimeMillis();
 

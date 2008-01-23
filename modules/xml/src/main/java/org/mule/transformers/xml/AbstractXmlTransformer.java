@@ -10,7 +10,7 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.transformers.AbstractTransformer;
+import org.mule.transformer.AbstractTransformer;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

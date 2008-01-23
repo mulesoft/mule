@@ -10,23 +10,23 @@
 
 package org.mule.ra;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleSession;
 import org.mule.api.MuleContext;
-import org.mule.config.MuleProperties;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.ReceiveException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.extras.client.i18n.ClientMessages;
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
-import org.mule.impl.security.MuleCredentials;
-import org.mule.providers.AbstractConnector;
 import org.mule.ra.i18n.JcaMessages;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.ReceiveException;
+import org.mule.security.MuleCredentials;
+import org.mule.transport.AbstractConnector;
 
 import java.util.Map;
 
@@ -60,17 +60,17 @@ public class DefaultMuleConnection implements MuleConnection
      * @param messageProperties any properties to be associated with the payload. In
      *            the case of Jms you could set the JMSReplyTo property in these
      *            properties.
-     * @throws org.mule.umo.UMOException
+     * @throws org.mule.api.MuleException
      */
-    public void dispatch(String url, Object payload, Map messageProperties) throws UMOException
+    public void dispatch(String url, Object payload, Map messageProperties) throws MuleException
     {
-        UMOMessage message = new MuleMessage(payload, messageProperties);
-        UMOEvent event = getEvent(message, url, false);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        MuleEvent event = getEvent(message, url, false);
         try
         {
             event.getSession().dispatchEvent(event);
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             throw e;
         }
@@ -84,7 +84,7 @@ public class DefaultMuleConnection implements MuleConnection
 
     /**
      * Sends an object (payload) synchronous to the given url and returns a
-     * UMOMessage response back.
+     * MuleMessage response back.
      * 
      * @param url the Mule url used to determine the destination and transport of the
      *            message
@@ -93,19 +93,19 @@ public class DefaultMuleConnection implements MuleConnection
      *            the case of Jms you could set the JMSReplyTo property in these
      *            properties.
      * @return a umomessage response.
-     * @throws org.mule.umo.UMOException
+     * @throws org.mule.api.MuleException
      */
-    public UMOMessage send(String url, Object payload, Map messageProperties) throws UMOException
+    public MuleMessage send(String url, Object payload, Map messageProperties) throws MuleException
     {
-        UMOMessage message = new MuleMessage(payload, messageProperties);
-        UMOEvent event = getEvent(message, url, true);
+        MuleMessage message = new DefaultMuleMessage(payload, messageProperties);
+        MuleEvent event = getEvent(message, url, true);
 
-        UMOMessage response;
+        MuleMessage response;
         try
         {
             response = event.getSession().sendEvent(event);
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             throw e;
         }
@@ -127,11 +127,11 @@ public class DefaultMuleConnection implements MuleConnection
      *            receive will not wait at all and if set to -1 the receive will wait
      *            forever
      * @return the message received or null if no message was received
-     * @throws org.mule.umo.UMOException
+     * @throws org.mule.api.MuleException
      */
-    public UMOMessage receive(String url, long timeout) throws UMOException
+    public MuleMessage receive(String url, long timeout) throws MuleException
     {
-        UMOImmutableEndpoint endpoint = manager.getRegistry().lookupEndpointFactory().getOutboundEndpoint(url);
+        ImmutableEndpoint endpoint = manager.getRegistry().lookupEndpointFactory().getOutboundEndpoint(url);
 
         try
         {
@@ -149,14 +149,14 @@ public class DefaultMuleConnection implements MuleConnection
      * @param message the event payload
      * @param uri the destination endpointUri
      * @param synchronous whether the event will be synchronously processed
-     * @return the UMOEvent
-     * @throws UMOException in case of Mule error
+     * @return the MuleEvent
+     * @throws MuleException in case of Mule error
      */
-    protected UMOEvent getEvent(UMOMessage message, String uri, boolean synchronous)
-        throws UMOException
+    protected MuleEvent getEvent(MuleMessage message, String uri, boolean synchronous)
+        throws MuleException
     {
-        UMOImmutableEndpoint endpoint = manager.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
-        //UMOConnector connector = endpoint.getConnector();
+        ImmutableEndpoint endpoint = manager.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+        //Connector connector = endpoint.getConnector();
 
 //        if (!connector.isStarted() && manager.isStarted())
 //        {
@@ -165,7 +165,7 @@ public class DefaultMuleConnection implements MuleConnection
 
         try
         {
-            UMOSession session = new MuleSession(message,
+            MuleSession session = new DefaultMuleSession(message,
                 ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
 
             if (credentials != null)
@@ -173,7 +173,7 @@ public class DefaultMuleConnection implements MuleConnection
                 message.setProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + credentials.getToken());
             }
 
-            return new MuleEvent(message, endpoint, session, synchronous);
+            return new DefaultMuleEvent(message, endpoint, session, synchronous);
         }
         catch (Exception e)
         {

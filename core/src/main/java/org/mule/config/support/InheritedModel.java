@@ -9,7 +9,7 @@
  */
 package org.mule.config.support;
 
-import org.mule.impl.model.AbstractModel;
+import org.mule.model.AbstractModel;
 
 /**
  * TODO
@@ -20,7 +20,7 @@ public class InheritedModel extends AbstractModel
     {
         return "inherited";
     }
-
+    
 
     //@Override
     public String getName()

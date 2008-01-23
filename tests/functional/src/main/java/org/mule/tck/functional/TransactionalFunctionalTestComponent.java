@@ -10,10 +10,10 @@
 
 package org.mule.tck.functional;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.umo.TransactionException;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOTransaction;
 
 /**
  * This component is useful for unit tests involving transactionality because it
@@ -25,14 +25,14 @@ public class TransactionalFunctionalTestComponent extends FunctionalTestComponen
     private boolean rollback = true;
 
     /** {@inheritDoc} */
-    public Object onCall(UMOEventContext context) throws Exception
+    public Object onCall(MuleEventContext context) throws Exception
     {
         Object replyMessage = super.onCall(context);
 
         if (expectTransaction)
         {
             // Verify transaction has begun.
-            UMOTransaction currentTx = context.getCurrentTransaction();
+            Transaction currentTx = context.getCurrentTransaction();
             if (currentTx == null || currentTx.isBegun() == false)
             {    
                 context.setStopFurtherProcessing(true);

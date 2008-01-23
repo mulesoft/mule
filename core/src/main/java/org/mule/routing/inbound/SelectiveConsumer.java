@@ -10,38 +10,38 @@
 
 package org.mule.routing.inbound;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.InboundRouter;
+import org.mule.api.routing.RoutingException;
+import org.mule.api.routing.filter.Filter;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleMessage;
 import org.mule.routing.AbstractRouter;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.routing.RoutingException;
-import org.mule.umo.routing.UMOInboundRouter;
-import org.mule.umo.transformer.TransformerException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>SelectiveConsumer</code> is an inbound router used to filter out unwanted
- * events. The filtering is performed by a <code>UMOFilter</code> that can be set
+ * events. The filtering is performed by a <code>Filter</code> that can be set
  * on the router.
  * 
- * @see UMOInboundRouter
- * @see org.mule.umo.routing.UMOInboundRouterCollection
- * @see org.mule.umo.routing.UMORouterCollection
+ * @see InboundRouter
+ * @see org.mule.api.routing.InboundRouterCollection
+ * @see org.mule.api.routing.RouterCollection
  */
 
-public class SelectiveConsumer extends AbstractRouter implements UMOInboundRouter
+public class SelectiveConsumer extends AbstractRouter implements InboundRouter
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private volatile UMOFilter filter;
+    private volatile Filter filter;
     private volatile boolean transformFirst = true;
 
-    public boolean isMatch(UMOEvent event) throws MessagingException
+    public boolean isMatch(MuleEvent event) throws MessagingException
     {
         if (logger.isDebugEnabled())
         {
@@ -53,14 +53,14 @@ public class SelectiveConsumer extends AbstractRouter implements UMOInboundRoute
             return true;
         }
 
-        UMOMessage message = event.getMessage();
+        MuleMessage message = event.getMessage();
 
         if (transformFirst)
         {
             try
             {
                 Object payload = event.transformMessage();
-                message = new MuleMessage(payload, message);
+                message = new DefaultMuleMessage(payload, message);
             }
             catch (TransformerException e)
             {
@@ -74,18 +74,18 @@ public class SelectiveConsumer extends AbstractRouter implements UMOInboundRoute
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Event " + event.getId() + (result ? " passed filter " : " did not pass filter ")
+            logger.debug("MuleEvent " + event.getId() + (result ? " passed filter " : " did not pass filter ")
                             + filter.getClass().getName());
         }
 
         return result;
     }
 
-    public UMOEvent[] process(UMOEvent event) throws MessagingException
+    public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
         if (this.isMatch(event))
         {
-            return new UMOEvent[]{event};
+            return new MuleEvent[]{event};
         }
         else
         {
@@ -93,12 +93,12 @@ public class SelectiveConsumer extends AbstractRouter implements UMOInboundRoute
         }
     }
 
-    public UMOFilter getFilter()
+    public Filter getFilter()
     {
         return filter;
     }
 
-    public void setFilter(UMOFilter filter)
+    public void setFilter(Filter filter)
     {
         this.filter = filter;
     }

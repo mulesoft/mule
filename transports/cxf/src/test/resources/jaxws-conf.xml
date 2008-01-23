@@ -12,7 +12,7 @@
       <inbound>
           <cxf:inbound-endpoint address="http://localhost:63081/services/Echo" />
       </inbound>
-      <component class="org.mule.providers.cxf.testmodels.Echo"/>
+      <component class="org.mule.transport.cxf.testmodels.Echo"/>
     </service>
   </model>
 </mule>

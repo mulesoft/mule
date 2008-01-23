@@ -10,8 +10,8 @@
 
 package org.mule.transaction;
 
+import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.TransactionException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,7 +33,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#begin()
+     * @see org.mule.api.Transaction#begin()
      */
     public void begin() throws TransactionException
     {
@@ -44,7 +44,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#commit()
+     * @see org.mule.api.Transaction#commit()
      */
     public void commit() throws TransactionException
     {
@@ -55,7 +55,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#rollback()
+     * @see org.mule.api.Transaction#rollback()
      */
     public void rollback() throws TransactionException
     {
@@ -66,7 +66,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#getStatus()
+     * @see org.mule.api.Transaction#getStatus()
      */
     public int getStatus() throws TransactionStatusException
     {
@@ -92,7 +92,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#getResource(java.lang.Object)
+     * @see org.mule.api.Transaction#getResource(java.lang.Object)
      */
     public Object getResource(Object key)
     {
@@ -102,7 +102,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#hasResource(java.lang.Object)
+     * @see org.mule.api.Transaction#hasResource(java.lang.Object)
      */
     public boolean hasResource(Object key)
     {
@@ -112,7 +112,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#bindResource(java.lang.Object,
+     * @see org.mule.api.Transaction#bindResource(java.lang.Object,
      *      java.lang.Object)
      */
     public void bindResource(Object key, Object resource) throws TransactionException
@@ -136,7 +136,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#setRollbackOnly()
+     * @see org.mule.api.Transaction#setRollbackOnly()
      */
     public void setRollbackOnly()
     {

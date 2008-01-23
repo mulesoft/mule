@@ -10,12 +10,11 @@
 
 package org.mule.test.integration.resolvers;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.umo.UMOMessage;
+import org.mule.tck.FunctionalTestCase;
 
 import java.util.Map;
-import java.util.HashMap;
 
 public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestCase
 {
@@ -28,7 +27,7 @@ public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestC
     protected void doTest(String path, Object payload, String result, Map properties) throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage response = client.send("vm://" + path, payload, properties);
+        MuleMessage response = client.send("vm://" + path, payload, properties);
         assertEquals(result, response.getPayloadAsString());
     }
 

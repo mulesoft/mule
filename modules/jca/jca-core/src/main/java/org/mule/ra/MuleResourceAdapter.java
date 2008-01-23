@@ -12,18 +12,18 @@ package org.mule.ra;
 
 import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
+import org.mule.api.component.Component;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.impl.DefaultMuleContextFactory;
-import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.endpoint.URIBuilder;
-import org.mule.impl.model.ModelFactory;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpointBuilder;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.model.UMOModel;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.model.Model;
+import org.mule.context.DefaultMuleContextFactory;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.MuleEndpointURI;
+import org.mule.endpoint.URIBuilder;
+import org.mule.model.ModelFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.SingletonObjectFactory;
 
@@ -103,7 +103,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 logger.info("Initializing Mule...");
                 muleContext = new DefaultMuleContextFactory().createMuleContext(builder);
             }
-            catch (UMOException e)
+            catch (MuleException e)
             {
                 logger.error(e);
                 throw new ResourceAdapterInternalException(
@@ -114,7 +114,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 logger.info("Starting Mule...");
                 muleContext.start();
             }
-            catch (UMOException e)
+            catch (MuleException e)
             {
                 logger.error(e);
                 throw new ResourceAdapterInternalException("Failed to start management context", e);
@@ -165,10 +165,10 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 JcaModel model = getJcaModel(modelName);
 
                 // Create Endpoint
-                UMOImmutableEndpoint endpoint = createMessageInflowEndpoint(muleActivationSpec);
+                ImmutableEndpoint endpoint = createMessageInflowEndpoint(muleActivationSpec);
 
                 // Create Component
-                UMOComponent component = createJcaComponent(endpointFactory, model, endpoint);
+                Component component = createJcaComponent(endpointFactory, model, endpoint);
 
                 // Keep reference to JcaComponent descriptor for endpointDeactivation
                 MuleEndpointKey key = new MuleEndpointKey(endpointFactory, muleActivationSpec);
@@ -197,7 +197,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         {
             MuleActivationSpec muleActivationSpec = (MuleActivationSpec) activationSpec;
             MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec) activationSpec);
-            UMOComponent component = (UMOComponent) endpoints.remove(key);
+            Component component = (Component) endpoints.remove(key);
             if (component == null)
             {
                 logger.warn("No endpoint was registered with key: " + key);
@@ -219,7 +219,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
             {
                 muleContext.getRegistry().unregisterComponent(component.getName());
             }
-            catch (UMOException e)
+            catch (MuleException e)
             {
                 logger.error(e.getMessage(), e);
             }
@@ -244,9 +244,9 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         return modelName;
     }
 
-    protected JcaModel getJcaModel(String modelName) throws UMOException, ResourceException
+    protected JcaModel getJcaModel(String modelName) throws MuleException, ResourceException
     {
-        UMOModel model = muleContext.getRegistry().lookupModel(modelName);
+        Model model = muleContext.getRegistry().lookupModel(modelName);
         if (model != null)
         {
             if (model instanceof JcaModel)
@@ -267,12 +267,12 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         }
     }
 
-    protected UMOComponent createJcaComponent(MessageEndpointFactory endpointFactory,
+    protected Component createJcaComponent(MessageEndpointFactory endpointFactory,
                                               JcaModel model,
-                                              UMOImmutableEndpoint endpoint) throws UMOException
+                                              ImmutableEndpoint endpoint) throws MuleException
     {
         String name = "JcaComponent#" + endpointFactory.hashCode();
-        UMOComponent component = new JcaComponent(new DelegateWorkManager(bootstrapContext.getWorkManager()));
+        Component component = new JcaComponent(new DelegateWorkManager(bootstrapContext.getWorkManager()));
         component.setName(name);
         component.getInboundRouter().addEndpoint(endpoint);
 
@@ -285,11 +285,11 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         return component;
     }
 
-    protected UMOImmutableEndpoint createMessageInflowEndpoint(MuleActivationSpec muleActivationSpec)
-        throws UMOException
+    protected ImmutableEndpoint createMessageInflowEndpoint(MuleActivationSpec muleActivationSpec)
+        throws MuleException
     {
-        UMOEndpointURI uri = new MuleEndpointURI(muleActivationSpec.getEndpoint());
-        UMOEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(
+        EndpointURI uri = new MuleEndpointURI(muleActivationSpec.getEndpoint());
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(
             muleActivationSpec.getEndpoint()), muleContext);
 
         // Use asynchronous endpoint as we need to dispatch to component

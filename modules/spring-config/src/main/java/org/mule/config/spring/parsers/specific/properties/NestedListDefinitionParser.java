@@ -10,12 +10,12 @@
 
 package org.mule.config.spring.parsers.specific.properties;
 
-import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.parsers.processors.AddAttribute;
-import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
+import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
+import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
+import org.mule.config.spring.parsers.processors.AddAttribute;
 
 /**
  * This extends a list that is itself a property (with key mapKey).  It does not have any

@@ -10,8 +10,8 @@
 
 package org.mule.modules.xml.functional;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.umo.UMOMessage;
 
 import java.util.Random;
 
@@ -31,7 +31,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
         logger.debug("not xml");
         MuleClient client = new MuleClient();
         client.dispatch("in", STRING_MESSAGE, null);
-        UMOMessage response = client.request("notxml", TIMEOUT);
+        MuleMessage response = client.request("notxml", TIMEOUT);
         assertNotNull(response);
         assertNotNull(response.getPayload());
         assertEquals(STRING_MESSAGE, response.getPayloadAsString());
@@ -53,7 +53,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
     {
         MuleClient client = new MuleClient();
         client.dispatch("in", xml, null);
-        UMOMessage response = client.request(endpoint, TIMEOUT);
+        MuleMessage response = client.request(endpoint, TIMEOUT);
         assertNotNull(response);
         assertNotNull(response.getPayload());
         assertEquals(xml, response.getPayloadAsString());

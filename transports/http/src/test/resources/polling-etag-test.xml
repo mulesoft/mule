@@ -11,7 +11,7 @@
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
     <http:connector name="PollingHttpConnector">
-        <service-overrides messageReceiver="org.mule.providers.http.PollingHttpMessageReceiver"/>
+        <service-overrides messageReceiver="org.mule.transport.http.PollingHttpMessageReceiver"/>
     </http:connector>
 
     <http:connector name="HttpConnector"/>
@@ -39,7 +39,7 @@
                 <inbound-endpoint address="http://localhost:60206" remoteSync="true" connector-ref="HttpConnector"/>
             </inbound>
             <component>
-                <singleton-object class="org.mule.providers.http.functional.ETagComponent"/>
+                <singleton-object class="org.mule.transport.http.functional.ETagComponent"/>
             </component>
         </service>
 

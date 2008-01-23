@@ -10,9 +10,9 @@
 
 package org.mule.test;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 /**
  * This test has been re-written to use entry point resolvers.
@@ -30,7 +30,7 @@ public class NoArgsCallWrapperFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         client.dispatch("vm://invoke", "test", null);
-        UMOMessage reply = client.request("vm://out", RECEIVE_TIMEOUT);
+        MuleMessage reply = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(reply);
         assertNull(reply.getExceptionPayload());
         assertEquals("Just an apple.", reply.getPayload());
@@ -40,7 +40,7 @@ public class NoArgsCallWrapperFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         client.dispatch("vm://invokeWithInjected", "test", null);
-        UMOMessage reply = client.request("vm://outWithInjected", RECEIVE_TIMEOUT);
+        MuleMessage reply = client.request("vm://outWithInjected", RECEIVE_TIMEOUT);
         assertNotNull(reply);
         assertNull(reply.getExceptionPayload());
         // same as original input

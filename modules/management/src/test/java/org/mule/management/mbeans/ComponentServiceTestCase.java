@@ -10,10 +10,10 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.config.ThreadingProfile;
-import org.mule.impl.model.seda.SedaComponent;
-import org.mule.impl.model.seda.SedaModel;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.management.AbstractMuleJmxTestCase;
+import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaModel;
 import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.Set;

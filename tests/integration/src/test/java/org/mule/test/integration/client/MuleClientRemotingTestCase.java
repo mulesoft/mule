@@ -12,10 +12,10 @@ package org.mule.test.integration.client;
 
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class MuleClientRemotingTestCase extends FunctionalTestCase
 {
@@ -37,14 +37,14 @@ public class MuleClientRemotingTestCase extends FunctionalTestCase
     // RegistryContext.getConfiguration().setSynchronous(true);
     //
     // RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
-    // UMOMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test
+    // MuleMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test
     // Client Send message", null);
     // assertNotNull(message);
     // assertEquals("Received: Test Client Send message", message.getPayload());
     // }
     //
     //    RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
-    //    UMOMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test Client Send message",
+    //    MuleMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test Client Send message",
     //        null);
     //    assertNotNull(message);
     //    assertEquals("Test Client Send message Received", message.getPayload());
@@ -57,7 +57,7 @@ public class MuleClientRemotingTestCase extends FunctionalTestCase
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
-        UMOMessage message = dispatcher.sendRemote("vm://remote.endpoint?connector=vmRemoteConnector", "foo",
+        MuleMessage message = dispatcher.sendRemote("vm://remote.endpoint?connector=vmRemoteConnector", "foo",
             null);
         assertNotNull(message);
         assertEquals("received from remote", message.getPayloadAsString());
@@ -71,7 +71,7 @@ public class MuleClientRemotingTestCase extends FunctionalTestCase
     // RegistryContext.getConfiguration().setSynchronous(true);
     //
     // RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
-    // UMOMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);
+    // MuleMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);
     // assertNull(message);
     //
     // // Dispatch a message

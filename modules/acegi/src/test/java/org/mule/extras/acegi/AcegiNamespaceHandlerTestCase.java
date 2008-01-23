@@ -10,9 +10,9 @@
 
 package org.mule.extras.acegi;
 
+import org.mule.api.security.SecurityManager;
+import org.mule.api.security.SecurityProvider;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.security.UMOSecurityManager;
-import org.mule.umo.security.UMOSecurityProvider;
 
 import java.util.Iterator;
 
@@ -31,9 +31,9 @@ public class AcegiNamespaceHandlerTestCase extends FunctionalTestCase
         knownProperties(getProvider("memory-dao"));
     }
 
-    protected UMOSecurityProvider getProvider(String name)
+    protected SecurityProvider getProvider(String name)
     {
-        UMOSecurityManager securityManager = muleContext.getSecurityManager();
+        SecurityManager securityManager = muleContext.getSecurityManager();
         return securityManager.getProvider(name);
     }
 
@@ -42,7 +42,7 @@ public class AcegiNamespaceHandlerTestCase extends FunctionalTestCase
         Iterator providers = muleContext.getSecurityManager().getProviders().iterator();
         while (providers.hasNext())
         {
-            UMOSecurityProvider provider = (UMOSecurityProvider) providers.next();
+            SecurityProvider provider = (SecurityProvider) providers.next();
             logger.debug(provider);
             logger.debug(provider.getName());
         }
@@ -50,7 +50,7 @@ public class AcegiNamespaceHandlerTestCase extends FunctionalTestCase
         knownProperties(getProvider("willOverwriteName"));
     }
 
-    protected void knownProperties(UMOSecurityProvider provider)
+    protected void knownProperties(SecurityProvider provider)
     {
         assertNotNull(provider);
         assertTrue(provider instanceof AcegiProviderAdapter);

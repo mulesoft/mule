@@ -19,9 +19,9 @@ import org.w3c.dom.Element;
 
 /**
  * Used to parse shortcut elements for simple built-in components such as
- * {@link org.mule.components.simple.BridgeComponent},
- * {@link import org.mule.components.simple.EchoComponent} and
- * {@link import org.mule.components.simple.LogComponent}. This allows shortcuts
+ * {@link org.mule.component.simple.BridgeComponent},
+ * {@link import org.mule.component.simple.EchoComponent} and
+ * {@link import org.mule.component.simple.LogComponent}. This allows shortcuts
  * like for example <i>&lt;mule:bridge-component/&gt;</i> to be used instead of
  * having to use the <i>&lt;mule:component/&gt;</i> element and specify the class
  * name (and scope) for built-in components that don't require configuration. <p/>

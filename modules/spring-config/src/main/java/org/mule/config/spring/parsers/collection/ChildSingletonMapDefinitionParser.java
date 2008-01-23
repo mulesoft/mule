@@ -10,12 +10,8 @@
 
 package org.mule.config.spring.parsers.collection;
 
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
-
-import org.w3c.dom.Element;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
 public class ChildSingletonMapDefinitionParser extends ChildDefinitionParser
 {

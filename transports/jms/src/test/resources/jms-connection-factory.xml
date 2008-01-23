@@ -8,11 +8,11 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
-    <spring:bean name="connectionFactory" class="org.mule.providers.jms.test.TestConnectionFactory">
+    <spring:bean name="connectionFactory" class="org.mule.transport.jms.test.TestConnectionFactory">
         <spring:property name="connectionFactoryProperty" value="TEST_VALUE"/>
     </spring:bean>
 
-    <jms:custom-connector name="jmsConnector1" class="org.mule.providers.jms.test.GenericTestJmsConnector">
+    <jms:custom-connector name="jmsConnector1" class="org.mule.transport.jms.test.GenericTestJmsConnector">
         <spring:property name="providerProperty" value="TEST_VALUE" />
         <spring:property name="connectionFactory" ref="connectionFactory" />
     </jms:custom-connector>

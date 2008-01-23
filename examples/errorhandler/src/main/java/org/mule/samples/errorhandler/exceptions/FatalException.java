@@ -10,13 +10,13 @@
 
 package org.mule.samples.errorhandler.exceptions;
 
+import org.mule.api.MuleException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.umo.UMOException;
 
 /**
  * <code>FatalException</code> TODO (document class)
  */
-public class FatalException extends UMOException
+public class FatalException extends MuleException
 {
 
     /**

@@ -7,7 +7,7 @@
 
     <mule-environment-properties synchronous="true"/>
 
-    <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
+    <connector name="axisConnector" className="org.mule.transport.soap.axis.AxisConnector">
         <properties>
             <list name="beanTypes">
                 <entry value="org.mule.test.usecases.axis.clientbridge.ComplexData"/>

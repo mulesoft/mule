@@ -11,13 +11,13 @@
 package org.mule.test.integration.spring.events.async;
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.test.integration.spring.events.Order;
 import org.mule.test.integration.spring.events.OrderManagerBean;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOMessage;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -53,7 +53,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
         // invoked
         EventCallback callback = new EventCallback()
         {
-            public void eventReceived(UMOEventContext context, Object o) throws Exception
+            public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 eventCount++;
             }
@@ -67,7 +67,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
         Thread.sleep(1000);
         assertTrue(eventCount == 1);
 
-        UMOMessage result = client.request("jms://processed.queue", 10000);
+        MuleMessage result = client.request("jms://processed.queue", 10000);
         assertEquals(1, eventCount);
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", result.getPayloadAsString());
@@ -80,7 +80,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
         assertNotNull(orderManager);
         EventCallback callback = new EventCallback()
         {
-            public void eventReceived(UMOEventContext context, Object o) throws Exception
+            public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 eventCount++;
             }
@@ -91,7 +91,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
         // Make an async call
         client.dispatch("axis:http://localhost:44444/mule/orderManager?method=processOrderAsync", order, null);
 
-        UMOMessage result = client.request("jms://processed.queue", 10000);
+        MuleMessage result = client.request("jms://processed.queue", 10000);
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed Async", result.getPayload());
     }

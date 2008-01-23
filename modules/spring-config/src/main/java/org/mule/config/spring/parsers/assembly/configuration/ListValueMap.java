@@ -10,8 +10,8 @@
 
 package org.mule.config.spring.parsers.assembly.configuration;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**

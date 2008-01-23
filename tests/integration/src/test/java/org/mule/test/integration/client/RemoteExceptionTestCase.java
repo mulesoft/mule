@@ -10,14 +10,14 @@
 
 package org.mule.test.integration.client;
 
-import org.mule.MuleException;
+import org.mule.api.ExceptionPayload;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.MalformedEndpointException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOExceptionPayload;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.transformer.TransformerException;
 
 import java.util.Date;
 
@@ -33,9 +33,9 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
-        UMOMessage result = dispatcher.sendRemote("vm://test.queue.1", new Date(), null);
+        MuleMessage result = dispatcher.sendRemote("vm://test.queue.1", new Date(), null);
         assertNotNull(result);
-        UMOExceptionPayload exceptionPayload = result.getExceptionPayload();
+        ExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
         assertTrue(exceptionPayload.getException().getCause() instanceof TransformerException);
         assertTrue(exceptionPayload.getRootException() instanceof Exception);
@@ -45,9 +45,9 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
-        UMOMessage result = dispatcher.sendRemote("test.queue.2", new Date(), null);
+        MuleMessage result = dispatcher.sendRemote("test.queue.2", new Date(), null);
         assertNotNull(result);
-        UMOExceptionPayload exceptionPayload = result.getExceptionPayload();
+        ExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
         assertTrue(exceptionPayload.getRootException() instanceof MalformedEndpointException);
     }
@@ -56,11 +56,11 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
-        UMOMessage result = dispatcher.sendRemote("vm://test.queue.2", new Date(), null);
+        MuleMessage result = dispatcher.sendRemote("vm://test.queue.2", new Date(), null);
         assertNotNull(result);
-        UMOExceptionPayload exceptionPayload = result.getExceptionPayload();
+        ExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getRootException() instanceof MuleException);
+        assertTrue(exceptionPayload.getRootException() instanceof DefaultMuleException);
         assertEquals("Functional Test Component Exception", exceptionPayload.getRootException().getMessage());
     }
 

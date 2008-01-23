@@ -10,8 +10,8 @@
 
 package org.mule.routing.filters.xml;
 
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
@@ -26,7 +26,7 @@ import javax.xml.stream.XMLStreamReader;
  * (well-formed) XML.
  */
 // @ThreadSafe
-public class IsXmlFilter implements UMOFilter
+public class IsXmlFilter implements Filter
 {
     private final XMLInputFactory factory = XMLInputFactory.newInstance();
 
@@ -37,7 +37,7 @@ public class IsXmlFilter implements UMOFilter
         super();
     }
 
-    public boolean accept(UMOMessage obj)
+    public boolean accept(MuleMessage obj)
     {
         return accept(obj.getPayload());
     }

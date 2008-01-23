@@ -10,7 +10,7 @@
 
 package org.mule.tck.functional;
 
-import org.mule.transformers.simple.StringAppendTransformer;
+import org.mule.transformer.simple.StringAppendTransformer;
 
 public class StringAppendTestTransformer extends StringAppendTransformer
 {

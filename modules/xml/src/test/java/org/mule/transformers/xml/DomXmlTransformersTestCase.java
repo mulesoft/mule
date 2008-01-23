@@ -10,7 +10,7 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.api.transformer.Transformer;
 import org.mule.util.IOUtils;
 
 import org.dom4j.DocumentHelper;
@@ -31,14 +31,14 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
         resultData = new DOMWriter().write(dom4jDoc);
     }
 
-    public UMOTransformer getTransformer() throws Exception
+    public Transformer getTransformer() throws Exception
     {
         XmlToDomDocument trans = new XmlToDomDocument();
         trans.setReturnClass(org.w3c.dom.Document.class);
         return trans;
     }
 
-    public UMOTransformer getRoundTripTransformer() throws Exception
+    public Transformer getRoundTripTransformer() throws Exception
     {
         DomDocumentToXml trans = new DomDocumentToXml();
         trans.setReturnClass(String.class);

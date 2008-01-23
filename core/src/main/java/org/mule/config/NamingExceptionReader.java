@@ -10,6 +10,8 @@
 
 package org.mule.config;
 
+import org.mule.api.config.ExceptionReader;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

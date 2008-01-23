@@ -10,16 +10,16 @@
 
 package org.mule.tck.providers;
 
+import org.mule.api.component.Component;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOMessageReceiver;
 
 public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCase
 {
-    protected UMOComponent component;
-    protected UMOImmutableEndpoint endpoint;
+    protected Component component;
+    protected ImmutableEndpoint endpoint;
 
     protected void doSetUp() throws Exception
     {
@@ -29,9 +29,9 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
 
     public void testCreate() throws Exception
     {
-        UMOComponent component = getTestComponent("orange", Orange.class);
-        UMOImmutableEndpoint endpoint = getTestEndpoint("Test", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
-        UMOMessageReceiver receiver = getMessageReceiver();
+        Component component = getTestComponent("orange", Orange.class);
+        ImmutableEndpoint endpoint = getTestEndpoint("Test", ImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+        MessageReceiver receiver = getMessageReceiver();
 
         assertNotNull(receiver.getEndpoint());
         assertNotNull(receiver.getConnector());
@@ -64,7 +64,7 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
         receiver.dispose();
     }
 
-    public abstract UMOMessageReceiver getMessageReceiver() throws Exception;
+    public abstract MessageReceiver getMessageReceiver() throws Exception;
 
     /**
      * Implementations of this method should ensure that the correct connector is set
@@ -73,5 +73,5 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
      * @return
      * @throws Exception
      */
-    public abstract UMOImmutableEndpoint getEndpoint() throws Exception;
+    public abstract ImmutableEndpoint getEndpoint() throws Exception;
 }

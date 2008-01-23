@@ -10,12 +10,12 @@
 
 package org.mule.tck.providers;
 
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
+import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleMessage;
+import org.mule.api.transport.MessageAdapter;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.provider.UMOMessageAdapter;
 
 public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCase
 {
@@ -37,8 +37,8 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
     public void testMessageRetrieval() throws Exception
     {
         Object message = getValidMessage();
-        UMOMessageAdapter adapter = createAdapter(message);
-        UMOMessage muleMessage = new MuleMessage(adapter);
+        MessageAdapter adapter = createAdapter(message);
+        MuleMessage muleMessage = new DefaultMuleMessage(adapter);
 
         doTestMessageEqualsPayload(message, adapter.getPayload());
 
@@ -53,7 +53,7 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
 
     public void testMessageProps() throws Exception
     {
-        UMOMessageAdapter adapter = createAdapter(getValidMessage());
+        MessageAdapter adapter = createAdapter(getValidMessage());
 
         adapter.setProperty("TestString", "Test1");
         adapter.setProperty("TestLong", new Long(20000000));
@@ -80,7 +80,7 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
 
     public abstract Object getValidMessage() throws Exception;
 
-    public abstract UMOMessageAdapter createAdapter(Object payload) throws MessagingException;
+    public abstract MessageAdapter createAdapter(Object payload) throws MessagingException;
 
     final class InvalidMessage
     {

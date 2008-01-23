@@ -10,16 +10,16 @@
 
 package org.mule.config.i18n;
 
+import org.mule.AbstractExceptionListener;
+import org.mule.api.component.Component;
+import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.model.EntryPointResolver;
+import org.mule.api.routing.InboundRouterCollection;
+import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.ResponseRouterCollection;
+import org.mule.api.transformer.Transformer;
 import org.mule.config.MuleManifest;
-import org.mule.impl.AbstractExceptionListener;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.model.UMOEntryPointResolver;
-import org.mule.umo.routing.UMOInboundRouterCollection;
-import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.DateUtils;
 import org.mule.util.StringMessageUtils;
@@ -118,7 +118,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 23);
     }
 
-    public static Message failedToRouterViaEndpoint(UMOImmutableEndpoint endpoint)
+    public static Message failedToRouterViaEndpoint(ImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 30, endpoint);
     }
@@ -143,7 +143,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 34);
     }
 
-    public static Message listenerAlreadyRegistered(UMOEndpointURI endpointUri)
+    public static Message listenerAlreadyRegistered(EndpointURI endpointUri)
     {
         return createMessage(BUNDLE_PATH, 35, endpointUri);
     }
@@ -220,7 +220,7 @@ public class CoreMessages extends MessageFactory
     }
 
     public static Message transformOnObjectUnsupportedTypeOfEndpoint(String name, Class class1,
-                                                                     UMOImmutableEndpoint endpoint)
+                                                                     ImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 54, name, StringMessageUtils.toString(class1),
                 (endpoint != null ? endpoint.getEndpointURI() : null));
@@ -364,7 +364,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 83, string);
     }
 
-    public static Message failedToCreateConnectorFromUri(UMOEndpointURI uri)
+    public static Message failedToCreateConnectorFromUri(EndpointURI uri)
     {
         return createMessage(BUNDLE_PATH, 84, uri);
     }
@@ -526,7 +526,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 127, name);
     }
 
-    public static Message failedToDispatchToReplyto(UMOImmutableEndpoint endpoint)
+    public static Message failedToDispatchToReplyto(ImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 128, endpoint);
     }
@@ -546,7 +546,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 133, name);
     }
 
-    public static Message authDeniedOnEndpoint(UMOEndpointURI endpointURI)
+    public static Message authDeniedOnEndpoint(EndpointURI endpointURI)
     {
         return createMessage(BUNDLE_PATH, 134, endpointURI);
     }
@@ -890,22 +890,22 @@ public class CoreMessages extends MessageFactory
 
     //These endpoint errors should go away once we make setting endpoints on routers typesafe
 
-    public static Message inboundRouterMustUseInboundEndpoints(UMOInboundRouterCollection router, UMOImmutableEndpoint endpoint)
+    public static Message inboundRouterMustUseInboundEndpoints(InboundRouterCollection router, ImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 232, endpoint, router);
     }
 
-    public static Message outboundRouterMustUseOutboudEndpoints(UMOOutboundRouter router, UMOImmutableEndpoint endpoint)
+    public static Message outboundRouterMustUseOutboudEndpoints(OutboundRouter router, ImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 233, endpoint, router);
     }
 
-    public static Message responseRouterMustUseInboundEndpoints(UMOResponseRouterCollection router, UMOImmutableEndpoint endpoint)
+    public static Message responseRouterMustUseInboundEndpoints(ResponseRouterCollection router, ImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 234, endpoint, router);
     }
 
-    public static Message exceptionListenerMustUseOutboundEndpoint(AbstractExceptionListener exceptionListener, UMOImmutableEndpoint endpoint)
+    public static Message exceptionListenerMustUseOutboundEndpoint(AbstractExceptionListener exceptionListener, ImmutableEndpoint endpoint)
     {
         return createMessage(BUNDLE_PATH, 235, endpoint, exceptionListener);
     }
@@ -934,30 +934,30 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 238);
     }
 
-    public static Message noEntryPointFoundForNoArgsMethodUsingResolver(final Object component, final String methodName, UMOEntryPointResolver resolver)
+    public static Message noEntryPointFoundForNoArgsMethodUsingResolver(final Object component, final String methodName, EntryPointResolver resolver)
     {
         return createMessage(BUNDLE_PATH, 239, methodName, component, resolver);
     }
 
-    public static Message noEntryPointFoundWithArgsUsingResolver(Object object, Object args, UMOEntryPointResolver resolver)
+    public static Message noEntryPointFoundWithArgsUsingResolver(Object object, Object args, EntryPointResolver resolver)
     {
         return createMessage(BUNDLE_PATH, 240, StringMessageUtils.toString(object),
                 StringMessageUtils.toString(args), resolver);
     }
 
-    public static Message noMatchingMethodsOnObjectReturningUsingResolver(Object object, Class returnType, UMOEntryPointResolver resolver)
+    public static Message noMatchingMethodsOnObjectReturningUsingResolver(Object object, Class returnType, EntryPointResolver resolver)
     {
         return createMessage(BUNDLE_PATH, 241, StringMessageUtils.toString(object),
                 returnType.getClass().getName(), resolver);
     }
 
-    public static Message tooManyAcceptableMethodsOnObjectUsingResolverForTypes(Object object, Object types, UMOEntryPointResolver resolver)
+    public static Message tooManyAcceptableMethodsOnObjectUsingResolverForTypes(Object object, Object types, EntryPointResolver resolver)
     {
         return createMessage(BUNDLE_PATH, 242, StringMessageUtils.toString(object),
                 StringMessageUtils.toString(types), resolver);
     }
 
-    public static Message tooManyMatchingMethodsOnObjectUsingResolverWhichReturn(Object object, Object returnType, UMOEntryPointResolver resolver)
+    public static Message tooManyMatchingMethodsOnObjectUsingResolverWhichReturn(Object object, Object returnType, EntryPointResolver resolver)
     {
         return createMessage(BUNDLE_PATH, 243, StringMessageUtils.toString(returnType),
                 StringMessageUtils.toString(object), resolver);
@@ -973,7 +973,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 245);
     }
 
-    public static Message noMatchingMethodsOnObjectCalledUsingResolver(Object object, String methodName, UMOEntryPointResolver resolver)
+    public static Message noMatchingMethodsOnObjectCalledUsingResolver(Object object, String methodName, EntryPointResolver resolver)
     {
         return createMessage(BUNDLE_PATH, 246, StringMessageUtils.toString(object),
                 methodName, resolver);
@@ -989,7 +989,7 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 248, tx.getClass());
     }
 
-    public static Message noComponentQueueTimeoutSet(UMOComponent component)
+    public static Message noComponentQueueTimeoutSet(Component component)
     {
         return createMessage(BUNDLE_PATH, 249, component);
     }
@@ -1019,12 +1019,12 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 254, name, origObject + "." + origObject.getClass(), newObject + "." + newObject.getClass());
     }
 
-    public static Message transformerNotImplementDiscoverable(UMOTransformer transformer)
+    public static Message transformerNotImplementDiscoverable(Transformer transformer)
     {
         return createMessage(BUNDLE_PATH, 255, transformer);
     }
 
-    public static Message transformHasMultipleMatches(Class input, Class output, UMOTransformer transformer1, UMOTransformer transformer2)
+    public static Message transformHasMultipleMatches(Class input, Class output, Transformer transformer1, Transformer transformer2)
     {
         return createMessage(BUNDLE_PATH, 256, new Object[]{input, output, transformer1.getName() + "(" + transformer1.getClass() + ")",
                 transformer2.getName() + "(" + transformer2.getClass() + ")"});

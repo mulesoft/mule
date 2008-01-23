@@ -10,10 +10,10 @@
 
 package org.mule.issues;
 
-import org.mule.config.MuleProperties;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class PropertyScribblingMule893TestCase extends FunctionalTestCase
         Map properties = new HashMap();
         properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, "receive");
         client.dispatch("dispatch", "Message", properties);
-        UMOMessage response = client.request("receive", 3000L);
+        MuleMessage response = client.request("receive", 3000L);
         assertNotNull("Response is null", response);
         assertEquals("Message Received", response.getPayload());
     }

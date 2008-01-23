@@ -62,7 +62,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.email.*
+                                    org.mule.transport.email.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

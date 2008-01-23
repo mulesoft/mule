@@ -51,7 +51,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.quartz.*
+                                    org.mule.transport.quartz.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

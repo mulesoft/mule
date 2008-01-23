@@ -9,8 +9,8 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.api.config.MuleProperties;
 import org.mule.config.MuleConfiguration;
-import org.mule.config.MuleProperties;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;

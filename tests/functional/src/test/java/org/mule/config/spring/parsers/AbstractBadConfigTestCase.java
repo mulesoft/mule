@@ -12,7 +12,7 @@ package org.mule.config.spring.parsers;
 
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.impl.DefaultMuleContextFactory;
+import org.mule.context.DefaultMuleContextFactory;
 
 import junit.framework.TestCase;
 

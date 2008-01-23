@@ -10,9 +10,9 @@
 
 package org.mule.routing.filters;
 
-import org.mule.impl.MuleMessage;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOMessage;
 
 public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
 {
@@ -20,7 +20,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilter() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
-        UMOMessage message = new MuleMessage("blah");
+        MuleMessage message = new DefaultMuleMessage("blah");
         assertTrue(!filter.accept(message));
         message.setProperty("foo", "bar");
         assertTrue(filter.accept(message));
@@ -29,7 +29,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterWithNot() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=bar");
-        UMOMessage message = new MuleMessage("blah");
+        MuleMessage message = new DefaultMuleMessage("blah");
 
         assertTrue(filter.accept(message));
         message.setProperty("foo", "bar");
@@ -41,7 +41,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterWithNotNull() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
-        UMOMessage message = new MuleMessage("blah");
+        MuleMessage message = new DefaultMuleMessage("blah");
 
         assertTrue(!filter.accept(message));
         message.removeProperty("foo");
@@ -53,7 +53,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterWithCaseSensitivity() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=Bar");
-        UMOMessage message = new MuleMessage("blah");
+        MuleMessage message = new DefaultMuleMessage("blah");
         message.setProperty("foo", "bar");
         assertTrue(!filter.accept(message));
         filter.setCaseSensitive(false);
@@ -66,7 +66,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept(null));
 
         filter = new MessagePropertyFilter("foo = bar");
-        UMOMessage message = new MuleMessage("blah");
+        MuleMessage message = new DefaultMuleMessage("blah");
         message.setProperty("foo", "bar");
         assertTrue(filter.accept(message));
         filter.setCaseSensitive(false);

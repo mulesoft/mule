@@ -10,27 +10,27 @@
 
 package org.mule.test.config;
 
+import org.mule.api.MuleException;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformers.NoActionTransformer;
-import org.mule.transformers.TransformerUtils;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.transformer.NoActionTransformer;
+import org.mule.transformer.TransformerUtils;
 
 public class EndpointTransformerTestCase extends AbstractMuleTestCase
 {
 
-    public void testTransformerProperty() throws UMOException
+    public void testTransformerProperty() throws MuleException
     {
         muleContext.getRegistry().registerTransformer(new NoActionTransformer());
-        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "test:///tmp?transformers=NoActionTransformer");
         assertEquals("NoActionTransformer", TransformerUtils.firstOrNull(endpoint.getTransformers()).getName());
     }
 
-    public void testResponseTransformerProperty() throws UMOException
+    public void testResponseTransformerProperty() throws MuleException
     {
         muleContext.getRegistry().registerTransformer(new NoActionTransformer());
-        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test:///tmp?responseTransformers=NoActionTransformer");
         assertEquals("NoActionTransformer", TransformerUtils.firstOrNull(endpoint.getResponseTransformers()).getName());
     }

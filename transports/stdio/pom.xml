@@ -39,7 +39,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.stdio.*
+                                    org.mule.transport.stdio.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

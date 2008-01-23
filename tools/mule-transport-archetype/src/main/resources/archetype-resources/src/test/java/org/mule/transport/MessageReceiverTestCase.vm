@@ -1,0 +1,48 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+#set($TransportName = "${TransportName.substring(0,1).toUpperCase()}${TransportName.substring(1)}")
+package org.mule.transport.${TransportName.toLowerCase()};
+
+import com.mockobjects.dynamic.Mock;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.transport.AbstractConnector;
+import org.mule.transport.${TransportName.toLowerCase()}.${TransportName}MessageReceiver;
+import org.mule.tck.providers.AbstractMessageReceiverTestCase;
+import org.mule.api.Component;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.MessageReceiver;
+
+
+public class ${TransportName}MessageReceiverTestCase extends AbstractMessageReceiverTestCase
+{
+
+    /* For general guidelines on writing transports see
+       http://mule.mulesource.org/display/MULE/Writing+Transports */
+
+    public MessageReceiver getMessageReceiver() throws Exception
+    {
+        Mock mockComponent = new Mock(Component.class);
+        mockComponent.expectAndReturn("getResponseTransformer", null);
+#if( $isPollingReceiver == "y")
+        return new ${TransportName}MessageReceiver(endpoint.getConnector(), (Component) mockComponent.proxy(), endpoint, 1000);
+#else
+        return new ${TransportName}MessageReceiver(endpoint.getConnector(), (Component) mockComponent.proxy(), endpoint);
+#end
+    }
+
+    public ImmutableEndpoint getEndpoint() throws Exception
+    {
+        // TODO return a valid endpoint i.e.
+        // return new MuleEndpoint("tcp://localhost:1234", true)
+        throw new UnsupportedOperationException("getEndpoint");
+    }
+
+}

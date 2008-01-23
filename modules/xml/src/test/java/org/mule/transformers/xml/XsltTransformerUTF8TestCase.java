@@ -10,7 +10,7 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.api.transformer.Transformer;
 import org.mule.util.IOUtils;
 
 public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
@@ -27,7 +27,7 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
             "UTF-8");
     }
 
-    public UMOTransformer getTransformer() throws Exception
+    public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setXslFile("cdcatalog.xsl");
@@ -36,7 +36,7 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
         return transformer;
     }
 
-    public UMOTransformer getRoundTripTransformer() throws Exception
+    public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
     }

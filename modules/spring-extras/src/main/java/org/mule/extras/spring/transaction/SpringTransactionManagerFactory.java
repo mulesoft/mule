@@ -10,14 +10,14 @@
 
 package org.mule.extras.spring.transaction;
 
-import org.mule.umo.manager.UMOTransactionManagerFactory;
+import org.mule.api.transaction.TransactionManagerFactory;
 
 import javax.transaction.TransactionManager;
 
 /**
  * A holder to a transaction manager set via a Spring Application context
  */
-public class SpringTransactionManagerFactory implements UMOTransactionManagerFactory
+public class SpringTransactionManagerFactory implements TransactionManagerFactory
 {
 
     private TransactionManager transactionManager;

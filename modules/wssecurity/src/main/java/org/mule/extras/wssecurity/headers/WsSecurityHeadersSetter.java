@@ -10,7 +10,7 @@
 
 package org.mule.extras.wssecurity.headers;
 
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
 
 import java.util.Properties;
 
@@ -26,7 +26,7 @@ public class WsSecurityHeadersSetter
      * @param message
      * @return
      */
-    public Properties addSecurityHeaders(UMOMessage message)
+    public Properties addSecurityHeaders(MuleMessage message)
     {
         Properties props = new Properties();
         props.setProperty(WSHandlerConstants.ACTION, (String)message

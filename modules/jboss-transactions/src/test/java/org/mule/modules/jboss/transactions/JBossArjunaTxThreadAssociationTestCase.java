@@ -10,13 +10,13 @@
 
 package org.mule.modules.jboss.transactions;
 
-import org.mule.umo.manager.UMOTransactionManagerFactory;
+import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.tck.AbstractTxThreadAssociationTestCase;
 
 public class JBossArjunaTxThreadAssociationTestCase extends AbstractTxThreadAssociationTestCase
 {
 
-    protected UMOTransactionManagerFactory getTransactionManagerFactory()
+    protected TransactionManagerFactory getTransactionManagerFactory()
     {
         return new JBossArjunaTransactionManagerFactory();
     }

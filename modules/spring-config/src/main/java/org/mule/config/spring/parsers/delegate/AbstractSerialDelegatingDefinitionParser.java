@@ -13,8 +13,8 @@ package org.mule.config.spring.parsers.delegate;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.util.StringUtils;
 
@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;

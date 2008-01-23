@@ -10,13 +10,13 @@
 
 package org.mule.examples.loanbroker.transformers;
 
+import org.mule.api.transformer.TransformerException;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.transformer.AbstractTransformer;
 
 /**
  * Extracts the customer information from the request into an array of arguments used
- * to invoke the Credit Agency Session bean
+ * to invoke the Credit Agency MuleSession bean
  */
 public class LoanQuoteRequestToCreditProfileArgs extends AbstractTransformer
 {

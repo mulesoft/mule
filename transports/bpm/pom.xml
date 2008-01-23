@@ -25,7 +25,7 @@
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- This is needed for org.mule.providers.bpm.tests -->
+        <!-- This is needed for org.mule.transport.bpm.tests -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
@@ -44,7 +44,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.bpm.*
+                                    org.mule.transport.bpm.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

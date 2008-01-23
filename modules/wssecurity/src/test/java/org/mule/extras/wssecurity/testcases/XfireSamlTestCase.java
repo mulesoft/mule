@@ -10,9 +10,9 @@
 
 package org.mule.extras.wssecurity.testcases;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 import java.util.Properties;
 
@@ -46,7 +46,7 @@ public class XfireSamlTestCase extends FunctionalTestCase
         props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS,
             "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
 
-        UMOMessage m = client.send("xfire:http://localhost:8282/MySecuredUMO?method=echo", "Test",
+        MuleMessage m = client.send("xfire:http://localhost:8282/MySecuredUMO?method=echo", "Test",
             props);
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
@@ -68,7 +68,7 @@ public class XfireSamlTestCase extends FunctionalTestCase
         props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS,
             "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
 
-        UMOMessage m = null;
+        MuleMessage m = null;
         try
         {
             m = client.send("xfire:http://localhost:8282/MySecuredUMO?method=echo", "Test", props);
@@ -101,7 +101,7 @@ public class XfireSamlTestCase extends FunctionalTestCase
         // "IssuerSerial" is not supported
         props.setProperty(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
 
-        UMOMessage m = client.send("xfire:http://localhost:8282/MySecuredUMO?method=echo", "Test",
+        MuleMessage m = client.send("xfire:http://localhost:8282/MySecuredUMO?method=echo", "Test",
             props);
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);

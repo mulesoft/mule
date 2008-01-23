@@ -12,10 +12,10 @@ package org.mule.test.integration.client;
 
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
 {
@@ -36,7 +36,7 @@ public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
-        UMOMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test Client Send message",
+        MuleMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test Client Send message",
             null);
         assertNotNull(message);
         assertEquals("Received: Test Client Send message", message.getPayload());
@@ -50,7 +50,7 @@ public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
-        UMOMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);
+        MuleMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);
         assertNull(message);
         // We do a send instead of a dispatch here so the operation is
         // synchronous

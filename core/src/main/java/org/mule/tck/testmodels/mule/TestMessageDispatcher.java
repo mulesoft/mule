@@ -10,16 +10,16 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.RoutingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.RoutingException;
+import org.mule.transport.AbstractMessageDispatcher;
 
 public class TestMessageDispatcher extends AbstractMessageDispatcher
 {
 
-    public TestMessageDispatcher(final UMOImmutableEndpoint endpoint)
+    public TestMessageDispatcher(final ImmutableEndpoint endpoint)
     {
         super(endpoint);
     }
@@ -29,7 +29,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         // template method
     }
 
-    protected void doDispatch(UMOEvent event) throws Exception
+    protected void doDispatch(MuleEvent event) throws Exception
     {
         if (event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail"))
         {
@@ -37,7 +37,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected UMOMessage doSend(UMOEvent event) throws Exception
+    protected MuleMessage doSend(MuleEvent event) throws Exception
     {
         if (event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail"))
         {

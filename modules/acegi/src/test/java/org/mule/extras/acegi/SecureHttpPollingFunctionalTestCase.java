@@ -9,9 +9,9 @@
  */
 package org.mule.extras.acegi;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
 {
@@ -19,7 +19,7 @@ public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
     public void testPollingHttpConnectorSentCredentials() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage result = client.request("vm://toclient", 5000);
+        MuleMessage result = client.request("vm://toclient", 5000);
         assertNotNull(result.getPayload());
     }
 

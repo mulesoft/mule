@@ -57,7 +57,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.vm.*
+                                    org.mule.transport.vm.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

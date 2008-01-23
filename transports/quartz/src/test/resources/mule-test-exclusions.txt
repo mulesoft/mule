@@ -1,10 +1,10 @@
 
 # Cannot run legacy tests without 1to2migration module
-org.mule.providers.quartz.QuartzFunctionalLegacyTestCase
+org.mule.transport.quartz.QuartzFunctionalLegacyTestCase
 
 # MULE-1925
-org.mule.providers.quartz.QuartzFunctionalTestCase
+org.mule.transport.quartz.QuartzFunctionalTestCase
 
 # MULE-2688
-org.mule.providers.quartz.QuartzReceiveAndDispatchJobTestCase
-org.mule.providers.quartz.QuartzReceiveAndDispatchUsingDelegatingJobTestCase
+org.mule.transport.quartz.QuartzReceiveAndDispatchJobTestCase
+org.mule.transport.quartz.QuartzReceiveAndDispatchUsingDelegatingJobTestCase

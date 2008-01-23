@@ -9,23 +9,23 @@
  */
 package org.mule.config.spring.parsers;
 
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.util.ClassUtils;
 import org.mule.util.XMLUtils;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

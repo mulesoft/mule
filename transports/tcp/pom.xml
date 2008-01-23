@@ -70,7 +70,7 @@
                                     tcp
                                 </Mule-Transports>
                                 <Export-Package>
-                                    org.mule.providers.tcp.*,
+                                    org.mule.transport.tcp.*,
                                     META-INF.services.org.mule.i18n
                                 </Export-Package>
                             </instructions>

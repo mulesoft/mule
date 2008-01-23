@@ -27,7 +27,7 @@
     </spring:bean>
 
 
-<!--    <spring:bean id="EmailMessageToString" class="org.mule.providers.email.transformers.EmailMessageToString"/>-->
+<!--    <spring:bean id="EmailMessageToString" class="org.mule.transport.email.transformers.EmailMessageToString"/>-->
 
     <spring:bean id="StringToOrder" class="org.mule.test.integration.spring.events.StringToOrder">
         <spring:property name="returnClass">

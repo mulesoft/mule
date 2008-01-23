@@ -12,13 +12,13 @@ package org.mule.config.spring.parsers.collection;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.config.ListFactoryBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ChildListDefinitionParser extends ChildDefinitionParser {
 

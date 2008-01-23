@@ -89,7 +89,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.jdbc.*
+                                    org.mule.transport.jdbc.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

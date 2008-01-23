@@ -10,9 +10,9 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Callable;
+import org.mule.api.MuleException;
+import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.Callable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +59,7 @@ public class Orange implements Fruit, Callable
         this.brand = brand;
     }
 
-    public Orange(HashMap props) throws UMOException
+    public Orange(HashMap props) throws MuleException
     {
         setBrand((String) props.get("brand"));
         setRadius((Double) props.get("radius"));
@@ -76,9 +76,9 @@ public class Orange implements Fruit, Callable
         return bitten;
     }
 
-    public Object onCall(UMOEventContext context) throws UMOException
+    public Object onCall(MuleEventContext context) throws MuleException
     {
-        logger.debug("Orange received an event in UMOCallable.onEvent! Event says: "
+        logger.debug("Orange received an event in UMOCallable.onEvent! MuleEvent says: "
                      + context.getMessageAsString());
         bite();
         return null;

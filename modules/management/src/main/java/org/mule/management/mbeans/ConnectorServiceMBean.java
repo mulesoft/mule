@@ -10,8 +10,8 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Initialisable;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Initialisable;
 
 import java.beans.ExceptionListener;
 
@@ -30,9 +30,9 @@ public interface ConnectorServiceMBean extends Initialisable
 
     ExceptionListener getExceptionListener();
 
-    void startConnector() throws UMOException;
+    void startConnector() throws MuleException;
 
-    void stopConnector() throws UMOException;
+    void stopConnector() throws MuleException;
 
     void dispose();
 

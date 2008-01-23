@@ -10,20 +10,20 @@
 
 package org.mule.util;
 
-import org.mule.MuleException;
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.filter.ObjectFilter;
+import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.filters.EqualsFilter;
-import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.transformers.TransformerUtils;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpointBuilder;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.transformer.TransformerUtils;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -52,10 +52,10 @@ public final class MuleObjectHelper
      * @param names - a list of transformers separated by "delim"
      * @param delim - the character used to delimit the transformers in the list
      * @return a list (possibly empty) of transformers or
-     * {@link org.mule.transformers.TransformerUtils#UNDEFINED} if the names list is null
-     * @throws MuleException
+     * {@link org.mule.transformer.TransformerUtils#UNDEFINED} if the names list is null
+     * @throws DefaultMuleException
      */
-    public static List getTransformers(String names, String delim) throws MuleException
+    public static List getTransformers(String names, String delim) throws DefaultMuleException
     {
         if (null != names)
         {
@@ -64,11 +64,11 @@ public final class MuleObjectHelper
             while (st.hasMoreTokens())
             {
                 String key = st.nextToken().trim();
-                UMOTransformer transformer = RegistryContext.getRegistry().lookupTransformer(key);
+                Transformer transformer = RegistryContext.getRegistry().lookupTransformer(key);
 
                 if (transformer == null)
                 {
-                    throw new MuleException(CoreMessages.objectNotRegistered("Transformer", key));
+                    throw new DefaultMuleException(CoreMessages.objectNotRegistered("Transformer", key));
                 }
                 transformers.add(transformer);
             }
@@ -80,24 +80,24 @@ public final class MuleObjectHelper
         }
     }
 
-    public static UMOImmutableEndpoint getEndpointByProtocol(String protocol) throws UMOException
+    public static ImmutableEndpoint getEndpointByProtocol(String protocol) throws MuleException
     {
-        UMOImmutableEndpoint iprovider;
+        ImmutableEndpoint iprovider;
         Collection endpoints = RegistryContext.getRegistry().getEndpoints();
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            iprovider = (UMOImmutableEndpoint) iterator.next();
+            iprovider = (ImmutableEndpoint) iterator.next();
             if (iprovider.getProtocol().equals(protocol))
             {
                 MuleContext muleContext = MuleServer.getMuleContext();
-                UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(iprovider, muleContext);
+                EndpointBuilder builder = new EndpointURIEndpointBuilder(iprovider, muleContext);
                 return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             }
         }
         return null;
     }
 
-    public static UMOImmutableEndpoint getEndpointByEndpointUri(String endpointUri, boolean wildcardMatch) throws UMOException
+    public static ImmutableEndpoint getEndpointByEndpointUri(String endpointUri, boolean wildcardMatch) throws MuleException
     {
         ObjectFilter filter;
 
@@ -110,16 +110,16 @@ public final class MuleObjectHelper
             filter = new EqualsFilter(endpointUri);
         }
 
-        UMOImmutableEndpoint iprovider;
+        ImmutableEndpoint iprovider;
         Collection endpoints = RegistryContext.getRegistry().getEndpoints();
 
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            iprovider = (UMOImmutableEndpoint) iterator.next();
+            iprovider = (ImmutableEndpoint) iterator.next();
             if (filter.accept(iprovider.getEndpointURI()))
             {
                 MuleContext muleContext = MuleServer.getMuleContext();
-                UMOEndpointBuilder builder = new EndpointURIEndpointBuilder(iprovider, muleContext);
+                EndpointBuilder builder = new EndpointURIEndpointBuilder(iprovider, muleContext);
                 return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             }
         }

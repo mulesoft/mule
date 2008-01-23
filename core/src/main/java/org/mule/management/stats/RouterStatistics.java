@@ -10,8 +10,9 @@
 
 package org.mule.management.stats;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.management.stats.Statistics;
 import org.mule.management.stats.printers.SimplePrinter;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class RouterStatistics implements Statistics
     private int type;
 
     /**
-     * @see org.mule.management.stats.Statistics#clear()
+     * @see org.mule.api.management.stats.Statistics#clear()
      */
     public synchronized void clear()
     {
@@ -58,7 +59,7 @@ public class RouterStatistics implements Statistics
     }
 
     /**
-     * @see org.mule.management.stats.Statistics#isEnabled()
+     * @see org.mule.api.management.stats.Statistics#isEnabled()
      */
     public boolean isEnabled()
     {
@@ -76,7 +77,7 @@ public class RouterStatistics implements Statistics
     }
 
     /**
-     * @see org.mule.management.stats.Statistics#setEnabled(boolean)
+     * @see org.mule.api.management.stats.Statistics#setEnabled(boolean)
      */
     public synchronized void setEnabled(boolean b)
     {
@@ -109,7 +110,7 @@ public class RouterStatistics implements Statistics
         {
             for (int i = 0; i < list.size(); i++)
             {
-                incrementRoutedMessage((UMOImmutableEndpoint) list.get(i));
+                incrementRoutedMessage((ImmutableEndpoint) list.get(i));
             }
         }
     }
@@ -119,7 +120,7 @@ public class RouterStatistics implements Statistics
      *
      * @param endpoint The endpoint
      */
-    public synchronized void incrementRoutedMessage(UMOImmutableEndpoint endpoint)
+    public synchronized void incrementRoutedMessage(ImmutableEndpoint endpoint)
     {
         if (endpoint == null)
         {

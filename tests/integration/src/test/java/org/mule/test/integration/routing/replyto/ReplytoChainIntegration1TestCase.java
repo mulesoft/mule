@@ -10,10 +10,10 @@
 
 package org.mule.test.integration.routing.replyto;
 
-import org.mule.config.MuleProperties;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +39,7 @@ public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
-        UMOMessage result = client.send("vm://pojo1", message, props);
+        MuleMessage result = client.send("vm://pojo1", message, props);
         assertNotNull(result);
         // TODO This assertion is incorrect a "TextMessage" should not be received here but
         // rather just a sting payload.  See MULE-2869
@@ -51,7 +51,7 @@ public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
         String message = "test";
 
         MuleClient client = new MuleClient();
-        UMOMessage result = client.send("vm://pojo1", message, null);
+        MuleMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
         // TODO This assertion is incorrect a "TextMessage" should not be received here but
         // rather just a sting payload.  See MULE-2869

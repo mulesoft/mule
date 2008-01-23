@@ -10,9 +10,9 @@
 
 package org.mule.examples.stockquote;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 import org.mule.util.StringUtils;
 
 public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTestCase
@@ -21,7 +21,7 @@ public abstract class AbstractStockQuoteFunctionalTestCase extends FunctionalTes
     public void testStockQuoteExample() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage response = client.send("vm://stockquote", "HRB", null);
+        MuleMessage response = client.send("vm://stockquote", "HRB", null);
     
         if (null == response)
         { 

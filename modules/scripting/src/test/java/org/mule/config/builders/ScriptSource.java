@@ -71,7 +71,7 @@ public class ScriptSource
 //        builder.registerEndpoint("test://apple.queue", "AppleQueue", false);
 //        builder.registerEndpoint("test://banana.queue", "Banana_Queue", false);
 //        builder.registerEndpoint("test://test.queue", "waterMelonEndpoint", false);
-//        UMOEndpoint ep = new MuleEndpoint("test://test.queue2", false);
+//        Endpoint ep = new MuleEndpoint("test://test.queue2", false);
 //        ep.setName("testEPWithCS");
 //        SimpleRetryConnectionStrategy cs = new SimpleRetryConnectionStrategy();
 //        cs.setRetryCount(4);
@@ -84,7 +84,7 @@ public class ScriptSource
 //        builder.registerEndpoint("test://orangeQ", "orangeEndpoint", false, props);
 //
 //        //register model
-//        UMOModel model = new SedaModel();
+//        Model model = new SedaModel();
 //        model.setName("main");
 //        TestExceptionStrategy es = new TestExceptionStrategy();
 //        es.addEndpoint(new MuleEndpoint("test://component.exceptions", false));
@@ -94,7 +94,7 @@ public class ScriptSource
 //        muleContext.getRegistry().registerModel(model);
 //
 //        //register components
-//        UMOEndpoint ep1 = muleContext.getRegistry().lookupEndpoint("appleInEndpoint");
+//        Endpoint ep1 = muleContext.getRegistry().lookupEndpoint("appleInEndpoint");
 //        ep1.setTransformer(muleContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 //        UMODescriptor d = builder.createDescriptor(Orange.class.getName(), "orangeComponent", null, ep1, props);
 //
@@ -102,13 +102,13 @@ public class ScriptSource
 //        dces.addEndpoint(new MuleEndpoint("test://orange.exceptions", false));
 //        d.setExceptionListener(dces);
 //        //Create the inbound router
-//        UMOInboundRouterCollection inRouter = new InboundRouterCollection();
+//        InboundRouterCollection inRouter = new DefaultInboundRouterCollection();
 //        inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
 //        inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test2://catch.all", false));
-//        UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true, "TestCompressionTransformer");
+//        Endpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true, "TestCompressionTransformer");
 //        ep2.setResponseTransformer(muleContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 //        inRouter.addEndpoint(ep2);
-//        UMOEndpoint ep3 = muleContext.getRegistry().lookupEndpoint("orangeEndpoint");
+//        Endpoint ep3 = muleContext.getRegistry().lookupEndpoint("orangeEndpoint");
 //        ep3.setFilter(new PayloadTypeFilter(String.class));
 //        ep3.setTransformer(muleContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 //        Map props2 = new HashMap();
@@ -118,13 +118,13 @@ public class ScriptSource
 //        d.setInboundRouter(inRouter);
 //
 //        //Nested Router
-//        UMONestedRouterCollection nestedRouter = new NestedRouterCollection();
-//        NestedRouter nr1 = new NestedRouter();
+//        NestedRouterCollection nestedRouter = new DefaultNestedRouterCollection();
+//        DefaultNestedRouter nr1 = new DefaultNestedRouter();
 //        nr1.setEndpoint(new MuleEndpoint("test://do.wash", false));
 //        nr1.setInterface(FruitCleaner.class);
 //        nr1.setMethod("wash");
 //        nestedRouter.addRouter(nr1);
-//        NestedRouter nr2 = new NestedRouter();
+//        DefaultNestedRouter nr2 = new DefaultNestedRouter();
 //        nr2.setEndpoint(new MuleEndpoint("test://do.polish", false));
 //        nr2.setInterface(FruitCleaner.class);
 //        nr2.setMethod("polish");
@@ -132,7 +132,7 @@ public class ScriptSource
 //        d.setNestedRouter(nestedRouter);
 //
 ////Response Router
-//        UMOResponseRouterCollection responseRouter = new ResponseRouterCollection();
+//        ResponseRouterCollection responseRouter = new DefaultResponseRouterCollection();
 //        responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
 //        responseRouter.addEndpoint(muleContext.getRegistry().lookupEndpoint("appleResponseEndpoint"));
 //        responseRouter.addRouter(new TestResponseAggregator());

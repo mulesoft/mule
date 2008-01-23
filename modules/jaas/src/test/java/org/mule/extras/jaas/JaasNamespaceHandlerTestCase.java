@@ -10,11 +10,11 @@
 
 package org.mule.extras.jaas;
 
-import org.mule.impl.security.PasswordBasedEncryptionStrategy;
+import org.mule.api.EncryptionStrategy;
+import org.mule.api.security.SecurityManager;
+import org.mule.api.security.SecurityProvider;
+import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.security.UMOSecurityManager;
-import org.mule.umo.security.UMOSecurityProvider;
 
 public class JaasNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -34,13 +34,13 @@ public class JaasNamespaceHandlerTestCase extends FunctionalTestCase
         knownProperties(getEncryptionStrategy("PBE"));
     }
     
-    protected UMOSecurityProvider getProvider(String name)
+    protected SecurityProvider getProvider(String name)
     {
-        UMOSecurityManager securityManager = muleContext.getSecurityManager();
+        SecurityManager securityManager = muleContext.getSecurityManager();
         return securityManager.getProvider(name);
     }
     
-    protected void knownProperties(UMOSecurityProvider provider)
+    protected void knownProperties(SecurityProvider provider)
     {
         assertNotNull(provider);
         assertTrue(provider instanceof JaasSimpleAuthenticationProvider);
@@ -51,13 +51,13 @@ public class JaasNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("jaas.conf", jaasProvider.getLoginConfig());
     }
     
-    protected UMOEncryptionStrategy getEncryptionStrategy(String name)
+    protected EncryptionStrategy getEncryptionStrategy(String name)
     {
-        UMOSecurityManager securityManager = muleContext.getSecurityManager();
+        SecurityManager securityManager = muleContext.getSecurityManager();
         return securityManager.getEncryptionStrategy(name);
     }
     
-    protected void knownProperties(UMOEncryptionStrategy encryptionStrategy)
+    protected void knownProperties(EncryptionStrategy encryptionStrategy)
     {
         assertNotNull(encryptionStrategy);
         assertTrue(encryptionStrategy instanceof PasswordBasedEncryptionStrategy);

@@ -10,7 +10,7 @@
 
 package org.mule.transaction.constraints;
 
-import org.mule.umo.UMOEvent;
+import org.mule.api.MuleEvent;
 
 /**
  * <code>BatchConstraint</code> is a filter that counts on every execution and
@@ -24,7 +24,7 @@ public class BatchConstraint extends ConstraintFilter
     // @GuardedBy(this)
     private int batchCount = 0;
 
-    public boolean accept(UMOEvent event)
+    public boolean accept(MuleEvent event)
     {
         synchronized (this)
         {

@@ -67,7 +67,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.rmi.*
+                                    org.mule.transport.rmi.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

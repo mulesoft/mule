@@ -10,12 +10,12 @@
 
 package org.mule.examples.webapp;
 
+import org.mule.api.MuleMessage;
 import org.mule.examples.loanbroker.messages.Customer;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanQuote;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOMessage;
 import org.mule.util.StringUtils;
 
 public abstract class AbstractWebappTestCase extends AbstractMuleTestCase
@@ -33,14 +33,14 @@ public abstract class AbstractWebappTestCase extends AbstractMuleTestCase
     public void testEchoExample() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage response = client.send("vm://echo", "Is anybody in there?", null);
+        MuleMessage response = client.send("vm://echo", "Is anybody in there?", null);
         assertEquals("Is anybody in there?", response.getPayload());
     }
     
     public void testHelloExample() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage response = client.send("vm://greeter", "Julius Caesar", null);
+        MuleMessage response = client.send("vm://greeter", "Julius Caesar", null);
         // ATTENTION: thie message is localized, a full comparison cannot be done here
         assertTrue(response.getPayloadAsString().indexOf("Julius Caesar") > -1);
     }
@@ -48,7 +48,7 @@ public abstract class AbstractWebappTestCase extends AbstractMuleTestCase
     public void testStockQuoteExample() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage response = client.send("vm://stockquote", "HRB", null);
+        MuleMessage response = client.send("vm://stockquote", "HRB", null);
     
         if (null == response)
         { 
@@ -77,7 +77,7 @@ public abstract class AbstractWebappTestCase extends AbstractMuleTestCase
     {
         MuleClient client = new MuleClient();
         CustomerQuoteRequest loanRequest = new CustomerQuoteRequest(new Customer("I.M. Broke", 1234), 50000, 60);
-        UMOMessage response = client.send("CustomerRequests", loanRequest, null);
+        MuleMessage response = client.send("CustomerRequests", loanRequest, null);
         assertNotNull("Result is null", response);
         assertTrue("Result should be LoanQuote but is " + response.getPayload().getClass().getName(), 
                     response.getPayload() instanceof LoanQuote);

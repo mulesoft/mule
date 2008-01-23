@@ -12,9 +12,9 @@ package org.mule.test.integration.client;
 
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class MuleClientTestCase extends FunctionalTestCase
 {
@@ -29,7 +29,7 @@ public class MuleClientTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
-        UMOMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
+        MuleMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
         assertNotNull(message);
         assertEquals("Test Client Send message Received", message.getPayload());
     }
@@ -48,7 +48,7 @@ public class MuleClientTestCase extends FunctionalTestCase
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
         RegistryContext.getConfiguration().setDefaultRemoteSync(true);
 
-        UMOMessage message = client.send("vmEndpoint", "Test Client Send message", null);
+        MuleMessage message = client.send("vmEndpoint", "Test Client Send message", null);
         assertNotNull(message);
         assertEquals("Test Client Send message Received", message.getPayload());
     }
@@ -59,7 +59,7 @@ public class MuleClientTestCase extends FunctionalTestCase
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
         RegistryContext.getConfiguration().setDefaultRemoteSync(true);
 
-        UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
+        MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
         assertNotNull(message);
         assertEquals("Test Client Send message Received", message.getPayload());
     }
@@ -72,7 +72,7 @@ public class MuleClientTestCase extends FunctionalTestCase
 
         for (int i = 0; i < 100; i++)
         {
-            UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
+            MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
             assertNotNull(message);
             assertEquals("Test Client Send message " + i + " Received", message.getPayload());
         }

@@ -10,7 +10,7 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.umo.UMOException;
+import org.mule.api.MuleException;
 
 /**
  * <code>RegistryServiceMBean</code> JMX Service interface for the Registry
@@ -18,9 +18,9 @@ import org.mule.umo.UMOException;
 public interface RegistryServiceMBean
 {
 
-    void start() throws UMOException;
+    void start() throws MuleException;
 
-    void stop() throws UMOException;
+    void stop() throws MuleException;
 
     //String getPersistenceMode();
 

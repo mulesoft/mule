@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.service;
 
-import org.mule.impl.RequestContext;
+import org.mule.RequestContext;
 import org.mule.util.StringMessageUtils;
 
 import javax.jms.TextMessage;

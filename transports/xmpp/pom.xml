@@ -24,7 +24,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.xmpp.*
+                                    org.mule.transport.xmpp.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

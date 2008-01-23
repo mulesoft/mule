@@ -3,4 +3,4 @@
 #
 
 # Cannot run legacy tests without 1to2migration module
-org.mule.providers.bpm.jbpm.SimpleJbpmLegacyTestCase
+org.mule.transport.bpm.jbpm.SimpleJbpmLegacyTestCase

@@ -10,10 +10,10 @@
 
 package org.mule.test.usecases.axis;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
-import org.mule.providers.soap.axis.AxisConnector;
+import org.mule.transport.soap.axis.AxisConnector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +60,7 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
         // method.addNamedParameter(new NamedParameter(new QName("submitTrade"),
         // NamedParameter.createQName("Object"), ParameterMode.IN));
         // props.put(MuleProperties.MULE_SOAP_METHOD, method);
-        UMOMessage result = client.send(uri, submittrade, props);
+        MuleMessage result = client.send(uri, submittrade, props);
         assertNotNull(result);
         SubmitTradeResponse response = (SubmitTradeResponse)result.getPayload();
         assertEquals("RECEIVED", response.get_return().getStatus());
@@ -71,7 +71,7 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage result = client.send(uri, trade, null);
+        MuleMessage result = client.send(uri, trade, null);
         assertNotNull(result);
         TradeStatus status = (TradeStatus)result.getPayload();
         assertEquals("RECEIVED", status.getStatus());

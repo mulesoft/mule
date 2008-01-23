@@ -6,7 +6,7 @@
 #org.mule.util.TimedSocketTestCase
 
 # MULE-2164
-org.mule.impl.endpoint.MuleCopiedEndpointURITestCase
+org.mule.endpoint.MuleCopiedEndpointURITestCase
 
 # MULE-2676 There are some issues with disposing objects in the pool
 org.mule.util.object.PooledObjectFactoryTestCase
@@ -19,5 +19,5 @@ org.mule.routing.inbound.IdempotentInMemoryMessageIdStoreTestCase
 # Duplicate registration doesn't currently produce an exception, should it?
 # See comment in TransientRegistry.doRegisterObject()
 # Blocked by MULE-2162 since the MuleConfiguration is being registered more than once.
-org.mule.impl.registry.DuplicateRegistrationTestCase
+org.mule.registry.DuplicateRegistrationTestCase
 

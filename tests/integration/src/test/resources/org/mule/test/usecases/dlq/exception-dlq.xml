@@ -28,7 +28,7 @@
     <transaction-manager factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
 
     <!-- Testing with ActiveMq -->
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+    <connector name="jmsConnector" className="org.mule.transport.jms.JmsConnector">
         <properties>
             <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <property name="specification" value="1.1"/>
@@ -39,10 +39,10 @@
 
     <model name="dev">
         <mule-descriptor name="RollbackComponent"
-            implementation="org.mule.components.simple.NullComponent">
+            implementation="org.mule.component.simple.NullComponent">
             <inbound-router>
                 <endpoint type="receiver" address="jms://request.queue">
-                    <transaction action="BEGIN_OR_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                    <transaction action="BEGIN_OR_JOIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
                 </endpoint>
             </inbound-router>
             <!-- this endpoint should never be invoked because the NullComponent will always
@@ -56,7 +56,7 @@
             <!-- this exception strategy will forward the current message to a jms queue
             and will do so in the current transaction if it is available
             -->
-            <exception-strategy className="org.mule.impl.DefaultExceptionStrategy">
+            <exception-strategy className="org.mule.DefaultExceptionStrategy">
                 <endpoint address="jms://DLQ">
                     <transaction action="JOIN_IF_POSSIBLE"/>
                 </endpoint>

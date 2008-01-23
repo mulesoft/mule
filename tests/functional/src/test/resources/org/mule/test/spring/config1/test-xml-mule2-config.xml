@@ -182,7 +182,7 @@
                 </filtering-router>
             </outbound>
 
-            <!--<custom-exception-strategy class="org.mule.impl.DefaultExceptionStrategy"/>-->
+            <!--<custom-exception-strategy class="org.mule.DefaultExceptionStrategy"/>-->
             <default-connector-exception-strategy/>
         </service>
     </model>

@@ -10,7 +10,7 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.api.transformer.Transformer;
 import org.mule.util.IOUtils;
 
 public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCase
@@ -25,7 +25,7 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
         resultData = IOUtils.getResourceAsString("simple-out.xml", getClass());
     }
 
-    public UMOTransformer getTransformer() throws Exception
+    public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setXslt("<?xml version='1.0'?>\n"
@@ -38,7 +38,7 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
         return transformer;
     }
 
-    public UMOTransformer getRoundTripTransformer() throws Exception
+    public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
     }

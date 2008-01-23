@@ -10,12 +10,12 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.RequestContext;
+import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.RequestContext;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -30,7 +30,6 @@ import java.util.Map.Entry;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
@@ -109,12 +108,12 @@ public class XsltTransformer extends AbstractXmlTransformer
             }
 
             DefaultErrorListener errorListener = new DefaultErrorListener(this);
-            Transformer transformer = null;
+            javax.xml.transform.Transformer transformer = null;
             Object result;
 
             try
             {
-                transformer = (Transformer) transformerPool.borrowObject();
+                transformer = (javax.xml.transform.Transformer) transformerPool.borrowObject();
 
                 transformer.setErrorListener(errorListener);
                 transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
@@ -287,9 +286,9 @@ public class XsltTransformer extends AbstractXmlTransformer
     protected class DefaultErrorListener implements ErrorListener
     {
         private TransformerException e = null;
-        private final UMOTransformer trans;
+        private final Transformer trans;
 
-        public DefaultErrorListener(UMOTransformer trans)
+        public DefaultErrorListener(Transformer trans)
         {
             this.trans = trans;
         }
@@ -391,7 +390,7 @@ public class XsltTransformer extends AbstractXmlTransformer
      * Returns the value to be set for the parameter. This method is called for each
      * parameter before it is set on the transformer. The purpose of this method is to
      * allow dynamic parameters related to the event (usually message properties) to be
-     * used. Any attribute of the current UMOEventContext can be accessed using JXPath.
+     * used. Any attribute of the current MuleEventContext can be accessed using JXPath.
      * </p>
      * <p>
      * For example: If the current event's message has a property named "myproperty", to
@@ -403,7 +402,7 @@ public class XsltTransformer extends AbstractXmlTransformer
      * </p>
      * 
      * <pre>
-     *  &lt;transformer name=&quot;MyXsltTransformer&quot; className=&quot;org.mule.transformers.xml.XsltTransformer&quot;&amp;gt
+     *  &lt;transformer name=&quot;MyXsltTransformer&quot; className=&quot;org.mule.transformer.xml.XsltTransformer&quot;&amp;gt
      *      &lt;properties&gt;
      *          &lt;property name=&quot;xslFile&quot; value=&quot;myXslFile.xsl&quot;/&amp;gt
      *          &lt;map name=&quot;transformParameters&quot;&amp;gt
@@ -448,7 +447,7 @@ public class XsltTransformer extends AbstractXmlTransformer
             else
             {
 
-                UMOEventContext context = RequestContext.getEventContext();
+                MuleEventContext context = RequestContext.getEventContext();
 
                 if (context == null)
                 {

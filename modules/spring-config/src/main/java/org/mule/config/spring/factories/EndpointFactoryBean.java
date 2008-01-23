@@ -10,11 +10,11 @@
 
 package org.mule.config.spring.factories;
 
-import org.mule.impl.MuleContextAware;
-import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,12 +42,12 @@ public class EndpointFactoryBean extends EndpointURIEndpointBuilder
 
     public Object getObject() throws Exception
     {
-        if (UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
+        if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
         {
             logger.debug("Endpont type is \"receiver\", building inbound endpoint");
             return buildInboundEndpoint();
         }
-        else if (UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
+        else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
         {
             logger.debug("Endpont type is \"sender\", building inbound endpoint");
             return buildOutboundEndpoint();
@@ -61,7 +61,7 @@ public class EndpointFactoryBean extends EndpointURIEndpointBuilder
     public Class getObjectType()
     {
         // TODO MULE-2292 Use role-specific interface
-        return UMOImmutableEndpoint.class;
+        return ImmutableEndpoint.class;
     }
 
     public boolean isSingleton()

@@ -10,7 +10,7 @@
 
     <vm:connector name="vm" queueEvents="true" numberOfConcurrentTransactedReceivers="1"/>
 
-    <spring:bean name="txFactory" class="org.mule.providers.vm.VMTransactionFactory"/>
+    <spring:bean name="txFactory" class="org.mule.transport.vm.VMTransactionFactory"/>
 
     <model name="main">
         <service name="testService">
@@ -22,7 +22,7 @@
                 </vm:inbound-endpoint>
             </inbound>
 
-            <component class="org.mule.providers.vm.functional.VmTransactionTestCase$TestComponent"/>
+            <component class="org.mule.transport.vm.functional.VmTransactionTestCase$TestComponent"/>
 
             <outbound>
                 <outbound-pass-through-router>

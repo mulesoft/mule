@@ -10,13 +10,13 @@
 
 package org.mule.test.usecases.axis.clientbridge;
 
+import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleContextFactory;
+import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.context.DefaultMuleContextFactory;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.DefaultMuleContextFactory;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
 
 public class Client
 {
@@ -47,7 +47,7 @@ public class Client
 
     private MuleClient client;
 
-    private void execute() throws UMOException
+    private void execute() throws MuleException
     {
         client = new MuleClient();
 
@@ -65,23 +65,23 @@ public class Client
         }
     }
 
-    private void executeComplexity() throws UMOException
+    private void executeComplexity() throws MuleException
     {
         System.err.println("\nexecuteComplexity");
         Object result = client.send(AXIS_ENDPOINT + "?method=executeComplexity", new ComplexData("Foo",
             new Integer(42)), null);
         System.err.println(result);
-        UMOMessage message = (UMOMessage)result;
+        MuleMessage message = (MuleMessage)result;
         ComplexData data = (ComplexData)message.getPayload();
         System.err.println(data);
     }
 
-    private void complexRequest() throws UMOException
+    private void complexRequest() throws MuleException
     {
         System.err.println("\ncomplexRequest");
         Object result = client.send(LOCAL_ENDPOINT, new ComplexData("Foo", new Integer(84)), null);
         System.err.println(result);
-        UMOMessage message = (UMOMessage)result;
+        MuleMessage message = (MuleMessage)result;
         ComplexData data = (ComplexData)message.getPayload();
         System.err.println(data);
     }

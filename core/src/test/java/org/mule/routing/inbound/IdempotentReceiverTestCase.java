@@ -10,18 +10,18 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.component.Component;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.routing.InboundRouterCollection;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.UMOInboundRouterCollection;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -34,17 +34,17 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         IdempotentReceiver router = new IdempotentReceiver();
 
         Mock session = MuleTestUtils.getMockSession();
-        UMOComponent testComponent = getTestComponent("test", Apple.class);
+        Component testComponent = getTestComponent("test", Apple.class);
 
-        UMOInboundRouterCollection messageRouter = new InboundRouterCollection();
+        InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
 
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOMessage message = new MuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event");
 
-        UMOEndpoint endpoint = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        UMOEvent event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
+        Endpoint endpoint = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         // called by idempotent receiver as this is the fist event it will try
         // and initialize the id store
         session.expectAndReturn("getComponent", testComponent);
@@ -60,15 +60,15 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         messageRouter.route(event);
 
         session.verify();
-        message = new MuleMessage("test event");
-        event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), true);
+        message = new DefaultMuleMessage("test event");
+        event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), true);
 
         session.expectAndReturn("sendEvent", C.eq(event), message);
         // called by idempotent receiver
         session.expectAndReturn("getComponent", testComponent);
         // called by Inbound message router
         session.expectAndReturn("getComponent", testComponent);
-        UMOMessage result = messageRouter.route(event);
+        MuleMessage result = messageRouter.route(event);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
@@ -77,7 +77,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         // called by idempotent receiver
         session.expectAndReturn("getComponent", testComponent);
 
-        event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
+        event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         // we've already received this message
         assertTrue(!router.isMatch(event));
 

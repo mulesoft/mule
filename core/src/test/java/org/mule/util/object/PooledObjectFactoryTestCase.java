@@ -10,14 +10,14 @@
 
 package org.mule.util.object;
 
+import org.mule.api.component.Component;
 import org.mule.config.PoolingProfile;
-import org.mule.impl.model.seda.SedaComponent;
-import org.mule.impl.model.seda.SedaModel;
+import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.services.UniqueComponent;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
-import org.mule.umo.UMOComponent;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.UUID;
 
@@ -251,7 +251,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         model.setMuleContext(muleContext);
         muleContext.applyLifecycle(model);
         
-        UMOComponent c = new SedaComponent();
+        Component c = new SedaComponent();
         c.setName("test");
         PooledObjectFactory of = new PooledObjectFactory(Orange.class, getDefaultPoolingProfile());
         of.initialise();        

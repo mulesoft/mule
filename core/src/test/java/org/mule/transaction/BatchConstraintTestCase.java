@@ -10,10 +10,10 @@
 
 package org.mule.transaction;
 
+import org.mule.api.MuleEvent;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.constraints.BatchConstraint;
 import org.mule.transaction.constraints.ConstraintFilter;
-import org.mule.umo.UMOEvent;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -22,7 +22,7 @@ public class BatchConstraintTestCase extends AbstractMuleTestCase
 
     public void testConstraintFilter() throws Exception
     {
-        UMOEvent testEvent = (UMOEvent)new Mock(UMOEvent.class).proxy();
+        MuleEvent testEvent = (MuleEvent)new Mock(MuleEvent.class).proxy();
         BatchConstraint filter = new BatchConstraint();
         filter.setBatchSize(3);
         assertEquals(3, filter.getBatchSize());

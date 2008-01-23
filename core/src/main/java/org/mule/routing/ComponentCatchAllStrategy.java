@@ -10,15 +10,15 @@
 
 package org.mule.routing;
 
-import org.mule.impl.MuleEvent;
-import org.mule.impl.RequestContext;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.ComponentRoutingException;
-import org.mule.umo.routing.RoutingException;
+import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
+import org.mule.api.MuleException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.ComponentRoutingException;
+import org.mule.api.routing.RoutingException;
 
 /**
  * <code>ComponentCatchAllStrategy</code> is used to catch any events and forward the
@@ -26,25 +26,25 @@ import org.mule.umo.routing.RoutingException;
  */
 public class ComponentCatchAllStrategy extends AbstractCatchAllStrategy
 {
-    public void setEndpoint(UMOImmutableEndpoint endpoint)
+    public void setEndpoint(ImmutableEndpoint endpoint)
     {
         throw new UnsupportedOperationException("The endpoint cannot be set on this catch all");
     }
 
-    public UMOImmutableEndpoint getEndpoint()
+    public ImmutableEndpoint getEndpoint()
     {
         return null;
     }
 
-    public synchronized UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
+    public synchronized MuleMessage catchMessage(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
-        UMOEvent event = RequestContext.getEvent();
+        MuleEvent event = RequestContext.getEvent();
         logger.debug("Catch all strategy handling event: " + event);
         try
         {
-            logger.info("Event being routed from catch all strategy for endpoint: " + event.getEndpoint());
-            event = new MuleEvent(message, event.getEndpoint(), session.getComponent(), event);
+            logger.info("MuleEvent being routed from catch all strategy for endpoint: " + event.getEndpoint());
+            event = new DefaultMuleEvent(message, event.getEndpoint(), session.getComponent(), event);
             if (synchronous)
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
@@ -57,7 +57,7 @@ public class ComponentCatchAllStrategy extends AbstractCatchAllStrategy
                 return null;
             }
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             throw new ComponentRoutingException(event.getMessage(), event.getEndpoint(),
                 session.getComponent(), e);

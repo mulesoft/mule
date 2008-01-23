@@ -10,7 +10,7 @@
 
 package org.mule.test.integration;
 
-import org.mule.providers.file.filters.FilenameWildcardFilter;
+import org.mule.transport.file.filters.FilenameWildcardFilter;
 import org.mule.util.FileUtils;
 
 import java.io.File;

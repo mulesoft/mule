@@ -10,14 +10,14 @@
 
 package org.mule;
 
+import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.impl.DefaultMuleContextFactory;
-import org.mule.impl.MuleShutdownHook;
-import org.mule.umo.UMOException;
+import org.mule.context.DefaultMuleContextFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
@@ -145,7 +145,7 @@ public class MuleServer implements Runnable
             registerShutdownHook(muleShutdownHook);
             options = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
         }
-        catch (MuleException me)
+        catch (DefaultMuleException me)
         {
             throw new IllegalArgumentException(me.toString());
         }
@@ -342,7 +342,7 @@ public class MuleServer implements Runnable
     public void shutdown(Throwable e)
     {
         Message msg = CoreMessages.fatalErrorWhileRunning();
-        UMOException muleException = ExceptionHelper.getRootMuleException(e);
+        MuleException muleException = ExceptionHelper.getRootMuleException(e);
         if (muleException != null)
         {
             logger.fatal(muleException.getDetailedMessage());
@@ -444,7 +444,7 @@ public class MuleServer implements Runnable
     /**
      * This class is installed only for MuleServer running as commandline app. A
      * clean Mule shutdown can be achieved by disposing the
-     * {@link org.mule.impl.DefaultMuleContext}.
+     * {@link org.mule.DefaultMuleContext}.
      */
     private class ShutdownThread extends Thread
     {

@@ -55,7 +55,7 @@ public class StatisticsService implements StatisticsServiceMBean
     }
 
     /**
-     * @see org.mule.management.stats.Statistics#clear()
+     * @see org.mule.api.management.stats.Statistics#clear()
      */
     public void clear()
     {
@@ -63,7 +63,7 @@ public class StatisticsService implements StatisticsServiceMBean
     }
 
     /**
-     * @see org.mule.management.stats.Statistics#isEnabled()
+     * @see org.mule.api.management.stats.Statistics#isEnabled()
      */
     public boolean isEnabled()
     {
@@ -71,7 +71,7 @@ public class StatisticsService implements StatisticsServiceMBean
     }
 
     /**
-     * @see org.mule.management.stats.Statistics#setEnabled(boolean)
+     * @see org.mule.api.management.stats.Statistics#setEnabled(boolean)
      */
     public void setEnabled(boolean b)
     {

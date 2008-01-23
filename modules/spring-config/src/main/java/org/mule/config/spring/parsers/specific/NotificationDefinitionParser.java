@@ -10,11 +10,35 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.api.context.notification.AdminNotificationListener;
+import org.mule.api.context.notification.ComponentNotificationListener;
+import org.mule.api.context.notification.ConnectionNotificationListener;
+import org.mule.api.context.notification.CustomNotificationListener;
+import org.mule.api.context.notification.ExceptionNotificationListener;
+import org.mule.api.context.notification.ManagementNotificationListener;
+import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.MessageNotificationListener;
+import org.mule.api.context.notification.ModelNotificationListener;
+import org.mule.api.context.notification.RegistryNotificationListener;
+import org.mule.api.context.notification.SecurityNotificationListener;
+import org.mule.api.context.notification.TransactionNotificationListener;
+import org.mule.config.spring.parsers.PreProcessor;
+import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.context.notification.AdminNotification;
+import org.mule.context.notification.ComponentNotification;
+import org.mule.context.notification.ConnectionNotification;
+import org.mule.context.notification.CustomNotification;
+import org.mule.context.notification.ExceptionNotification;
+import org.mule.context.notification.ManagementNotification;
+import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.MessageNotification;
+import org.mule.context.notification.ModelNotification;
+import org.mule.context.notification.RegistryNotification;
+import org.mule.context.notification.SecurityNotification;
+import org.mule.context.notification.TransactionNotification;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,32 +66,32 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
     static
     {
         EVENT_MAP = new HashMap();
-        EVENT_MAP.put("MANAGER", org.mule.impl.internal.notifications.ManagerNotification.class.getName());
-        EVENT_MAP.put("MODEL", org.mule.impl.internal.notifications.ModelNotification.class.getName());
-        EVENT_MAP.put("COMPONENT", org.mule.impl.internal.notifications.ComponentNotification.class.getName());
-        EVENT_MAP.put("SECURITY", org.mule.impl.internal.notifications.SecurityNotification.class.getName());
-        EVENT_MAP.put("MANAGEMENT", org.mule.impl.internal.notifications.ManagementNotification.class.getName());
-        EVENT_MAP.put("ADMIN", org.mule.impl.internal.notifications.AdminNotification.class.getName());
-        EVENT_MAP.put("CONNECTION", org.mule.impl.internal.notifications.ConnectionNotification.class.getName());
-        EVENT_MAP.put("REGISTRY", org.mule.impl.internal.notifications.RegistryNotification.class.getName());
-        EVENT_MAP.put("CUSTOM", org.mule.impl.internal.notifications.CustomNotification.class.getName());
-        EVENT_MAP.put("MESSAGE", org.mule.impl.internal.notifications.MessageNotification.class.getName());
-        EVENT_MAP.put("EXCEPTION", org.mule.impl.internal.notifications.ExceptionNotification.class.getName());
-        EVENT_MAP.put("TRANSACTION", org.mule.impl.internal.notifications.TransactionNotification.class.getName());
+        EVENT_MAP.put("MANAGER", ManagerNotification.class.getName());
+        EVENT_MAP.put("MODEL", ModelNotification.class.getName());
+        EVENT_MAP.put("COMPONENT", ComponentNotification.class.getName());
+        EVENT_MAP.put("SECURITY", SecurityNotification.class.getName());
+        EVENT_MAP.put("MANAGEMENT", ManagementNotification.class.getName());
+        EVENT_MAP.put("ADMIN", AdminNotification.class.getName());
+        EVENT_MAP.put("CONNECTION", ConnectionNotification.class.getName());
+        EVENT_MAP.put("REGISTRY", RegistryNotification.class.getName());
+        EVENT_MAP.put("CUSTOM", CustomNotification.class.getName());
+        EVENT_MAP.put("MESSAGE", MessageNotification.class.getName());
+        EVENT_MAP.put("EXCEPTION", ExceptionNotification.class.getName());
+        EVENT_MAP.put("TRANSACTION", TransactionNotification.class.getName());
 
         INTERFACE_MAP = new HashMap();
-        INTERFACE_MAP.put("MANAGER", org.mule.impl.internal.notifications.ManagerNotificationListener.class.getName());
-        INTERFACE_MAP.put("MODEL", org.mule.impl.internal.notifications.ModelNotificationListener.class.getName());
-        INTERFACE_MAP.put("COMPONENT", org.mule.impl.internal.notifications.ComponentNotificationListener.class.getName());
-        INTERFACE_MAP.put("SECURITY", org.mule.impl.internal.notifications.SecurityNotificationListener.class.getName());
-        INTERFACE_MAP.put("MANAGEMENT", org.mule.impl.internal.notifications.ManagementNotificationListener.class.getName());
-        INTERFACE_MAP.put("ADMIN", org.mule.impl.internal.notifications.AdminNotificationListener.class.getName());
-        INTERFACE_MAP.put("CONNECTION", org.mule.impl.internal.notifications.ConnectionNotificationListener.class.getName());
-        INTERFACE_MAP.put("REGISTRY", org.mule.impl.internal.notifications.RegistryNotificationListener.class.getName());
-        INTERFACE_MAP.put("CUSTOM", org.mule.impl.internal.notifications.CustomNotificationListener.class.getName());
-        INTERFACE_MAP.put("MESSAGE", org.mule.impl.internal.notifications.MessageNotificationListener.class.getName());
-        INTERFACE_MAP.put("EXCEPTION", org.mule.impl.internal.notifications.ExceptionNotificationListener.class.getName());
-        INTERFACE_MAP.put("TRANSACTION", org.mule.impl.internal.notifications.TransactionNotificationListener.class.getName());
+        INTERFACE_MAP.put("MANAGER", ManagerNotificationListener.class.getName());
+        INTERFACE_MAP.put("MODEL", ModelNotificationListener.class.getName());
+        INTERFACE_MAP.put("COMPONENT", ComponentNotificationListener.class.getName());
+        INTERFACE_MAP.put("SECURITY", SecurityNotificationListener.class.getName());
+        INTERFACE_MAP.put("MANAGEMENT", ManagementNotificationListener.class.getName());
+        INTERFACE_MAP.put("ADMIN", AdminNotificationListener.class.getName());
+        INTERFACE_MAP.put("CONNECTION", ConnectionNotificationListener.class.getName());
+        INTERFACE_MAP.put("REGISTRY", RegistryNotificationListener.class.getName());
+        INTERFACE_MAP.put("CUSTOM", CustomNotificationListener.class.getName());
+        INTERFACE_MAP.put("MESSAGE", MessageNotificationListener.class.getName());
+        INTERFACE_MAP.put("EXCEPTION", ExceptionNotificationListener.class.getName());
+        INTERFACE_MAP.put("TRANSACTION", TransactionNotificationListener.class.getName());
     }
 
     public NotificationDefinitionParser()

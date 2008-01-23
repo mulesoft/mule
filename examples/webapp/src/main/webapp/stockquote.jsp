@@ -1,5 +1,5 @@
 <%@ page import="org.mule.extras.client.MuleClient,
-                 org.mule.umo.UMOMessage"%>
+                 org.mule.api.MuleMessage"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 
 <html>
@@ -11,7 +11,7 @@
     String symbol = request.getParameter("symbol");
     if(symbol!=null) {
         MuleClient client = new MuleClient();
-        UMOMessage message = client.send("vm://stockquote", symbol, null);
+        MuleMessage message = client.send("vm://stockquote", symbol, null);
 
         if(message!=null) { %>
             <%if(message.getExceptionPayload()!=null) {%>

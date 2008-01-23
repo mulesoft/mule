@@ -10,14 +10,15 @@
 
 package org.mule.routing.filters;
 
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
+import org.mule.api.routing.filter.ObjectFilter;
 
 /**
  * <code>EqualsFilter</code> is a filter for comparing two objects using the
  * equals() method.
  */
-public class EqualsFilter implements UMOFilter, ObjectFilter
+public class EqualsFilter implements Filter, ObjectFilter
 {
     private Object pattern;
 
@@ -31,7 +32,7 @@ public class EqualsFilter implements UMOFilter, ObjectFilter
         this.pattern = compareTo;
     }
 
-    public boolean accept(UMOMessage message)
+    public boolean accept(MuleMessage message)
     {
         return accept(message.getPayload());
     }

@@ -10,7 +10,7 @@
 
 package org.mule.extras.wssecurity.handlers;
 
-import org.mule.umo.security.SecurityException;
+import org.mule.api.security.SecurityException;
 
 import java.security.cert.X509Certificate;
 import java.util.Properties;

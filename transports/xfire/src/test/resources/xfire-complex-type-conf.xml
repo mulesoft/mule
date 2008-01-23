@@ -41,6 +41,6 @@
         </service>
     </model>
 
-    <spring:bean id="service" class="org.mule.providers.soap.xfire.testmodels.XFireComplexTypeService"/>
+    <spring:bean id="service" class="org.mule.transport.soap.xfire.testmodels.XFireComplexTypeService"/>
 
 </mule>

@@ -25,7 +25,7 @@
             <inbound>
                 <inbound-endpoint address="vm://cxf.in"/>
             </inbound>
-            <component class="org.mule.components.simple.BridgeComponent"/>
+            <component class="org.mule.component.simple.BridgeComponent"/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="axis:http://localhost:63382/services/CxfService?method=receive">
@@ -33,7 +33,7 @@
                             <spring:entry key="soapAction" value="${methodNamespace}${method}"/>
                             <spring:entry key="soapMethods">
                                 <spring:list>
-                                    <spring:bean class="org.mule.providers.soap.SoapMethod">
+                                    <spring:bean class="org.mule.transport.soap.SoapMethod">
                                         <!-- the strange qname syntax here will generate a QName instance via a property editor -->
                                         <spring:constructor-arg value="qname{add:http://muleumo.org/Calc}"/>
                                         <spring:constructor-arg>

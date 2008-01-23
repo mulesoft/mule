@@ -10,11 +10,11 @@
 
 package org.mule.management.config;
 
+import org.mule.api.agent.Agent;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.agents.JmxServerNotificationAgent;
 import org.mule.management.agents.Log4jAgent;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.manager.UMOAgent;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -28,7 +28,7 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
 
     public void testDefaultJmxAgentConfig() throws Exception
     {
-        UMOAgent agent = muleContext.getRegistry().lookupAgent("JMX Agent");
+        Agent agent = muleContext.getRegistry().lookupAgent("JMX Agent");
         assertNotNull(agent);
         assertEquals(JmxAgent.class, agent.getClass());
         JmxAgent jmxAgent = (JmxAgent) agent;

@@ -10,9 +10,9 @@
 
 package org.mule.extras.spring.events;
 
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.umo.lifecycle.InitialisationException;
 
 public class TestConnectorWithContainerDependents extends TestConnector
 {
@@ -21,7 +21,7 @@ public class TestConnectorWithContainerDependents extends TestConnector
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.providers.AbstractConnector#doInitialise()
+     * @see org.mule.transport.AbstractConnector#doInitialise()
      */
     protected void doInitialise() throws InitialisationException
     {

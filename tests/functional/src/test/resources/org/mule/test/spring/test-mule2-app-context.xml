@@ -12,7 +12,7 @@
 
     <!--<mgmt:jmx-server id="jmx"/>-->
 
-    <custom-transformer name="ArrayToLenderList" class="org.mule.transformers.simple.ObjectToString"
+    <custom-transformer name="ArrayToLenderList" class="org.mule.transformer.simple.ObjectToString"
                         returnClass="java.lang.String">
     </custom-transformer>
 

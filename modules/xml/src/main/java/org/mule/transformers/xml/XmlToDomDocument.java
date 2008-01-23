@@ -10,8 +10,8 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.umo.transformer.DiscoverableTransformer;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.api.transformer.DiscoverableTransformer;
+import org.mule.api.transformer.TransformerException;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;

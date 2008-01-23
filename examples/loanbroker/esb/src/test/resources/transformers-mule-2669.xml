@@ -12,14 +12,14 @@
     <custom-transformer name="SetLendersAsRecipients"
                         class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
     <custom-transformer name="ObjectToJMSMessage"
-                        class="org.mule.providers.jms.transformers.ObjectToJMSMessage"/>
+                        class="org.mule.transport.jms.transformers.ObjectToJMSMessage"/>
     <custom-transformer name="JMSMessageToObject"
-                        class="org.mule.providers.jms.transformers.JMSMessageToObject"/>
+                        class="org.mule.transport.jms.transformers.JMSMessageToObject"/>
 
     <jms:activemq-connector name="default"/>
     
     <jms:activemq-connector name="noOutbound">
-        <service-overrides responseTransformer="org.mule.transformers.NoActionTransformer"/>
+        <service-overrides responseTransformer="org.mule.transformer.NoActionTransformer"/>
     </jms:activemq-connector>
 
     <model name="test">

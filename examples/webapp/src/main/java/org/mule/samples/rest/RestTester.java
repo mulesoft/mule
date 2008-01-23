@@ -10,7 +10,7 @@
 
 package org.mule.samples.rest;
 
-import org.mule.components.simple.StaticComponent;
+import org.mule.component.simple.StaticComponent;
 
 /**
  * TODO This is a bogus class that has been put here so that the Corbertura plugin

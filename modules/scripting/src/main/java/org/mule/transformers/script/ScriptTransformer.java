@@ -10,11 +10,11 @@
 
 package org.mule.transformers.script;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.components.script.jsr223.Scriptable;
-import org.mule.transformers.AbstractMessageAwareTransformer;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.transformer.AbstractMessageAwareTransformer;
 
 import javax.script.Bindings;
 import javax.script.CompiledScript;
@@ -33,7 +33,7 @@ public class ScriptTransformer extends AbstractMessageAwareTransformer
         super();
     }
 
-    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
+    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Bindings bindings = this.getScriptEngine().createBindings();
         this.populateBindings(bindings, message);
@@ -48,7 +48,7 @@ public class ScriptTransformer extends AbstractMessageAwareTransformer
         }
     }
 
-    protected void populateBindings(Bindings namespace, UMOMessage message)
+    protected void populateBindings(Bindings namespace, MuleMessage message)
     {
         namespace.put("message", message);
         namespace.put("src", message.getPayload());
@@ -60,7 +60,7 @@ public class ScriptTransformer extends AbstractMessageAwareTransformer
      * Template method were deriving classes can do any initialisation after the
      * properties have been set on this transformer
      * 
-     * @throws org.mule.umo.lifecycle.InitialisationException
+     * @throws org.mule.api.lifecycle.InitialisationException
      */
     public void initialise() throws InitialisationException
     {

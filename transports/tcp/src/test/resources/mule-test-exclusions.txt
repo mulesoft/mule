@@ -3,20 +3,20 @@
 #
 
 # MULE-1389
-org.mule.providers.tcp.issues.StreamingDownloadMule1389TestCase
+org.mule.transport.tcp.issues.StreamingDownloadMule1389TestCase
 
 # MULE-2067
-org.mule.providers.tcp.issues.LingerExperimentMule2067TestCase
-org.mule.providers.tcp.issues.ReuseExperimentMule2067TestCase
+org.mule.transport.tcp.issues.LingerExperimentMule2067TestCase
+org.mule.transport.tcp.issues.ReuseExperimentMule2067TestCase
 
 # cannot have a legacy test case with old config without 1to2migration
-org.mule.providers.tcp.integration.TcpFunctionalLegacyTestCase
+org.mule.transport.tcp.integration.TcpFunctionalLegacyTestCase
 
 # MULE-2574
-org.mule.providers.tcp.integration.MuleMessageProtocolChunkingTestCase
+org.mule.transport.tcp.integration.MuleMessageProtocolChunkingTestCase
 
 # MULE-2575 be careful when re-enabling this, it may hang the CI server
-#org.mule.providers.tcp.issues.KeepSendSocketOpenMule1491TestCase
+#org.mule.transport.tcp.issues.KeepSendSocketOpenMule1491TestCase
 
 # MULE-2730
-org.mule.providers.tcp.issues.SynchStreamingMule1687TestCase
+org.mule.transport.tcp.issues.SynchStreamingMule1687TestCase

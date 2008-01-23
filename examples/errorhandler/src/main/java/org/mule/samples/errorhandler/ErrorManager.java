@@ -11,9 +11,9 @@
 package org.mule.samples.errorhandler;
 
 import org.mule.MuleServer;
+import org.mule.api.MuleException;
 import org.mule.samples.errorhandler.handlers.DefaultHandler;
 import org.mule.samples.errorhandler.handlers.FatalHandler;
-import org.mule.umo.UMOException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -68,7 +68,7 @@ public class ErrorManager
         return (ExceptionHandler)obj;
     }
 
-    public void onException(ErrorMessage msg) throws UMOException
+    public void onException(ErrorMessage msg) throws MuleException
     {
         Class eClass = null;
         ExceptionHandler eh = null;

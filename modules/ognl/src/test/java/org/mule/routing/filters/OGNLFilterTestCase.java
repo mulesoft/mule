@@ -10,12 +10,12 @@
 
 package org.mule.routing.filters;
 
-import org.mule.config.ConfigurationException;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.ConfigurationException;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class OGNLFilterTestCase extends FunctionalTestCase
 {
@@ -54,13 +54,13 @@ public class OGNLFilterTestCase extends FunctionalTestCase
 
     public void testNoExpressionEmptyMessage()
     {
-        UMOMessage message = new MuleMessage(null);
+        MuleMessage message = new DefaultMuleMessage(null);
         assertFalse(filter.accept(message));
     }
 
     public void testNoExpressionValidMessage()
     {
-        UMOMessage message = new MuleMessage("foo");
+        MuleMessage message = new DefaultMuleMessage("foo");
         assertFalse(filter.accept(message));
     }
 
@@ -80,7 +80,7 @@ public class OGNLFilterTestCase extends FunctionalTestCase
         try
         {
             client.dispatch(DEFAULT_INPUT_QUEUE, FIRST_MESSAGE, null);
-            UMOMessage message = client.request(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
+            MuleMessage message = client.request(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
             assertNotNull(message);
             assertNotNull(message.getPayload());
             assertNull(message.getExceptionPayload());
@@ -88,7 +88,7 @@ public class OGNLFilterTestCase extends FunctionalTestCase
 
             Dummy payload = new Dummy();
             payload.setContent(SECOND_MESSAGE);
-            client.dispatch(DEFAULT_INPUT_QUEUE, new MuleMessage(payload));
+            client.dispatch(DEFAULT_INPUT_QUEUE, new DefaultMuleMessage(payload));
             message = client.request(DEFUALT_OUTPUT_QUEUE, TIMEOUT);
             assertNotNull(message);
             assertNotNull(message.getPayload());

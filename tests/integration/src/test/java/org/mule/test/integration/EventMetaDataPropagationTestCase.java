@@ -10,23 +10,23 @@
 
 package org.mule.test.integration;
 
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.DefaultMuleSession;
+import org.mule.api.MuleException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.component.Component;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.Callable;
+import org.mule.api.routing.OutboundRouter;
+import org.mule.api.transformer.TransformerException;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.transformer.AbstractEventAwareTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,23 +48,23 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
         return "org/mule/test/integration/event-metadata-propagation-config.xml";
     }
 
-    public void testEventMetaDataPropagation() throws UMOException
+    public void testEventMetaDataPropagation() throws MuleException
     {
-        UMOComponent component = muleContext.getRegistry().lookupComponent("component1");
-        UMOOutboundRouter outboundRouter = (UMOOutboundRouter) component.getOutboundRouter().getRouters().get(0);
-        UMOEndpoint endpoint = (UMOEndpoint) outboundRouter.getEndpoints().get(0);
+        Component component = muleContext.getRegistry().lookupComponent("component1");
+        OutboundRouter outboundRouter = (OutboundRouter) component.getOutboundRouter().getRouters().get(0);
+        Endpoint endpoint = (Endpoint) outboundRouter.getEndpoints().get(0);
         List transformers = new ArrayList();
         transformers.add(DummyTransformer.class);
         endpoint.setTransformers(transformers);
         
-        UMOSession session = new MuleSession(component);
+        MuleSession session = new DefaultMuleSession(component);
 
-        UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), (UMOImmutableEndpoint)component
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent"), (ImmutableEndpoint)component
                 .getInboundRouter().getEndpoints().get(0), session, true);
         session.sendEvent(event);
     }
 
-    public Object onCall(UMOEventContext context) throws Exception
+    public Object onCall(MuleEventContext context) throws Exception
     {
         if ("component1".equals(context.getComponent().getName()))
         {
@@ -75,7 +75,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
             props.put("integerParam", new Integer(12345));
             props.put("longParam", new Long(123456789));
             props.put("booleanParam", Boolean.TRUE);
-            UMOMessage msg = new MuleMessage(context.getMessageAsString(), props);
+            MuleMessage msg = new DefaultMuleMessage(context.getMessageAsString(), props);
             msg.addAttachment("test1", new DataHandler(new DataSource()
             {
                 public InputStream getInputStream() throws IOException
@@ -102,7 +102,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
         }
         else
         {
-            UMOMessage msg = context.getMessage();
+            MuleMessage msg = context.getMessage();
             assertEquals("param1", msg.getProperty("stringParam"));
             assertEquals(testObjectProperty, msg.getProperty("objectParam"));
             assertEquals(12345.6, 12345.6, msg.getDoubleProperty("doubleParam", 0));
@@ -116,10 +116,10 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
 
     private class DummyTransformer extends AbstractEventAwareTransformer
     {
-        public Object transform(Object src, String encoding, UMOEventContext context)
+        public Object transform(Object src, String encoding, MuleEventContext context)
             throws TransformerException
         {
-            UMOMessage msg = context.getMessage();
+            MuleMessage msg = context.getMessage();
             assertEquals("param1", msg.getProperty("stringParam"));
             assertEquals(testObjectProperty, msg.getProperty("objectParam"));
             assertEquals(12345.6, 12345.6, msg.getDoubleProperty("doubleParam", 0));

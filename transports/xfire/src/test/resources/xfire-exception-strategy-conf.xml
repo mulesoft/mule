@@ -22,14 +22,14 @@
             <inbound>
                 <xfire:inbound-endpoint address="http://localhost:63181/services"/>
             </inbound>
-            <component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
-            <custom-exception-strategy class="org.mule.providers.soap.xfire.XFireComponentExceptionStrategy"/>
+            <component class="org.mule.transport.soap.xfire.testmodels.TestXFireComponent"/>
+            <custom-exception-strategy class="org.mule.transport.soap.xfire.XFireComponentExceptionStrategy"/>
         </service>
         <service name="XFireDefault">
             <inbound>
                 <xfire:inbound-endpoint address="http://localhost:63181/services"/>
             </inbound>
-            <component class="org.mule.providers.soap.xfire.testmodels.TestXFireComponent"/>
+            <component class="org.mule.transport.soap.xfire.testmodels.TestXFireComponent"/>
         </service>
     </model>
 

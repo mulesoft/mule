@@ -10,14 +10,14 @@
 
 package org.mule.test.usecases.properties;
 
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.api.MuleEventContext;
+import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractEventAwareTransformer;
 
 public class DummyTransformer extends AbstractEventAwareTransformer
 {
 
-    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
+    public Object transform(Object src, String encoding, MuleEventContext context) throws TransformerException
     {
         logger.debug("transform() starting.");
 

@@ -10,8 +10,8 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.api.transformer.Transformer;
 import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -32,12 +32,12 @@ public class XmlObjectTransformersUTF8TestCase extends AbstractTransformerTestCa
             TEST_STRING.getBytes("UTF-8"), "</string>".getBytes("ASCII")));
     }
 
-    public UMOTransformer getTransformer() throws Exception
+    public Transformer getTransformer() throws Exception
     {
         return new XmlToObject();
     }
 
-    public UMOTransformer getRoundTripTransformer() throws Exception
+    public Transformer getRoundTripTransformer() throws Exception
     {
         // no round tripping because ObjectToXml transforms to String, and not byte[]
         return null;

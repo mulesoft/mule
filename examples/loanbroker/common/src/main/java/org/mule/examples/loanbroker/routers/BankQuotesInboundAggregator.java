@@ -10,10 +10,10 @@
 
 package org.mule.examples.loanbroker.routers;
 
+import org.mule.api.MuleMessage;
 import org.mule.routing.AggregationException;
 import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.EventGroup;
-import org.mule.umo.UMOMessage;
 
 /**
  * <code>BankQuotesInboundAggregator</code> receives a number of quotes and selects the
@@ -32,7 +32,7 @@ public class BankQuotesInboundAggregator extends CorrelationAggregator
      *             whole event group is removed and passed to the exception handler
      *             for this componenet
      */
-    protected UMOMessage aggregateEvents(EventGroup events) throws AggregationException
+    protected MuleMessage aggregateEvents(EventGroup events) throws AggregationException
     {
         try
         {

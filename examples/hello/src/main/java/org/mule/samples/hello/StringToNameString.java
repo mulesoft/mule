@@ -10,8 +10,8 @@
 
 package org.mule.samples.hello;
 
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractTransformer;
 
 /**
  * <code>StringToNameString</code> converts from a String to a NameString object.
@@ -29,7 +29,7 @@ public class StringToNameString extends AbstractTransformer
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
+     * @see org.mule.transformer.AbstractTransformer#doTransform(java.lang.Object)
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {

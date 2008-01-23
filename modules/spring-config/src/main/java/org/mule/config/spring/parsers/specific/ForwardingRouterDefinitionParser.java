@@ -9,12 +9,12 @@
  */
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.components.simple.NullComponent;
+import org.mule.component.simple.NullComponent;
 import org.mule.config.spring.parsers.delegate.AbstractSerialDelegatingDefinitionParser;
 import org.mule.config.spring.parsers.generic.GrandchildDefinitionParser;
 import org.mule.routing.inbound.ForwardingConsumer;
-import org.mule.util.object.SingletonObjectFactory;
 import org.mule.util.object.AbstractObjectFactory;
+import org.mule.util.object.SingletonObjectFactory;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;

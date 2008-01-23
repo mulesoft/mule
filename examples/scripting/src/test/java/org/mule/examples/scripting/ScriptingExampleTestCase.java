@@ -10,10 +10,10 @@
 
 package org.mule.examples.scripting;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class ScriptingExampleTestCase extends FunctionalTestCase
 {    
@@ -25,7 +25,7 @@ public class ScriptingExampleTestCase extends FunctionalTestCase
     public void testScriptingExample() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage reply = client.send("vm://scripting", new MuleMessage("mule"));
+        MuleMessage reply = client.send("vm://scripting", new DefaultMuleMessage("mule"));
         
         assertNotNull(reply);
         assertNotNull(reply.getPayload());

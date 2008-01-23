@@ -13,8 +13,8 @@
     <!-- in a typical production environment you'd set jndiProviderUrl to the jndi server
          instead, here, we need to provide a "dummy" context -->
 
-    <spring:bean name="jndiFactory" class="org.mule.providers.ejb.SimpleEjbContextFactory"/>
-    <spring:bean name="dummy" class="org.mule.impl.container.DummyEjbHomeProxy"/>
+    <spring:bean name="jndiFactory" class="org.mule.transport.ejb.SimpleEjbContextFactory"/>
+    <spring:bean name="dummy" class="org.mule.container.DummyEjbHomeProxy"/>
     <spring:bean name="jndiContext" factory-bean="jndiFactory" factory-method="create">
         <spring:constructor-arg>
             <spring:map>

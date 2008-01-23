@@ -10,20 +10,20 @@
 
 package org.mule.tck.model;
 
-import org.mule.config.ConfigurationException;
+import org.mule.api.component.Component;
+import org.mule.api.config.ConfigurationException;
+import org.mule.api.context.ContainerContext;
+import org.mule.api.context.ObjectNotFoundException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.FruitBowl;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.UMOContainerContext;
 
 public abstract class AbstractContainerContextTestCase extends AbstractMuleTestCase
 {
 
     public void testContainerContext() throws Exception
     {
-        UMOContainerContext container = getContainerContext();
+        ContainerContext container = getContainerContext();
         container.initialise();
         assertNotNull(container);
 
@@ -32,7 +32,7 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
         doContentTest(container);
     }
 
-    protected void doNullTest(UMOContainerContext container)
+    protected void doNullTest(ContainerContext container)
     {
         try
         {
@@ -45,7 +45,7 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
         }
     }
 
-    protected void doBadKeyTest(UMOContainerContext container)
+    protected void doBadKeyTest(ContainerContext container)
     {
         try
         {
@@ -58,7 +58,7 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
         }
     }
 
-    protected void doContentTest(UMOContainerContext container) throws Exception
+    protected void doContentTest(ContainerContext container) throws Exception
     {
         Object result = container.getComponent(Apple.class);
         assertNotNull("Component should exist in container", result);
@@ -75,14 +75,14 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
         getAndVerifyExternalReference(getTestComponent("fruit Bowl", FruitBowl.class));
     }
 
-    protected void getAndVerifyExternalReference(UMOComponent component) throws Exception
+    protected void getAndVerifyExternalReference(Component component) throws Exception
     {
         verifyExternalReference(getExternalReference(component));
     }
 
-    protected Object getExternalReference(UMOComponent component) throws Exception
+    protected Object getExternalReference(Component component) throws Exception
     {
-        UMOContainerContext container = getContainerContext();
+        ContainerContext container = getContainerContext();
         assertNotNull(container);
         container.initialise();
         component.initialise();
@@ -102,7 +102,7 @@ public abstract class AbstractContainerContextTestCase extends AbstractMuleTestC
         assertTrue(fruitBowl.hasBanana());
     }
 
-    public abstract UMOContainerContext getContainerContext() throws ConfigurationException;
+    public abstract ContainerContext getContainerContext() throws ConfigurationException;
 
     protected String getFruitBowlComponentName()
     {

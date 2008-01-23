@@ -12,7 +12,6 @@ package org.mule.config.spring.parsers.processors;
 
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.util.XMLUtils;
 import org.mule.util.StringUtils;
 
 import org.w3c.dom.Element;

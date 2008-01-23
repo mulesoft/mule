@@ -10,11 +10,11 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.config.spring.parsers.delegate.AttributeSelectionDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
-import org.mule.config.spring.parsers.delegate.AttributeSelectionDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
 
  public class NotificationDisableDefinitionParser extends AttributeSelectionDefinitionParser
 {

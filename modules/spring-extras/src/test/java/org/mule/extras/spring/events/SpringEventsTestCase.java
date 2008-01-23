@@ -10,14 +10,14 @@
 
 package org.mule.extras.spring.events;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
-import org.mule.transformers.AbstractMessageAwareTransformer;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.concurrent.Latch;
 
@@ -74,19 +74,19 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
 
         multicaster.removeApplicationListener(subscriptionBean);
         MuleClient client = new MuleClient();
-        client.send("vm://event.multicaster", "Test Spring Event", null);
+        client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         assertEquals(0, eventCounter1.get());
 
         multicaster.addApplicationListener(subscriptionBean);
-        client.send("vm://event.multicaster", "Test Spring Event", null);
+        client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         assertTrue(whenFinished.await(3000, TimeUnit.MILLISECONDS));
         assertEquals(1, eventCounter1.get());
         eventCounter1.set(0);
 
         multicaster.removeAllListeners();
-        client.send("vm://event.multicaster", "Test Spring Event", null);
+        client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         assertEquals(0, eventCounter1.get());
         multicaster.addApplicationListener(subscriptionBean);
@@ -104,7 +104,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         bean.setEventCallback(new CountingEventCallback(eventCounter1, 1, whenFinished));
 
         MuleClient client = new MuleClient();
-        client.send("vm://event.multicaster", "Test Spring Event", null);
+        client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         whenFinished.await(3000, TimeUnit.MILLISECONDS);
         assertEquals(1, eventCounter1.get());
@@ -118,7 +118,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         final Latch whenFinished = new Latch();
         EventCallback callback = new EventCallback()
         {
-            public void eventReceived(UMOEventContext context, Object o) throws Exception
+            public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 assertNull(context);
                 if (o instanceof TestApplicationEvent)
@@ -148,7 +148,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         bean.setEventCallback(new CountingEventCallback(eventCounter1, 2, whenFinished));
 
         MuleClient client = new MuleClient();
-        client.send("vm://event.multicaster", "Test Spring Event", null);
+        client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
         context.publishEvent(new TestApplicationEvent(context));
 
         whenFinished.await(3000, TimeUnit.MILLISECONDS);
@@ -165,7 +165,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         subscriptionBean.setEventCallback(new CountingEventCallback(eventCounter1, 1, whenFinished));
 
         MuleClient client = new MuleClient();
-        client.send("vm://event.multicaster", "Test Spring Event", null);
+        client.send("vm://event.multicaster", "Test Spring MuleEvent", null);
 
         whenFinished.await(3000, TimeUnit.MILLISECONDS);
         assertEquals(1, eventCounter1.get());
@@ -180,9 +180,9 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         final Latch whenFinished1 = new Latch();
         EventCallback callback = new EventCallback()
         {
-            public void eventReceived(UMOEventContext context, Object o) throws Exception
+            public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
-                MuleApplicationEvent returnEvent = new MuleApplicationEvent("Event from a spring bean",
+                MuleApplicationEvent returnEvent = new MuleApplicationEvent("MuleEvent from a spring bean",
                     "vm://testBean2");
                 MuleApplicationEvent e = (MuleApplicationEvent) o;
                 e.getApplicationContext().publishEvent(returnEvent);
@@ -202,7 +202,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         bean2.setEventCallback(new CountingEventCallback(eventCounter2, NUMBER_OF_MESSAGES, whenFinished2));
 
         // send asynchronously
-        this.doSend("vm://event.multicaster", "Test Spring Event", NUMBER_OF_MESSAGES);
+        this.doSend("vm://event.multicaster", "Test Spring MuleEvent", NUMBER_OF_MESSAGES);
 
         whenFinished1.await(3000, TimeUnit.MILLISECONDS);
         whenFinished2.await(3000, TimeUnit.MILLISECONDS);
@@ -212,7 +212,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
 
     public void testPublishOnly() throws Exception
     {
-        final MuleApplicationEvent event = new MuleApplicationEvent("Event from a spring bean",
+        final MuleApplicationEvent event = new MuleApplicationEvent("MuleEvent from a spring bean",
             "vm://testBean2");
 
         TestSubscriptionEventBean bean2 = (TestSubscriptionEventBean) context
@@ -237,7 +237,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         trans.setLatch(transformerLatch);
         muleContext.getRegistry().registerTransformer(trans);
 
-        MuleApplicationEvent event = new MuleApplicationEvent("Event from a spring bean",
+        MuleApplicationEvent event = new MuleApplicationEvent("MuleEvent from a spring bean",
             "vm://testBean2?transformers=dummyTransformer");
 
         TestSubscriptionEventBean bean2 = (TestSubscriptionEventBean) context
@@ -289,7 +289,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
                         client.send(url, payload, null);
                     }
                 }
-                catch (UMOException ex)
+                catch (MuleException ex)
                 {
                     fail(ExceptionUtils.getStackTrace(ex));
                 }
@@ -301,7 +301,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
     }
 
     /*
-     * This callback counts how many times an UMOEvent was received. If a maximum
+     * This callback counts how many times an MuleEvent was received. If a maximum
      * number has been reached, the given CountDownLatch is counted down. When
      * passing in a Latch (CountDownLatch(1)) this acts just like a sempahore for the
      * caller.
@@ -320,7 +320,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
             this.finished = whenFinished;
         }
 
-        public void eventReceived(UMOEventContext context, Object o) throws Exception
+        public void eventReceived(MuleEventContext context, Object o) throws Exception
         {
             // apparently beans get an extra ContextRefreshedEvent during startup;
             // this messes up our event counts.
@@ -335,7 +335,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
     }
 
     /*
-     * A simple UMOTransformer that counts down a Latch to indicate that it has been
+     * A simple Transformer that counts down a Latch to indicate that it has been
      * called.
      */
     public static class TestEventAwareTransformer extends AbstractMessageAwareTransformer
@@ -367,7 +367,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
             this.latch = latch;
         }
 
-        public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
+        public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
         {
             assertNotNull(message);
 

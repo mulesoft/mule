@@ -15,7 +15,7 @@
             <inbound>
                 <inbound-endpoint ref="vm-in"/>
             </inbound>
-            <component class="org.mule.providers.vm.functional.AttachmentsComponent"/>
+            <component class="org.mule.transport.vm.functional.AttachmentsComponent"/>
         </service>
     </model>
 

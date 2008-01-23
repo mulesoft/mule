@@ -10,8 +10,8 @@
 
 package org.mule.test.integration.spring.events;
 
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractTransformer;
 
 /**
  * <code>StringToOrder</code> converts a String representation of an Order to an

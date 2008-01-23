@@ -10,17 +10,17 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.api.routing.RoutePathNotFoundException;
+import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.endpoint.DynamicEndpointURIEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
-import org.mule.umo.routing.RoutePathNotFoundException;
-import org.mule.umo.routing.RoutingException;
+import org.mule.endpoint.DynamicEndpointURIEndpoint;
+import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.TemplateParser;
 
 import java.util.HashMap;
@@ -40,10 +40,10 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
     // We used square templates as they can exist as part of an URI.
     private TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
-        UMOMessage result = null;
+        MuleMessage result = null;
 
         if (endpoints == null || endpoints.size() == 0)
         {
@@ -52,7 +52,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
 
         try
         {
-            UMOImmutableEndpoint ep = (UMOImmutableEndpoint) endpoints.get(0);
+            ImmutableEndpoint ep = (ImmutableEndpoint) endpoints.get(0);
             String uri = ep.getEndpointURI().toString();
 
             if (logger.isDebugEnabled())
@@ -78,7 +78,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
                 logger.debug("Uri after parsing is: " + uri);
             }
 
-            UMOEndpointURI newUri = new MuleEndpointURI(uri);
+            EndpointURI newUri = new MuleEndpointURI(uri);
 
             if (!newUri.getScheme().equalsIgnoreCase(ep.getEndpointURI().getScheme()))
             {
@@ -97,9 +97,9 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
                 dispatch(session, message, ep);
             }
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
-            throw new CouldNotRouteOutboundMessageException(message, (UMOImmutableEndpoint) endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, (ImmutableEndpoint) endpoints.get(0), e);
         }
 
         return result;

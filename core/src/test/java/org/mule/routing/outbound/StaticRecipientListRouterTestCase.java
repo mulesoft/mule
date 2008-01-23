@@ -10,13 +10,13 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.impl.MuleMessage;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.routing.RoutingException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.RoutingException;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -29,7 +29,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     public void testRecipientListRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
         assertNotNull(endpoint1);
 
         List recipients = new ArrayList();
@@ -45,7 +45,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(2, router.getRecipients().size());
 
-        UMOMessage message = new MuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event");
         assertTrue(router.isMatch(message));
         // note this router clones endpoints so that the endpointUri can be
         // changed
@@ -53,20 +53,20 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         // The static recipient list router duplicates the message for each endpoint
         // so we can't
         // check for equality on the arguments passed to the dispatch / send methods
-        session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)));
-        session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)));
-        router.route(message, (UMOSession)session.proxy(), false);
+        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.isA(Endpoint.class)));
+        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.isA(Endpoint.class)));
+        router.route(message, (MuleSession)session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage("test event");
+        message = new DefaultMuleMessage("test event");
         router.getRecipients().add("test://recipient3");
-        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)),
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(Endpoint.class)),
             message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)),
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(Endpoint.class)),
             message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.isA(UMOEndpoint.class)),
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(Endpoint.class)),
             message);
-        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
+        MuleMessage result = router.route(message, (MuleSession)session.proxy(), true);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);
         assertEquals(3, ((List)result.getPayload()).size());
@@ -78,7 +78,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
         assertNotNull(endpoint1);
 
         List recipients = new ArrayList();
@@ -92,11 +92,11 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(1, router.getRecipients().size());
 
-        UMOMessage message = new MuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event");
         assertTrue(router.isMatch(message));
         try
         {
-            router.route(message, (UMOSession)session.proxy(), false);
+            router.route(message, (MuleSession)session.proxy(), false);
             fail("Should not allow malformed endpointUri");
         }
         catch (RoutingException e)

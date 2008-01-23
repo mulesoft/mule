@@ -10,7 +10,7 @@
 
 package org.mule.mule.security;
 
-import org.mule.impl.security.PasswordBasedEncryptionStrategy;
+import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 
 public class PbeEncryptionStrategyTestCase extends AbstractMuleTestCase

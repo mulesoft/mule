@@ -10,10 +10,10 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ObjectNameHelper;
 
 import org.apache.commons.logging.Log;
@@ -30,18 +30,18 @@ public class EndpointService implements EndpointServiceMBean
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private UMOImmutableEndpoint endpoint;
-    private UMOMessageReceiver receiver;
+    private ImmutableEndpoint endpoint;
+    private MessageReceiver receiver;
     private String name;
     private String componentName;
 
-    public EndpointService(UMOImmutableEndpoint endpoint)
+    public EndpointService(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
         init();
     }
 
-    public EndpointService(UMOMessageReceiver receiver)
+    public EndpointService(MessageReceiver receiver)
     {
         if (receiver == null)
         {
@@ -59,7 +59,7 @@ public class EndpointService implements EndpointServiceMBean
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("Endpoint").getMessage());
         }
-        if (receiver == null && UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
+        if (receiver == null && Endpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
         {
             throw new IllegalArgumentException(
                 "Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");

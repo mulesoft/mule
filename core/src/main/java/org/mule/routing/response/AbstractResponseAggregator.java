@@ -10,13 +10,13 @@
 
 package org.mule.routing.response;
 
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.ResponseTimeoutException;
+import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.inbound.AbstractEventAggregator;
 import org.mule.routing.inbound.EventGroup;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.routing.ResponseTimeoutException;
-import org.mule.umo.routing.RoutingException;
 import org.mule.util.MapUtils;
 import org.mule.util.concurrent.Latch;
 
@@ -31,7 +31,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  * Response Agrregators are used to collect responses that are usually sent to
  * replyTo endpoints set on outbound routers. When an event is sent out via an
  * outbound router, the response router will block the response flow on an
- * UMOComponent until the Response Router resolves a reply or times out.
+ * Component until the Response Router resolves a reply or times out.
  */
 public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 {
@@ -53,7 +53,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      */
     protected final ConcurrentMap responseMessages = new ConcurrentHashMap();
 
-    public void process(UMOEvent event) throws RoutingException
+    public void process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
         final Object groupId = this.getReplyAggregateIdentifier(event.getMessage());
@@ -115,7 +115,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                 if (this.shouldAggregateEvents(group))
                 {
                     // create the response message
-                    UMOMessage returnMessage = this.aggregateEvents(group);
+                    MuleMessage returnMessage = this.aggregateEvents(group);
 
                     // remove the eventGroup as no further message will be received
                     // for this group once we aggregate
@@ -123,7 +123,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
                     // add the new response message so that it can be collected by
                     // the response Thread
-                    UMOMessage previousResult = (UMOMessage) responseMessages.putIfAbsent(groupId,
+                    MuleMessage previousResult = (MuleMessage) responseMessages.putIfAbsent(groupId,
                         returnMessage);
                     if (previousResult != null)
                     {
@@ -163,9 +163,9 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     }
 
     /**
-     * @see AbstractEventAggregator#createEventGroup(UMOEvent, Object)
+     * @see AbstractEventAggregator#createEventGroup(MuleEvent, Object)
      */
-    protected EventGroup createEventGroup(UMOEvent event, Object groupId)
+    protected EventGroup createEventGroup(MuleEvent event, Object groupId)
     {
         if (logger.isDebugEnabled())
         {
@@ -210,7 +210,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      * @return
      * @throws RoutingException
      */
-    public UMOMessage getResponse(UMOMessage message) throws RoutingException
+    public MuleMessage getResponse(MuleMessage message) throws RoutingException
     {
         Object responseId = this.getCallResponseAggregateIdentifier(message);
 
@@ -242,7 +242,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         }
 
         // the final result message
-        UMOMessage result;
+        MuleMessage result;
 
         // indicates whether the result message could be obtained in the required
         // timeout interval
@@ -277,7 +277,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         finally
         {
             locks.remove(responseId);
-            result = (UMOMessage) responseMessages.remove(responseId);
+            result = (MuleMessage) responseMessages.remove(responseId);
 
             if (interruptedWhileWaiting)
             {
@@ -320,6 +320,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     /**
      * @see AbstractEventAggregator#aggregateEvents(EventGroup)
      */
-    protected abstract UMOMessage aggregateEvents(EventGroup events) throws RoutingException;
+    protected abstract MuleMessage aggregateEvents(EventGroup events) throws RoutingException;
 
 }

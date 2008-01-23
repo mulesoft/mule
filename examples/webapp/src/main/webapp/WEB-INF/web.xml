@@ -33,7 +33,7 @@
 
     <servlet>
         <servlet-name>muleRESTServlet</servlet-name>
-        <servlet-class>org.mule.providers.http.servlet.MuleRESTReceiverServlet</servlet-class>
+        <servlet-class>org.mule.transport.http.servlet.MuleRESTReceiverServlet</servlet-class>
         <init-param>
             <param-name>org.mule.servlet.timeout</param-name>
             <param-value>4000</param-value>
@@ -49,7 +49,7 @@
 
     <servlet>
         <servlet-name>muleServlet</servlet-name>
-        <servlet-class>org.mule.providers.http.servlet.MuleReceiverServlet</servlet-class>
+        <servlet-class>org.mule.transport.http.servlet.MuleReceiverServlet</servlet-class>
         <load-on-startup>2</load-on-startup>
     </servlet>
 

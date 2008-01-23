@@ -10,14 +10,14 @@
 
 package org.mule.routing.filters;
 
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
 
 /**
  * <code>PayloadTypeFilter</code> filters based on the type of the object received.
  */
 
-public class PayloadTypeFilter implements UMOFilter
+public class PayloadTypeFilter implements Filter
 {
     private Class expectedType;
 
@@ -31,7 +31,7 @@ public class PayloadTypeFilter implements UMOFilter
         this.expectedType = expectedType;
     }
 
-    public boolean accept(UMOMessage message)
+    public boolean accept(MuleMessage message)
     {
         return (expectedType != null ? expectedType.isAssignableFrom(message.getPayload().getClass()) : false);
     }

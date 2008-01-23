@@ -10,7 +10,7 @@
 
 package org.mule.routing.filters.xml;
 
-import org.mule.impl.MuleMessage;
+import org.mule.DefaultMuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.io.InputStream;
@@ -71,7 +71,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         {
             JXPathFilter myFilter = new JXPathFilter();
             myFilter.setPattern("foo/bar/");
-            myFilter.accept(new MuleMessage(xmlStringInput));
+            myFilter.accept(new DefaultMuleMessage(xmlStringInput));
             fail("Invalid XPath should have thrown an exception");
         }
         //Now we have Jaxen on the class path we get a Jaxen exception, but this is an unchecked exception
@@ -85,38 +85,38 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
     {
         simpleFilter.setPattern("catalog/cd[3]/title");
         simpleFilter.setExpectedValue("Greatest Hits");
-        assertTrue(simpleFilter.accept(new MuleMessage(xmlData)));
+        assertTrue(simpleFilter.accept(new DefaultMuleMessage(xmlData)));
     }
 
     private void doTestBooleanFilter1(Object xmlData) throws Exception
     {
         simpleFilter.setPattern("(catalog/cd[3]/title) ='Greatest Hits'");
-        assertTrue(simpleFilter.accept(new MuleMessage(xmlData)));
+        assertTrue(simpleFilter.accept(new DefaultMuleMessage(xmlData)));
     }
 
     private void doTestBooleanFilter2(Object xmlData) throws Exception
     {
         simpleFilter.setPattern("count(catalog/cd) = 26");
-        assertTrue(simpleFilter.accept(new MuleMessage(xmlData)));
+        assertTrue(simpleFilter.accept(new DefaultMuleMessage(xmlData)));
     }
 
     private void doTestExpectedValueFilterNS(Object xmlData) throws Exception
     {
         nsAwareFilter.setPattern("nsone:catalog/nstwo:cd[3]/title");
         nsAwareFilter.setExpectedValue("Greatest Hits");
-        assertTrue(nsAwareFilter.accept(new MuleMessage(xmlData)));
+        assertTrue(nsAwareFilter.accept(new DefaultMuleMessage(xmlData)));
     }
 
     private void doTestBooleanFilter1NS(Object xmlData) throws Exception
     {
         nsAwareFilter.setPattern("(nsone:catalog/nstwo:cd[3]/title) ='Greatest Hits'");
-        assertTrue(nsAwareFilter.accept(new MuleMessage(xmlData)));
+        assertTrue(nsAwareFilter.accept(new DefaultMuleMessage(xmlData)));
     }
 
     private void doTestBooleanFilter2NS(Object xmlData) throws Exception
     {
         nsAwareFilter.setPattern("count(nsone:catalog/nstwo:cd) = 26");
-        assertTrue(nsAwareFilter.accept(new MuleMessage(xmlData)));
+        assertTrue(nsAwareFilter.accept(new DefaultMuleMessage(xmlData)));
     }
 
     public void testFilterOnObject() throws Exception
@@ -126,7 +126,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         d.setContent("hello");
 
         simpleFilter.setPattern("id=10 and content='hello'");
-        assertTrue(simpleFilter.accept(new MuleMessage(d)));
+        assertTrue(simpleFilter.accept(new DefaultMuleMessage(d)));
     }
 
     public void testExpectedValueFilterXmlString() throws Exception

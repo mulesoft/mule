@@ -6,7 +6,7 @@
 # Figure out how to use proxy settings here.
 org.mule.test.integration.client.MuleClientAxisExternalTestCase
 org.mule.test.integration.client.MuleClientWsdlSoapExternalTestCase
-org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
+org.mule.test.integration.transport.xmpp.XmppFunctionalTestCase
 
 # Require updated config?
 org.mule.test.integration.routing.replyto.ReplytoChainIntegration2TestCase
@@ -27,7 +27,7 @@ org.mule.test.integration.transaction.OutboundTransactionsTestCase
 org.mule.test.usecases.dlq.DLQExceptionHandlerTestCase
 
 # MULE-2868
-org.mule.test.integration.providers.jms.NestedRouterTestCase
+org.mule.test.integration.transport.jms.NestedRouterTestCase
 # The following test is also affected but has 2/3 test methods commented out rather than excluding whole
 # test to ensure we have at least one nested-router functional test.
 #org.mule.test.integration.routing.nested.NestedRouterTestCase
@@ -41,12 +41,12 @@ org.mule.test.usecases.sync.TcpToFileTestCase
 ##########################################################################
 
 # MULE-2749
-org.mule.test.integration.providers.jdbc.JdbcConnectionTestCase
-org.mule.test.integration.providers.jdbc.JdbcTransactionalJdbcFunctionalTestCase
-org.mule.test.integration.providers.jdbc.JdbcTransactionalXaFunctionalTestCase
+org.mule.test.integration.transport.jdbc.JdbcConnectionTestCase
+org.mule.test.integration.transport.jdbc.JdbcTransactionalJdbcFunctionalTestCase
+org.mule.test.integration.transport.jdbc.JdbcTransactionalXaFunctionalTestCase
 
 # MULE-2747
-org.mule.test.integration.providers.xmpp.XmppFunctionalTestCase
+org.mule.test.integration.transport.xmpp.XmppFunctionalTestCase
 
 org.mule.test.integration.EventMetaDataPropagationTestCase
 org.mule.test.integration.message.AttachmentsPropagationTestCase

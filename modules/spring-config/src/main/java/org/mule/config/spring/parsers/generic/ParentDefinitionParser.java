@@ -9,9 +9,9 @@
  */
 package org.mule.config.spring.parsers.generic;
 
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.AbstractHierarchicalDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

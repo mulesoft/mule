@@ -10,8 +10,8 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.api.transformer.Transformer;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.transformer.UMOTransformer;
 
 public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCase
 {
@@ -23,12 +23,12 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
         testObject.wash();
     }
 
-    public UMOTransformer getTransformer() throws Exception
+    public Transformer getTransformer() throws Exception
     {
         return new ObjectToXml();
     }
 
-    public UMOTransformer getRoundTripTransformer() throws Exception
+    public Transformer getRoundTripTransformer() throws Exception
     {
         return new XmlToObject();
     }

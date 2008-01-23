@@ -21,7 +21,7 @@
         <service name="mycomponent2">
             <inbound>
                 <axis:inbound-endpoint address="vm://mycomponent2">
-                    <axis:soap-service interface="org.mule.components.simple.EchoService"/>
+                    <axis:soap-service interface="org.mule.api.component.simple.EchoService"/>
                     <axis:soap-service interface="org.mule.tck.testmodels.services.DateService"/>
                 </axis:inbound-endpoint>
             </inbound>

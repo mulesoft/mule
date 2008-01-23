@@ -10,8 +10,9 @@
 
 package org.mule.routing.filters;
 
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
+import org.mule.api.routing.filter.ObjectFilter;
 import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
@@ -26,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  * not "jms.queue".
  */
 
-public class WildcardFilter implements UMOFilter, ObjectFilter
+public class WildcardFilter implements Filter, ObjectFilter
 {
     protected final Log logger = LogFactory.getLog(this.getClass());
 
@@ -44,7 +45,7 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
         this.setPattern(pattern);
     }
 
-    public boolean accept(UMOMessage message)
+    public boolean accept(MuleMessage message)
     {
         try
         {

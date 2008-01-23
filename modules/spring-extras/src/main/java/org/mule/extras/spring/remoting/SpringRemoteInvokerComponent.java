@@ -10,11 +10,11 @@
 
 package org.mule.extras.spring.remoting;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.Callable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassUtils;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -149,7 +149,7 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
         this.remoteInvocationExecutor = remoteInvocationExecutor;
     }
 
-    public Object onCall(UMOEventContext eventContext) throws Exception
+    public Object onCall(MuleEventContext eventContext) throws Exception
     {
         Object transformedMessage = eventContext.transformMessage();
         RemoteInvocation ri = (RemoteInvocation)transformedMessage;

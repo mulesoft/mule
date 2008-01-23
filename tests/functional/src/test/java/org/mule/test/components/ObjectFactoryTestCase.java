@@ -9,7 +9,7 @@
  */
 package org.mule.test.components;
 
-import org.mule.registry.Registry;
+import org.mule.api.registry.Registry;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.services.UniqueComponent;
 

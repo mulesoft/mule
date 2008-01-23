@@ -10,11 +10,11 @@
 
 package org.mule.test.integration.client;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.providers.soap.SoapConstants;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
+import org.mule.transport.soap.SoapConstants;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 
@@ -35,7 +35,7 @@ public class MuleClientWSDLExternalTestCase extends AbstractMuleTestCase
         properties.put(SoapConstants.SOAP_ACTION_PROPERTY, "${methodNamespace}${method}");
         properties.put(SoapConstants.METHOD_NAMESPACE_PROPERTY, "http://www.webserviceX.NET/");
         String url = "wsdl:http://www.webservicex.net/stockquote.asmx?WSDL&method=GetQuote";
-        UMOMessage result = null;
+        MuleMessage result = null;
         String resultPayload = StringUtils.EMPTY;
 
         try
@@ -44,7 +44,7 @@ public class MuleClientWSDLExternalTestCase extends AbstractMuleTestCase
             result = client.send(url, input, properties);
             resultPayload = (result != null ? result.getPayloadAsString() : StringUtils.EMPTY);
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             fail(ExceptionUtils.getStackTrace(e));
         }

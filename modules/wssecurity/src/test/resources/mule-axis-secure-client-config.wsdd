@@ -11,9 +11,9 @@
             </handler>
         </requestFlow>
         <responseFlow>
-            <handler type="java:org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler"/>
+            <handler type="java:org.mule.transport.soap.axis.extensions.MuleSoapHeadersHandler"/>
         </responseFlow>
     </globalConfiguration>
 
-    <transport name="http" pivot="java:org.mule.providers.soap.axis.extensions.UniversalSender"/>
+    <transport name="http" pivot="java:org.mule.transport.soap.axis.extensions.UniversalSender"/>
 </deployment>

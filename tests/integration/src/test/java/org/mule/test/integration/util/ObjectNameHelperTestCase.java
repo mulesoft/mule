@@ -10,15 +10,15 @@
 
 package org.mule.test.integration.util;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class ObjectNameHelperTestCase extends AbstractMuleTestCase
 {
     public void testEndpointAutomaticNames() throws Exception
     {
 
-        UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://cn=foo,name=queue");
         muleContext.getRegistry().registerEndpoint(ep);
         assertEquals("endpoint.test.cn.foo.name.queue", ep.getName());
@@ -36,7 +36,7 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
 
     public void testEndpointNames() throws Exception
     {
-        UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://cn=foo,name=queue?endpointName=foo");
         muleContext.getRegistry().registerEndpoint(ep);
         assertEquals("foo", ep.getName());
@@ -57,7 +57,7 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
 
     public void testTestEndpoint() throws Exception
     {
-        UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "test://exception.listener");
         muleContext.getRegistry().registerEndpoint(ep);
         assertEquals("endpoint.test.exception.listener", ep.getName());

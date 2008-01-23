@@ -10,11 +10,12 @@
 
 package org.mule.config;
 
-import org.mule.impl.work.MuleWorkManager;
-import org.mule.umo.manager.UMOWorkManager;
+import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.WorkManager;
+import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.WaitPolicy;
-import org.mule.util.StringUtils;
+import org.mule.work.MuleWorkManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
@@ -164,7 +165,7 @@ public class ImmutableThreadingProfile implements ThreadingProfile
         throw new UnsupportedOperationException(getClass().getName());
     }
 
-    public UMOWorkManager createWorkManager(String name)
+    public WorkManager createWorkManager(String name)
     {
         return workManagerFactory.createWorkManager(this, name);
     }
@@ -202,7 +203,7 @@ public class ImmutableThreadingProfile implements ThreadingProfile
     public static class DefaultWorkManagerFactory implements WorkManagerFactory
     {
 
-        public UMOWorkManager createWorkManager(ThreadingProfile profile, String name)
+        public WorkManager createWorkManager(ThreadingProfile profile, String name)
         {
             return new MuleWorkManager(profile, name);
         }

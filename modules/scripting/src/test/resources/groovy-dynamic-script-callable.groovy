@@ -1,5 +1,5 @@
-import org.mule.umo.UMOEventContext
-import org.mule.umo.lifecycle.Callable
+import org.mule.api.MuleEventContext
+import org.mule.api.lifecycle.Callable
 
 public class GroovyDynamicScript implements Callable
 {

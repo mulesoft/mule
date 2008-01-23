@@ -11,8 +11,8 @@ package org.mule.util;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /** TODO */
 public class ExceptionHolder implements ExceptionListener

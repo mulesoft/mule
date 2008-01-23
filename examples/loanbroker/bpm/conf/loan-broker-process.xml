@@ -15,16 +15,16 @@
 
     <state name="validateCustomerRequest">
         <event type="node-enter">
-            <action class="org.mule.providers.bpm.jbpm.actions.ValidateMessageSource">
+            <action class="org.mule.transport.bpm.jbpm.actions.ValidateMessageSource">
                 <expectedSource>CustomerRequests</expectedSource>
             </action>
             <!-- We could perform additional data validation here
             <action class="com.mycompany.process.actions.ValidateMessageData" />
             -->
-            <action class="org.mule.providers.bpm.jbpm.actions.StoreIncomingData">
+            <action class="org.mule.transport.bpm.jbpm.actions.StoreIncomingData">
                 <variable>customerRequest</variable>
             </action>
-            <action class="org.mule.providers.bpm.jbpm.actions.Continue" />
+            <action class="org.mule.transport.bpm.jbpm.actions.Continue" />
         </event>
         <transition to="sendToCreditAgency" />
     </state>
@@ -32,7 +32,7 @@
     <!-- Send customer info. to credit agency -->
     <state name="sendToCreditAgency">
         <event type="node-enter">
-            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEventAndContinue">
+            <action class="org.mule.transport.bpm.jbpm.actions.SendMuleEventAndContinue">
                 <!-- This is the variable we stored in the previous step -->
                 <payloadSource>customerRequest.customer</payloadSource>
                 <endpoint>CreditAgency</endpoint>
@@ -50,16 +50,16 @@
 
     <state name="validateCreditProfile">
         <event type="node-enter">
-            <action class="org.mule.providers.bpm.jbpm.actions.ValidateMessageSource">
+            <action class="org.mule.transport.bpm.jbpm.actions.ValidateMessageSource">
                 <expectedSource>CreditProfiles</expectedSource>
             </action>
             <!-- We could perform additional data validation here
             <action class="com.mycompany.process.actions.ValidateMessageData" />
             -->
-            <action class="org.mule.providers.bpm.jbpm.actions.StoreIncomingData">
+            <action class="org.mule.transport.bpm.jbpm.actions.StoreIncomingData">
                 <variable>creditProfile</variable>
             </action>
-            <action class="org.mule.providers.bpm.jbpm.actions.Continue" />
+            <action class="org.mule.transport.bpm.jbpm.actions.Continue" />
         </event>
         <transition to="prepareLoanQuoteRequest" />
     </state>
@@ -68,7 +68,7 @@
     <state name="prepareLoanQuoteRequest">
         <event type="node-enter">
             <action class="org.mule.examples.loanbroker.bpm.actions.PrepareLoanQuoteRequest" />
-            <action class="org.mule.providers.bpm.jbpm.actions.Continue" />
+            <action class="org.mule.transport.bpm.jbpm.actions.Continue" />
         </event>
         <transition to="sendToBank" />
     </state>
@@ -79,7 +79,7 @@
             <condition><![CDATA[#{customerRequest.loanAmount >= 20000}]]></condition>
             <condition><![CDATA[#{creditProfile.creditHistory >= 24}]]></condition>
             <condition><![CDATA[#{creditProfile.creditScore >= 5}]]></condition>
-            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEvent">
+            <action class="org.mule.transport.bpm.jbpm.actions.SendMuleEvent">
                 <endpoint>BigBank</endpoint>
                 <payloadSource>loanRequest</payloadSource>
             </action>
@@ -88,7 +88,7 @@
             <condition><![CDATA[#{customerRequest.loanAmount >= 10000}]]></condition>
             <condition><![CDATA[#{creditProfile.creditHistory >= 12}]]></condition>
             <condition><![CDATA[#{creditProfile.creditScore >= 3}]]></condition>
-            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEvent">
+            <action class="org.mule.transport.bpm.jbpm.actions.SendMuleEvent">
                 <endpoint>MediumBank</endpoint>
                 <payloadSource>loanRequest</payloadSource>
             </action>
@@ -97,7 +97,7 @@
             <condition><![CDATA[#{customerRequest.loanAmount < 10000}]]></condition>
             <condition><![CDATA[#{creditProfile.creditHistory >= 6}]]></condition>
             <condition><![CDATA[#{creditProfile.creditScore >= 1}]]></condition>
-            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEvent">
+            <action class="org.mule.transport.bpm.jbpm.actions.SendMuleEvent">
                 <endpoint>SmallBank</endpoint>
                 <payloadSource>loanRequest</payloadSource>
             </action>
@@ -109,17 +109,17 @@
 
     <state name="validateLoanQuote">
         <event type="node-enter">
-            <action class="org.mule.providers.bpm.jbpm.actions.ValidateMessageType">
+            <action class="org.mule.transport.bpm.jbpm.actions.ValidateMessageType">
                 <expectedType>org.mule.examples.loanbroker.messages.LoanQuote</expectedType>
             </action>
             <!-- We could perform additional data validation here
             <action class="com.mycompany.process.actions.ValidateMessageData" />
             -->
-            <action class="org.mule.providers.bpm.jbpm.actions.Continue" />
+            <action class="org.mule.transport.bpm.jbpm.actions.Continue" />
         </event>
         <transition to="loanApproved">
             <!-- Send the final loan quote back to the customer. -->
-            <action class="org.mule.providers.bpm.jbpm.actions.SendMuleEvent">
+            <action class="org.mule.transport.bpm.jbpm.actions.SendMuleEvent">
                 <endpoint>CustomerResponses</endpoint>
                 <synchronous>false</synchronous>
             </action>

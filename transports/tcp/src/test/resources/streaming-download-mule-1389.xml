@@ -25,7 +25,7 @@
                 <tcp:inbound-endpoint host="localhost" port="65432" synchronous="true"/>
             </inbound>
             <component>
-                <singleton-object class="org.mule.providers.tcp.issues.InputStreamSource"/>
+                <singleton-object class="org.mule.transport.tcp.issues.InputStreamSource"/>
             </component>
         </service>
     </model>

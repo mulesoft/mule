@@ -3,4 +3,4 @@
 #
 
 # MULE-2868
-org.mule.providers.jms.issues.JmsRemoteSyncMule2868TestCase
+org.mule.transport.jms.issues.JmsRemoteSyncMule2868TestCase

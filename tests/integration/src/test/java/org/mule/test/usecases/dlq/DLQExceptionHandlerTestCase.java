@@ -10,11 +10,11 @@
 
 package org.mule.test.usecases.dlq;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.message.ExceptionMessage;
+import org.mule.message.ExceptionMessage;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
 
 
 public class DLQExceptionHandlerTestCase extends FunctionalTestCase
@@ -30,14 +30,14 @@ public class DLQExceptionHandlerTestCase extends FunctionalTestCase
         client.getMuleContext().start();
         client.dispatch("jms://request.queue", "testing 1 2 3", null);
 
-        UMOMessage message = client.request("jms://out.queue", 3000);
+        MuleMessage message = client.request("jms://out.queue", 3000);
         assertNull(message);
 
         try
         {
             message = client.request("jms://DLQ", 20000);
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             e.printStackTrace(System.err);
         }

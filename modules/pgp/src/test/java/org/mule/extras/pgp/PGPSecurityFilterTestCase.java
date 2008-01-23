@@ -10,10 +10,10 @@
 
 package org.mule.extras.pgp;
 
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOExceptionPayload;
-import org.mule.umo.UMOMessage;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -51,7 +51,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         Map props = new HashMap();
         props.put("TARGET_FILE", TARGET);
         MuleClient client = new MuleClient();
-        UMOMessage reply = client.send("vm://echo", new String(msg), props);
+        MuleMessage reply = client.send("vm://echo", new String(msg), props);
         assertNull(reply.getExceptionPayload());
         
         try
@@ -74,10 +74,10 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage reply = client.send("vm://echo", "An unsigned message", null);
+        MuleMessage reply = client.send("vm://echo", "An unsigned message", null);
         
         assertNotNull(reply.getExceptionPayload());
-        UMOExceptionPayload excPayload = reply.getExceptionPayload();
+        ExceptionPayload excPayload = reply.getExceptionPayload();
         assertEquals(MESSAGE_EXCEPTION, excPayload.getMessage());
 
     }

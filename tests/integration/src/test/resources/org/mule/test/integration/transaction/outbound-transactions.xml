@@ -26,7 +26,7 @@
     <transaction-manager
         factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
 
-    <connector name="jmsConnector" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
+    <connector name="jmsConnector" className="org.mule.transport.jms.activemq.ActiveMqJmsConnector">
         <properties>
             <!-- The ActiveMQ ConnectionFactory is configured as a Spring bean. -->
             <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
@@ -44,12 +44,12 @@
             <outbound-router>
                 <router className="org.mule.routing.outbound.MulticastingRouter">
                     <endpoint address="jms://my.queue1">
-                        <transaction action="ALWAYS_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                        <transaction action="ALWAYS_JOIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
                     </endpoint>
                     <endpoint address="jms://my.queue2">
-                        <transaction action="ALWAYS_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                        <transaction action="ALWAYS_JOIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
                     </endpoint>
-                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -58,7 +58,7 @@
             implementation="org.mule.test.integration.service.TestReceiver">
             <inbound-router>
                 <endpoint address="jms://component2">
-                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
                 </endpoint>
             </inbound-router>
             <outbound-router>

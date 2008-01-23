@@ -11,14 +11,14 @@
 
 package org.mule.ra;
 
-import org.mule.impl.model.seda.SedaModel;
+import org.mule.api.MuleException;
+import org.mule.api.component.Component;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.model.Model;
+import org.mule.api.routing.InboundRouterCollection;
+import org.mule.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.routing.UMOInboundRouterCollection;
 
 import java.lang.reflect.Method;
 import java.util.Timer;
@@ -89,15 +89,15 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         }
     }
 
-    public void testGetJcaModelCreateNew() throws UMOException, ResourceException
+    public void testGetJcaModelCreateNew() throws MuleException, ResourceException
     {
         JcaModel jcaModel = resourceAdapter.getJcaModel("jca");
         assertEquals("jca", jcaModel.getName());
     }
 
-    public void testGetJcaModelUseExisting() throws UMOException, ResourceException
+    public void testGetJcaModelUseExisting() throws MuleException, ResourceException
     {
-        UMOModel jcaModel = new JcaModel();
+        Model jcaModel = new JcaModel();
         jcaModel.setName("jca");
         muleContext.getRegistry().registerModel(jcaModel);
         JcaModel jcaModel2 = resourceAdapter.getJcaModel("jca");
@@ -105,9 +105,9 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(jcaModel, jcaModel2);
     }
 
-    public void testGetJcaModel3ExistingWrongType() throws UMOException
+    public void testGetJcaModel3ExistingWrongType() throws MuleException
     {
-        UMOModel sedaModel = new SedaModel();
+        Model sedaModel = new SedaModel();
         sedaModel.setName("jca");
         muleContext.getRegistry().registerModel(sedaModel);
         try
@@ -120,11 +120,11 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         }
     }
 
-    public void testCreateMessageInflowEndpoint() throws UMOException
+    public void testCreateMessageInflowEndpoint() throws MuleException
     {
         MuleActivationSpec activationSpec = new MuleActivationSpec();
         activationSpec.setEndpoint("test://testEndpoint");
-        UMOImmutableEndpoint endpoint = resourceAdapter.createMessageInflowEndpoint(activationSpec);
+        ImmutableEndpoint endpoint = resourceAdapter.createMessageInflowEndpoint(activationSpec);
         testEndpoint(endpoint);
     }
 
@@ -134,9 +134,9 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         JcaModel jcaModel = resourceAdapter.getJcaModel("jca");
         MuleActivationSpec activationSpec = new MuleActivationSpec();
         activationSpec.setEndpoint("test://testEndpoint");
-        UMOImmutableEndpoint endpoint = resourceAdapter.createMessageInflowEndpoint(activationSpec);
+        ImmutableEndpoint endpoint = resourceAdapter.createMessageInflowEndpoint(activationSpec);
 
-        UMOComponent component = resourceAdapter.createJcaComponent(endpointFactory, jcaModel, endpoint);
+        Component component = resourceAdapter.createJcaComponent(endpointFactory, jcaModel, endpoint);
 
         // Check component
         assertNotNull(component);
@@ -149,7 +149,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         testEndpoint(component);
 
         // Check endpoint
-        UMOEndpoint endpoint2 = (UMOEndpoint) component.getInboundRouter().getEndpoints().get(0);
+        Endpoint endpoint2 = (Endpoint) component.getInboundRouter().getEndpoints().get(0);
         assertEquals(endpoint, endpoint2);
 
         // Check component implementation
@@ -170,7 +170,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(1, resourceAdapter.endpoints.size());
 
         MuleEndpointKey key = new MuleEndpointKey(endpointFactory, activationSpec);
-        UMOComponent component = (UMOComponent) resourceAdapter.endpoints.get(key);
+        Component component = (Component) resourceAdapter.endpoints.get(key);
 
         assertEquals("JcaComponent#" + endpointFactory.hashCode(), component.getName());
         testJcaComponent(component);
@@ -182,7 +182,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         resourceAdapter.endpointActivation(endpointFactory, activationSpec);
         assertEquals(1, resourceAdapter.endpoints.size());
 
-        // Additional activation with new EndpointFactory instance increments size of
+        // Additional activation with new DefaultEndpointFactory instance increments size of
         // endpoint cahce
         resourceAdapter.endpointActivation(new MockEndpointFactory(), activationSpec);
         assertEquals(2, resourceAdapter.endpoints.size());
@@ -218,14 +218,14 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(0, resourceAdapter.endpoints.size());
     }
 
-    protected void testEndpoint(UMOComponent component)
+    protected void testEndpoint(Component component)
     {
-        UMOInboundRouterCollection inboundRouterCollection = component.getInboundRouter();
-        UMOEndpoint endpoint = (UMOEndpoint) inboundRouterCollection.getEndpoints().get(0);
+        InboundRouterCollection inboundRouterCollection = component.getInboundRouter();
+        Endpoint endpoint = (Endpoint) inboundRouterCollection.getEndpoints().get(0);
         testEndpoint(endpoint);
     }
 
-    protected void testEndpoint(UMOImmutableEndpoint endpoint)
+    protected void testEndpoint(ImmutableEndpoint endpoint)
     {
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
@@ -233,7 +233,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(false, endpoint.isSynchronous());
     }
 
-    protected void testJcaComponent(UMOComponent component)
+    protected void testJcaComponent(Component component)
     {
         // Check for a single inbound router, no outbound routers and no nested
         // routers

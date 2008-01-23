@@ -30,7 +30,7 @@
                 <axis:inbound-endpoint address="http://localhost:65082/services"/>
                 <inbound-endpoint address="vm://echo" />
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
     </model>
 

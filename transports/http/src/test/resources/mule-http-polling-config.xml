@@ -11,7 +11,7 @@
        http://www.mulesource.org/schema/mule/http/2.0 http://www.mulesource.org/schema/mule/http/2.0/mule-http.xsd">
 
     <http:connector name="PollingHttpConnector" reuseAddress="true">
-        <service-overrides messageReceiver="org.mule.providers.http.PollingHttpMessageReceiver"/>
+        <service-overrides messageReceiver="org.mule.transport.http.PollingHttpMessageReceiver"/>
     </http:connector>
 
     <http:connector name="HttpConnector"/>

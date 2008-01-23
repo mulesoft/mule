@@ -21,7 +21,7 @@
             <inbound>
                 <axis:inbound-endpoint address="https://localhost:62000"/>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
     </model>
 </mule>

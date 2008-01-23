@@ -11,9 +11,9 @@
 package org.mule.management.mbeans;
 
 import org.mule.MuleServer;
+import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
 import org.mule.config.MuleManifest;
-import org.mule.umo.UMOException;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
@@ -123,17 +123,17 @@ public class MuleService implements MuleServiceMBean
         return vendor;
     }
 
-    public void start() throws UMOException
+    public void start() throws MuleException
     {
         muleContext.start();
     }
 
-    public void stop() throws UMOException
+    public void stop() throws MuleException
     {
         muleContext.stop();
     }
 
-    public void dispose() throws UMOException
+    public void dispose() throws MuleException
     {
         muleContext.dispose();
     }

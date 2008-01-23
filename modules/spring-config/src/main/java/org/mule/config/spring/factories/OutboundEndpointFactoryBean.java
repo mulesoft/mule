@@ -10,8 +10,8 @@
 
 package org.mule.config.spring.factories;
 
-import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
-import org.mule.umo.endpoint.EndpointException;
+import org.mule.api.endpoint.EndpointException;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 /**
  * Spring FactoryBean used to create concrete instances of outbound endpoints

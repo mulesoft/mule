@@ -10,8 +10,8 @@
 
 package org.mule.util;
 
-import org.mule.MuleRuntimeException;
 import org.mule.RegistryContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
 
 import java.io.BufferedOutputStream;
@@ -29,7 +29,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;

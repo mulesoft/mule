@@ -10,16 +10,16 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.api.MuleException;
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.api.routing.RoutePathNotFoundException;
+import org.mule.api.routing.RoutingException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOExceptionPayload;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
-import org.mule.umo.routing.RoutePathNotFoundException;
-import org.mule.umo.routing.RoutingException;
 
 /**
  * <code>ExceptionBasedRouter</code> Will send the current event to the first
@@ -32,7 +32,7 @@ import org.mule.umo.routing.RoutingException;
 public class ExceptionBasedRouter extends FilteringOutboundRouter
 {
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
         if (endpoints == null || endpoints.size() == 0)
@@ -56,9 +56,9 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
             }
         }
 
-        UMOMessage result = null;
+        MuleMessage result = null;
         // need that ref for an error message
-        UMOImmutableEndpoint endpoint = null;
+        ImmutableEndpoint endpoint = null;
         boolean success = false;
 
         synchronized (endpoints)
@@ -90,7 +90,7 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
                             break;
                         }
                     }
-                    catch (UMOException e)
+                    catch (MuleException e)
                     {
                         logger.warn("Failed to send to endpoint: " + endpoint.getEndpointURI().toString()
                                     + ". Error was: " + ExceptionHelper.getRootException(e) + ". Trying next endpoint");
@@ -104,7 +104,7 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
                         success = true;
                         break;
                     }
-                    catch (UMOException e)
+                    catch (MuleException e)
                     {
                         logger.info("Failed to dispatch to endpoint: " + endpoint.getEndpointURI().toString()
                                     + ". Error was: " + e.getMessage() + ". Trying next endpoint");
@@ -121,7 +121,7 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
         return result;
     }
 
-//    public void addEndpoint(UMOEndpoint endpoint)
+//    public void addEndpoint(Endpoint endpoint)
 //    {
 //        if (!endpoint.isRemoteSync())
 //        {
@@ -137,14 +137,14 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
      * @param message message to check
      * @return true if there was an exception payload set
      */
-    protected boolean exceptionPayloadAvailable(UMOMessage message)
+    protected boolean exceptionPayloadAvailable(MuleMessage message)
     {
         if (message == null)
         {
             return false;
         }
 
-        final UMOExceptionPayload exceptionPayload = message.getExceptionPayload();
+        final ExceptionPayload exceptionPayload = message.getExceptionPayload();
         if (exceptionPayload != null)
         {
             logger.info("Failure returned, will try next endpoint. Exception payload is: " + exceptionPayload);

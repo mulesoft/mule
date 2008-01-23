@@ -9,19 +9,19 @@
  */
 package org.mule.test.integration.transaction;
 
-import org.mule.impl.DefaultExceptionStrategy;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.DefaultExceptionStrategy;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
 
 /**
- * Will rollback the transaction in case a {@link org.mule.umo.routing.RoutingException}
+ * Will rollback the transaction in case a {@link org.mule.api.routing.RoutingException}
  * is encountered. Typically used with {@link org.mule.routing.outbound.TransactionJoiningRouter}
  * and configured on a connector.
  */
 public class RollbackRoutingExceptionStrategy extends DefaultExceptionStrategy
 {
 
-    public void handleRoutingException(UMOMessage message, UMOImmutableEndpoint endpoint, Throwable t)
+    public void handleRoutingException(MuleMessage message, ImmutableEndpoint endpoint, Throwable t)
     {
         logger.debug("handleRoutingException: endpoint=" + endpoint + " message=" + message);
         defaultHandler(t);

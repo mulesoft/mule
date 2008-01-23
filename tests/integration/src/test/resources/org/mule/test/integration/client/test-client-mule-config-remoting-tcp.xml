@@ -33,7 +33,7 @@
                 <inbound-endpoint address="vm://remote.endpoint" connector-ref="vmRemoteConnector" remoteSync="true"/>
             </inbound>
             <component>
-                <singleton-object class="org.mule.components.simple.StaticComponent">
+                <singleton-object class="org.mule.component.simple.StaticComponent">
                     <property key="data" value="received from remote"/>
                 </singleton-object>
             </component>

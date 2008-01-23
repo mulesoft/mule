@@ -34,7 +34,7 @@
                     <acegi:http-security-filter realm="mule-realm"/>
                 </inbound-endpoint>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
     </model>
 

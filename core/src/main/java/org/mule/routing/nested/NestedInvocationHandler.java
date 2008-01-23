@@ -10,12 +10,12 @@
 
 package org.mule.routing.nested;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.NestedRouter;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.routing.UMONestedRouter;
 import org.mule.util.StringMessageUtils;
 
 import java.lang.reflect.InvocationHandler;
@@ -36,12 +36,12 @@ public class NestedInvocationHandler implements InvocationHandler
 
     protected Map routers = new ConcurrentHashMap();
 
-    protected NestedInvocationHandler(UMONestedRouter router)
+    protected NestedInvocationHandler(NestedRouter router)
     {
         addRouterForInterface(router);
     }
 
-    public void addRouterForInterface(UMONestedRouter router)
+    public void addRouterForInterface(NestedRouter router)
     {
         if (router.getMethod() == null)
         {
@@ -67,11 +67,11 @@ public class NestedInvocationHandler implements InvocationHandler
             return toString();
         }
 
-        UMOMessage message = new MuleMessage(args);
-        UMONestedRouter router = (UMONestedRouter) routers.get(method.getName());
+        MuleMessage message = new DefaultMuleMessage(args);
+        NestedRouter router = (NestedRouter) routers.get(method.getName());
         if (router == null)
         {
-            router = (UMONestedRouter) routers.get(DEFAULT_METHOD_NAME_TOKEN);
+            router = (NestedRouter) routers.get(DEFAULT_METHOD_NAME_TOKEN);
         }
 
         if (router == null)
@@ -79,8 +79,8 @@ public class NestedInvocationHandler implements InvocationHandler
             throw new IllegalArgumentException(CoreMessages.cannotFindBindingForMethod(method.getName()).toString());
         }
 
-        UMOMessage reply;
-        UMOEvent currentEvent = RequestContext.getEvent();
+        MuleMessage reply;
+        MuleEvent currentEvent = RequestContext.getEvent();
         reply = router.route(message, currentEvent.getSession(), router.getEndpoint().isSynchronous());
 
         if (reply != null)

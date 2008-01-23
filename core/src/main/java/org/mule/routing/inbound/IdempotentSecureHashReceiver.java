@@ -10,12 +10,12 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.transformers.simple.ByteArrayToHexString;
-import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.routing.RoutingException;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.routing.RoutingException;
+import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.simple.ByteArrayToHexString;
+import org.mule.transformer.simple.SerializableToByteArray;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -40,7 +40,7 @@ public class IdempotentSecureHashReceiver extends IdempotentReceiver
     private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
     // @Override
-    protected Object getIdForEvent(UMOEvent event) throws MessagingException
+    protected Object getIdForEvent(MuleEvent event) throws MessagingException
     {
         try
         {

@@ -10,9 +10,9 @@
 
 package org.mule.test.spring;
 
+import org.mule.api.component.Component;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase
 {
@@ -24,9 +24,9 @@ public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase
 
     public void testProperties()
     {
-        UMOComponent component = muleContext.getRegistry().lookupComponent("service");
+        Component component = muleContext.getRegistry().lookupComponent("service");
         assertNotNull(component);
-        UMOImmutableEndpoint ep = (UMOImmutableEndpoint) component.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint ep = (ImmutableEndpoint) component.getInboundRouter().getEndpoints().get(0);
         assertNotNull(ep);
         assertEquals("local", ep.getProperties().get("local"));
         assertEquals("global", ep.getProperties().get("global"));

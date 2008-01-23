@@ -10,12 +10,12 @@
 
 package org.mule.config.spring.parsers.specific.properties;
 
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
+import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
-import org.mule.config.spring.parsers.assembly.MapEntryCombiner;
 import org.mule.config.spring.parsers.processors.AddAttribute;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 /**
  * This generates a nested map (an element of the parent map, with the key "mapKey", which is a map itself)

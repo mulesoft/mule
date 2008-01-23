@@ -10,10 +10,8 @@
 
 package org.mule.util.properties;
 
-import org.mule.providers.NullPayload;
-import org.mule.umo.UMOMessage;
-
-import java.sql.Timestamp;
+import org.mule.api.MuleMessage;
+import org.mule.transport.NullPayload;
 
 /**
  * Looks up the property on the message using the name given.
@@ -24,16 +22,16 @@ public class MessageHeaderPropertyExtractor implements PropertyExtractor
 
     public Object getProperty(String name, Object message)
     {
-        if (message instanceof UMOMessage)
+        if (message instanceof MuleMessage)
         {
             if (name.equalsIgnoreCase("payload"))
             {
-                Object payload = ((UMOMessage) message).getPayload();
+                Object payload = ((MuleMessage) message).getPayload();
                 return (payload instanceof NullPayload ? null : payload);
             }
             else
             {
-                return ((UMOMessage) message).getProperty(name);
+                return ((MuleMessage) message).getProperty(name);
             }
         }
         return null;

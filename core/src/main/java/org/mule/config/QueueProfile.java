@@ -10,7 +10,7 @@
 
 package org.mule.config;
 
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
 

@@ -10,20 +10,20 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.message.ExceptionPayload;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.api.routing.RoutingException;
+import org.mule.endpoint.MuleEndpointURI;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
-import org.mule.umo.routing.RoutingException;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -35,24 +35,24 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 {
 
     /**
-     * Multiple endpoints, no failures. Event dispatched asynchronously, but forced
+     * Multiple endpoints, no failures. MuleEvent dispatched asynchronously, but forced
      * into sync mode. Test case ends here.
      */
     public void testSuccessfulExceptionRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
+        DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
  
-        UMOImmutableEndpoint endpoint1 = muleContext.getRegistry()
+        ImmutableEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy1");
 
-        UMOImmutableEndpoint endpoint2 = muleContext.getRegistry()
+        ImmutableEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy2");
 
-        UMOImmutableEndpoint endpoint3 = muleContext.getRegistry()
+        ImmutableEndpoint endpoint3 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://Dummy3");
 
@@ -67,21 +67,21 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        UMOMessage message = new MuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event");
 
         assertTrue(router.isMatch(message));
 
         session.expect("sendEvent", C.eq(message, endpoint1));
-        UMOMessage result = router.route(message, (UMOSession)session.proxy(), false);
+        MuleMessage result = router.route(message, (MuleSession)session.proxy(), false);
         assertNull("Async call should've returned null.", result);
         session.verify();
 
-        message = new MuleMessage("test event");
+        message = new DefaultMuleMessage("test event");
 
         // only one send should be called and succeed, the others should not be
         // called
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
-        result = router.route(message, (UMOSession)session.proxy(), true);
+        result = router.route(message, (MuleSession)session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
@@ -94,14 +94,14 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     public void testBothFailing() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
-        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
+        DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOImmutableEndpoint endpoint1 = muleContext.getRegistry()
+        ImmutableEndpoint endpoint1 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://AlwaysFail");
 
-        UMOImmutableEndpoint endpoint2 = muleContext.getRegistry()
+        ImmutableEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint("test://AlwaysFail");
 
@@ -115,16 +115,16 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        UMOMessage message = new MuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event");
 
         assertTrue(router.isMatch(message));
 
         // exception to throw
-        UMOException rex = new RoutingException(message, endpoint1);
+        MuleException rex = new RoutingException(message, endpoint1);
         mockSession.expectAndThrow("sendEvent", C.args(C.eq(message), C.eq(endpoint1)), rex);
         mockSession.expectAndThrow("dispatchEvent", C.args(C.eq(message), C.eq(endpoint2)), rex);
-        UMOSession session = (UMOSession)mockSession.proxy();
-        UMOMessage result = null;
+        MuleSession session = (MuleSession)mockSession.proxy();
+        MuleMessage result = null;
         try
         {
             result = router.route(message, session, false);
@@ -137,7 +137,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         assertNull("Async call should've returned null.", result);
         mockSession.verify();
 
-        message = new MuleMessage("test event");
+        message = new DefaultMuleMessage("test event");
 
     }
 
@@ -149,29 +149,29 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        UMOEndpoint endpoint1 = getTestEndpoint("TestFailEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestEndpoint("TestFailEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
-        UMOEndpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.addEndpoint(endpoint1);
         router.addEndpoint(endpoint2);
 
-        UMOMessage message = new MuleMessage("test event");
-        UMOMessage expectedResultMessage = new MuleMessage("Return event");
+        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event");
 
         assertTrue(router.isMatch(message));
 
-        final UMOSession session = (UMOSession)mockSession.proxy();
+        final MuleSession session = (MuleSession)mockSession.proxy();
         // exception to throw
-        UMOException rex = new RoutingException(message, endpoint1);
+        MuleException rex = new RoutingException(message, endpoint1);
         // 1st failure
         mockSession.expectAndThrow("sendEvent", C.args(C.eq(message), C.eq(endpoint1)), rex);
         // next endpoint
         mockSession.expectAndReturn("sendEvent", C.args(C.eq(message), C.eq(endpoint2)),
             expectedResultMessage);
-        UMOMessage actualResultMessage = router.route(message, session, true);
+        MuleMessage actualResultMessage = router.route(message, session, true);
         mockSession.verify();
 
         assertEquals("Got an invalid return message.", expectedResultMessage, actualResultMessage);
@@ -185,29 +185,29 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        UMOEndpoint endpoint1 = getTestEndpoint("TestFailEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestEndpoint("TestFailEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
-        UMOEndpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.addEndpoint(endpoint1);
         router.addEndpoint(endpoint2);
 
-        UMOMessage message = new MuleMessage("test event");
-        UMOMessage expectedResultMessage = new MuleMessage("Return event");
+        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event");
 
         assertTrue(router.isMatch(message));
 
-        final UMOSession session = (UMOSession)mockSession.proxy();
+        final MuleSession session = (MuleSession)mockSession.proxy();
         // exception to throw
-        UMOException rex = new RoutingException(message, endpoint1);
+        MuleException rex = new RoutingException(message, endpoint1);
         // 1st failure
         mockSession.expectAndThrow("sendEvent", C.args(C.eq(message), C.eq(endpoint1)), rex);
         // next endpoint
         mockSession.expectAndReturn("dispatchEvent", C.args(C.eq(message), C.eq(endpoint2)),
             expectedResultMessage);
-        UMOMessage actualResultMessage = router.route(message, session, false);
+        MuleMessage actualResultMessage = router.route(message, session, false);
         assertNull("Async call should not return any results.", actualResultMessage);
         mockSession.verify();
     }
@@ -220,32 +220,32 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        UMOEndpoint endpoint1 = getTestEndpoint("TestFailEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestEndpoint("TestFailEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
-        UMOEndpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.addEndpoint(endpoint1);
         router.addEndpoint(endpoint2);
 
-        UMOMessage message = new MuleMessage("test event");
-        UMOMessage expectedResultMessage = new MuleMessage("Return event");
+        MuleMessage message = new DefaultMuleMessage("test event");
+        MuleMessage expectedResultMessage = new DefaultMuleMessage("Return event");
 
         assertTrue(router.isMatch(message));
 
         // remote endpoint failed and set an exception payload on the returned
         // message
-        UMOMessage exPayloadMessage = new MuleMessage("there was a failure");
-        exPayloadMessage.setExceptionPayload(new ExceptionPayload(new RuntimeException()));
+        MuleMessage exPayloadMessage = new DefaultMuleMessage("there was a failure");
+        exPayloadMessage.setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
 
-        final UMOSession session = (UMOSession)mockSession.proxy();
+        final MuleSession session = (MuleSession)mockSession.proxy();
         // 1st failure
         mockSession.expectAndReturn("sendEvent", C.args(C.eq(message), C.eq(endpoint1)), exPayloadMessage);
         // next endpoint
         mockSession.expectAndReturn("sendEvent", C.args(C.eq(message), C.eq(endpoint2)),
             expectedResultMessage);
-        UMOMessage actualResultMessage = router.route(message, session, true);
+        MuleMessage actualResultMessage = router.route(message, session, true);
         mockSession.verify();
 
         assertEquals("Got an invalid return message.", expectedResultMessage, actualResultMessage);

@@ -22,7 +22,7 @@
             </inbound>
             <component>
                 <singleton-object class="org.mule.test.integration.service.TestServiceComponent">
-                    <property key="serviceInterfaces" value="org.mule.components.simple.EchoService"/>
+                    <property key="serviceInterfaces" value="org.mule.api.component.simple.EchoService"/>
                 </singleton-object>
             </component>
         </service>

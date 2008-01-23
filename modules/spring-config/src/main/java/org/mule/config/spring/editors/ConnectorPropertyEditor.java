@@ -10,13 +10,13 @@
 package org.mule.config.spring.editors;
 
 import org.mule.RegistryContext;
+import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.provider.UMOConnector;
 
 import java.beans.PropertyEditorSupport;
 
 /**
- * Translates a connector name property into the corresponding {@link org.mule.umo.provider.UMOConnector}
+ * Translates a connector name property into the corresponding {@link org.mule.api.transport.Connector}
  * instance.
  *
  * TODO - Why isn't this simply a reference?
@@ -26,7 +26,7 @@ public class ConnectorPropertyEditor extends PropertyEditorSupport
     public void setAsText(String text)
     {
 
-        UMOConnector connector = RegistryContext.getRegistry().lookupConnector(text);
+        Connector connector = RegistryContext.getRegistry().lookupConnector(text);
 
         if (connector == null)
         {

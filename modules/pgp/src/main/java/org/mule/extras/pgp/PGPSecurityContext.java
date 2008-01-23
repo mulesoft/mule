@@ -10,10 +10,10 @@
 
 package org.mule.extras.pgp;
 
-import org.mule.umo.security.UMOAuthentication;
-import org.mule.umo.security.UMOSecurityContext;
+import org.mule.api.security.Authentication;
+import org.mule.api.security.SecurityContext;
 
-public class PGPSecurityContext implements UMOSecurityContext
+public class PGPSecurityContext implements SecurityContext
 {
     private volatile PGPAuthentication authentication;
 
@@ -25,9 +25,9 @@ public class PGPSecurityContext implements UMOSecurityContext
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.security.UMOSecurityContext#setAuthentication(org.mule.umo.security.UMOAuthentication)
+     * @see org.mule.api.security.SecurityContext#setAuthentication(org.mule.api.security.Authentication)
      */
-    public void setAuthentication(UMOAuthentication authentication)
+    public void setAuthentication(Authentication authentication)
     {
         this.authentication = (PGPAuthentication)authentication;
     }
@@ -35,9 +35,9 @@ public class PGPSecurityContext implements UMOSecurityContext
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.security.UMOSecurityContext#getAuthentication()
+     * @see org.mule.api.security.SecurityContext#getAuthentication()
      */
-    public UMOAuthentication getAuthentication()
+    public Authentication getAuthentication()
     {
         return authentication;
     }

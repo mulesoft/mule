@@ -10,15 +10,15 @@
 
 package org.mule.examples.loanbroker;
 
-import org.mule.api.MuleContextFactory;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.context.MuleContextFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.context.DefaultMuleContextFactory;
 import org.mule.examples.loanbroker.messages.Customer;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.DefaultMuleContextFactory;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public abstract class AbstractLoanBrokerApp
         customers.add(new Customer("Jarno Trulli", 192));
     }
 
-    protected ConfigurationBuilder getConfigBuilder() throws UMOException
+    protected ConfigurationBuilder getConfigBuilder() throws MuleException
     {
         return new SpringXmlConfigurationBuilder(config);
     }
@@ -194,7 +194,7 @@ public abstract class AbstractLoanBrokerApp
         }
         else
         {
-            UMOMessage result = client.send("CustomerRequests", request, null);
+            MuleMessage result = client.send("CustomerRequests", request, null);
             if (result == null)
             {
                 System.out.println(LocaleMessage.requestError());
@@ -222,7 +222,7 @@ public abstract class AbstractLoanBrokerApp
     public List requestSend(int number, String endpoint, Map properties) throws Exception
     {
         List results = new ArrayList(number);
-        UMOMessage result;
+        MuleMessage result;
         for (int i = 0; i < number; i++)
         {
             result = client.send(endpoint, createRequest(), properties);

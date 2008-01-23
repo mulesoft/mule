@@ -10,12 +10,12 @@
 
 package org.mule.management.agents;
 
-import org.mule.impl.AbstractAgent;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.util.StringUtils;
+import org.mule.AbstractAgent;
 import org.mule.RegistryContext;
+import org.mule.api.MuleException;
+import org.mule.api.agent.Agent;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.util.StringUtils;
 
 import java.rmi.server.RMIClientSocketFactory;
 import java.text.MessageFormat;
@@ -73,13 +73,13 @@ public class DefaultJmxSupportAgent extends AbstractAgent
     }
 
     /** {@inheritDoc} */
-    public void start() throws UMOException
+    public void start() throws MuleException
     {
         // nothing to do
     }
 
     /** {@inheritDoc} */
-    public void stop() throws UMOException
+    public void stop() throws MuleException
     {
         // nothing to do
     }
@@ -102,7 +102,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      * There is no guarantee that by throwing a Recoverable exception that the Mule
      * instance will not shut down.
      *
-     * @throws org.mule.umo.lifecycle.InitialisationException
+     * @throws org.mule.api.lifecycle.InitialisationException
      *          if a fatal error occurs
      *          causing the Mule instance to shutdown
      */
@@ -111,7 +111,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
 
         try
         {
-            UMOAgent agent = createRmiAgent();
+            Agent agent = createRmiAgent();
             if (!isAgentRegistered(agent))
             {
                 RegistryContext.getRegistry().registerAgent(agent);
@@ -162,7 +162,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
             //TODO RM* this currently does nothing!!!
             muleContext.getRegistry().unregisterAgent(name);
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             throw new InitialisationException(e, this);
         }
@@ -239,7 +239,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         return new YourKitProfilerAgent();
     }
 
-    protected boolean isAgentRegistered(UMOAgent agent)
+    protected boolean isAgentRegistered(Agent agent)
     {
         return muleContext.getRegistry().lookupAgent(agent.getName()) != null;
     }

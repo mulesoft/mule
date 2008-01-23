@@ -45,7 +45,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.ssl.*
+                                    org.mule.transport.ssl.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

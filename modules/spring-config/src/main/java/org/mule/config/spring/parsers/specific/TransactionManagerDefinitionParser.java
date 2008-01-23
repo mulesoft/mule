@@ -10,8 +10,8 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
 public class TransactionManagerDefinitionParser extends MuleOrphanDefinitionParser
 {

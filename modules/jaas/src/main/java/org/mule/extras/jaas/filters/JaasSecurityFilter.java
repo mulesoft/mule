@@ -10,23 +10,23 @@
 
 package org.mule.extras.jaas.filters;
 
+import org.mule.api.MuleEvent;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.security.CredentialsNotSetException;
+import org.mule.api.security.CryptoFailureException;
+import org.mule.api.security.EncryptionStrategyNotFoundException;
+import org.mule.api.security.SecurityException;
+import org.mule.api.security.SecurityProviderNotFoundException;
+import org.mule.api.security.Authentication;
+import org.mule.api.security.Credentials;
+import org.mule.api.security.SecurityContext;
+import org.mule.api.security.UnauthorisedException;
+import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.extras.jaas.JaasAuthentication;
-import org.mule.impl.security.AbstractEndpointSecurityFilter;
-import org.mule.impl.security.MuleCredentials;
-import org.mule.impl.security.MuleHeaderCredentialsAccessor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.CredentialsNotSetException;
-import org.mule.umo.security.CryptoFailureException;
-import org.mule.umo.security.EncryptionStrategyNotFoundException;
-import org.mule.umo.security.SecurityException;
-import org.mule.umo.security.SecurityProviderNotFoundException;
-import org.mule.umo.security.UMOAuthentication;
-import org.mule.umo.security.UMOCredentials;
-import org.mule.umo.security.UMOSecurityContext;
-import org.mule.umo.security.UnauthorisedException;
-import org.mule.umo.security.UnknownAuthenticationTypeException;
+import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.MuleCredentials;
+import org.mule.security.MuleHeaderCredentialsAccessor;
 
 public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
 {
@@ -36,7 +36,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
         setCredentialsAccessor(new MuleHeaderCredentialsAccessor());
     }
 
-    protected final void authenticateInbound(UMOEvent event)
+    protected final void authenticateInbound(MuleEvent event)
         throws SecurityException, CryptoFailureException, EncryptionStrategyNotFoundException,
         UnknownAuthenticationTypeException
     {
@@ -47,9 +47,9 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
                 event.getEndpoint(), this);
         }
 
-        UMOCredentials user = new MuleCredentials(userHeader, getSecurityManager());
-        UMOAuthentication authResult;
-        UMOAuthentication umoAuthentication = new JaasAuthentication(user);
+        Credentials user = new MuleCredentials(userHeader, getSecurityManager());
+        Authentication authResult;
+        Authentication umoAuthentication = new JaasAuthentication(user);
         try
         {
             authResult = getSecurityManager().authenticate(umoAuthentication);
@@ -82,12 +82,12 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
             logger.debug("Authentication success: " + authResult.toString());
         }
 
-        UMOSecurityContext context = getSecurityManager().createSecurityContext(authResult);
+        SecurityContext context = getSecurityManager().createSecurityContext(authResult);
         context.setAuthentication(authResult);
         event.getSession().setSecurityContext(context);
     }
 
-    protected void authenticateOutbound(UMOEvent event)
+    protected void authenticateOutbound(MuleEvent event)
         throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
     {
         if (event.getSession().getSecurityContext() == null)
@@ -102,7 +102,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
                 return;
             }
         }
-        UMOAuthentication auth = event.getSession().getSecurityContext().getAuthentication();
+        Authentication auth = event.getSession().getSecurityContext().getAuthentication();
         if (isAuthenticate())
         {
             auth = getSecurityManager().authenticate(auth);

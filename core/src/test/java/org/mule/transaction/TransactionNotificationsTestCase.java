@@ -10,12 +10,12 @@
 
 package org.mule.transaction;
 
-import org.mule.impl.internal.notifications.TransactionNotification;
-import org.mule.impl.internal.notifications.TransactionNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.context.notification.TransactionNotificationListener;
+import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionException;
+import org.mule.context.notification.TransactionNotification;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.TransactionException;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.manager.UMOServerNotification;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -28,7 +28,7 @@ public class TransactionNotificationsTestCase extends AbstractMuleTestCase
 
         muleContext.registerListener(new TransactionNotificationListener()
         {
-            public void onNotification(UMOServerNotification notification)
+            public void onNotification(ServerNotification notification)
             {
                 if (notification.getAction() == TransactionNotification.TRANSACTION_BEGAN)
                 {
@@ -57,7 +57,7 @@ public class TransactionNotificationsTestCase extends AbstractMuleTestCase
 
         // the code is simple and deceptive :) The trick is this dummy transaction is handled by
         // a global TransactionCoordination instance, which binds it to the current thread.
-        UMOTransaction transaction = new DummyTransaction();
+        Transaction transaction = new DummyTransaction();
         transaction.begin();
         transaction.commit();
         transaction.rollback();

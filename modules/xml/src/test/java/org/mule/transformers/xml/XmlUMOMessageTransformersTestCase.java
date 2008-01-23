@@ -10,13 +10,13 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
+import org.mule.DefaultMuleMessage;
+import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.Transformer;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +25,12 @@ import org.custommonkey.xmlunit.XMLAssert;
 
 public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTestCase
 {
-    private UMOMessage testObject = null;
+    private MuleMessage testObject = null;
 
     // @Override
     protected void doSetUp() throws Exception
     {
-        RequestContext.setEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"), MuleTestUtils
+        RequestContext.setEvent(new DefaultMuleEvent(testObject, getTestEndpoint("test", "sender"), MuleTestUtils
             .getTestSession(), true));
     }
 
@@ -46,17 +46,17 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
         props.put("object", new Apple());
         props.put("number", new Integer(1));
         props.put("string", "hello");
-        testObject = new MuleMessage("test", props);
+        testObject = new DefaultMuleMessage("test", props);
     }
 
-    public UMOTransformer getTransformer() throws Exception
+    public Transformer getTransformer() throws Exception
     {
         ObjectToXml t = new ObjectToXml();
         t.setAcceptUMOMessage(true);
         return t;
     }
 
-    public UMOTransformer getRoundTripTransformer() throws Exception
+    public Transformer getRoundTripTransformer() throws Exception
     {
         return new XmlToObject();
     }
@@ -68,31 +68,31 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
 
     public Object getResultData()
     {
-        return "<org.mule.impl.MuleMessage>\n"
-               + " <adapter class=\"org.mule.providers.DefaultMessageAdapter\">\n"
+        return "<org.mule.DefaultMuleMessage>\n"
+               + " <adapter class=\"org.mule.transport.DefaultMessageAdapter\">\n"
                + " <message class=\"string\">test</message>\n"
                + "   <properties>\n"
                + "     <scopedMap class=\"tree-map\">\n"
-               + "       <comparator class=\"org.mule.umo.provider.PropertyScope$ScopeComarator\"/>\n"
+               + "       <comparator class=\"org.mule.api.transport.PropertyScope$ScopeComarator\"/>\n"
                + "       <entry>\n"
-               + "         <org.mule.umo.provider.PropertyScope>\n"
+               + "         <org.mule.api.transport.PropertyScope>\n"
                + "           <scope>invocation</scope>\n"
                + "           <order>0</order>\n"
-               + "         </org.mule.umo.provider.PropertyScope>\n"
+               + "         </org.mule.api.transport.PropertyScope>\n"
                + "         <map/>\n"
                + "       </entry>\n"
                + "       <entry>\n"
-               + "         <org.mule.umo.provider.PropertyScope>\n"
+               + "         <org.mule.api.transport.PropertyScope>\n"
                + "           <scope>inbound</scope>\n"
                + "           <order>1</order>\n"
-               + "         </org.mule.umo.provider.PropertyScope>\n"
+               + "         </org.mule.api.transport.PropertyScope>\n"
                + "         <map/>\n"
                + "       </entry>\n"
                + "       <entry>\n"
-               + "         <org.mule.umo.provider.PropertyScope>\n"
+               + "         <org.mule.api.transport.PropertyScope>\n"
                + "           <scope>outbound</scope>\n"
                + "           <order>2</order>\n"
-               + "         </org.mule.umo.provider.PropertyScope>\n"
+               + "         </org.mule.api.transport.PropertyScope>\n"
                + "         <map>\n"
                + "           <entry>\n"
                + "             <string>object</string>\n"
@@ -112,10 +112,10 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
                + "         </map>\n"
                + "       </entry>\n"
                + "       <entry>\n"
-               + "         <org.mule.umo.provider.PropertyScope>\n"
+               + "         <org.mule.api.transport.PropertyScope>\n"
                + "           <scope>session</scope>\n"
                + "           <order>3</order>\n"
-               + "         </org.mule.umo.provider.PropertyScope>\n"
+               + "         </org.mule.api.transport.PropertyScope>\n"
                + "         <map/>\n"
                + "       </entry>\n"
                + "     </scopedMap>\n"
@@ -126,11 +126,11 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
                + "       <string>string</string>\n"
                + "     </keySet>\n"
                + "     <applicationProperties class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n"
-               + "     <defaultScope reference=\"../scopedMap/entry[3]/org.mule.umo.provider.PropertyScope\"/>\n"
+               + "     <defaultScope reference=\"../scopedMap/entry[3]/org.mule.api.transport.PropertyScope\"/>\n"
                + "     <fallbackToRegistry>false</fallbackToRegistry>\n" + "   </properties>\n"
                + "   <attachments class=\"edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap\"/>\n"
                + "   <encoding>UTF-8</encoding>\n" + "   <id>3be5fe5a-87f8-11dc-a153-0b6db396665f</id>\n"
-               + " </adapter>\n" + " </org.mule.impl.MuleMessage>\n";
+               + " </adapter>\n" + " </org.mule.DefaultMuleMessage>\n";
     }
 
     /**
@@ -174,14 +174,14 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
             return false;
         }
 
-        if (expected instanceof UMOMessage && result instanceof UMOMessage)
+        if (expected instanceof MuleMessage && result instanceof MuleMessage)
         {
-            return ((UMOMessage)expected).getPayload().equals(((UMOMessage)result).getPayload())
-                            && ((UMOMessage)expected).getProperty("object").equals(
-                                ((UMOMessage)result).getProperty("object"))
-                            && ((UMOMessage)expected).getProperty("string").equals(
-                                ((UMOMessage)result).getProperty("string"))
-                            && ((UMOMessage)expected).getIntProperty("number", -1) == ((UMOMessage)result)
+            return ((MuleMessage)expected).getPayload().equals(((MuleMessage)result).getPayload())
+                            && ((MuleMessage)expected).getProperty("object").equals(
+                                ((MuleMessage)result).getProperty("object"))
+                            && ((MuleMessage)expected).getProperty("string").equals(
+                                ((MuleMessage)result).getProperty("string"))
+                            && ((MuleMessage)expected).getIntProperty("number", -1) == ((MuleMessage)result)
                                 .getIntProperty("number", -2);
         }
         else

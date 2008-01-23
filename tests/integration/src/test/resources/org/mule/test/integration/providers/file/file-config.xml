@@ -15,7 +15,7 @@
                     <file:filter-filename-wildcard pattern="*.data"/>
                 </inbound-endpoint>
             </inbound>
-            <component class="org.mule.test.integration.providers.file.FileFunctionalTestCase$FileTestComponent"/>
+            <component class="org.mule.test.integration.transport.file.FileFunctionalTestCase$FileTestComponent"/>
         </service>
     </model>
 </mule>

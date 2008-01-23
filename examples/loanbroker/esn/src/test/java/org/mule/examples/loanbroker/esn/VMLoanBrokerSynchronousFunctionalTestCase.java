@@ -10,9 +10,9 @@
 
 package org.mule.examples.loanbroker.esn;
 
+import org.mule.api.component.Component;
 import org.mule.examples.loanbroker.tests.AbstractLoanBrokerTestCase;
-import org.mule.impl.model.seda.SedaModel;
-import org.mule.umo.UMOComponent;
+import org.mule.model.seda.SedaModel;
 
 
 public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBrokerTestCase
@@ -43,7 +43,7 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
 
     protected void assertComponent(SedaModel model, String name)
     {
-        UMOComponent component = muleContext.getRegistry().lookupComponent(name);
+        Component component = muleContext.getRegistry().lookupComponent(name);
         assertNotNull(name + " missing", component);
     }
 

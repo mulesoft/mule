@@ -10,13 +10,13 @@
 
 package org.mule.extras.jaas;
 
-import org.mule.config.MuleProperties;
+import org.mule.api.EncryptionStrategy;
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.security.MuleCredentials;
+import org.mule.security.MuleCredentials;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.UMOExceptionPayload;
-import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,10 +30,10 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         this.setDisposeManagerPerSuite(true);
     }
     
-    public void assertExceptionPayload(UMOMessage umoMessage, String exceptionMessage)
+    public void assertExceptionPayload(MuleMessage umoMessage, String exceptionMessage)
     {
         assertNotNull(umoMessage.getExceptionPayload());
-        UMOExceptionPayload exceptionPayload = umoMessage.getExceptionPayload();
+        ExceptionPayload exceptionPayload = umoMessage.getExceptionPayload();
         assertNotNull(exceptionPayload);
         assertEquals(exceptionMessage, exceptionPayload.getMessage());
     }
@@ -43,12 +43,12 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://test", "Test", props);
+        MuleMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
@@ -60,12 +60,12 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://test", "Test", props);
+        MuleMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
@@ -77,12 +77,12 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://test", "Test", props);
+        MuleMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
@@ -96,12 +96,12 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Evil", "dragon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://test", "Test", props);
+        MuleMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
@@ -114,12 +114,12 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "evil", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        UMOMessage m = client.send("vm://test", "Test", props);
+        MuleMessage m = client.send("vm://test", "Test", props);
 
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);

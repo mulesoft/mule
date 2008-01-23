@@ -10,11 +10,11 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.umo.UMOEventContext;
+import org.mule.api.MuleEventContext;
 
 /**
  * A test object not implementing Callable, but having a matching method accepting
- * UMOEventContext.
+ * MuleEventContext.
  */
 public class Kiwi implements Fruit
 {
@@ -25,7 +25,7 @@ public class Kiwi implements Fruit
 
     private boolean bitten;
 
-    public void handle(UMOEventContext eventContext) throws Exception
+    public void handle(MuleEventContext eventContext) throws Exception
     {
         final Object payload = eventContext.transformMessage();
         if (payload instanceof FruitLover)

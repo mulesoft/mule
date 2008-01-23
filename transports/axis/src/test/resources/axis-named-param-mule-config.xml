@@ -14,7 +14,7 @@
             <inbound>
                 <inbound-endpoint address="vm://mycomponent1"/>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
             <outbound>
                 <outbound-pass-through-router>
                     <axis:outbound-endpoint address="http://localhost:62111/mule/mycomponent2?method=echo"

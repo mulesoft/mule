@@ -8,7 +8,7 @@
 
     <${TransportNameLower}:connector name="${TransportNameLower}Connector">
         <!-- TODO Add connector specific properties here and then assert that 
-             they have been set in org.mule.providers.${TransportNameLower}.${TransportName}NamespaceHandlerTestCase -->
+             they have been set in org.mule.transport.${TransportNameLower}.${TransportName}NamespaceHandlerTestCase -->
     </${TransportNameLower}:connector>
 
 </mule>

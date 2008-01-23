@@ -2,7 +2,7 @@
                  org.mule.examples.loanbroker.messages.Customer,
                  org.mule.examples.loanbroker.messages.CustomerQuoteRequest,
                  org.mule.extras.client.MuleClient,
-                 org.mule.umo.UMOMessage,
+                 org.mule.api.MuleMessage,
                  java.util.Iterator,
                  java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
@@ -38,7 +38,7 @@
         double amount = Double.valueOf(amountString).doubleValue();
         int duration = Integer.parseInt(durationString);
         CustomerQuoteRequest loanRequest = new CustomerQuoteRequest(cust, amount,  duration);
-        UMOMessage message = client.send("CustomerRequests", loanRequest, null);
+        MuleMessage message = client.send("CustomerRequests", loanRequest, null);
         %>
 <h3>The best quote was received from: <br/> <%=message.getPayload()%></h3>
      <%} else {%>

@@ -10,10 +10,10 @@
 
 package org.mule.extras.pgp;
 
+import org.mule.api.EncryptionStrategy;
+import org.mule.api.security.SecurityManager;
+import org.mule.api.security.SecurityProvider;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.security.UMOSecurityManager;
-import org.mule.umo.security.UMOSecurityProvider;
 
 public class PgpNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -33,13 +33,13 @@ public class PgpNamespaceHandlerTestCase extends FunctionalTestCase
         knownProperties(getEncryptionStrategy("keyBasedEncryptionStrategy"));
     }
 
-    protected UMOSecurityProvider getProvider(String name)
+    protected SecurityProvider getProvider(String name)
     {
-        UMOSecurityManager securityManager = muleContext.getSecurityManager();
+        SecurityManager securityManager = muleContext.getSecurityManager();
         return securityManager.getProvider(name);
     }
 
-    protected void knownProperties(UMOSecurityProvider provider)
+    protected void knownProperties(SecurityProvider provider)
     {
         assertNotNull(provider);
         assertTrue(provider instanceof PGPSecurityProvider);
@@ -48,13 +48,13 @@ public class PgpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(pgpProvider.getKeyManager() instanceof PGPKeyRingImpl);
     }
     
-    protected UMOEncryptionStrategy getEncryptionStrategy(String name)
+    protected EncryptionStrategy getEncryptionStrategy(String name)
     {
-        UMOSecurityManager securityManager = muleContext.getSecurityManager();
+        SecurityManager securityManager = muleContext.getSecurityManager();
         return securityManager.getEncryptionStrategy(name);
     }
     
-    protected void knownProperties(UMOEncryptionStrategy encryptionStrategy)
+    protected void knownProperties(EncryptionStrategy encryptionStrategy)
     {
         assertNotNull(encryptionStrategy);
         assertTrue(encryptionStrategy instanceof KeyBasedEncryptionStrategy);

@@ -10,11 +10,11 @@
 
 package org.mule.extras.client;
 
-import org.mule.MuleException;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.Transformer;
 import org.mule.extras.client.i18n.ClientMessages;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.transformer.UMOTransformer;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -33,7 +33,7 @@ public class MuleProxyListener implements InvocationHandler
     private Object proxy;
     private MuleClient client;
 
-    public MuleProxyListener(Class listenerClass, String componentName) throws UMOException
+    public MuleProxyListener(Class listenerClass, String componentName) throws MuleException
     {
         setListenerClass(listenerClass);
         setEventTransformer(new EventObjectTransformer());
@@ -44,7 +44,7 @@ public class MuleProxyListener implements InvocationHandler
 
     public MuleProxyListener(Class listenerClass,
                              AbstractEventTransformer eventTransformer,
-                             String componentName) throws UMOException
+                             String componentName) throws MuleException
     {
         setListenerClass(listenerClass);
         setEventTransformer(eventTransformer);
@@ -80,7 +80,7 @@ public class MuleProxyListener implements InvocationHandler
         this.listenerClass = listenerClass;
     }
 
-    public UMOTransformer getEventTransformer()
+    public Transformer getEventTransformer()
     {
         return eventTransformer;
     }
@@ -114,13 +114,13 @@ public class MuleProxyListener implements InvocationHandler
     {
         if (args.length == 0)
         {
-            throw new MuleException(ClientMessages.noArgsForProxy());
+            throw new DefaultMuleException(ClientMessages.noArgsForProxy());
         }
-        UMOMessage message = eventTransformer.transform(args[0], method);
+        MuleMessage message = eventTransformer.transform(args[0], method);
         if (!"void".equals(method.getReturnType().getName()))
         {
-            UMOMessage result = client.sendDirect(componentName, null, message);
-            if (UMOMessage.class.equals(method.getReturnType()))
+            MuleMessage result = client.sendDirect(componentName, null, message);
+            if (MuleMessage.class.equals(method.getReturnType()))
             {
                 return result;
             }

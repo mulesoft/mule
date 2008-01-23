@@ -10,9 +10,9 @@
 
 package org.mule.management.agents;
 
-import org.mule.umo.security.provider.AutoDiscoverySecurityProviderFactory;
-import org.mule.umo.security.provider.SecurityProviderFactory;
-import org.mule.umo.security.provider.SecurityProviderInfo;
+import org.mule.api.security.provider.AutoDiscoverySecurityProviderFactory;
+import org.mule.api.security.provider.SecurityProviderFactory;
+import org.mule.api.security.provider.SecurityProviderInfo;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 

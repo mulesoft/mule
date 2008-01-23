@@ -9,13 +9,13 @@
  */
 package org.mule.test.integration.config;
 
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
 
 /**
  * TODO
  */
-public class TestFilter implements UMOFilter
+public class TestFilter implements Filter
 {
     private String foo;
     private int bar;
@@ -40,7 +40,7 @@ public class TestFilter implements UMOFilter
         this.foo = foo;
     }
 
-    public boolean accept(UMOMessage message)
+    public boolean accept(MuleMessage message)
     {
         return true;
     }

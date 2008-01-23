@@ -10,12 +10,8 @@
 
 package org.mule.test.integration.resolvers;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.extras.client.MuleClient;
-import org.mule.umo.UMOMessage;
-
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class EntryPointResolverTestCase extends AbstractEntryPointResolverTestCase
 {

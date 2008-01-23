@@ -102,7 +102,7 @@
                          <configuration>
                              <instructions>
                                  <Export-Package>
-                                     org.mule.providers.ftp.*
+                                     org.mule.transport.ftp.*
                                  </Export-Package>
                              </instructions>
                          </configuration>

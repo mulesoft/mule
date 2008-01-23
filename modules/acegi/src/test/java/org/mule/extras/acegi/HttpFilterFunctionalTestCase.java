@@ -10,8 +10,8 @@
 
 package org.mule.extras.acegi;
 
-import org.mule.providers.http.HttpConstants;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;

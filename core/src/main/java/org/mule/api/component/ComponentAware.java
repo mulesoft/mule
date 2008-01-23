@@ -1,0 +1,31 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.api.component;
+
+import org.mule.api.config.ConfigurationException;
+
+/**
+ * <code>ComponentAware</code> is an injector interface that will supply a
+ * Component to the object. This interface should be implemented by services
+ * managed by Mule that want to receive their Component instance. The
+ * Component will be set before any initialisation method is called. i.e. if the
+ * component implements org.mule.api.lifecycle.Initialisable, the descriptor will be
+ * set before initialise() method is called.
+ * 
+ * @see org.mule.api.lifecycle.Initialisable
+ * @see Component
+ */
+public interface ComponentAware
+{
+
+    void setComponent(Component component) throws ConfigurationException;
+
+}

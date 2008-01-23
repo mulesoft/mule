@@ -12,13 +12,14 @@ package org.mule.extras.spring.events;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
 /**
- * <code>AsynchronousEventListener</code> will proces a received Event in a
+ * <code>AsynchronousEventListener</code> will proces a received MuleEvent in a
  * separate Thread. The thread pool passed in the constructor will determine how many
  * threads can be executed at any time.
  */

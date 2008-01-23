@@ -10,10 +10,10 @@
 
 package org.mule.test.integration.client;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.service.Person;
-import org.mule.umo.UMOMessage;
 
 public class MuleClientAxisTestCase extends FunctionalTestCase
 {
@@ -27,7 +27,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage result = client.send("axis:http://localhost:38104/mule/services/mycomponent2?method=echo",
+        MuleMessage result = client.send("axis:http://localhost:38104/mule/services/mycomponent2?method=echo",
             "test", null);
         assertNotNull(result);
         assertEquals("test", result.getPayloadAsString());
@@ -37,7 +37,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage result = client.send(
+        MuleMessage result = client.send(
             "axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Fred", null);
         assertNotNull(result);
         logger.debug(result.getPayload());
@@ -51,7 +51,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         String[] args = new String[]{"Betty", "Rubble"};
-        UMOMessage result = client.send(
+        MuleMessage result = client.send(
             "axis:http://localhost:38104/mule/services/mycomponent3?method=addPerson", args, null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
@@ -75,7 +75,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
         String uri = "axis:http://localhost:38104/mule/services/mycomponent3?method=addPerson";
         client.send(uri, person, null);
         uri = "axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson";
-        UMOMessage result = client.send(uri, "Joe", null);
+        MuleMessage result = client.send(uri, "Joe", null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Joe", ((Person)result.getPayload()).getFirstName());

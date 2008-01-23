@@ -10,9 +10,9 @@
 
 package org.mule.test.components;
 
+import org.mule.api.component.Component;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.umo.UMOComponent;
 
 public class ServiceDescriptorTestCase extends FunctionalTestCase
 {
@@ -23,7 +23,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
 
     public void testGenericObjectFactory() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("orange1");
+        Component c = muleContext.getRegistry().lookupComponent("orange1");
         
         Object service =  c.getServiceFactory().getOrCreate();
         assertTrue("Service should be an Orange", service instanceof Orange);
@@ -33,7 +33,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     
     public void testGenericObjectFactoryWithProperties() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("orange2");
+        Component c = muleContext.getRegistry().lookupComponent("orange2");
 
         // Create an orange
         Object service =  c.getServiceFactory().getOrCreate();
@@ -50,7 +50,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     
     public void testSingletonObjectFactory() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("orange3");
+        Component c = muleContext.getRegistry().lookupComponent("orange3");
         Object service =  c.getServiceFactory().getOrCreate();
         assertTrue("Service should be an Orange", service instanceof Orange);
         // Default values
@@ -59,7 +59,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
     
     public void testSpringFactoryBean() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("orange4");
+        Component c = muleContext.getRegistry().lookupComponent("orange4");
         Object service =  c.getServiceFactory().getOrCreate();
         assertNotNull(service);
         assertTrue("Service should be an Orange but is: " + service.getClass(), service instanceof Orange);

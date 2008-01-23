@@ -10,9 +10,9 @@
 
 package org.mule.extras.wssecurity.testcases;
 
+import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.extras.wssecurity.filters.WsSecurityFilter;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.security.UMOEndpointSecurityFilter;
 
 public class WsSecurityNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -24,7 +24,7 @@ public class WsSecurityNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testPropertiesOnFilter() throws Exception
     {
-        UMOEndpointSecurityFilter filter = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        EndpointSecurityFilter filter = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "endpoint").getSecurityFilter();
         assertTrue(filter instanceof WsSecurityFilter);
         assertNotNull(((WsSecurityFilter)filter).getWsDecryptionFile());

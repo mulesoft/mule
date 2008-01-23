@@ -10,12 +10,12 @@
 
 package org.mule.test.usecases;
 
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.lifecycle.Callable;
+import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.Callable;
 
 public class ReceiverComponent implements Callable
 {
-    public Object onCall(UMOEventContext eventContext) throws Exception
+    public Object onCall(MuleEventContext eventContext) throws Exception
     {
         return "Received: " + eventContext.getMessageAsString();
     }

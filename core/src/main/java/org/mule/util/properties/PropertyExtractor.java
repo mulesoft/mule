@@ -10,7 +10,7 @@
 
 package org.mule.util.properties;
 
-import org.mule.umo.NamedObject;
+import org.mule.api.NamedObject;
 
 /**
  * <code>PropertyExtractor</code> extracts a property from the message in a generic

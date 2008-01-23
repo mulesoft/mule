@@ -10,8 +10,8 @@
 
 package org.mule.test.integration;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class VisualizerServiceTestCase extends FunctionalTestCase
 
     public void testVisualizer() throws Exception
     {
-        MuleMessage m = new MuleMessage("ooh, I love pictures!");
+        DefaultMuleMessage m = new DefaultMuleMessage("ooh, I love pictures!");
         FileDataSource ds = new FileDataSource(new File("tests/integration/src/test/resources/" + getConfigResources()).getAbsoluteFile());
         m.addAttachment("visualizer-service", new DataHandler(ds));
         MuleClient client = new MuleClient();

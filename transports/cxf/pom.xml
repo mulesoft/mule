@@ -178,7 +178,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.soap.cxf.*
+                                    org.mule.transport.soap.cxf.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

@@ -13,7 +13,7 @@
             <inbound>
                 <axis:inbound-endpoint address="http://localhost:62181/services"/>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
             <async-reply>
                 <inbound-endpoint address="http://localhost:62182/reply"/>
             </async-reply>

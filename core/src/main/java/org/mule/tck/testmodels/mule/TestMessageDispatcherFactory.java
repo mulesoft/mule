@@ -9,10 +9,10 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.providers.AbstractMessageDispatcherFactory;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.api.MuleException;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.MessageDispatcher;
+import org.mule.transport.AbstractMessageDispatcherFactory;
 
 /**
  * A Test message dispatcher factory that is used for testing configuration loading since "test://"
@@ -21,7 +21,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 public class TestMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
 
-    public UMOMessageDispatcher create(UMOImmutableEndpoint endpoint) throws UMOException
+    public MessageDispatcher create(ImmutableEndpoint endpoint) throws MuleException
     {
         return new TestMessageDispatcher(endpoint);
     }

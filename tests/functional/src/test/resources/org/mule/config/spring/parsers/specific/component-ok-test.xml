@@ -11,7 +11,7 @@
                 <inbound-endpoint address="test://test-in" />
             </inbound>
             <component>
-                <singleton-object class="org.mule.components.simple.StaticComponent" />
+                <singleton-object class="org.mule.component.simple.StaticComponent" />
                 <binding interface="java.lang.String" method="setPrefix">
                     <outbound-endpoint address="test://test" />
                 </binding>
@@ -22,7 +22,7 @@
             <inbound>
                 <inbound-endpoint address="test://test-in" />
             </inbound>
-            <component class="org.mule.components.simple.StaticComponent">
+            <component class="org.mule.component.simple.StaticComponent">
                 <binding interface="java.lang.String" method="setPrefix">
                     <outbound-endpoint address="test://test" />
                 </binding>

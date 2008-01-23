@@ -10,7 +10,7 @@
 
 package org.mule.test.config;
 
-import org.mule.impl.MuleMessage;
+import org.mule.DefaultMuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -25,7 +25,7 @@ public class JXPathPropertyExtractorTestCase extends AbstractMuleTestCase
         Apple apple = new Apple();
         apple.wash();
         FruitBowl payload = new FruitBowl(apple, new Banana());
-        MuleMessage msg = new MuleMessage(payload);
+        DefaultMuleMessage msg = new DefaultMuleMessage(payload);
 
         JXPathPropertyExtractor e = new JXPathPropertyExtractor();
         Object value = e.getProperty("apple/washed", msg);

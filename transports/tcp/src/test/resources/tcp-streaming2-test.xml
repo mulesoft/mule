@@ -24,7 +24,7 @@
                 <tcp:inbound-endpoint host="localhost" port="65432" synchronous="false"/>
             </inbound>
             <component>
-                <singleton-object class="org.mule.components.simple.PassThroughComponent"/>
+                <singleton-object class="org.mule.component.simple.PassThroughComponent"/>
             </component>
             <outbound>
                 <outbound-pass-through-router>
@@ -39,7 +39,7 @@
             </inbound>
             <component>
                 <!-- This component knows how to look for EOF -->
-                <singleton-object class="org.mule.providers.tcp.integration.EOFStreamingTestComponent"/>
+                <singleton-object class="org.mule.transport.tcp.integration.EOFStreamingTestComponent"/>
             </component>
         </service>
     </model>

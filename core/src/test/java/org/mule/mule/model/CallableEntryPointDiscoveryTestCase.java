@@ -10,11 +10,11 @@
 
 package org.mule.mule.model;
 
-import org.mule.impl.model.resolvers.CallableEntryPointResolver;
+import org.mule.api.model.InvocationResult;
+import org.mule.model.resolvers.CallableEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.WaterMelon;
-import org.mule.umo.model.InvocationResult;
 
 public class CallableEntryPointDiscoveryTestCase extends AbstractMuleTestCase
 {

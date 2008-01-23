@@ -10,31 +10,31 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.umo.UMOException;
+import org.mule.api.MuleException;
 
 /**
- * <code>ModelServiceMBean</code> JMX Service interface for the UMOModel.
+ * <code>ModelServiceMBean</code> JMX Service interface for the Model.
  */
 public interface ModelServiceMBean
 {
 
-    void start() throws UMOException;
+    void start() throws MuleException;
 
-    void stop() throws UMOException;
+    void stop() throws MuleException;
 
 //    boolean isComponentRegistered(String name);
 //
 //    UMODescriptor getComponentDescriptor(String name);
 //
-//    void startComponent(String name) throws UMOException;
+//    void startComponent(String name) throws MuleException;
 //
-//    void stopComponent(String name) throws UMOException;
+//    void stopComponent(String name) throws MuleException;
 //
-//    void pauseComponent(String name) throws UMOException;
+//    void pauseComponent(String name) throws MuleException;
 //
-//    void resumeComponent(String name) throws UMOException;
+//    void resumeComponent(String name) throws MuleException;
 //
-//    void unregisterComponent(String name) throws UMOException;
+//    void unregisterComponent(String name) throws MuleException;
 
     String getName();
 

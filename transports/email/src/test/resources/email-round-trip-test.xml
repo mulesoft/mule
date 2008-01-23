@@ -15,8 +15,8 @@
     <vm:connector name="default"/>
     <vm:connector name="queue" queueEvents="true"/>
 
-    <custom-transformer name="rfc822-mime" class="org.mule.providers.email.transformers.Rfc822ByteArraytoMimeMessage"/>
-    <custom-transformer name="mime-rfc822" class="org.mule.providers.email.transformers.MimeMessageToRfc822ByteArray"/>
+    <custom-transformer name="rfc822-mime" class="org.mule.transport.email.transformers.Rfc822ByteArraytoMimeMessage"/>
+    <custom-transformer name="mime-rfc822" class="org.mule.transport.email.transformers.MimeMessageToRfc822ByteArray"/>
 
     <model name="main">
 

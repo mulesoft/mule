@@ -11,10 +11,10 @@
 package org.mule.extras.spring.transaction;
 
 import org.mule.api.MuleContext;
+import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionException;
+import org.mule.api.transaction.TransactionFactory;
 import org.mule.transaction.AbstractSingleResourceTransaction;
-import org.mule.umo.TransactionException;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionFactory;
 
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.jms.connection.JmsResourceHolder;
@@ -25,7 +25,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * TODO: document this class
  */
-public class SpringTransactionFactory implements UMOTransactionFactory
+public class SpringTransactionFactory implements TransactionFactory
 {
 
     private PlatformTransactionManager manager;
@@ -35,9 +35,9 @@ public class SpringTransactionFactory implements UMOTransactionFactory
         super();
     }
 
-    public UMOTransaction beginTransaction(MuleContext muleContext) throws TransactionException
+    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException
     {
-        UMOTransaction tx = new SpringTransaction();
+        Transaction tx = new SpringTransaction();
         tx.begin();
         return tx;
     }

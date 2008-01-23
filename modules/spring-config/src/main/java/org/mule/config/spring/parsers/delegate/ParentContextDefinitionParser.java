@@ -10,7 +10,6 @@
 
 package org.mule.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 
 import java.util.HashMap;

@@ -34,7 +34,7 @@ public class OrderManagerBean extends TestMuleEventBean
         // Cast the event to a Mule event, we'll use this to get the AppContext
         MuleApplicationEvent muleEvent = (MuleApplicationEvent)event;
 
-        // Create a new MuleEvent. This will be sent to the replyTo
+        // Create a new DefaultMuleEvent. This will be sent to the replyTo
         // address
         MuleApplicationEvent returnEvent = null;
 

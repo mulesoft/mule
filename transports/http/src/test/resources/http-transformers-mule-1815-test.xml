@@ -57,7 +57,7 @@
             <inbound>
                 <inbound-endpoint ref="adapted"/>
             </inbound>
-            <component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
+            <component class="org.mule.transport.http.issues.NoTransformPassThroughComponent"/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://echo2" synchronous="true"/>
@@ -69,7 +69,7 @@
             <inbound>
                 <inbound-endpoint address="vm://echo2" synchronous="true"/>
             </inbound>
-            <component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
+            <component class="org.mule.transport.http.issues.NoTransformFunctionalTestComponent"/>
         </service>
 
     </model>
@@ -83,7 +83,7 @@
             <inbound>
                 <http:inbound-endpoint ref="ignored" transformer-refs="appendString"/>
             </inbound>
-            <component class="org.mule.providers.http.issues.NoTransformPassThroughComponent"/>
+            <component class="org.mule.transport.http.issues.NoTransformPassThroughComponent"/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://echo3" synchronous="true"/>
@@ -95,7 +95,7 @@
             <inbound>
                 <inbound-endpoint address="vm://echo3" synchronous="true" transformer-refs="appendString2"/>
             </inbound>
-            <component class="org.mule.providers.http.issues.NoTransformFunctionalTestComponent"/>
+            <component class="org.mule.transport.http.issues.NoTransformFunctionalTestComponent"/>
         </service>
 
     </model>

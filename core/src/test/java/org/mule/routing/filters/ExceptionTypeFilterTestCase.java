@@ -10,10 +10,10 @@
 
 package org.mule.routing.filters;
 
-import org.mule.impl.MuleMessage;
-import org.mule.impl.message.ExceptionPayload;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOMessage;
 
 import java.io.IOException;
 
@@ -24,14 +24,14 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase
     {
         ExceptionTypeFilter filter = new ExceptionTypeFilter();
         assertNull(filter.getExpectedType());
-        UMOMessage m = new MuleMessage("test");
+        MuleMessage m = new DefaultMuleMessage("test");
         assertTrue(!filter.accept(m));
-        m.setExceptionPayload(new ExceptionPayload(new IllegalArgumentException("test")));
+        m.setExceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test")));
         assertTrue(filter.accept(m));
 
         filter = new ExceptionTypeFilter(IOException.class);
         assertTrue(!filter.accept(m));
-        m.setExceptionPayload(new ExceptionPayload(new IOException("test")));
+        m.setExceptionPayload(new DefaultExceptionPayload(new IOException("test")));
         assertTrue(filter.accept(m));
     }
 

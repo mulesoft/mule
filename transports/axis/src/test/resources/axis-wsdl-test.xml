@@ -15,7 +15,7 @@
                 <axis:inbound-endpoint address="http://localhost:62081/services"
                     serviceNamespace="http://foo"/>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
 
         <service name="EchoService2">
@@ -26,7 +26,7 @@
                                   wsdlServicePort="muleServicePort"/>
                 </axis:inbound-endpoint>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
 
         <service name="EchoService3">
@@ -34,7 +34,7 @@
                 <axis:inbound-endpoint address="http://localhost:62083/services"
                         wsdlFile="test-service.wsdl"/>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
 
     </model>

@@ -12,10 +12,10 @@ package org.mule.util;
 
 import org.mule.tck.AbstractMuleTestCase;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 

@@ -11,9 +11,11 @@
 package org.mule.management.config;
 
 import org.mule.RegistryContext;
+import org.mule.agent.EndpointNotificationLoggerAgent;
+import org.mule.agent.Log4jNotificationLoggerAgent;
+import org.mule.api.agent.Agent;
+import org.mule.api.registry.Registry;
 import org.mule.config.spring.SpringRegistry;
-import org.mule.impl.internal.admin.EndpointNotificationLoggerAgent;
-import org.mule.impl.internal.admin.Log4jNotificationLoggerAgent;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.agents.JmxServerNotificationAgent;
 import org.mule.management.agents.Log4jAgent;
@@ -21,10 +23,8 @@ import org.mule.management.agents.Mx4jAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
-import org.mule.registry.Registry;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestAgent;
-import org.mule.umo.manager.UMOAgent;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -42,7 +42,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testSimpleJmxAgentConfig() throws Exception
     {
-        UMOAgent agent = muleContext.getRegistry().lookupAgent("simpleJmxServer");
+        Agent agent = muleContext.getRegistry().lookupAgent("simpleJmxServer");
         assertNotNull(agent);
         assertEquals(JmxAgent.class, agent.getClass());
         JmxAgent jmxAgent = (JmxAgent) agent;
@@ -87,7 +87,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         Registry registry = RegistryContext.getRegistry();
         SpringRegistry springRegistry = (SpringRegistry) registry.getParent();
         assertNotNull(springRegistry);
-        Collection agents = springRegistry.lookupObjects(UMOAgent.class);
+        Collection agents = springRegistry.lookupObjects(Agent.class);
         assertEquals(agents.size(), 8);
         Iterator iter = agents.iterator();
         assertTrue(iter.next() instanceof JmxAgent);

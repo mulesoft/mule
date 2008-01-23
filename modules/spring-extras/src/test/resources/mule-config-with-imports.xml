@@ -34,7 +34,7 @@
     <connector name="dummyConnector" className="org.mule.tck.testmodels.mule.TestConnector">
         <threading-profile id="dispatcher" maxBufferSize="2"/>
         <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
-        <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
+        <connection-strategy className="org.mule.transport.SimpleRetryConnectionStrategy">
             <properties>
                 <property name="retryCount" value="4"/>
                 <property name="frequency" value="3000"/>
@@ -58,7 +58,7 @@
                 <container-property name="containerProperty" reference="string"/>
             </properties>
         </transformer>
-        <transformer name="Default" className="org.mule.transformers.NoActionTransformer"/>
+        <transformer name="Default" className="org.mule.transformer.NoActionTransformer"/>
     </transformers>
 
     <global-endpoints>
@@ -140,7 +140,7 @@
             <interceptor name="default"/>
             <interceptor className="org.mule.interceptors.TimerInterceptor"/>
 
-            <exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
+            <exception-strategy className="org.mule.DefaultComponentExceptionStrategy">
                 <endpoint address="test://orange.exceptions"/>
             </exception-strategy>
 
@@ -197,7 +197,7 @@
 
             <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
 
-            <exception-strategy className="org.mule.impl.DefaultExceptionStrategy"/>
+            <exception-strategy className="org.mule.DefaultExceptionStrategy"/>
         </mule-descriptor>
     </model>
 

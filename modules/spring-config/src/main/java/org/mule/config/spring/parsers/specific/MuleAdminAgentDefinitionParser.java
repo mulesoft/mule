@@ -9,13 +9,13 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.agent.MuleAdminAgent;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.impl.internal.admin.MuleAdminAgent;
 
-import org.w3c.dom.Element;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.w3c.dom.Element;
 
 public class MuleAdminAgentDefinitionParser extends MuleOrphanDefinitionParser
 {

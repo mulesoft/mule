@@ -10,14 +10,14 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.routing.RoutingException;
-import org.mule.umo.routing.UMOOutboundRouterCollection;
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleException;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.routing.RoutingException;
 
 /**
  * <code>ForwardingConsumer</code> is used to forward an incoming event over
@@ -27,33 +27,33 @@ import org.mule.umo.routing.UMOOutboundRouterCollection;
 public class ForwardingConsumer extends SelectiveConsumer
 {
 
-    public UMOEvent[] process(UMOEvent event) throws MessagingException
+    public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
         if (super.process(event) != null)
         {
-            UMOOutboundRouterCollection router = event.getComponent().getOutboundRouter();
+            OutboundRouterCollection router = event.getComponent().getOutboundRouter();
 
             // Set the stopFurtherProcessing flag to true to inform the
-            // InboundRouterCollection not to route these events to the component
+            // DefaultInboundRouterCollection not to route these events to the component
             event.setStopFurtherProcessing(true);
 
             if (router == null)
             {
                 logger.debug("Descriptor has no outbound router configured to forward to, continuing with normal processing");
-                return new UMOEvent[]{event};
+                return new MuleEvent[]{event};
             }
             else
             {
                 try
                 {
-                    UMOMessage message = new MuleMessage(event.transformMessage(), event.getMessage());
+                    MuleMessage message = new DefaultMuleMessage(event.transformMessage(), event.getMessage());
 
-                    UMOMessage response = router.route(message, event.getSession(), event.isSynchronous());
+                    MuleMessage response = router.route(message, event.getSession(), event.isSynchronous());
                     // TODO What's the correct behaviour for async endpoints?
                     // maybe let router.route() return a Future for the returned msg?
                     if (response != null)
                     {
-                        return new UMOEvent[]{new MuleEvent(response, event)};
+                        return new MuleEvent[]{new DefaultMuleEvent(response, event)};
                     }
                     else
                     {
@@ -61,7 +61,7 @@ public class ForwardingConsumer extends SelectiveConsumer
                     }
 
                 }
-                catch (UMOException e)
+                catch (MuleException e)
                 {
                     throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
                 }

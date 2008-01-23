@@ -10,15 +10,15 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.umo.UMOMessage;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
 
 /**
  * <code>ObjectToXml</code> converts any object to XML using Xstream. Xstream uses
  * some clever tricks so objects that get marshalled to XML do not need to implement
  * any interfaces including Serializable and you don't even need to specify a default
- * constructor. If <code>UMOMessage</code> is configured as a source type on this
- * transformer by calling <code>setAcceptUMOMessage(true)</code> then the UMOMessage
+ * constructor. If <code>MuleMessage</code> is configured as a source type on this
+ * transformer by calling <code>setAcceptUMOMessage(true)</code> then the MuleMessage
  * will be serialised. This is useful for transports such as TCP where the message
  * headers would normally be lost.
  */
@@ -34,26 +34,26 @@ public class ObjectToXml extends AbstractXStreamTransformer
 
     public boolean isAcceptUMOMessage()
     {
-        return this.sourceTypes.contains(UMOMessage.class);
+        return this.sourceTypes.contains(MuleMessage.class);
     }
 
     public void setAcceptUMOMessage(boolean value)
     {
         if (value)
         {
-            this.registerSourceType(UMOMessage.class);
+            this.registerSourceType(MuleMessage.class);
         }
         else
         {
-            this.unregisterSourceType(UMOMessage.class);
+            this.unregisterSourceType(MuleMessage.class);
         }
     }
 
-    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
+    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object src = message.getPayload();
         /*
-         * If the UMOMessage source type has been registered that we can assume that
+         * If the MuleMessage source type has been registered that we can assume that
          * the whole message is to be serialised to Xml, not just the payload. This
          * can be useful for protocols such as tcp where the protocol does not
          * support headers, thus the whole messgae needs to be serialized

@@ -11,7 +11,7 @@
     <vm:connector name="test">
         <service-overrides
                 dispatcherFactory="org.mule.tck.testmodels.mule.TestMessageDispatcherFactory"
-                inboundTransformer="org.mule.transformers.NoActionTransformer"
+                inboundTransformer="org.mule.transformer.NoActionTransformer"
                 />
     </vm:connector>
 

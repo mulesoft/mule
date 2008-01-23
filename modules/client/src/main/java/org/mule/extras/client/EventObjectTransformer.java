@@ -10,19 +10,19 @@
 
 package org.mule.extras.client;
 
-import org.mule.impl.MuleMessage;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.transformer.TransformerException;
 
 import java.util.EventObject;
 
 /**
  * <code>EventObjectTransformer</code> converts a
- * <code>java.util.EventObject</code> into a <code>MuleMessage</code>. This
+ * <code>java.util.EventObject</code> into a <code>DefaultMuleMessage</code>. This
  * transformer is used by the MuleProxyListener to marshall events into something
  * that Mule understands.
  * 
  * @see MuleProxyListener
- * @see MuleMessage
+ * @see DefaultMuleMessage
  * @see EventObject
  */
 
@@ -36,7 +36,7 @@ public class EventObjectTransformer extends AbstractEventTransformer
 
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        return new MuleMessage(((EventObject)src).getSource());
+        return new DefaultMuleMessage(((EventObject)src).getSource());
     }
 
 }

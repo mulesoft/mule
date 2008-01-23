@@ -10,9 +10,6 @@
 
 package org.mule.config.spring.parsers.beans;
 
-import org.mule.config.spring.parsers.beans.AbstractBean;
-import org.mule.config.spring.parsers.beans.ChildBean;
-
 import java.util.Collection;
 
 /**

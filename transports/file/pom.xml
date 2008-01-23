@@ -70,7 +70,7 @@
                         <configuration>
                             <instructions>
                                 <Mule-Transports>file</Mule-Transports>
-                                <Export-Package>org.mule.providers.file.*</Export-Package>
+                                <Export-Package>org.mule.transport.file.*</Export-Package>
                             </instructions>
                         </configuration>
                     </plugin>

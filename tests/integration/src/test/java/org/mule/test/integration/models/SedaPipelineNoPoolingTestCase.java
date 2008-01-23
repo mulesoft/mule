@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.models;
 
-import org.mule.impl.model.seda.SedaModel;
+import org.mule.model.seda.SedaModel;
 
 public class SedaPipelineNoPoolingTestCase extends SedaPipelineTestCase
 {

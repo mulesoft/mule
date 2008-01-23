@@ -10,9 +10,9 @@
     </globalConfiguration>
     <handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
     <handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
-    <handler name="RPCDispatcher" type="java:org.mule.providers.soap.axis.extensions.MuleRPCProvider"/>
+    <handler name="RPCDispatcher" type="java:org.mule.transport.soap.axis.extensions.MuleRPCProvider"/>
     <handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
-    <handler name="MsgDispatcher" type="java:org.mule.providers.soap.axis.extensions.MuleMsgProvider"/>
+    <handler name="MsgDispatcher" type="java:org.mule.transport.soap.axis.extensions.MuleMsgProvider"/>
 
     <service name="AdminService" provider="java:MSG">
         <parameter name="allowedMethods" value="AdminService"/>

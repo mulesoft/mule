@@ -10,10 +10,10 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.impl.DefaultExceptionStrategy;
+import org.mule.DefaultExceptionStrategy;
 
 /**
- * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct replacement of the {@link org.mule.impl.DefaultExceptionStrategy}
+ * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct replacement of the {@link org.mule.DefaultExceptionStrategy}
  * This is used to test that overriding the default Exception strategy works
  */
 public class TestExceptionStrategy extends DefaultExceptionStrategy

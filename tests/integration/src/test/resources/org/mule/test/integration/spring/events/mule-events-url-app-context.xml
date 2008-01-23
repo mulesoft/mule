@@ -17,7 +17,7 @@
         </property>
     </bean>
 
-    <bean id="emailEndpoint" class="org.mule.impl.endpoint.MuleEndpoint">
+    <bean id="emailEndpoint" class="org.mule.endpoint.MuleEndpoint">
         <property name="name" value="email"/>
         <property name="connector">
             <ref local="mailConnector"/>
@@ -26,7 +26,7 @@
         <property name="endpointURI" value="pop3://user@lotsofmail.org"/>
     </bean>
 
-    <bean id="mailConnector" class="org.mule.providers.email.Pop3Connector">
+    <bean id="mailConnector" class="org.mule.transport.email.Pop3Connector">
         <property name="name" value="mailConnector"/>
         <property name="username" value="mule"/>
         <property name="hostname" value="mail.muleumo.org"/>

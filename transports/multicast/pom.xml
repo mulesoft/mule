@@ -52,7 +52,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.multicast.*
+                                    org.mule.transport.multicast.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

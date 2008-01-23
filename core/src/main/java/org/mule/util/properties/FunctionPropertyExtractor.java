@@ -9,7 +9,7 @@
  */
 package org.mule.util.properties;
 
-import org.mule.MuleRuntimeException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.UUID;
 

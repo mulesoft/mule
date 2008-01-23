@@ -24,7 +24,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.udp.*
+                                    org.mule.transport.udp.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

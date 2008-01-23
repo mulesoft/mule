@@ -10,17 +10,17 @@
 
 package org.mule.tck.providers;
 
-import org.mule.MuleException;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.component.Component;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.Connector;
+import org.mule.api.transport.MessageAdapter;
+import org.mule.api.transport.MessageDispatcherFactory;
+import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
-import org.mule.umo.provider.UMOMessageRequesterFactory;
+import org.mule.transport.AbstractConnector;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -47,7 +47,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
      */
     protected void doSetUp() throws Exception
     {
-        UMOConnector connector = createConnector();
+        Connector connector = createConnector();
         connectorName = connector.getName();
         if (connectorName == null)
         {
@@ -59,7 +59,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     protected void doTearDown() throws Exception
     {
-        UMOConnector connector = getConnector();
+        Connector connector = getConnector();
         if (connector.isDisposed())
         {
             fail("Connector has been disposed prematurely - lifecycle problem? Instance: " + connector);
@@ -69,14 +69,14 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
     }
 
     /** Look up the connector from the Registry */
-    protected UMOConnector getConnector()
+    protected Connector getConnector()
     {
         return muleContext.getRegistry().lookupConnector(connectorName);
     }
     
     public void testConnectorExceptionHandling() throws Exception
     {
-        UMOConnector connector = getConnector();
+        Connector connector = getConnector();
         assertNotNull(connector);
 
         // Text exception handler
@@ -86,13 +86,13 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         assertNotNull(connector.getExceptionListener());
         connector.setExceptionListener((ExceptionListener) ehandlerMock.proxy());
-        connector.handleException(new MuleException(MessageFactory.createStaticMessage("Dummy")));
+        connector.handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
 
         if (connector instanceof AbstractConnector)
         {
             ehandlerMock.expect("exceptionThrown", C.isA(Exception.class));
             ((AbstractConnector) connector).exceptionThrown(
-                    new MuleException(MessageFactory.createStaticMessage("Dummy")));
+                    new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
         }
 
         ehandlerMock.verify();
@@ -100,7 +100,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         connector.setExceptionListener(null);
         try
         {
-            connector.handleException(new MuleException(MessageFactory.createStaticMessage("Dummy")));
+            connector.handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
             fail("Should have thrown exception as no strategy is set");
         }
         catch (RuntimeException e)
@@ -114,7 +114,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         // this test used to use the connector created for this test, but since we need to
         // simulate disposal as well we have to create an extra instance here.
 
-        UMOConnector localConnector = this.createConnector();
+        Connector localConnector = this.createConnector();
         localConnector.setMuleContext(muleContext);
         localConnector.setName(connectorName+"-temp");
         // the connector did not come from the registry, so we need to initialise manually
@@ -144,12 +144,12 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     public void testConnectorListenerSupport() throws Exception
     {
-        UMOConnector connector = getConnector();
+        Connector connector = getConnector();
         assertNotNull(connector);
 
-        UMOComponent component = getTestComponent("anApple", Apple.class);
+        Component component = getTestComponent("anApple", Apple.class);
 
-        UMOImmutableEndpoint endpoint = 
+        ImmutableEndpoint endpoint = 
             muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(getTestEndpointURI());
 
         try
@@ -221,7 +221,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     public void testConnectorBeanProps() throws Exception
     {
-        UMOConnector connector = getConnector();
+        Connector connector = getConnector();
         assertNotNull(connector);
 
         try
@@ -243,33 +243,33 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     public void testConnectorMessageAdapter() throws Exception
     {
-        UMOConnector connector = getConnector();
+        Connector connector = getConnector();
         assertNotNull(connector);
-        UMOMessageAdapter adapter = connector.getMessageAdapter(getValidMessage());
+        MessageAdapter adapter = connector.getMessageAdapter(getValidMessage());
         assertNotNull(adapter);
     }
 
     public void testConnectorMessageDispatcherFactory() throws Exception
     {
-        UMOConnector connector = getConnector();
+        Connector connector = getConnector();
         assertNotNull(connector);
 
-        UMOMessageDispatcherFactory factory = connector.getDispatcherFactory();
+        MessageDispatcherFactory factory = connector.getDispatcherFactory();
         assertNotNull(factory);
     }
 
     public void testConnectorMessageRequesterFactory() throws Exception
     {
-        UMOConnector connector = getConnector();
+        Connector connector = getConnector();
         assertNotNull(connector);
 
-        UMOMessageRequesterFactory factory = connector.getRequesterFactory();
+        MessageRequesterFactory factory = connector.getRequesterFactory();
         assertNotNull(factory);
     }
 
     public void testConnectorInitialise() throws Exception
     {
-        UMOConnector connector = getConnector();
+        Connector connector = getConnector();
         try
         {
             connector.initialise();
@@ -281,7 +281,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         }
     }
 
-    public abstract UMOConnector createConnector() throws Exception;
+    public abstract Connector createConnector() throws Exception;
 
     public abstract Object getValidMessage() throws Exception;
 

@@ -10,9 +10,9 @@
 
 package org.mule.transaction;
 
+import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.umo.TransactionException;
 
 public class TransactionRollbackException extends TransactionException
 {

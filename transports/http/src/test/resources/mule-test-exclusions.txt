@@ -4,10 +4,10 @@
 
 # this test depends on external services which may not always be available
 # even so, as soon as we disable it, it drifts out of maintenance...
-#org.mule.providers.http.components.RESTTestCase
+#org.mule.transport.http.components.RESTTestCase
 
 # MULE-1389
-org.mule.providers.http.issues.StreamingDownloadMule1389TestCase
+org.mule.transport.http.issues.StreamingDownloadMule1389TestCase
 
 # MULE-2208
-org.mule.providers.http.functional.HttpsFunctionalTestCase
+org.mule.transport.http.functional.HttpsFunctionalTestCase

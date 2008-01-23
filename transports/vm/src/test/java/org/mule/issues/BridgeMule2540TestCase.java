@@ -10,9 +10,9 @@
 
 package org.mule.issues;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class BridgeMule2540TestCase extends FunctionalTestCase
 {
@@ -30,7 +30,7 @@ public class BridgeMule2540TestCase extends FunctionalTestCase
         String[] output = {"Test", "message"};
         MuleClient client = new MuleClient();
         client.dispatch("vm://receiver", input, null);
-        UMOMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNotNull(result);
         assertNotNull(result.getPayload());
         assertNull(result.getExceptionPayload());

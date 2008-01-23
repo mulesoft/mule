@@ -10,8 +10,8 @@
 
 package org.mule.routing.filters;
 
-import org.mule.umo.UMOExceptionPayload;
-import org.mule.umo.UMOMessage;
+import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleMessage;
 
 /**
  * A filter that accepts messages that have an exception payload. An Exception type
@@ -37,9 +37,9 @@ public class ExceptionTypeFilter extends PayloadTypeFilter
      * @param message a non null message to filter.
      * @return <code>true</code> if the message matches the filter
      */
-    public boolean accept(UMOMessage message)
+    public boolean accept(MuleMessage message)
     {
-        UMOExceptionPayload epl = message.getExceptionPayload();
+        ExceptionPayload epl = message.getExceptionPayload();
 
         if (getExpectedType() == null)
         {

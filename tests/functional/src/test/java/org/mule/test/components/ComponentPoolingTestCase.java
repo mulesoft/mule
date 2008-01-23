@@ -10,10 +10,10 @@
 
 package org.mule.test.components;
 
+import org.mule.api.component.Component;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.services.UniqueComponent;
 import org.mule.tck.testmodels.mule.TestSedaComponent;
-import org.mule.umo.UMOComponent;
 
 public class ComponentPoolingTestCase extends FunctionalTestCase
 {
@@ -24,7 +24,7 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
 
     public void testConfigSanity() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("unique1");
+        Component c = muleContext.getRegistry().lookupComponent("unique1");
         assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
         Object component = ((TestSedaComponent) c).getOrCreateService();
         assertNotNull(component);
@@ -35,7 +35,7 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
 
     public void testSimpleFactory() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("unique1");        
+        Component c = muleContext.getRegistry().lookupComponent("unique1");        
         
         Object component = ((TestSedaComponent) c).getOrCreateService();
         String id1 = ((UniqueComponent) component).getId();
@@ -48,7 +48,7 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
 
     public void testSingletonFactoryWithClassName() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("unique2");        
+        Component c = muleContext.getRegistry().lookupComponent("unique2");        
         
         Object component = ((TestSedaComponent) c).getOrCreateService();
         String id1 = ((UniqueComponent) component).getId();
@@ -61,7 +61,7 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
 
     public void testSingletonFactoryWithBean() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("unique3");        
+        Component c = muleContext.getRegistry().lookupComponent("unique3");        
         
         Object component = ((TestSedaComponent) c).getOrCreateService();
         String id1 = ((UniqueComponent) component).getId();
@@ -74,8 +74,8 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
 
 //    public void testPoolingDisabled() throws Exception
 //    {
-//        UMOModel model = muleContext.getRegistry().lookupModel("main");
-//        UMOComponent c = model.getComponent("unique4");        
+//        Model model = muleContext.getRegistry().lookupModel("main");
+//        Component c = model.getComponent("unique4");        
 //        
 //        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
 //        Object component = ((TestMuleProxy) proxy).getComponent();

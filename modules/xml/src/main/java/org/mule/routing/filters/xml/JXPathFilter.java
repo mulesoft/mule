@@ -10,8 +10,8 @@
 
 package org.mule.routing.filters.xml;
 
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
 import org.mule.util.StringMessageUtils;
 
 import java.util.Iterator;
@@ -30,7 +30,7 @@ import org.dom4j.XPath;
  * <code>JXPathFilter</code> evaluates an XPath expression against a W3C Document,
  * XML string, or Java bean and returns true if the result is as expected.
  */
-public class JXPathFilter implements UMOFilter
+public class JXPathFilter implements Filter
 {
 
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -58,7 +58,7 @@ public class JXPathFilter implements UMOFilter
         this.expectedValue = expectedValue;
     }
 
-    public boolean accept(UMOMessage obj)
+    public boolean accept(MuleMessage obj)
     {
         if (obj.getPayload() instanceof byte[])
         {

@@ -10,8 +10,8 @@
 
 package org.mule.tck.services;
 
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.lifecycle.Callable;
+import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.Callable;
 import org.mule.util.UUID;
 import org.mule.util.object.Identifiable;
 
@@ -23,7 +23,7 @@ public class UniqueComponent implements Callable, Identifiable
 {
     String id = UUID.getUUID();
 
-    public Object onCall(UMOEventContext eventContext) throws Exception
+    public Object onCall(MuleEventContext eventContext) throws Exception
     {
         return getId();
     }

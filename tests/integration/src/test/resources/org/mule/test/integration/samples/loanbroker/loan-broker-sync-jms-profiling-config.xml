@@ -12,7 +12,7 @@
         <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
     </agents>
     <!--Testing with ActiveMq-->
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+    <connector name="jmsConnector" className="org.mule.transport.jms.JmsConnector">
         <properties>
             <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
             <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
@@ -25,7 +25,7 @@
 
 
     <!-- testing with OpenJms -->
-    <!--<connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
+    <!--<connector name="jmsConnector" className="org.mule.transport.jms.JmsConnector">-->
     <!--<properties>-->
     <!--<property name="connectionFactoryJndiName" value="JmsQueueConnectionFactory"/>-->
     <!--<property name="jndiInitialFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>-->

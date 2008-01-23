@@ -13,10 +13,10 @@
     <vm:connector name="quedvm" queueEvents="true"/>
 
     <tcp:connector name="tcpConnector">
-        <tcp:custom-protocol class="org.mule.providers.tcp.integration.CustomSerializationProtocol"/>
+        <tcp:custom-protocol class="org.mule.transport.tcp.integration.CustomSerializationProtocol"/>
     </tcp:connector>
 
-    <custom-transformer name="NoAction" class="org.mule.transformers.NoActionTransformer"/>
+    <custom-transformer name="NoAction" class="org.mule.transformer.NoActionTransformer"/>
 
     <model name="model">
 
@@ -27,7 +27,7 @@
             <outbound>
                 <outbound-pass-through-router>
                     <tcp:outbound-endpoint host="localhost" port="9994">
-                        <custom-transformer class="org.mule.transformers.NoActionTransformer"/>
+                        <custom-transformer class="org.mule.transformer.NoActionTransformer"/>
                     </tcp:outbound-endpoint>
                 </outbound-pass-through-router>
             </outbound>

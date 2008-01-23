@@ -10,7 +10,7 @@
 
 package org.mule.transaction.lookup;
 
-import org.mule.umo.manager.UMOTransactionManagerFactory;
+import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * @see com.ibm.ejs.jts.jta.JTSXA#getTransactionManager
  * @see com.ibm.ejs.jts.jta.TransactionManagerFactory#getTransactionManager
  */
-public class WebsphereTransactionManagerLookupFactory implements UMOTransactionManagerFactory
+public class WebsphereTransactionManagerLookupFactory implements TransactionManagerFactory
 {
     private static final String FACTORY_CLASS_5_1_AND_ABOVE = "com.ibm.ws.Transaction.TransactionManagerFactory";
 

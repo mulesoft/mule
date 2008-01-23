@@ -10,14 +10,14 @@
 
 package org.mule.config.spring.processors;
 
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.api.agent.Agent;
+import org.mule.api.component.Component;
+import org.mule.api.context.ContainerContext;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.model.Model;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transport.Connector;
+import org.mule.endpoint.MuleEndpoint;
 import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 
@@ -41,53 +41,53 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
             return o;
         }
         
-        if (o instanceof UMOConnector)
+        if (o instanceof Connector)
         {
-            if (((UMOConnector)o).getName() == null || overwrite)
+            if (((Connector)o).getName() == null || overwrite)
             {
-                ((UMOConnector)o).setName(s);
+                ((Connector)o).setName(s);
             }
         }
-        else if (o instanceof UMOTransformer)
+        else if (o instanceof Transformer)
         {
-            if (((UMOTransformer)o).getName() == null || overwrite)
+            if (((Transformer)o).getName() == null || overwrite)
             {
-               ((UMOTransformer)o).setName(s);
+               ((Transformer)o).setName(s);
             }
         }
-        else if (o instanceof UMOEndpoint)
+        else if (o instanceof Endpoint)
         {
             // spring uses the class name of the object as the name if no other
             // id is set; this is no good for endpoints
-            if ((((UMOEndpoint)o).getName() == null || overwrite)
+            if ((((Endpoint)o).getName() == null || overwrite)
                 && !MuleEndpoint.class.getName().equals(s))
             {
-                final UMOEndpoint endpoint = (UMOEndpoint) o;
+                final Endpoint endpoint = (Endpoint) o;
                 final String name = ObjectNameHelper.getEndpointName(endpoint);
                 endpoint.setName(name);
             }
         }
-        else if (o instanceof UMOComponent)
+        else if (o instanceof Component)
         {
-            if (((UMOComponent)o).getName() == null || overwrite)
+            if (((Component)o).getName() == null || overwrite)
             {
-                ((UMOComponent)o).setName(s);
+                ((Component)o).setName(s);
             }
         }
-        else if (o instanceof UMOModel)
+        else if (o instanceof Model)
         {
-            if (((UMOModel)o).getName() == null || overwrite)
+            if (((Model)o).getName() == null || overwrite)
             {
-                ((UMOModel)o).setName(s);
+                ((Model)o).setName(s);
             }
         }
-        else if (o instanceof UMOAgent)
+        else if (o instanceof Agent)
         {
-            ((UMOAgent)o).setName(s);
+            ((Agent)o).setName(s);
         }
-        else if (o instanceof UMOContainerContext)
+        else if (o instanceof ContainerContext)
         {
-            ((UMOContainerContext)o).setName(s);
+            ((ContainerContext)o).setName(s);
         }
         return o;
     }

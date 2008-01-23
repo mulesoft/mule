@@ -10,11 +10,11 @@
 
 package org.mule.routing;
 
-import org.mule.impl.MuleEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.RoutingException;
+import org.mule.DefaultMuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.RoutingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,9 +27,9 @@ import org.apache.commons.logging.LogFactory;
 
 public class LoggingCatchAllStrategy extends AbstractCatchAllStrategy
 {
-    private static final Log logger = LogFactory.getLog(MuleEvent.class);
+    private static final Log logger = LogFactory.getLog(DefaultMuleEvent.class);
 
-    public void setEndpoint(UMOImmutableEndpoint endpoint)
+    public void setEndpoint(ImmutableEndpoint endpoint)
     {
         throw new UnsupportedOperationException("An endpoint cannot be set on this Catch All strategy");
     }
@@ -39,12 +39,12 @@ public class LoggingCatchAllStrategy extends AbstractCatchAllStrategy
         throw new UnsupportedOperationException("An endpoint cannot be set on this Catch All strategy");
     }
 
-    public UMOImmutableEndpoint getEndpoint()
+    public ImmutableEndpoint getEndpoint()
     {
         return null;
     }
 
-    public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
+    public MuleMessage catchMessage(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
         logger.warn("Message: " + message + " was not dispatched on session: " + session

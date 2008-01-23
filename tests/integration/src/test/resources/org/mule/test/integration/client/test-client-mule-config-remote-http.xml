@@ -19,7 +19,7 @@
                 <inbound-endpoint ref="vmRemoteEndpoint" remoteSync="true" />
             </inbound>
             <component>
-                <singleton-object class="org.mule.components.simple.StaticComponent">
+                <singleton-object class="org.mule.component.simple.StaticComponent">
                     <properties>
                         <spring:entry key="data" value="received from remote" />
                     </properties>

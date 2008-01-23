@@ -10,9 +10,9 @@
 
 package org.mule.examples.loanbroker.bpm;
 
+import org.mule.api.MuleException;
 import org.mule.examples.loanbroker.AbstractLoanBrokerApp;
-import org.mule.providers.jdbc.util.MuleDerbyUtils;
-import org.mule.umo.UMOException;
+import org.mule.transport.jdbc.util.MuleDerbyUtils;
 
 /**
  * Executes the LoanBroker BPM example.

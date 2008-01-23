@@ -10,12 +10,12 @@
 
 package org.mule.components.script.jsr223;
 
-import org.mule.components.builder.AbstractMessageBuilder;
-import org.mule.components.builder.MessageBuilderException;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.component.builder.AbstractMessageBuilder;
+import org.mule.component.builder.MessageBuilderException;
 
 import javax.script.Bindings;
 import javax.script.Compilable;
@@ -37,7 +37,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
         this.scriptable = new Scriptable();
     }
 
-    public Object buildMessage(UMOMessage request, UMOMessage response) throws MessageBuilderException
+    public Object buildMessage(MuleMessage request, MuleMessage response) throws MessageBuilderException
     {
         Bindings bindings = scriptable.getScriptEngine().createBindings();
         populateBindings(bindings, request, response);
@@ -61,7 +61,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
         scriptable.initialise();
     }
 
-    protected void populateBindings(Bindings namespace, UMOMessage request, UMOMessage response)
+    protected void populateBindings(Bindings namespace, MuleMessage request, MuleMessage response)
     {
         namespace.put("request", request);
         namespace.put("response", response);
@@ -115,7 +115,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
         scriptable.setScriptEngineName(scriptEngineName);
     }
 
-    protected void populateBindings(Bindings namespace, UMOEventContext context)
+    protected void populateBindings(Bindings namespace, MuleEventContext context)
     {
         namespace.put("context", context);
         namespace.put("message", context.getMessage());

@@ -10,13 +10,13 @@
 
 package org.mule.test.integration.routing;
 
-import org.mule.impl.MuleMessage;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.RoutingException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.routing.response.ResponseCorrelationAggregator;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.routing.RoutingException;
-import org.mule.umo.transformer.TransformerException;
 
 import java.util.Iterator;
 
@@ -30,17 +30,17 @@ public class TestAggregator extends ResponseCorrelationAggregator
      * 
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws org.mule.umo.routing.RoutingException if the aggregation fails. in
+     * @throws org.mule.api.routing.RoutingException if the aggregation fails. in
      *             this scenario the whole event group is removed and passed to the
      *             exception handler for this componenet
      */
-    protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
+    protected MuleMessage aggregateEvents(EventGroup events) throws RoutingException
     {
         StringBuffer buffer = new StringBuffer(128);
 
         for (Iterator iterator = events.iterator(); iterator.hasNext();)
         {
-            UMOEvent event = (UMOEvent)iterator.next();
+            MuleEvent event = (MuleEvent)iterator.next();
             try
             {
                 buffer.append(event.transformMessageToString());
@@ -52,6 +52,6 @@ public class TestAggregator extends ResponseCorrelationAggregator
         }
 
         logger.debug("event payload is: " + buffer.toString());
-        return new MuleMessage(buffer.toString());
+        return new DefaultMuleMessage(buffer.toString());
     }
 }

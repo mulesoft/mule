@@ -10,7 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.config.PropertyFactory;
+import org.mule.api.config.PropertyFactory;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import java.util.Map;

@@ -10,8 +10,8 @@
 
 package org.mule.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 
 /**
  * This encapsulates two definition parsers - orphan and named - and returns the

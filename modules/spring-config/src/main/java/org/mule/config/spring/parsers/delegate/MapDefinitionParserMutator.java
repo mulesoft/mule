@@ -10,8 +10,8 @@
 
 package org.mule.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.MuleChildDefinitionParser;
+import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.TwoStageMapBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
@@ -20,9 +20,9 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.w3c.dom.Element;
 
 /**

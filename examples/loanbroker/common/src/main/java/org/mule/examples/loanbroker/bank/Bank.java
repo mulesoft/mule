@@ -10,14 +10,14 @@
 
 package org.mule.examples.loanbroker.bank;
 
-import org.mule.config.ConfigurationException;
+import org.mule.api.component.Component;
+import org.mule.api.component.ComponentAware;
+import org.mule.api.config.ConfigurationException;
+import org.mule.api.endpoint.Endpoint;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.examples.loanbroker.LocaleMessage;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanQuote;
-import org.mule.impl.UMOComponentAware;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.io.Serializable;
 import java.util.List;
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * quotes.
  */
 
-public class Bank implements UMOComponentAware, Serializable, BankService
+public class Bank implements ComponentAware, Serializable, BankService
 {
     /**
      * Serial version
@@ -66,7 +66,7 @@ public class Bank implements UMOComponentAware, Serializable, BankService
 
     // TODO This method doesn't help us with the Static Recipient list because the list of banks is created 
     // programatically in DefaultLenderService (they should be looked up from the config/registry).
-    public void setComponent(UMOComponent component) throws ConfigurationException 
+    public void setComponent(Component component) throws ConfigurationException 
     {
         this.bankName = component.getName(); 
 
@@ -77,7 +77,7 @@ public class Bank implements UMOComponentAware, Serializable, BankService
         }
         // TODO This gives us the endpoint the bank is listening on, but the endpoint for sending to the bank 
         // is different in the ESB config ("Bank1In" vs. "Bank1")
-        this.endpoint = ((UMOEndpoint) endpoints.get(0)).getName();
+        this.endpoint = ((Endpoint) endpoints.get(0)).getName();
     }
 
     public LoanQuote getLoanQuote(LoanBrokerQuoteRequest request)

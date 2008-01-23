@@ -10,13 +10,13 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOMessage;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -37,9 +37,9 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         final AtomicBoolean hop1made = new AtomicBoolean(false);
         EventCallback callback1 = new EventCallback()
         {
-            public void eventReceived(final UMOEventContext context, final Object component) throws Exception
+            public void eventReceived(final MuleEventContext context, final Object component) throws Exception
             {
-                UMOMessage msg = context.getMessage();
+                MuleMessage msg = context.getMessage();
                 assertTrue(hop1made.compareAndSet(false, true));
                 FunctionalTestComponent ftc = (FunctionalTestComponent) component;
                 ftc.setReturnMessage("Hop1 ACK");
@@ -49,9 +49,9 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         final AtomicBoolean hop2made = new AtomicBoolean(false);
         EventCallback callback2 = new EventCallback()
         {
-            public void eventReceived(final UMOEventContext context, final Object component) throws Exception
+            public void eventReceived(final MuleEventContext context, final Object component) throws Exception
             {
-                UMOMessage msg = context.getMessage();
+                MuleMessage msg = context.getMessage();
                 assertTrue(hop2made.compareAndSet(false, true));
                 assertEquals("Property not propagated from the first hop.", "hop1", msg.getProperty("TICKET"));
                 FunctionalTestComponent ftc = (FunctionalTestComponent) component;
@@ -63,8 +63,8 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
         hop2.setEventCallback(callback2);
 
         MuleClient client = new MuleClient();
-        MuleMessage request = new MuleMessage("payload");
-        UMOMessage reply = client.send("inboundEndpoint", request);
+        DefaultMuleMessage request = new DefaultMuleMessage("payload");
+        MuleMessage reply = client.send("inboundEndpoint", request);
         assertNotNull(reply);
 
         assertTrue("First callback never fired", hop1made.get());

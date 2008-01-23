@@ -11,11 +11,11 @@
 package org.mule.test.integration.client;
 
 
+import org.mule.api.MuleMessage;
+import org.mule.api.component.Component;
+import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.provider.NoReceiverForEndpointException;
 
 
 public class MuleClientListenerTestCase extends FunctionalTestCase
@@ -42,10 +42,10 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
             }
         }
         
-        UMOComponent c = muleContext.getRegistry().lookupComponent(component);
+        Component c = muleContext.getRegistry().lookupComponent(component);
         c.start();
 
-        UMOMessage message = client.send(endpoint, "Test Client Send message", null);
+        MuleMessage message = client.send(endpoint, "Test Client Send message", null);
         assertNotNull(message);
         assertEquals("Received: Test Client Send message", message.getPayloadAsString());
 

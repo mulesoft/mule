@@ -11,7 +11,7 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
-import org.mule.impl.MuleContextAware;
+import org.mule.api.context.MuleContextAware;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

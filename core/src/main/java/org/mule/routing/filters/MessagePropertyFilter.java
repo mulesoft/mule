@@ -10,8 +10,8 @@
 
 package org.mule.routing.filters;
 
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  * expressions. By default the comparison is case sensitive; you can set the
  * <i>caseSensitive</i> property to override this.
  */
-public class MessagePropertyFilter implements UMOFilter
+public class MessagePropertyFilter implements Filter
 {
     /**
      * logger used by this class
@@ -48,7 +48,7 @@ public class MessagePropertyFilter implements UMOFilter
         setExpression(expression);
     }
 
-    public boolean accept(UMOMessage message)
+    public boolean accept(MuleMessage message)
     {
         if (message == null)
         {

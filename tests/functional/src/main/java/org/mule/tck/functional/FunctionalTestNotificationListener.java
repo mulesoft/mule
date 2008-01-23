@@ -10,15 +10,15 @@
 
 package org.mule.tck.functional;
 
-import org.mule.impl.internal.notifications.CustomNotificationListener;
+import org.mule.api.context.notification.CustomNotificationListener;
 
 /**
  * By implementing this listener interface and registering the object with the
- * {@link org.mule.api.MuleContext#registerListener(org.mule.umo.manager.UMOServerNotificationListener)}
+ * {@link org.mule.api.MuleContext#registerListener(org.mule.api.context.ServerNotificationListener)}
  * You can receive {@link org.mule.tck.functional.FunctionalTestNotification}s from the
  * {@link org.mule.tck.functional.FunctionalTestComponent}.
  *
- * This Notification contains the current EventContext and reply message. The resource Identifier for this event
+ * This Notification contains the current MuleEventContext and reply message. The resource Identifier for this event
  * is the component name that received the message.  This means you can register to listen to Notifications from a
  * selected {@link org.mule.tck.functional.FunctionalTestComponent}. i.e.
  * <code>

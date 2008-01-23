@@ -11,9 +11,9 @@
 package org.mule.util;
 
 import org.mule.RegistryContext;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
+import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.Connector;
 
 /**
  * Generates consistent objects names for Mule components
@@ -32,10 +32,10 @@ public final class ObjectNameHelper
         // no-op
     }
 
-    public static String getEndpointName(UMOImmutableEndpoint endpoint)
+    public static String getEndpointName(ImmutableEndpoint endpoint)
     {
         String name = endpoint.getName();
-        final UMOEndpointURI endpointUri = endpoint.getEndpointURI();
+        final EndpointURI endpointUri = endpoint.getEndpointURI();
         if (name != null)
         {
             // If the name is the same as the address, we need to add the scheme
@@ -109,7 +109,7 @@ public final class ObjectNameHelper
         return tempName;
     }
 
-    public static String getConnectorName(UMOConnector connector)
+    public static String getConnectorName(Connector connector)
     {
         if (connector.getName() != null && connector.getName().indexOf('#') == -1)
         {

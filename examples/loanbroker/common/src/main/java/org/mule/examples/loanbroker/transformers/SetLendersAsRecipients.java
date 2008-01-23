@@ -10,12 +10,12 @@
 
 package org.mule.examples.loanbroker.transformers;
 
+import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
 import org.mule.examples.loanbroker.bank.Bank;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.routing.outbound.StaticRecipientList;
-import org.mule.transformers.AbstractMessageAwareTransformer;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.transformer.AbstractMessageAwareTransformer;
 
 /**
  * Set the Recipient List property on the LoanBrokerQuoteRequest message based on the
@@ -27,10 +27,10 @@ public class SetLendersAsRecipients extends AbstractMessageAwareTransformer
     public SetLendersAsRecipients()
     {
         this.registerSourceType(LoanBrokerQuoteRequest.class);
-        this.setReturnClass(UMOMessage.class);
+        this.setReturnClass(MuleMessage.class);
     }
 
-    public Object transform(UMOMessage message, String outputEncoding) throws TransformerException
+    public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object src = message.getPayload();
         Bank[] lenders = ((LoanBrokerQuoteRequest) src).getLenders();

@@ -10,12 +10,12 @@
 
 package org.mule.test.integration.client;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.service.Person;
 import org.mule.transformers.xml.wire.XStreamWireFormat;
-import org.mule.umo.UMOMessage;
 
 public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
 {
@@ -36,7 +36,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
         dispatcher.setWireFormat(new XStreamWireFormat());
         try
         {
-            UMOMessage result = dispatcher.sendRemote(
+            MuleMessage result = dispatcher.sendRemote(
                 "axis:http://localhost:38104/mule/services/mycomponent2?method=echo", "test", null);
             assertNotNull(result);
             assertEquals("test", result.getPayloadAsString());
@@ -55,7 +55,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
 
         try
         {
-            UMOMessage result = dispatcher.sendRemote(
+            MuleMessage result = dispatcher.sendRemote(
                 "axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Fred", null);
             assertNotNull(result);
             logger.debug(result.getPayload());
@@ -78,7 +78,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
         try
         {
             String[] args = new String[]{"Betty", "Rubble"};
-            UMOMessage result = dispatcher.sendRemote(
+            MuleMessage result = dispatcher.sendRemote(
                 "axis:http://localhost:38104/mule/services/mycomponent3?method=addPerson", args, null);
             assertNotNull(result);
             assertTrue(result.getPayload() instanceof Person);

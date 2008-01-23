@@ -10,7 +10,7 @@
 
 package org.mule.xml.util.properties;
 
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
 import org.mule.util.properties.PropertyExtractor;
 
 import org.apache.commons.jxpath.JXPathContext;
@@ -36,9 +36,9 @@ public class JXPathPropertyExtractor implements PropertyExtractor
 
         Object result = null;
         Object payload = message;
-        if (message instanceof UMOMessage)
+        if (message instanceof MuleMessage)
         {
-            payload = ((UMOMessage) message).getPayload();
+            payload = ((MuleMessage) message).getPayload();
         }
 
         if (payload instanceof String)

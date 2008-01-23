@@ -10,9 +10,10 @@
 
 package org.mule.config;
 
-import org.mule.MuleRuntimeException;
+import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.ExceptionReader;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.UMOException;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.SpiUtils;
@@ -369,15 +370,15 @@ public final class ExceptionHelper
         return t;
     }
 
-    public static UMOException getRootMuleException(Throwable t)
+    public static MuleException getRootMuleException(Throwable t)
     {
         Throwable cause = t;
-        UMOException umoException = null;
+        MuleException umoException = null;
         while (cause != null)
         {
-            if (cause instanceof UMOException)
+            if (cause instanceof MuleException)
             {
-                umoException = (UMOException)cause;
+                umoException = (MuleException)cause;
             }
             cause = getExceptionReader(cause).getCause(cause);
             // address some misbehaving exceptions, avoid endless loop

@@ -24,7 +24,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.ejb.*
+                                    org.mule.transport.ejb.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

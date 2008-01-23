@@ -11,7 +11,7 @@
     <file:connector name="FileConnector"
                     pollingFrequency="1000" moveToDirectory="/tmp/test-data/out" outputPattern="${DATE}.pdf"/>
 
-    <!--    <connector name="MidFileConnector" className="org.mule.providers.file.FileConnector">-->
+    <!--    <connector name="MidFileConnector" className="org.mule.transport.file.FileConnector">-->
     <!--        <properties>-->
     <!--            <property name="pollingFrequency" value="1000"/>-->
     <!--            <property name="moveToDirectory" value="../test-data/out"/>-->
@@ -21,13 +21,13 @@
     <!--    </connector>-->
 
     <!--    <transformers>-->
-    <!--        <transformer name="W10LaszloToW10Report" className="org.mule.transformers.xml.XsltTransformer"-->
+    <!--        <transformer name="W10LaszloToW10Report" className="org.mule.transformer.xml.XsltTransformer"-->
     <!--            returnClass="java.lang.String">-->
     <!--            <properties>-->
     <!--                <property name="xslFile" value="/home/bkalbfu/workspace31/W10_Output/src/w10laszlo_to_w10report.xsl"/>-->
     <!--            </properties>-->
     <!--        </transformer>-->
-    <!--        <transformer name="W10ReportToFormattingObjects" className="org.mule.transformers.xml.XsltTransformer"-->
+    <!--        <transformer name="W10ReportToFormattingObjects" className="org.mule.transformer.xml.XsltTransformer"-->
     <!--            returnClass="java.lang.String">-->
     <!--            <properties>-->
     <!--                <property name="xslFile" value="/home/bkalbfu/workspace31/W10_Output/src/w10report_to_w10fo.xsl"/>-->
@@ -35,11 +35,11 @@
     <!--        </transformer>-->
     <!--        <transformer name="FormattingObjectsToPDF" className="org.hhcc.fop.FormattingObjectsToPDF"-->
     <!--            returnClass="java.lang.Object"/>-->
-    <!--        <transformer name="ByteArrayToString" className="org.mule.transformers.simple.ByteArrayToObject"-->
+    <!--        <transformer name="ByteArrayToString" className="org.mule.transformer.simple.ByteArrayToObject"-->
     <!--            returnClass="java.lang.String"/>-->
-    <!--        <transformer name="XMLToDOM" className="org.mule.transformers.xml.XmlToDomDocument"-->
+    <!--        <transformer name="XMLToDOM" className="org.mule.transformer.xml.XmlToDomDocument"-->
     <!--            returnClass="org.w3c.dom.Document"/>-->
-    <!--        <transformer name="DOMToXML" className="org.mule.transformers.xml.DomDocumentToXml"-->
+    <!--        <transformer name="DOMToXML" className="org.mule.transformer.xml.DomDocumentToXml"-->
     <!--            returnClass="java.lang.String"/>-->
     <!--    </transformers>-->
 

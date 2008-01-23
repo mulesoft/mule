@@ -6,7 +6,7 @@
 
     <model name="model">
         <mule-descriptor name="TcpReceiver"
-            implementation="org.mule.components.simple.NullComponent">
+            implementation="org.mule.component.simple.NullComponent">
             <inbound-router>
                 <endpoint address="tcp://localhost:4444"/>
                 <router className="org.mule.routing.inbound.ForwardingConsumer"/>

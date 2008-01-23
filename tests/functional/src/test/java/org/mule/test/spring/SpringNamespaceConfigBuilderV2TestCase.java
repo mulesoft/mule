@@ -10,19 +10,19 @@
 
 package org.mule.test.spring;
 
+import org.mule.api.component.Component;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.routing.InboundRouterCollection;
+import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.routing.ResponseRouterCollection;
+import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.UMOInboundRouterCollection;
-import org.mule.umo.routing.UMOOutboundRouterCollection;
-import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.properties.PropertyExtractor;
 import org.mule.xml.util.properties.JXPathPropertyExtractor;
 
@@ -61,9 +61,9 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyExtractorConfig() throws Exception
     {
-        UMOComponent d = muleContext.getRegistry().lookupComponent("propertyExtractorTestComponent");
+        Component d = muleContext.getRegistry().lookupComponent("propertyExtractorTestComponent");
         assertNotNull(d);
-        UMOOutboundRouterCollection router = d.getOutboundRouter();
+        OutboundRouterCollection router = d.getOutboundRouter();
         assertNotNull(router);
         List routers = router.getRouters();
         assertNotNull(routers);
@@ -77,9 +77,9 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyExtractorResponseRouterConfig() throws Exception
     {
-        UMOComponent d = muleContext.getRegistry().lookupComponent("propertyExtractorResponseRouterTestComponent");
+        Component d = muleContext.getRegistry().lookupComponent("propertyExtractorResponseRouterTestComponent");
         assertNotNull(d);
-        UMOResponseRouterCollection router = d.getResponseRouter();
+        ResponseRouterCollection router = d.getResponseRouter();
         assertNotNull(router);
         List routers = router.getRouters();
         assertNotNull(routers);
@@ -93,7 +93,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyTypesConfig() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("testPropertiesComponent");
+        Component c = muleContext.getRegistry().lookupComponent("testPropertiesComponent");
         assertNotNull(c);
         Object obj = c.getServiceFactory().getOrCreate();
         assertNotNull(obj);
@@ -104,14 +104,14 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testEndpointURIParamsConfig()
     {
-        UMOComponent d = muleContext.getRegistry().lookupComponent("testPropertiesComponent");
+        Component d = muleContext.getRegistry().lookupComponent("testPropertiesComponent");
         assertNotNull(d);
-        final UMOInboundRouterCollection router = d.getInboundRouter();
+        final InboundRouterCollection router = d.getInboundRouter();
         assertNotNull(router);
         final List endpoints = router.getEndpoints();
         assertNotNull(endpoints);
         assertFalse(endpoints.isEmpty());
-        final UMOEndpoint inboundEndpoint = (UMOEndpoint) endpoints.get(0);
+        final Endpoint inboundEndpoint = (Endpoint) endpoints.get(0);
         assertNotNull(inboundEndpoint);
         final List transformers = inboundEndpoint.getTransformers();
         assertFalse(transformers.isEmpty());
@@ -127,7 +127,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         // first of all test generic transformer configuration
         super.testTransformerConfig();
 
-        UMOTransformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
+        Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
 
@@ -157,10 +157,10 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 //     * that defaults can be declared in the main configuration but overiding elements
 //     * can just replace certain values
 //     *
-//     * @throws MuleException
+//     * @throws DefaultMuleException
 //     */
 //    // @Override
-//    public void testThreadingConfig() throws MuleException
+//    public void testThreadingConfig() throws DefaultMuleException
 //    {
 //        // test config
 //        ThreadingProfile tp = RegistryContext.getConfiguration().getDefaultThreadingProfile();
@@ -187,7 +187,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 //        assertEquals(0, tp.getPoolExhaustedAction());
 //        assertEquals(60001, tp.getThreadTTL());
 //
-//        UMOComponent component = muleContext.getRegistry().lookupComponent("appleComponent2");
+//        Component component = muleContext.getRegistry().lookupComponent("appleComponent2");
 //        assertTrue("component must be SedaComponent to get threading profile", component instanceof SedaComponent);
 //        tp = ((SedaComponent) component).getThreadingProfile();
 //        assertEquals(6, tp.getMaxBufferSize());
@@ -200,7 +200,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     // MULE-2458 (now has separate test)
 //    public void testGlobalEndpointOverrides()
 //    {
-//        UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpoint("orangeEndpoint");
+//        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpoint("orangeEndpoint");
 //        assertNotNull(ep);
 //        assertEquals(1, ep.getProperties().size());
 //        assertEquals("value1", ep.getProperties().get("testGlobal"));

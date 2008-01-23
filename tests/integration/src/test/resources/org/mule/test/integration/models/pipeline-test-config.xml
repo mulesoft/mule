@@ -5,9 +5,9 @@
 
 <mule-configuration id="PipelineModelConfiguration" version="1.0">
 
-    <connector name="vmNoQueuing" className="org.mule.providers.vm.VMConnector"/>
+    <connector name="vmNoQueuing" className="org.mule.transport.vm.VMConnector"/>
 
-    <connector name="vmWithQueuing" className="org.mule.providers.vm.VMConnector">
+    <connector name="vmWithQueuing" className="org.mule.transport.vm.VMConnector">
         <properties>
             <property name="queueEvents" value="true"/>
         </properties>
@@ -21,7 +21,7 @@
     </global-endpoints>
 
     <model name="main" type="inherited">
-        <mule-descriptor name="component1" implementation="org.mule.components.simple.EchoComponent">
+        <mule-descriptor name="component1" implementation="org.mule.component.simple.EchoComponent">
             <inbound-router>
                 <global-endpoint name="component1.endpoint"/>
             </inbound-router>
@@ -32,7 +32,7 @@
             </outbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="component2" implementation="org.mule.components.simple.EchoComponent">
+        <mule-descriptor name="component2" implementation="org.mule.component.simple.EchoComponent">
             <inbound-router>
                 <global-endpoint name="component2.endpoint"/>
             </inbound-router>
@@ -43,7 +43,7 @@
             </outbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="component3" implementation="org.mule.components.simple.StaticComponent">
+        <mule-descriptor name="component3" implementation="org.mule.component.simple.StaticComponent">
             <inbound-router>
                 <global-endpoint name="component3.endpoint"/>
             </inbound-router>

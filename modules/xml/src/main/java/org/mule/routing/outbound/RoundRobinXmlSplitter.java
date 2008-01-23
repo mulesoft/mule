@@ -10,14 +10,14 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.config.MuleProperties;
-import org.mule.impl.MuleMessage;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
-import org.mule.umo.routing.RoutingException;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.api.routing.RoutingException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,7 +40,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
     private boolean deterministic = true;
     private static final AtomicInteger globalCounter = new AtomicInteger(0);
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
         try
@@ -49,8 +49,8 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                 MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
             initialise(message);
 
-            UMOEndpoint endpoint;
-            UMOMessage result = null;
+            Endpoint endpoint;
+            MuleMessage result = null;
             Document part;
             List parts = (List)nodesContext.get();
             if (parts == null)
@@ -66,7 +66,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                 part = (Document)iterator.next();
                 // Create the message
                 Map theProperties = (Map)propertiesContext.get();
-                message = new MuleMessage(part, new HashMap(theProperties));
+                message = new DefaultMuleMessage(part, new HashMap(theProperties));
 
                 if (enableEndpointFiltering)
                 {
@@ -74,7 +74,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                 }
                 else
                 {
-                    endpoint = (UMOEndpoint)getEndpoints().get(epCounter.next());
+                    endpoint = (Endpoint)getEndpoints().get(epCounter.next());
                 }
 
                 if (endpoint == null)
@@ -109,7 +109,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                             dispatch(session, message, endpoint);
                         }
                     }
-                    catch (UMOException e)
+                    catch (MuleException e)
                     {
                         throw new CouldNotRouteOutboundMessageException(message, endpoint, e);
                     }
@@ -130,11 +130,11 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
      * @param message the current message being processed
      * @return the message part to dispatch
      */
-    protected UMOEndpoint getEndpointForMessage(UMOMessage message)
+    protected Endpoint getEndpointForMessage(MuleMessage message)
     {
         for (int i = 0; i < endpoints.size(); i++)
         {
-            UMOEndpoint endpoint = (UMOEndpoint)endpoints.get(i);
+            Endpoint endpoint = (Endpoint)endpoints.get(i);
 
             try
             {
@@ -165,7 +165,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
         return null;
     }
 
-    public void addEndpoint(UMOEndpoint endpoint)
+    public void addEndpoint(Endpoint endpoint)
     {
         if (endpoint.getFilter() != null && !enableEndpointFiltering)
         {

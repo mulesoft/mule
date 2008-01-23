@@ -15,6 +15,7 @@ import org.mule.management.i18n.ManagementMessages;
 import com.yourkit.api.Controller;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

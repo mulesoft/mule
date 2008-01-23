@@ -20,7 +20,7 @@
     </message-properties-transformer>
 
     <!-- avoid name clash when used with hello-http-config.xml -->
-    <custom-transformer name="HttpRequestToParameter2" class="org.mule.providers.http.servlet.HttpRequestToParameter"/>
+    <custom-transformer name="HttpRequestToParameter2" class="org.mule.transport.http.servlet.HttpRequestToParameter"/>
 
     <model name="samples">
 

@@ -53,7 +53,7 @@
         <xsd:attribute name="cacheJmsSessions" type="mule:substitutableBoolean"/>
         <xsd:attribute name="recoverJmsConnections" type="mule:substitutableBoolean"/>
         <xsd:attribute name="eagerConsumer" type="mule:substitutableBoolean"/>
-        <!-- Defaults to org.mule.providers.jms.JmsConstants.JMS_SPECIFICATION_102B  -->
+        <!-- Defaults to org.mule.transport.jms.JmsConstants.JMS_SPECIFICATION_102B  -->
         <xsd:attribute name="specification" default="1.0.2b">
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">

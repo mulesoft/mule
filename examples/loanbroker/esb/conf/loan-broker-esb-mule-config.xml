@@ -104,7 +104,7 @@
             <inbound>
                 <inbound-endpoint ref="CreditAgencyGateway" />
             </inbound>
-            <component class="org.mule.components.builder.ReflectionMessageBuilder" />
+            <component class="org.mule.component.builder.ReflectionMessageBuilder" />
             <outbound>
                 <filtering-router>
                     <!-- We invoke the credit Agency service using remoteSync which means that a response

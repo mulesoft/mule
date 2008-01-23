@@ -4,7 +4,7 @@
                                 "http://mule.mulesource.org/dtds/mule-configuration.dtd">
 
 <mule-configuration id="Mule_Sample" version="1.0">
-    <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
+    <connector name="servlet" className="org.mule.transport.http.servlet.ServletConnector">
         <properties>
             <property name="servletUrl" value="http://localhost:18088/services"/>
         </properties>

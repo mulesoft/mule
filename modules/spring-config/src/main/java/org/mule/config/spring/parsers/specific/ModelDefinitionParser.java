@@ -9,10 +9,10 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.api.model.Model;
+import org.mule.api.registry.ServiceException;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.impl.model.ModelFactory;
-import org.mule.registry.ServiceException;
-import org.mule.umo.model.UMOModel;
+import org.mule.model.ModelFactory;
 import org.mule.util.ClassUtils;
 
 import org.springframework.beans.factory.BeanCreationException;
@@ -42,7 +42,7 @@ public class ModelDefinitionParser extends AbstractMuleBeanDefinitionParser
     public class ModelFactoryBean extends AbstractFactoryBean
     {
 
-        private UMOModel model;
+        private Model model;
 
 
         public Class getObjectType()
@@ -59,7 +59,7 @@ public class ModelDefinitionParser extends AbstractMuleBeanDefinitionParser
 
         protected Object createInstance() throws Exception
         {
-            model = (UMOModel) ClassUtils.instanciateClass(getObjectType(), ClassUtils.NO_ARGS);
+            model = (Model) ClassUtils.instanciateClass(getObjectType(), ClassUtils.NO_ARGS);
             return model;
         }
 

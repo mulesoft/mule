@@ -10,11 +10,11 @@
 
 package org.mule.issues;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.StringAppendTestTransformer;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
 
 public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 {
@@ -27,7 +27,7 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
         return "issues/endpoint-transformer-mule-2131-test.xml";
     }
 
-    protected MuleClient send() throws UMOException
+    protected MuleClient send() throws MuleException
     {
         MuleClient client = new MuleClient();
         client.dispatch("in", MESSAGE, null);
@@ -68,7 +68,7 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 
     protected String request(MuleClient client, String endpoint) throws Exception
     {
-        UMOMessage message = client.request(endpoint, TIMEOUT);
+        MuleMessage message = client.request(endpoint, TIMEOUT);
         assertNotNull(message);
         assertNotNull(message.getPayloadAsString());
         return message.getPayloadAsString();

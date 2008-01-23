@@ -10,14 +10,14 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
+import org.mule.api.MuleException;
+import org.mule.api.agent.Agent;
+import org.mule.api.lifecycle.InitialisationException;
 
 /**
  * Mock agent
  */
-public class TestAgent implements UMOAgent
+public class TestAgent implements Agent
 {
     public String getName()
     {
@@ -39,12 +39,12 @@ public class TestAgent implements UMOAgent
         // nothing to do
     }
 
-    public void start() throws UMOException
+    public void start() throws MuleException
     {
         // nothing to do
     }
 
-    public void stop() throws UMOException
+    public void stop() throws MuleException
     {
         // nothing to do
     }

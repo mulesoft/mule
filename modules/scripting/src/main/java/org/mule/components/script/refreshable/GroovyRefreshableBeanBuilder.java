@@ -10,10 +10,10 @@
 
 package org.mule.components.script.refreshable;
 
-import org.mule.MuleException;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.Callable;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringUtils;
 
 import groovy.lang.GroovyObject;
@@ -24,14 +24,14 @@ public class GroovyRefreshableBeanBuilder implements Callable
     private volatile Object refreshableBean;
     private String methodName;
     private static final String ON_CALL = "onCall";
-    private static final Class[] UMOEVENTCONTEXT = new Class[]{UMOEventContext.class};
+    private static final Class[] UMOEVENTCONTEXT = new Class[]{MuleEventContext.class};
     
     public GroovyRefreshableBeanBuilder()
     {
         super();
     }
 
-    public Object onCall(UMOEventContext eventContext) throws Exception
+    public Object onCall(MuleEventContext eventContext) throws Exception
     {
         if (refreshableBean instanceof GroovyObject)
         {
@@ -46,7 +46,7 @@ public class GroovyRefreshableBeanBuilder implements Callable
             {
                 if (StringUtils.isEmpty(methodName))
                 {
-                    throw new MuleException(CoreMessages.propertiesNotSet("methodName"));
+                    throw new DefaultMuleException(CoreMessages.propertiesNotSet("methodName"));
                 }
                 
                 return script.invokeMethod(methodName, eventContext.transformMessage());
@@ -54,7 +54,7 @@ public class GroovyRefreshableBeanBuilder implements Callable
             
         }
         
-        throw new Exception(new MuleException("script engine not supported"));
+        throw new Exception(new DefaultMuleException("script engine not supported"));
     }
 
     public Object getRefreshableBean()

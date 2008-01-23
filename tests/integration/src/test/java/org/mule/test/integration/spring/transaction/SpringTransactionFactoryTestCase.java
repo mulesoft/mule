@@ -10,9 +10,9 @@
 
 package org.mule.test.integration.spring.transaction;
 
+import org.mule.api.transaction.Transaction;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.UMOTransaction;
 
 public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
 {
@@ -20,7 +20,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
     // //@Override
     protected void doTearDown() throws Exception
     {
-        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null)
         {
             TransactionCoordination.getInstance().unbindTransaction(tx);
@@ -48,7 +48,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
 //        factory.setManager(tm);
 //
 //        // Create a new transaction
-//        UMOTransaction tx = factory.beginTransaction();
+//        Transaction tx = factory.beginTransaction();
 //        TransactionCoordination.getInstance().bindTransaction(tx);
 //        // Check that the jdbc connection is enlisted
 //        assertTrue(tx.hasResource(ds));

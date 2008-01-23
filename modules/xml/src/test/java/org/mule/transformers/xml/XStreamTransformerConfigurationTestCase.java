@@ -10,8 +10,8 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.transformer.TransformerException;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;

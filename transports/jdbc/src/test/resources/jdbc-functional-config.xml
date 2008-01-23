@@ -14,7 +14,7 @@
                 <inbound-endpoint address="jdbc://getTest?type=1"/>
             </inbound>
             <component>
-                <singleton-object class="org.mule.providers.jdbc.test.JdbcFunctionalTestComponent"/>
+                <singleton-object class="org.mule.transport.jdbc.test.JdbcFunctionalTestComponent"/>
             </component>
             <outbound>
                 <outbound-pass-through-router>

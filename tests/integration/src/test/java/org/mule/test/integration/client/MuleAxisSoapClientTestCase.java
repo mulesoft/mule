@@ -10,10 +10,10 @@
 
 package org.mule.test.integration.client;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.service.Person;
-import org.mule.umo.UMOMessage;
 
 public class MuleAxisSoapClientTestCase extends FunctionalTestCase
 {
@@ -37,7 +37,7 @@ public class MuleAxisSoapClientTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage result = client.send(getSoapProvider()
+        MuleMessage result = client.send(getSoapProvider()
                 + ":http://localhost:38104/mule/services/mycomponent2?method=echo",
                 "test", null);
         assertNotNull(result);
@@ -48,7 +48,7 @@ public class MuleAxisSoapClientTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage result = client.send(
+        MuleMessage result = client.send(
                 getSoapProvider() + ":http://localhost:38104/mule/services/mycomponent3?method=getPerson",
                 "Fred", null);
         assertNotNull(result);
@@ -63,7 +63,7 @@ public class MuleAxisSoapClientTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         String[] args = new String[]{"Betty", "Rubble"};
-        UMOMessage result = client.send(
+        MuleMessage result = client.send(
                 getSoapProvider() + ":http://localhost:38104/mule/services/mycomponent3?method=addPerson", args,
                 null);
         assertNotNull(result);

@@ -11,10 +11,10 @@
 package org.mule.test.integration.client;
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.providers.jms.JmsConstants;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
+import org.mule.transport.jms.JmsConstants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
-        UMOMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
+        MuleMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
         assertNotNull(message);
         assertEquals("Received: Test Client Send message", message.getPayload());
     }
@@ -57,7 +57,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
         RegistryContext.getConfiguration().setDefaultRemoteSync(true);
 
-        UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
+        MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
         assertNotNull(message);
         assertEquals("Received: Test Client Send message", message.getPayload());
     }
@@ -70,7 +70,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
 
         for (int i = 0; i < INTERATIONS; i++)
         {
-            UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
+            MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
             assertNotNull(message);
             assertEquals("Received: Test Client Send message " + i, message.getPayload());
         }
@@ -116,7 +116,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
         start = System.currentTimeMillis();
         for (i = 0; i < INTERATIONS; i++)
         {
-            UMOMessage message = client.request("jms://replyTo.queue", 5000);
+            MuleMessage message = client.request("jms://replyTo.queue", 5000);
             assertNotNull("message should not be null from Reply queue", message);
             logger.debug("Count is " + i);
             logger.debug("ReplyTo Message is: " + message.getPayloadAsString());

@@ -9,7 +9,7 @@
  */
 package org.mule.extras.acegi.config;
 
-import org.mule.config.MuleProperties;
+import org.mule.api.config.MuleProperties;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.DescendentDefinitionParser;

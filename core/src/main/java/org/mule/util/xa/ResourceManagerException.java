@@ -10,10 +10,10 @@
 
 package org.mule.util.xa;
 
+import org.mule.api.MuleException;
 import org.mule.config.i18n.Message;
-import org.mule.umo.UMOException;
 
-public class ResourceManagerException extends UMOException
+public class ResourceManagerException extends MuleException
 {
     /**
      * Serial version

@@ -9,9 +9,9 @@
  */
 package org.mule;
 
+import org.mule.api.registry.Registry;
 import org.mule.config.MuleConfiguration;
-import org.mule.impl.registry.TransientRegistry;
-import org.mule.registry.Registry;
+import org.mule.registry.TransientRegistry;
 
 /** 
  * A handle to the Mule Registry.  We should make no assumptions about the location of the actual Registry

@@ -10,19 +10,19 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.UMOConnector;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transport.Connector;
 import org.mule.util.ObjectNameHelper;
 
 import java.beans.ExceptionListener;
 
 public class ConnectorService implements ConnectorServiceMBean
 {
-    private final UMOConnector connector;
+    private final Connector connector;
     private final String name;
 
-    public ConnectorService(final UMOConnector connector)
+    public ConnectorService(final Connector connector)
     {
         this.connector = connector;
         name = ObjectNameHelper.getConnectorName(connector);
@@ -58,12 +58,12 @@ public class ConnectorService implements ConnectorServiceMBean
         return connector.getExceptionListener();
     }
 
-    public void startConnector() throws UMOException
+    public void startConnector() throws MuleException
     {
         connector.start();
     }
 
-    public void stopConnector() throws UMOException
+    public void stopConnector() throws MuleException
     {
         connector.stop();
     }

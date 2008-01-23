@@ -22,7 +22,7 @@
     </container-context>
 
     <!-- Testing with ActiveMq -->
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+    <connector name="jmsConnector" className="org.mule.transport.jms.JmsConnector">
         <properties>
             <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <property name="specification" value="1.1"/>
@@ -34,7 +34,7 @@
     -->
     <model name="InjectionProblem">
         <mule-descriptor name="pojo1"
-            implementation="org.mule.components.simple.EchoComponent">
+            implementation="org.mule.component.simple.EchoComponent">
             <inbound-router>
                 <endpoint address="vm://pojo1" remoteSync="true" remoteSyncTimeout="10000" />
             </inbound-router>
@@ -47,7 +47,7 @@
         </mule-descriptor>
 
         <mule-descriptor name="pojo2"
-            implementation="org.mule.components.simple.EchoComponent">
+            implementation="org.mule.component.simple.EchoComponent">
             <inbound-router>
                 <endpoint address="jms://pojo2"/>
             </inbound-router>

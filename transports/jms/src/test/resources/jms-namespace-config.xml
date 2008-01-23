@@ -12,9 +12,9 @@
         <spring:property name="value" value="foo"/>
     </spring:bean>
 
-    <spring:bean name="connectionFactory" class="org.mule.providers.jms.test.TestConnectionFactory"/>
+    <spring:bean name="connectionFactory" class="org.mule.transport.jms.test.TestConnectionFactory"/>
 
-    <spring:bean name="redeliveryHandler" class="org.mule.providers.jms.test.TestRedeliveryHandler"/>
+    <spring:bean name="redeliveryHandler" class="org.mule.transport.jms.test.TestRedeliveryHandler"/>
     
     <!-- Default config -->
     <jms:connector name="jmsConnectorDefaults" connectionFactory-ref="connectionFactory"/>
@@ -36,7 +36,7 @@
                    username="myuser"
                    password="mypass"/>
 
-    <jms:custom-connector name="jmsConnector2" class="org.mule.providers.jms.JmsConnector"
+    <jms:custom-connector name="jmsConnector2" class="org.mule.transport.jms.JmsConnector"
                           specification="1.1">
          <spring:property name="connectionFactory" ref="connectionFactory"/>
     </jms:custom-connector>

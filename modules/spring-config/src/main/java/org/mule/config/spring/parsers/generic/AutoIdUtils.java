@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.util.StringUtils;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 import org.w3c.dom.Element;
 
 public class AutoIdUtils

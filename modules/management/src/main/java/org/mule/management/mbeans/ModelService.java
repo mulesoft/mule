@@ -10,8 +10,8 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.model.UMOModel;
+import org.mule.api.MuleException;
+import org.mule.api.model.Model;
 
 /**
  * <code>ModelService</code> exposes service information and actions on the Mule
@@ -19,45 +19,45 @@ import org.mule.umo.model.UMOModel;
  */
 public class ModelService implements ModelServiceMBean
 {
-    private UMOModel model;
+    private Model model;
 
-    public ModelService(UMOModel model)
+    public ModelService(Model model)
     {
         this.model = model;
 
     }
 
-    public void start() throws UMOException
+    public void start() throws MuleException
     {
         model.start();
     }
 
-    public void stop() throws UMOException
+    public void stop() throws MuleException
     {
         model.stop();
     }
 
-//    public void startComponent(String name) throws UMOException
+//    public void startComponent(String name) throws MuleException
 //    {
 //        model.startComponent(name);
 //    }
 //
-//    public void stopComponent(String name) throws UMOException
+//    public void stopComponent(String name) throws MuleException
 //    {
 //        model.stopComponent(name);
 //    }
 //
-//    public void pauseComponent(String name) throws UMOException
+//    public void pauseComponent(String name) throws MuleException
 //    {
 //        model.pauseComponent(name);
 //    }
 //
-//    public void resumeComponent(String name) throws UMOException
+//    public void resumeComponent(String name) throws MuleException
 //    {
 //        model.resumeComponent(name);
 //    }
 //
-//    public void unregisterComponent(String name) throws UMOException
+//    public void unregisterComponent(String name) throws MuleException
 //    {
 //        RegistryContext.getRegistry().unregisterService(name);
 //        //model.unregisterComponent(model.getDescriptor(name));

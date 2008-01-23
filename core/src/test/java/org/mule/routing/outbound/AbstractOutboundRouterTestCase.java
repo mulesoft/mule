@@ -10,10 +10,10 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.impl.endpoint.InboundEndpoint;
-import org.mule.impl.endpoint.OutboundEndpoint;
+import org.mule.api.endpoint.InvalidEndpointTypeException;
+import org.mule.endpoint.InboundEndpoint;
+import org.mule.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.endpoint.InvalidEndpointTypeException;
 
 import java.util.ArrayList;
 import java.util.List;

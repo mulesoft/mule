@@ -10,7 +10,7 @@
 
 package org.mule.config.factories;
 
-import org.mule.config.PropertyFactory;
+import org.mule.api.config.PropertyFactory;
 
 import java.net.InetAddress;
 import java.util.Map;

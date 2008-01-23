@@ -134,7 +134,7 @@
                                             to="${email.toAddress}" from="${email.fromAddress}"
                                             subject="${email.subject}"
                                             transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage"/>
-                    <payload-type-filter expectedType="org.mule.umo.lifecycle.FatalException"/>
+                    <payload-type-filter expectedType="org.mule.api.lifecycle.FatalException"/>
                 </filtering-router>
                 
                 <filtering-router transformer-refs="ErrorMessageToException">

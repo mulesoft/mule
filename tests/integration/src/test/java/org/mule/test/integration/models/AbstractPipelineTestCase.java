@@ -10,9 +10,9 @@
 
 package org.mule.test.integration.models;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,7 +32,7 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
         List results = new ArrayList();
         for (int i = 0; i < getNumberOfMessages(); i++)
         {
-            UMOMessage result = client.send("component1.endpoint", "test", null);
+            MuleMessage result = client.send("component1.endpoint", "test", null);
             assertNotNull(result);
             results.add(result);
         }
@@ -40,7 +40,7 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
         assertEquals(results.size(), getNumberOfMessages());
         for (Iterator iterator = results.iterator(); iterator.hasNext();)
         {
-            UMOMessage umoMessage = (UMOMessage)iterator.next();
+            MuleMessage umoMessage = (MuleMessage)iterator.next();
             assertEquals("request received by component 3", umoMessage.getPayloadAsString());
         }
     }
@@ -57,14 +57,14 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
 
         for (int i = 0; i < getNumberOfMessages(); i++)
         {
-            UMOMessage result = client.request("results.endpoint", 1000);
+            MuleMessage result = client.request("results.endpoint", 1000);
             assertNotNull(result);
             results.add(result);
         }
         assertEquals(results.size(), getNumberOfMessages());
         for (Iterator iterator = results.iterator(); iterator.hasNext();)
         {
-            UMOMessage umoMessage = (UMOMessage)iterator.next();
+            MuleMessage umoMessage = (MuleMessage)iterator.next();
             assertEquals("request received by component 3", umoMessage.getPayloadAsString());
         }
     }

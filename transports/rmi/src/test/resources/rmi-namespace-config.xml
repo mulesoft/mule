@@ -9,7 +9,7 @@
        http://www.mulesource.org/schema/mule/rmi/2.0 http://www.mulesource.org/schema/mule/rmi/2.0/mule-rmi.xsd">
 
     <spring:bean name="securityManager"
-          class="org.mule.providers.rmi.DummySecurityManager"/>
+          class="org.mule.transport.rmi.DummySecurityManager"/>
 
     <spring:bean name="jndiContext"
           class="org.mule.tck.jndi.InMemoryContext"/>

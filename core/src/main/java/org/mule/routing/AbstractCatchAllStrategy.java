@@ -10,9 +10,9 @@
 
 package org.mule.routing;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.RouterCatchAllStrategy;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.UMORouterCatchAllStrategy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,23 +24,23 @@ import org.apache.commons.logging.LogFactory;
  * queue in messaging.
  */
 
-public abstract class AbstractCatchAllStrategy implements UMORouterCatchAllStrategy
+public abstract class AbstractCatchAllStrategy implements RouterCatchAllStrategy
 {
     /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected UMOImmutableEndpoint endpoint;
+    protected ImmutableEndpoint endpoint;
 
     protected RouterStatistics statistics;
 
-    public void setEndpoint(UMOImmutableEndpoint endpoint)
+    public void setEndpoint(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
     }
 
-    public UMOImmutableEndpoint getEndpoint()
+    public ImmutableEndpoint getEndpoint()
     {
         return endpoint;
     }

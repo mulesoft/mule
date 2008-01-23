@@ -10,9 +10,9 @@
 
 package org.mule.test.usecases.sync;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class TcpToFileTestCase extends FunctionalTestCase
 {
@@ -29,7 +29,7 @@ public class TcpToFileTestCase extends FunctionalTestCase
 
         client.sendNoReceive("tcp://localhost:4444", payload, null);
 
-        UMOMessage msg = client.request("file://temp/tests/mule", 10000);
+        MuleMessage msg = client.request("file://temp/tests/mule", 10000);
         assertNotNull(msg);
         assertEquals(payload, msg.getPayloadAsString());
     }

@@ -82,7 +82,7 @@ public class TransportArchetypeMojo extends AbstractMojo
     private String transportId;
 
     /**
-     * @parameter expression="${groupId}" alias="newGroupId" default-value="org.mule.providers.${transportId}
+     * @parameter expression="${groupId}" alias="newGroupId" default-value="org.mule.transport.${transportId}
      * @require
      */
     private String groupId;

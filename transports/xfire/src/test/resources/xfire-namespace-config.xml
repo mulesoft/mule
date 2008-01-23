@@ -8,22 +8,22 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/xfire/2.0 http://www.mulesource.org/schema/mule/xfire/2.0/mule-xfire.xsd">
        
-    <spring:bean name="mockFactory" class="org.mule.providers.soap.xfire.testmodels.MockServiceFactory"/>
-    <spring:bean name="mockXFire" class="org.mule.providers.soap.xfire.testmodels.MockXFire"/>
+    <spring:bean name="mockFactory" class="org.mule.transport.soap.xfire.testmodels.MockServiceFactory"/>
+    <spring:bean name="mockXFire" class="org.mule.transport.soap.xfire.testmodels.MockXFire"/>
        
     <xfire:connector name="xfireConnector"
         bindingProviderClass="org.codehaus.xfire.service.binding.MessageBindingProvider"
         clientTransportClass="org.codehaus.xfire.transport.dead.DeadLetterTransport"
         enableJSR181Annotations="false"
-        serviceTransport="org.mule.providers.soap.xfire.testmodels.MockService"
-        typeMappingRegistryClass="org.mule.providers.soap.xfire.testmodels.MockTypeMappingRegistry">
+        serviceTransport="org.mule.transport.soap.xfire.testmodels.MockService"
+        typeMappingRegistryClass="org.mule.transport.soap.xfire.testmodels.MockTypeMappingRegistry">
         
         <xfire:client-in-handler>org.codehaus.xfire.util.dom.DOMInHandler</xfire:client-in-handler>
         <xfire:client-in-handler>org.codehaus.xfire.util.LoggingHandler</xfire:client-in-handler>
         
         <xfire:client-out-handler>org.codehaus.xfire.util.dom.DOMOutHandler</xfire:client-out-handler>
 
-        <xfire:client-service>org.mule.providers.soap.xfire.testmodels.MockService</xfire:client-service>
+        <xfire:client-service>org.mule.transport.soap.xfire.testmodels.MockService</xfire:client-service>
 
         <xfire:server-in-handler>org.codehaus.xfire.util.dom.DOMInHandler</xfire:server-in-handler>
         <xfire:server-in-handler>org.codehaus.xfire.util.LoggingHandler</xfire:server-in-handler>

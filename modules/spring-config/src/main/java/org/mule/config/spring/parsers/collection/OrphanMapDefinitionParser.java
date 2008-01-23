@@ -9,8 +9,8 @@
  */
 package org.mule.config.spring.parsers.collection;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 import java.util.Map;
 

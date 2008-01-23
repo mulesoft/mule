@@ -10,7 +10,7 @@
 
 package org.mule.test.config;
 
-import org.mule.MuleException;
+import org.mule.api.DefaultMuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.AbstractMuleTestCase;
@@ -47,7 +47,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
     private Exception getException()
     {
 
-        return new MuleException(MessageFactory.createStaticMessage("foo"), new MuleException(
+        return new DefaultMuleException(MessageFactory.createStaticMessage("foo"), new DefaultMuleException(
             MessageFactory.createStaticMessage("bar"), new Exception("blah")));
     }
 }

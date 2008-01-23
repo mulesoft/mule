@@ -10,8 +10,8 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.umo.transformer.DiscoverableTransformer;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.api.transformer.DiscoverableTransformer;
+import org.mule.api.transformer.TransformerException;
 
 /** <code>DomDocumentToXml</code> Transform a org.w3c.dom.Document to XML String */
 public class DomDocumentToXml extends AbstractXmlTransformer implements DiscoverableTransformer

@@ -10,19 +10,19 @@
 
 package org.mule.extras.jaas;
 
-import org.mule.umo.security.UMOAuthentication;
-import org.mule.umo.security.UMOSecurityContext;
-import org.mule.umo.security.UMOSecurityContextFactory;
+import org.mule.api.security.Authentication;
+import org.mule.api.security.SecurityContext;
+import org.mule.api.security.SecurityContextFactory;
 
-public class JaasSecurityContextFactory implements UMOSecurityContextFactory
+public class JaasSecurityContextFactory implements SecurityContextFactory
 {
     /**
      * Creates the Jaas Security Context
      * 
      * @param authentication
-     * @return JaasSecurityContext((MuleAuthentication) authentication)
+     * @return JaasSecurityContext((Authentication) authentication)
      */
-    public final UMOSecurityContext create(UMOAuthentication authentication)
+    public final SecurityContext create(Authentication authentication)
     {
         return new JaasSecurityContext((JaasAuthentication) authentication);
     }

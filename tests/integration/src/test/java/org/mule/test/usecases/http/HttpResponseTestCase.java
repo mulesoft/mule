@@ -10,12 +10,12 @@
 
 package org.mule.test.usecases.http;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.NullPayload;
-import org.mule.providers.http.HttpConnector;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
+import org.mule.transport.NullPayload;
+import org.mule.transport.http.HttpConnector;
 
 public class HttpResponseTestCase extends FunctionalTestCase
 {
@@ -27,7 +27,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testNullPayloadUsingAsync() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage reply = client.send("http://localhost:8990", new MuleMessage("test"));
+        MuleMessage reply = client.send("http://localhost:8990", new DefaultMuleMessage("test"));
 
         //TODO RM: What should really be returned when doing an async request?
         assertNotNull(reply.getPayload());
@@ -38,7 +38,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testPayloadIsNotEmptyNoRemoteSynch() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage reply = client.send("http://localhost:8999", new MuleMessage("test"));
+        MuleMessage reply = client.send("http://localhost:8999", new DefaultMuleMessage("test"));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
         assertEquals("test", reply.getPayloadAsString());
@@ -47,7 +47,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
     public void testPayloadIsNotEmptyWithRemoteSynch() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage reply = client.send("http://localhost:8989", new MuleMessage("test"));
+        MuleMessage reply = client.send("http://localhost:8989", new DefaultMuleMessage("test"));
         assertNotNull(reply.getPayload());
         assertFalse(reply.getPayload() instanceof NullPayload);
         assertEquals("test", reply.getPayloadAsString());

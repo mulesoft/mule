@@ -24,7 +24,7 @@
         <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
     </spring:bean>
 
-    <spring:bean name="echoComponent" class="org.mule.components.simple.EchoComponent"/>
+    <spring:bean name="echoComponent" class="org.mule.component.simple.EchoComponent"/>
 
     <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>

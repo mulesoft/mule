@@ -28,7 +28,7 @@
             <mule:inbound>
                 <mule:inbound-endpoint address="vm://test" />
             </mule:inbound>
-            <mule:component class="org.mule.providers.cxf.bridge.EchoComponent"/>
+            <mule:component class="org.mule.transport.cxf.bridge.EchoComponent"/>
         </mule:service>
         
     </mule:model>

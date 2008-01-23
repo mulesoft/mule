@@ -11,10 +11,10 @@
 package org.mule.transaction;
 
 import org.mule.MuleServer;
+import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.internal.notifications.TransactionNotification;
-import org.mule.umo.TransactionException;
-import org.mule.umo.UMOTransaction;
+import org.mule.context.notification.TransactionNotification;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This base class provides low level features for transactions.
  */
-public abstract class AbstractTransaction implements UMOTransaction
+public abstract class AbstractTransaction implements Transaction
 {
 
     protected final transient Log logger = LogFactory.getLog(getClass());
@@ -30,7 +30,7 @@ public abstract class AbstractTransaction implements UMOTransaction
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#isRollbackOnly()
+     * @see org.mule.api.Transaction#isRollbackOnly()
      */
     public boolean isRollbackOnly() throws TransactionException
     {
@@ -40,7 +40,7 @@ public abstract class AbstractTransaction implements UMOTransaction
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#isBegun()
+     * @see org.mule.api.Transaction#isBegun()
      */
     public boolean isBegun() throws TransactionException
     {
@@ -51,7 +51,7 @@ public abstract class AbstractTransaction implements UMOTransaction
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#isRolledBack()
+     * @see org.mule.api.Transaction#isRolledBack()
      */
     public boolean isRolledBack() throws TransactionException
     {
@@ -61,7 +61,7 @@ public abstract class AbstractTransaction implements UMOTransaction
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#isCommitted()
+     * @see org.mule.api.Transaction#isCommitted()
      */
     public boolean isCommitted() throws TransactionException
     {
@@ -71,7 +71,7 @@ public abstract class AbstractTransaction implements UMOTransaction
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#begin()
+     * @see org.mule.api.Transaction#begin()
      */
     public void begin() throws TransactionException
     {
@@ -84,7 +84,7 @@ public abstract class AbstractTransaction implements UMOTransaction
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#commit()
+     * @see org.mule.api.Transaction#commit()
      */
     public void commit() throws TransactionException
     {
@@ -109,7 +109,7 @@ public abstract class AbstractTransaction implements UMOTransaction
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.UMOTransaction#rollback()
+     * @see org.mule.api.Transaction#rollback()
      */
     public void rollback() throws TransactionException
     {
@@ -149,7 +149,7 @@ public abstract class AbstractTransaction implements UMOTransaction
 
     /**
      * Fires a server notification to all registered
-     * {@link org.mule.impl.internal.notifications.TransactionNotificationListener}s.
+     * {@link org.mule.api.context.notification.listener.TransactionNotificationListener}s.
      *
      */
     protected void fireNotification(TransactionNotification notification)

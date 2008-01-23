@@ -14,14 +14,14 @@ import org.mule.config.spring.parsers.assembly.configuration.PropertyConfigurati
 import org.mule.util.MapCombiner;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.ManagedList;
+import org.springframework.beans.factory.support.ManagedMap;
 
 public abstract class AbstractMapBeanAssembler extends DefaultBeanAssembler
 {

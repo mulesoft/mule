@@ -6,7 +6,7 @@
     </bean>
 
     <!-- the jms server connector config -->
-    <bean id="jmsConnector" class="org.mule.providers.jms.JmsConnector">
+    <bean id="jmsConnector" class="org.mule.transport.jms.JmsConnector">
         <property name="connectionFactory" ref="jmsConnectionFactory"/>
         <property name="specification" value="1.1"/>
     </bean>
@@ -30,7 +30,7 @@ register it as the spring context event multicaster  -->
     </bean>
 
 
-    <!-- <bean id="EmailMessageToString" class="org.mule.providers.email.transformers.EmailMessageToString"/>-->
+    <!-- <bean id="EmailMessageToString" class="org.mule.transport.email.transformers.EmailMessageToString"/>-->
 
     <bean id="StringToOrder" class="org.mule.test.integration.spring.events.StringToOrder">
         <property name="returnClass">

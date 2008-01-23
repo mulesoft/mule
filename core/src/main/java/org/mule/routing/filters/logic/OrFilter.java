@@ -10,8 +10,8 @@
 
 package org.mule.routing.filters.logic;
 
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
 
 import java.util.Iterator;
 
@@ -31,16 +31,16 @@ public class OrFilter extends AbstractFilterCollection
      * @param left
      * @param right
      */
-    public OrFilter(UMOFilter left, UMOFilter right)
+    public OrFilter(Filter left, Filter right)
     {
         super(left, right);
     }
 
-    public boolean accept(UMOMessage message)
+    public boolean accept(MuleMessage message)
     {
         for (Iterator iterator = getFilters().iterator(); iterator.hasNext();)
         {
-            UMOFilter umoFilter = (UMOFilter) iterator.next();
+            Filter umoFilter = (Filter) iterator.next();
             if(umoFilter.accept(message))
             {
                 return true;

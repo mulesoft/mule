@@ -11,11 +11,11 @@
 package org.mule.test.integration.spring.events;
 
 import org.mule.RegistryContext;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOMessage;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
@@ -55,7 +55,7 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
         // invoked
         EventCallback callback = new EventCallback()
         {
-            public void eventReceived(UMOEventContext context, Object o) throws Exception
+            public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 eventCount.incrementAndGet();
             }
@@ -69,7 +69,7 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
         Thread.sleep(1000);
         assertTrue(eventCount.get() == 1);
 
-        UMOMessage result = client.request("jms://processed.queue", 10000);
+        MuleMessage result = client.request("jms://processed.queue", 10000);
         assertEquals(1, eventCount.get());
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", result.getPayload());
@@ -82,7 +82,7 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
         assertNotNull(orderManager);
         EventCallback callback = new EventCallback()
         {
-            public void eventReceived(UMOEventContext context, Object o) throws Exception
+            public void eventReceived(MuleEventContext context, Object o) throws Exception
             {
                 eventCount.incrementAndGet();
             }
@@ -90,7 +90,7 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
         orderManager.setEventCallback(callback);
 
         Order order = new Order("Sausage and Mash");
-        UMOMessage result = client.send("axis:http://localhost:44444/mule/orderManager?method=processOrder",
+        MuleMessage result = client.send("axis:http://localhost:44444/mule/orderManager?method=processOrder",
             order, null);
 
         assertNotNull(result);

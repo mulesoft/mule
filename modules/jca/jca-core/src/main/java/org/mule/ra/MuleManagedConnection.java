@@ -10,8 +10,8 @@
 
 package org.mule.ra;
 
-import org.mule.impl.security.MuleCredentials;
 import org.mule.ra.i18n.JcaMessages;
+import org.mule.security.MuleCredentials;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

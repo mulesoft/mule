@@ -7,6 +7,6 @@
        http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion} http://www.mulesource.org/schema/mule/${ModuleNameLower}/${MuleMajorMinorVersion}/mule-${ModuleNameLower}.xsd">
 
         <!-- TODO Add your configuration elements here and Add specific properties here and then assert that
-             they have been set properly in org.mule.providers.${ModuleNameLower}.${ModuleName}NamespaceHandlerTestCase -->
+             they have been set properly in org.mule.transport.${ModuleNameLower}.${ModuleName}NamespaceHandlerTestCase -->
 
 </mule>

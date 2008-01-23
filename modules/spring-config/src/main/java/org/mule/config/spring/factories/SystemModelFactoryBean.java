@@ -11,11 +11,11 @@ package org.mule.config.spring.factories;
 
 import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.model.Model;
 import org.mule.config.MuleConfiguration;
-import org.mule.config.MuleProperties;
-import org.mule.impl.MuleContextAware;
-import org.mule.impl.model.ModelFactory;
-import org.mule.umo.model.UMOModel;
+import org.mule.model.ModelFactory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
@@ -28,13 +28,13 @@ public class SystemModelFactoryBean extends AbstractFactoryBean implements MuleC
 
     private String type;
 
-    private UMOModel model;
+    private Model model;
 
     private MuleContext muleContext;
 
     public Class getObjectType()
     {
-        return UMOModel.class;
+        return Model.class;
     }
 
     protected Object createInstance() throws Exception

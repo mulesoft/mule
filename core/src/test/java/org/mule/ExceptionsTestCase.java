@@ -10,12 +10,13 @@
 
 package org.mule;
 
+import org.mule.api.MuleException;
+import org.mule.api.DefaultMuleException;
+import org.mule.api.context.MuleContextException;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.manager.ManagerException;
-import org.mule.umo.routing.RoutingException;
 
 public class ExceptionsTestCase extends AbstractMuleTestCase
 {
@@ -25,7 +26,7 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
         String rootMsg = "Root Test Exception Message";
         String msg = "Test Exception Message";
 
-        Exception e = new ManagerException(MessageFactory.createStaticMessage(msg), new MuleException(
+        Exception e = new MuleContextException(MessageFactory.createStaticMessage(msg), new DefaultMuleException(
             MessageFactory.createStaticMessage(rootMsg)));
 
         assertEquals(rootMsg, e.getCause().getMessage());
@@ -33,15 +34,15 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
         assertEquals(e.getClass().getName() + ": " + msg, e.toString());
     }
 
-    public final void testRoutingExceptionNullUMOMessageNullUMOImmutableEndpoint() throws UMOException
+    public final void testRoutingExceptionNullUMOMessageNullUMOImmutableEndpoint() throws MuleException
     {
         RoutingException rex = new RoutingException(null, null);
         assertNotNull(rex);
     }
 
-    public final void testRoutingExceptionNullUMOMessageValidUMOImmutableEndpoint() throws UMOException
+    public final void testRoutingExceptionNullUMOMessageValidUMOImmutableEndpoint() throws MuleException
     {
-        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint("test://outbound");
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint("test://outbound");
         assertNotNull(endpoint);
 
         RoutingException rex = new RoutingException(null, endpoint);

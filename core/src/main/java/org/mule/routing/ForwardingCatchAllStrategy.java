@@ -10,14 +10,14 @@
 
 package org.mule.routing;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.ComponentRoutingException;
+import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleEvent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.ComponentRoutingException;
-import org.mule.umo.routing.RoutingException;
 
 /**
  * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router for
@@ -30,7 +30,7 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
 {
     private boolean sendTransformed = false;
 
-    public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
+    public MuleMessage catchMessage(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
         if (getEndpoint() == null)
@@ -40,17 +40,17 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
         }
         try
         {
-            UMOImmutableEndpoint endpoint = getEndpoint();
+            ImmutableEndpoint endpoint = getEndpoint();
             if (sendTransformed && endpoint.getTransformers() != null)
             {
                 message.applyTransformers(endpoint.getTransformers());
             }
 
-            UMOEvent newEvent = new MuleEvent(message, endpoint, session, synchronous);
+            MuleEvent newEvent = new DefaultMuleEvent(message, endpoint, session, synchronous);
 
             if (synchronous)
             {
-                UMOMessage result = endpoint.send(newEvent);
+                MuleMessage result = endpoint.send(newEvent);
                 if (statistics != null)
                 {
                     statistics.incrementRoutedMessage(getEndpoint());

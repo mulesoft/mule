@@ -1,8 +1,8 @@
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.impl.endpoint.URIBuilder;
+import org.mule.api.endpoint.EndpointURI;
+import org.mule.endpoint.URIBuilder;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.endpoint.UMOEndpointURI;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class URIBuilderTestCase extends AbstractMuleTestCase
     public void testFromString()
     {
         URIBuilder uri = new URIBuilder("test://bar");
-        UMOEndpointURI endpointURI = uri.getEndpoint();
+        EndpointURI endpointURI = uri.getEndpoint();
         assertEquals("test://bar", endpointURI.getUri().toString());
         assertEquals("test", endpointURI.getSchemeMetaInfo());
         uri = new URIBuilder("meta:test://bar");

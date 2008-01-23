@@ -10,20 +10,20 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.EndpointException;
+import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.api.routing.RoutePathNotFoundException;
+import org.mule.api.routing.RoutingException;
+import org.mule.api.routing.filter.Filter;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.endpoint.DynamicEndpointURIEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.EndpointException;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
-import org.mule.umo.routing.RoutePathNotFoundException;
-import org.mule.umo.routing.RoutingException;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.endpoint.DynamicEndpointURIEndpoint;
+import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.TemplateParser;
 
 import java.util.HashMap;
@@ -41,24 +41,24 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 {
     private List transformers = new LinkedList();
 
-    private UMOFilter filter;
+    private Filter filter;
 
     private boolean useTemplates = false;
 
     // We used Square templates as they can exist as part of an URI.
     private TemplateParser parser = TemplateParser.createSquareBracesStyleParser();
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
-        UMOMessage result = null;
+        MuleMessage result = null;
 
         if (endpoints == null || endpoints.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
 
-        UMOImmutableEndpoint ep = getEndpoint(0, message);
+        ImmutableEndpoint ep = getEndpoint(0, message);
 
         try
         {
@@ -71,24 +71,24 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
                 dispatch(session, message, ep);
             }
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             throw new CouldNotRouteOutboundMessageException(message, ep, e);
         }
         return result;
     }
 
-    public UMOFilter getFilter()
+    public Filter getFilter()
     {
         return filter;
     }
 
-    public void setFilter(UMOFilter filter)
+    public void setFilter(Filter filter)
     {
         this.filter = filter;
     }
 
-    public boolean isMatch(UMOMessage message) throws RoutingException
+    public boolean isMatch(MuleMessage message) throws RoutingException
     {
         if (getFilter() == null)
         {
@@ -102,7 +102,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         {
             throw new RoutingException(
                     CoreMessages.transformFailedBeforeFilter(),
-                    message, (UMOImmutableEndpoint) endpoints.get(0), e);
+                    message, (ImmutableEndpoint) endpoints.get(0), e);
         }
         return getFilter().accept(message);
     }
@@ -117,7 +117,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         this.transformers = transformers;
     }
 
-    public void addEndpoint(UMOImmutableEndpoint endpoint)
+    public void addEndpoint(ImmutableEndpoint endpoint)
     {
         if (!useTemplates && parser.isContainsTemplate(endpoint.getEndpointURI().toString()))
         {
@@ -137,16 +137,16 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
      * @throws CouldNotRouteOutboundMessageException if the template causs the
      *             endpoint to become illegal or malformed
      */
-    public UMOImmutableEndpoint getEndpoint(int index, UMOMessage message)
+    public ImmutableEndpoint getEndpoint(int index, MuleMessage message)
         throws CouldNotRouteOutboundMessageException
     {
         if (!useTemplates)
         {
-            return (UMOImmutableEndpoint) endpoints.get(index);
+            return (ImmutableEndpoint) endpoints.get(index);
         }
         else
         {
-            UMOImmutableEndpoint ep = (UMOImmutableEndpoint) endpoints.get(index);
+            ImmutableEndpoint ep = (ImmutableEndpoint) endpoints.get(index);
             String uri = ep.getEndpointURI().toString();
 
             if (logger.isDebugEnabled())
@@ -172,7 +172,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
 
             try
             {
-                UMOEndpointURI newUri = new MuleEndpointURI(newUriString);
+                EndpointURI newUri = new MuleEndpointURI(newUriString);
                 if (!newUri.getScheme().equalsIgnoreCase(ep.getEndpointURI().getScheme()))
                 {
                     throw new CouldNotRouteOutboundMessageException(CoreMessages.schemeCannotChangeForRouter(

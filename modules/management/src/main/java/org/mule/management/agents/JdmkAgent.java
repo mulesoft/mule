@@ -10,10 +10,10 @@
 
 package org.mule.management.agents;
 
+import org.mule.AbstractAgent;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.AbstractAgent;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -68,7 +68,7 @@ public class JdmkAgent extends AbstractAgent
         return "Jdmk Http adaptor: " + jmxAdaptorUrl;
     }
 
-    public void start() throws UMOException
+    public void start() throws MuleException
     {
         try
         {
@@ -90,7 +90,7 @@ public class JdmkAgent extends AbstractAgent
         }
     }
 
-    public void stop() throws UMOException
+    public void stop() throws MuleException
     {
         if (mBeanServer == null)
         {

@@ -11,6 +11,7 @@
 package org.mule.tck.testmodels.services;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

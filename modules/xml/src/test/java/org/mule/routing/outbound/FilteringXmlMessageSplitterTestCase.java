@@ -10,13 +10,13 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.util.IOUtils;
 
 import com.mockobjects.constraint.Constraint;
@@ -31,20 +31,20 @@ import org.dom4j.DocumentHelper;
 
 public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 {
-    private UMOEndpoint endpoint1;
-    private UMOEndpoint endpoint2;
-    private UMOEndpoint endpoint3;
+    private Endpoint endpoint1;
+    private Endpoint endpoint2;
+    private Endpoint endpoint3;
     private FilteringXmlMessageSplitter xmlSplitter;
 
     // @Override
     protected void doSetUp() throws Exception
     {
         // setup endpoints
-        endpoint1 = getTestEndpoint("Test1Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint1 = getTestEndpoint("Test1Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
-        endpoint2 = getTestEndpoint("Test2Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint2 = getTestEndpoint("Test2Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint2.setEndpointURI(new MuleEndpointURI("test://endpointUri.2"));
-        endpoint3 = getTestEndpoint("Test3Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint3 = getTestEndpoint("Test3Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
 
         // setup splitter
@@ -95,20 +95,20 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        UMOMessage message = new MuleMessage(payload);
+        MuleMessage message = new DefaultMuleMessage(payload);
 
         assertTrue(xmlSplitter.isMatch(message));
         final ItemNodeConstraint itemNodeConstraint = new ItemNodeConstraint();
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
-        xmlSplitter.route(message, (UMOSession)session.proxy(), false);
+        xmlSplitter.route(message, (MuleSession)session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage(payload);
+        message = new DefaultMuleMessage(payload);
 
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint1)), message);
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint1)), message);
-        UMOMessage result = xmlSplitter.route(message, (UMOSession)session.proxy(), true);
+        MuleMessage result = xmlSplitter.route(message, (MuleSession)session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
@@ -119,7 +119,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         final String invalidSchemaLocation = "non-existent.xsd";
         Mock session = MuleTestUtils.getMockSession();
 
-        UMOEndpoint endpoint1 = getTestEndpoint("Test1Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestEndpoint("Test1Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
 
         FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();
@@ -128,12 +128,12 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
 
-        UMOMessage message = new MuleMessage(payload);
+        MuleMessage message = new DefaultMuleMessage(payload);
 
         assertTrue(splitter.isMatch(message));
         try
         {
-            splitter.route(message, (UMOSession)session.proxy(), false);
+            splitter.route(message, (MuleSession)session.proxy(), false);
             fail("Should have thrown an exception, because XSD is not found.");
         }
         catch (IllegalArgumentException iaex)
@@ -150,15 +150,15 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         Mock session = MuleTestUtils.getMockSession();
 
-        UMOMessage message = new MuleMessage(unsupportedPayload);
+        MuleMessage message = new DefaultMuleMessage(unsupportedPayload);
 
         assertTrue(xmlSplitter.isMatch(message));
-        xmlSplitter.route(message, (UMOSession)session.proxy(), false);
+        xmlSplitter.route(message, (MuleSession)session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage(unsupportedPayload);
+        message = new DefaultMuleMessage(unsupportedPayload);
 
-        UMOMessage result = xmlSplitter.route(message, (UMOSession)session.proxy(), true);
+        MuleMessage result = xmlSplitter.route(message, (MuleSession)session.proxy(), true);
         assertNull(result);
         session.verify();
     }
@@ -169,11 +169,11 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();
 
-        UMOMessage message = new MuleMessage("This is not XML.");
+        MuleMessage message = new DefaultMuleMessage("This is not XML.");
 
         try
         {
-            splitter.route(message, (UMOSession)session.proxy(), false);
+            splitter.route(message, (MuleSession)session.proxy(), false);
             fail("No exception thrown.");
         }
         catch (IllegalArgumentException iaex)
@@ -188,7 +188,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
     {
         public boolean eval(Object o)
         {
-            final UMOMessage message = (UMOMessage)o;
+            final MuleMessage message = (MuleMessage)o;
             final Object payload = message.getPayload();
             assertTrue("Wrong class type for node.", payload instanceof Document);
 

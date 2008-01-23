@@ -2,8 +2,8 @@
 package org.mule.extras.client;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOException;
 
 public class MuleClientStandaloneTestCase extends AbstractMuleTestCase
 {
@@ -13,7 +13,7 @@ public class MuleClientStandaloneTestCase extends AbstractMuleTestCase
         return null;
     }
 
-    public void testCreateMuleClient() throws UMOException
+    public void testCreateMuleClient() throws MuleException
     {
         MuleClient muleClient = new MuleClient();
         assertNotSame(muleContext, muleClient.getMuleContext());

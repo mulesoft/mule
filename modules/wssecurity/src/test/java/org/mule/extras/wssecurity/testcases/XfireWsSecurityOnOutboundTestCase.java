@@ -10,9 +10,9 @@
 
 package org.mule.extras.wssecurity.testcases;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 import java.util.Properties;
 
@@ -35,7 +35,7 @@ public class XfireWsSecurityOnOutboundTestCase extends FunctionalTestCase
         // Callback used to retrive password for given user.
         props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
 
-        UMOMessage m = client.send("vm://testin", "Test", props);
+        MuleMessage m = client.send("vm://testin", "Test", props);
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertTrue(m.getPayload().equals("Test"));
@@ -55,7 +55,7 @@ public class XfireWsSecurityOnOutboundTestCase extends FunctionalTestCase
         // Callback used to retrive password for given user.
         props.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler");
 
-        UMOMessage m = null;
+        MuleMessage m = null;
         try
         {
             m = client.send("vm://testin", "Test", props);
@@ -81,7 +81,7 @@ public class XfireWsSecurityOnOutboundTestCase extends FunctionalTestCase
         // Property file containing the Encryption properties
         props.setProperty(WSHandlerConstants.ENC_PROP_FILE, "out-encrypted-security.properties");
 
-        UMOMessage m = client.send("vm://testin", "Test", props);
+        MuleMessage m = client.send("vm://testin", "Test", props);
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertTrue(m.getPayload().equals("Test"));
@@ -101,7 +101,7 @@ public class XfireWsSecurityOnOutboundTestCase extends FunctionalTestCase
         // Property file containing the Encryption properties
         props.setProperty(WSHandlerConstants.ENC_PROP_FILE, "out-encrypted-security.properties");
 
-        UMOMessage m = null;
+        MuleMessage m = null;
         try
         {
             m = client.send("vm://testin", "Test", props);
@@ -129,7 +129,7 @@ public class XfireWsSecurityOnOutboundTestCase extends FunctionalTestCase
         // possible values are : "IssuerSerial" ( recommended ) and "DirectReference"
         props.setProperty(WSHandlerConstants.SIG_KEY_ID, "IssuerSerial");
 
-        UMOMessage m = client.send("vm://testin", "Test", props);
+        MuleMessage m = client.send("vm://testin", "Test", props);
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertTrue(m.getPayload().equals("Test"));

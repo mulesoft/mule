@@ -10,17 +10,17 @@
 
 package org.mule.extras.acegi;
 
+import org.mule.api.EncryptionStrategy;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.security.CredentialsNotSetException;
+import org.mule.api.security.UnauthorisedException;
 import org.mule.config.ExceptionHelper;
-import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.security.MuleCredentials;
-import org.mule.providers.http.HttpConnector;
-import org.mule.providers.http.HttpConstants;
+import org.mule.security.MuleCredentials;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.security.CredentialsNotSetException;
-import org.mule.umo.security.UnauthorisedException;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
     public void testAuthenticationFailureNoContext() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage m = client.send("vm://my.queue", "foo", null);
+        MuleMessage m = client.send("vm://my.queue", "foo", null);
         assertNotNull(m);
         assertNotNull(m.getExceptionPayload());
         assertEquals(ExceptionHelper.getErrorCode(CredentialsNotSetException.class), m.getExceptionPayload()
@@ -47,13 +47,13 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
-        UMOMessage m = client.send("vm://my.queue", "foo", props);
+        MuleMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
         assertNotNull(m.getExceptionPayload());
         assertEquals(ExceptionHelper.getErrorCode(UnauthorisedException.class), m.getExceptionPayload()
@@ -65,13 +65,13 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
-        UMOMessage m = client.send("vm://my.queue", "foo", props);
+        MuleMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
         assertNull(m.getExceptionPayload());
     }
@@ -80,13 +80,13 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
-        UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
+        MuleMessage m = client.send("http://localhost:4567/index.html", "", props);
         assertNotNull(m);
 
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
@@ -98,13 +98,13 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         Map props = new HashMap();
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
-        UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
+        MuleMessage m = client.send("http://localhost:4567/index.html", "", props);
         assertNotNull(m);
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_OK, status);

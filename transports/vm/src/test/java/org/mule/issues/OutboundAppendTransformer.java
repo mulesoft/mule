@@ -10,7 +10,7 @@
 
 package org.mule.issues;
 
-import org.mule.transformers.simple.StringAppendTransformer;
+import org.mule.transformer.simple.StringAppendTransformer;
 
 public class OutboundAppendTransformer extends StringAppendTransformer
 {

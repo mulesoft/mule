@@ -10,9 +10,9 @@
 
 package org.mule.test.usecases.http;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class HttpPostTestCase extends FunctionalTestCase
 {
@@ -25,7 +25,7 @@ public class HttpPostTestCase extends FunctionalTestCase
     public void testPost() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage message = client.send("httpRequest", "payload", null);
+        MuleMessage message = client.send("httpRequest", "payload", null);
         assertNotNull(message);
         assertNotNull(message.getPayloadAsString());
         assertEquals("IncidentData=payload", message.getPayloadAsString());

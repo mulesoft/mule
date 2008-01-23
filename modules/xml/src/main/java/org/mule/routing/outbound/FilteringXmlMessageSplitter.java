@@ -10,9 +10,10 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.impl.MuleMessage;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.routing.outbound.AbstractMessageSplitter;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -119,7 +120,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
      * @param message the message being routed
      */
     // @Override
-    protected void initialise(UMOMessage message)
+    protected void initialise(MuleMessage message)
     {
         if (logger.isDebugEnabled())
         {
@@ -237,7 +238,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
      *            part
      * @return the message part to dispatch
      */
-    protected UMOMessage getMessagePart(UMOMessage message, UMOImmutableEndpoint endpoint)
+    protected MuleMessage getMessagePart(MuleMessage message, ImmutableEndpoint endpoint)
     {
         List nodes = (List)nodesContext.get();
 
@@ -254,7 +255,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
             try
             {
                 Map theProperties = (Map)propertiesContext.get();
-                UMOMessage result = new MuleMessage(doc, new HashMap(theProperties));
+                MuleMessage result = new DefaultMuleMessage(doc, new HashMap(theProperties));
 
                 if (endpoint.getFilter() == null || endpoint.getFilter().accept(result))
                 {

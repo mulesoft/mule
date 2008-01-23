@@ -10,8 +10,8 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.umo.UMOEvent;
-import org.mule.umo.routing.RoutingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.routing.RoutingException;
 
 /**
  * <code>InboundPassThroughRouter</code> allows inbound routing over all
@@ -21,15 +21,15 @@ import org.mule.umo.routing.RoutingException;
 
 public class InboundPassThroughRouter extends SelectiveConsumer
 {
-    public UMOEvent[] process(UMOEvent event) throws RoutingException
+    public MuleEvent[] process(MuleEvent event) throws RoutingException
     {
         synchronized (event)
         {
-            return new UMOEvent[]{event};
+            return new MuleEvent[]{event};
         }
     }
 
-    public boolean isMatch(UMOEvent event) throws RoutingException
+    public boolean isMatch(MuleEvent event) throws RoutingException
     {
         return true;
     }

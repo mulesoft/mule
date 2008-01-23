@@ -9,7 +9,7 @@
  */
 package org.mule.routing.filters.logic;
 
-import org.mule.umo.UMOFilter;
+import org.mule.api.routing.filter.Filter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
  * Manages a filter collection. Used as the base clas for the Or and AND filters
  */
 
-public abstract class AbstractFilterCollection implements UMOFilter
+public abstract class AbstractFilterCollection implements Filter
 {
     private List filters;
 
@@ -32,7 +32,7 @@ public abstract class AbstractFilterCollection implements UMOFilter
      * @param left
      * @param right
      */
-    public AbstractFilterCollection(UMOFilter left, UMOFilter right)
+    public AbstractFilterCollection(Filter left, Filter right)
     {
         this();
         filters.add(left);
@@ -43,7 +43,7 @@ public abstract class AbstractFilterCollection implements UMOFilter
      * @deprecated
      * @param leftFilter
      */
-    public void setLeftFilter(UMOFilter leftFilter)
+    public void setLeftFilter(Filter leftFilter)
     {
         filters.add(0, leftFilter);
     }
@@ -52,7 +52,7 @@ public abstract class AbstractFilterCollection implements UMOFilter
      * @deprecated
      * @param rightFilter
      */
-    public void setRightFilter(UMOFilter rightFilter)
+    public void setRightFilter(Filter rightFilter)
     {
         filters.add(rightFilter);
 
@@ -62,27 +62,27 @@ public abstract class AbstractFilterCollection implements UMOFilter
      * @deprecated
      * @return
      */
-    public UMOFilter getLeftFilter()
+    public Filter getLeftFilter()
     {
         if(filters.size()==0) return null;
-        return (UMOFilter)filters.get(0);
+        return (Filter)filters.get(0);
     }
 
     /**
      * @deprecated
      * @return
      */
-    public UMOFilter getRightFilter()
+    public Filter getRightFilter()
     {
         if(filters.size() > 1)
         {
-            return (UMOFilter)filters.get(1);
+            return (Filter)filters.get(1);
         } else if(filters.size()==0) {
             return null;
         }
         else
         {
-            return (UMOFilter)filters.get(0);
+            return (Filter)filters.get(0);
 
         }
     }

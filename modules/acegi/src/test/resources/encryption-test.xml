@@ -43,7 +43,7 @@
                     <encryption-security-filter strategy-ref="PBE"/>
                 </inbound-endpoint>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
     </model>
 

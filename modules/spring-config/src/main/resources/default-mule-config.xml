@@ -10,13 +10,13 @@
     <bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
         <property name="customEditors">
             <map>
-                <entry key="org.mule.umo.provider.UMOConnector">
+                <entry key="org.mule.api.transport.Connector">
                     <bean class="org.mule.config.spring.editors.ConnectorPropertyEditor"/>
                 </entry>
-                <!-- entry key="org.mule.umo.endpoint.UMOEndpointURI">
+                <!-- entry key="org.mule.api.endpoint.UMOEndpointURI">
                     <bean class="org.mule.config.spring.editors.EndpointURIPropertyEditor"/>
                 </entry -->
-                <entry key="org.mule.impl.endpoint.URIBuilder">
+                <entry key="org.mule.endpoint.URIBuilder">
                     <bean class="org.mule.config.spring.editors.URIBuilderPropertyEditor"/>
                 </entry>
             </map>
@@ -84,11 +84,11 @@
         </property>
     </bean>
 
-    <bean name="_muleSecurityManager" class="org.mule.impl.security.MuleSecurityManager"/>
+    <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
 
     <bean name="_muleProperties" class="java.util.HashMap"/>
 
-    <bean name="_muleEndpointFactory" class="org.mule.impl.endpoint.EndpointFactory"/>
+    <bean name="_muleEndpointFactory" class="org.mule.endpoint.DefaultEndpointFactory"/>
 
     <bean name="_defaultThreadingProfile" class="org.mule.config.ChainedThreadingProfile">
         <property name="threadWaitTimeout" value="30"/>

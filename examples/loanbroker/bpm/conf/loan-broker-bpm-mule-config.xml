@@ -135,7 +135,7 @@
         </spring:property>
     </spring:bean>
     <!-- BPMS object for Mule's BPM Connector -->
-    <spring:bean id="jbpm" class="org.mule.providers.bpm.jbpm.Jbpm" destroy-method="destroy">
+    <spring:bean id="jbpm" class="org.mule.transport.bpm.jbpm.Jbpm" destroy-method="destroy">
         <spring:property name="jbpmConfiguration">
             <spring:ref local="jbpmConfig" />
         </spring:property>

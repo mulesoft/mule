@@ -10,7 +10,7 @@
 package org.mule.transformers.xml;
 
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformers.simple.ObjectToByteArray;
+import org.mule.transformer.simple.ObjectToByteArray;
 
 public class TransformerWeightingsTestCase extends AbstractMuleTestCase
 {

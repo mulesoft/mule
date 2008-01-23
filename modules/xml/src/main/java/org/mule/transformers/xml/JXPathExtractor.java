@@ -10,8 +10,8 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractTransformer;
 
 import java.util.ArrayList;
 import java.util.List;

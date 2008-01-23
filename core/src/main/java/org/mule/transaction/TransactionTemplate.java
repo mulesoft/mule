@@ -11,9 +11,10 @@
 package org.mule.transaction;
 
 import org.mule.api.MuleContext;
+import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionCallback;
+import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionConfig;
 
 import java.beans.ExceptionListener;
 
@@ -24,11 +25,11 @@ public class TransactionTemplate
 {
     private static final Log logger = LogFactory.getLog(TransactionTemplate.class);
 
-    private final UMOTransactionConfig config;
+    private final TransactionConfig config;
     private final ExceptionListener exceptionListener;
     private final MuleContext context;
 
-    public TransactionTemplate(UMOTransactionConfig config, ExceptionListener listener, MuleContext context)
+    public TransactionTemplate(TransactionConfig config, ExceptionListener listener, MuleContext context)
     {
         this.config = config;
         exceptionListener = listener;
@@ -44,9 +45,9 @@ public class TransactionTemplate
         else
         {
             byte action = config.getAction();
-            UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+            Transaction tx = TransactionCoordination.getInstance().getTransaction();
 
-            if (action == UMOTransactionConfig.ACTION_NONE && tx != null)
+            if (action == TransactionConfig.ACTION_NONE && tx != null)
             {
                 //TODO RM*: I'm not sure there is any value in throwing an exection here, since
                 //there may be a transaction in progress but has nothing to to with this invocation
@@ -68,19 +69,19 @@ public class TransactionTemplate
                 throw new IllegalTransactionStateException(
                     CoreMessages.transactionAvailableButActionIs("None"));
             }
-            else if (action == UMOTransactionConfig.ACTION_ALWAYS_BEGIN && tx != null)
+            else if (action == TransactionConfig.ACTION_ALWAYS_BEGIN && tx != null)
             {
                 throw new IllegalTransactionStateException(
                     CoreMessages.transactionAvailableButActionIs("Always Begin"));
             }
-            else if (action == UMOTransactionConfig.ACTION_ALWAYS_JOIN && tx == null)
+            else if (action == TransactionConfig.ACTION_ALWAYS_JOIN && tx == null)
             {
                 throw new IllegalTransactionStateException(
                     CoreMessages.transactionNotAvailableButActionIs("Always Join"));
             }
 
-            if (action == UMOTransactionConfig.ACTION_ALWAYS_BEGIN
-                            || (action == UMOTransactionConfig.ACTION_BEGIN_OR_JOIN && tx == null))
+            if (action == TransactionConfig.ACTION_ALWAYS_BEGIN
+                            || (action == TransactionConfig.ACTION_BEGIN_OR_JOIN && tx == null))
             {
                 logger.debug("Beginning transaction");
                 tx = config.getFactory().beginTransaction(context);

@@ -10,10 +10,10 @@
 
 package org.mule.issues;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class CustomFilterMule2437TestCase extends FunctionalTestCase
 {
@@ -38,8 +38,8 @@ public class CustomFilterMule2437TestCase extends FunctionalTestCase
     protected void doTest(String message, String destination) throws Exception
     {
         MuleClient client = new MuleClient();
-        client.dispatch("vm://in?connector=default", new MuleMessage(message));
-        UMOMessage response = client.request(destination + "?connector=queue", TIMEOUT);
+        client.dispatch("vm://in?connector=default", new DefaultMuleMessage(message));
+        MuleMessage response = client.request(destination + "?connector=queue", TIMEOUT);
         assertNotNull(response);
         assertEquals(message, response.getPayloadAsString());
     }

@@ -2,7 +2,7 @@
 
   <jbpm-context>
     <service name="persistence" factory="org.jbpm.persistence.db.DbPersistenceServiceFactory" />
-    <service name="message" factory="org.mule.providers.bpm.jbpm.MuleMessageServiceFactory" />
+    <service name="message" factory="org.mule.transport.bpm.jbpm.MuleMessageServiceFactory" />
     <service name="scheduler" factory="org.jbpm.scheduler.db.DbSchedulerServiceFactory" />
     <service name="logging" factory="org.jbpm.logging.db.DbLoggingServiceFactory" />
     <service name="authentication" factory="org.jbpm.security.authentication.DefaultAuthenticationServiceFactory" />

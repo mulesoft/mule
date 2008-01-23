@@ -13,8 +13,8 @@ package org.mule.config.spring.parsers.processors;
 import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 
-import org.w3c.dom.Element;
 import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
 
 public class ExtendTarget implements PostProcessor
 {

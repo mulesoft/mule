@@ -20,7 +20,7 @@
     <!-- Transaction manager -->
     <transaction-manager ref="transactionManagerFactory"/>
 
-    <connector name="jdbcConnectorXA" className="org.mule.providers.jdbc.JdbcConnector">
+    <connector name="jdbcConnectorXA" className="org.mule.transport.jdbc.JdbcConnector">
         <properties>
             <container-property name="dataSource" reference="jdbcDataSourceXA" required="true"/>
             <map name="queries">
@@ -30,7 +30,7 @@
         </properties>
     </connector>
 
-    <connector name="jmsConnectorXA" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
+    <connector name="jmsConnectorXA" className="org.mule.transport.jms.activemq.ActiveMqJmsConnector">
         <properties>
             <container-property name="connectionFactory" reference="jmsConnectionFactoryXa"/>
             <property name="specification" value="1.1"/>
@@ -39,7 +39,7 @@
 
     <model name="model">
         <mule-descriptor name="TestJdbc"
-                         implementation="org.mule.components.simple.BridgeComponent">
+                         implementation="org.mule.component.simple.BridgeComponent">
             <inbound-router>
                 <endpoint address="vm://in">
                 </endpoint>
@@ -59,7 +59,7 @@
         </mule-descriptor>
 
         <mule-descriptor name="TestJms"
-                         implementation="org.mule.components.simple.BridgeComponent">
+                         implementation="org.mule.component.simple.BridgeComponent">
             <inbound-router>
                 <endpoint address="vm://in1"/>
             </inbound-router>
@@ -75,7 +75,7 @@
 
 <!--
         <mule-descriptor name="TestJmsConsole"
-                         implementation="org.mule.components.simple.BridgeComponent">
+                         implementation="org.mule.component.simple.BridgeComponent">
             <inbound-router>
                 <endpoint address="jms://queue.out"/>
             </inbound-router>

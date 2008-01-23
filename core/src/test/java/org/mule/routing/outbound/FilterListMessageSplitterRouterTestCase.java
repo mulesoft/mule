@@ -10,16 +10,16 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
 
 import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
@@ -35,13 +35,13 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        UMOEndpoint endpoint1 = getTestEndpoint("Test1endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestEndpoint("Test1endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
         endpoint1.setFilter(new PayloadTypeFilter(Apple.class));
-        UMOEndpoint endpoint2 = getTestEndpoint("Test2Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestEndpoint("Test2Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint2.setEndpointURI(new MuleEndpointURI("test://endpointUri.2"));
         endpoint2.setFilter(new PayloadTypeFilter(Orange.class));
-        UMOEndpoint endpoint3 = getTestEndpoint("Test3Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint3 = getTestEndpoint("Test3Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
 
         FilteringListMessageSplitter router = new FilteringListMessageSplitter();
@@ -55,17 +55,17 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         payload.add(new Apple());
         payload.add(new Orange());
         payload.add(new String());
-        UMOMessage message = new MuleMessage(payload);
+        MuleMessage message = new DefaultMuleMessage(payload);
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Orange.class), C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)));
-        router.route(message, (UMOSession) session.proxy(), false);
+        router.route(message, (MuleSession) session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage(payload);
+        message = new DefaultMuleMessage(payload);
 
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)),
             message);
@@ -75,7 +75,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
             message);
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(String.class), C.eq(endpoint3)),
             message);
-        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
+        MuleMessage result = router.route(message, (MuleSession) session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
@@ -92,7 +92,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
 
         public boolean eval(Object o)
         {
-            return ((UMOMessage) o).getPayload().getClass().equals(type);
+            return ((MuleMessage) o).getPayload().getClass().equals(type);
         }
     }
 

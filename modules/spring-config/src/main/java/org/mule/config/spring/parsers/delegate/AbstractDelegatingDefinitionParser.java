@@ -10,13 +10,13 @@
 
 package org.mule.config.spring.parsers.delegate;
 
-import org.mule.util.ArrayUtils;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
-import org.mule.config.spring.parsers.PreProcessor;
-import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
+import org.mule.config.spring.parsers.PostProcessor;
+import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.util.ArrayUtils;
 
 import java.util.Map;
 

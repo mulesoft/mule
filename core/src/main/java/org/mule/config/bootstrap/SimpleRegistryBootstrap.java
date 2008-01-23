@@ -9,16 +9,16 @@
  */
 package org.mule.config.bootstrap;
 
+import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.Registry;
+import org.mule.api.transformer.DiscoverableTransformer;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.MuleContextAware;
-import org.mule.registry.Registry;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.transformer.DiscoverableTransformer;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassUtils;
 import org.mule.util.PropertiesUtils;
 
@@ -59,9 +59,9 @@ import java.util.Properties;
  * the transformer as parameters i.e.
  * <p/>
  * <code>
- * transformer.1=org.mule.providers.jms.transformers.JMSMessageToObject,returnClass=byte[]
- * transformer.2=org.mule.providers.jms.transformers.JMSMessageToObject,returnClass=java.lang.String, name=JMSMessageToString
- * transformer.3=org.mule.providers.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
+ * transformer.1=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=byte[]
+ * transformer.2=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.lang.String, name=JMSMessageToString
+ * transformer.3=org.mule.transport.jms.transformers.JMSMessageToObject,returnClass=java.util.Hashtable)
  * </code>
  * <p/>
  * Note that the key used for transformers must be 'transformer.x' where 'x' is a sequential number.  The transformer name will be
@@ -69,7 +69,7 @@ import java.util.Properties;
  * parameter is specified. If no 'returnClass' is specified the defualt in the transformer will be used.
  * <p/>
  * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
- * {@link org.mule.impl.MuleContextAware} and lifecylce interfaces such as {@link org.mule.umo.lifecycle.Initialisable}.
+ * {@link org.mule.api.context.MuleContextAware} and lifecylce interfaces such as {@link org.mule.api.lifecycle.Initialisable}.
  */
 public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 {
@@ -109,7 +109,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    protected void process(Properties props) throws NoSuchMethodException, IllegalAccessException, UMOException, InvocationTargetException, ClassNotFoundException, InstantiationException
+    protected void process(Properties props) throws NoSuchMethodException, IllegalAccessException, MuleException, InvocationTargetException, ClassNotFoundException, InstantiationException
     {
         registerTransformers(props, context.getRegistry());
         registerUnnamedObjects(props, context.getRegistry());
@@ -118,7 +118,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     }
 
-    private void registerTransformers(Properties props, Registry registry) throws UMOException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
+    private void registerTransformers(Properties props, Registry registry) throws MuleException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
     {
         int i = 1;
         String transString = props.getProperty(TRANSFORMER_PREFIX + i);
@@ -148,7 +148,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
                 }
             }
             String transClass = (x == -1 ? transString : transString.substring(0, x));
-            UMOTransformer trans = (UMOTransformer) ClassUtils.instanciateClass(transClass, ClassUtils.NO_ARGS);
+            Transformer trans = (Transformer) ClassUtils.instanciateClass(transClass, ClassUtils.NO_ARGS);
             if (!(trans instanceof DiscoverableTransformer))
             {
                 throw new TransformerException(CoreMessages.transformerNotImplementDiscoverable(trans));
@@ -177,7 +177,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         }
     }
 
-    private void registerObjects(Properties props, Registry registry) throws UMOException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
+    private void registerObjects(Properties props, Registry registry) throws MuleException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
     {
         //Note that caling the other register methods first will have removed any processed entries
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
@@ -190,7 +190,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
         props.clear();
     }
 
-    private void registerUnnamedObjects(Properties props, Registry registry) throws UMOException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
+    private void registerUnnamedObjects(Properties props, Registry registry) throws MuleException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
     {
         int i = 1;
         String objectString = props.getProperty(OBJECT_PREFIX + i);

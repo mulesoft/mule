@@ -10,14 +10,14 @@
 
 package org.mule.ra;
 
-import org.mule.components.simple.EchoComponent;
-import org.mule.impl.model.ModelFactory;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.component.Component;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.component.simple.EchoComponent;
+import org.mule.model.ModelFactory;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.util.object.SingletonObjectFactory;
 
 public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractComponentTestCase
@@ -26,7 +26,7 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
     // Cannot extend AbstractComponentTestCase because of inconsistent behaviour. See
     // MULE-2843
 
-    private UMOComponent component;
+    private Component component;
 
     private TestJCAWorkManager workManager;
 
@@ -57,8 +57,8 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
     public void testSendEvent() throws Exception
     {
         component.start();
-        UMOEndpoint endpoint = getTestEndpoint("jcaInFlowEndpoint", UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
-        UMOEvent event = getTestEvent("Message", endpoint);
+        Endpoint endpoint = getTestEndpoint("jcaInFlowEndpoint", ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
+        MuleEvent event = getTestEvent("Message", endpoint);
 
         try
         {
@@ -73,8 +73,8 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
     public void testDispatchEvent() throws Exception
     {
         component.start();
-        UMOEndpoint endpoint = getTestEndpoint("jcaInFlowEndpoint", UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
-        UMOEvent event = getTestEvent("Message", endpoint);
+        Endpoint endpoint = getTestEndpoint("jcaInFlowEndpoint", ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
+        MuleEvent event = getTestEvent("Message", endpoint);
 
         component.dispatchEvent(event);
         assertEquals(1, workManager.getScheduledWorkList().size());
@@ -89,7 +89,7 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
             component.pause();
             fail("Exception expected, JcaComponent does not support pause()");
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
 
         }
@@ -102,7 +102,7 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
             component.resume();
             fail("Exception expected, JcaComponent does not support resume()");
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
         }
     }

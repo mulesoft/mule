@@ -48,7 +48,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.providers.soap.*
+                                    org.mule.transport.soap.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

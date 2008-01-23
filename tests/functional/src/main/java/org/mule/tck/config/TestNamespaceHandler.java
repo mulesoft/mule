@@ -10,17 +10,15 @@
 
 package org.mule.tck.config;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.tck.testmodels.mule.TestConnector;
 
-import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
-
-public class TestNamespaceHandler extends NamespaceHandlerSupport
+public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public void init()
     {
-        registerBeanDefinitionParser("connector", new MuleOrphanDefinitionParser(TestConnector.class, true));
+        registerConnector(TestConnector.class);
     }
 
 }

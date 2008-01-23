@@ -10,8 +10,8 @@
 
 package org.mule.extras.pgp;
 
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.lifecycle.Callable;
+import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.Callable;
 
 public class EchoMsg implements Callable
 {
@@ -19,9 +19,9 @@ public class EchoMsg implements Callable
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.umo.lifecycle.Callable#onCall(org.mule.umo.UMOEventContext)
+     * @see org.mule.api.lifecycle.Callable#onCall(org.mule.api.MuleEventContext)
      */
-    public Object onCall(UMOEventContext eventContext) throws Exception
+    public Object onCall(MuleEventContext eventContext) throws Exception
     {
         return eventContext.getMessageAsString(null);
     }

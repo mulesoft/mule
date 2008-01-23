@@ -10,11 +10,10 @@
 
 package org.mule.config.spring.parsers.delegate;
 
-import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 
-import org.w3c.dom.Element;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
 
 public class BooleanAttributeSelectionDefinitionParser extends AbstractParallelDelegatingDefinitionParser
 {

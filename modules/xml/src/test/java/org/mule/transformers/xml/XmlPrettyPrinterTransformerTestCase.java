@@ -10,8 +10,8 @@
 
 package org.mule.transformers.xml;
 
+import org.mule.api.transformer.Transformer;
 import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.umo.transformer.UMOTransformer;
 
 import org.dom4j.io.OutputFormat;
 
@@ -30,7 +30,7 @@ public class XmlPrettyPrinterTransformerTestCase extends AbstractTransformerTest
                + "    <test>test</test>\n" + "  </a>\n" + "</just>\n";
     }
 
-    public UMOTransformer getRoundTripTransformer() throws Exception
+    public Transformer getRoundTripTransformer() throws Exception
     {
         // there is no XmlUnprettyPrinter :)
         return null;
@@ -41,7 +41,7 @@ public class XmlPrettyPrinterTransformerTestCase extends AbstractTransformerTest
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><just><a><test>test</test></a></just>";
     }
 
-    public UMOTransformer getTransformer() throws Exception
+    public Transformer getTransformer() throws Exception
     {
         return new XmlPrettyPrinter();
     }

@@ -23,14 +23,14 @@
             <inbound>
                 <inbound-endpoint ref="quartz.in.1"/>
             </inbound>
-            <component class="org.mule.providers.quartz.TestComponent1"/>
+            <component class="org.mule.transport.quartz.TestComponent1"/>
         </service>
 
         <service name="quartzService2">
             <inbound>
                 <inbound-endpoint ref="quartz.in.2"/>
             </inbound>
-            <component class="org.mule.providers.quartz.TestComponent1"/>
+            <component class="org.mule.transport.quartz.TestComponent1"/>
         </service>
     </model>
     

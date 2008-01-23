@@ -10,11 +10,11 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
+import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.delegate.AbstractSingleParentFamilyDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.processors.BlockAttribute;
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.config.spring.parsers.MuleDefinitionParser;
 
 /**
  * Generates a transaction config with embedded factory.  If no factory is defined, it's taken from the

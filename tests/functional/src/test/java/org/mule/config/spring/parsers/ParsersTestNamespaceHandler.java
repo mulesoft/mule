@@ -15,8 +15,8 @@ import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.beans.ChildBean;
 import org.mule.config.spring.parsers.beans.OrphanBean;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
-import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
+import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
 import org.mule.config.spring.parsers.delegate.InheritDefinitionParser;
 import org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator;
@@ -33,7 +33,7 @@ import org.mule.config.spring.parsers.specific.endpoint.support.AddressedEndpoin
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildAddressDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
-import org.mule.impl.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 /**
  * Registers a Bean Definition Parser for handling <code><parsers-test:...></code> elements.

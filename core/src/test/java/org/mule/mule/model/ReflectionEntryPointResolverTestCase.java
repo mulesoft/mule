@@ -10,9 +10,9 @@
 
 package org.mule.mule.model;
 
-import org.mule.impl.RequestContext;
-import org.mule.impl.model.resolvers.ReflectionEntryPointResolver;
-import org.mule.providers.NullPayload;
+import org.mule.RequestContext;
+import org.mule.api.model.InvocationResult;
+import org.mule.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -22,7 +22,7 @@ import org.mule.tck.testmodels.fruit.FruitLover;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
-import org.mule.umo.model.InvocationResult;
+import org.mule.transport.NullPayload;
 
 public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
 {
@@ -77,7 +77,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
 
     /**
      * Tests entrypoint discovery when there is more than one discoverable method
-     * with UMOEventContext parameter.
+     * with MuleEventContext parameter.
      */
     public void testFailEntryPointMultiplePayloadMatches() throws Exception
     {

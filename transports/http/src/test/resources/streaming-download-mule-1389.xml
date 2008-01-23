@@ -11,7 +11,7 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:60208"/>
             </inbound>
-            <component class="org.mule.providers.tcp.issues.InputStreamSource"/>
+            <component class="org.mule.transport.tcp.issues.InputStreamSource"/>
         </service>
     </model>
 

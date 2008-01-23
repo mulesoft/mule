@@ -11,7 +11,7 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
-import org.mule.registry.Registry;
+import org.mule.api.registry.Registry;
 import org.mule.util.ClassUtils;
 
 import java.io.IOException;

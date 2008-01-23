@@ -27,6 +27,6 @@
                             specification="1.1"
                             redeliveryHandler-ref="redeliveryHandler"/>
 
-     <spring:bean name="redeliveryHandler" class="org.mule.providers.jms.test.TestRedeliveryHandler"/>
+     <spring:bean name="redeliveryHandler" class="org.mule.transport.jms.test.TestRedeliveryHandler"/>
 
 </mule>

@@ -24,7 +24,7 @@
 
     <servlet:connector name="servletConnector" servletUrl="http://localhost:18088/services">
         <!--  TODO DO: this should not be necessary, see MULE-1508 -->
-        <custom-exception-strategy class="org.mule.providers.soap.axis.UnitTestExceptionStrategy"/>
+        <custom-exception-strategy class="org.mule.transport.soap.axis.UnitTestExceptionStrategy"/>
     </servlet:connector>
 
     <acegi:security-manager>
@@ -39,7 +39,7 @@
                     <acegi:http-security-filter realm="mule-realm"/>
                 </axis:inbound-endpoint>
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent"/>
+            <component class="org.mule.component.simple.EchoComponent"/>
         </service>
     </model>
 

@@ -13,14 +13,14 @@
 
     <transaction-manager factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
 
-    <connector name="jmsXAConnector" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
+    <connector name="jmsXAConnector" className="org.mule.transport.jms.activemq.ActiveMqJmsConnector">
         <properties>
             <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <property name="specification" value="1.1"/>
         </properties>
     </connector>
 
-    <connector name="VMQueue" className="org.mule.providers.vm.VMConnector">
+    <connector name="VMQueue" className="org.mule.transport.vm.VMConnector">
         <properties>
             <property value="true" name="queueEvents"/>
         </properties>

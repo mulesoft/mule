@@ -10,18 +10,18 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transformer.TransformerException;
+import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.transformer.AbstractTransformer;
 import org.mule.util.CollectionUtils;
 
 import com.mockobjects.dynamic.C;
@@ -37,10 +37,10 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
     public void testFilteringOutboundRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
+        DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
         assertNotNull(endpoint1);
 
         FilteringOutboundRouter router = new FilteringOutboundRouter();
@@ -53,23 +53,23 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertFalse(router.isUseTemplates());
         assertEquals(filter, router.getFilter());
 
-        UMOMessage message = new MuleMessage("test event");
+        MuleMessage message = new DefaultMuleMessage("test event");
 
         assertTrue(router.isMatch(message));
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
-        router.route(message, (UMOSession)session.proxy(), false);
+        router.route(message, (MuleSession)session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage("test event");
+        message = new DefaultMuleMessage("test event");
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
-        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
+        MuleMessage result = router.route(message, (MuleSession)session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
 
-        message = new MuleMessage(new Exception("test event"));
+        message = new DefaultMuleMessage(new Exception("test event"));
 
         assertTrue(!router.isMatch(message));
 
@@ -90,10 +90,10 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
     public void testFilteringOutboundRouterWithTemplates() throws Exception
     {
-        OutboundRouterCollection messageRouter = new OutboundRouterCollection();
+        DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
         assertNotNull(endpoint1);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://foo?[barValue]"));
 
@@ -109,10 +109,10 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
         Map m = new HashMap();
         m.put("barValue", "bar");
-        UMOMessage message = new MuleMessage("test event", m);
+        MuleMessage message = new DefaultMuleMessage("test event", m);
 
         assertTrue(router.isMatch(message));
-        UMOImmutableEndpoint ep = router.getEndpoint(0, message);
+        ImmutableEndpoint ep = router.getEndpoint(0, message);
         // MULE-2690: assert that templated endpoints are not mutated
         assertNotSame(endpoint1, ep);
         // assert that the returned endpoint has a resolved URI

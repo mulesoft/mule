@@ -10,8 +10,22 @@
 
 package org.mule.tck;
 
-import org.mule.impl.AbstractExceptionListener;
-import org.mule.impl.model.resolvers.LegacyEntryPointResolverSet;
+import org.mule.AbstractExceptionListener;
+import org.mule.api.MuleException;
+import org.mule.api.component.Component;
+import org.mule.api.context.ObjectNotFoundException;
+import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.model.Model;
+import org.mule.api.routing.InboundRouterCollection;
+import org.mule.api.routing.NestedRouter;
+import org.mule.api.routing.NestedRouterCollection;
+import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.routing.ResponseRouter;
+import org.mule.api.routing.ResponseRouterCollection;
+import org.mule.api.transformer.Transformer;
+import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
@@ -22,21 +36,7 @@ import org.mule.tck.testmodels.mule.TestEntryPointResolverSet;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
-import org.mule.transformers.TransformerUtils;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.model.UMOModel;
-import org.mule.umo.routing.UMOInboundRouterCollection;
-import org.mule.umo.routing.UMONestedRouter;
-import org.mule.umo.routing.UMONestedRouterCollection;
-import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.umo.routing.UMOOutboundRouterCollection;
-import org.mule.umo.routing.UMOResponseRouter;
-import org.mule.umo.routing.UMOResponseRouterCollection;
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.transformer.TransformerUtils;
 
 import java.util.List;
 
@@ -72,9 +72,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
     }
 
-    public void testGlobalEndpointConfig() throws UMOException
+    public void testGlobalEndpointConfig() throws MuleException
     {
-        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "fruitBowlEndpoint");
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
@@ -84,7 +84,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("bar", filter.getExpectedValue());
         assertEquals("http://foo.com", filter.getNamespaces().get("foo"));
 
-        //UMOImmutableEndpoint ep = muleContext.getRegistry().lookupEndpoint("testEPWithCS");
+        //ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpoint("testEPWithCS");
         //assertNotNull(ep);
         //assertNotNull(ep.getConnectionStrategy());
         //assertTrue(ep.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
@@ -92,17 +92,17 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         //assertEquals(3000, ((SimpleRetryConnectionStrategy) ep.getConnectionStrategy()).getRetryFrequency());
     }
 
-    public void testEndpointConfig() throws UMOException
+    public void testEndpointConfig() throws MuleException
     {
         // test that endpoints have been resolved on endpoints
-        UMOImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "waterMelonEndpoint");
         assertNotNull(endpoint);
         // aliases no longer possible
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
-        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
-        UMOImmutableEndpoint ep = component.getInboundRouter().getEndpoint("Orange");
+        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
+        ImmutableEndpoint ep = component.getInboundRouter().getEndpoint("Orange");
         assertNotNull(ep);
         final List responseTransformers = ep.getResponseTransformers();
         assertNotNull(responseTransformers);
@@ -113,12 +113,12 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testExceptionStrategy()
     {
-        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
+        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertNotNull(muleContext.getRegistry().lookupModel("main").getExceptionListener());
         assertNotNull(component.getExceptionListener());
 
         assertTrue(((AbstractExceptionListener) component.getExceptionListener()).getEndpoints().size() > 0);
-        UMOEndpoint ep = (UMOEndpoint) ((AbstractExceptionListener) component.getExceptionListener()).getEndpoints()
+        Endpoint ep = (Endpoint) ((AbstractExceptionListener) component.getExceptionListener()).getEndpoints()
                 .get(0);
 
         assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
@@ -126,7 +126,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testTransformerConfig()
     {
-        UMOTransformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
+        Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
         assertEquals(t.getReturnClass(), String.class);
@@ -135,7 +135,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testModelConfig() throws Exception
     {
-        UMOModel model = muleContext.getRegistry().lookupModel("main");
+        Model model = muleContext.getRegistry().lookupModel("main");
         assertNotNull(model);
         assertEquals("main", model.getName());
         if (legacy)
@@ -149,7 +149,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(model.getExceptionListener() instanceof TestExceptionStrategy);
 
         assertTrue(((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().size() > 0);
-        UMOEndpoint ep = (UMOEndpoint) ((AbstractExceptionListener) model.getExceptionListener()).getEndpoints()
+        Endpoint ep = (Endpoint) ((AbstractExceptionListener) model.getExceptionListener()).getEndpoints()
                 .get(0);
 
         assertEquals("test://component.exceptions", ep.getEndpointURI().toString());
@@ -160,7 +160,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     // TODO Fix this somehow after MULE-1933
 //    public void testPropertiesConfig() throws Exception
 //    {
-//        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
+//        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
 //
 //        Map props = descriptor.getProperties();
 //        assertNotNull(props);
@@ -193,13 +193,13 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testOutboundRouterConfig()
     {
         // test outbound message router
-        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
+        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertNotNull(component.getOutboundRouter());
-        UMOOutboundRouterCollection router = component.getOutboundRouter();
+        OutboundRouterCollection router = component.getOutboundRouter();
         assertNull(router.getCatchAllStrategy());
         assertEquals(1, router.getRouters().size());
         // check first Router
-        UMOOutboundRouter route1 = (UMOOutboundRouter) router.getRouters().get(0);
+        OutboundRouter route1 = (OutboundRouter) router.getRouters().get(0);
         assertTrue(route1 instanceof OutboundPassThroughRouter);
         assertEquals(1, route1.getEndpoints().size());
     }
@@ -207,17 +207,17 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testNestedRouterConfig() throws ObjectNotFoundException
     {
         // test outbound message router
-        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
+        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertNotNull(component.getNestedRouter());
-        UMONestedRouterCollection router = component.getNestedRouter();
+        NestedRouterCollection router = component.getNestedRouter();
         assertEquals(2, router.getRouters().size());
         // check first Router
-        UMONestedRouter route1 = (UMONestedRouter) router.getRouters().get(0);
+        NestedRouter route1 = (NestedRouter) router.getRouters().get(0);
         assertEquals(FruitCleaner.class, route1.getInterface());
         assertEquals("wash", route1.getMethod());
         assertNotNull(route1.getEndpoint());
         // check second Router
-        UMONestedRouter route2 = (UMONestedRouter) router.getRouters().get(1);
+        NestedRouter route2 = (NestedRouter) router.getRouters().get(1);
         assertEquals(FruitCleaner.class, route2.getInterface());
         assertEquals("polish", route2.getMethod());
         assertNotNull(route1.getEndpoint());
@@ -225,11 +225,11 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testDescriptorEndpoints()
     {
-        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
+        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertEquals(1, component.getOutboundRouter().getRouters().size());
-        UMOOutboundRouter router = (UMOOutboundRouter)component.getOutboundRouter().getRouters().get(0);
+        OutboundRouter router = (OutboundRouter)component.getOutboundRouter().getRouters().get(0);
         assertEquals(1, router.getEndpoints().size());
-        UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) router.getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) router.getEndpoints().get(0);
         assertNotNull(endpoint);
         assertEquals("appleInEndpoint", endpoint.getName());
         assertNotNull(endpoint.getTransformers());
@@ -240,7 +240,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         {
             endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("appleInEndpoint");
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             e.printStackTrace();
             fail(e.getMessage());
@@ -270,7 +270,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         {
             endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("orangeEndpoint");
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             e.printStackTrace();
             fail(e.getMessage());
@@ -282,9 +282,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testInboundRouterConfig()
     {
-        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
+        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertNotNull(component.getInboundRouter());
-        UMOInboundRouterCollection messageRouter = component.getInboundRouter();
+        InboundRouterCollection messageRouter = component.getInboundRouter();
         assertNotNull(messageRouter.getCatchAllStrategy());
         assertEquals(0, messageRouter.getRouters().size());
         assertTrue(messageRouter.getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
@@ -293,27 +293,27 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testResponseRouterConfig()
     {
-        UMOComponent component = muleContext.getRegistry().lookupComponent("orangeComponent");
+        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
         assertNotNull(component.getResponseRouter());
-        UMOResponseRouterCollection messageRouter = component.getResponseRouter();
+        ResponseRouterCollection messageRouter = component.getResponseRouter();
         assertNull(messageRouter.getCatchAllStrategy());
         assertEquals(10001, messageRouter.getTimeout());
         assertEquals(1, messageRouter.getRouters().size());
-        UMOResponseRouter router = (UMOResponseRouter) messageRouter.getRouters().get(0);
+        ResponseRouter router = (ResponseRouter) messageRouter.getRouters().get(0);
         assertTrue(router instanceof TestResponseAggregator);
         assertNotNull(messageRouter.getEndpoints());
         assertEquals(2, messageRouter.getEndpoints().size());
-        UMOEndpoint ep = (UMOEndpoint) messageRouter.getEndpoints().get(0);
+        Endpoint ep = (Endpoint) messageRouter.getEndpoints().get(0);
         assertEquals("response1", ep.getEndpointURI().getAddress());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
-        ep = (UMOEndpoint) messageRouter.getEndpoints().get(1);
+        assertEquals(Endpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+        ep = (Endpoint) messageRouter.getEndpoints().get(1);
         assertEquals("AppleResponseQueue", ep.getEndpointURI().getAddress());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+        assertEquals(Endpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
     }
 
     /* excluded - dep on management
 
-    public void _testAgentConfiguration() throws UMOException
+    public void _testAgentConfiguration() throws MuleException
     {
         JmxAgent agent = (JmxAgent)muleContext.getRegistry().lookupAgent("jmxAgent");
         assertNotNull(agent);

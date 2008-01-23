@@ -10,7 +10,7 @@
 
     <quartz:endpoint name="schedulerEndpoint" path="myService"
                      repeatInterval="1000"
-                     jobClass="org.mule.providers.quartz.jobs.MuleClientDispatchJob"
+                     jobClass="org.mule.transport.quartz.jobs.MuleClientDispatchJob"
                      jobDispatchEndpoint="vm://quartz.in"/>
 
     <model name="quartz-dispatcher">
@@ -30,7 +30,7 @@
             <inbound>
                 <inbound-endpoint address="vm://quartz.in"/>
             </inbound>
-            <component class="org.mule.providers.quartz.TestComponent2"/>
+            <component class="org.mule.transport.quartz.TestComponent2"/>
         </service>
     </model>
 

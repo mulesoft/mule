@@ -10,9 +10,9 @@
 
 package org.mule.tck.functional;
 
-import org.mule.impl.AbstractExceptionListener;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.AbstractExceptionListener;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,12 +25,12 @@ public class QuietExceptionStrategy extends AbstractExceptionListener
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public void handleMessagingException(UMOMessage message, Throwable e)
+    public void handleMessagingException(MuleMessage message, Throwable e)
     {
         logger.debug("Ignoring", e);
     }
 
-    public void handleRoutingException(UMOMessage message, UMOImmutableEndpoint endpoint, Throwable e)
+    public void handleRoutingException(MuleMessage message, ImmutableEndpoint endpoint, Throwable e)
     {
         logger.debug("Ignoring", e);
     }

@@ -10,6 +10,7 @@
 
 package org.mule.management.stats;
 
+import org.mule.api.management.stats.Statistics;
 import org.mule.management.stats.printers.AbstractTablePrinter;
 import org.mule.management.stats.printers.SimplePrinter;
 

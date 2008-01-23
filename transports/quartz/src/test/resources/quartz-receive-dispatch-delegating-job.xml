@@ -32,7 +32,7 @@
             <inbound>
                 <inbound-endpoint address="vm://quartz.in"/>
             </inbound>
-            <component class="org.mule.providers.quartz.TestComponent2"/>
+            <component class="org.mule.transport.quartz.TestComponent2"/>
         </service>
     </model>
 </mule>

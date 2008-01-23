@@ -23,7 +23,7 @@
 
     <!--Connectors Used-->
 
-    <connector name="jmsConnector1" className="org.mule.providers.jms.JmsConnector">
+    <connector name="jmsConnector1" className="org.mule.transport.jms.JmsConnector">
         <properties>
             <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <!--<property name="connectionFactoryJndiName" value="ConnectionFactory"/>-->
@@ -34,7 +34,7 @@
             <property name="maxRedelivery" value="2"/>
         </properties>
         <threading-profile maxThreadsActive="2" maxThreadsIdle="2" threadTTL="60000" poolExhaustedAction="WAIT"/>
-        <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
+        <connection-strategy className="org.mule.transport.SimpleRetryConnectionStrategy">
             <properties>
                 <property name="retryCount" value="4"/>
                 <property name="frequency" value="10000"/>
@@ -44,7 +44,7 @@
     </connector>
 
 
-    <connector name="jmsConnector2" className="org.mule.providers.jms.JmsConnector">
+    <connector name="jmsConnector2" className="org.mule.transport.jms.JmsConnector">
         <properties>
             <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <!--<property name="connectionFactoryJndiName" value="ConnectionFactory"/>-->
@@ -55,7 +55,7 @@
             <property name="maxRedelivery" value="2"/>
         </properties>
         <threading-profile maxThreadsActive="5" maxThreadsIdle="5" threadTTL="60000" poolExhaustedAction="WAIT"/>
-        <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
+        <connection-strategy className="org.mule.transport.SimpleRetryConnectionStrategy">
             <properties>
                 <property name="retryCount" value="4"/>
                 <property name="frequency" value="10000"/>
@@ -64,7 +64,7 @@
         </connection-strategy>
     </connector>
 
-    <connector name="clientConnector" className="org.mule.providers.jms.JmsConnector">
+    <connector name="clientConnector" className="org.mule.transport.jms.JmsConnector">
         <properties>
             <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <property name="specification" value="1.1"/>
@@ -93,10 +93,10 @@
 
     <model name="bus-instance">
 
-        <mule-descriptor name="service1" implementation="org.mule.components.simple.EchoComponent">
+        <mule-descriptor name="service1" implementation="org.mule.component.simple.EchoComponent">
             <inbound-router>
                 <endpoint address="endpoint1" type="receiver" synchronous="true">
-                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
                 </endpoint>
             </inbound-router>
             <outbound-router>
@@ -112,10 +112,10 @@
         </mule-descriptor>
 
 
-        <mule-descriptor name="service2" implementation="org.mule.components.simple.EchoComponent">
+        <mule-descriptor name="service2" implementation="org.mule.component.simple.EchoComponent">
             <inbound-router>
                 <endpoint address="endpoint2" type="receiver" synchronous="true">
-                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>
                 </endpoint>
             </inbound-router>
 

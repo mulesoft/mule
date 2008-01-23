@@ -9,13 +9,13 @@
  */
 package org.mule.management.agents;
 
+import org.mule.agent.AbstractNotificationLoggerAgent;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.internal.admin.AbstractNotificationLoggerAgent;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOServerNotification;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +107,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     /**
      * {@inheritDoc}
      */
-    protected void logEvent(UMOServerNotification e)
+    protected void logEvent(ServerNotification e)
     {
         broadcastNotificationMbean.sendNotification(new Notification(e.getClass().getName(), e, e.getTimestamp(), e.toString()));
     }

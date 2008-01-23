@@ -28,7 +28,7 @@
                             <spring:entry key="soapAction" value="[methodNamespace][method]"/>
                             <spring:entry key="soapMethods">
                                 <spring:list>
-                                    <spring:bean class="org.mule.providers.soap.SoapMethod">
+                                    <spring:bean class="org.mule.transport.soap.SoapMethod">
                                         <spring:constructor-arg value="qname{getTest:http://mule.mulesource.org/Tests/TestService/}"/>
                                         <spring:constructor-arg>
                                             <spring:list>

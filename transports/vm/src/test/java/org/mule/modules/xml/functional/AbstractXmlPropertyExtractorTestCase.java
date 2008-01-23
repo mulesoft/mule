@@ -10,10 +10,10 @@
 
 package org.mule.modules.xml.functional;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.providers.NullPayload;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.NullPayload;
 
 public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTestCase
 {
@@ -39,7 +39,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
     {
         MuleClient client = new MuleClient();
         client.dispatch("in", getMatchMessage(), null);
-        UMOMessage message = client.request("vm://match1?connector=queue", WAIT_PERIOD);
+        MuleMessage message = client.request("vm://match1?connector=queue", WAIT_PERIOD);
         assertNotNull(message);
         assertFalse(message.getPayload() instanceof NullPayload);
         if(!matchSingle)
@@ -55,7 +55,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
     {
         MuleClient client = new MuleClient();
         client.dispatch("in", getErrorMessage(), null);
-        UMOMessage message = client.request("vm://error?connector=queue", WAIT_PERIOD);
+        MuleMessage message = client.request("vm://error?connector=queue", WAIT_PERIOD);
         assertNotNull(message);
         assertFalse(message.getPayload() instanceof NullPayload);
     }

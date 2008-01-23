@@ -9,7 +9,7 @@
  */
 package org.mule.tck.functional;
 
-import org.mule.umo.UMOEventContext;
+import org.mule.api.MuleEventContext;
 
 /**
  * A test callback that writes the results of a service invocation to the response output stream
@@ -23,7 +23,7 @@ import org.mule.umo.UMOEventContext;
 public class ResponseWriterCallback extends CounterCallback
 {
 
-    public void eventReceived(UMOEventContext context, Object component) throws Exception
+    public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
         if (context.isSynchronous())
         {

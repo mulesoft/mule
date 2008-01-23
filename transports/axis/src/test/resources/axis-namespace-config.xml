@@ -8,11 +8,11 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/axis/2.0 http://www.mulesource.org/schema/mule/axis/2.0/mule-axis.xsd">
 
-    <spring:bean name="mockEngineConfig" class="org.mule.providers.soap.axis.mock.MockEngineConfiguration"/>
-    <spring:bean name="axisServer" class="org.mule.providers.soap.axis.mock.MockAxisServer">
+    <spring:bean name="mockEngineConfig" class="org.mule.transport.soap.axis.mock.MockEngineConfiguration"/>
+    <spring:bean name="axisServer" class="org.mule.transport.soap.axis.mock.MockAxisServer">
         <spring:constructor-arg ref="mockEngineConfig"/>
     </spring:bean>
-    <spring:bean name="mockProvider" class="org.mule.providers.soap.axis.mock.MockProvider"/>
+    <spring:bean name="mockProvider" class="org.mule.transport.soap.axis.mock.MockProvider"/>
 
     <axis:connector name="axisConnector" clientConfig="test-axis-config.wsdd" doAutoTypes="false"
                     serverConfig="test-axis-config.wsdd" treatMapAsNamedParams="false">

@@ -10,13 +10,13 @@
 
 package org.mule.components.script;
 
-import org.mule.config.ConfigurationException;
-import org.mule.impl.UMOComponentAware;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Callable;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.Lifecycle;
+import org.mule.api.MuleException;
+import org.mule.api.component.Component;
+import org.mule.api.component.ComponentAware;
+import org.mule.api.config.ConfigurationException;
+import org.mule.api.lifecycle.Callable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.monitor.FileListener;
@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  */
 public abstract class AbstractScriptComponent
-    implements Lifecycle, UMOComponentAware, FileListener, Callable
+    implements Lifecycle, ComponentAware, FileListener, Callable
 {
     public static final int DEFAULT_RELOAD_INTERVAL_MS = 60000;
 
@@ -48,11 +48,11 @@ public abstract class AbstractScriptComponent
 
     private String scriptText = null;
     private boolean autoReload = true;
-    protected UMOComponent component;
+    protected Component component;
     private FileMonitor monitor;
     private long reloadInterval = DEFAULT_RELOAD_INTERVAL_MS;
 
-    public void setComponent(UMOComponent component) throws ConfigurationException
+    public void setComponent(Component component) throws ConfigurationException
     {
         this.component = component;
     }
@@ -138,7 +138,7 @@ public abstract class AbstractScriptComponent
         this.autoReload = autoReload;
     }
 
-    public void start() throws UMOException
+    public void start() throws MuleException
     {
         if (monitor != null)
         {
@@ -146,7 +146,7 @@ public abstract class AbstractScriptComponent
         }
     }
 
-    public void stop() throws UMOException
+    public void stop() throws MuleException
     {
         if (monitor != null)
         {
@@ -160,7 +160,7 @@ public abstract class AbstractScriptComponent
         {
             stop();
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             logger.error(e.getMessage(), e);
         }

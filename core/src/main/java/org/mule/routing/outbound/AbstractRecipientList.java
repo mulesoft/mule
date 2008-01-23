@@ -10,16 +10,16 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.MuleServer;
-import org.mule.impl.MuleMessage;
-import org.mule.registry.RegistrationException;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
-import org.mule.umo.routing.RoutingException;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
+import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.registry.RegistrationException;
+import org.mule.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.api.routing.RoutingException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -46,7 +46,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
     private final ConcurrentMap recipientCache = new ConcurrentHashMap();
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+    public MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous)
         throws RoutingException
     {
         List recipients = this.getRecipients(message);
@@ -66,9 +66,9 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             }
         }
 
-        UMOMessage result = null;
-        UMOImmutableEndpoint endpoint;
-        UMOMessage request;
+        MuleMessage result = null;
+        ImmutableEndpoint endpoint;
+        MuleMessage request;
 
         for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
         {
@@ -76,7 +76,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             // Make a copy of the message. Question is do we do a proper clone? in
             // which case there
             // would potentially be multiple messages with the same id...
-            request = new MuleMessage(message.getPayload(), message);
+            request = new DefaultMuleMessage(message.getPayload(), message);
             endpoint = this.getRecipientEndpoint(request, recipient);
 
             try
@@ -102,7 +102,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
                     this.dispatch(session, request, endpoint);
                 }
             }
-            catch (UMOException e)
+            catch (MuleException e)
             {
                 throw new CouldNotRouteOutboundMessageException(request, endpoint, e);
             }
@@ -114,22 +114,22 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
         else if (results.size() == 1)
         {
-            return new MuleMessage(results.get(0), result);
+            return new DefaultMuleMessage(results.get(0), result);
         }
         else
         {
-            return new MuleMessage(results, result);
+            return new DefaultMuleMessage(results, result);
         }
     }
 
-    protected UMOImmutableEndpoint getRecipientEndpoint(UMOMessage message, Object recipient) throws RoutingException
+    protected ImmutableEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException
     {
-        UMOImmutableEndpoint endpoint = null;
+        ImmutableEndpoint endpoint = null;
         try
         {
-            if (recipient instanceof UMOEndpointURI)
+            if (recipient instanceof EndpointURI)
             {
-                endpoint = getRecipientEndpointFromUri((UMOEndpointURI) recipient);
+                endpoint = getRecipientEndpointFromUri((EndpointURI) recipient);
             }
             else if (recipient instanceof String)
             {
@@ -140,27 +140,27 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
                 throw new RegistrationException("Failed to create endpoint for: " + recipient);
             }
 
-            UMOImmutableEndpoint existingEndpoint = (UMOImmutableEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
+            ImmutableEndpoint existingEndpoint = (ImmutableEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
             if (existingEndpoint != null)
             {
                 endpoint = existingEndpoint;
             }
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             throw new RoutingException(message, endpoint, e);
         }
         return endpoint;
     }
 
-    protected UMOImmutableEndpoint getRecipientEndpointFromUri(UMOEndpointURI uri)
-            throws UMOException
+    protected ImmutableEndpoint getRecipientEndpointFromUri(EndpointURI uri)
+            throws MuleException
     {
-        UMOImmutableEndpoint endpoint = null;
+        ImmutableEndpoint endpoint = null;
         if (null != getMuleContext() && null != getMuleContext().getRegistry())
         {
             endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getEndpoint(uri,
-                UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+                ImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         }
         if (null != endpoint)
         {
@@ -169,10 +169,10 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         return endpoint;
     }
 
-    protected UMOImmutableEndpoint getRecipientEndpointFromString(UMOMessage message, String recipient)
-            throws UMOException
+    protected ImmutableEndpoint getRecipientEndpointFromString(MuleMessage message, String recipient)
+            throws MuleException
     {
-        UMOImmutableEndpoint endpoint = (UMOImmutableEndpoint) recipientCache.get(recipient);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) recipientCache.get(recipient);
         if (null == endpoint && null != getMuleContext() && null != getMuleContext().getRegistry())
         {
             endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(recipient);
@@ -180,7 +180,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         return endpoint;
     }
 
-    protected abstract List getRecipients(UMOMessage message);
+    protected abstract List getRecipients(MuleMessage message);
 
     public boolean isDynamicEndpoints()
     {

@@ -10,17 +10,17 @@
 package org.mule.routing;
 
 import org.mule.api.MuleContext;
-import org.mule.impl.MuleContextAware;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.routing.Router;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.routing.UMORouter;
 
 /**
  * Implements the shared methods that all routers have. The implementations of the different
  * router types can vary depending on their usage pattern. The types of router are inbound, outbound
  * response and nested.
  */
-public abstract class AbstractRouter implements UMORouter, MuleContextAware
+public abstract class AbstractRouter implements Router, MuleContextAware
 {
     private RouterStatistics routerStatistics;
 

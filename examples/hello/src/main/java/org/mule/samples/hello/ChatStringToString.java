@@ -10,8 +10,8 @@
 
 package org.mule.samples.hello;
 
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
+import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractTransformer;
 
 /**
  * <code>NameStringToChatString</code> is a dummy transformer used in the hello world
@@ -30,7 +30,7 @@ public class ChatStringToString extends AbstractTransformer
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
+     * @see org.mule.transformer.AbstractTransformer#doTransform(java.lang.Object)
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {

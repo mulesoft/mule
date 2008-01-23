@@ -10,7 +10,7 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.util.object.ObjectFactory;
 
 /**

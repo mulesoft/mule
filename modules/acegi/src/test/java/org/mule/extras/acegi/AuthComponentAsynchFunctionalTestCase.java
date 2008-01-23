@@ -10,12 +10,12 @@
 
 package org.mule.extras.acegi;
 
-import org.mule.config.MuleProperties;
+import org.mule.api.EncryptionStrategy;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.security.MuleCredentials;
+import org.mule.security.MuleCredentials;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,13 +43,13 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
 
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("marie", "marie", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
         client.dispatch("vm://test", "Marie", props);
-        UMOMessage m = client.request("vm://output", 3000);
+        MuleMessage m = client.request("vm://output", 3000);
         assertNotNull(m);
         assertEquals((String)m.getPayload(), "Marie");
     }
@@ -59,13 +59,13 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
 
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
         client.dispatch("vm://test", "Marie", props);
-        UMOMessage m = client.request("vm://output", 3000);
+        MuleMessage m = client.request("vm://output", 3000);
         assertNull(m);
     }
 
@@ -74,13 +74,13 @@ public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
 
-        UMOEncryptionStrategy strategy = muleContext
+        EncryptionStrategy strategy = muleContext
             .getSecurityManager()
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
         client.dispatch("vm://test", "USD,MTL", props);
-        UMOMessage m = client.request("vm://output", 3000);
+        MuleMessage m = client.request("vm://output", 3000);
         assertNull(m);
     }
 

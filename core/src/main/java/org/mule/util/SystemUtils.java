@@ -10,7 +10,7 @@
 
 package org.mule.util;
 
-import org.mule.MuleException;
+import org.mule.api.DefaultMuleException;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -161,7 +161,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
     /** 
      * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0 
      */
-    private static CommandLine parseCommandLine(String args[], String opts[][]) throws MuleException
+    private static CommandLine parseCommandLine(String args[], String opts[][]) throws DefaultMuleException
     {
         Options options = new Options();
         for (int i = 0; i < opts.length; i++)
@@ -176,14 +176,14 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
             CommandLine line = parser.parse(options, args, true);
             if (line == null)
             {
-                throw new MuleException("Unknown error parsing the Mule command line");
+                throw new DefaultMuleException("Unknown error parsing the Mule command line");
             }
 
             return line;
         }
         catch (ParseException p)
         {
-            throw new MuleException("Unable to parse the Mule command line because of: " + p.toString(), p);
+            throw new DefaultMuleException("Unable to parse the Mule command line because of: " + p.toString(), p);
         }
     }
 
@@ -195,7 +195,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0
      */
     public static String getCommandLineOption(String option, String args[], String opts[][])
-        throws MuleException
+        throws DefaultMuleException
     {
         CommandLine line = parseCommandLine(args, opts);
         return line.getOptionValue(option);
@@ -209,7 +209,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0
      */
     public static boolean hasCommandLineOption(String option, String args[], String opts[][])
-        throws MuleException
+        throws DefaultMuleException
     {
         CommandLine line = parseCommandLine(args, opts);
         return line.hasOption(option);
@@ -222,7 +222,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
      * 
      * @deprecated MULE-1947 Command-line arguments will be handled exclusively by the bootloader in 2.0
      */
-    public static Map getCommandLineOptions(String args[], String opts[][]) throws MuleException
+    public static Map getCommandLineOptions(String args[], String opts[][]) throws DefaultMuleException
     {
         CommandLine line = parseCommandLine(args, opts);
         Map ret = new HashMap();

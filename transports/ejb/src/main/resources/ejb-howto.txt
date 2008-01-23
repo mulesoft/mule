@@ -6,7 +6,7 @@
 
 -->
 
-<connector name="EJBConnector" className="org.mule.providers.ejb.EjbConnector">
+<connector name="EJBConnector" className="org.mule.transport.ejb.EjbConnector">
     <properties>
         <property name="jndiInitialFactory" value="org.jnp.interfaces.NamingContextFactory"/>
         <property name="jndiUrlPkgPrefixes" value="org.jboss.naming:org.jnp.interfaces"/>

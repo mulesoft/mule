@@ -10,17 +10,17 @@
 
 package org.mule.management;
 
-import org.mule.impl.internal.notifications.ComponentNotification;
-import org.mule.impl.internal.notifications.ComponentNotificationListener;
-import org.mule.impl.internal.notifications.CustomNotification;
-import org.mule.impl.internal.notifications.CustomNotificationListener;
-import org.mule.impl.internal.notifications.ManagerNotification;
-import org.mule.impl.internal.notifications.ManagerNotificationListener;
-import org.mule.impl.internal.notifications.ModelNotification;
-import org.mule.impl.internal.notifications.ModelNotificationListener;
+import org.mule.api.context.notification.ComponentNotificationListener;
+import org.mule.api.context.notification.CustomNotificationListener;
+import org.mule.api.context.notification.ManagerNotificationListener;
+import org.mule.api.context.notification.ModelNotificationListener;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.context.notification.ComponentNotification;
+import org.mule.context.notification.CustomNotification;
+import org.mule.context.notification.ManagerNotification;
+import org.mule.context.notification.ModelNotification;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.manager.UMOServerNotification;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -95,7 +95,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         final CountDownLatch latch = new CountDownLatch(1);
         muleContext.registerListener(new ComponentNotificationListener()
         {
-            public void onNotification(UMOServerNotification notification)
+            public void onNotification(ServerNotification notification)
             {
                 if (notification.getAction() == ComponentNotification.COMPONENT_STARTED)
                 {
@@ -121,7 +121,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
         muleContext.registerListener(new ComponentNotificationListener()
         {
-            public void onNotification(UMOServerNotification notification)
+            public void onNotification(ServerNotification notification)
             {
                 if (notification.getAction() == ComponentNotification.COMPONENT_STARTED)
                 {
@@ -148,7 +148,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
         muleContext.registerListener(new DummyNotificationListener()
         {
-            public void onNotification(UMOServerNotification notification)
+            public void onNotification(ServerNotification notification)
             {
                 if (notification.getAction() == DummyNotification.EVENT_RECEIVED)
                 {
@@ -174,7 +174,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
 
         muleContext.registerListener(new DummyNotificationListener()
         {
-            public void onNotification(UMOServerNotification notification)
+            public void onNotification(ServerNotification notification)
             {
                 if (notification.getAction() == DummyNotification.EVENT_RECEIVED)
                 {
@@ -195,7 +195,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(2, customNotificationCount.get());
     }
 
-    public void onNotification(UMOServerNotification notification)
+    public void onNotification(ServerNotification notification)
     {
         if (notification.getAction() == ModelNotification.MODEL_STOPPED)
         {

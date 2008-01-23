@@ -10,12 +10,12 @@
 
 package org.mule.test.components;
 
-import org.mule.providers.AbstractConnector;
+import org.mule.api.MuleException;
+import org.mule.api.component.Component;
+import org.mule.api.component.ComponentException;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.ComponentException;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.transport.AbstractConnector;
 
 public class ComponentInitialStateTestCase extends FunctionalTestCase
 {
@@ -31,7 +31,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
     
     public void testDefaultInitialState() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("defaultComponent");
+        Component c = muleContext.getRegistry().lookupComponent("defaultComponent");
         // Component initially started
         assertTrue(c.isStarted());
         assertFalse(c.isPaused());
@@ -40,7 +40,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
         AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
         assertNotNull(connector);
         assertTrue(connector.isStarted());
-        UMOMessageReceiver[] receivers = connector.getReceivers("*default*");
+        MessageReceiver[] receivers = connector.getReceivers("*default*");
         assertEquals(1, receivers.length);
         assertTrue(receivers[0].isConnected());
     }
@@ -48,7 +48,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
     // MULE-494
     public void testInitialStateStopped() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("stoppedComponent");
+        Component c = muleContext.getRegistry().lookupComponent("stoppedComponent");
         // Component initially stopped
         assertFalse(c.isStarted());
 
@@ -56,7 +56,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
         AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
         assertNotNull(connector);
         assertTrue(connector.isStarted());
-        UMOMessageReceiver[] receivers = connector.getReceivers("*stopped*");
+        MessageReceiver[] receivers = connector.getReceivers("*stopped*");
         assertEquals(0, receivers.length);
 
         // Start the component.
@@ -73,14 +73,14 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
     // MULE-503
     public void testStoppingComponentStopsEndpoints() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("startedComponent");
+        Component c = muleContext.getRegistry().lookupComponent("startedComponent");
         assertTrue(c.isStarted());
 
         // The listeners should be registered and started.
         AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
         assertNotNull(connector);
         assertTrue(connector.isStarted());
-        UMOMessageReceiver[] receivers = connector.getReceivers("*started*");
+        MessageReceiver[] receivers = connector.getReceivers("*started*");
         assertEquals(1, receivers.length);
         assertTrue(receivers[0].isConnected());
 
@@ -96,7 +96,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
     
     public void testSendToStoppedComponent() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("stoppedComponent");
+        Component c = muleContext.getRegistry().lookupComponent("stoppedComponent");
         // Component initially stopped
         assertFalse(c.isStarted());
 
@@ -123,7 +123,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
 
     public void testInitialStatePaused() throws Exception
     {
-        UMOComponent c = muleContext.getRegistry().lookupComponent("pausedComponent");
+        Component c = muleContext.getRegistry().lookupComponent("pausedComponent");
         // Component initially started but paused.
         assertTrue(c.isStarted());
         assertTrue(c.isPaused());
@@ -132,7 +132,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
         AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
         assertNotNull(connector);
         assertTrue(connector.isStarted());
-        UMOMessageReceiver[] receivers = connector.getReceivers("*paused*");
+        MessageReceiver[] receivers = connector.getReceivers("*paused*");
         assertEquals(1, receivers.length);
         assertTrue(receivers[0].isConnected());
     }
@@ -140,7 +140,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
     public void testSendToPausedComponent() throws Exception
     {
         // TODO MULE-1995
-        final UMOComponent c = muleContext.getRegistry().lookupComponent("startedComponent");
+        final Component c = muleContext.getRegistry().lookupComponent("startedComponent");
         assertTrue(c.isStarted());
         
         c.pause();
@@ -164,7 +164,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
                 {
                     c.resume();
                 }
-                catch (UMOException e)
+                catch (MuleException e)
                 {
                     fail(e.getMessage());
                 }

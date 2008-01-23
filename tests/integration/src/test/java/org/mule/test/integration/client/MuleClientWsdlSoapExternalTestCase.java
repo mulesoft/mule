@@ -10,10 +10,10 @@
 
 package org.mule.test.integration.client;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 
@@ -32,7 +32,7 @@ public class MuleClientWsdlSoapExternalTestCase extends AbstractMuleTestCase
         }
 
         String url = "wsdl-xfire:" + WSDL_URL + "&method=" + METHOD;
-        UMOMessage result = null;
+        MuleMessage result = null;
         String resultPayload = StringUtils.EMPTY;
 
         try
@@ -41,7 +41,7 @@ public class MuleClientWsdlSoapExternalTestCase extends AbstractMuleTestCase
             result = client.send(url, INPUT, null);
             resultPayload = (result != null ? result.getPayloadAsString() : StringUtils.EMPTY);
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             fail(ExceptionUtils.getStackTrace(e));
         }
@@ -68,7 +68,7 @@ public class MuleClientWsdlSoapExternalTestCase extends AbstractMuleTestCase
     // String url = "wsdl-axis:" + WSDL_URL + "&method=" + METHOD;
     // MuleClient client = null;
     // client = new MuleClient();
-    // UMOMessage result = client.send(url, INPUT, properties);
+    // MuleMessage result = client.send(url, INPUT, properties);
     // assertNotNull(result);
     // assertEquals(OUTPUT, result.getPayload());
     // }
@@ -83,7 +83,7 @@ public class MuleClientWsdlSoapExternalTestCase extends AbstractMuleTestCase
         String url = "wsdl:" + WSDL_URL + "&method=" + METHOD;
         MuleClient client;
         client = new MuleClient();
-        UMOMessage result = client.send(url, INPUT, null);
+        MuleMessage result = client.send(url, INPUT, null);
         assertNotNull(result);
         assertEquals(OUTPUT, result.getPayload());
     }

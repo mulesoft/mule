@@ -10,10 +10,10 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.impl.MuleMessage;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.routing.AggregationException;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -47,10 +47,10 @@ public class MessageChunkingAggregator extends CorrelationAggregator
      *             this scenario the whole event group is removed and passed to the
      *             exception handler for this componenet
      */
-    protected UMOMessage aggregateEvents(EventGroup events) throws AggregationException
+    protected MuleMessage aggregateEvents(EventGroup events) throws AggregationException
     {
-        UMOEvent[] collectedEvents = events.toArray();
-        UMOEvent firstEvent = collectedEvents[0];
+        MuleEvent[] collectedEvents = events.toArray();
+        MuleEvent firstEvent = collectedEvents[0];
         Arrays.sort(collectedEvents, eventComparator);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 
@@ -58,23 +58,23 @@ public class MessageChunkingAggregator extends CorrelationAggregator
         {
             for (Iterator iterator = IteratorUtils.arrayIterator(collectedEvents); iterator.hasNext();)
             {
-                UMOEvent event = (UMOEvent) iterator.next();
+                MuleEvent event = (MuleEvent) iterator.next();
                 baos.write(event.getMessageAsBytes());
             }
 
-            UMOMessage message;
+            MuleMessage message;
 
             // try to deserialize message, since ChunkingRouter might have serialized
             // the object...
             try
             {
-                message = new MuleMessage(SerializationUtils.deserialize(baos.toByteArray()),
+                message = new DefaultMuleMessage(SerializationUtils.deserialize(baos.toByteArray()),
                     firstEvent.getMessage());
 
             }
             catch (SerializationException e)
             {
-                message = new MuleMessage(baos.toByteArray(), firstEvent.getMessage());
+                message = new DefaultMuleMessage(baos.toByteArray(), firstEvent.getMessage());
             }
 
             message.setCorrelationGroupSize(-1);

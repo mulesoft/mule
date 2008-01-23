@@ -10,11 +10,11 @@
 
 package org.mule.transaction.lookup;
 
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.impl.container.JndiContextHelper;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOTransactionManagerFactory;
+import org.mule.container.JndiContextHelper;
 import org.mule.util.StringUtils;
 
 import java.util.Map;
@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * namespace, so your only bet is to run Mule in the same JVM as the application
  * server.
  */
-public class GenericTransactionManagerLookupFactory implements UMOTransactionManagerFactory, Initialisable
+public class GenericTransactionManagerLookupFactory implements TransactionManagerFactory, Initialisable
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
@@ -86,7 +86,7 @@ public class GenericTransactionManagerLookupFactory implements UMOTransactionMan
         this.context = context;
     }
 
-    /** @see org.mule.umo.manager.UMOTransactionManagerFactory#create() */
+    /** @see org.mule.api.transaction.TransactionManagerFactory#create() */
     public TransactionManager create() throws Exception
     {
         // implementing the Initilisable interface does not call it??
@@ -107,7 +107,7 @@ public class GenericTransactionManagerLookupFactory implements UMOTransactionMan
      * There is no guarantee that by throwing a Recoverable exception that the Mule
      * instance will not shut down.
      *
-     * @throws org.mule.umo.lifecycle.InitialisationException
+     * @throws org.mule.api.lifecycle.InitialisationException
      *          if a fatal error occurs
      *          causing the Mule instance to shutdown
      */

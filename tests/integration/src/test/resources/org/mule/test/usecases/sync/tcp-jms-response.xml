@@ -26,7 +26,7 @@
                 <inbound-endpoint address="tcp://localhost:4444" remoteSync="true"
                     responseTransformer-refs="jmsmessage-to-object" />
             </inbound>
-            <component class="org.mule.components.simple.EchoComponent" />
+            <component class="org.mule.component.simple.EchoComponent" />
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="jms://queue_in" />

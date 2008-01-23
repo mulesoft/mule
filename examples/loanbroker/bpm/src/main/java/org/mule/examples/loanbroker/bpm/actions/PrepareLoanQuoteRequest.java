@@ -13,7 +13,7 @@ package org.mule.examples.loanbroker.bpm.actions;
 import org.mule.examples.loanbroker.messages.CreditProfile;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
-import org.mule.providers.bpm.jbpm.actions.LoggingActionHandler;
+import org.mule.transport.bpm.jbpm.actions.LoggingActionHandler;
 
 import org.jbpm.graph.exe.ExecutionContext;
 

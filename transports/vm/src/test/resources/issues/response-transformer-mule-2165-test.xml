@@ -16,7 +16,7 @@
 
     <vm:connector name="queue" queueEvents="true"/>
 
-    <custom-transformer name="response" class="org.mule.transformers.simple.StringAppendTransformer">
+    <custom-transformer name="response" class="org.mule.transformer.simple.StringAppendTransformer">
         <spring:property name="message" value=" response"/>
     </custom-transformer>
 

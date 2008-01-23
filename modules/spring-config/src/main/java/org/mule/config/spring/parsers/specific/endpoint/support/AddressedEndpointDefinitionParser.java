@@ -18,7 +18,7 @@ import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParse
 import org.mule.config.spring.parsers.processors.BlockAttribute;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
-import org.mule.impl.endpoint.URIBuilder;
+import org.mule.endpoint.URIBuilder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

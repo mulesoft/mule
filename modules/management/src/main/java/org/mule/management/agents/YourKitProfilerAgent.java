@@ -12,16 +12,16 @@ package org.mule.management.agents;
 
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.agent.Agent;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.i18n.ManagementMessages;
 import org.mule.management.mbeans.YourKitProfilerService;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
 import org.mule.management.support.JmxSupportFactory;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
 import org.mule.util.ClassUtils;
 
 import java.util.List;
@@ -36,7 +36,7 @@ import javax.management.ObjectName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class YourKitProfilerAgent implements UMOAgent
+public class YourKitProfilerAgent implements Agent
 {
     /**
      * MBean name to register under.
@@ -58,7 +58,7 @@ public class YourKitProfilerAgent implements UMOAgent
     /*
     * (non-Javadoc)
     *
-    * @see org.mule.umo.manager.UMOAgent#getName()
+    * @see org.mule.api.context.Agent#getName()
     */
     public String getName()
     {
@@ -68,7 +68,7 @@ public class YourKitProfilerAgent implements UMOAgent
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.umo.manager.UMOAgent#setName(java.lang.String)
+     * @see org.mule.api.context.Agent#setName(java.lang.String)
      */
     public void setName(String name)
     {
@@ -78,7 +78,7 @@ public class YourKitProfilerAgent implements UMOAgent
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.umo.manager.UMOAgent#getDescription()
+     * @see org.mule.api.context.Agent#getDescription()
      */
     public String getDescription()
     {
@@ -88,7 +88,7 @@ public class YourKitProfilerAgent implements UMOAgent
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.umo.lifecycle.Initialisable#initialise()
+     * @see org.mule.api.lifecycle.Initialisable#initialise()
      */
     public void initialise() throws InitialisationException
     {
@@ -148,7 +148,7 @@ public class YourKitProfilerAgent implements UMOAgent
             // remove the agent from the list, it's not functional
             RegistryContext.getRegistry().unregisterAgent(this.getName());
         }
-        catch (UMOException e)
+        catch (MuleException e)
         {
             // not interested, really
         }
@@ -169,9 +169,9 @@ public class YourKitProfilerAgent implements UMOAgent
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.umo.lifecycle.Startable#start()
+     * @see org.mule.api.lifecycle.Startable#start()
      */
-    public void start() throws UMOException
+    public void start() throws MuleException
     {
         // nothing to do
     }
@@ -179,9 +179,9 @@ public class YourKitProfilerAgent implements UMOAgent
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.umo.lifecycle.Stoppable#stop()
+     * @see org.mule.api.lifecycle.Stoppable#stop()
      */
-    public void stop() throws UMOException
+    public void stop() throws MuleException
     {
         // nothing to do
     }
@@ -189,7 +189,7 @@ public class YourKitProfilerAgent implements UMOAgent
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.umo.lifecycle.Disposable#dispose()
+     * @see org.mule.api.lifecycle.Disposable#dispose()
      */
     public void dispose()
     {
@@ -207,7 +207,7 @@ public class YourKitProfilerAgent implements UMOAgent
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.umo.manager.UMOAgent#registered()
+     * @see org.mule.api.context.Agent#registered()
      */
     public void registered()
     {
@@ -217,7 +217,7 @@ public class YourKitProfilerAgent implements UMOAgent
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.umo.manager.UMOAgent#unregistered()
+     * @see org.mule.api.context.Agent#unregistered()
      */
     public void unregistered()
     {

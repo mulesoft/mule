@@ -12,8 +12,8 @@
 
     <file:connector name="fileConnector2">
         <service-overrides
-                outboundTransformer="org.mule.transformers.simple.SerializableToByteArray"
-                inboundTransformer="org.mule.transformers.simple.ByteArrayToSerializable"/>
+                outboundTransformer="org.mule.transformer.simple.SerializableToByteArray"
+                inboundTransformer="org.mule.transformer.simple.ByteArrayToSerializable"/>
     </file:connector>
 
     <file:connector name="fileConnector3"/>

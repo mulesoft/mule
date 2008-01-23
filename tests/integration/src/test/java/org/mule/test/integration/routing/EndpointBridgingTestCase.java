@@ -10,9 +10,9 @@
 
 package org.mule.test.integration.routing;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
 
 public class EndpointBridgingTestCase extends FunctionalTestCase
 {
@@ -25,7 +25,7 @@ public class EndpointBridgingTestCase extends FunctionalTestCase
     public void testSynchronousBridging() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage result = client.send("vm://bridge.inbound", "test", null);
+        MuleMessage result = client.send("vm://bridge.inbound", "test", null);
         assertNotNull(result);
         assertEquals("Received: test", result.getPayloadAsString());
     }

@@ -10,7 +10,7 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.management.stats.Statistics;
+import org.mule.api.management.stats.Statistics;
 
 /**
  * <code>StatisticsServiceMBean</code> is a JMX interfaces for querying Mule event

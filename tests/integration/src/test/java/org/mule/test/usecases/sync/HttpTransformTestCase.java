@@ -10,11 +10,11 @@
 
 package org.mule.test.usecases.sync;
 
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transformers.compression.GZipUncompressTransformer;
-import org.mule.transformers.simple.ByteArrayToSerializable;
-import org.mule.umo.UMOMessage;
+import org.mule.transformer.compression.GZipUncompressTransformer;
+import org.mule.transformer.simple.ByteArrayToSerializable;
 
 import java.util.Arrays;
 
@@ -29,7 +29,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
     public void testTransform() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage message = client.send("http://localhost:18080/RemoteService", "payload", null);
+        MuleMessage message = client.send("http://localhost:18080/RemoteService", "payload", null);
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
         gu.setReturnClass(String.class);
@@ -42,7 +42,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         Object payload = Arrays.asList(new Integer[]{new Integer(42)});
-        UMOMessage message = client.send("http://localhost:18081/RemoteService", payload, null);
+        MuleMessage message = client.send("http://localhost:18081/RemoteService", payload, null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         assertNotNull(message.getPayload());
@@ -55,7 +55,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         Object payload = Arrays.asList(new Integer[]{new Integer(42)});
-        UMOMessage message = client.send("vm://LocalService", payload, null);
+        MuleMessage message = client.send("vm://LocalService", payload, null);
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         assertNotNull(message.getPayload());

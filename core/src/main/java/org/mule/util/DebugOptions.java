@@ -9,7 +9,7 @@
  */
 package org.mule.util;
 
-import org.mule.config.MuleProperties;
+import org.mule.api.config.MuleProperties;
 
 import java.util.ArrayList;
 import java.util.List;

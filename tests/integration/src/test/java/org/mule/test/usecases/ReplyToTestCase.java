@@ -10,11 +10,11 @@
 
 package org.mule.test.usecases;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.NullPayload;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.umo.UMOMessage;
+import org.mule.transport.NullPayload;
 
 /**
  * see MULE-2721
@@ -33,14 +33,14 @@ public class ReplyToTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         
-        UMOMessage msg = new MuleMessage("testing");
+        MuleMessage msg = new DefaultMuleMessage("testing");
         msg.setReplyTo("ReplyTo");
         
         // Send asynchronous request
         client.dispatch("EchoVm", msg, null);
 
         // Wait for asynchronous response
-        UMOMessage result = client.request("ReplyTo", RECEIVE_DELAY);
+        MuleMessage result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertEquals("testing", result.getPayload());
@@ -54,14 +54,14 @@ public class ReplyToTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         
-        UMOMessage msg = new MuleMessage("testing");
+        MuleMessage msg = new DefaultMuleMessage("testing");
         msg.setReplyTo("ReplyTo");
         
         // Send asynchronous request
         client.dispatch("EchoAxisSend", msg, null);
 
         // Wait for asynchronous response
-        UMOMessage result = client.request("ReplyTo", RECEIVE_DELAY);
+        MuleMessage result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertEquals("testing", result.getPayload());
@@ -75,14 +75,14 @@ public class ReplyToTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         
-        UMOMessage msg = new MuleMessage("testing");
+        MuleMessage msg = new DefaultMuleMessage("testing");
         msg.setReplyTo("ReplyTo");
         
         // Send asynchronous request
         client.dispatch("EchoXFireSend", msg, null);
 
         // Wait for asynchronous response
-        UMOMessage result = client.request("ReplyTo", RECEIVE_DELAY);
+        MuleMessage result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertEquals("testing", result.getPayload());

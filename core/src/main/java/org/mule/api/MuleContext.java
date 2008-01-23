@@ -9,22 +9,21 @@
  */
 package org.mule.api;
 
+import org.mule.Directories;
+import org.mule.api.context.WorkManager;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.Registry;
+import org.mule.api.security.SecurityManager;
+import org.mule.api.store.Store;
 import org.mule.config.MuleConfiguration;
-import org.mule.impl.Directories;
-import org.mule.impl.internal.notifications.NotificationException;
-import org.mule.impl.internal.notifications.manager.ServerNotificationManager;
+import org.mule.context.notification.NotificationException;
+import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
-import org.mule.registry.RegistrationException;
-import org.mule.registry.Registry;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.lifecycle.UMOLifecycleManager;
-import org.mule.umo.manager.UMOServerNotification;
-import org.mule.umo.manager.UMOServerNotificationListener;
-import org.mule.umo.manager.UMOWorkManager;
-import org.mule.umo.security.UMOSecurityManager;
-import org.mule.umo.store.UMOStore;
 import org.mule.util.queue.QueueManager;
 
 import javax.transaction.TransactionManager;
@@ -34,11 +33,11 @@ public interface MuleContext extends Lifecycle
 
     String getSystemName();
 
-    UMOStore getStore(String name) throws UMOException;
+    Store getStore(String name) throws MuleException;
 
-    UMOStore createStore(String name) throws UMOException;
+    Store createStore(String name) throws MuleException;
 
-    void removeStore(UMOStore store);
+    void removeStore(Store store);
 
     Directories getDirectories();
 
@@ -99,23 +98,23 @@ public interface MuleContext extends Lifecycle
     /**
      * Registers an intenal server event listener. The listener will be notified
      * when a particular event happens within the server. Typically this is not
-     * an event in the same sense as an UMOEvent (although there is nothing
+     * an event in the same sense as an MuleEvent (although there is nothing
      * stopping the implementation of this class triggering listeners when a
-     * UMOEvent is received).
+     * MuleEvent is received).
      * <p/>
      * The types of notifications fired is entirely defined by the implementation of
      * this class
      *
      * @param l the listener to register
      */
-    void registerListener(UMOServerNotificationListener l) throws NotificationException;
+    void registerListener(ServerNotificationListener l) throws NotificationException;
 
     /**
      * Registers an intenal server event listener. The listener will be notified
      * when a particular event happens within the server. Typically this is not
-     * an event in the same sense as an UMOEvent (although there is nothing
+     * an event in the same sense as an MuleEvent (although there is nothing
      * stopping the implementation of this class triggering listeners when a
-     * UMOEvent is received).
+     * MuleEvent is received).
      * <p/>
      * The types of notifications fired is entirely defined by the implementation of
      * this class
@@ -125,7 +124,7 @@ public interface MuleContext extends Lifecycle
      *                           of listener For example, the resourceName could be the name of
      *                           a component if the listener was a ComponentNotificationListener
      */
-    void registerListener(UMOServerNotificationListener l, String resourceIdentifier) throws NotificationException;
+    void registerListener(ServerNotificationListener l, String resourceIdentifier) throws NotificationException;
 
     /**
      * Unregisters a previously registered listener. If the listener has not
@@ -133,14 +132,14 @@ public interface MuleContext extends Lifecycle
      *
      * @param l the listener to unregister
      */
-    void unregisterListener(UMOServerNotificationListener l);
+    void unregisterListener(ServerNotificationListener l);
 
     /**
      * Fires a server notification to all regiistered listeners
      *
      * @param notification the notification to fire
      */
-    void fireNotification(UMOServerNotification notification);
+    void fireNotification(ServerNotification notification);
 
     /**
      * Sets the unique Id for this Manager instance. this id can be used to
@@ -177,7 +176,7 @@ public interface MuleContext extends Lifecycle
      *                        and service invocations
      * @throws RegistrationException 
      */
-    void setSecurityManager(UMOSecurityManager securityManager) throws InitialisationException, RegistrationException;
+    void setSecurityManager(SecurityManager securityManager) throws InitialisationException, RegistrationException;
 
     /**
      * Gets the security manager used by this Mule instance to authenticate and
@@ -187,7 +186,7 @@ public interface MuleContext extends Lifecycle
      *         and authorise incoming and outgoing event traffic and service
      *         invocations
      */
-    UMOSecurityManager getSecurityManager();
+    SecurityManager getSecurityManager();
 
     /**
      * Obtains a workManager instance that can be used to schedule work in a
@@ -198,7 +197,7 @@ public interface MuleContext extends Lifecycle
      *
      * @return a workManager instance used by the current MuleManager
      */
-    UMOWorkManager getWorkManager();
+    WorkManager getWorkManager();
 
     /**
      * Sets a workManager instance that can be used to schedule work in a thread
@@ -210,7 +209,7 @@ public interface MuleContext extends Lifecycle
      * @param workManager the workManager instance used by the current
      *                    MuleManager
      */
-    void setWorkManager(UMOWorkManager workManager);
+    void setWorkManager(WorkManager workManager);
 
     /**
      * Sets the queue manager used by mule for queuing events. This is used for
@@ -235,13 +234,13 @@ public interface MuleContext extends Lifecycle
 
     public void setStatistics(AllStatistics stats);
 
-    UMOLifecycleManager getLifecycleManager();
+    LifecycleManager getLifecycleManager();
 
-    void setLifecycleManager(UMOLifecycleManager lifecycleManager);
+    void setLifecycleManager(LifecycleManager lifecycleManager);
     
     Registry getRegistry();
     
-    void applyLifecycle(Object object) throws UMOException;
+    void applyLifecycle(Object object) throws MuleException;
     
     void setConfiguration(MuleConfiguration config);
     

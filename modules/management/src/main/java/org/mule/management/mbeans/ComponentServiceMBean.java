@@ -10,9 +10,9 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Startable;
-import org.mule.umo.lifecycle.Stoppable;
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 
 import javax.management.ObjectName;
 
@@ -52,29 +52,29 @@ public interface ComponentServiceMBean extends Stoppable, Startable, ComponentSt
      * Muleconfiguration to true. this causes all internal queues to store their
      * state.
      * 
-     * @throws UMOException if the component failed to pause.
+     * @throws MuleException if the component failed to pause.
      * @see org.mule.config.MuleConfiguration
      */
-    void pause() throws UMOException;
+    void pause() throws MuleException;
 
     /**
      * Resumes the Component that has been paused. If the component is not paused
      * nothing is executed.
      * 
-     * @throws UMOException if the component failed to resume
+     * @throws MuleException if the component failed to resume
      */
-    void resume() throws UMOException;
+    void resume() throws MuleException;
 
     boolean isPaused();
 
     boolean isStopped();
 
-    void dispose() throws UMOException;
+    void dispose() throws MuleException;
 
     /**
      * Causes the component to stop without processing its event queue first
      */
-    void forceStop() throws UMOException;
+    void forceStop() throws MuleException;
 
     boolean isStopping();
 }

@@ -13,7 +13,7 @@
     <bpm:connector name="bpmConnector1" bpms-ref="testBpms"
         allowGlobalReceiver="true" allowGlobalDispatcher="true" processIdField="myId"/>
 
-    <spring:bean id="testBpms" class="org.mule.providers.bpm.test.TestBpms">
+    <spring:bean id="testBpms" class="org.mule.transport.bpm.test.TestBpms">
         <spring:property name="foo" value="bar"/>
     </spring:bean>
 

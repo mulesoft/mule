@@ -10,9 +10,9 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.impl.MuleMessage;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,7 +37,7 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
      * @param message the message being routed
      */
     // //@Override
-    protected void initialise(UMOMessage message)
+    protected void initialise(MuleMessage message)
     {
         if (message.getPayload() instanceof List)
         {
@@ -86,14 +86,14 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
     /**
      * @inheritDocs
      */
-    protected UMOMessage getMessagePart(UMOMessage message, UMOImmutableEndpoint endpoint)
+    protected MuleMessage getMessagePart(MuleMessage message, ImmutableEndpoint endpoint)
     {
         List payloads = (List) payloadContext.get();
 
         for (Iterator i = payloads.iterator(); i.hasNext();)
         {
             Object payload = i.next();
-            UMOMessage result = new MuleMessage(payload, (Map) propertiesContext.get());
+            MuleMessage result = new DefaultMuleMessage(payload, (Map) propertiesContext.get());
             // If there is no filter assume that the endpoint can accept the
             // message. Endpoints will be processed in order to only the last
             // (if any) of the the endpoints may not have a filter

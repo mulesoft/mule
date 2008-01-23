@@ -9,19 +9,19 @@
  */
 package org.mule.mule.model;
 
-import org.mule.impl.model.resolvers.MethodHeaderPropertyEntryPointResolver;
-import org.mule.providers.NullPayload;
+import org.mule.api.MuleEventContext;
+import org.mule.api.model.InvocationResult;
+import org.mule.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.model.InvocationResult;
+import org.mule.transport.NullPayload;
 
 public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
 {
     public void testMethodSetPass() throws Exception
     {
         MethodHeaderPropertyEntryPointResolver resolver = new MethodHeaderPropertyEntryPointResolver();
-        UMOEventContext ctx = getTestEventContext("blah");
+        MuleEventContext ctx = getTestEventContext("blah");
         ctx.getMessage().setProperty("method", "someBusinessMethod");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
@@ -30,7 +30,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
     public void testMethodSetWithNoArgsPass() throws Exception
     {
         MethodHeaderPropertyEntryPointResolver resolver = new MethodHeaderPropertyEntryPointResolver();
-        UMOEventContext ctx = getTestEventContext(NullPayload.getInstance());
+        MuleEventContext ctx = getTestEventContext(NullPayload.getInstance());
         ctx.getMessage().setProperty("method", "wash");
         InvocationResult result = resolver.invoke(new Apple(), ctx);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
@@ -41,7 +41,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
     {
         MethodHeaderPropertyEntryPointResolver resolver = new MethodHeaderPropertyEntryPointResolver();
         resolver.setMethodProperty("serviceMethod");
-        UMOEventContext ctx = getTestEventContext("blah");
+        MuleEventContext ctx = getTestEventContext("blah");
         ctx.getMessage().setProperty("serviceMethod", "someBusinessMethod");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
@@ -51,7 +51,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
     {
         MethodHeaderPropertyEntryPointResolver resolver = new MethodHeaderPropertyEntryPointResolver();
         resolver.setMethodProperty("serviceMethod");
-        UMOEventContext ctx = getTestEventContext("blah");
+        MuleEventContext ctx = getTestEventContext("blah");
         ctx.getMessage().setProperty("serviceMethod", "noMethod");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_FAILED);
@@ -61,7 +61,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
     {
         MethodHeaderPropertyEntryPointResolver resolver = new MethodHeaderPropertyEntryPointResolver();
         resolver.setMethodProperty("serviceMethod");
-        UMOEventContext ctx = getTestEventContext("blah");
+        MuleEventContext ctx = getTestEventContext("blah");
         ctx.getMessage().setProperty("myMethod", "someBusinessMethod");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_FAILED);
@@ -70,7 +70,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
     public void testMethodPropertyMismatch() throws Exception
     {
         MethodHeaderPropertyEntryPointResolver resolver = new MethodHeaderPropertyEntryPointResolver();
-        UMOEventContext ctx = getTestEventContext("blah");
+        MuleEventContext ctx = getTestEventContext("blah");
         ctx.getMessage().setProperty("method", "noMethod");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
         assertEquals(result.getState(), InvocationResult.STATE_INVOKED_FAILED);

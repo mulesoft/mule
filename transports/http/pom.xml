@@ -34,7 +34,7 @@
                                     !javax.security.auth, !javax.security.cert, !javax.xml.namespace,
                                     !javax.xml.transform, !org.xml.sax, !sun.misc, *
                                 </Import-Package>
-                                <Export-Package>org.mule.providers.http.*</Export-Package>
+                                <Export-Package>org.mule.transport.http.*</Export-Package>
                                 <Private-Package>
                                     org.mule.modules.osgi, org.apache.commons.codec.*,
                                     org.apache.commons.httpclient.*, org.mortbay.http.*, org.mortbay.jetty.*,

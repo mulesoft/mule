@@ -9,11 +9,11 @@
  */
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.api.routing.filter.Filter;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.umo.UMOFilter;
 
 /**
  * This allows a filter to be defined globally, or embedded within an endpoint.
@@ -27,7 +27,7 @@ public class FilterDefinitionParser extends ParentContextDefinitionParser
     public FilterDefinitionParser(Class filter)
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENTS, new MuleOrphanDefinitionParser(filter, false));
-        otherwise(new ChildDefinitionParser(FILTER, filter, UMOFilter.class, false));
+        otherwise(new ChildDefinitionParser(FILTER, filter, Filter.class, false));
         addIgnored(ATTRIBUTE_NAME);
     }
 
@@ -37,7 +37,7 @@ public class FilterDefinitionParser extends ParentContextDefinitionParser
     public FilterDefinitionParser()
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENTS, new MuleOrphanDefinitionParser(false));
-        otherwise(new ChildDefinitionParser(FILTER, null, UMOFilter.class, true));
+        otherwise(new ChildDefinitionParser(FILTER, null, Filter.class, true));
         addIgnored(ATTRIBUTE_NAME);
     }
 

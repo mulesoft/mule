@@ -25,7 +25,7 @@
                             <instructions>
                                 <!-- TODO This module needs reorganization in order to properly export its packages. -->
                                 <Export-Package>
-                                    org.mule.transformers.xml,
+                                    org.mule.transformer.xml,
                                     org.mule.routing.filters.xml
                                 </Export-Package>
                             </instructions>

@@ -10,14 +10,14 @@
 
 package org.mule.management;
 
+import org.mule.api.MuleException;
 import org.mule.config.i18n.Message;
-import org.mule.umo.UMOException;
 
 /**
  * <code>ManagementException</code> is a general exception thrown by management
  * extensions.
  */
-public abstract class ManagementException extends UMOException
+public abstract class ManagementException extends MuleException
 {
     /**
      * @param message the exception message

@@ -10,12 +10,12 @@
 
 package org.mule.examples.loanbroker;
 
-import org.mule.MuleException;
+import org.mule.api.DefaultMuleException;
 
 /**
  * Exception related to the LoanBroker example app.
  */
-public class LoanBrokerException extends MuleException
+public class LoanBrokerException extends DefaultMuleException
 {
     private static final long serialVersionUID = -1669865702115931005L;
 

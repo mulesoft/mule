@@ -9,13 +9,14 @@
  */
 package org.mule.tck.functional;
 
+import org.mule.api.MuleEventContext;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.lifecycle.InitialisationException;
+
+import junit.framework.AssertionFailedError;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import junit.framework.AssertionFailedError;
 
 public class CountdownCallback implements EventCallback
 {
@@ -26,7 +27,7 @@ public class CountdownCallback implements EventCallback
         this.countDown = new CountDownLatch(messagesExpected);
     }
 
-    public void eventReceived(UMOEventContext context, Object Component) throws Exception
+    public void eventReceived(MuleEventContext context, Object Component) throws Exception
     {
         synchronized (this)
         {            

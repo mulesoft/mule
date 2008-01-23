@@ -10,8 +10,8 @@
 
 package org.mule.extras.wssecurity.callbackhandlers;
 
-import org.mule.MuleException;
 import org.mule.RegistryContext;
+import org.mule.api.DefaultMuleException;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.IOException;
@@ -31,15 +31,15 @@ public class MuleWsSecurityCallbackHandler implements CallbackHandler
      * This is the standard Mule callback handler that gets a set of passwords from
      * the configuration file.
      * 
-     * @throws MuleException
+     * @throws DefaultMuleException
      */
-    public MuleWsSecurityCallbackHandler() throws MuleException
+    public MuleWsSecurityCallbackHandler() throws DefaultMuleException
     {
         PasswordContainer pass;
         pass = (PasswordContainer) RegistryContext.getRegistry().lookupObject("passwords");
         if(pass==null)
         {
-            throw new MuleException(CoreMessages.authNoCredentials());
+            throw new DefaultMuleException(CoreMessages.authNoCredentials());
         }
         passwords = pass.getPasswords();
     }
