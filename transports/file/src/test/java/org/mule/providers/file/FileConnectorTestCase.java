@@ -109,4 +109,24 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 //            ((FileMessageReceiver)receiver).getFrequency());
 //    }
 
+    public void testOnlySingleDispatcherPerEndpoint()
+    {
+        // MULE-1773 implies that we must only have one dispatcher per endpoint
+        FileConnector connector = (FileConnector) getConnector();
+
+        assertEquals(1, connector.getMaxDispatchersActive());
+
+        try
+        {
+            connector.setMaxDispatchersActive(2);
+            fail("expected IllegalArgumentException");
+        }
+        catch (IllegalArgumentException iax)
+        {
+            // OK - expected
+        }
+
+        // value must be unchanged
+        assertEquals(1, connector.getMaxDispatchersActive());        
+    }
 }
