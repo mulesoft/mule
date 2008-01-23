@@ -11,7 +11,6 @@
 package org.mule.transport.cxf.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.transport.cxf.CxfConnector;
 
 public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
@@ -22,7 +21,6 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMetaTransportEndpoints(CxfConnector.CXF);
         registerConnectorDefinitionParser(CxfConnector.class);
         registerBeanDefinitionParser("features", new FeaturesDefinitionParser());
-        registerBeanDefinitionParser("dummy-feature", new OrphanDefinitionParser(java.lang.Object.class, true));
     }
 
 }
