@@ -23,6 +23,7 @@ public class FeaturesDefinitionParser extends ChildSingletonMapDefinitionParser
 {
 
     public static final String PROPERTIES = "properties";
+    public static final String FEATURES = "features";
 
     public FeaturesDefinitionParser()
     {
@@ -31,7 +32,7 @@ public class FeaturesDefinitionParser extends ChildSingletonMapDefinitionParser
         addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_NO_RECURSE);
         PropertyConfiguration configuration = new SimplePropertyConfiguration();
         configuration.addCollection(MapEntryCombiner.VALUE);
-        registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, "features"));
+        registerPreProcessor(new AddAttribute(MapEntryCombiner.KEY, FEATURES));
         registerPostProcessor(
                 new NamedSetterChildElementIterator(
                         MapEntryCombiner.VALUE, new DefaultBeanAssemblerFactory(), configuration));

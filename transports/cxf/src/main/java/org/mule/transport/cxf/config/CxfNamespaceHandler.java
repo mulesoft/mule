@@ -20,7 +20,7 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerMetaTransportEndpoints(CxfConnector.CXF);
         registerConnectorDefinitionParser(CxfConnector.class);
-        registerBeanDefinitionParser("features", new FeaturesDefinitionParser());
+        registerBeanDefinitionParser(FeaturesDefinitionParser.FEATURES, new FeaturesDefinitionParser());
     }
 
 }
