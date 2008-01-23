@@ -23,7 +23,7 @@ public class UdpNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(UdpConnector.UDP, URIBuilder.SOCKET_ATTRIBUTES);
-        registerConnector(UdpConnector.class);
+        registerConnectorDefinitionParser(UdpConnector.class);
     }
 
 }

@@ -57,14 +57,14 @@ public class AllAttributeChildDefinitionParser
             if (!isIgnored(name))
             {
                 delegate.setAttributeName(name);
-                delegate.parseDelegate(element, parserContext);
+                delegate.muleParse(element, parserContext);
             }
         }
         return null;
     }
 
 
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext)
     {
         return parseInternal(element, parserContext);
     }

@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 
 import org.w3c.dom.Element;
+import org.springframework.beans.factory.xml.ParserContext;
 
 public class ConstructorReference implements PostProcessor
 {
@@ -25,7 +26,7 @@ public class ConstructorReference implements PostProcessor
         this.reference = reference;
     }
 
-    public void postProcess(BeanAssembler assembler, Element element)
+    public void postProcess(ParserContext unused, BeanAssembler assembler, Element element)
     {
         assembler.getBean().addConstructorArgReference(reference);
     }

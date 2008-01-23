@@ -68,6 +68,8 @@ public interface BeanAssembler
      */
     void extendTarget(String newName, Object newValue, boolean isReference);
 
+    void extendTarget(String oldName, String newName, Object newValue);
+
     /**
      * Insert the bean we have built into the target (typically the parent bean).
      *

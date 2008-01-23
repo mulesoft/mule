@@ -10,14 +10,15 @@
 
 package org.mule.config.spring.parsers.specific.endpoint.support;
 
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.PostProcessor;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.util.StringUtils;
 
+import org.w3c.dom.Element;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Element;
+import org.springframework.beans.factory.xml.ParserContext;
 
 /**
  * Routines and constants common to the two endpoint definition parsers.
@@ -68,7 +69,7 @@ public class EndpointUtils
     {
         parser.registerPostProcessor(new PostProcessor()
         {
-            public void postProcess(BeanAssembler assembler, Element element)
+            public void postProcess(ParserContext unused, BeanAssembler assembler, Element element)
             {
                 EndpointUtils.processConnectorDependency(assembler, element);
                 EndpointUtils.processTransformerDependencies(assembler, element);

@@ -13,7 +13,6 @@ import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.properties.NestedMapDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.quartz.QuartzConnector;
 

@@ -65,7 +65,7 @@ public class AttributeListEntryDefinitionParser
         }
         String value = attribute.getNodeValue();
         builder.setSource(new ChildListEntryDefinitionParser.ListEntry(value));
-        this.postProcess(getBeanAssembler(element, builder), element);
+        this.postProcess(parserContext, getBeanAssembler(element, builder), element);
     }
 
 }

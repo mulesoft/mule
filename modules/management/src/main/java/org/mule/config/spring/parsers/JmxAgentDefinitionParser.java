@@ -19,6 +19,7 @@ import java.util.Map;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.springframework.beans.factory.xml.ParserContext;
 
 /**
  * TODO
@@ -39,7 +40,7 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
     }
 
 
-    protected void postProcess(BeanAssembler assembler, Element element) {
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
         NodeList childNodes = element.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node node = childNodes.item(i);
@@ -53,6 +54,6 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
                 }
             }
         }
-        super.postProcess(assembler, element);
+        super.postProcess(context, assembler, element);
     }
 }

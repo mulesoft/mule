@@ -13,6 +13,7 @@ package org.mule.config.spring.parsers;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 
 import org.w3c.dom.Element;
+import org.springframework.beans.factory.xml.ParserContext;
 
 /**
  * This interface allows post-processing of the bean assmebler to be injected into
@@ -21,6 +22,6 @@ import org.w3c.dom.Element;
 public interface PostProcessor
 {
 
-    public void postProcess(BeanAssembler assembler, Element element);
+    public void postProcess(ParserContext context, BeanAssembler assembler, Element element);
 
 }

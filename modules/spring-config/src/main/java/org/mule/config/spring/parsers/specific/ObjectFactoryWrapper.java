@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
@@ -54,9 +55,9 @@ public class ObjectFactoryWrapper extends ParentDefinitionParser
         this.objectFactoryPropertyName = objectFactoryPropertyName;
     }
 
-    protected void postProcess(BeanAssembler assembler, Element element)
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
-        super.postProcess(assembler, element);
+        super.postProcess(context, assembler, element);
         BeanDefinition parent = getParentBeanDefinition(element);
         parent.setAttribute(OBJECT_FACTORY_SETTER, objectFactoryPropertyName);
     }

@@ -16,20 +16,22 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * This interface allows {@link org.mule.config.spring.parsers.delegate.AbstractParallelDelegatingDefinitionParser}
- * to forward the work of parsing to a particular sub-parser.  We exploit the fact that
- * (nearly?) all parsers subclass Spring's {@link org.springframework.beans.factory.xml.AbstractBeanDefinitionParser}
- * via {@link org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser} and so provide
- * these methods
- * ({@link #parseDelegate(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
- * has the same signature as
- * {@link org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#parseInternal(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
- * and so can be delegated).
+ * This is the interface all Mule BDPs implement.  It is a bit odd because it had to be retro-fitted
+ * to existing code.  In particular {@link org.springframework.beans.factory.xml.BeanDefinitionParser#parse(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
+ * and {@link #muleParse(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
+ * seem to duplicate each other.  This is because many Mule classes subclass a Spring helper which makes
+ * parse() final.  So instead we need to use {@link #muleParse(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)},
+ * to allow over-rides.
+ *
+ * <p>In case that's not clear - always call {@link # muleParse (org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}
+ * rather than {@link org.springframework.beans.factory.xml.BeanDefinitionParser#parse(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)}.
+ * The {@link org.springframework.beans.factory.xml.BeanDefinitionParser} is here only to allow the BDP
+ * to be handed over to Spring.
  */
 public interface MuleDefinitionParser extends BeanDefinitionParser, MuleDefinitionParserConfiguration
 {
 
-    AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext);
+    AbstractBeanDefinition muleParse(Element element, ParserContext parserContext);
 
     String getBeanName(Element element);
 

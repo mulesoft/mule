@@ -108,7 +108,9 @@
     <xsd:complexType name="abstractExtensionType"/>
 
     <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType"/>
-    <xsd:complexType name="abstractConnectorType"/>
+    <xsd:complexType name="abstractConnectorType">
+        <xsd:attribute name="name" type="substitutableName" use="required"/>
+    </xsd:complexType>    
 
     <xsd:element name="abstract-global-endpoint" abstract="true" type="abstractGlobalEndpointType"/>
     <xsd:complexType name="abstractGlobalEndpointType">
@@ -2242,7 +2244,6 @@
          inherit directly -->
 
     <xsd:attributeGroup name="connectorAttributes">
-        <xsd:attribute name="name" type="substitutableName" use="required"/>
         <xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
         <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
         <xsd:attribute name="numberOfConcurrentTransactedReceivers" type="substitutableInt"/>

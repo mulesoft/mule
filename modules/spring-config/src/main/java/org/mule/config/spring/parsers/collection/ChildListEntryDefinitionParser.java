@@ -54,13 +54,13 @@ public class ChildListEntryDefinitionParser extends ChildDefinitionParser
         fromText = false;
     }
 
-    protected void postProcess(BeanAssembler assembler, Element element)
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
         if (fromText)
         {
             assembler.extendBean(VALUE, SpringXMLUtils.getTextChild(element), false);
         }
-        super.postProcess(assembler, element);
+        super.postProcess(context, assembler, element);
     }
 
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)

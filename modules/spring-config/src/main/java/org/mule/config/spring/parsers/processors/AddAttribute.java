@@ -16,6 +16,7 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 
 import org.w3c.dom.Element;
+import org.springframework.beans.factory.xml.ParserContext;
 
 public class AddAttribute implements PreProcessor, PostProcessor
 {
@@ -29,7 +30,7 @@ public class AddAttribute implements PreProcessor, PostProcessor
         this.value = value;
     }
 
-    public void postProcess(BeanAssembler assembler, Element element)
+    public void postProcess(ParserContext unused, BeanAssembler assembler, Element element)
     {
         element.setAttribute(name, value);
     }

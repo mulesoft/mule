@@ -70,7 +70,7 @@ public class ComplexComponentDefinitionParser extends AbstractDelegatingDefiniti
         }
     }
 
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext)
     {
         switch (state)
         {
@@ -78,14 +78,14 @@ public class ComplexComponentDefinitionParser extends AbstractDelegatingDefiniti
             // first we parse the object factory, allowing it access to its own attributes
             // only.  this will search for the parent bean (which is presumably expecting a
             // factory to be injected) and wire itself up as the child.
-            AbstractBeanDefinition objectFactoryDefn = objectFactoryParser.parseDelegate(element, parserContext);
+            AbstractBeanDefinition objectFactoryDefn = objectFactoryParser.muleParse(element, parserContext);
             // next we fake the parent for the component, since this is where the properties
             // will need to be injected
             componentParser.forceParent(objectFactoryDefn);
             // now we do the initial parse for the component.  because this is wrapped in the
             // map mutator the properties are not set yet.  instead the bean assembler is stored
             // in the mutator
-            AbstractBeanDefinition componentDefn1 = componentParser.parseDelegate(element, parserContext);
+            AbstractBeanDefinition componentDefn1 = componentParser.muleParse(element, parserContext);
             state = POST_CHILDREN;
             // save the element to check below
             currentElement = element;
@@ -100,7 +100,7 @@ public class ComplexComponentDefinitionParser extends AbstractDelegatingDefiniti
                 throw new IllegalStateException("Cannot nest " + ClassUtils.getSimpleName(getClass()));
             }
             // child nodes have now been processed, so we can set the properties in the factory.
-            AbstractBeanDefinition componentDefn2 = componentParser.parseDelegate(element, parserContext);
+            AbstractBeanDefinition componentDefn2 = componentParser.muleParse(element, parserContext);
             // that should be it, so reset state for next use.
             state = START;
             return componentDefn2;

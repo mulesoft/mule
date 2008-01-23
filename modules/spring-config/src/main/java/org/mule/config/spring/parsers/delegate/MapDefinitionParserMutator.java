@@ -47,7 +47,7 @@ public class MapDefinitionParserMutator
         delegate.setBeanAssemblerFactory(new TwoStageMapBeanAssemblerFactory(this));
     }
 
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext)
     {
         if (pendingAssemblers.containsKey(element))
         {
@@ -63,7 +63,7 @@ public class MapDefinitionParserMutator
             // when the store callback is called, we can associate the assembler with this
             // element
             currentElement = element;
-            return getChildDelegate().parseDelegate(element, parserContext);
+            return getChildDelegate().muleParse(element, parserContext);
         }
     }
 

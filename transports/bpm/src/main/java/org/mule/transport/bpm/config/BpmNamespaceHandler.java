@@ -24,7 +24,7 @@ public class BpmNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(ProcessConnector.BPM, new String[]{PROCESS}).addAlias(PROCESS, URIBuilder.PATH);
-        registerConnector(ProcessConnector.class);
+        registerConnectorDefinitionParser(ProcessConnector.class);
     }
 
 }

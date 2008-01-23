@@ -22,7 +22,7 @@ public class ServletNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(ServletConnector.SERVLET, URIBuilder.SOCKET_ATTRIBUTES);
-        registerConnector(ServletConnector.class);
+        registerConnectorDefinitionParser(ServletConnector.class);
     }
 
 }

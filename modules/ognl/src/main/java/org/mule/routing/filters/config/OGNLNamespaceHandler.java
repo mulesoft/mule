@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.routing.filters.OGNLFilter;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
@@ -36,7 +37,7 @@ public class OGNLNamespaceHandler extends NamespaceHandlerSupport
             super(setterMethod, clazz);
         }
 
-        protected void postProcess(BeanAssembler assembler, Element element)
+        protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
         {
             assembler.extendTarget(setterMethod, element.getFirstChild().getNodeValue(), false);
         }

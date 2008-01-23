@@ -47,12 +47,12 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         registerBeanDefinitionParser(name, new IgnoredDefinitionParser());
     }
     
-    protected MuleDefinitionParserConfiguration registerConnector(Class connectorClass)
+    protected MuleDefinitionParserConfiguration registerConnectorDefinitionParser(Class connectorClass)
     {
-        return registerConnector( new MuleOrphanDefinitionParser(connectorClass, true));
+        return registerConnectorDefinitionParser( new MuleOrphanDefinitionParser(connectorClass, true));
     }
 
-    protected MuleDefinitionParserConfiguration registerConnector(MuleDefinitionParser parser)
+    protected MuleDefinitionParserConfiguration registerConnectorDefinitionParser(MuleDefinitionParser parser)
     {
         registerBeanDefinitionParser("connector", parser);
         return parser;

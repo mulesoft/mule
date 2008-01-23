@@ -34,7 +34,7 @@ public class RmiNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("endpoint", new TransportGlobalEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, ADDRESS, PROPERTIES)).addAlias(OBJECT, URIBuilder.PATH);
         registerMuleBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, InboundEndpointFactoryBean.class, ADDRESS, PROPERTIES)).addAlias(OBJECT, URIBuilder.PATH);
         registerMuleBeanDefinitionParser("outbound-endpoint", new TransportEndpointDefinitionParser(RmiConnector.RMI, TransportGlobalEndpointDefinitionParser.PROTOCOL, OutboundEndpointFactoryBean.class, ADDRESS, PROPERTIES)).addAlias(OBJECT, URIBuilder.PATH);
-        registerConnector(RmiConnector.class);
+        registerConnectorDefinitionParser(RmiConnector.class);
     }
 
 }

@@ -199,7 +199,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      * @param assembler the parsed (and probably totally defined) bean definition being built
      * @param element   the XML element that was the source of the bean definition's metadata
      */
-    protected void postProcess(BeanAssembler assembler, Element element)
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
         element.setAttribute(ATTRIBUTE_NAME, getBeanName(element));
         for (Iterator attributes = beanAttributes.iterator(); attributes.hasNext();)
@@ -208,7 +208,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
         }
         for (Iterator processes = postProcessors.iterator(); processes.hasNext();)
         {
-            ((PostProcessor) processes.next()).postProcess(assembler, element);
+            ((PostProcessor) processes.next()).postProcess(context, assembler, element);
         }
     }
 
@@ -390,7 +390,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
             Attr attribute = (Attr) attributes.item(x);
             processProperty(attribute, assembler);
         }
-        postProcess(assembler, element);
+        postProcess(getParserContext(), assembler, element);
     }
 
     //@Override
@@ -457,7 +457,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
                 || element.getParentNode().getLocalName().equals(ROOT_UNSAFE_ELEMENT);
     }
 
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext)
     {
         return parseInternal(element, parserContext);
     }

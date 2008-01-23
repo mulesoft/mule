@@ -37,9 +37,9 @@ public abstract class AbstractPluggableDelegate implements MuleDefinitionParser
         this.delegate = delegate;
     }
 
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext)
     {
-        return delegate.parseDelegate(element, parserContext);
+        return delegate.muleParse(element, parserContext);
     }
 
     public MuleDefinitionParserConfiguration registerPreProcessor(PreProcessor preProcessor)

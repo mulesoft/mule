@@ -58,7 +58,7 @@ public class AttributeMapDefinitionParser extends ChildDefinitionParser
         }
         builder.addPropertyValue("sourceMap", values);
         builder.addPropertyValue("targetMapClass", super.getBeanClass(element));
-        postProcess(getBeanAssembler(element, builder), element);
+        postProcess(parserContext, getBeanAssembler(element, builder), element);
     }
 
 }

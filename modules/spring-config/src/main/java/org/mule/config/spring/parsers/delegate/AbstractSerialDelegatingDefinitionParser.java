@@ -64,7 +64,7 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
         this.doReset = doReset;
     }
 
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext)
     {
         if (index == 0 || index >= size())
         {
@@ -117,7 +117,7 @@ public abstract class AbstractSerialDelegatingDefinitionParser extends AbstractD
     protected AbstractBeanDefinition doSingleBean(int index, MuleDefinitionParser parser,
                                                   Element element, ParserContext parserContext)
     {
-        return parser.parseDelegate(element, parserContext);
+        return parser.muleParse(element, parserContext);
     }
 
     protected MuleDefinitionParserConfiguration addDelegate(MuleDefinitionParser delegate)

@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
 import org.w3c.dom.Element;
+import org.springframework.beans.factory.xml.ParserContext;
 
 public class ScriptDefinitionParser extends MuleOrphanDefinitionParser
 {
@@ -29,10 +30,10 @@ public class ScriptDefinitionParser extends MuleOrphanDefinitionParser
         return String.class;
     }
     
-    protected void postProcess(BeanAssembler assembler, Element element)
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
         assembler.getBean().addConstructorArg(element.getFirstChild().getNodeValue());
-        super.postProcess(assembler, element);
+        super.postProcess(context, assembler, element);
     }
 
 }

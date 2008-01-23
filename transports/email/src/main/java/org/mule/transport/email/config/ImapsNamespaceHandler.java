@@ -23,7 +23,7 @@ public class ImapsNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(ImapsConnector.IMAPS, URIBuilder.USERHOST_ATTRIBUTES);
-        registerConnector(ImapsConnector.class);
+        registerConnectorDefinitionParser(ImapsConnector.class);
         registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
     }

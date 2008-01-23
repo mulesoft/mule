@@ -31,7 +31,7 @@ public class StdioNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(StdioConnector.STDIO, SYSTEM_ATTRIBUTE_ARRAY).addMapping(SYSTEM_ATTRIBUTE, SYSTEM_MAP).addAlias(SYSTEM_ATTRIBUTE, URIBuilder.PATH);
-        registerConnector(PromptStdioConnector.class);
+        registerConnectorDefinitionParser(PromptStdioConnector.class);
     }
 
 }

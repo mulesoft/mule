@@ -22,7 +22,7 @@ public class HttpsNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(HttpsConnector.HTTPS, URIBuilder.SOCKET_ATTRIBUTES);
-        registerConnector(HttpsConnector.class);
+        registerConnectorDefinitionParser(HttpsConnector.class);
         registerBeanDefinitionParser("tls-key-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-server", new ParentDefinitionParser());

@@ -23,7 +23,7 @@ public class SslNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(SslConnector.SSL, URIBuilder.SOCKET_ATTRIBUTES);
-        registerConnector(SslConnector.class);
+        registerConnectorDefinitionParser(SslConnector.class);
         registerBeanDefinitionParser("ssl-key-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("ssl-client", new ParentDefinitionParser());
         registerBeanDefinitionParser("ssl-server", new ParentDefinitionParser());

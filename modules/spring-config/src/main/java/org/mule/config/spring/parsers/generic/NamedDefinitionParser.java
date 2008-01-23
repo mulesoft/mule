@@ -69,9 +69,9 @@ public class NamedDefinitionParser extends ParentDefinitionParser
         return super.parseInternal(element, parserContext);
     }
 
-    protected void postProcess(BeanAssembler assembler, Element element)
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
-        super.postProcess(assembler, element);
+        super.postProcess(context, assembler, element);
         // may be used as top level element, so set ID from name
         AutoIdUtils.ensureUniqueId(element, "named");
     }

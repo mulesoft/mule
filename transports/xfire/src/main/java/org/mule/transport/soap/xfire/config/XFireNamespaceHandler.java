@@ -23,7 +23,7 @@ public class XFireNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerMetaTransportEndpoints(XFireConnector.XFIRE);
-        registerBeanDefinitionParser("connector", new XfireElementDefinitionParser());
+        registerConnectorDefinitionParser(new XfireElementDefinitionParser());
         registerBeanDefinitionParser("client-in-handler", new ChildListEntryDefinitionParser("clientInHandlers"));
         registerBeanDefinitionParser("client-out-handler", new ChildListEntryDefinitionParser("clientOutHandlers"));
         registerBeanDefinitionParser("client-service", new ChildListEntryDefinitionParser("clientServices"));

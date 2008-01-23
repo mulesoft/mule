@@ -21,7 +21,7 @@ public class JettyNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerMetaTransportEndpoints(JettyConnector.JETTY);
-        registerConnector(JettyConnector.class);
+        registerConnectorDefinitionParser(JettyConnector.class);
     }
 
 }

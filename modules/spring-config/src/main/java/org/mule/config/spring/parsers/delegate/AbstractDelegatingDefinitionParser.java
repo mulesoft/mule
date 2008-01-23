@@ -47,7 +47,7 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
 
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
-        return parseDelegate(element, parserContext);
+        return muleParse(element, parserContext);
     }
 
     protected AbstractDelegatingDefinitionParser(MuleDefinitionParser[] delegates)

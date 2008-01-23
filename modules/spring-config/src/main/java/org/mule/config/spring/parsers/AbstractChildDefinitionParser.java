@@ -56,7 +56,7 @@ public abstract class AbstractChildDefinitionParser
         super.doParse(element, parserContext, builder);
     }
 
-    protected void postProcess(BeanAssembler assembler, Element element)
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
         // legacy handling of orphan beans - avoid setting parent
         if (null != getPropertyName(element))
@@ -64,7 +64,7 @@ public abstract class AbstractChildDefinitionParser
             assembler.insertBeanInTarget(getPropertyName(element));
         }
 
-        super.postProcess(assembler, element);
+        super.postProcess(context, assembler, element);
     }
 
     public String getBeanName(Element e)

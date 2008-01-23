@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xsd:schema xmlns="http://www.mulesource.org/schema/mule/cxf/2.0"
+            xmlns:cxf="http://cxf.apache.org/core"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
             xmlns:beans="http://www.springframework.org/schema/beans"
@@ -11,7 +12,9 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans"/>
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0" 
-                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd" />
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
+    <xsd:import namespace="http://cxf.apache.org/core"
+                schemaLocation="http://cxf.apache.org/schemas/core.xsd"/>
 
     <xsd:element name="connector" type="cxfConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:complexType name="cxfConnectorType">
@@ -27,6 +30,7 @@
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractInboundEndpointType">
+                <xsd:group ref="endpointElements"/>
                 <xsd:attributeGroup ref="endpointAttributes"/>
                 <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
@@ -37,6 +41,7 @@
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractGlobalEndpointType">
+                <xsd:group ref="endpointElements"/>
                 <xsd:attributeGroup ref="endpointAttributes"/>
                 <xsd:attributeGroup ref="mule:defaultEndpointAttributes"/>
             </xsd:extension>
@@ -58,7 +63,7 @@
             <xsd:element name="binding" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="executor" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="features" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element ref="features" minOccurs="0"/>
             <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="invoker" type="xsd:anyType" minOccurs="0"/>
@@ -74,5 +79,15 @@
             <xsd:element name="schemaLocation" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:element name="features">
+        <xsd:complexType>
+            <xsd:sequence>
+                <!-- maxOccurs defined for test - once there's some other feature,
+                     remove and update FeaturesTestCase -->
+                <xsd:element ref="cxf:logging" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
 
 </xsd:schema>

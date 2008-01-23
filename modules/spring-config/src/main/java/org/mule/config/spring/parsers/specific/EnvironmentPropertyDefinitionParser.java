@@ -13,6 +13,7 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 
 import org.springframework.util.SystemPropertyUtils;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 public class EnvironmentPropertyDefinitionParser extends MuleOrphanDefinitionParser
@@ -32,7 +33,7 @@ public class EnvironmentPropertyDefinitionParser extends MuleOrphanDefinitionPar
         return String.class;
     }
 
-    protected void postProcess(BeanAssembler assembler, Element element)
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
         String name = element.getAttribute(NAME_ATTR);
         if(name.indexOf(' ') != -1)
@@ -42,6 +43,6 @@ public class EnvironmentPropertyDefinitionParser extends MuleOrphanDefinitionPar
 
         String value = element.getAttribute(VALUE_ATTR);
         assembler.getBean().addConstructorArg(SystemPropertyUtils.resolvePlaceholders(value));
-        super.postProcess(assembler, element);
+        super.postProcess(context, assembler, element);
     }
 }

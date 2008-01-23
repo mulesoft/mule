@@ -18,7 +18,7 @@ public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
 
     public void init()
     {
-        registerConnector(TestConnector.class);
+        registerConnectorDefinitionParser(TestConnector.class);
     }
 
 }

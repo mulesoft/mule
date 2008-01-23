@@ -30,7 +30,7 @@ public class SmtpNamespaceHandler extends AbstractMuleNamespaceHandler
                 .addAlias("bcc", MailProperties.BCC_ADDRESSES_PROPERTY)
                 .addAlias("from", MailProperties.FROM_ADDRESS_PROPERTY)
                 .addAlias("replyTo", MailProperties.REPLY_TO_ADDRESSES_PROPERTY);
-        registerConnector(SmtpConnector.class);
+        registerConnectorDefinitionParser(SmtpConnector.class);
         registerBeanDefinitionParser("header", new ChildMapEntryDefinitionParser("customHeaders", "key", "value"));
     }
 }

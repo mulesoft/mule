@@ -23,7 +23,7 @@ public class ImapNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(ImapConnector.IMAP, URIBuilder.USERHOST_ATTRIBUTES);
-        registerConnector(ImapConnector.class);
+        registerConnectorDefinitionParser(ImapConnector.class);
     }
 
 }

@@ -14,6 +14,7 @@ import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.SingleProperty;
 import org.mule.config.spring.parsers.assembly.configuration.SinglePropertyLiteral;
+import org.mule.config.spring.parsers.assembly.configuration.SinglePropertyWrapper;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.util.SpringXMLUtils;
@@ -49,7 +50,7 @@ public class DefaultBeanAssembler implements BeanAssembler
     private BeanDefinition target;
 
     public DefaultBeanAssembler(PropertyConfiguration beanConfig, BeanDefinitionBuilder bean,
-                             PropertyConfiguration targetConfig, BeanDefinition target)
+                                PropertyConfiguration targetConfig, BeanDefinition target)
     {
         this.beanConfig = beanConfig;
         this.bean = bean;
@@ -150,6 +151,13 @@ public class DefaultBeanAssembler implements BeanAssembler
                 new SinglePropertyLiteral(isReference), newName, newValue);
     }
     
+    public void extendTarget(String oldName, String newName, Object newValue)
+    {
+        assertTargetPresent();
+        addPropertyWithReference(target.getPropertyValues(),
+                new SinglePropertyWrapper(oldName, getTargetConfig()), newName, newValue);
+    }
+
     /**
      * Insert the bean we have built into the target (typically the parent bean).
      *

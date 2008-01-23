@@ -23,7 +23,7 @@ public class TlsNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(TlsConnector.TLS, URIBuilder.SOCKET_ATTRIBUTES);
-        registerConnector(TlsConnector.class);
+        registerConnectorDefinitionParser(TlsConnector.class);
         registerBeanDefinitionParser("tls-key-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-server", new ParentDefinitionParser());

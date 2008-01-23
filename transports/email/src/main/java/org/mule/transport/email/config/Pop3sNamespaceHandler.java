@@ -23,7 +23,7 @@ public class Pop3sNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(Pop3sConnector.POP3S, URIBuilder.USERHOST_ATTRIBUTES);
-        registerConnector(Pop3sConnector.class);
+        registerConnectorDefinitionParser(Pop3sConnector.class);
         registerBeanDefinitionParser("tls-trust-store", new ParentDefinitionParser());
         registerBeanDefinitionParser("tls-client", new ParentDefinitionParser());
     }

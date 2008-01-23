@@ -18,6 +18,7 @@ import org.mule.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
@@ -106,9 +107,9 @@ public abstract class AbstractHierarchicalDefinitionParser extends AbstractMuleB
     }
 
     // reset the forced parent
-    protected void postProcess(BeanAssembler assembler, Element element)
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
-        super.postProcess(assembler, element);
+        super.postProcess(context, assembler, element);
         forcedParent = null;
     }
     

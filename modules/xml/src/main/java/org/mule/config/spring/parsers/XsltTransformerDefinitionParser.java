@@ -24,6 +24,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.springframework.beans.factory.xml.ParserContext;
 
 public class XsltTransformerDefinitionParser extends MuleOrphanDefinitionParser
 {
@@ -37,7 +38,7 @@ public class XsltTransformerDefinitionParser extends MuleOrphanDefinitionParser
         addAlias("transformerFactoryClass", "xslTransformerFactory");
     }
 
-    protected void postProcess(BeanAssembler assembler, Element element)
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
     {
         NodeList children = element.getChildNodes();
         if (0 != children.getLength())
@@ -60,7 +61,7 @@ public class XsltTransformerDefinitionParser extends MuleOrphanDefinitionParser
                 element.removeChild(stylesheet);
             }
         }
-        super.postProcess(assembler, element);
+        super.postProcess(context, assembler, element);
     }
 
     protected String domToString(Element dom)

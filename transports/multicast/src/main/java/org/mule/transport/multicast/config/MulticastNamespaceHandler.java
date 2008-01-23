@@ -23,7 +23,7 @@ public class MulticastNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(MulticastConnector.MULTICAST, URIBuilder.SOCKET_ATTRIBUTES);
-        registerConnector(MulticastConnector.class);
+        registerConnectorDefinitionParser(MulticastConnector.class);
     }
 
 }

@@ -22,6 +22,6 @@ public class Pop3NamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(Pop3Connector.POP3, URIBuilder.USERHOST_ATTRIBUTES);
-        registerConnector(Pop3Connector.class);
+        registerConnectorDefinitionParser(Pop3Connector.class);
     }
 }

@@ -39,9 +39,9 @@ public abstract class AbstractParallelDelegatingDefinitionParser extends Abstrac
         super(delegates);
     }
 
-    public AbstractBeanDefinition parseDelegate(Element element, ParserContext parserContext)
+    public AbstractBeanDefinition muleParse(Element element, ParserContext parserContext)
     {
-        return getDelegate(element, parserContext).parseDelegate(element, parserContext);
+        return getDelegate(element, parserContext).muleParse(element, parserContext);
     }
 
     protected abstract MuleDefinitionParser getDelegate(Element element, ParserContext parserContext);
