@@ -59,6 +59,18 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         this.spring = spring;
     }
 
+    public boolean isDefaultNamespace(String namespaceUri)
+    {
+        if (StringUtils.isEmpty(namespaceUri))
+        {
+            return false;
+        }
+        else
+        {
+            return super.isDefaultNamespace(namespaceUri);
+        }
+    }
+
     public BeanDefinition parseCustomElement(Element element, BeanDefinition parent)
     {
         if (logger.isDebugEnabled())
