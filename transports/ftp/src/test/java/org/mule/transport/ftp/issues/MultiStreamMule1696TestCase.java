@@ -88,10 +88,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
 
         // repeat, but restart server due to simple state, connection limitations
         stopServer();
-        synchronized(this)
-        {
-            wait(2000); // TCP socket timeout
-        }
+        Thread.sleep(3000); // wait for scket to close
         startServer();
 
         CountDownLatch latch2 = new CountDownLatch(1);
