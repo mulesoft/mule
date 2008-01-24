@@ -65,11 +65,10 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
             throw new ConfigurationException(CoreMessages.objectIsNull("Configuration Resource"));
         }
 
-        logger.info("Configuring Mule with configuration resource(s) \"" + createConfigResourcesString()
-                    + "\" using " + this.getClass().getName());
-
         super.configure(muleContext);
 
+        logger.info(CoreMessages.configurationBuilderSuccess(this, createConfigResourcesString()));
+        
         muleContext.getRegistry().getConfiguration().setConfigResources(configResources);
     }
 
@@ -104,7 +103,7 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
         }
     }
 
-    private String createConfigResourcesString()
+    protected String createConfigResourcesString()
     {
         StringBuffer configResourcesString = new StringBuffer();
         configResourcesString.append("[");

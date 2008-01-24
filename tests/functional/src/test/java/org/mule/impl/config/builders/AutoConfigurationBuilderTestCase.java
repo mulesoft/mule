@@ -57,9 +57,20 @@ public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
     public void testConfigureUnkownExtension() throws ConfigurationException
     {
         ConfigurationBuilder configurationBuilder = new AutoConfigurationBuilder("my.dtd");
-        configurationBuilder.configure(muleContext);
 
-        // This currently doesn't fail, a warning is logged.
+        try
+        {
+            configurationBuilder.configure(muleContext);
+        }
+        catch (ConfigurationException ce)
+        {
+            assertEquals(
+                "No suitable configuration builder for resource \"my.dtd\" found.  Check you have configuration module ion your classpath and are using correct file extension.",
+                ce.getCause().getMessage());
+        }
+        catch (Exception e)
+        {
+            fail("Exception unexpected:" + e);
+        }
     }
-
 }

@@ -10,10 +10,11 @@
 
 package org.mule;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleContext;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.config.ConfigurationException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
@@ -50,7 +51,7 @@ public class MuleServer implements Runnable
     /**
      * Don't use a class object so the core doesn't depend on mule-module-spring-config.
      */
-    protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
+    protected static final String CLASSNAME_DEFAULT_CONFIG_BUILDER = "org.mule.config.builders.AutoConfigurationBuilder";
 
     /**
      * This builder sets up the configuration for an idle Mule node - a node that
@@ -63,7 +64,7 @@ public class MuleServer implements Runnable
      * the core doesn't depend on mule-module-spring. TODO this may not be a problem
      * for Mule 2.x
      */
-    protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.extras.spring.config.MuleXmlConfigurationBuilder";
+    protected static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
 
     /**
      * logger used by this class
@@ -307,8 +308,7 @@ public class MuleServer implements Runnable
     }
 
     /**
-     * Initializes this daemon. Derived classes could add some extra behaviour if
-     * they wish.
+     * Initializes this daemon. Derived classes could add some extra behaviour if they wish.
      * 
      * @throws Exception if failed to initialize
      */
@@ -316,21 +316,34 @@ public class MuleServer implements Runnable
     {
         Runtime.getRuntime().addShutdownHook(new ShutdownThread());
 
-        // create a new ConfigurationBuilder that is disposed afterwards
-        Class cfgBuilderClass = ClassUtils.loadClass(getConfigBuilderClassName(), MuleServer.class);
-        ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) cfgBuilderClass.newInstance();
+        if (configurationResources == null)
+        {
+            logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
+            configurationResources = DEFAULT_CONFIGURATION;
+        }
+
+        ConfigurationBuilder cfgBuilder;
+
+        try
+        {
+            // create a new ConfigurationBuilder that is disposed afterwards
+            cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(getConfigBuilderClassName(),
+                new Object[]{configurationResources}, MuleServer.class);
+        }
+        catch (Exception e)
+        {
+            throw new ConfigurationException(CoreMessages.failedToLoad(getConfigBuilderClassName()), e);
+        }
 
         if (!cfgBuilder.isConfigured())
         {
-            if (configurationResources == null)
+            Properties startupProperties= null;
+            if (getStartupPropertiesFile() != null)
             {
-                logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
-                configurationResources = DEFAULT_CONFIGURATION;
+                startupProperties = PropertiesUtils.loadProperties(getStartupPropertiesFile(), getClass());
             }
-            Properties startupProperties = PropertiesUtils.loadProperties(getStartupPropertiesFile(),
-                getClass());
             DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            muleContextFactory.createMuleContext(configurationResources, startupProperties);
+            muleContext = muleContextFactory.createMuleContext(cfgBuilder, startupProperties);
         }
     }
 
@@ -357,14 +370,20 @@ public class MuleServer implements Runnable
         msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
         msgs.add(" ");
         msgs.add(CoreMessages.fatalErrorInShutdown());
-        msgs.add(CoreMessages.serverStartedAt(muleContext.getStartDate()));
+        if (muleContext != null)
+        {
+            msgs.add(CoreMessages.serverStartedAt(muleContext.getStartDate()));
+        }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
 
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
         logger.fatal(shutdownMessage);
 
         // make sure that Mule is shutdown correctly.
-        muleContext.dispose();
+        if (muleContext != null)
+        {
+            muleContext.dispose();
+        }
         System.exit(0);
     }
 
@@ -450,7 +469,7 @@ public class MuleServer implements Runnable
     {
         public void run()
         {
-            if (!muleContext.isDisposed() && !muleContext.isDisposing())
+            if (muleContext !=null && !muleContext.isDisposed() && !muleContext.isDisposing())
             {
                 muleContext.dispose();
             }

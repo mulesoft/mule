@@ -13,6 +13,10 @@ package org.mule.config.builders;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.config.i18n.CoreMessages;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A support class for {@link org.mule.api.config.ConfigurationBuilder} implementations
@@ -23,6 +27,7 @@ import org.mule.api.config.ConfigurationException;
  */
 public abstract class AbstractConfigurationBuilder implements ConfigurationBuilder
 {
+    protected static final Log logger = LogFactory.getLog(AbstractConfigurationBuilder.class);
 
     private boolean configured = false;
 
@@ -35,6 +40,7 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
         }
         catch (Exception e)
         {
+            logger.error(CoreMessages.configurationBuilderError(this), e);
             throw new ConfigurationException(e);
         }
     }

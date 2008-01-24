@@ -119,12 +119,19 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateMuleContextString() throws InitialisationException, ConfigurationException
     {
-        MuleContext muleContext = muleContextFactory.createMuleContext("my-resource.xml");
+        try
+        {
+            MuleContext muleContext = muleContextFactory.createMuleContext("my-resource.xml");
 
-        // Assert MuleContext config
-        testMuleContext(muleContext);
+        }
+        catch (ConfigurationException e)
+        {
+            assertEquals(
+                "No suitable configuration builder for resource \"my-resource.xml\" found.  Check you have configuration module ion your classpath and are using correct file extension.",
+                e.getCause().getMessage());
+        }
+        assertNull(muleContext);
 
-        testNoDefaults(muleContext);
     }
 
     public void testCreateMuleContextStringProperties() throws InitialisationException, ConfigurationException
@@ -133,15 +140,19 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         properties.put("testKey1", "testValue1");
         properties.put("testKey2", "testValue2");
 
-        MuleContext muleContext = muleContextFactory.createMuleContext("my-resource.xml", properties);
+        try
+        {
+            MuleContext muleContext = muleContextFactory.createMuleContext("my-resource.xml", properties);
 
-        // Assert MuleContext config
-        testMuleContext(muleContext);
+        }
+        catch (ConfigurationException e)
+        {
+            assertEquals(
+                "No suitable configuration builder for resource \"my-resource.xml\" found.  Check you have configuration module ion your classpath and are using correct file extension.",
+                e.getCause().getMessage());
+        }
 
-        assertEquals("testValue1", muleContext.getRegistry().lookupObject("testKey1"));
-        assertEquals("testValue2", muleContext.getRegistry().lookupObject("testKey2"));
-
-        testNoDefaults(muleContext);
+        assertNull(muleContext);
     }
 
     public void testCreateMuleContextConfigurationBuilderProperties()
