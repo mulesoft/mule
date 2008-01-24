@@ -775,8 +775,8 @@
     <!--   Filter elements                                            -->
     <!--==============================================================-->
 
-    <xsd:element name="filter" type="filterRefType" substitutionGroup="abstract-filter"/>
-    <xsd:complexType name="filterRefType">
+    <xsd:element name="filter" type="refFilterType" substitutionGroup="abstract-filter"/>
+    <xsd:complexType name="refFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractFilterType">
                 <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required"/>
@@ -868,8 +868,8 @@
     <!--   Transformer elements                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="transformer" type="transformerRefType" substitutionGroup="abstract-transformer"/>
-    <xsd:complexType name="transformerRefType">
+    <xsd:element name="transformer" type="refTransformerType" substitutionGroup="abstract-transformer"/>
+    <xsd:complexType name="refTransformerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransformerType">
                 <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required"/>
