@@ -1775,13 +1775,13 @@
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:element name="spring-factory-bean" type="springFactoryBeanType" substitutionGroup="abstract-object-factory"/>
-    <xsd:complexType name="springFactoryBeanType">
+    <xsd:element name="spring-object" type="springBeanLookupType" substitutionGroup="abstract-object-factory"/>
+    <xsd:complexType name="springBeanLookupType">
         <xsd:complexContent>
             <xsd:extension base="abstractObjectFactoryType">
-                <xsd:attribute name="ref" type="xsd:string">
+                <xsd:attribute name="bean" type="substitutableName">
                     <xsd:annotation>
-                        <xsd:documentation>Name of bean which implements the Spring FactoryBean interface</xsd:documentation>
+                        <xsd:documentation>Name of Spring bean to look up</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
@@ -1795,11 +1795,6 @@
                 <xsd:attribute name="class" type="substitutableClass">
                     <xsd:annotation>
                         <xsd:documentation>Class name</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="instance-ref" type="xsd:NMTOKEN">
-                    <xsd:annotation>
-                        <xsd:documentation>Singleton object instance to use</xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>

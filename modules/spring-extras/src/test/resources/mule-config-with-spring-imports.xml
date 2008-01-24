@@ -17,7 +17,7 @@
             </inbound>
 
             <component>
-                <singleton-object instance-ref="apple"/>
+                <spring-object bean="apple"/>
             </component>
         </service>
     </model>

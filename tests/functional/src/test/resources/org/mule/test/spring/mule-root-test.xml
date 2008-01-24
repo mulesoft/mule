@@ -22,7 +22,7 @@
                 <inbound-endpoint ref="endpoint"/>
             </inbound>
             <component>
-                <singleton-object instance-ref="poot"/>
+                <spring-object bean="poot"/>
             </component>
         </service>
     </model>

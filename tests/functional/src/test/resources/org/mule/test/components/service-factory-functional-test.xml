@@ -23,13 +23,25 @@
 
         <service name="orange3">
             <component>
-                <singleton-object instance-ref="myOnlyOrange"/>
+                <singleton-object class="org.mule.tck.testmodels.fruit.Orange"/>
             </component>
         </service>
 
         <service name="orange4">
             <component>
-                <spring-factory-bean ref="&amp;myCustomFactory"/>
+                <spring-object bean="myOnlyOrange"/>
+            </component>
+        </service>
+        
+        <service name="orange5">
+            <component>
+                <spring-object bean="myOrangeFactory"/>
+            </component>
+        </service>
+
+        <service name="orange6">
+            <component>
+                <spring-object bean="myNonStandardOrangeFactory"/>
             </component>
         </service>
     </model>
@@ -37,9 +49,15 @@
     <!-- Singleton instance -->
     <spring:bean name="myOnlyOrange" class="org.mule.tck.testmodels.fruit.Orange"/>
 
-    <!-- Spring FactoryBean -->
-    <spring:bean id="myCustomFactory" class="org.mule.tck.testmodels.fruit.FloridaSunnyOrangeFactory">
+    <!-- Spring FactoryBean implementation -->
+    <spring:bean id="myOrangeFactory" class="org.mule.tck.testmodels.fruit.FloridaSunnyOrangeFactoryBean">
         <spring:property name="segments" value="8"/>
         <spring:property name="radius" value="15"/>
     </spring:bean>
+
+    <!-- POJO used as FactoryBean -->
+    <spring:bean id="myNonStandardOrangeFactory" 
+                 class="org.mule.tck.testmodels.fruit.FloridaSunnyOrangeFactory" 
+                 factory-method="giveMeAnOrange"/>
+
 </mule>

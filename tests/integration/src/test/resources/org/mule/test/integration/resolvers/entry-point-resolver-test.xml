@@ -21,7 +21,7 @@
             </inbound>
             <component>
                 <legacy-entry-point-resolver-set/>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
     </model>
@@ -33,7 +33,7 @@
                 <vm:inbound-endpoint path="array"/>
             </inbound>
             <component>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
     </model>
@@ -46,7 +46,7 @@
             </inbound>
             <component>
                 <callable-entry-point-resolver/>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
 
@@ -56,7 +56,7 @@
             </inbound>
             <component>
                 <custom-entry-point-resolver class="org.mule.test.integration.resolvers.CustomEntryPointResolver"/>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
         
@@ -69,7 +69,7 @@
                     <include-entry-point method="methodString"/>
                     <include-entry-point method="methodInteger"/>
                 </method-entry-point-resolver>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
 
@@ -80,7 +80,7 @@
             </inbound>
             <component>
                 <no-arguments-entry-point-resolver/>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
 
@@ -90,7 +90,7 @@
             </inbound>
             <component>
                 <property-entry-point-resolver property="propertyName"/>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
 
@@ -102,7 +102,7 @@
                 <reflection-entry-point-resolver>
                     <exclude-entry-point method="methodInteger"/>
                 </reflection-entry-point-resolver>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
 
@@ -119,7 +119,7 @@
                         <exclude-entry-point method="methodInteger"/>
                     </reflection-entry-point-resolver>
                 </entry-point-resolver-set>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
 

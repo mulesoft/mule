@@ -22,7 +22,7 @@
                     <exclude-entry-point method="unused"/>
                     <exclude-entry-point method="selected"/>
                 </no-arguments-entry-point-resolver>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
 
@@ -34,7 +34,7 @@
                 <no-arguments-entry-point-resolver>
                     <include-entry-point method="selected"/>
                 </no-arguments-entry-point-resolver>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
 

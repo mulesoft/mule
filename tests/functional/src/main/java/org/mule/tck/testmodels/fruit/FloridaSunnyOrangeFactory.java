@@ -10,46 +10,16 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.springframework.beans.factory.FactoryBean;
 
-
-public class FloridaSunnyOrangeFactory implements FactoryBean
+/**
+ * A simple object factory for unit testing.
+ */
+public class FloridaSunnyOrangeFactory 
 {
-    Integer segments = new Integer(10);
-    Double radius = new Double(4.34);
-    
-    public Object getObject() throws Exception
+    public static Orange giveMeAnOrange() 
     {
-        return new Orange(segments, radius, "Florida Sunny");
-    }
-
-    public Class getObjectType()
-    {
-        return Orange.class;
-    }
-
-    public boolean isSingleton()
-    {
-        return false;
-    }
-
-    public Double getRadius()
-    {
-        return radius;
-    }
-
-    public void setRadius(Double radius)
-    {
-        this.radius = radius;
-    }
-
-    public Integer getSegments()
-    {
-        return segments;
-    }
-
-    public void setSegments(Integer segments)
-    {
-        this.segments = segments;
+        Orange o = new Orange();
+        o.setBrand("Florida Sunny");
+        return o;
     }
 }

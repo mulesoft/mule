@@ -30,17 +30,8 @@
                 <xfire:inbound-endpoint address="http://localhost:63999/services"/>
             </inbound>
             <component>
-                <singleton-object instance-ref="service">
-                    <properties>
-                        <spring:entry key="SOAP_NAMESPACE_PROPERTY" value="http://services.testmodels.tck.mule.org"/>
-                        <spring:entry key="style" value="document"/>
-                        <spring:entry key="use" value="literal"/>
-                    </properties>
-                </singleton-object>
+                <singleton-object class="org.mule.transport.soap.xfire.testmodels.XFireComplexTypeService"/>
             </component>
         </service>
     </model>
-
-    <spring:bean id="service" class="org.mule.transport.soap.xfire.testmodels.XFireComplexTypeService"/>
-
 </mule>

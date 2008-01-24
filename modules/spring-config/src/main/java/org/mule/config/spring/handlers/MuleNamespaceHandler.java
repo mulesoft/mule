@@ -48,7 +48,6 @@ import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceOverridesDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimplePojoServiceDefinitionParser;
-import org.mule.config.spring.parsers.specific.SpringFactoryBeanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
@@ -136,6 +135,7 @@ import org.mule.transport.SimpleRetryConnectionStrategy;
 import org.mule.util.object.PooledObjectFactory;
 import org.mule.util.object.PrototypeObjectFactory;
 import org.mule.util.object.SingletonObjectFactory;
+import org.mule.util.object.SpringBeanLookup;
 import org.mule.util.properties.FunctionPropertyExtractor;
 import org.mule.util.properties.MapPayloadPropertyExtractor;
 import org.mule.util.properties.MessageHeaderPropertyExtractor;
@@ -275,7 +275,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("singleton-object", new ObjectFactoryDefinitionParser(SingletonObjectFactory.class));
         registerBeanDefinitionParser("prototype-object", new ObjectFactoryDefinitionParser(PrototypeObjectFactory.class));
         registerBeanDefinitionParser("pooled-object", new ObjectFactoryDefinitionParser(PooledObjectFactory.class));
-        registerBeanDefinitionParser("spring-factory-bean", new SpringFactoryBeanDefinitionParser());
+        registerBeanDefinitionParser("spring-object", new ObjectFactoryDefinitionParser(SpringBeanLookup.class));
 
         //Routers
         registerBeanDefinitionParser("inbound", new ChildDefinitionParser("inboundRouter", DefaultInboundRouterCollection.class));

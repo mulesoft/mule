@@ -132,7 +132,7 @@
                     <mule:inbound-endpoint ref="CreditAgency" />
                 </mule:inbound>
                 <mule:component>
-                    <mule:singleton-object instance-ref="creditAgencyEJB"/>
+                    <mule:spring-object bean="creditAgencyEJB"/>
                 </mule:component>
             </mule:service>
 

@@ -36,7 +36,7 @@
                     </mule:inbound-endpoint>
                 </mule:inbound>
                 <mule:component>
-                    <mule:singleton-object instance-ref="echoComponent"/>
+                    <mule:spring-object bean="echoComponent"/>
                 </mule:component>
                 <mule:outbound>
                     <mule:outbound-pass-through-router>

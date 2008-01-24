@@ -33,7 +33,7 @@
                 <inbound-endpoint name="endpoint" address="test://${property}"/>
             </inbound>
             <component>
-                <singleton-object instance-ref="poot"/>
+                <spring-object bean="poot"/>
             </component>
         </service>
     </model>

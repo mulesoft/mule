@@ -73,8 +73,32 @@
 
     <spring:bean name="apple" class="org.mule.tck.testmodels.fruit.Apple"/>
 
-    <spring:bean name="orange" class="org.mule.tck.testmodels.fruit.Orange"/>
-
+    <spring:bean name="orange" class="org.mule.tck.testmodels.fruit.Orange">
+        <spring:property name="brand" value="Juicy Baby!"/>
+        <spring:property name="segments" value="9"/>
+        <spring:property name="radius" value="4.21"/>
+        <spring:property name="mapProperties">
+            <spring:map>
+                <spring:entry key="prop1" value="prop1"/>
+                <spring:entry key="prop2" value="prop2"/>
+            </spring:map>
+        </spring:property>
+        <spring:property name="listProperties">
+            <spring:list>
+                <spring:value>prop1</spring:value>
+                <spring:value>prop2</spring:value>
+                <spring:value>prop3</spring:value>
+            </spring:list>
+        </spring:property>
+        <spring:property name="arrayProperties">
+            <spring:list>
+                <spring:value>prop4</spring:value>
+                <spring:value>prop5</spring:value>
+                <spring:value>prop6</spring:value>
+            </spring:list>
+        </spring:property>
+    </spring:bean>
+    
     <model name="main">
 
         <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
@@ -98,34 +122,7 @@
             </inbound>
 
             <component>
-                <singleton-object instance-ref="orange">
-                    <!-- no attempt made to simplify this! -->
-                    <properties>
-                        <spring:entry key="brand" value="Juicy Baby!"/>
-                        <spring:entry key="segments" value="9"/>
-                        <spring:entry key="radius" value="4.21"/>
-                        <spring:entry key="mapProperties">
-                            <spring:map>
-                                <spring:entry key="prop1" value="prop1"/>
-                                <spring:entry key="prop2" value="prop2"/>
-                            </spring:map>
-                        </spring:entry>
-                        <spring:entry key="listProperties">
-                            <spring:list>
-                                <spring:value>prop1</spring:value>
-                                <spring:value>prop2</spring:value>
-                                <spring:value>prop3</spring:value>
-                            </spring:list>
-                        </spring:entry>
-                        <spring:entry key="arrayProperties">
-                            <spring:list>
-                                <spring:value>prop4</spring:value>
-                                <spring:value>prop5</spring:value>
-                                <spring:value>prop6</spring:value>
-                            </spring:list>
-                        </spring:entry>
-                    </properties>
-                </singleton-object>
+                <spring-object bean="orange"/>
                 <binding interface="org.mule.tck.testmodels.fruit.FruitCleaner" method="wash">
                     <outbound-endpoint address="test://do.wash"/>
                 </binding>
@@ -163,7 +160,7 @@
             </inbound>
 
             <component>
-                <singleton-object instance-ref="apple"/>
+                <spring-object bean="apple"/>
             </component>
 
             <outbound>

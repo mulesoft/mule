@@ -39,7 +39,7 @@
                 <no-arguments-entry-point-resolver>
                     <include-entry-point method="wash"/>
                 </no-arguments-entry-point-resolver>
-                <singleton-object instance-ref="containerDelegate"/>
+                <spring-object bean="containerDelegate"/>
             </component>
             <outbound>
                 <outbound-pass-through-router>

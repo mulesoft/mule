@@ -17,7 +17,7 @@
                     <mule:inbound-endpoint address="test://blah?transformers=TestCompressionTransformer&amp;responseTransformers=TestCompressionTransformer"/>
                 </mule:inbound>
                 <mule:component>
-                    <mule:singleton-object instance-ref="prop-test-ref"/>
+                    <mule:spring-object bean="prop-test-ref"/>
                 </mule:component>
             </mule:service>
 

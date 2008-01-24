@@ -17,7 +17,7 @@
         </service>
         <service name="unique3" class="org.mule.tck.testmodels.mule.TestSedaComponent">
             <component>
-                <singleton-object instance-ref="myUniqueBean"  />
+                <spring-object bean="myUniqueBean"  />
             </component>
         </service>
         <!-- SEDA-specific attributes 

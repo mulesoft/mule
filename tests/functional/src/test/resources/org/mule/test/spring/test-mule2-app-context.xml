@@ -39,7 +39,7 @@
                 <inbound-endpoint address="vm://LoanBrokerRequests"/>
             </inbound>
 
-            <component instance-ref="apple"/>
+            <spring-object bean="apple"/>
 
             <!--<outbound-router>-->
             <!--<router-static-recipient-list messageProperty="recipients">-->

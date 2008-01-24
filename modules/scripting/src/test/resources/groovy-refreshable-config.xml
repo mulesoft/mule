@@ -54,7 +54,7 @@
                 <inbound-endpoint address="vm://groovy_refresh_callable"/>
             </inbound>
             <component>
-                <singleton-object instance-ref="groovyRefreshableCallable"/>
+                <spring-object bean="groovyRefreshableCallable"/>
             </component>
         </service>
 
@@ -63,7 +63,7 @@
                 <inbound-endpoint address="vm://groovy_refresh_bean"/>
             </inbound>
             <component>
-                <singleton-object instance-ref="groovyRefreshableBean"/>
+                <spring-object bean="groovyRefreshableBean"/>
             </component>
         </service>
 
@@ -72,7 +72,7 @@
                 <inbound-endpoint address="vm://groovy_refresh_changeInterfaces"/>
             </inbound>
             <component>
-                <singleton-object instance-ref="groovyRefreshableBeanChangeInterfaces"/>
+                <spring-object bean="groovyRefreshableBeanChangeInterfaces"/>
             </component>
         </service>
 
