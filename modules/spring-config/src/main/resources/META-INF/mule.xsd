@@ -2227,32 +2227,18 @@
                     <!-- for normal connectors, this is for emergency use only, but it is
                          critical for custom connector -->
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:group ref="connectorElements"/>
+                    <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"/>
+                    <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"/>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attributeGroup ref="connectorAttributes"/>
+                <xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
+                <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
+                <xsd:attribute name="numberOfConcurrentTransactedReceivers" type="substitutableInt"/>
+                <xsd:attribute name="dynamicNotification" type="substitutableBoolean"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <!-- we do this so that they can be included elsewhere - necessary because
-         custom connector needs "property" to be first element, so cannot
-         inherit directly -->
-
-    <xsd:attributeGroup name="connectorAttributes">
-        <xsd:attribute name="createDispatcherPerRequest" type="substitutableBoolean"/>
-        <xsd:attribute name="createMultipleTransactedReceivers" type="substitutableBoolean"/>
-        <xsd:attribute name="numberOfConcurrentTransactedReceivers" type="substitutableInt"/>
-        <xsd:attribute name="dynamicNotification" type="substitutableBoolean"/>
-    </xsd:attributeGroup>
-
-    <xsd:group name="connectorElements">
-        <xsd:sequence>
-            <xsd:element name="receiver-threading-profile" type="threadingProfileType" minOccurs="0"/>
-            <xsd:element name="dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"/>
-            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-            <xsd:element name="service-overrides" type="serviceOverridesType" minOccurs="0"/>
-        </xsd:sequence>
-    </xsd:group>
 
     <xsd:complexType name="serviceOverridesType">
         <xsd:attribute name="messageReceiver" type="xsd:NMTOKEN"/>
