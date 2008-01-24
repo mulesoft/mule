@@ -91,7 +91,7 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         client.dispatch(endpoint, new DefaultMuleMessage(adapter));
 
         // if we assume 1MB/sec then we need at least...
-        int pause = (int) Math.max(size / ONE_MB, 10) + 100000;
+        long pause = Math.max(size / ONE_MB, 60 * 10) + 10;
         logger.info("Waiting for up to " + pause + " seconds");
 
         latch.await(pause, TimeUnit.SECONDS);

@@ -30,8 +30,8 @@ public class BigInputStream extends InputStream
     private long sent = 0;
     private byte[] data;
     private int dataIndex = 0;
-    private int printedMessages = 0;
-    private int nextMessage = 0;
+    private long printedMessages = 0;
+    private long nextMessage = 0;
 
 
     /**
@@ -89,7 +89,7 @@ public class BigInputStream extends InputStream
 
     public int available() throws IOException
     {
-        return (int) (size - sent);
+        return (int) Math.min(size - sent, Integer.MAX_VALUE);
     }
 
 }

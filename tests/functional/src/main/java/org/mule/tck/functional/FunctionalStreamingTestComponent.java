@@ -77,15 +77,15 @@ public class FunctionalStreamingTestComponent implements Callable
         {
             logger.debug("arrived at " + toString());
             byte[] startData = new byte[STREAM_SAMPLE_SIZE];
-            int startDataSize = 0;
+            long startDataSize = 0;
             byte[] endData = new byte[STREAM_SAMPLE_SIZE]; // ring buffer
-            int endDataSize = 0;
-            int endRingPointer = 0;
+            long endDataSize = 0;
+            long endRingPointer = 0;
             long streamLength = 0;
             byte[] buffer = new byte[STREAM_BUFFER_SIZE];
 
             // throw data on the floor, but keep a record of size, start and end values
-            int bytesRead = 0;
+            long bytesRead = 0;
             while (bytesRead >= 0)
             {
                 bytesRead = read(in, buffer);
@@ -97,17 +97,17 @@ public class FunctionalStreamingTestComponent implements Callable
                     }
                     
                     streamLength += bytesRead;
-                    int startOfEndBytes = 0;
-                    for (int i = 0; startDataSize < STREAM_SAMPLE_SIZE && i < bytesRead; ++i)
+                    long startOfEndBytes = 0;
+                    for (long i = 0; startDataSize < STREAM_SAMPLE_SIZE && i < bytesRead; ++i)
                     {
-                        startData[startDataSize++] = buffer[i];
+                        startData[(int) startDataSize++] = buffer[(int) i];
                         ++startOfEndBytes; // skip data included in startData
                     }
                     startOfEndBytes = Math.max(startOfEndBytes, bytesRead - STREAM_SAMPLE_SIZE);
-                    for (int i = startOfEndBytes; i < bytesRead; ++i)
+                    for (long i = startOfEndBytes; i < bytesRead; ++i)
                     {
                         ++endDataSize;
-                        endData[endRingPointer++ % STREAM_SAMPLE_SIZE] = buffer[i];
+                        endData[(int) (endRingPointer++ % STREAM_SAMPLE_SIZE)] = buffer[(int) i];
                     }
                     if (streamLength >= targetSize)
                     {
@@ -140,8 +140,8 @@ public class FunctionalStreamingTestComponent implements Callable
         return in.read(buffer);
     }
 
-    private void doCallback(byte[] startData, int startDataSize,
-                            byte[] endData, int endDataSize, int endRingPointer,
+    private void doCallback(byte[] startData, long startDataSize,
+                            byte[] endData, long endDataSize, long endRingPointer,
                             long streamLength, MuleEventContext context) throws Exception
     {
         // make a nice summary of the data
@@ -150,18 +150,18 @@ public class FunctionalStreamingTestComponent implements Callable
         result.append(streamLength);
         result.append("; '");
 
-        for (int i = 0; i < startDataSize; ++i)
+        for (long i = 0; i < startDataSize; ++i)
         {
-            result.append((char) startData[i]);
+            result.append((char) startData[(int) i]);
         }
 
-        int endSize = Math.min(endDataSize, STREAM_SAMPLE_SIZE);
+        long endSize = Math.min(endDataSize, STREAM_SAMPLE_SIZE);
         if (endSize > 0)
         {
             result.append("...");
-            for (int i = 0; i < endSize; ++i)
+            for (long i = 0; i < endSize; ++i)
             {
-                result.append((char) endData[(endRingPointer + i) % STREAM_SAMPLE_SIZE]);
+                result.append((char) endData[(int) ((endRingPointer + i) % STREAM_SAMPLE_SIZE)]);
             }
         }
         result.append("'");
