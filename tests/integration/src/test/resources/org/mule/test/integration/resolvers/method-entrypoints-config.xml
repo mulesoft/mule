@@ -16,7 +16,7 @@
                 <vm:inbound-endpoint path="service"/>
             </inbound>
             <component>
-                <singleton-object instance-ref="target"/>
+                <spring-object bean="target"/>
             </component>
         </service>
     </model>
