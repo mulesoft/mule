@@ -16,29 +16,27 @@ import org.mule.util.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.springframework.beans.factory.xml.ParserContext;
 
 /**
  * TODO
  */
 public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
-
     public static final String CONNECTOR_SERVER = "connector-server";
-
 
     public JmxAgentDefinitionParser()
     {
         singleton = true;
+        addAlias("server", "mBeanServer");
     }
 
     protected Class getBeanClass(Element element) {
         return JmxAgent.class;
     }
-
 
     protected void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
         NodeList childNodes = element.getChildNodes();

@@ -44,7 +44,6 @@ import org.mule.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
-import org.mule.util.object.ObjectFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -114,7 +113,6 @@ public class JmxAgent extends AbstractAgent
      * Username/password combinations for JMX Remoting authentication.
      */
     private Map credentials = new HashMap();
-    private ObjectFactory mBeanServerObjectFactory;
 
     static
     {
@@ -156,19 +154,6 @@ public class JmxAgent extends AbstractAgent
         if (initialized.get())
         {
             return;
-        }
-        //Obtain mBeanServer from objectFactory.
-        //mBeanServerObjectFactory has priority over mBeanServer in intialization.
-        if (mBeanServerObjectFactory != null)
-        {
-            try
-            {
-                mBeanServer = (MBeanServer) mBeanServerObjectFactory.getOrCreate();
-            }
-            catch (Exception e)
-            {
-                throw new InitialisationException(CoreMessages.failedToCreate(mBeanServerObjectFactory.toString()), this);
-            }
         }
         if (mBeanServer == null && !locateServer && !createServer)
         {
@@ -570,17 +555,10 @@ public class JmxAgent extends AbstractAgent
 
     /**
      * @param mBeanServer The mBeanServer to set.
-     * @deprecated
      */
     public void setMBeanServer(MBeanServer mBeanServer)
     {
         this.mBeanServer = mBeanServer;
-    }
-
-    public void setMBeanServerObjectFactory(ObjectFactory mBeanServerObjectFactory)
-    {
-
-        this.mBeanServerObjectFactory =  mBeanServerObjectFactory;
     }
 
     /**
