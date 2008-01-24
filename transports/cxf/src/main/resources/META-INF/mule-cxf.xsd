@@ -60,17 +60,7 @@
     
     <xsd:group name="endpointElements">
         <xsd:sequence>
-            <xsd:element name="binding" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="executor" type="xsd:anyType" minOccurs="0"/>
             <xsd:element ref="features" minOccurs="0"/>
-            <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="invoker" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="outInterceptors" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="outFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
-            <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
-            <xsd:element name="properties" type="beans:mapType" minOccurs="0"/>
         </xsd:sequence>
     </xsd:group>
     
@@ -83,9 +73,7 @@
     <xsd:element name="features">
         <xsd:complexType>
             <xsd:sequence>
-                <!-- maxOccurs defined for test - once there's some other feature,
-                     remove and update FeaturesTestCase -->
-                <xsd:element ref="cxf:logging" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:any minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>

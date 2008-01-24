@@ -15,4 +15,5 @@ public interface CxfConstants {
     String OPERATION = "operation";
     String BRIDGE = "bridge";
     String SERVICE_CLASS = "serviceClass";
+    String FEATURES = "features";
 }

@@ -25,6 +25,7 @@ import org.mule.transport.cxf.support.ProviderService;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -36,6 +37,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
@@ -73,6 +75,8 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             String frontend = (String) endpointProps.get(CxfConstants.FRONTEND);
             String bridge = (String) endpointProps.get(CxfConstants.BRIDGE);
             String serviceClassName = (String) endpointProps.get(CxfConstants.SERVICE_CLASS);
+            List<AbstractFeature> features = (List<AbstractFeature>) endpointProps.get(CxfConstants.FEATURES);
+            
             Class<?> svcCls = null;
             if (!StringUtils.isEmpty(serviceClassName)) {
                 svcCls = ClassUtils.loadClass(serviceClassName, getClass());
@@ -110,6 +114,10 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             if (bindingId != null)
             {
                 sfb.setBindingId(bindingId);
+            }
+            
+            if (features != null) {
+                sfb.setFeatures(features);
             }
 
             // Aegis, JAXB, other?
