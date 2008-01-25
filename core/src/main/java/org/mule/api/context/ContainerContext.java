@@ -38,13 +38,13 @@ public interface ContainerContext extends Initialisable, Disposable
     String getName();
 
     /**
-     * Queries a component from the underlying container
+     * Queries a service from the underlying container
      * 
-     * @param key the key fo find the component with. Its up to the individual
+     * @param key the key fo find the service with. Its up to the individual
      *            implementation to check the type of this key and look up objects
      *            accordingly
-     * @return The component found in the container
-     * @throws ObjectNotFoundException if the component is not found
+     * @return The service found in the container
+     * @throws ObjectNotFoundException if the service is not found
      */
     Object getComponent(Object key) throws ObjectNotFoundException;
 

@@ -14,12 +14,12 @@ import org.mule.DefaultMuleMessage;
 import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.ReceiveException;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -57,14 +57,14 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
     private String backupFolder = null;
 
     public RetrieveMessageReceiver(Connector connector,
-                                        Component component,
+                                        Service service,
                                         Endpoint endpoint,
                                         long checkFrequency,
                                         boolean backupEnabled,
                                         String backupFolder)
                  throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
              this.backupFolder = backupFolder;
              this.backupEnabled = backupEnabled;
              this.setFrequency(checkFrequency);

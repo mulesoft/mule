@@ -11,9 +11,9 @@
 package org.mule.test.integration.transport.jdbc;
 
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -50,16 +50,16 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
     public void testReconnection() throws Exception
     {
 
-        Component component = getTestComponent("anOrange", Orange.class);
-        component.setModel(model);
-        muleContext.getRegistry().registerComponent(component);
+        Service service = getTestService("anOrange", Orange.class);
+        service.setModel(model);
+        muleContext.getRegistry().registerService(service);
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jdbc://test?sql=SELECT * FROM TABLE", muleContext);
         endpointBuilder.setName("test");
         endpointBuilder.setConnector(connector);
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             endpointBuilder);
         muleContext.start();
-        connector.registerListener(component, endpoint);
+        connector.registerListener(service, endpoint);
 
         // The derbydb instance should be put offline before starting test
         // The receiver should try to connect to the database

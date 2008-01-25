@@ -24,17 +24,17 @@ public interface Persistable
 {
     /**
      * Registers a listener from the Persistence Manager. This is
-     * used by the component to alert the Manager to queue up the
+     * used by the service to alert the Manager to queue up the
      * persistence request.
      *
-     * @param listener The listener that the component will talk to
+     * @param listener The listener that the service will talk to
      * @throws MuleException if the registration fails
      */
     void registerPersistenceRequestListener(PersistenceNotificationListener listener) throws MuleException;
 
     /**
      * Return the data for persistence. It is the responsibility
-     * of the component to handle any locks, copies, deep copies,
+     * of the service to handle any locks, copies, deep copies,
      * or synchronizations necessary in order to preserve a consistent
      * backup.
      *

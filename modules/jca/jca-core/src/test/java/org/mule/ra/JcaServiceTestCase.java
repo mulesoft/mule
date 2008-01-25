@@ -12,21 +12,21 @@ package org.mule.ra;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.component.simple.EchoComponent;
 import org.mule.model.ModelFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.object.SingletonObjectFactory;
 
-public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractComponentTestCase
+public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceTestCase
 {
 
-    // Cannot extend AbstractComponentTestCase because of inconsistent behaviour. See
+    // Cannot extend AbstractServiceTestCase because of inconsistent behaviour. See
     // MULE-2843
 
-    private Component component;
+    private Service service;
 
     private TestJCAWorkManager workManager;
 
@@ -37,33 +37,33 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
         JcaModel jcaModel = (JcaModel) ModelFactory.createModel(JcaModel.JCA_MODEL_TYPE);
         muleContext.getRegistry().registerModel(jcaModel);
 
-        // Create, register, initialise and start JcaComponent
-        String name = "JcaComponent#";
-        component = new JcaComponent(new DelegateWorkManager(workManager));
-        component.setName(name);
-        component.setModel(jcaModel);
-        component.setServiceFactory(new SingletonObjectFactory(new EchoComponent()));
-        muleContext.getRegistry().registerComponent(component);
+        // Create, register, initialise and start JcaService
+        String name = "JcaService#";
+        service = new JcaService(new DelegateWorkManager(workManager));
+        service.setName(name);
+        service.setModel(jcaModel);
+        service.setServiceFactory(new SingletonObjectFactory(new EchoComponent()));
+        muleContext.getRegistry().registerService(service);
 
-        assertNotNull(component);
+        assertNotNull(service);
     }
 
     protected void doTearDown() throws Exception
     {
         workManager = null;
-        component = null;
+        service = null;
     }
 
     public void testSendEvent() throws Exception
     {
-        component.start();
+        service.start();
         Endpoint endpoint = getTestEndpoint("jcaInFlowEndpoint", ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
         MuleEvent event = getTestEvent("Message", endpoint);
 
         try
         {
-            component.sendEvent(event);
-            fail("Exception expected, JcaComponent does not support sendEvent()");
+            service.sendEvent(event);
+            fail("Exception expected, JcaService does not support sendEvent()");
         }
         catch (Exception e)
         {
@@ -72,11 +72,11 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
 
     public void testDispatchEvent() throws Exception
     {
-        component.start();
+        service.start();
         Endpoint endpoint = getTestEndpoint("jcaInFlowEndpoint", ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
         MuleEvent event = getTestEvent("Message", endpoint);
 
-        component.dispatchEvent(event);
+        service.dispatchEvent(event);
         assertEquals(1, workManager.getScheduledWorkList().size());
         assertEquals(0, workManager.getStartWorkList().size());
         assertEquals(0, workManager.getDoWorkList().size());
@@ -86,8 +86,8 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
     {
         try
         {
-            component.pause();
-            fail("Exception expected, JcaComponent does not support pause()");
+            service.pause();
+            fail("Exception expected, JcaService does not support pause()");
         }
         catch (MuleException e)
         {
@@ -99,8 +99,8 @@ public class JcaComponentTestCase extends AbstractMuleTestCase // AbstractCompon
     {
         try
         {
-            component.resume();
-            fail("Exception expected, JcaComponent does not support resume()");
+            service.resume();
+            fail("Exception expected, JcaService does not support resume()");
         }
         catch (MuleException e)
         {

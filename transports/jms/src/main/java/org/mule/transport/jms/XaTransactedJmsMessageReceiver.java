@@ -11,9 +11,9 @@
 package org.mule.transport.jms;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
@@ -72,10 +72,10 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         }
     }
 
-    public XaTransactedJmsMessageReceiver(Connector umoConnector, Component component, ImmutableEndpoint endpoint)
+    public XaTransactedJmsMessageReceiver(Connector umoConnector, Service service, ImmutableEndpoint endpoint)
         throws CreateException
     {
-        super(umoConnector, component, endpoint);
+        super(umoConnector, service, endpoint);
         // TODO AP: find appropriate value for polling frequency with the scheduler;
         // see setFrequency/setTimeUnit & VMMessageReceiver for more
         this.setFrequency(DEFAULT_JMS_POLL_FREQUENCY);

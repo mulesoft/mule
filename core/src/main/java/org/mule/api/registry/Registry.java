@@ -12,13 +12,13 @@ package org.mule.api.registry;
 
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.model.Model;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
@@ -86,7 +86,7 @@ public interface Registry extends Initialisable, Disposable
 
     Transformer lookupTransformer(String name);
 
-    Component lookupComponent(String component);
+    Service lookupService(String component);
 
     /**
      * This method will return a list of {@link org.mule.api.transformer.Transformer} objects that accept the given
@@ -108,9 +108,9 @@ public interface Registry extends Initialisable, Disposable
      */
     Transformer lookupTransformer(Class input, Class output) throws TransformerException;
 
-    Collection/*<Component>*/ lookupComponents(String model);
+    Collection/*<Service>*/ lookupComponents(String model);
 
-    Collection/*<Component>*/ lookupComponents();
+    Collection/*<Service>*/ lookupComponents();
 
     Model lookupModel(String name);
 
@@ -167,7 +167,7 @@ public interface Registry extends Initialisable, Disposable
 
     void unregisterTransformer(String transformerName) throws MuleException;
 
-    void registerComponent(Component component) throws MuleException;
+    void registerService(Service service) throws MuleException;
 
     void unregisterComponent(String componentName) throws MuleException;
 

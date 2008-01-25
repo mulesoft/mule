@@ -12,11 +12,11 @@
 package org.mule.ra;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -136,24 +136,24 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         activationSpec.setEndpoint("test://testEndpoint");
         ImmutableEndpoint endpoint = resourceAdapter.createMessageInflowEndpoint(activationSpec);
 
-        Component component = resourceAdapter.createJcaComponent(endpointFactory, jcaModel, endpoint);
+        Service service = resourceAdapter.createJcaService(endpointFactory, jcaModel, endpoint);
 
-        // Check component
-        assertNotNull(component);
-        assertEquals("JcaComponent#" + endpointFactory.hashCode(), component.getName());
-        assertNotNull(component);
-        assertTrue(component instanceof JcaComponent);
-        assertNotNull(((JcaComponent) component).workManager);
-        testJcaComponent(component);
+        // Check service
+        assertNotNull(service);
+        assertEquals("JcaService#" + endpointFactory.hashCode(), service.getName());
+        assertNotNull(service);
+        assertTrue(service instanceof JcaService);
+        assertNotNull(((JcaService) service).workManager);
+        testJcaService(service);
 
-        testEndpoint(component);
+        testEndpoint(service);
 
         // Check endpoint
-        Endpoint endpoint2 = (Endpoint) component.getInboundRouter().getEndpoints().get(0);
+        Endpoint endpoint2 = (Endpoint) service.getInboundRouter().getEndpoints().get(0);
         assertEquals(endpoint, endpoint2);
 
-        // Check component implementation
-        assertEquals(endpointFactory, component.getServiceFactory().getOrCreate());
+        // Check service implementation
+        assertEquals(endpointFactory, service.getServiceFactory().getOrCreate());
     }
 
     public void testendpointActivationOK() throws Exception
@@ -170,12 +170,12 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(1, resourceAdapter.endpoints.size());
 
         MuleEndpointKey key = new MuleEndpointKey(endpointFactory, activationSpec);
-        Component component = (Component) resourceAdapter.endpoints.get(key);
+        Service service = (Service) resourceAdapter.endpoints.get(key);
 
-        assertEquals("JcaComponent#" + endpointFactory.hashCode(), component.getName());
-        testJcaComponent(component);
-        testEndpoint(component);
-        assertEquals(endpointFactory, component.getServiceFactory().getOrCreate());
+        assertEquals("JcaService#" + endpointFactory.hashCode(), service.getName());
+        testJcaService(service);
+        testEndpoint(service);
+        assertEquals(endpointFactory, service.getServiceFactory().getOrCreate());
 
         // Additional activation with same endpointFactory does not increase size of
         // endpoint cache.
@@ -218,9 +218,9 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(0, resourceAdapter.endpoints.size());
     }
 
-    protected void testEndpoint(Component component)
+    protected void testEndpoint(Service service)
     {
-        InboundRouterCollection inboundRouterCollection = component.getInboundRouter();
+        InboundRouterCollection inboundRouterCollection = service.getInboundRouter();
         Endpoint endpoint = (Endpoint) inboundRouterCollection.getEndpoints().get(0);
         testEndpoint(endpoint);
     }
@@ -233,17 +233,17 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(false, endpoint.isSynchronous());
     }
 
-    protected void testJcaComponent(Component component)
+    protected void testJcaService(Service service)
     {
         // Check for a single inbound router, no outbound routers and no nested
         // routers
-        assertNotNull(component);
+        assertNotNull(service);
 
-        assertNotNull(component.getInboundRouter());
+        assertNotNull(service.getInboundRouter());
 
-        // InboundPassThroughRouter is now set in runtime rather than in component creation as in 1.4.x
-        // assertEquals(1, component.getInboundRouter().getRouters().size());
-        assertEquals(0, component.getInboundRouter().getRouters().size());
+        // InboundPassThroughRouter is now set in runtime rather than in service creation as in 1.4.x
+        // assertEquals(1, service.getInboundRouter().getRouters().size());
+        assertEquals(0, service.getInboundRouter().getRouters().size());
     }
 
 }

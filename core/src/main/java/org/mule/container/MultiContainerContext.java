@@ -153,7 +153,7 @@ public class MultiContainerContext implements ContainerContext
             }
             else if (logger.isDebugEnabled())
             {
-                logger.debug("Component reference not found: " + realKey.toFullString());
+                logger.debug("Service reference not found: " + realKey.toFullString());
                 return null;
             }
         }

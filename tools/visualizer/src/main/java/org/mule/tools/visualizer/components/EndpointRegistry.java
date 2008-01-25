@@ -44,7 +44,7 @@ public class EndpointRegistry
             while (stringTokenizer.hasMoreTokens())
             {
                 String s = stringTokenizer.nextToken();
-                env.log("Mapping virtual endpoint '" + s + "' for component '" + componentName + "'");
+                env.log("Mapping virtual endpoint '" + s + "' for service '" + componentName + "'");
                 GraphNode n = getEndpoint(s, componentName);
                 if (n != null)
                 {

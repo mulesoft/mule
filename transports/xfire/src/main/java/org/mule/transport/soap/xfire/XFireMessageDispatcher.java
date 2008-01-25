@@ -237,9 +237,9 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
                                    + endpointURI.getHost()
                                    + (endpointURI.getPort() > -1
                                                    ? ":" + String.valueOf(endpointURI.getPort()) : ""));
-        if (event.getComponent() != null)
+        if (event.getService() != null)
         {
-            properties.put("serviceName", event.getComponent().getName());
+            properties.put("serviceName", event.getService().getName());
         }
 
         soapAction = soapActionTemplateParser.parse(properties, soapAction);

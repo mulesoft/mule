@@ -18,30 +18,30 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
-public class SedaComponentTestCase extends AbstractMuleTestCase // AbstractComponentTestCase
+public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractServiceTestCase
 {
-    // Cannot extend AbstractComponentTestCase because of inconsistent behaviour. See
+    // Cannot extend AbstractServiceTestCase because of inconsistent behaviour. See
     // MULE-2843
 
     // protected void doSetUp() throws Exception
     // {
-    // component = new SedaComponent();
-    // component.setName("seda");
-    // component.setServiceFactory(new PrototypeObjectFactory(Object.class));
-    // component.setMuleContext(muleContext);
-    // component.setModel(new SedaModel());
-    // component.getModel().setMuleContext(muleContext);
-    // component.getModel().initialise();
+    // service = new SedaService();
+    // service.setName("seda");
+    // service.setServiceFactory(new PrototypeObjectFactory(Object.class));
+    // service.setMuleContext(muleContext);
+    // service.setModel(new SedaModel());
+    // service.getModel().setMuleContext(muleContext);
+    // service.getModel().initialise();
     // }
     //
     // protected void doTearDown() throws Exception
     // {
-    // component = null;
+    // service = null;
     //    }
 
     public void testSedaModelEventTimeoutDefault() throws Exception
     {
-        SedaComponent component = new SedaComponent();
+        SedaService component = new SedaService();
         component.setName("test");
         component.setServiceFactory(new PrototypeObjectFactory(Object.class));
         component.setModel(new SedaModel());
@@ -59,9 +59,9 @@ public class SedaComponentTestCase extends AbstractMuleTestCase // AbstractCompo
     {
         try
         {
-            // getTestComponent() currently already returns a SedaComponent, but
+            // getTestComponent() currently already returns a SedaService, but
             // here we are safe-guarding for any future changes
-            SedaComponent component = new SedaComponent();
+            SedaService component = new SedaService();
             component.setName("test");
             component.setServiceFactory(new PrototypeObjectFactory(Object.class));
             component.setModel(new SedaModel());

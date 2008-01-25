@@ -13,11 +13,11 @@ package org.mule.transport.vm;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.MessageAdapter;
@@ -38,7 +38,7 @@ import org.mule.util.queue.TransactionalQueueManager;
 import java.util.Iterator;
 
 /**
- * <code>VMConnector</code> A simple endpoint wrapper to allow a Mule component to
+ * <code>VMConnector</code> A simple endpoint wrapper to allow a Mule service to
  * <p/> be accessed from an endpoint
  * 
  */
@@ -99,13 +99,13 @@ public class VMConnector extends AbstractConnector
         // template method
     }
 
-    public MessageReceiver createReceiver(Component component, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
     {
         if (queueEvents)
         {
             queueProfile.configureQueue(endpoint.getEndpointURI().getAddress(), queueManager);
         }
-        return serviceDescriptor.createMessageReceiver(this, component, endpoint);
+        return serviceDescriptor.createMessageReceiver(this, service, endpoint);
     }
 
     public MessageAdapter getMessageAdapter(Object message) throws MessagingException

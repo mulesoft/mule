@@ -11,13 +11,13 @@
 package org.mule.transport.ssl;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.testmodels.mule.TestSedaComponent;
+import org.mule.tck.testmodels.mule.TestSedaService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,10 +55,10 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
             assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
         }
 
-        Component c = muleContext.getRegistry().lookupComponent("testComponent2");
-        assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
-        Object ftc = ((TestSedaComponent) c).getOrCreateService();
-        assertNotNull("Functional Test Component not found in the model.", ftc);
+        Service c = muleContext.getRegistry().lookupService("testComponent2");
+        assertTrue("Service should be a TestSedaService", c instanceof TestSedaService);
+        Object ftc = ((TestSedaService) c).getOrCreateService();
+        assertNotNull("Functional Test Service not found in the model.", ftc);
         assertTrue("Service should be a FunctionalTestComponent", ftc instanceof FunctionalTestComponent);
 
         EventCallback cc = ((FunctionalTestComponent) ftc).getEventCallback();

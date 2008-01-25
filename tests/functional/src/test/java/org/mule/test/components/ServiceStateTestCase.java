@@ -11,28 +11,28 @@
 package org.mule.test.components;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
-import org.mule.api.component.ComponentException;
+import org.mule.api.service.Service;
+import org.mule.api.service.ServiceException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.AbstractConnector;
 
-public class ComponentInitialStateTestCase extends FunctionalTestCase
+public class ServiceStateTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
         return "org/mule/test/components/component-initial-state.xml";
     }
 
-    public ComponentInitialStateTestCase()
+    public ServiceStateTestCase()
     {
         setStartContext(true);
     }
     
     public void testDefaultInitialState() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("defaultComponent");
-        // Component initially started
+        Service c = muleContext.getRegistry().lookupService("defaultComponent");
+        // Service initially started
         assertTrue(c.isStarted());
         assertFalse(c.isPaused());
 
@@ -48,8 +48,8 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
     // MULE-494
     public void testInitialStateStopped() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("stoppedComponent");
-        // Component initially stopped
+        Service c = muleContext.getRegistry().lookupService("stoppedComponent");
+        // Service initially stopped
         assertFalse(c.isStarted());
 
         // The connector should be started, but with no listeners registered.
@@ -59,7 +59,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
         MessageReceiver[] receivers = connector.getReceivers("*stopped*");
         assertEquals(0, receivers.length);
 
-        // Start the component.
+        // Start the service.
         c.start();
         assertTrue(c.isStarted());
 
@@ -73,7 +73,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
     // MULE-503
     public void testStoppingComponentStopsEndpoints() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("startedComponent");
+        Service c = muleContext.getRegistry().lookupService("startedComponent");
         assertTrue(c.isStarted());
 
         // The listeners should be registered and started.
@@ -84,7 +84,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
         assertEquals(1, receivers.length);
         assertTrue(receivers[0].isConnected());
 
-        // Stop component
+        // Stop service
         c.stop();
         assertFalse(c.isStarted());
 
@@ -96,8 +96,8 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
     
     public void testSendToStoppedComponent() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("stoppedComponent");
-        // Component initially stopped
+        Service c = muleContext.getRegistry().lookupService("stoppedComponent");
+        // Service initially stopped
         assertFalse(c.isStarted());
 
         try
@@ -105,7 +105,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
             c.dispatchEvent(getTestEvent("hello", c));
             fail();
         }
-        catch (ComponentException e)
+        catch (ServiceException e)
         {
             // expected
         }
@@ -115,7 +115,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
             c.sendEvent(getTestEvent("hello", c));
             fail();
         }
-        catch (ComponentException e)
+        catch (ServiceException e)
         {
             // expected
         }
@@ -123,8 +123,8 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
 
     public void testInitialStatePaused() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("pausedComponent");
-        // Component initially started but paused.
+        Service c = muleContext.getRegistry().lookupService("pausedComponent");
+        // Service initially started but paused.
         assertTrue(c.isStarted());
         assertTrue(c.isPaused());
 
@@ -140,7 +140,7 @@ public class ComponentInitialStateTestCase extends FunctionalTestCase
     public void testSendToPausedComponent() throws Exception
     {
         // TODO MULE-1995
-        final Component c = muleContext.getRegistry().lookupComponent("startedComponent");
+        final Service c = muleContext.getRegistry().lookupService("startedComponent");
         assertTrue(c.isStarted());
         
         c.pause();

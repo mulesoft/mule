@@ -11,9 +11,9 @@
 package org.mule.transport.http;
 
 import org.mule.api.MuleContext;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -66,7 +66,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
 
     public void testValidListener() throws Exception
     {
-        Component component = getTestComponent("orange", Orange.class);
+        Service service = getTestService("orange", Orange.class);
         Endpoint endpoint = (Endpoint) muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             getTestEndpointURI());
 
@@ -81,7 +81,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI(getTestEndpointURI()));
-        getConnector().registerListener(component, endpoint);
+        getConnector().registerListener(service, endpoint);
     }
 
     public void testProperties() throws Exception

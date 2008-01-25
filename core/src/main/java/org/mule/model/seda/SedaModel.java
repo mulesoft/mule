@@ -17,7 +17,7 @@ import org.mule.config.QueueProfile;
 import org.mule.model.AbstractModel;
 
 /**
- * A mule component service model that uses Seda principals to achieve high
+ * A mule service service model that uses Seda principals to achieve high
  * throughput by Quing events for compoonents and processing them concurrently.
  * 
  */
@@ -34,18 +34,18 @@ public class SedaModel extends AbstractModel
     private boolean enablePooling = true;
 
     /**
-     * Whether to create a new component for every request.
+     * Whether to create a new service for every request.
      */
     protected boolean componentPerRequest = false;
 
     /**
-     * the pooling configuration used when initialising the component described by
+     * the pooling configuration used when initialising the service described by
      * this descriptor.
      */
     protected PoolingProfile poolingProfile;
 
     /**
-     * The queuing profile for events received for this component
+     * The queuing profile for events received for this service
      */
     protected QueueProfile queueProfile;
 

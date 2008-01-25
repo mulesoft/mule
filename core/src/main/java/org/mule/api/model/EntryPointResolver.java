@@ -14,7 +14,7 @@ import org.mule.api.MuleEventContext;
 
 /**
  * <code>EntryPointResolver</code> resolves a method to call on the given
- * UMODescriptor when an event is received for the component
+ * UMODescriptor when an event is received for the service
  */
 public interface EntryPointResolver
 {

@@ -145,13 +145,13 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
         // don't wait for ages, has to be set before TX is begun
         tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
 
-        // this is one component with a TX always begin
+        // this is one service with a TX always begin
         TransactionConfig config = new MuleTransactionConfig();
         config.setFactory(new XaTransactionFactory());
         config.setAction(TransactionConfig.ACTION_ALWAYS_BEGIN);
         TransactionTemplate template = new TransactionTemplate(config, new DefaultExceptionStrategy(), muleContext);
 
-        // and the callee component which should join the current XA transaction, not begin a nested one
+        // and the callee service which should join the current XA transaction, not begin a nested one
         final TransactionConfig nestedConfig = new MuleTransactionConfig();
         nestedConfig.setFactory(new XaTransactionFactory());
         nestedConfig.setAction(TransactionConfig.ACTION_BEGIN_OR_JOIN);

@@ -17,10 +17,10 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
@@ -101,14 +101,14 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      */
     public DefaultMuleEvent(MuleMessage message,
                      ImmutableEndpoint endpoint,
-                     Component component,
+                     Service service,
                      MuleEvent previousEvent)
     {
         super(message.getPayload());
         this.message = message;
         this.id = generateEventId();
         this.session = previousEvent.getSession();
-        ((DefaultMuleSession) session).setComponent(component);
+        ((DefaultMuleSession) session).setService(service);
         this.endpoint = endpoint;
         this.synchronous = previousEvent.isSynchronous();
         this.timeout = previousEvent.getTimeout();
@@ -183,7 +183,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.message = message;
         this.id = rewriteEvent.getId();
         this.session = rewriteEvent.getSession();
-        ((DefaultMuleSession) session).setComponent(rewriteEvent.getComponent());
+        ((DefaultMuleSession) session).setService(rewriteEvent.getService());
         this.endpoint = rewriteEvent.getEndpoint();
         this.synchronous = rewriteEvent.isSynchronous();
         this.timeout = rewriteEvent.getTimeout();
@@ -496,11 +496,11 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     }
 
     /**
-     * Gets the recipient component of this event
+     * Gets the recipient service of this event
      */
-    public Component getComponent()
+    public Service getService()
     {
-        return session.getComponent();
+        return session.getService();
     }
 
     /**
@@ -517,8 +517,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * Setting this parameter will stop the Mule framework from processing this event
      * in the standard way. This allow for client code to override default behaviour.
      * The common reasons for doing this are - 1. The UMO has more than one send
-     * endpoint configured; the component must dispatch to other prviders
-     * programatically by using the component on the current event 2. The UMO doesn't
+     * endpoint configured; the service must dispatch to other prviders
+     * programatically by using the service on the current event 2. The UMO doesn't
      * send the current event out through a endpoint. i.e. the processing of the
      * event stops in the uMO.
      *

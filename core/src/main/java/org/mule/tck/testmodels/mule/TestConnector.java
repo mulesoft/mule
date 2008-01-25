@@ -13,9 +13,9 @@ package org.mule.tck.testmodels.mule;
 import org.mule.api.MuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
@@ -94,9 +94,9 @@ public class TestConnector extends AbstractConnector
         this.someProperty = someProperty;
     }
 
-    public MessageReceiver createReceiver(Component component, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
     {
-        MessageReceiver receiver = new AbstractMessageReceiver(this, component, endpoint)
+        MessageReceiver receiver = new AbstractMessageReceiver(this, service, endpoint)
         {
 
             protected void doInitialise() throws InitialisationException

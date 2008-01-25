@@ -12,7 +12,7 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.component.DefaultMuleProxy;
 
 /**
@@ -22,10 +22,10 @@ public class TestMuleProxy extends DefaultMuleProxy
 {
     private Object pojoService;
     
-    public TestMuleProxy(Object pojoService, Component component, MuleContext muleContext)
+    public TestMuleProxy(Object pojoService, Service service, MuleContext muleContext)
         throws MuleException
     {
-        super(pojoService, component, muleContext);
+        super(pojoService, service, muleContext);
         this.pojoService = pojoService;
     }
 

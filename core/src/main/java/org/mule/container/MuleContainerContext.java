@@ -19,7 +19,7 @@ import java.io.Reader;
  * <code>MuleContainerContext</code> is a default resolver that doesn't support
  * external reference resolution. It's function is to provide a complete
  * implementation when a componenet resolver is not defined. The default behaviour is
- * to build a component key as a fully qualified class name
+ * to build a service key as a fully qualified class name
  */
 public class MuleContainerContext extends AbstractContainerContext
 {
@@ -39,7 +39,7 @@ public class MuleContainerContext extends AbstractContainerContext
     {
         if (key == null)
         {
-            throw new ObjectNotFoundException("Component not found for null key");
+            throw new ObjectNotFoundException("Service not found for null key");
         }
         try
         {

@@ -12,12 +12,12 @@ package org.mule.transport.jms;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.StartException;
 import org.mule.api.lifecycle.StopException;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
@@ -55,16 +55,16 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
 
     /**
      * @param connector
-     * @param component
+     * @param service
      * @param endpoint
      * @throws InitialisationException
      */
     public TransactedSingleResourceJmsMessageReceiver(Connector connector,
-                                                      Component component,
+                                                      Service service,
                                                       Endpoint endpoint) throws CreateException
     {
 
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
 
         this.connector = (JmsConnector) connector;
 

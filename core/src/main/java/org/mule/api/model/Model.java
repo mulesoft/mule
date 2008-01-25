@@ -34,7 +34,7 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject
 
     /**
      * The entry point resolver is used to determine the method to be called on a
-     * component when an event is received for it.
+     * service when an event is received for it.
      *
      * @return Returns the entryPointResolver.
      */
@@ -51,7 +51,7 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject
 
 //    /**
 //     * Registers a <code>UMODescriptor</code> with the <code>MuleManager</code>.
-//     * The manager will take care of creating the Mule UMO and, it's component and
+//     * The manager will take care of creating the Mule UMO and, it's service and
 //     * proxies.
 //     *
 //     * @param descriptor the <code>UMODescriptor</code> to register
@@ -59,16 +59,16 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject
 //    void registerComponent(UMODescriptor descriptor) throws MuleException;
 //
 //    /**
-//     * Unregisters a component From the model
+//     * Unregisters a service From the model
 //     *
 //     * @param descriptor the descriptor of the componnt to remove
-//     * @throws MuleException if the component is not registered or it failed to be
+//     * @throws MuleException if the service is not registered or it failed to be
 //     *                      disposing or the descriptor is null
 //     */
 //    void unregisterComponent(UMODescriptor descriptor) throws MuleException;
 //
 //    /**
-//     * Determines if a UMO component descriptor by the given name is regestered with
+//     * Determines if a UMO service descriptor by the given name is regestered with
 //     * the model
 //     *
 //     * @param name the name of the UMO
@@ -100,10 +100,10 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject
     void setLifecycleAdapterFactory(LifecycleAdapterFactory lifecycleAdapterFactory);
 
 //    /**
-//     * Returns the Component for the given Mule name.
+//     * Returns the Service for the given Mule name.
 //     *
-//     * @param muleName the Name of the Mule Component to obtain a session for
-//     * @return a MuleSession for the given name or null if the component is not
+//     * @param muleName the Name of the Mule Service to obtain a session for
+//     * @return a MuleSession for the given name or null if the service is not
 //     *         registered
 //     */
 //    MuleSession getComponentSession(String muleName);
@@ -121,7 +121,7 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject
     /**
      * The exception strategy to use by components managed by the model. The
      * exception strategy is used when an exception occurs while processing the
-     * current event for a component. A component can define it's own exception
+     * current event for a service. A service can define it's own exception
      * strategy, but if it doesn't this implmentation will be used.
      *
      * @return the default exception strategy for this model.
@@ -132,7 +132,7 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject
     /**
      * The exception strategy to use by components managed by the model. The
      * exception strategy is used when an exception occurs while processing the
-     * current event for a component. A component can define it's own exception
+     * current event for a service. A service can define it's own exception
      * strategy, but if it doesn't this implmentation will be used.
      *
      * @param listener the default exception strategy for this model.
@@ -141,75 +141,75 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject
     void setExceptionListener(ExceptionListener listener);
 
     /**
-     * Returns a descriptor for the given component name
+     * Returns a descriptor for the given service name
      *
-     * @param name the name of the component
-     * @return a descriptor for the given component name or null if there is no
-     *         component registered by that name
+     * @param name the name of the service
+     * @return a descriptor for the given service name or null if there is no
+     *         service registered by that name
      * @see UMODescriptor
      */
     //UMODescriptor getDescriptor(String name);
 
     /**
-     * Returns the Component object for the given component name
+     * Returns the Service object for the given service name
      *
-     * @param name the name of the component
-     * @return the Component object for the given component name or null if there
-     *         is no component registered by that name
-     * @see Component
+     * @param name the name of the service
+     * @return the Service object for the given service name or null if there
+     *         is no service registered by that name
+     * @see Service
      */
-    //Component getComponent(String name);
+    //Service getComponent(String name);
 
 //    /**
-//     * Stops a single Mule Component. This can be useful when stopping and starting
-//     * some Mule UMOs while letting others continue. When a component is stopped all
-//     * listeners for that component are unregistered.
+//     * Stops a single Mule Service. This can be useful when stopping and starting
+//     * some Mule UMOs while letting others continue. When a service is stopped all
+//     * listeners for that service are unregistered.
 //     *
 //     * @param name the name of the Mule UMO to stop
-//     * @throws MuleException if the MuleUMO is not registered or the component failed
+//     * @throws MuleException if the MuleUMO is not registered or the service failed
 //     *                      to stop
 //     */
 //    void stopComponent(String name) throws MuleException;
 //
 //    /**
-//     * Starts a single Mule Component. This can be useful when stopping and starting
+//     * Starts a single Mule Service. This can be useful when stopping and starting
 //     * some Mule UMOs while letting others continue.
 //     *
 //     * @param name the name of the Mule UMO to start
-//     * @throws MuleException if the MuleUMO is not registered or the component failed
+//     * @throws MuleException if the MuleUMO is not registered or the service failed
 //     *                      to start
 //     */
 //    void startComponent(String name) throws MuleException;
 //
 //    /**
-//     * Pauses event processing for a single Mule Component. Unlike stopComponent(), a
-//     * paused component will still consume messages from the underlying transport,
-//     * but those messages will be queued until the component is resumed. In order to
+//     * Pauses event processing for a single Mule Service. Unlike stopComponent(), a
+//     * paused service will still consume messages from the underlying transport,
+//     * but those messages will be queued until the service is resumed. In order to
 //     * persist these queued messages you can set the 'recoverableMode' property on
 //     * the Muleconfiguration to true. this causes all internal queues to store their
 //     * state.
 //     *
 //     * @param name the name of the Mule UMO to stop
-//     * @throws MuleException if the MuleUMO is not registered or the component failed
+//     * @throws MuleException if the MuleUMO is not registered or the service failed
 //     *                      to pause.
 //     * @see org.mule.config.MuleConfiguration
 //     */
 //    void pauseComponent(String name) throws MuleException;
 //
 //    /**
-//     * Resumes a single Mule Component that has been paused. If the component is not
+//     * Resumes a single Mule Service that has been paused. If the service is not
 //     * paused nothing is executed.
 //     *
 //     * @param name the name of the Mule UMO to resume
-//     * @throws MuleException if the MuleUMO is not registered or the component failed
+//     * @throws MuleException if the MuleUMO is not registered or the service failed
 //     *                      to resume
 //     */
 //    void resumeComponent(String name) throws MuleException;
 //
 //    /**
-//     * Gets an iterator of all component names registered in the model
+//     * Gets an iterator of all service names registered in the model
 //     *
-//     * @return an iterator of all component names
+//     * @return an iterator of all service names
 //     */
 //    Iterator getComponentNames();
 }

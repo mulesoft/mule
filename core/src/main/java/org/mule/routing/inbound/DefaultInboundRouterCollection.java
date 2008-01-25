@@ -83,7 +83,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
             addRouter(new InboundPassThroughRouter());
         }
 
-        String componentName = event.getSession().getComponent().getName();
+        String componentName = event.getSession().getService().getName();
 
         MuleEvent[] eventsToRoute = null;
         boolean noRoute = true;
@@ -107,7 +107,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
         }
 
         // If the stopFurtherProcessing flag has been set
-        // do not route events to the component.
+        // do not route events to the service.
         // This is the case when using a ForwardingConsumer
         // inbound router for example.
         if (!event.isStopFurtherProcessing())

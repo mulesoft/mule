@@ -18,7 +18,7 @@ import org.mule.util.MuleLogger;
 import javax.script.Bindings;
 
 /**
- * A JSR 223 Script component. Allows any JSR 223 compliant script engines such as
+ * A JSR 223 Script service. Allows any JSR 223 compliant script engines such as
  * JavaScript, Groovy or Rhino to be embedded as Mule components.
  */
 public class ScriptComponent extends Scriptable implements Callable
@@ -47,7 +47,7 @@ public class ScriptComponent extends Scriptable implements Callable
         namespace.put("eventContext", context);
         namespace.put("muleContext", context.getMuleContext());
         namespace.put("message", context.getMessage());
-        namespace.put("descriptor", context.getComponent());
+        namespace.put("descriptor", context.getService());
         namespace.put("componentNamespace", this.bindings);
         namespace.put("log", new MuleLogger(logger));
         namespace.put("result", new Object());

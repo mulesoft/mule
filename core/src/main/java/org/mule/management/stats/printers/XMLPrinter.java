@@ -45,9 +45,9 @@ public class XMLPrinter extends AbstractTablePrinter
     public String[] getHeaders()
     {
         String[] column = new String[42];
-        column[0] = "Component Name";
-        column[1] = "Component Pool Max Size";
-        column[2] = "Component Pool Size";
+        column[0] = "Service Name";
+        column[1] = "Service Pool Max Size";
+        column[2] = "Service Pool Size";
         column[3] = "Thread Pool Size";
         column[4] = "Current Queue Size";
         column[5] = "Max Queue Size";
@@ -146,7 +146,7 @@ public class XMLPrinter extends AbstractTablePrinter
 
         for (int i = 1; i < table.length; i++)
         {
-            println("<Component name=\"" + table[i][0] + "\">", indentLevel);
+            println("<Service name=\"" + table[i][0] + "\">", indentLevel);
             indentLevel++;
             for (int j = 1; j < table[i].length; j++)
             {
@@ -202,7 +202,7 @@ public class XMLPrinter extends AbstractTablePrinter
                 }
             }
             indentLevel--;
-            println("</Component>", indentLevel);
+            println("</Service>", indentLevel);
         }
         indentLevel--;
         println("</Components>", indentLevel);

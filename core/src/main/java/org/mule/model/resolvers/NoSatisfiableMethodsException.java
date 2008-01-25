@@ -15,7 +15,7 @@ import org.mule.config.i18n.CoreMessages;
 
 /**
  * <code>NoSatisfiableMethodsException</code> is thrown by EntryPointResolvers when
- * the component passed has no methods that meet the criteria of the configured
+ * the service passed has no methods that meet the criteria of the configured
  * EntryPointResolver.
  *
  * @see org.mule.api.model.EntryPointResolver

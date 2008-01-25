@@ -11,11 +11,11 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
@@ -55,13 +55,13 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     public static final String SERVICE_NAMESPACE = "serviceNamespace";
 
     protected AxisConnector connector;
-    protected SOAPService service;
+    protected SOAPService soapService;
 
-    public AxisMessageReceiver(Connector connector, Component component, Endpoint endpoint)
+    public AxisMessageReceiver(Connector connector, Service service, Endpoint endpoint)
             throws CreateException
     {
 
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
 
         this.connector = (AxisConnector) connector;
         try
@@ -87,12 +87,12 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         String doc = (String) endpoint.getProperties().get("documentation");
 
         EndpointURI uri = endpoint.getEndpointURI();
-        String serviceName = component.getName();
+        String serviceName = service.getName();
 
         SOAPService existing = this.connector.getAxis().getService(serviceName);
         if (existing != null)
         {
-            service = existing;
+            soapService = existing;
             logger.debug("Using existing service for " + serviceName);
         }
         else
@@ -102,7 +102,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             if (style != null && style.equalsIgnoreCase("message"))
             {
                 logger.debug("Creating Message Provider");
-                service = new SOAPService(new MuleMsgProvider(connector));
+                soapService = new SOAPService(new MuleMsgProvider(connector));
                 // } else if (style != null && style.equalsIgnoreCase("document")) {
                 // logger.debug("Creating Doc Provider");
                 // service = new SOAPService(new MuleDocLitProvider(connector));
@@ -110,18 +110,18 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             else
             {
                 logger.debug("Creating RPC Provider");
-                service = new SOAPService(new MuleRPCProvider(connector));
+                soapService = new SOAPService(new MuleRPCProvider(connector));
             }
 
-            service.setEngine(connector.getAxis());
+            soapService.setEngine(connector.getAxis());
         }
 
         String servicePath = uri.getPath();
-        service.setOption(serviceName, this);
-        service.setOption(AxisConnector.SERVICE_PROPERTY_SERVCE_PATH, servicePath);
-        service.setOption(AxisConnector.SERVICE_PROPERTY_COMPONENT_NAME, serviceName);
+        soapService.setOption(serviceName, this);
+        soapService.setOption(AxisConnector.SERVICE_PROPERTY_SERVCE_PATH, servicePath);
+        soapService.setOption(AxisConnector.SERVICE_PROPERTY_COMPONENT_NAME, serviceName);
 
-        service.setName(serviceName);
+        soapService.setName(serviceName);
 
         // Add any custom options from the Descriptor config
         Map options = (Map) endpoint.getProperties().get(AXIS_OPTIONS);
@@ -140,16 +140,16 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         for (Iterator iterator = options.entrySet().iterator(); iterator.hasNext();)
         {
             entry = (Map.Entry) iterator.next();
-            service.setOption(entry.getKey().toString(), entry.getValue());
+            soapService.setOption(entry.getKey().toString(), entry.getValue());
             logger.debug("Adding Axis option: " + entry);
         }
 
         // set method names
-        Class[] interfaces = AxisServiceProxy.getInterfacesForComponent(component);
+        Class[] interfaces = AxisServiceProxy.getInterfacesForComponent(service);
         if (interfaces.length == 0)
         {
             throw new InitialisationException(
-                    AxisMessages.objectMustImplementAnInterface(serviceName), component);
+                    AxisMessages.objectMustImplementAnInterface(serviceName), service);
         }
         // You must supply a class name if you want to restrict methods
         // or specify the 'allowedMethods' property in the axisOptions property
@@ -158,7 +158,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         Map methods = (Map) endpoint.getProperties().get(AxisConnector.SOAP_METHODS);
         if (methods == null)
         {
-            methods = (Map) component.getProperties().get(AxisConnector.SOAP_METHODS);
+            methods = (Map) service.getProperties().get(AxisConnector.SOAP_METHODS);
         }
         if (methods != null)
         {
@@ -196,7 +196,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
                     parameters[j] = new ParameterDesc(parameter.getName(), mode, parameter.getType());
                 }
 
-                service.getServiceDescription().addOperationDesc(
+                soapService.getServiceDescription().addOperationDesc(
                         new OperationDesc(method.getName().getLocalPart(), parameters, method.getReturnType()));
                 buf.append(method.getName().getLocalPart() + ",");
             }
@@ -230,7 +230,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         String wsdlFile = (String) endpoint.getProperties().get("wsdlFile");
         if (wsdlFile != null)
         {
-            service.getServiceDescription().setWSDLFile(wsdlFile);
+            soapService.getServiceDescription().setWSDLFile(wsdlFile);
         }
         /*
          * Now we set up the various options for the SOAPService. We set:
@@ -245,22 +245,22 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
          * methods the service can execute on our class. We don't set:
          * RPCProvider.OPTION_WSDL_PORTTYPE RPCProvider.OPTION_WSDL_SERVICEELEMENT
          */
-        setOptionIfNotset(service, JavaProvider.OPTION_WSDL_SERVICEPORT, serviceName);
-        setOptionIfNotset(service, JavaProvider.OPTION_CLASSNAME, className);
-        setOptionIfNotset(service, JavaProvider.OPTION_SCOPE, "Request");
+        setOptionIfNotset(soapService, JavaProvider.OPTION_WSDL_SERVICEPORT, serviceName);
+        setOptionIfNotset(soapService, JavaProvider.OPTION_CLASSNAME, className);
+        setOptionIfNotset(soapService, JavaProvider.OPTION_SCOPE, "Request");
         if (StringUtils.isNotBlank(namespace))
         {
-            setOptionIfNotset(service, JavaProvider.OPTION_WSDL_TARGETNAMESPACE, namespace);
+            setOptionIfNotset(soapService, JavaProvider.OPTION_WSDL_TARGETNAMESPACE, namespace);
         }
 
         // Set the allowed methods, allow all if there are none specified.
         if (methodNames == null)
         {
-            setOptionIfNotset(service, JavaProvider.OPTION_ALLOWEDMETHODS, "*");
+            setOptionIfNotset(soapService, JavaProvider.OPTION_ALLOWEDMETHODS, "*");
         }
         else
         {
-            setOptionIfNotset(service, JavaProvider.OPTION_ALLOWEDMETHODS, methodNames);
+            setOptionIfNotset(soapService, JavaProvider.OPTION_ALLOWEDMETHODS, methodNames);
         }
 
         // Note that Axis has specific rules to how these two variables are
@@ -277,7 +277,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             }
             else
             {
-                service.setStyle(s);
+                soapService.setStyle(s);
             }
         }
         // Set use: Endcoded/Literal
@@ -291,11 +291,11 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             }
             else
             {
-                service.setUse(u);
+                soapService.setUse(u);
             }
         }
 
-        service.getServiceDescription().setDocumentation(doc);
+        soapService.getServiceDescription().setDocumentation(doc);
 
         // Tell Axis to try and be intelligent about serialization.
         // TypeMappingRegistryImpl registry = (TypeMappingRegistryImpl)
@@ -313,34 +313,34 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // List types = (List) descriptor.getProperties().get(BEAN_TYPES);
         // connector.registerTypes(registry, types);
 
-        service.setName(serviceName);
+        soapService.setName(serviceName);
 
         // Add initialisation callback for the Axis service
-        component.addInitialisationCallback(new AxisInitialisationCallback(service));
+        service.addInitialisationCallback(new AxisInitialisationCallback(soapService));
 
         if (uri.getScheme().equalsIgnoreCase("servlet"))
         {
-            connector.addServletService(service);
+            connector.addServletService(soapService);
             String endpointUrl = uri.getAddress() + "/" + serviceName;
             endpointUrl = endpointUrl.replaceFirst("servlet:", "http:");
-            service.getServiceDescription().setEndpointURL(endpointUrl);
+            soapService.getServiceDescription().setEndpointURL(endpointUrl);
         }
         else
         {
-            service.getServiceDescription().setEndpointURL(uri.getAddress() + "/" + serviceName);
+            soapService.getServiceDescription().setEndpointURL(uri.getAddress() + "/" + serviceName);
         }
         if (StringUtils.isNotBlank(namespace))
         {
-            service.getServiceDescription().setDefaultNamespace(namespace);
+            soapService.getServiceDescription().setDefaultNamespace(namespace);
         }
-        service.init();
-        service.stop();
+        soapService.init();
+        soapService.stop();
     }
 
     protected void doConnect() throws Exception
     {
         // Tell the axis configuration about our new service.
-        connector.getServerProvider().deployService(service.getName(), service);
+        connector.getServerProvider().deployService(soapService.getName(), soapService);
         connector.registerReceiverWithMuleService(this, endpoint.getEndpointURI());
     }
 
@@ -362,17 +362,17 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
     protected void doStart() throws MuleException
     {
-        if (service != null)
+        if (soapService != null)
         {
-            service.start();
+            soapService.start();
         }
     }
 
     protected void doStop() throws MuleException
     {
-        if (service != null)
+        if (soapService != null)
         {
-            service.stop();
+            soapService.stop();
         }
     }
 
@@ -390,8 +390,8 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    public SOAPService getService()
+    public SOAPService getSoapService()
     {
-        return service;
+        return soapService;
     }
 }

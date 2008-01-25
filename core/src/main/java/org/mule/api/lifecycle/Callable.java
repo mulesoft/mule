@@ -16,7 +16,7 @@ import org.mule.api.MuleEventContext;
  * <code>Callable</code> is used to provide UMOs with an interface that supports
  * event calls. UMO components do not have to implement this interface, though the
  * <code>onCall</code> method provides an example lifecycle method that is executed
- * when an event is received for the implementing component.
+ * when an event is received for the implementing service.
  */
 public interface Callable extends EventListener
 {
@@ -25,7 +25,7 @@ public interface Callable extends EventListener
      * 
      * @param eventContext the context of the current event being process
      * @return Object this object can be anything. When the
-     *         <code>LifecycleAdapter</code> for the component receives this
+     *         <code>LifecycleAdapter</code> for the service receives this
      *         object it will first see if the Object is an <code>MuleMessage</code>
      *         if not and the Object is not null a new message will be created using
      *         the returned object as the payload. This new event will then get
@@ -37,7 +37,7 @@ public interface Callable extends EventListener
      *         </ol>
      * @throws Exception if the event fails to process properly. If exceptions aren't
      *             handled by the implementation they will be handled by the
-     *             exceptionListener associated with the component
+     *             exceptionListener associated with the service
      */
     Object onCall(MuleEventContext eventContext) throws Exception;
 }

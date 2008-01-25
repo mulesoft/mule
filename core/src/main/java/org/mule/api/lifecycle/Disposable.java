@@ -12,7 +12,7 @@ package org.mule.api.lifecycle;
 
 /**
  * <code>Disposable</code> is a lifecycle interface that gets called at the dispose
- * lifecycle stage of the implementing component as the component is being destroyed.
+ * lifecycle stage of the implementing service as the service is being destroyed.
  */
 public interface Disposable
 {

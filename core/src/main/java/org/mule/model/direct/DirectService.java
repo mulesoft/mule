@@ -16,15 +16,15 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.MuleProxy;
-import org.mule.component.AbstractComponent;
+import org.mule.service.AbstractService;
 
 import java.util.List;
 
 /**
- * A direct component invokes the service component directly without any threading, 
+ * A direct service invokes the service service directly without any threading, 
  * even when the invocation is asynchronous
  */
-public class DirectComponent extends AbstractComponent
+public class DirectService extends AbstractService
 {
     /**
      * Serial version
@@ -35,7 +35,7 @@ public class DirectComponent extends AbstractComponent
     protected MuleProxy proxy;
     protected Object pojoService;
 
-    public DirectComponent()
+    public DirectService()
     {
         super();
     }

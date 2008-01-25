@@ -19,7 +19,7 @@ import org.mule.api.context.notification.CustomNotificationListener;
  * {@link org.mule.tck.functional.FunctionalTestComponent}.
  *
  * This Notification contains the current MuleEventContext and reply message. The resource Identifier for this event
- * is the component name that received the message.  This means you can register to listen to Notifications from a
+ * is the service name that received the message.  This means you can register to listen to Notifications from a
  * selected {@link org.mule.tck.functional.FunctionalTestComponent}. i.e.
  * <code>
  * muleContext.registerListener(this, "*JmsTestCompoennt");

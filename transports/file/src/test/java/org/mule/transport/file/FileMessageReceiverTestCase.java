@@ -10,8 +10,8 @@
 
 package org.mule.transport.file;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
@@ -43,12 +43,12 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public MessageReceiver getMessageReceiver() throws Exception
     {
         endpoint.getConnector().start();
-        Mock mockComponent = new Mock(Component.class);
+        Mock mockComponent = new Mock(Service.class);
         mockComponent.expectAndReturn("getResponseRouter", null);
         read.deleteOnExit();
         move.deleteOnExit();
 
-        return new FileMessageReceiver(endpoint.getConnector(), (Component)mockComponent.proxy(),
+        return new FileMessageReceiver(endpoint.getConnector(), (Service)mockComponent.proxy(),
             endpoint, read.getAbsolutePath(), move.getAbsolutePath(), null, 1000);
     }
 

@@ -14,12 +14,12 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.security.SecurityContext;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
@@ -54,12 +54,12 @@ public final class DefaultMuleSession implements MuleSession
     private static Log logger = LogFactory.getLog(DefaultMuleSession.class);
 
     /**
-     * The Mule component associated with the session
+     * The Mule service associated with the session
      */
-    private Component component = null;
+    private Service service = null;
 
     /**
-     * Determines if the component is valid
+     * Determines if the service is valid
      */
     private boolean valid = true;
 
@@ -69,23 +69,23 @@ public final class DefaultMuleSession implements MuleSession
 
     private Map properties = null;
 
-    public DefaultMuleSession(Component component)
+    public DefaultMuleSession(Service service)
     {
         properties = new HashMap();
         id = UUID.getUUID();
-        this.component = component;
+        this.service = service;
     }
 
-    public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, Component component)
+    public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, Service service)
         throws MuleException
     {
         this(message, requestSessionHandler);
-        if (component == null)
+        if (service == null)
         {
             throw new IllegalArgumentException(
-                CoreMessages.propertiesNotSet("component").toString());
+                CoreMessages.propertiesNotSet("service").toString());
         }
-        this.component = component;
+        this.service = service;
     }
 
     public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler) throws MuleException
@@ -123,16 +123,16 @@ public final class DefaultMuleSession implements MuleSession
 
     public void dispatchEvent(MuleMessage message) throws MuleException
     {
-        if (component == null)
+        if (service == null)
         {
-            throw new IllegalStateException(CoreMessages.objectIsNull("Component").getMessage());
+            throw new IllegalStateException(CoreMessages.objectIsNull("Service").getMessage());
         }
 
-        OutboundRouterCollection router = component.getOutboundRouter();
+        OutboundRouterCollection router = service.getOutboundRouter();
         if (router == null)
         {
             throw new EndpointNotFoundException(
-                CoreMessages.noOutboundRouterSetOn(component.getName()));
+                CoreMessages.noOutboundRouterSetOn(service.getName()));
         }
         router.route(message, this, false);
     }
@@ -169,15 +169,15 @@ public final class DefaultMuleSession implements MuleSession
 
     public MuleMessage sendEvent(MuleMessage message) throws MuleException
     {
-        if (component == null)
+        if (service == null)
         {
-            throw new IllegalStateException(CoreMessages.objectIsNull("Component").getMessage());
+            throw new IllegalStateException(CoreMessages.objectIsNull("Service").getMessage());
         }
-        OutboundRouterCollection router = component.getOutboundRouter();
+        OutboundRouterCollection router = service.getOutboundRouter();
         if (router == null)
         {
             throw new EndpointNotFoundException(
-                CoreMessages.noOutboundRouterSetOn(component.getName()));
+                CoreMessages.noOutboundRouterSetOn(service.getName()));
         }
         MuleMessage result = router.route(message, this, true);
         if (result != null)
@@ -256,14 +256,14 @@ public final class DefaultMuleSession implements MuleSession
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
         }
-        else if (component != null)
+        else if (service != null)
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("dispatching event to component: " + component.getName()
+                logger.debug("dispatching event to service: " + service.getName()
                              + ", event is: " + event);
             }
-            component.dispatchEvent(event);
+            service.dispatchEvent(event);
             processResponse(event.getMessage());
         }
         else
@@ -332,14 +332,14 @@ public final class DefaultMuleSession implements MuleSession
             }
 
         }
-        else if (component != null)
+        else if (service != null)
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("sending event to component: " + component.getName()
+                logger.debug("sending event to service: " + service.getName()
                              + " event is: " + event);
             }
-            return component.sendEvent(event);
+            return service.sendEvent(event);
 
         }
         else
@@ -434,7 +434,7 @@ public final class DefaultMuleSession implements MuleSession
             MuleEvent event;
             if (previousEvent != null)
             {
-                event = new DefaultMuleEvent(message, endpoint, component, previousEvent);
+                event = new DefaultMuleEvent(message, endpoint, service, previousEvent);
             }
             else
             {
@@ -450,16 +450,16 @@ public final class DefaultMuleSession implements MuleSession
     }
 
     /**
-     * @return Returns the component.
+     * @return Returns the service.
      */
-    public Component getComponent()
+    public Service getService()
     {
-        return component;
+        return service;
     }
 
-    void setComponent(Component component)
+    void setService(Service service)
     {
-        this.component = component;
+        this.service = service;
     }
 
     /**

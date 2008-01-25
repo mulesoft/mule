@@ -85,14 +85,14 @@ public class PropertiesContainerContext extends AbstractContainerContext impleme
     }
 
     /**
-     * Queries a component from the underlying container. For this container it will
+     * Queries a service from the underlying container. For this container it will
      * look up a property on the Mule Management Context.
      * 
-     * @param key the key fo find the component with. It's up to the individual
+     * @param key the key fo find the service with. It's up to the individual
      *            implementation to check the type of this key and look up objects
      *            accordingly
-     * @return the component found in the container
-     * @throws org.mule.api.context.ObjectNotFoundException if the component is not
+     * @return the service found in the container
+     * @throws org.mule.api.context.ObjectNotFoundException if the service is not
      *             found
      */
     public Object getComponent(Object key) throws ObjectNotFoundException

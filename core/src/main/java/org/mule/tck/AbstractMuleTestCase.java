@@ -16,11 +16,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
@@ -463,9 +463,9 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestEndpoint(name, type, muleContext);
     }
 
-    public static MuleEvent getTestEvent(Object data, Component component) throws Exception
+    public static MuleEvent getTestEvent(Object data, Service service) throws Exception
     {
-        return MuleTestUtils.getTestEvent(data, component, muleContext);
+        return MuleTestUtils.getTestEvent(data, service, muleContext);
     }
 
     public static MuleEvent getTestEvent(Object data) throws Exception
@@ -488,15 +488,15 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestEvent(data, endpoint, muleContext);
     }
 
-    public static MuleEvent getTestEvent(Object data, Component component, ImmutableEndpoint endpoint)
+    public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint)
         throws Exception
     {
-        return MuleTestUtils.getTestEvent(data, component, endpoint, muleContext);
+        return MuleTestUtils.getTestEvent(data, service, endpoint, muleContext);
     }
 
-    public static MuleSession getTestSession(Component component)
+    public static MuleSession getTestSession(Service service)
     {
-        return MuleTestUtils.getTestSession(component);
+        return MuleTestUtils.getTestSession(service);
     }
 
     public static TestConnector getTestConnector() throws Exception
@@ -504,19 +504,19 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestConnector(muleContext);
     }
 
-    public static Component getTestComponent() throws Exception
+    public static Service getTestService() throws Exception
     {
-        return MuleTestUtils.getTestComponent(muleContext);
+        return MuleTestUtils.getTestService(muleContext);
     }
 
-    public static Component getTestComponent(String name, Class clazz) throws Exception
+    public static Service getTestService(String name, Class clazz) throws Exception
     {
-        return MuleTestUtils.getTestComponent(name, clazz, muleContext);
+        return MuleTestUtils.getTestService(name, clazz, muleContext);
     }
 
-    public static Component getTestComponent(String name, Class clazz, Map props) throws Exception
+    public static Service getTestService(String name, Class clazz, Map props) throws Exception
     {
-        return MuleTestUtils.getTestComponent(name, clazz, props, muleContext);
+        return MuleTestUtils.getTestService(name, clazz, props, muleContext);
     }
 
     public static class TestInfo

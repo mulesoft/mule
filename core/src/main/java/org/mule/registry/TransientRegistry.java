@@ -14,7 +14,6 @@ import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -29,6 +28,7 @@ import org.mule.api.registry.Registry;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -390,9 +390,9 @@ public class TransientRegistry extends AbstractRegistry
     }
 
     //@java.lang.Override
-    public void registerComponent(Component component) throws MuleException
+    public void registerService(Service service) throws MuleException
     {
-        registerObject(component.getName(), component, Component.class);
+        registerObject(service.getName(), service, Service.class);
     }
 
     protected void unregisterObject(String key, Object metadata) throws MuleException
@@ -412,7 +412,7 @@ public class TransientRegistry extends AbstractRegistry
     //@java.lang.Override
     public void unregisterComponent(String componentName) throws MuleException
     {
-        unregisterObject(componentName, Component.class);
+        unregisterObject(componentName, Service.class);
     }
 
 

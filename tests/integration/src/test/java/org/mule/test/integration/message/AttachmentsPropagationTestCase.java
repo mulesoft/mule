@@ -58,7 +58,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
     {
         MuleMessage message = context.getMessage();
         // add an attachment, named after the componentname...
-        message.addAttachment(context.getComponent().getName(), new DataHandler(
+        message.addAttachment(context.getService().getName(), new DataHandler(
             new PlainTextDataSource("text/plain", "<content>")));
 
         // return the list of attachment names
@@ -73,7 +73,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
         MuleMessage result = client.send("vm://Single", "", null);
         assertNotNull(result);
 
-        // expect SINGLE attachment from SINGLE component
+        // expect SINGLE attachment from SINGLE service
         assertEquals("[SINGLE]", result.getPayloadAsString());
     }
 
@@ -83,8 +83,8 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
         MuleMessage result = client.send("vm://Chained", "", null);
         assertNotNull(result);
 
-        // expect CHAINED attachment from CHAINED component
-        // and SINGLE attachment from SINGLE component
+        // expect CHAINED attachment from CHAINED service
+        // and SINGLE attachment from SINGLE service
         assertEquals("[SINGLE, CHAINED]", result.getPayloadAsString());
     }
 
@@ -96,7 +96,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
         MuleMessage result = client.send("vm://Single", "", null);
         assertNotNull(result);
 
-        // expect SINGLE attachment from SINGLE component
+        // expect SINGLE attachment from SINGLE service
         assertEquals("[SINGLE]", result.getPayloadAsString());
         assertNotNull(result.getAttachment("SINGLE"));
         assertEquals("<content>", result.getAttachment("SINGLE").getContent().toString());

@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.Iterator;
 
 /**
- * <code>ExceptionMessage</code> is used by the DefaultComponentExceptionStrategy
+ * <code>ExceptionMessage</code> is used by the DefaultServiceExceptionStrategy
  * for wrapping an exception with a message to send via an endpointUri.
  */
 public class ExceptionMessage extends BaseMessage

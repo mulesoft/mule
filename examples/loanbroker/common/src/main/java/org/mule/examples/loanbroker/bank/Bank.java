@@ -10,10 +10,10 @@
 
 package org.mule.examples.loanbroker.bank;
 
-import org.mule.api.component.Component;
-import org.mule.api.component.ComponentAware;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.Endpoint;
+import org.mule.api.service.Service;
+import org.mule.api.service.ServiceAware;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.examples.loanbroker.LocaleMessage;
 import org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest;
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * quotes.
  */
 
-public class Bank implements ComponentAware, Serializable, BankService
+public class Bank implements ServiceAware, Serializable, BankService
 {
     /**
      * Serial version
@@ -66,11 +66,11 @@ public class Bank implements ComponentAware, Serializable, BankService
 
     // TODO This method doesn't help us with the Static Recipient list because the list of banks is created 
     // programatically in DefaultLenderService (they should be looked up from the config/registry).
-    public void setComponent(Component component) throws ConfigurationException 
+    public void setService(Service service) throws ConfigurationException 
     {
-        this.bankName = component.getName(); 
+        this.bankName = service.getName(); 
 
-        List endpoints = component.getInboundRouter().getEndpoints();
+        List endpoints = service.getInboundRouter().getEndpoints();
         if ((endpoints == null) || (endpoints.size() != 1))
         {
             throw new ConfigurationException(MessageFactory.createStaticMessage("Bank is expected to have exactly 1 incoming endpoint."));

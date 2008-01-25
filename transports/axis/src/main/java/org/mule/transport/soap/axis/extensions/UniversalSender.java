@@ -15,12 +15,11 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -28,6 +27,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.transport.http.HttpConstants;
@@ -260,7 +260,7 @@ public class UniversalSender extends BasicHandler
 
     protected ImmutableEndpoint lookupEndpoint(String uri) throws MuleException
     {
-        Component axis = RegistryContext.getRegistry().lookupComponent(AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
+        Service axis = RegistryContext.getRegistry().lookupService(AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
         EndpointURI endpoint = new MuleEndpointURI(uri);
         MuleContext muleContext = MuleServer.getMuleContext(); 
         ImmutableEndpoint ep;

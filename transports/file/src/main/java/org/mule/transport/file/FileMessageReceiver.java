@@ -13,10 +13,10 @@ package org.mule.transport.file;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -60,14 +60,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private FileFilter fileFilter = null;
 
     public FileMessageReceiver(Connector connector,
-                               Component component,
+                               Service service,
                                ImmutableEndpoint endpoint,
                                String readDir,
                                String moveDir,
                                String moveToPattern,
                                long frequency) throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
         this.setFrequency(frequency);
 
         this.readDir = readDir;

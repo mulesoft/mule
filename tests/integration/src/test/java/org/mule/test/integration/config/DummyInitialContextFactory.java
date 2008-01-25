@@ -11,8 +11,8 @@
 package org.mule.test.integration.config;
 
 import org.mule.MuleServer;
-import org.mule.api.component.Component;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.component.simple.EchoComponent;
 import org.mule.jndi.SimpleContext;
 import org.mule.management.agents.Log4jAgent;
@@ -33,7 +33,7 @@ public class DummyInitialContextFactory implements ObjectFactory
         c.bind("endpointRef", "vm://my.object");
         c.bind("Log4JAgent", new Log4jAgent());
         c.bind("XmlToObject", new XmlToObject());
-        Component d = MuleTestUtils.getTestComponent("EchoUMO", EchoComponent.class, MuleServer.getMuleContext());
+        Service d = MuleTestUtils.getTestService("EchoUMO", EchoComponent.class, MuleServer.getMuleContext());
         c.bind("EchoUMO", d);
         return c;
     }

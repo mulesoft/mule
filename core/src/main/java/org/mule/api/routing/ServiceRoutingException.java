@@ -11,68 +11,68 @@
 package org.mule.api.routing;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>ComponentRoutingException</code> is thrown due to a routing exception
- * between the endpoint the event was received on and the component receiving the
+ * <code>ServiceRoutingException</code> is thrown due to a routing exception
+ * between the endpoint the event was received on and the service receiving the
  * event.
  */
-public class ComponentRoutingException extends RoutingException
+public class ServiceRoutingException extends RoutingException
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = -113944443831267318L;
 
-    private transient Component component;
+    private transient Service service;
 
-    public ComponentRoutingException(Message message,
+    public ServiceRoutingException(Message message,
                                      MuleMessage umoMessage,
                                      ImmutableEndpoint endpoint,
-                                     Component component)
+                                     Service service)
     {
-        super(generateMessage(message, endpoint, component), umoMessage, endpoint);
-        this.component = component;
+        super(generateMessage(message, endpoint, service), umoMessage, endpoint);
+        this.service = service;
     }
 
-    public ComponentRoutingException(Message message,
+    public ServiceRoutingException(Message message,
                                      MuleMessage umoMessage,
                                      ImmutableEndpoint endpoint,
-                                     Component component,
+                                     Service service,
                                      Throwable cause)
     {
-        super(generateMessage(message, endpoint, component), umoMessage, endpoint, cause);
-        this.component = component;
+        super(generateMessage(message, endpoint, service), umoMessage, endpoint, cause);
+        this.service = service;
     }
 
-    public ComponentRoutingException(MuleMessage umoMessage,
+    public ServiceRoutingException(MuleMessage umoMessage,
                                      ImmutableEndpoint endpoint,
-                                     Component component)
+                                     Service service)
     {
-        super(generateMessage(null, endpoint, component), umoMessage, endpoint);
-        this.component = component;
+        super(generateMessage(null, endpoint, service), umoMessage, endpoint);
+        this.service = service;
     }
 
-    public ComponentRoutingException(MuleMessage umoMessage,
+    public ServiceRoutingException(MuleMessage umoMessage,
                                      ImmutableEndpoint endpoint,
-                                     Component component,
+                                     Service service,
                                      Throwable cause)
     {
-        super(generateMessage(null, endpoint, component), umoMessage, endpoint, cause);
-        this.component = component;
+        super(generateMessage(null, endpoint, service), umoMessage, endpoint, cause);
+        this.service = service;
 
     }
 
     private static Message generateMessage(Message message,
                                            ImmutableEndpoint endpoint,
-                                           Component component)
+                                           Service service)
     {
 
-        Message m = CoreMessages.routingFailedOnEndpoint(component.getName(), 
+        Message m = CoreMessages.routingFailedOnEndpoint(service.getName(), 
             endpoint.getEndpointURI());
         if (message != null)
         {
@@ -85,8 +85,8 @@ public class ComponentRoutingException extends RoutingException
         }
     }
 
-    public Component getComponent()
+    public Service getService()
     {
-        return component;
+        return service;
     }
 }

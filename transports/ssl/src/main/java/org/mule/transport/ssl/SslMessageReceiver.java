@@ -11,9 +11,9 @@
 package org.mule.transport.ssl;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.tcp.TcpMessageReceiver;
@@ -34,10 +34,10 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
     private Certificate[] peerCertificateChain;
     private Certificate[] localCertificateChain;
 
-    public SslMessageReceiver(Connector connector, Component component, ImmutableEndpoint endpoint)
+    public SslMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
             throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
     }
 
     protected Work createWork(Socket socket) throws IOException

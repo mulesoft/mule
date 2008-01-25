@@ -7,15 +7,15 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <model name="main">
-        <service name="unique1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="unique1" class="org.mule.tck.testmodels.mule.TestSedaService">
             <component class="org.mule.tck.services.UniqueComponent" />
         </service>
-        <service name="unique2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="unique2" class="org.mule.tck.testmodels.mule.TestSedaService">
             <component>
                 <singleton-object class="org.mule.tck.services.UniqueComponent" />
             </component>
         </service>
-        <service name="unique3" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="unique3" class="org.mule.tck.testmodels.mule.TestSedaService">
             <component>
                 <spring-object bean="myUniqueBean"  />
             </component>

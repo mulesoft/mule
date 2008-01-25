@@ -11,7 +11,6 @@
 package org.mule.transport.soap.xfire;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
@@ -36,7 +35,7 @@ import org.codehaus.xfire.service.Service;
 
 /**
  * Used to register an Xfire endpoint registered with Mule and associated with a
- * component This receiver is responsible or registering the transport endpoint i.e.
+ * service This receiver is responsible or registering the transport endpoint i.e.
  * http:// as well as managing the association of this transport endpoint with the
  * Xfire service.
  */
@@ -45,14 +44,14 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     private static final String PORT_TYPE = "portType";
 
     protected XFireConnector connector;
-    protected Service service;
+    protected Service xfireService;
 
     protected List serviceInterfaces;
 
-    public XFireMessageReceiver(Connector umoConnector, Component component, Endpoint umoEndpoint)
+    public XFireMessageReceiver(Connector umoConnector, org.mule.api.service.Service service, Endpoint umoEndpoint)
         throws CreateException
     {
-        super(umoConnector, component, umoEndpoint);
+        super(umoConnector, service, umoEndpoint);
 
         connector = (XFireConnector) umoConnector;
         create();
@@ -62,7 +61,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            Map props = new HashMap(component.getProperties());
+            Map props = new HashMap(service.getProperties());
             props.putAll(endpoint.getProperties());
 
             // convert port Type to QName if specified
@@ -74,8 +73,8 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 props.put(PORT_TYPE, portTypeQName);
             }
 
-            // check if there is the namespace property on the component
-            String namespace = (String) component.getProperties().get(SoapConstants.SOAP_NAMESPACE_PROPERTY);
+            // check if there is the namespace property on the service
+            String namespace = (String) service.getProperties().get(SoapConstants.SOAP_NAMESPACE_PROPERTY);
 
             // check for namespace set as annotation
             if (connector.isEnableJSR181Annotations())
@@ -86,7 +85,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 // we have to retrieve the implementation classname and create a
                 // class for it
                 WebServiceAnnotation webServiceAnnotation = 
-                    wa.getWebServiceAnnotation(component.getServiceFactory().getObjectClass());
+                    wa.getWebServiceAnnotation(service.getServiceFactory().getObjectClass());
                 namespace = webServiceAnnotation.getTargetNamespace();
             }
 
@@ -118,12 +117,12 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 rewriteProperty(props, "schemas");
             }
 
-            serviceInterfaces = (List)component.getProperties().get(SoapConstants.SERVICE_INTERFACES);
+            serviceInterfaces = (List)service.getProperties().get(SoapConstants.SERVICE_INTERFACES);
             Class exposedInterface;
 
             if (serviceInterfaces == null)
             {
-                exposedInterface = component.getServiceFactory().getOrCreate().getClass();
+                exposedInterface = service.getServiceFactory().getOrCreate().getClass();
             }
             else
             {
@@ -137,17 +136,17 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 }
             }
 
-            String wsdlUrl = (String) component.getProperties().get(SoapConstants.WSDL_URL_PROPERTY);
+            String wsdlUrl = (String) service.getProperties().get(SoapConstants.WSDL_URL_PROPERTY);
 
             if (StringUtils.isBlank(wsdlUrl))
             {
-                service = connector.getServiceFactory().create(exposedInterface,
-                    component.getName(), namespace, props);
+                xfireService = connector.getServiceFactory().create(exposedInterface,
+                    service.getName(), namespace, props);
             }
             else
             {
-                service = connector.getServiceFactory().create(exposedInterface,
-                    new QName(namespace, component.getName()), new URL(wsdlUrl), props);
+                xfireService = connector.getServiceFactory().create(exposedInterface,
+                    new QName(namespace, service.getName()), new URL(wsdlUrl), props);
             }
             
             List inList = connector.getServerInHandlers();
@@ -157,12 +156,12 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 {
                     Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
                     Handler handler = (Handler) clazz.getConstructor(null).newInstance(null);
-                    service.addInHandler(handler);
+                    xfireService.addInHandler(handler);
                 }
             }
 
             boolean sync = endpoint.isSynchronous();
-            service.setInvoker(new MuleInvoker(this, sync));
+            xfireService.setInvoker(new MuleInvoker(this, sync));
         }
         catch (Exception e)
         {
@@ -178,13 +177,13 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     public void doConnect() throws Exception
     {
         // Tell the Xfire registry about our new service.
-        connector.getXfire().getServiceRegistry().register(service);
+        connector.getXfire().getServiceRegistry().register(xfireService);
         connector.registerReceiverWithMuleService(this, endpoint.getEndpointURI());
     }
 
     public void doDisconnect() throws Exception
     {
-        connector.getXfire().getServiceRegistry().unregister(service);
+        connector.getXfire().getServiceRegistry().unregister(xfireService);
     }
 
     public void doStart() throws MuleException

@@ -14,7 +14,7 @@ import org.mule.config.i18n.MessageFactory;
 
 /**
  * Tis exception gets thrown by the {@link org.mule.model.resolvers.DefaultEntryPointResolverSet} if after trying
- * all entrypointResolvers it cannot fin the entrypoint on the service component
+ * all entrypointResolvers it cannot fin the entrypoint on the service service
  */
 public class EntryPointNotFoundException extends MuleException
 {

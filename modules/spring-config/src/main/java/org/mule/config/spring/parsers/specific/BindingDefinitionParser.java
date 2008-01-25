@@ -13,7 +13,7 @@ import org.mule.config.spring.parsers.generic.GrandchildDefinitionParser;
 import org.mule.routing.inbound.CorrelationAggregator;
 
 /**
- * Binding definition parser for parsing all binding elements configured as part of the component.
+ * Binding definition parser for parsing all binding elements configured as part of the service.
  */
 public class BindingDefinitionParser extends GrandchildDefinitionParser
 {

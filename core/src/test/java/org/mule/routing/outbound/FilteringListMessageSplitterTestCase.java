@@ -13,8 +13,8 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
+import org.mule.api.service.Service;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -25,8 +25,8 @@ public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
 {
     public void testCorrelationGroupSizePropertySet() throws Exception
     {
-        Component testComponent = getTestComponent("test", Apple.class);
-        MuleSession session = getTestSession(testComponent);
+        Service testService = getTestService("test", Apple.class);
+        MuleSession session = getTestSession(testService);
 
         Endpoint endpoint = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
 

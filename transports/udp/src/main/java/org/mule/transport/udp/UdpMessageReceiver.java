@@ -13,11 +13,11 @@ package org.mule.transport.udp;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
@@ -48,11 +48,11 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     private URI uri;
     protected List responseTransformers = null;
 
-    public UdpMessageReceiver(Connector connector, Component component, ImmutableEndpoint endpoint)
+    public UdpMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
             throws CreateException
     {
 
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
 
         bufferSize = ((UdpConnector) connector).getReceiveBufferSize();
 

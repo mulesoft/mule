@@ -12,7 +12,7 @@ package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
-import org.mule.model.direct.DirectComponent;
+import org.mule.model.direct.DirectService;
 import org.mule.model.direct.DirectModel;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -23,7 +23,7 @@ public class SimpleNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         registerBeanDefinitionParser("model", new OrphanDefinitionParser(DirectModel.class, true));
-        registerBeanDefinitionParser("service", new ServiceDefinitionParser(DirectComponent.class));
+        registerBeanDefinitionParser("service", new ServiceDefinitionParser(DirectService.class));
     }
 
 }

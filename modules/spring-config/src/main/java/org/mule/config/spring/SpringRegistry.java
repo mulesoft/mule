@@ -12,7 +12,6 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -24,6 +23,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.MuleConfiguration;
@@ -227,10 +227,10 @@ public class SpringRegistry extends AbstractRegistry
     }
 
     /** {@inheritDoc} */
-    public void registerComponent(Component component)
+    public void registerService(Service service)
             throws MuleException
     {
-        unsupportedOperation("registerComponent", component);
+        unsupportedOperation("registerComponent", service);
     }
 
     public void unregisterComponent(String componentName)

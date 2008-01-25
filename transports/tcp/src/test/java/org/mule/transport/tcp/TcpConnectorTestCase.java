@@ -10,8 +10,8 @@
 
 package org.mule.transport.tcp;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -41,7 +41,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
 
     public void testValidListener() throws Exception
     {
-        Component component = getTestComponent("orange", Orange.class);
+        Service service = getTestService("orange", Orange.class);
         
         Endpoint endpoint = (Endpoint) muleContext.getRegistry()
             .lookupEndpointFactory()
@@ -60,7 +60,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI(getTestEndpointURI()));
-        connector.registerListener(component, endpoint);
+        connector.registerListener(service, endpoint);
     }
 
     public void testProperties() throws Exception

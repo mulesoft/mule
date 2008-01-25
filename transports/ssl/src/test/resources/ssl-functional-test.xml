@@ -23,7 +23,7 @@
 
     <model name="main">
 
-        <service name="testComponent1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="testComponent1" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <ssl:inbound-endpoint ref="sendEndpoint"/>
             </inbound>
@@ -38,7 +38,7 @@
             </component>
         </service>
 
-        <service name="testComponent2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="testComponent2" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <ssl:inbound-endpoint ref="sendManyEndpoint"/>
             </inbound>
@@ -53,7 +53,7 @@
             </component>
         </service>
 
-        <service name="testComponent3" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="testComponent3" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <inbound-endpoint ref="asyncEndpoint"/>
             </inbound>

@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.model.direct.DirectComponent;
+import org.mule.model.direct.DirectService;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transport.DefaultMessageAdapter;
@@ -70,7 +70,7 @@ public class ThreadSafeAccessTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null);
         return new DefaultMuleEvent(message, MuleTestUtils.getTestEndpoint("test",
-            ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, muleContext), new DefaultMuleSession(new DirectComponent()), false);
+            ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, muleContext), new DefaultMuleSession(new DirectService()), false);
     }
 
     protected void resetAccessControl(ThreadSafeAccess target) throws InterruptedException

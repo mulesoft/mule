@@ -26,9 +26,9 @@ public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
     /* RM
     Described as:
     1. Client dispatch = "outbound"
-    2. First Component receiver = "inbound"
-    3. First Component dispatch (first endpoint) = "outbound"
-    4. Second Component receiver = "inbound"
+    2. First Service receiver = "inbound"
+    3. First Service dispatch (first endpoint) = "outbound"
+    4. Second Service receiver = "inbound"
     5. Response transformer from SecondComponent = "response"
     Note that because the response transformer is configured locally on the outbound endppoint it only gets called once
     */
@@ -38,12 +38,12 @@ public class ResponseTransformerMule2165TestCase extends FunctionalTestCase
     /* RM
     Described as:
     1. Client dispatch = "outbound"
-    2. First Component receiver = "inbound"
-    3. First Component dispatch (first endpoint) = "outbound"
-    4. Second Component receiver = "inbound"
+    2. First Service receiver = "inbound"
+    3. First Service dispatch (first endpoint) = "outbound"
+    4. Second Service receiver = "inbound"
     5. Response transformer from SecondComponent = "response"
-    6. Response from outbound endpoint (to the component) = "response"
-    Note that because the global outbound inpoint is also the inbound endpoint of the bounce component
+    6. Response from outbound endpoint (to the service) = "response"
+    Note that because the global outbound inpoint is also the inbound endpoint of the bounce service
     The "response" ResponseTransformer gets called twice
     */
     public static final String GLOBAL_RESPONSE = LOCAL_RESPONSE + " response";

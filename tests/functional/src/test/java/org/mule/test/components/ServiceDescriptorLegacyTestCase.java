@@ -10,7 +10,7 @@
 
 package org.mule.test.components;
 
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 
@@ -27,7 +27,7 @@ public class ServiceDescriptorLegacyTestCase extends FunctionalTestCase
 
     public void testClassName() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("orange1");
+        Service c = muleContext.getRegistry().lookupService("orange1");
         Object service =  c.getServiceFactory().getOrCreate();
         assertTrue("Service should be an Orange", service instanceof Orange);
         // Default values
@@ -36,7 +36,7 @@ public class ServiceDescriptorLegacyTestCase extends FunctionalTestCase
 
     public void testContainerReference() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("orange2");
+        Service c = muleContext.getRegistry().lookupService("orange2");
         Object service =  c.getServiceFactory().getOrCreate();
         assertTrue("Service should be an Orange", service instanceof Orange);
         // Default values

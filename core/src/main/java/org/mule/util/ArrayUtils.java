@@ -66,7 +66,7 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
         }
         else
         {
-            throw new IllegalArgumentException("Unknown array component type: " + componentType.getName());
+            throw new IllegalArgumentException("Unknown array service type: " + componentType.getName());
         }
 
         if (Array.getLength(array) > maxElements)
@@ -86,11 +86,11 @@ public class ArrayUtils extends org.apache.commons.lang.ArrayUtils
      * and a "typed view" onto these objects is required.
      * 
      * @param objects the array of objects
-     * @param clazz the desired component type of the new array
+     * @param clazz the desired service type of the new array
      * @return <code>null</code> when objects is <code>null</code>, or a new
      *         array containing the elements of the source array which is typed to
      *         the given <code>clazz</code> parameter. If <code>clazz</code> is
-     *         already the component type of the source array, the source array is
+     *         already the service type of the source array, the source array is
      *         returned (i.e. no copy is created).
      * @throws IllegalArgumentException if the <code>clazz</code> argument is
      *             <code>null</code>.

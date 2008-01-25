@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class TestComponent implements ITestComponent
 {
-    public static final String EXCEPTION_MESSAGE = "Test Component fired an Exception";
+    public static final String EXCEPTION_MESSAGE = "Test Service fired an Exception";
 
     protected static final Log logger = LogFactory.getLog(TestComponent.class);
 

@@ -19,12 +19,12 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Transformer;
@@ -33,7 +33,7 @@ import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.model.seda.SedaModel;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -120,27 +120,27 @@ public final class MuleTestUtils
         }
     }
 
-    /** Supply no component, no endpoint */
+    /** Supply no service, no endpoint */
     public static MuleEvent getTestEvent(Object data, MuleContext context) throws Exception
     {
-        return getTestEvent(data, getTestComponent(context), context);
+        return getTestEvent(data, getTestService(context), context);
     }
 
-    /** Supply component but no endpoint */
-    public static MuleEvent getTestEvent(Object data, Component component, MuleContext context) throws Exception
+    /** Supply service but no endpoint */
+    public static MuleEvent getTestEvent(Object data, Service service, MuleContext context) throws Exception
     {
-        return getTestEvent(data, component, getTestEndpoint("test1", Endpoint.ENDPOINT_TYPE_SENDER, context), context);
+        return getTestEvent(data, service, getTestEndpoint("test1", Endpoint.ENDPOINT_TYPE_SENDER, context), context);
     }
 
-    /** Supply endpoint but no component */
+    /** Supply endpoint but no service */
     public static MuleEvent getTestEvent(Object data, ImmutableEndpoint endpoint, MuleContext context) throws Exception
     {
-        return getTestEvent(data, getTestComponent(context), endpoint, context);
+        return getTestEvent(data, getTestService(context), endpoint, context);
     }
 
-    public static MuleEvent getTestEvent(Object data, Component component, ImmutableEndpoint endpoint, MuleContext context) throws Exception
+    public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint, MuleContext context) throws Exception
     {
-        MuleSession session = getTestSession(component);
+        MuleSession session = getTestSession(service);
         return new DefaultMuleEvent(new DefaultMuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
@@ -165,9 +165,9 @@ public final class MuleTestUtils
         return t;
     }
 
-    public static MuleSession getTestSession(Component component)
+    public static MuleSession getTestSession(Service service)
     {
-        return new DefaultMuleSession(component);
+        return new DefaultMuleSession(service);
     }
 
     public static MuleSession getTestSession()
@@ -184,28 +184,28 @@ public final class MuleTestUtils
         return testConnector;
     }
 
-    public static Component getTestComponent(MuleContext context) throws Exception
+    public static Service getTestService(MuleContext context) throws Exception
     {
-        return getTestComponent("appleService", Apple.class, context);
+        return getTestService("appleService", Apple.class, context);
     }
 
-    public static Component getTestComponent(String name, Class clazz, MuleContext context) throws Exception
+    public static Service getTestService(String name, Class clazz, MuleContext context) throws Exception
     {
-        return getTestComponent(name, clazz, null, context);
+        return getTestService(name, clazz, null, context);
     }
 
-    public static Component getTestComponent(String name, Class clazz, Map props, MuleContext context) throws Exception
+    public static Service getTestService(String name, Class clazz, Map props, MuleContext context) throws Exception
     {
-        return getTestComponent(name, clazz, props, context, true);        
+        return getTestService(name, clazz, props, context, true);        
     }
 
-    public static Component getTestComponent(String name, Class clazz, Map props, MuleContext context, boolean initialize) throws Exception
+    public static Service getTestService(String name, Class clazz, Map props, MuleContext context, boolean initialize) throws Exception
     {
         SedaModel model = new SedaModel();
         model.setMuleContext(context);
         context.applyLifecycle(model);
         
-        Component c = new SedaComponent();
+        Service c = new SedaService();
         c.setName(name);
         ObjectFactory of = new SingletonObjectFactory(clazz, props);
         of.initialise();
@@ -213,7 +213,7 @@ public final class MuleTestUtils
         c.setModel(model);
         if (initialize)
         {
-            context.getRegistry().registerComponent(c);
+            context.getRegistry().registerService(c);
             //TODO Why is this necessary
             OutboundRouter router = new OutboundPassThroughRouter();
             c.getOutboundRouter().addRouter(router);

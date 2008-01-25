@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.routing.ComponentRoutingException;
+import org.mule.api.routing.ServiceRoutingException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
 
@@ -35,8 +35,8 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
     {
         if (getEndpoint() == null)
         {
-            throw new ComponentRoutingException(CoreMessages.noCatchAllEndpointSet(), message,
-                getEndpoint(), session.getComponent());
+            throw new ServiceRoutingException(CoreMessages.noCatchAllEndpointSet(), message,
+                getEndpoint(), session.getService());
         }
         try
         {

@@ -17,14 +17,14 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.routing.ComponentRoutingException;
+import org.mule.api.routing.ServiceRoutingException;
 import org.mule.api.routing.RoutingException;
 
 /**
- * <code>ComponentCatchAllStrategy</code> is used to catch any events and forward the
- * events to the component as is.
+ * <code>ServiceCatchAllStrategy</code> is used to catch any events and forward the
+ * events to the service as is.
  */
-public class ComponentCatchAllStrategy extends AbstractCatchAllStrategy
+public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
 {
     public void setEndpoint(ImmutableEndpoint endpoint)
     {
@@ -44,23 +44,23 @@ public class ComponentCatchAllStrategy extends AbstractCatchAllStrategy
         try
         {
             logger.info("MuleEvent being routed from catch all strategy for endpoint: " + event.getEndpoint());
-            event = new DefaultMuleEvent(message, event.getEndpoint(), session.getComponent(), event);
+            event = new DefaultMuleEvent(message, event.getEndpoint(), session.getService(), event);
             if (synchronous)
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                return session.getComponent().sendEvent(event);
+                return session.getService().sendEvent(event);
             }
             else
             {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                session.getComponent().dispatchEvent(event);
+                session.getService().dispatchEvent(event);
                 return null;
             }
         }
         catch (MuleException e)
         {
-            throw new ComponentRoutingException(event.getMessage(), event.getEndpoint(),
-                session.getComponent(), e);
+            throw new ServiceRoutingException(event.getMessage(), event.getEndpoint(),
+                session.getService(), e);
         }
     }
 }

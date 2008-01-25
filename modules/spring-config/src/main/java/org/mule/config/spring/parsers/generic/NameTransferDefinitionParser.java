@@ -49,7 +49,7 @@ public class NameTransferDefinitionParser extends ParentDefinitionParser
 
     /**
      * @param componentAttributeName The attribute name (after processing, which will strip "-ref",
-     * add plurals, etc) that identifies the component which will receive the "name".
+     * add plurals, etc) that identifies the service which will receive the "name".
      */
     public NameTransferDefinitionParser(String componentAttributeName)
     {
@@ -102,7 +102,7 @@ public class NameTransferDefinitionParser extends ParentDefinitionParser
             if (ATTRIBUTE_NAME.equals(name) && value instanceof String)
             {
                 NameTransferDefinitionParser.this.name = (String) value;
-                // name is set after component
+                // name is set after service
                 if (null != componentAttributeValue)
                 {
                     setName();
@@ -112,11 +112,11 @@ public class NameTransferDefinitionParser extends ParentDefinitionParser
             {
                 super.addPropertyWithReference(properties, config, name, value);
 
-                // intercept setting of component
+                // intercept setting of service
                 if (componentAttributeName.equals(name) && value instanceof String)
                 {
                     componentAttributeValue = (String) value;
-                    // name was set before component
+                    // name was set before service
                     if (null != NameTransferDefinitionParser.this.name)
                     {
                         setName();

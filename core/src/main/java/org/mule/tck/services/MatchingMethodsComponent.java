@@ -15,7 +15,7 @@ import org.mule.util.StringUtils;
 import java.rmi.Remote;
 
 /**
- * A test component that has two service methods with matching signature
+ * A test service that has two service methods with matching signature
  */
 public class MatchingMethodsComponent implements Remote
 {

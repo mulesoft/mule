@@ -12,12 +12,12 @@ package org.mule.transport.jms;
 
 import org.mule.api.MuleException;
 import org.mule.api.MessagingException;
-import org.mule.api.component.Component;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.StartException;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.MessageAdapter;
@@ -319,9 +319,9 @@ public class JmsConnector extends AbstractConnector implements ConnectionNotific
         return adapter;
     }
 
-    protected Object getReceiverKey(Component component, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
     {
-        return component.getName() + "~" + endpoint.getEndpointURI().getAddress();
+        return service.getName() + "~" + endpoint.getEndpointURI().getAddress();
     }
 
     public Session getSessionFromTransaction()

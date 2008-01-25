@@ -12,10 +12,10 @@ package org.mule.transport.http;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
@@ -134,9 +134,9 @@ public class HttpConnector extends TcpConnector
     }
 
     /**
-     * @see Connector#registerListener(Component, Endpoint)
+     * @see Connector#registerListener(Service, Endpoint)
      */
-    public MessageReceiver registerListener(Component component, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver registerListener(Service service, ImmutableEndpoint endpoint) throws Exception
     {
         if (endpoint != null)
         {
@@ -163,17 +163,17 @@ public class HttpConnector extends TcpConnector
             }
         }
         // proceed as usual
-        return super.registerListener(component, endpoint);
+        return super.registerListener(service, endpoint);
     }
 
     /**
      * The method determines the key used to store the receiver against.
      *
-     * @param component the component for which the endpoint is being registered
-     * @param endpoint the endpoint being registered for the component
+     * @param service the service for which the endpoint is being registered
+     * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against
      */
-    protected Object getReceiverKey(Component component, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
     {
         String key = endpoint.getEndpointURI().toString();
         int i = key.indexOf('?');

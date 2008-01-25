@@ -14,7 +14,7 @@ import org.mule.config.i18n.Message;
 import org.mule.DefaultMuleMessage;
 import org.mule.transport.ConnectException;
 import org.mule.transport.TransactedPollingMessageReceiver;
-import org.mule.api.Component;
+import org.mule.api.service.Service;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
@@ -33,11 +33,11 @@ public class ${TransportName}TransactedMessageReceiver extends TransactedPolling
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
     public ${TransportName}TransactedMessageReceiver(Connector connector,
-                                          Component component,
+                                          Service service,
                                           final Endpoint endpoint,
                                           long pollingFrequency) throws CreateException
     {
-        super(connector, component, endpoint, pollingFrequency);
+        super(connector, service, endpoint, pollingFrequency);
     }
 
     protected List getMessages() throws Exception

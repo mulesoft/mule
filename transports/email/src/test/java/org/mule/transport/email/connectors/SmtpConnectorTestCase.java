@@ -15,9 +15,9 @@ import org.mule.DefaultMuleEvent;
 import org.mule.ResponseOutputStream;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
@@ -65,15 +65,15 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         Connector connector = getConnector();
         assertNotNull(connector);
 
-        Component component = getTestComponent("anApple", Apple.class);
-        //muleContext.getRegistry().registerComponent(component);
+        Service service = getTestService("anApple", Apple.class);
+        //muleContext.getRegistry().registerComponent(service);
         EndpointBuilder builder = new EndpointURIEndpointBuilder(getTestEndpointURI(), muleContext);
         builder.setName("test");
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             builder);
         try
         {
-            connector.registerListener(component, endpoint);
+            connector.registerListener(service, endpoint);
             fail("SMTP connector does not accept listeners");
         }
         catch (Exception e)
@@ -88,14 +88,14 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             getTestEndpointURI());
         
-        Component component = getTestComponent(uniqueName("testComponent"), FunctionalTestComponent.class);
+        Service service = getTestService(uniqueName("testComponent"), FunctionalTestComponent.class);
         // TODO Simplify this API for adding an outbound endpoint.
-        ((OutboundPassThroughRouter) component.getOutboundRouter().getRouters().get(0)).addEndpoint(endpoint);
-        //muleContext.getRegistry().registerComponent(component);
+        ((OutboundPassThroughRouter) service.getOutboundRouter().getRouters().get(0)).addEndpoint(endpoint);
+        //muleContext.getRegistry().registerComponent(service);
 
         MuleMessage message = new DefaultMuleMessage(MESSAGE);
         message.setStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, EMAIL);
-        MuleSession session = getTestSession(getTestComponent("apple", Apple.class));
+        MuleSession session = getTestSession(getTestService("apple", Apple.class));
         DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, true, new ResponseOutputStream(System.out));
         endpoint.dispatch(event);
 

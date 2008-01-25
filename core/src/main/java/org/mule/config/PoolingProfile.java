@@ -17,7 +17,7 @@ import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 /**
  * <code>PoolingProfile</code> is a configuration object used to define the object
- * pooling parameters for the component it is associated with.
+ * pooling parameters for the service it is associated with.
  */
 
 public class PoolingProfile
@@ -29,7 +29,7 @@ public class PoolingProfile
     public static final int INITIALISE_NONE = 0;
 
     /**
-     * Tells the object pool only to initialise one component on startup.
+     * Tells the object pool only to initialise one service on startup.
      */
     public static final int INITIALISE_ONE = 1;
 
@@ -46,7 +46,7 @@ public class PoolingProfile
     public static final int WHEN_EXHAUSTED_GROW = 2;
 
     /**
-     * Controls the maximum number of Mule UMOs that can be borrowed from a component
+     * Controls the maximum number of Mule UMOs that can be borrowed from a service
      * pool at one time. When non-positive, there is no limit to the number of
      * components that may be active at one time. When maxActive is exceeded, the
      * pool is said to be exhausted. You can specify this value on the descriptor
@@ -90,7 +90,7 @@ public class PoolingProfile
      * are:
      * <ul>
      * <li>INITIALISE_NONE : Will not load any components in the pool on startup</li>
-     * <li>INITIALISE_ONE : Will load only the first component in the pool on
+     * <li>INITIALISE_ONE : Will load only the first service in the pool on
      * startup</li>
      * <li>INITIALISE_ALL : Will load all components in the pool on startup</li>
      * </ul>
@@ -180,7 +180,7 @@ public class PoolingProfile
     }
 
     /**
-     * @return max number of Mule UMOs that can be idle in a component
+     * @return max number of Mule UMOs that can be idle in a service
      */
     public int getMaxIdle()
     {
@@ -188,7 +188,7 @@ public class PoolingProfile
     }
 
     /**
-     * @return max number of Mule UMOs that can be active in a component
+     * @return max number of Mule UMOs that can be active in a service
      */
     public int getMaxActive()
     {
@@ -197,7 +197,7 @@ public class PoolingProfile
 
     /**
      * @return time in miilisconds to wait for a Mule UMO to be available in a
-     *         component when the pool of Mule UMOs is exhausted and the
+     *         service when the pool of Mule UMOs is exhausted and the
      *         PoolExhaustedAction is set to WHEN_EXHAUSTED_BLOCK
      */
     public long getMaxWait()
@@ -206,7 +206,7 @@ public class PoolingProfile
     }
 
     /**
-     * @return the action when the Mule UMO pool is exhaused for a component
+     * @return the action when the Mule UMO pool is exhaused for a service
      */
     public int getExhaustedAction()
     {

@@ -12,9 +12,9 @@ package org.mule.transport.jdbc;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
@@ -39,12 +39,12 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
     protected List ackParams;
 
     public JdbcMessageReceiver(Connector connector,
-                               Component component,
+                               Service service,
                                Endpoint endpoint,
                                String readStmt,
                                String ackStmt) throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
         this.setFrequency(((JdbcConnector) connector).getPollingFrequency());
         this.setReceiveMessagesInTransaction(false);
 

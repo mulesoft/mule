@@ -13,7 +13,7 @@
     <vm:endpoint name="endpointHop2" path="hop2"/>
 
     <model name="main">
-        <service name="multicastComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="multicastComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <vm:inbound-endpoint ref="inbound" synchronous="true"/>
             </inbound>
@@ -26,7 +26,7 @@
             </outbound>
         </service>
 
-        <service name="hop1" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="hop1" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <vm:inbound-endpoint ref="endpointHop1"/>
             </inbound>
@@ -35,7 +35,7 @@
             </component>
         </service>
 
-        <service name="hop2" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="hop2" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <vm:inbound-endpoint ref="endpointHop2"/>
             </inbound>

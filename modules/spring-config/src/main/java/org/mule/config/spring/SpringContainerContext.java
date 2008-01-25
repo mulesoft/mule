@@ -100,7 +100,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         }
         if (key == null)
         {
-            throw new ObjectNotFoundException("Component not found for null key");
+            throw new ObjectNotFoundException("Service not found for null key");
         }
 
         if (key instanceof Class)
@@ -125,7 +125,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         }
         catch (BeansException e)
         {
-            throw new ObjectNotFoundException("Component not found for key: " + key.toString(), e);
+            throw new ObjectNotFoundException("Service not found for key: " + key.toString(), e);
         }
     }
 

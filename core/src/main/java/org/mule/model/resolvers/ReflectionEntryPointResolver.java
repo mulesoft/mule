@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * <code>ReflectEntryPointResolver</code> is used to determine the entry point on a component
+ * <code>ReflectEntryPointResolver</code> is used to determine the entry point on a service
  * after an event has been received for it. The entrypoint is  discovered using
  * the event payload type(s) as the argument using reflection. An entry point will try and match for
  * different argument types, so it's possible to have multiple entry points on a
- * single component.
+ * single service.
  * <p/>
  * For multiple parameters the payload of context.getMessage().getPayload() should be an Array of objects.
  * If the message payload is of type {@link org.mule.transport.NullPayload} the resolver will look for a no-argument
@@ -103,12 +103,12 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
     }
 
     /**
-     * Will discover the entrypoint on the component using the payload type to figure out the method to call.
+     * Will discover the entrypoint on the service using the payload type to figure out the method to call.
      * For multiple parameters the payload of context.getMessage().geTPayload() should be an Array of objects.
      * If the message payload is of type {@link org.mule.transport.NullPayload} the resolver will look for a no-argument
      * method to call that doesn't match the set of ignoredMethods on the resover.
      *
-     * @param component
+     * @param service
      * @param context
      * @return
      * @throws Exception
@@ -129,7 +129,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver
 
         Class[] types = ClassUtils.getClassTypes(payload);
 
-        // do any methods on the component accept a context?
+        // do any methods on the service accept a context?
         List methods = ClassUtils.getSatisfiableMethods(component.getClass(), types,
                 isAcceptVoidMethods(), false, ignoredMethods, filter);
 

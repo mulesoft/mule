@@ -12,7 +12,6 @@ package org.mule.tck;
 
 import org.mule.AbstractExceptionListener;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -24,6 +23,7 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouter;
 import org.mule.api.routing.ResponseRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.ForwardingCatchAllStrategy;
@@ -101,8 +101,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         // aliases no longer possible
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
-        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
-        ImmutableEndpoint ep = component.getInboundRouter().getEndpoint("Orange");
+        Service service = muleContext.getRegistry().lookupService("orangeComponent");
+        ImmutableEndpoint ep = service.getInboundRouter().getEndpoint("Orange");
         assertNotNull(ep);
         final List responseTransformers = ep.getResponseTransformers();
         assertNotNull(responseTransformers);
@@ -113,12 +113,12 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testExceptionStrategy()
     {
-        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
+        Service service = muleContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(muleContext.getRegistry().lookupModel("main").getExceptionListener());
-        assertNotNull(component.getExceptionListener());
+        assertNotNull(service.getExceptionListener());
 
-        assertTrue(((AbstractExceptionListener) component.getExceptionListener()).getEndpoints().size() > 0);
-        Endpoint ep = (Endpoint) ((AbstractExceptionListener) component.getExceptionListener()).getEndpoints()
+        assertTrue(((AbstractExceptionListener) service.getExceptionListener()).getEndpoints().size() > 0);
+        Endpoint ep = (Endpoint) ((AbstractExceptionListener) service.getExceptionListener()).getEndpoints()
                 .get(0);
 
         assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
@@ -160,7 +160,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     // TODO Fix this somehow after MULE-1933
 //    public void testPropertiesConfig() throws Exception
 //    {
-//        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
+//        Service service = muleContext.getRegistry().lookupComponent("orangeComponent");
 //
 //        Map props = descriptor.getProperties();
 //        assertNotNull(props);
@@ -193,9 +193,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testOutboundRouterConfig()
     {
         // test outbound message router
-        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
-        assertNotNull(component.getOutboundRouter());
-        OutboundRouterCollection router = component.getOutboundRouter();
+        Service service = muleContext.getRegistry().lookupService("orangeComponent");
+        assertNotNull(service.getOutboundRouter());
+        OutboundRouterCollection router = service.getOutboundRouter();
         assertNull(router.getCatchAllStrategy());
         assertEquals(1, router.getRouters().size());
         // check first Router
@@ -207,9 +207,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testNestedRouterConfig() throws ObjectNotFoundException
     {
         // test outbound message router
-        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
-        assertNotNull(component.getNestedRouter());
-        NestedRouterCollection router = component.getNestedRouter();
+        Service service = muleContext.getRegistry().lookupService("orangeComponent");
+        assertNotNull(service.getNestedRouter());
+        NestedRouterCollection router = service.getNestedRouter();
         assertEquals(2, router.getRouters().size());
         // check first Router
         NestedRouter route1 = (NestedRouter) router.getRouters().get(0);
@@ -225,9 +225,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testDescriptorEndpoints()
     {
-        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
-        assertEquals(1, component.getOutboundRouter().getRouters().size());
-        OutboundRouter router = (OutboundRouter)component.getOutboundRouter().getRouters().get(0);
+        Service service = muleContext.getRegistry().lookupService("orangeComponent");
+        assertEquals(1, service.getOutboundRouter().getRouters().size());
+        OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRouters().get(0);
         assertEquals(1, router.getEndpoints().size());
         ImmutableEndpoint endpoint = (ImmutableEndpoint) router.getEndpoints().get(0);
         assertNotNull(endpoint);
@@ -249,16 +249,16 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint.getTransformers().get(0) instanceof TestInboundTransformer);
 
-        assertEquals(2, component.getInboundRouter().getEndpoints().size());
-        assertNotNull(component.getInboundRouter().getCatchAllStrategy());
-        assertTrue(component.getInboundRouter().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
-        assertNotNull(component.getInboundRouter().getCatchAllStrategy().getEndpoint());
-        assertEquals("test://catch.all", component.getInboundRouter()
+        assertEquals(2, service.getInboundRouter().getEndpoints().size());
+        assertNotNull(service.getInboundRouter().getCatchAllStrategy());
+        assertTrue(service.getInboundRouter().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
+        assertNotNull(service.getInboundRouter().getCatchAllStrategy().getEndpoint());
+        assertEquals("test://catch.all", service.getInboundRouter()
             .getCatchAllStrategy()
             .getEndpoint()
             .getEndpointURI()
             .toString());
-        endpoint = component.getInboundRouter().getEndpoint("orangeEndpoint");
+        endpoint = service.getInboundRouter().getEndpoint("orangeEndpoint");
         assertNotNull(endpoint);
         assertEquals("orangeEndpoint", endpoint.getName());
         assertEquals("orangeQ", endpoint.getEndpointURI().getAddress());
@@ -282,9 +282,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testInboundRouterConfig()
     {
-        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
-        assertNotNull(component.getInboundRouter());
-        InboundRouterCollection messageRouter = component.getInboundRouter();
+        Service service = muleContext.getRegistry().lookupService("orangeComponent");
+        assertNotNull(service.getInboundRouter());
+        InboundRouterCollection messageRouter = service.getInboundRouter();
         assertNotNull(messageRouter.getCatchAllStrategy());
         assertEquals(0, messageRouter.getRouters().size());
         assertTrue(messageRouter.getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
@@ -293,9 +293,9 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testResponseRouterConfig()
     {
-        Component component = muleContext.getRegistry().lookupComponent("orangeComponent");
-        assertNotNull(component.getResponseRouter());
-        ResponseRouterCollection messageRouter = component.getResponseRouter();
+        Service service = muleContext.getRegistry().lookupService("orangeComponent");
+        assertNotNull(service.getResponseRouter());
+        ResponseRouterCollection messageRouter = service.getResponseRouter();
         assertNull(messageRouter.getCatchAllStrategy());
         assertEquals(10001, messageRouter.getTimeout());
         assertEquals(1, messageRouter.getRouters().size());

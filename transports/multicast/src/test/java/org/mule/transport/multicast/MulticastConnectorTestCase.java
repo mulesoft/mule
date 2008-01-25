@@ -10,9 +10,9 @@
 
 package org.mule.transport.multicast;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -43,7 +43,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 
     public void testValidListener() throws Exception
     {
-        Component component = getTestComponent("orange", Orange.class);
+        Service service = getTestService("orange", Orange.class);
         Endpoint endpoint = getTestEndpoint("Test", ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
         Connector connector = getConnector();
 
@@ -51,7 +51,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         {
             endpoint.setEndpointURI(null);
             endpoint.setConnector(connector);
-            connector.registerListener(component, endpoint);
+            connector.registerListener(service, endpoint);
             fail("cannot register with null endpointUri");
         }
         catch (Exception e)
@@ -62,7 +62,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         try
         {
             endpoint.setEndpointURI(null);
-            connector.registerListener(component, endpoint);
+            connector.registerListener(service, endpoint);
             fail("cannot register with empty endpointUri");
         }
         catch (Exception e)
@@ -74,10 +74,10 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
             .lookupEndpointFactory()
             .getOutboundEndpoint("multicast://228.2.3.4:10100");
 
-        connector.registerListener(component, endpoint2);
+        connector.registerListener(service, endpoint2);
         try
         {
-            connector.registerListener(component, endpoint2);
+            connector.registerListener(service, endpoint2);
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)

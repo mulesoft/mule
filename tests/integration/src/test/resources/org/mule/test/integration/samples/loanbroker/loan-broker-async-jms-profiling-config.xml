@@ -89,7 +89,7 @@ the different components are made from the loan broker component (a la hub and s
             types the catch all strategy is invoked, which simply passes the event to the component
             -->
             <inbound-router>
-                <catch-all-strategy className="org.mule.routing.ComponentCatchAllStrategy"/>
+                <catch-all-strategy className="org.mule.routing.ServiceCatchAllStrategy"/>
                 <endpoint address="LoanBrokerRequests"/>
                 <endpoint address="LoanBrokerQuotes"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesAggregator">

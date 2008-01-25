@@ -20,9 +20,9 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.model.direct.DirectComponent;
+import org.mule.model.direct.DirectService;
 
-public class PipelineComponent extends DirectComponent
+public class PipelineService extends DirectService
 {
     /**
      * Serial version
@@ -31,7 +31,7 @@ public class PipelineComponent extends DirectComponent
 
     private Callable callable;
 
-    public PipelineComponent()
+    public PipelineService()
     {
         super();
     }
@@ -98,7 +98,7 @@ public class PipelineComponent extends DirectComponent
                 }
                 else
                 {
-                    logger.debug("Outbound router on component '" + name
+                    logger.debug("Outbound router on service '" + name
                                  + "' doesn't have any endpoints configured.");
                 }
             }

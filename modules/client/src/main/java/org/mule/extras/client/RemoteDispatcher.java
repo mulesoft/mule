@@ -105,7 +105,7 @@ public class RemoteDispatcher implements Disposable
      * Users can endpoint a url to a remote Mule server in the constructor of a Mule
      * client, by default the default Mule server url tcp://localhost:60504 is used.
      * 
-     * @param component the name of the Mule components to dispatch to
+     * @param service the name of the Mule components to dispatch to
      * @param payload the object that is the payload of the event
      * @param messageProperties any properties to be associated with the payload. as
      *            null
@@ -123,7 +123,7 @@ public class RemoteDispatcher implements Disposable
      * can endpoint a url to a remote Mule server in the constructor of a Mule
      * client, by default the default Mule server url tcp://localhost:60504 is used.
      * 
-     * @param component the name of the Mule components to send to
+     * @param service the name of the Mule components to send to
      * @param payload the object that is the payload of the event
      * @param messageProperties any properties to be associated with the payload. as
      *            null
@@ -144,7 +144,7 @@ public class RemoteDispatcher implements Disposable
      * constructor of a Mule client, by default the default Mule server url
      * tcp://localhost:60504 is used.
      * 
-     * @param component the name of the Mule components to send to
+     * @param service the name of the Mule components to send to
      * @param transformers a comma separated list of transformers to apply to the
      *            result message
      * @param payload the object that is the payload of the event

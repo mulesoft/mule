@@ -10,9 +10,9 @@
 
 package org.mule.transport.udp;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
@@ -28,11 +28,11 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             "udp://localhost:10100");
-        Mock mockComponent = new Mock(Component.class);
+        Mock mockComponent = new Mock(Service.class);
         mockComponent.expectAndReturn("getResponseTransformer", null);
         mockComponent.expectAndReturn("getResponseRouter", null);
 
-        return new UdpMessageReceiver(endpoint.getConnector(), (Component) mockComponent.proxy(), endpoint);
+        return new UdpMessageReceiver(endpoint.getConnector(), (Service) mockComponent.proxy(), endpoint);
     }
 
     public ImmutableEndpoint getEndpoint() throws Exception

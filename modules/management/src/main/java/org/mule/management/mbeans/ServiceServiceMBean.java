@@ -17,51 +17,51 @@ import org.mule.api.lifecycle.Stoppable;
 import javax.management.ObjectName;
 
 /**
- * <code>ComponentServiceMBean</code> defines the management interface for a mule
- * managed component.
+ * <code>ServiceServiceMBean</code> defines the management interface for a mule
+ * managed service.
  */
-public interface ComponentServiceMBean extends Stoppable, Startable, ComponentStatsMBean
+public interface ServiceServiceMBean extends Stoppable, Startable, ServiceStatsMBean
 {
     /**
-     * The statistics for this component
+     * The statistics for this service
      * 
-     * @return statistics for this component
-     * @see ComponentStats
+     * @return statistics for this service
+     * @see ServiceStats
      */
     ObjectName getStatistics();
 
     /**
-     * The name of this component
+     * The name of this service
      * 
-     * @return The name of this component
+     * @return The name of this service
      */
     String getName();
 
     /**
-     * The number of queued events for this component
+     * The number of queued events for this service
      * 
-     * @return The number of queued events for this component
+     * @return The number of queued events for this service
      */
     int getQueueSize();
 
     /**
-     * Pauses event processing for theComponent. Unlike stop(), a paused component
+     * Pauses event processing for theComponent. Unlike stop(), a paused service
      * will still consume messages from the underlying transport, but those messages
-     * will be queued until the component is resumed. In order to persist these
+     * will be queued until the service is resumed. In order to persist these
      * queued messages you can set the 'recoverableMode' property on the
      * Muleconfiguration to true. this causes all internal queues to store their
      * state.
      * 
-     * @throws MuleException if the component failed to pause.
+     * @throws MuleException if the service failed to pause.
      * @see org.mule.config.MuleConfiguration
      */
     void pause() throws MuleException;
 
     /**
-     * Resumes the Component that has been paused. If the component is not paused
+     * Resumes the Service that has been paused. If the service is not paused
      * nothing is executed.
      * 
-     * @throws MuleException if the component failed to resume
+     * @throws MuleException if the service failed to resume
      */
     void resume() throws MuleException;
 
@@ -72,7 +72,7 @@ public interface ComponentServiceMBean extends Stoppable, Startable, ComponentSt
     void dispose() throws MuleException;
 
     /**
-     * Causes the component to stop without processing its event queue first
+     * Causes the service to stop without processing its event queue first
      */
     void forceStop() throws MuleException;
 

@@ -19,7 +19,7 @@ public class QuartzFunctionalLegacyTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        //We need to reset the counter since we use this component for schema test
+        //We need to reset the counter since we use this service for schema test
         //and legacy config test. Its a bit crude...
         TestComponent1.resetCounter();
         return "quartz-functional-legacy-test.xml";

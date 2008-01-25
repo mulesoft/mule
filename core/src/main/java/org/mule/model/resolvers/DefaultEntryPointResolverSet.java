@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Provides the default implementation of an {@link org.mule.api.model.EntryPointResolverSet}
- * It resolves a method to call on the given component when an event is received.
+ * It resolves a method to call on the given service when an event is received.
  * This object maintains a set of Resolvers that will be used in order to resolve
  * an entrypoint on a service object until one is found or until the set is
  * exhausted.

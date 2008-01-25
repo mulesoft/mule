@@ -11,9 +11,9 @@
 package org.mule.management.mbeans;
 
 /**
- * <code>ComponentStatsMBean</code> TODO
+ * <code>ServiceStatsMBean</code> TODO
  */
-public interface ComponentStatsMBean
+public interface ServiceStatsMBean
 {
 
     void clearStatistics();

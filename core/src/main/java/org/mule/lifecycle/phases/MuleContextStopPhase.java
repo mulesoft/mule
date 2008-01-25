@@ -11,12 +11,12 @@ package org.mule.lifecycle.phases;
 
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
-import org.mule.api.component.Component;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.ManagerNotification;
 import org.mule.lifecycle.DefaultLifecyclePhase;
@@ -50,7 +50,7 @@ public class MuleContextStopPhase extends DefaultLifecyclePhase
         stopOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Model.class, ManagerNotification.class,
                 ManagerNotification.MANAGER_STOPPING_MODELS,ManagerNotification.MANAGER_STOPPED_MODELS));
-        stopOrderedObjects.add(new NotificationLifecycleObject(Component.class));
+        stopOrderedObjects.add(new NotificationLifecycleObject(Service.class));
         stopOrderedObjects.add(new NotificationLifecycleObject(Stoppable.class));
 
         setIgnorredObjectTypes(ignorredObjects);

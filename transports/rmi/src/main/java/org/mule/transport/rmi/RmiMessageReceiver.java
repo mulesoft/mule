@@ -11,10 +11,10 @@
 package org.mule.transport.rmi;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
@@ -46,11 +46,11 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
     protected Object[] methodArguments = null;
 
     public RmiMessageReceiver(Connector connector,
-                              Component component,
+                              Service service,
                               Endpoint endpoint,
                               long frequency) throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
         this.setFrequency(frequency);
         this.connector = (RmiConnector) connector;
     }

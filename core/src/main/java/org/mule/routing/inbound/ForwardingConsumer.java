@@ -21,7 +21,7 @@ import org.mule.api.routing.RoutingException;
 
 /**
  * <code>ForwardingConsumer</code> is used to forward an incoming event over
- * another transport without invoking a component. This can be used to implement a
+ * another transport without invoking a service. This can be used to implement a
  * bridge accross different transports.
  */
 public class ForwardingConsumer extends SelectiveConsumer
@@ -31,10 +31,10 @@ public class ForwardingConsumer extends SelectiveConsumer
     {
         if (super.process(event) != null)
         {
-            OutboundRouterCollection router = event.getComponent().getOutboundRouter();
+            OutboundRouterCollection router = event.getService().getOutboundRouter();
 
             // Set the stopFurtherProcessing flag to true to inform the
-            // DefaultInboundRouterCollection not to route these events to the component
+            // DefaultInboundRouterCollection not to route these events to the service
             event.setStopFurtherProcessing(true);
 
             if (router == null)

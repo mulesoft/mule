@@ -87,7 +87,7 @@ public class ScriptSource
 //        Model model = new SedaModel();
 //        model.setName("main");
 //        TestExceptionStrategy es = new TestExceptionStrategy();
-//        es.addEndpoint(new MuleEndpoint("test://component.exceptions", false));
+//        es.addEndpoint(new MuleEndpoint("test://service.exceptions", false));
 //        model.setExceptionListener(es);
 //        model.setLifecycleAdapterFactory(new TestDefaultLifecycleAdapterFactory());
 //        model.setEntryPointResolver(new TestEntryPointResolver());
@@ -98,7 +98,7 @@ public class ScriptSource
 //        ep1.setTransformer(muleContext.getRegistry().lookupTransformer("TestCompressionTransformer"));
 //        UMODescriptor d = builder.createDescriptor(Orange.class.getName(), "orangeComponent", null, ep1, props);
 //
-//        DefaultComponentExceptionStrategy dces = new DefaultComponentExceptionStrategy();
+//        DefaultServiceExceptionStrategy dces = new DefaultServiceExceptionStrategy();
 //        dces.addEndpoint(new MuleEndpoint("test://orange.exceptions", false));
 //        d.setExceptionListener(dces);
 //        //Create the inbound router

@@ -14,7 +14,7 @@ import org.mule.api.MuleEventContext;
 
 /**
  * <code>EntryPointResolver</code> resolves a method to call on the given
- * component object when an event is received.
+ * service object when an event is received.
  * This object maintains a set of Resolvers that will be used in order to resolve
  * an entrypoint on a service object until one is found or until the set is
  * exhausted.

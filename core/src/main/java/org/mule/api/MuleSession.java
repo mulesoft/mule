@@ -10,9 +10,9 @@
 
 package org.mule.api;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.SecurityContext;
+import org.mule.api.service.Service;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -29,21 +29,21 @@ import java.util.Iterator;
 public interface MuleSession extends Serializable
 {
     /**
-     * Returns the Component associated with the session in its current execution
+     * Returns the Service associated with the session in its current execution
      * 
-     * @return the Component associated with the session in its current execution
-     * @see org.mule.api.component.Component
+     * @return the Service associated with the session in its current execution
+     * @see org.mule.api.service.Service
      */
-    Component getComponent();
+    Service getService();
 
     /**
-     * This will send an event via the configured outbound endpoint on the component
+     * This will send an event via the configured outbound endpoint on the service
      * for this session
      * 
      * @param message the message to send
      * @return the result of the send if any
      * @throws org.mule.api.MuleException if there is no outbound endpoint configured
-     *             on the component or the events fails during dispatch
+     *             on the service or the events fails during dispatch
      */
     MuleMessage sendEvent(MuleMessage message) throws MuleException;
 
@@ -54,7 +54,7 @@ public interface MuleSession extends Serializable
      * 
      * @param event the event to process
      * @return the return Message from the call or null if there was no result
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     MuleMessage sendEvent(MuleEvent event) throws MuleException;
@@ -67,7 +67,7 @@ public interface MuleSession extends Serializable
      * @param message the event message payload to send
      * @param endpoint The endpoint to disptch the event through
      * @return the return Message from the call or null if there was no result
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     MuleMessage sendEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException;
@@ -79,21 +79,21 @@ public interface MuleSession extends Serializable
      * 
      * @param message the event message payload to send
      * @param endpointName The endpoint name to disptch the event through. This will
-     *            be looked up first on the component configuration and then on the
+     *            be looked up first on the service configuration and then on the
      *            mule manager configuration
      * @return the return Message from the call or null if there was no result
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException;
 
     /**
      * This will dispatch an event asynchronously via the configured outbound
-     * endpoint on the component for this session
+     * endpoint on the service for this session
      * 
      * @param message the message to send
      * @throws MuleException if there is no outbound endpoint configured on the
-     *             component or the events fails during dispatch
+     *             service or the events fails during dispatch
      */
     void dispatchEvent(MuleMessage message) throws MuleException;
 
@@ -102,9 +102,9 @@ public interface MuleSession extends Serializable
      * asynchronously to the next available Mule UMO in the pool or via the endpoint
      * configured for the event
      * 
-     * @param event the event message payload to send first on the component
+     * @param event the event message payload to send first on the service
      *            configuration and then on the mule manager configuration
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     void dispatchEvent(MuleEvent event) throws MuleException;
@@ -116,7 +116,7 @@ public interface MuleSession extends Serializable
      * 
      * @param message the event message payload to send
      * @param endpoint The endpoint name to disptch the event through
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     void dispatchEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException;
@@ -128,15 +128,15 @@ public interface MuleSession extends Serializable
      * 
      * @param message the event message payload to send
      * @param endpointName The endpoint name to disptch the event through. This will
-     *            be looked up first on the component configuration and then on the
+     *            be looked up first on the service configuration and then on the
      *            mule manager configuration
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     void dispatchEvent(MuleMessage message, String endpointName) throws MuleException;
 
     /**
-     * Requests a synchronous receive of an event on the component
+     * Requests a synchronous receive of an event on the service
      * 
      * @param endpoint the endpoint identifing the endpointUri on ewhich the event
      *            will be received
@@ -147,7 +147,7 @@ public interface MuleSession extends Serializable
     MuleMessage receiveEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException;
 
     /**
-     * Requests a synchronous receive of an event on the component
+     * Requests a synchronous receive of an event on the service
      * 
      * @param endpointName the endpoint name identifing the endpointUri on ewhich the
      *            event will be received
@@ -161,7 +161,7 @@ public interface MuleSession extends Serializable
      * Determines if this session is valid. A session becomes invalid if an exception
      * occurs while processing
      * 
-     * @return true if the component is functioning properly, false otherwise
+     * @return true if the service is functioning properly, false otherwise
      */
     boolean isValid();
 
@@ -169,7 +169,7 @@ public interface MuleSession extends Serializable
      * Determines if this session is valid. A session becomes invalid if an exception
      * occurs while processing
      * 
-     * @param value true if the component is functioning properly, false otherwise
+     * @param value true if the service is functioning properly, false otherwise
      */
     void setValid(boolean value);
 

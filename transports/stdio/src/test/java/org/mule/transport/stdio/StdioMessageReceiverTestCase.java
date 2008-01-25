@@ -10,9 +10,9 @@
 
 package org.mule.transport.stdio;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -32,8 +32,8 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
     {
         StdioMessageReceiver receiver = (StdioMessageReceiver) getMessageReceiver();
 
-        Component component = getTestComponent("orange", Orange.class);
-        assertNotNull(component);
+        Service service = getTestService("orange", Orange.class);
+        assertNotNull(service);
 
         endpoint.getConnector().start();
 
@@ -47,7 +47,7 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
 
     public MessageReceiver getMessageReceiver() throws CreateException
     {
-        return new StdioMessageReceiver(endpoint.getConnector(), component, endpoint, 1000);
+        return new StdioMessageReceiver(endpoint.getConnector(), service, endpoint, 1000);
     }
 
     public ImmutableEndpoint getEndpoint() throws Exception

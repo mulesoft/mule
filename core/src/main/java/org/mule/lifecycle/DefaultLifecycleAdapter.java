@@ -12,14 +12,11 @@ package org.mule.lifecycle;
 
 import org.mule.RequestContext;
 import org.mule.VoidResult;
+import org.mule.api.Invocation;
 import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
-import org.mule.api.component.ComponentAware;
-import org.mule.api.component.ComponentException;
-import org.mule.api.component.Invocation;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -28,6 +25,9 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.routing.NestedRouter;
+import org.mule.api.service.Service;
+import org.mule.api.service.ServiceAware;
+import org.mule.api.service.ServiceException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.model.resolvers.NoSatisfiableMethodsException;
@@ -58,7 +58,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
     protected static final Log logger = LogFactory.getLog(DefaultLifecycleAdapter.class);
 
     private Object pojoService;
-    private Component component;
+    private Service service;
     private boolean isStoppable = false;
     private boolean isStartable = false;
     private boolean isDisposable = false;
@@ -68,19 +68,19 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
 
     private EntryPointResolverSet entryPointResolver;
 
-    public DefaultLifecycleAdapter(Object pojoService, Component component) throws MuleException
+    public DefaultLifecycleAdapter(Object pojoService, Service service) throws MuleException
     {
-        this(pojoService, component, new LegacyEntryPointResolverSet());
+        this(pojoService, service, new LegacyEntryPointResolverSet());
     }
 
     public DefaultLifecycleAdapter(Object pojoService,
-                                   Component component,
+                                   Service service,
                                    EntryPointResolverSet epResolver) throws MuleException
     {
-        initialise(pojoService, component, epResolver);
+        initialise(pojoService, service, epResolver);
     }
 
-    protected void initialise(Object pojoService, Component component, EntryPointResolverSet entryPointResolver)
+    protected void initialise(Object pojoService, Service service, EntryPointResolverSet entryPointResolver)
             throws MuleException
     {
         if (pojoService == null)
@@ -92,16 +92,16 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
             entryPointResolver = new LegacyEntryPointResolverSet();
         }
         this.pojoService = pojoService;
-        this.component = component;
+        this.service = service;
         this.entryPointResolver = entryPointResolver;
 
-        isStartable = Startable.class.isInstance(component);
-        isStoppable = Stoppable.class.isInstance(component);
-        isDisposable = Disposable.class.isInstance(component);
+        isStartable = Startable.class.isInstance(service);
+        isStoppable = Stoppable.class.isInstance(service);
+        isDisposable = Disposable.class.isInstance(service);
 
-        if (pojoService instanceof ComponentAware)
+        if (pojoService instanceof ServiceAware)
         {
-            ((ComponentAware) pojoService).setComponent(component);
+            ((ServiceAware) pojoService).setService(service);
         }
         configureNestedRouter();
     }
@@ -112,12 +112,12 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         {
             try
             {
-                ((Startable) component).start();
+                ((Startable) service).start();
             }
             catch (Exception e)
             {
                 throw new DefaultMuleException(
-                    CoreMessages.failedToStart("UMO Component: " + component.getName()), e);
+                    CoreMessages.failedToStart("UMO Service: " + service.getName()), e);
             }
         }
         started = true;
@@ -129,12 +129,12 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         {
             try
             {
-                ((Stoppable) component).stop();
+                ((Stoppable) service).stop();
             }
             catch (Exception e)
             {
                 throw new DefaultMuleException(
-                    CoreMessages.failedToStop("UMO Component: " + component.getName()), e);
+                    CoreMessages.failedToStop("UMO Service: " + service.getName()), e);
             }
         }
         started = false;
@@ -146,24 +146,24 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         {
             try
             {
-                ((Disposable) component).dispose();
+                ((Disposable) service).dispose();
             }
             catch (Exception e)
             {
                 // TODO MULE-863: Handle or fail
-                logger.error("failed to dispose: " + component.getName(), e);
+                logger.error("failed to dispose: " + service.getName(), e);
             }
         }
         disposed = true;
     }
 
-    /** @return true if the component has been started */
+    /** @return true if the service has been started */
     public boolean isStarted()
     {
         return started;
     }
 
-    /** @return whether the component managed by this lifecycle has been disposed */
+    /** @return whether the service managed by this lifecycle has been disposed */
     public boolean isDisposed()
     {
         return disposed;
@@ -171,7 +171,7 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
 
     public void handleException(Object message, Exception e)
     {
-        component.getExceptionListener().exceptionThrown(e);
+        service.getExceptionListener().exceptionThrown(e);
     }
 
     // Note: Invocation argument is not even used!
@@ -184,9 +184,9 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         try
         {
             //Use the overriding entrypoint resolver if one is set
-            if (component.getEntryPointResolverSet() != null)
+            if (service.getEntryPointResolverSet() != null)
             {
-                result = component.getEntryPointResolverSet().invoke(pojoService, RequestContext.getEventContext());
+                result = service.getEntryPointResolverSet().invoke(pojoService, RequestContext.getEventContext());
 
             }
             else
@@ -196,9 +196,9 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         }
         catch (Exception e)
         {
-            // should all Exceptions caught here be a ComponentException?!?
+            // should all Exceptions caught here be a ServiceException?!?
             // TODO MULE-863: See above
-            throw new ComponentException(RequestContext.getEventContext().getMessage(), component, e);
+            throw new ServiceException(RequestContext.getEventContext().getMessage(), service, e);
         }
 
         MuleMessage resultMessage = null;
@@ -228,19 +228,19 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
 
     public void initialise() throws InitialisationException
     {
-        if (Initialisable.class.isInstance(component))
+        if (Initialisable.class.isInstance(service))
         {
-            ((Initialisable) component).initialise();
+            ((Initialisable) service).initialise();
         }
     }
 
     protected void configureNestedRouter() throws MuleException
     {
         // Initialise the nested router and bind the endpoints to the methods using a Proxy
-        if (component.getNestedRouter() != null)
+        if (service.getNestedRouter() != null)
         {
             Map bindings = new HashMap();
-            for (Iterator it = component.getNestedRouter().getRouters().iterator(); it.hasNext();)
+            for (Iterator it = service.getNestedRouter().getRouters().iterator(); it.hasNext();)
             {
                 NestedRouter nestedRouter = (NestedRouter) it.next();
                 Object proxy = bindings.get(nestedRouter.getInterface());
@@ -296,8 +296,8 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         }
     }
 
-    public Component getComponent()
+    public Service getService()
     {
-        return component;
+        return service;
     }
 }

@@ -11,10 +11,10 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
@@ -48,10 +48,10 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
     protected Session session;
     protected boolean startOnConnect = false;
 
-    public JmsMessageReceiver(Connector connector, Component component, ImmutableEndpoint endpoint)
+    public JmsMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
             throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
         this.connector = (JmsConnector) connector;
 
         try

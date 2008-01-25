@@ -11,10 +11,10 @@
 package org.mule.transport.http;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 
 import java.io.IOException;
@@ -30,10 +30,10 @@ import javax.resource.spi.work.Work;
 public class HttpsMessageReceiver extends HttpMessageReceiver
 {
 
-    public HttpsMessageReceiver(Connector connector, Component component, Endpoint endpoint)
+    public HttpsMessageReceiver(Connector connector, Service service, Endpoint endpoint)
             throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
     }
 
     // @Override

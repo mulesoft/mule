@@ -109,7 +109,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
                         {
                             throw new MessagingException(e.getI18nMessage(), returnMessage, e);
                         }
-                        MuleEvent returnEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getComponent(),
+                        MuleEvent returnEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getService(),
                             event);
                         result = new MuleEvent[]{returnEvent};
                         this.removeEventGroup(group);

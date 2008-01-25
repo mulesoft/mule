@@ -16,7 +16,7 @@ import org.mule.transaction.TransactionCoordination;
 import java.util.Map;
 
 /**
- * Simple component that receives messages from jdbc or jms and just forward the
+ * Simple service that receives messages from jdbc or jms and just forward the
  * interesting part.
  */
 public class XABridgeComponent
@@ -25,7 +25,7 @@ public class XABridgeComponent
     public static boolean mayRollback = false;
 
     /**
-     * If <code>mayRollback</code> has been set to true, the component will mark
+     * If <code>mayRollback</code> has been set to true, the service will mark
      * the current transaction as rollback only on a 30 percent basis.
      * 
      * @throws Exception

@@ -10,9 +10,9 @@
 
 package org.mule.transport.multicast;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.transport.udp.UdpConnector;
 
 /**
@@ -65,10 +65,10 @@ public class MulticastConnector extends UdpConnector
 
 
     //@java.lang.Override
-    protected Object getReceiverKey(Component component, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
     {
         //you can have multiple Multicast sockets bound to a single port,
-        // so store listeners with the component name too
-        return endpoint.getEndpointURI().getAddress() + "/" + component.getName();
+        // so store listeners with the service name too
+        return endpoint.getEndpointURI().getAddress() + "/" + service.getName();
     }
 }

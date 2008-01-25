@@ -20,7 +20,7 @@ public class EndpointServiceConflictTestCase extends AbstractBadConfigTestCase
 
     public void testBeanError() throws Exception
     {
-        assertErrorContains("A component named LenderService already exists");
+        assertErrorContains("A service named LenderService already exists");
     }
 
 }

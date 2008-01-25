@@ -15,7 +15,7 @@ import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
 
 /**
- * <code>QueueProfile</code> determines how an internal queue for a component will
+ * <code>QueueProfile</code> determines how an internal queue for a service will
  * behave
  */
 

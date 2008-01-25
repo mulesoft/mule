@@ -16,9 +16,9 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.routing.InboundRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -34,8 +34,8 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
     public void testMessageResequencer() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        Component testComponent = getTestComponent("test", Apple.class);
-        assertNotNull(testComponent);
+        Service testService = getTestService("test", Apple.class);
+        assertNotNull(testService);
 
         InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
         SimpleEventResequencer router = new SimpleEventResequencer(3);

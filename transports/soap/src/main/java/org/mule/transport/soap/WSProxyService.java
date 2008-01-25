@@ -15,14 +15,14 @@ import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
-import org.mule.api.component.ComponentAware;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.service.Service;
+import org.mule.api.service.ServiceAware;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.IOUtils;
@@ -53,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  * (with no xfire or axis).
  * 
  */
-public class WSProxyService implements Callable, ComponentAware, Initialisable
+public class WSProxyService implements Callable, ServiceAware, Initialisable
 {
 
     private String urlWebservice;
@@ -62,7 +62,7 @@ public class WSProxyService implements Callable, ComponentAware, Initialisable
     private String wsdlFileContents;
     private boolean useFile = false;
 
-    private Component component;
+    private Service service;
 
     private static final String HTTP_REQUEST = "http.request";
     private static final String WSDL_PARAM_1 = "?wsdl";
@@ -166,16 +166,16 @@ public class WSProxyService implements Callable, ComponentAware, Initialisable
     }
 
     // called once upon initialisation
-    public void setComponent(Component component)
+    public void setService(Service service)
     {
-        this.component = component;
+        this.service = service;
     }
 
     public void initialise() throws InitialisationException
     {
-        if (component != null)
+        if (service != null)
         {        
-            OutboundRouter router = (OutboundRouter)component.getOutboundRouter().getRouters().get(0);
+            OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRouters().get(0);
             Endpoint endpoint = (Endpoint)router.getEndpoints().get(0);
             this.urlWebservice = endpoint.getEndpointURI().getAddress();
     
@@ -226,14 +226,14 @@ public class WSProxyService implements Callable, ComponentAware, Initialisable
         }
         else if (!lazyInit)
         {
-            // Component not injected yet, try lazy init (i.e., upon onCall()).
-            logger.debug("Component has not yet been injected, lazy initialization will be used.");
+            // Service not injected yet, try lazy init (i.e., upon onCall()).
+            logger.debug("Service has not yet been injected, lazy initialization will be used.");
             lazyInit = true;
         }
         else
         {
-            // We're already in lazy init and the component is still not set, so throw an exception.
-            throw new InitialisationException(MessageFactory.createStaticMessage("Component not set, this service has not been initialized properly."), this);                        
+            // We're already in lazy init and the service is still not set, so throw an exception.
+            throw new InitialisationException(MessageFactory.createStaticMessage("Service not set, this service has not been initialized properly."), this);                        
         }
     }
 }

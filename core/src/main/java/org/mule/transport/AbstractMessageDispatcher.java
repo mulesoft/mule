@@ -91,9 +91,9 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 if (connector.isEnableMessageEvents())
                 {
                     String component = null;
-                    if (event.getComponent() != null)
+                    if (event.getService() != null)
                     {
-                        component = event.getComponent().getName();
+                        component = event.getService().getName();
                     }
                     connector.fireNotification(new MessageNotification(event.getMessage(), event
                         .getEndpoint(), component, MessageNotification.MESSAGE_DISPATCHED));
@@ -114,7 +114,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
 
     public final MuleMessage send(MuleEvent event) throws DispatchException
     {
-        // No point continuing if the component has rolledback the transaction
+        // No point continuing if the service has rolledback the transaction
         if (isTransactionRollback())
         {
             return event.getMessage();
@@ -157,9 +157,9 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
             if (connector.isEnableMessageEvents())
             {
                 String component = null;
-                if (event.getComponent() != null)
+                if (event.getService() != null)
                 {
-                    component = event.getComponent().getName();
+                    component = event.getService().getName();
                 }
                 connector.fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(),
                     component, MessageNotification.MESSAGE_SENT));
@@ -193,7 +193,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
      * RemoteSync 1. The connector has to support remoteSync. Some transports do not
      * have the notion of a response channel 2. Check if the endpoint has been
      * configured for remoteSync 3. Check if the REMOTE_SYNC message header has been
-     * set 4. Finally, if the current component has a response router configured,
+     * set 4. Finally, if the current service has a response router configured,
      * that the router will handle the response channel event and we should not try
      * and receive a response in the Message dispatcher If remotesync should not be
      * used we must remove the REMOTE_SYNC header Note the MuleClient will
@@ -214,10 +214,10 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                                 MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
             if (remoteSync)
             {
-                // component will be null for client calls
-                if (event.getComponent() != null)
+                // service will be null for client calls
+                if (event.getService() != null)
                 {
-                    ResponseRouterCollection responseRouters = event.getComponent().getResponseRouter();
+                    ResponseRouterCollection responseRouters = event.getService().getResponseRouter();
                     if (responseRouters != null && responseRouters.hasEndpoints())
                     {
                         remoteSync = false;
@@ -262,9 +262,9 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
                 if (connector.isEnableMessageEvents())
                 {
                     String component = null;
-                    if (event.getComponent() != null)
+                    if (event.getService() != null)
                     {
-                        component = event.getComponent().getName();
+                        component = event.getService().getName();
                     }
 
                     connector.fireNotification(new MessageNotification(event.getMessage(), event

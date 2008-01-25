@@ -12,12 +12,12 @@ package org.mule.transport.service;
 
 import org.mule.MuleSessionHandler;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.registry.Registry;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Transformer;
@@ -201,18 +201,18 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
      * @see org.mule.transport.service.TransportServiceDescriptor#createMessageReceiver(org.mule.api.transport.Connector, org.mule.api.Component, org.mule.api.endpoint.Endpoint)
      */
     public MessageReceiver createMessageReceiver(Connector connector,
-                                                    Component component,
+                                                    Service service,
                                                     ImmutableEndpoint endpoint) throws MuleException
     {
 
-        return createMessageReceiver(connector, component, endpoint, null);
+        return createMessageReceiver(connector, service, endpoint, null);
     }
 
     /* (non-Javadoc)
      * @see org.mule.transport.service.TransportServiceDescriptor#createMessageReceiver(org.mule.api.transport.Connector, org.mule.api.Component, org.mule.api.endpoint.Endpoint, java.lang.Object[])
      */
     public MessageReceiver createMessageReceiver(Connector connector,
-                                                    Component component,
+                                                    Service service,
                                                     ImmutableEndpoint endpoint,
                                                     Object[] args) throws MuleException
     {
@@ -247,7 +247,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             }
 
             newArgs[0] = connector;
-            newArgs[1] = component;
+            newArgs[1] = service;
             newArgs[2] = endpoint;
 
             if (args != null && args.length != 0)

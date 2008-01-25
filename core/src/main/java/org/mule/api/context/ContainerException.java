@@ -13,8 +13,8 @@ package org.mule.api.context;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>ContainerException</code> is an Exception thrown by the component resolver
- * when it fials to find a component
+ * <code>ContainerException</code> is an Exception thrown by the service resolver
+ * when it fials to find a service
  */
 public class ContainerException extends MuleContextException
 {

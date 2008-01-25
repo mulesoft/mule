@@ -69,7 +69,7 @@ public class MessageChunkingMule2192TestCase extends FunctionalTestCase
         final int parts = (int)Math
             .ceil((SerializationUtils.serialize(simpleSerializableObject).length / (double)2));
 
-        // Listen to events fired by the ChunkingReceiver component
+        // Listen to events fired by the ChunkingReceiver service
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
             public void onNotification(ServerNotification notification)
@@ -118,7 +118,7 @@ public class MessageChunkingMule2192TestCase extends FunctionalTestCase
         final AtomicInteger messagePartsCount = new AtomicInteger(0);
         final Latch chunkingReceiverLatch = new Latch();
 
-        // Listen to events fired by the ChunkingReceiver component
+        // Listen to events fired by the ChunkingReceiver service
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
             public void onNotification(ServerNotification notification)

@@ -9,11 +9,11 @@
  */
 package org.mule.util.object;
 
-import org.mule.api.component.Component;
-import org.mule.api.component.ComponentAware;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
+import org.mule.api.service.ServiceAware;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 
@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Creates object instances based on the class and sets any properties.
  */
-public abstract class AbstractObjectFactory implements ObjectFactory, ComponentAware
+public abstract class AbstractObjectFactory implements ObjectFactory, ServiceAware
 {
     public static final String ATTRIBUTE_OBJECT_CLASS_NAME = "objectClassName";
     public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
@@ -35,10 +35,10 @@ public abstract class AbstractObjectFactory implements ObjectFactory, ComponentA
     protected Map properties = null;
     
     /**
-     * This is not pretty but its the only way I could find to get the Component
+     * This is not pretty but its the only way I could find to get the Service
      * injected into each instance of a POJO service.
      */
-    Component component;
+    Service service;
     
     protected transient Log logger = LogFactory.getLog(getClass());
     
@@ -97,11 +97,11 @@ public abstract class AbstractObjectFactory implements ObjectFactory, ComponentA
             BeanUtils.populate(object, properties);            
         }
         
-        // This is not pretty but its the only way I could find to get the Component
+        // This is not pretty but its the only way I could find to get the Service
         // properly injected into each instance of a POJO service.
-        if (component != null)
+        if (service != null)
         {
-            BeanUtils.setProperty(object, "component", component);
+            BeanUtils.setProperty(object, "service", service);
         }
 
         if (object instanceof Initialisable)
@@ -112,12 +112,12 @@ public abstract class AbstractObjectFactory implements ObjectFactory, ComponentA
     }
 
     /**
-     * This is not pretty but its the only way I could find to get the Component
+     * This is not pretty but its the only way I could find to get the Service
      * injected into each instance of a POJO service.
      */
-    public void setComponent(Component component) throws ConfigurationException
+    public void setService(Service service) throws ConfigurationException
     {
-        this.component = component;
+        this.service = service;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////

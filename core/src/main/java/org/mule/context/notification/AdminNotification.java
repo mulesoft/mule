@@ -35,7 +35,7 @@ public class AdminNotification extends ServerNotification
         registerAction("receive event", ACTION_RECEIVE);
         registerAction("dispatch event", ACTION_DISPATCH);
         registerAction("send event", ACTION_SEND);
-        registerAction("invoke component", ACTION_INVOKE);
+        registerAction("invoke service", ACTION_INVOKE);
     }
 
     private Map properties = new HashMap();

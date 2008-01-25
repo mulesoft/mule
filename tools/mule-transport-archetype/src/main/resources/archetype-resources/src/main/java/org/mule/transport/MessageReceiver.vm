@@ -16,7 +16,7 @@ import org.mule.transport.AbstractPollingMessageReceiver;
 #else
 import org.mule.transport.AbstractMessageReceiver;
 #end
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
@@ -30,11 +30,11 @@ public class ${TransportName}MessageReceiver extends #if( $isPollingReceiver == 
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
-    public ${TransportName}MessageReceiver(Connector connector, Component component,
+    public ${TransportName}MessageReceiver(Connector connector, Service service,
                               ImmutableEndpoint endpoint)
             throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
     }
 
     public void doConnect() throws ConnectException

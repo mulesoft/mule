@@ -10,9 +10,9 @@
 
 package org.mule.management.stats.printers;
 
-import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.ServiceStatistics;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.management.stats.SedaComponentStatistics;
+import org.mule.management.stats.SedaServiceStatistics;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -42,9 +42,9 @@ public class AbstractTablePrinter extends PrintWriter
     public String[] getHeaders()
     {
         String[] column = new String[36];
-        column[0] = "Component Name";
-        column[1] = "Component Pool Max Size";
-        column[2] = "Component Pool Size";
+        column[0] = "Service Name";
+        column[1] = "Service Pool Max Size";
+        column[2] = "Service Pool Size";
         column[3] = "Thread Pool Size";
         column[4] = "Current Queue Size";
         column[5] = "Max Queue Size";
@@ -81,7 +81,7 @@ public class AbstractTablePrinter extends PrintWriter
         return column;
     }
 
-    protected void getColumn(ComponentStatistics stats, String[] col)
+    protected void getColumn(ServiceStatistics stats, String[] col)
     {
         if (stats == null)
         {
@@ -92,11 +92,11 @@ public class AbstractTablePrinter extends PrintWriter
         col[0] = stats.getName();
 
         //TODO RM* Handling custom stats objects
-        if (stats instanceof SedaComponentStatistics)
+        if (stats instanceof SedaServiceStatistics)
         {
-            col[1] = ((SedaComponentStatistics) stats).getComponentPoolMaxSize() + "/"
-                    + ((SedaComponentStatistics) stats).getComponentPoolAbsoluteMaxSize();
-            col[2] = String.valueOf(((SedaComponentStatistics) stats).getComponentPoolSize());
+            col[1] = ((SedaServiceStatistics) stats).getComponentPoolMaxSize() + "/"
+                    + ((SedaServiceStatistics) stats).getComponentPoolAbsoluteMaxSize();
+            col[2] = String.valueOf(((SedaServiceStatistics) stats).getComponentPoolSize());
         }
         else
         {
@@ -182,7 +182,7 @@ public class AbstractTablePrinter extends PrintWriter
         int i = 1;
         for (Iterator iterator = stats.iterator(); iterator.hasNext(); i++)
         {
-            getColumn((ComponentStatistics) iterator.next(), table[i]);
+            getColumn((ServiceStatistics) iterator.next(), table[i]);
         }
 
         return table;
@@ -194,7 +194,7 @@ public class AbstractTablePrinter extends PrintWriter
         {
             print((Collection) obj);
         }
-        else if (obj instanceof ComponentStatistics)
+        else if (obj instanceof ServiceStatistics)
         {
             List l = new ArrayList();
             l.add(obj);

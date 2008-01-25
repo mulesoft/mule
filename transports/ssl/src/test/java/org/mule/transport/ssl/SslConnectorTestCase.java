@@ -10,10 +10,10 @@
 
 package org.mule.transport.ssl;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -72,7 +72,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
 
     public void testValidListener() throws Exception
     {
-        Component component = getTestComponent("orange", Orange.class);
+        Service service = getTestService("orange", Orange.class);
         Endpoint endpoint = getTestEndpoint("Test", Endpoint.ENDPOINT_TYPE_RECEIVER);
         Connector connector = getConnector();
 
@@ -80,7 +80,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         {
             endpoint.setEndpointURI(null);
             endpoint.setConnector(connector);
-            connector.registerListener(component, endpoint);
+            connector.registerListener(service, endpoint);
             fail("cannot register with null endpointUri");
         }
         catch (Exception e)
@@ -91,7 +91,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         try
         {
             endpoint.setEndpointURI(null);
-            connector.registerListener(component, endpoint);
+            connector.registerListener(service, endpoint);
             fail("cannot register with empty endpointUri");
         }
         catch (Exception e)
@@ -104,10 +104,10 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
             .lookupEndpointFactory()
             .getOutboundEndpoint("ssl://localhost:30303");
 
-        connector.registerListener(component, endpoint2);
+        connector.registerListener(service, endpoint2);
         try
         {
-            connector.registerListener(component, endpoint2);
+            connector.registerListener(service, endpoint2);
             fail("cannot register on the same endpointUri");
         }
         catch (Exception e)

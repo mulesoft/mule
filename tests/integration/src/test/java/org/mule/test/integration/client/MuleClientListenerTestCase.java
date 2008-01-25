@@ -12,7 +12,7 @@ package org.mule.test.integration.client;
 
 
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -42,14 +42,14 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
             }
         }
         
-        Component c = muleContext.getRegistry().lookupComponent(component);
+        Service c = muleContext.getRegistry().lookupService(component);
         c.start();
 
         MuleMessage message = client.send(endpoint, "Test Client Send message", null);
         assertNotNull(message);
         assertEquals("Received: Test Client Send message", message.getPayloadAsString());
 
-        // The SpringRegistry is read-only so we can't unregister the component!
+        // The SpringRegistry is read-only so we can't unregister the service!
         //muleContext.getRegistry().unregisterComponent("vmComponent");
         c.stop();
 

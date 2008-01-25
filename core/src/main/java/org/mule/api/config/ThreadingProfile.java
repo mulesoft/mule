@@ -22,7 +22,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 /**
- * Mule uses a few different pools i.e. for component threads and message dispatchers. This interface
+ * Mule uses a few different pools i.e. for service threads and message dispatchers. This interface
  * makes it easier to configure the pool.  Pools are created via
  * {@link ImmutableThreadingProfile#createPool(String, ThreadingProfile)} (which
  * should really be a separate factory).

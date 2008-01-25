@@ -13,9 +13,9 @@ package org.mule.transport.xmpp;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
@@ -39,11 +39,11 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
 {
     private XMPPConnection xmppConnection = null;
 
-    public XmppMessageReceiver(AbstractConnector connector, Component component, Endpoint endpoint)
+    public XmppMessageReceiver(AbstractConnector connector, Service service, Endpoint endpoint)
             throws CreateException
     {
 
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
     }
 
     protected void doConnect() throws Exception

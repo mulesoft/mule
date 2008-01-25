@@ -12,11 +12,11 @@ package org.mule.transport.rmi;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
@@ -202,10 +202,10 @@ public class RmiConnector extends AbstractJndiConnector
         this.securityManager = securityManager;
     }
 
-    public MessageReceiver createReceiver(Component component, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
     {
         final Object[] args = new Object[]{new Long(pollingFrequency)};
-        return getServiceDescriptor().createMessageReceiver(this, component, endpoint, args);
+        return getServiceDescriptor().createMessageReceiver(this, service, endpoint, args);
     }
 
     /**

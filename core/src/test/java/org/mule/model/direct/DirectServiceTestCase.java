@@ -11,24 +11,24 @@
 package org.mule.model.direct;
 
 import org.mule.api.MuleException;
-import org.mule.model.AbstractComponentTestCase;
+import org.mule.model.AbstractServiceTestCase;
 import org.mule.util.object.SingletonObjectFactory;
 
-public class DirectComponentTestCase extends AbstractComponentTestCase
+public class DirectServiceTestCase extends AbstractServiceTestCase
 {
 
     protected void doSetUp() throws Exception
     {
-        component = new DirectComponent();
-        component.setName("direct");
-        component.setServiceFactory(new SingletonObjectFactory(Object.class));
-        component.setModel(new DirectModel());
-        component.setMuleContext(muleContext);
+        service = new DirectService();
+        service.setName("direct");
+        service.setServiceFactory(new SingletonObjectFactory(Object.class));
+        service.setModel(new DirectModel());
+        service.setMuleContext(muleContext);
     }
 
     protected void doTearDown() throws Exception
     {
-        component = null;
+        service = null;
     }
 
     public void testStop() throws MuleException

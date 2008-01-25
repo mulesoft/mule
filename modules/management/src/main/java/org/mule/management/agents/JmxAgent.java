@@ -13,19 +13,19 @@ import org.mule.AbstractAgent;
 import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.component.Component;
 import org.mule.api.context.notification.ManagerNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ManagerNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.management.i18n.ManagementMessages;
-import org.mule.management.mbeans.ComponentService;
-import org.mule.management.mbeans.ComponentServiceMBean;
+import org.mule.management.mbeans.ServiceService;
+import org.mule.management.mbeans.ServiceServiceMBean;
 import org.mule.management.mbeans.ConnectorService;
 import org.mule.management.mbeans.ConnectorServiceMBean;
 import org.mule.management.mbeans.EndpointService;
@@ -216,7 +216,7 @@ public class JmxAgent extends AbstractAgent
                         registerMuleService();
                         registerConfigurationService();
                         registerModelServices();
-                        registerComponentServices();
+                        registerServiceServices();
                         registerEndpointServices();
                         registerConnectorServices();
                     }
@@ -399,17 +399,17 @@ public class JmxAgent extends AbstractAgent
         registeredMBeans.add(on);
     }
 
-    protected void registerComponentServices() throws NotCompliantMBeanException, MBeanRegistrationException,
+    protected void registerServiceServices() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
         String rawName;
-        for (Iterator iterator = muleContext.getRegistry().lookupObjects(Component.class).iterator(); iterator.hasNext();)
+        for (Iterator iterator = muleContext.getRegistry().lookupObjects(Service.class).iterator(); iterator.hasNext();)
         {
-            rawName = ((Component) iterator.next()).getName();
+            rawName = ((Service) iterator.next()).getName();
             final String name = jmxSupport.escape(rawName);
-            ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Component,name=" + name);
-            ComponentServiceMBean serviceMBean = new ComponentService(rawName);
-            logger.debug("Registering component with name: " + on);
+            ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Service,name=" + name);
+            ServiceServiceMBean serviceMBean = new ServiceService(rawName);
+            logger.debug("Registering service with name: " + on);
             mBeanServer.registerMBean(serviceMBean, on);
             registeredMBeans.add(on);
         }
@@ -433,13 +433,13 @@ public class JmxAgent extends AbstractAgent
                     final String name = jmxSupport.escape(rawName);
                     if (logger.isInfoEnabled()) {
                         logger.info("Attempting to register service with name: " + jmxSupport.getDomainName(muleContext) +
-                                                    ":type=org.mule.Endpoint,component=" +
+                                                    ":type=org.mule.Endpoint,service=" +
                                                     jmxSupport.escape(mBean.getComponentName()) +
                                                     ",name=" + name);
                     }
                     ObjectName on = jmxSupport.getObjectName(
                                                     jmxSupport.getDomainName(muleContext) +
-                                                    ":type=org.mule.Endpoint,component=" +
+                                                    ":type=org.mule.Endpoint,service=" +
                                                     jmxSupport.escape(mBean.getComponentName()) +
                                                     ",name=" + name);
                     mBeanServer.registerMBean(mBean, on);

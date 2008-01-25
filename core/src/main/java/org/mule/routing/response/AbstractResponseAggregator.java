@@ -31,7 +31,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  * Response Agrregators are used to collect responses that are usually sent to
  * replyTo endpoints set on outbound routers. When an event is sent out via an
  * outbound router, the response router will block the response flow on an
- * Component until the Response Router resolves a reply or times out.
+ * Service until the Response Router resolves a reply or times out.
  */
 public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 {

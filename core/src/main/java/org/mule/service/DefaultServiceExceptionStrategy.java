@@ -8,32 +8,32 @@
  * LICENSE.txt file.
  */
 
-package org.mule.component;
+package org.mule.service;
 
 import org.mule.DefaultExceptionStrategy;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.lifecycle.DefaultLifecycleAdapter;
-import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.ServiceStatistics;
 
 /**
- * <code>DefaultComponentExceptionStrategy</code> is the default exception handler
+ * <code>DefaultServiceExceptionStrategy</code> is the default exception handler
  * for components. The handler logs errors and will forward the message and exception
  * to an exception endpointUri if one is set on this Exception strategy
  */
-public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
+public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
 {
     /**
-     * The component to which the Exception handler belongs
+     * The service to which the Exception handler belongs
      */
-    protected Component component;
+    protected Service service;
 
-    protected ComponentStatistics statistics;
+    protected ServiceStatistics statistics;
 
-    public DefaultComponentExceptionStrategy()
+    public DefaultServiceExceptionStrategy()
     {
         super();
     }
@@ -41,40 +41,40 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
     /**
      * Constructor
      * 
-     * @param component the owner of this exception strategy
+     * @param service the owner of this exception strategy
      * @see DefaultLifecycleAdapter
      */
-    public DefaultComponentExceptionStrategy(Component component)
+    public DefaultServiceExceptionStrategy(Service service)
     {
         super();
-        setComponent(component);
+        setService(service);
     }
 
     /**
      * @return the UniversalMessageObject to which this handler is attached
      */
-    public Component getComponent()
+    public Service getService()
     {
-        return component;
+        return service;
     }
 
     protected void defaultHandler(Throwable t)
     {
-        // Lazy initialisation of the component
-        // This strategy should be associated with only one component
+        // Lazy initialisation of the service
+        // This strategy should be associated with only one service
         // and thus there is no concurrency problem
-        if (component == null)
+        if (service == null)
         {
             MuleEvent event = RequestContext.getEvent();
             if (event == null)
             {
                 // very bad should not happen
-                logger.fatal("The Default Component Exception Strategy has been invoked but there is no current event on the context");
+                logger.fatal("The Default Service Exception Strategy has been invoked but there is no current event on the context");
                 logger.fatal("The error is: " + t.getMessage(), t);
             }
             else
             {
-                setComponent(event.getComponent());
+                setService(event.getService());
             }
         }
 
@@ -108,14 +108,14 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
         }
     }
 
-    public void setComponent(Component component)
+    public void setService(Service service)
     {
-        this.component = component;
-        if (component instanceof AbstractComponent)
+        this.service = service;
+        if (service instanceof AbstractService)
         {
             if (statistics != null)
             {
-                this.statistics = ((AbstractComponent) component).getStatistics();
+                this.statistics = ((AbstractService) service).getStatistics();
             }
         }
     }

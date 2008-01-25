@@ -13,7 +13,7 @@ package org.mule.api.model;
 import org.mule.api.MuleEventContext;
 
 /**
- * <code>EntryPoint</code> defines the current entry method on a component. If
+ * <code>EntryPoint</code> defines the current entry method on a service. If
  * the invoked method does not have a return value, a {@link org.mule.VoidResult}
  * is returned.
  */

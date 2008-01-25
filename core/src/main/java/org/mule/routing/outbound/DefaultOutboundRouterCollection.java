@@ -13,11 +13,11 @@ package org.mule.routing.outbound;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
@@ -57,9 +57,9 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
                 matchfound = true;
                 // Manage outbound only transactions here
                 final OutboundRouter router = umoOutboundRouter;
-                Component component = session.getComponent();
+                Service service = session.getService();
                 TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig(),
-                        component.getExceptionListener(), muleContext);
+                        service.getExceptionListener(), muleContext);
 
                 TransactionCallback cb = new TransactionCallback()
                 {
@@ -89,7 +89,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
             if (logger.isDebugEnabled())
             {
                 logger.debug("Message did not match any routers on: "
-                        + session.getComponent().getName()
+                        + session.getService().getName()
                         + " invoking catch all strategy");
             }
             return catchAll(message, session, synchronous);
@@ -97,7 +97,7 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         else if (!matchfound)
         {
             logger.warn("Message did not match any routers on: "
-                    + session.getComponent().getName()
+                    + session.getService().getName()
                     + " and there is no catch all strategy configured on this router.  Disposing message " + message);
         }
         return message;

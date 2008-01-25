@@ -17,13 +17,13 @@ import org.mule.api.MessagingException;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.ComponentException;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.component.AbstractComponent;
+import org.mule.api.service.ServiceException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.ra.i18n.JcaMessages;
+import org.mule.service.AbstractService;
 
 import javax.resource.spi.UnavailableException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
@@ -32,10 +32,10 @@ import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
 
 /**
- * <code>JcaComponent</code> Is the type of component used in Mule when embedded inside an app server using
+ * <code>JcaService</code> Is the type of service used in Mule when embedded inside an app server using
  * JCA. In the future we might want to use one of the existing models.
  */
-public class JcaComponent extends AbstractComponent implements WorkListener
+public class JcaService extends AbstractService implements WorkListener
 {
 
     /**
@@ -45,7 +45,7 @@ public class JcaComponent extends AbstractComponent implements WorkListener
 
     protected WorkManager workManager;
 
-    public JcaComponent(WorkManager workManager)
+    public JcaService(WorkManager workManager)
     {
         super();
         this.workManager = workManager;
@@ -65,25 +65,25 @@ public class JcaComponent extends AbstractComponent implements WorkListener
 
     public boolean isPaused()
     {
-        // JcaComponent is a wrapper for a hosted component implementation and
+        // JcaService is a wrapper for a hosted service implementation and
         // therefore cannot be paused by mule
         return false;
     }
 
     protected void waitIfPaused(MuleEvent event) throws InterruptedException
     {
-        // JcaComponent is a wrapper for a hosted component implementation and
+        // JcaService is a wrapper for a hosted service implementation and
         // therefore cannot be paused by mule
     }
 
     protected void doPause() throws MuleException
     {
-        throw new ComponentException(JcaMessages.cannotPauseResumeJcaComponent(), null, this);
+        throw new ServiceException(JcaMessages.cannotPauseResumeJcaComponent(), null, this);
     }
 
     protected void doResume() throws MuleException
     {
-        throw new ComponentException(JcaMessages.cannotPauseResumeJcaComponent(), null, this);
+        throw new ServiceException(JcaMessages.cannotPauseResumeJcaComponent(), null, this);
     }
 
     public synchronized void doInitialise() throws InitialisationException
@@ -102,7 +102,7 @@ public class JcaComponent extends AbstractComponent implements WorkListener
         }
         catch (Exception e)
         {
-            throw new DefaultMuleException(CoreMessages.failedToInvoke("UMO Component: " + getName()), e);
+            throw new DefaultMuleException(CoreMessages.failedToInvoke("UMO Service: " + getName()), e);
         }
     }
 
@@ -115,7 +115,7 @@ public class JcaComponent extends AbstractComponent implements WorkListener
     }
 
     /*
-     * The component ins actually managed by the Application Server container,Since the instance might be
+     * The service ins actually managed by the Application Server container,Since the instance might be
      * pooled by the server, we should use the MessageEndPointFactory to delegate the request for creation to
      * the container. The container might create a Proxy object to intercept the actual method call to
      * implement transaction,security related functionalities

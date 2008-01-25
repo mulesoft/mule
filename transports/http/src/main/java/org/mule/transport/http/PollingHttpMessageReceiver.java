@@ -16,9 +16,9 @@ import org.mule.DefaultMuleSession;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.DefaultMessageAdapter;
@@ -34,11 +34,11 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
     private boolean checkEtag;
     
     public PollingHttpMessageReceiver(Connector connector,
-                                      Component component,
+                                      Service service,
                                       final Endpoint endpoint) throws CreateException
     {
 
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
 
         long pollingFrequency = MapUtils.getLongValue(endpoint.getProperties(), "pollingFrequency",
                 -1);
@@ -74,7 +74,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
         }
         req.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         
-        MuleSession session = new DefaultMuleSession(component);
+        MuleSession session = new DefaultMuleSession(service);
         MuleEvent event = new DefaultMuleEvent(req, endpoint, session, true);
         
         MuleMessage message = connector.send(endpoint, event);

@@ -12,7 +12,6 @@ package org.mule.transport.soap.xfire;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.component.Component;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ManagerNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
@@ -20,12 +19,13 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ManagerNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnectable;
@@ -54,7 +54,6 @@ import org.codehaus.xfire.annotations.AnnotationServiceFactory;
 import org.codehaus.xfire.annotations.WebAnnotations;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.handler.Handler;
-import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.service.ServiceFactory;
 import org.codehaus.xfire.service.binding.BindingProvider;
 import org.codehaus.xfire.service.binding.ObjectServiceFactory;
@@ -148,8 +147,8 @@ public class XFireConnector extends AbstractConnector
                 try
                 {
                     Class clazz = ClassUtils.loadClass(clientServices.get(i).toString(), this.getClass());
-                    Service service = factory.create(clazz);
-                    xfire.getServiceRegistry().register(service);
+                    org.codehaus.xfire.service.Service xfireService = factory.create(clazz);
+                    xfire.getServiceRegistry().register(xfireService);
                 }
                 catch (ClassNotFoundException e)
                 {
@@ -362,8 +361,8 @@ public class XFireConnector extends AbstractConnector
         throws MuleException
     {
     	 // TODO MULE-2228 Simplify this API
-    	SedaComponent c = new SedaComponent();
-        c.setName(XFIRE_SERVICE_COMPONENT_NAME + receiver.getComponent().getName());            
+    	SedaService c = new SedaService();
+        c.setName(XFIRE_SERVICE_COMPONENT_NAME + receiver.getService().getName());            
         c.setModel(muleContext.getRegistry().lookupSystemModel());
         //c.setMuleContext(muleContext);
         //c.initialise();
@@ -374,10 +373,10 @@ public class XFireConnector extends AbstractConnector
         svcComponent.initialise();
         
         SingletonObjectFactory of = new SingletonObjectFactory(svcComponent);
-        // Inject the Component because XFireServiceComponent is ComponentAware.
-        // TODO Is this really necessary?  The only thing the Component is needed for is to get the
+        // Inject the Service because XFireServiceComponent is ServiceAware.
+        // TODO Is this really necessary?  The only thing the Service is needed for is to get the
         // threading profile.
-        of.setComponent(c);
+        of.setService(c);
         of.initialise();
         c.setServiceFactory(of);
         
@@ -393,7 +392,7 @@ public class XFireConnector extends AbstractConnector
             c.getProperties().put(XFIRE_TRANSPORT, serviceTransport);
         }
         
-        String serviceName = receiver.getComponent().getName();
+        String serviceName = receiver.getService().getName();
 
         // No determine if the endpointUri requires a new connector to be
         // registed in the case of http we only need to register the new
@@ -469,21 +468,21 @@ public class XFireConnector extends AbstractConnector
     /**
      * The method determines the key used to store the receiver against.
      *
-     * @param component the component for which the endpoint is being registered
-     * @param endpoint the endpoint being registered for the component
+     * @param service the service for which the endpoint is being registered
+     * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against. In this case it
-     *         is the component name, which is equivilent to the Axis service name.
+     *         is the service name, which is equivilent to the Axis service name.
      */
-    protected Object getReceiverKey(Component component, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
     {
         if (endpoint.getEndpointURI().getPort() == -1)
         {
-            return component.getName();
+            return service.getName();
         }
         else
         {
             return endpoint.getEndpointURI().getAddress() + "/"
-                   + component.getName();
+                   + service.getName();
         }
     }
 
@@ -569,12 +568,12 @@ public class XFireConnector extends AbstractConnector
 
     public void onNotification(ServerNotification event)
     {
-        // We need to register the xfire service component once the model
+        // We need to register the xfire service service once the model
         // starts because
         // when the model starts listeners on components are started, thus
         // all listener
         // need to be registered for this connector before the xfire service
-        // component is registered. The implication of this is that to add a
+        // service is registered. The implication of this is that to add a
         // new service and a
         // different http port the model needs to be restarted before the
         // listener is available
@@ -582,11 +581,11 @@ public class XFireConnector extends AbstractConnector
         {
         	for (Iterator itr = components.iterator(); itr.hasNext();)
         	{
-        		Component c = (Component) itr.next();
+        		org.mule.api.service.Service c = (org.mule.api.service.Service) itr.next();
 
                 try
                 {
-                    muleContext.getRegistry().registerComponent(c);
+                    muleContext.getRegistry().registerService(c);
                 }
                 catch (MuleException e)
                 {
@@ -635,13 +634,13 @@ public class XFireConnector extends AbstractConnector
         }
     }
 
-    protected Client createXFireClient(ImmutableEndpoint endpoint, Service service, XFire xfire)
+    protected Client createXFireClient(ImmutableEndpoint endpoint, org.codehaus.xfire.service.Service service, XFire xfire)
             throws Exception
     {
         return createXFireClient(endpoint, service, xfire, null);
     }
 
-    protected Client createXFireClient(ImmutableEndpoint endpoint, Service service,
+    protected Client createXFireClient(ImmutableEndpoint endpoint, org.codehaus.xfire.service.Service service,
                                        XFire xfire, String transportClass) throws Exception
     {
         Class transportClazz = MuleUniversalTransport.class;
@@ -699,9 +698,9 @@ public class XFireConnector extends AbstractConnector
     {
         final XFire xfire = getXfire();
         final String serviceName = XFireMessageDispatcher.getServiceName(endpoint);
-        final Service service = xfire.getServiceRegistry().getService(serviceName);
+        final org.codehaus.xfire.service.Service xfireService = xfire.getServiceRegistry().getService(serviceName);
 
-        if (service == null)
+        if (xfireService == null)
         {
             throw new FatalConnectException(XFireMessages.serviceIsNull(serviceName), this);
         }
@@ -713,7 +712,7 @@ public class XFireConnector extends AbstractConnector
             {
                 Handler handler = (Handler) ClassUtils.instanciateClass(
                                     inList.get(i).toString(), ClassUtils.NO_ARGS, getClass());
-                service.addInHandler(handler);
+                xfireService.addInHandler(handler);
             }
         }
 
@@ -724,13 +723,13 @@ public class XFireConnector extends AbstractConnector
             {
                 Handler handler = (Handler) ClassUtils.instanciateClass(
                                     outList.get(i).toString(), ClassUtils.NO_ARGS, getClass());
-                service.addOutHandler(handler);
+                xfireService.addOutHandler(handler);
             }
         }
 
         try
         {
-            return createXFireClient(endpoint, service, xfire);
+            return createXFireClient(endpoint, xfireService, xfire);
         }
         catch (Exception ex)
         {

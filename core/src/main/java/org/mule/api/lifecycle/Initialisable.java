@@ -12,7 +12,7 @@ package org.mule.api.lifecycle;
 
 /**
  * <code>Initialisable</code> is a lifecycle interface that gets called at the
- * initialise lifecycle stage of the implementing component.
+ * initialise lifecycle stage of the implementing service.
  */
 public interface Initialisable
 {

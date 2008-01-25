@@ -20,7 +20,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.EndpointURI;
@@ -28,6 +27,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.SecurityException;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
@@ -60,8 +60,8 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
     /** logger used by this class */
     protected final Log logger = LogFactory.getLog(getClass());
 
-    /** The Component with which this receiver is associated with */
-    protected Component component = null;
+    /** The Service with which this receiver is associated with */
+    protected Service service = null;
 
     /** The endpoint descriptor which is associated with this receiver */
     protected ImmutableEndpoint endpoint = null;
@@ -104,24 +104,24 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
      * Creates the Message Receiver
      *
      * @param connector the endpoint that created this listener
-     * @param component the component to associate with the receiver. When data is
-     *                  received the component <code>dispatchEvent</code> or
+     * @param service the service to associate with the receiver. When data is
+     *                  received the service <code>dispatchEvent</code> or
      *                  <code>sendEvent</code> is used to dispatch the data to the
      *                  relivant UMO.
      * @param endpoint  the provider contains the endpointUri on which the receiver
      *                  will listen on. The endpointUri can be anything and is specific to
      *                  the receiver implementation i.e. an email address, a directory, a
      *                  jms destination or port address.
-     * @see Component
+     * @see Service
      * @see ImmutableEndpoint
      */
-    public AbstractMessageReceiver(Connector connector, Component component, ImmutableEndpoint endpoint)
+    public AbstractMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
             throws CreateException
     {
         setConnector(connector);
-        setComponent(component);
+        setService(service);
         setEndpoint(endpoint);
-        if (component.getResponseRouter() != null && component.getResponseRouter().getEndpoints().contains(endpoint))
+        if (service.getResponseRouter() != null && service.getResponseRouter().getEndpoints().contains(endpoint))
         {
             responseEndpoint = true;
         }
@@ -252,9 +252,9 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
         }
     }
 
-    public Component getComponent()
+    public Service getService()
     {
-        return component;
+        return service;
     }
 
     public final MuleMessage routeMessage(MuleMessage message) throws MuleException
@@ -296,7 +296,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
         if (connector.isEnableMessageEvents())
         {
             connector.fireNotification(
-                    new MessageNotification(message, endpoint, component.getName(), MessageNotification.MESSAGE_RECEIVED));
+                    new MessageNotification(message, endpoint, service.getName(), MessageNotification.MESSAGE_RECEIVED));
         }
 
         //IF REMOTE_SYNCis set on the endpoint, we need to set it on the message
@@ -379,13 +379,13 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
      * 
      * @see org.mule.api.transport.MessageReceiver#setSession(org.mule.api.MuleSession)
      */
-    public void setComponent(Component component)
+    public void setService(Service service)
     {
-        if (component == null)
+        if (service == null)
         {
-            throw new IllegalArgumentException("Component cannot be null");
+            throw new IllegalArgumentException("Service cannot be null");
         }
-        this.component = component;
+        this.service = service;
     }
 
     public final void dispose()
@@ -561,7 +561,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
                     ros = new ResponseOutputStream(outputStream);
                 }
             }
-            MuleSession session = new DefaultMuleSession(message, connector.getSessionHandler(), component);
+            MuleSession session = new DefaultMuleSession(message, connector.getSessionHandler(), service);
             MuleEvent muleEvent = new DefaultMuleEvent(message, endpoint, session, synchronous, ros);
             muleEvent = OptimizedRequestContext.unsafeSetEvent(muleEvent);
             message = muleEvent.getMessage();
@@ -594,12 +594,12 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
                 // This is a replyTo event for a current request
                 if (responseEndpoint)
                 {
-                    component.getResponseRouter().route(muleEvent);
+                    service.getResponseRouter().route(muleEvent);
                     return null;
                 }
                 else
                 {
-                    resultMessage = component.getInboundRouter().route(muleEvent);
+                    resultMessage = service.getInboundRouter().route(muleEvent);
                 }
             }
             if (resultMessage != null)

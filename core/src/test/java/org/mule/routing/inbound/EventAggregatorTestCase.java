@@ -16,9 +16,9 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.routing.InboundRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.routing.AggregationException;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.tck.AbstractMuleTestCase;
@@ -32,8 +32,8 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
 
     public void testMessageAggregator() throws Exception
     {
-        Component testComponent = getTestComponent("test", Apple.class);
-        MuleSession session = getTestSession(testComponent);
+        Service testService = getTestService("test", Apple.class);
+        MuleSession session = getTestSession(testService);
 
         InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
         SimpleEventAggregator router = new SimpleEventAggregator(3);

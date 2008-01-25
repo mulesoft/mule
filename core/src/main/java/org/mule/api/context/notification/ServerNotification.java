@@ -21,7 +21,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>ServerNotification</code> is an event triggered by something happening
- * in the Server itself such as the server starting or a component being registered.
+ * in the Server itself such as the server starting or a service being registered.
  */
 public abstract class ServerNotification extends EventObject
 {
@@ -36,7 +36,7 @@ public abstract class ServerNotification extends EventObject
 
     public static final int MANAGER_EVENT_ACTION_START_RANGE = 100;
     public static final int MODEL_EVENT_ACTION_START_RANGE = 200;
-    public static final int COMPONENT_EVENT_ACTION_START_RANGE = 300;
+    public static final int SERVICE_EVENT_ACTION_START_RANGE = 300;
     public static final int SECURITY_EVENT_ACTION_START_RANGE = 400;
     public static final int MANAGEMENT_EVENT_ACTION_START_RANGE = 500;
     public static final int ADMIN_EVENT_ACTION_START_RANGE = 600;
@@ -65,8 +65,8 @@ public abstract class ServerNotification extends EventObject
      * The resourceIdentifier is used when firing inbound server notifications such
      * as Admin notifications or other action notifications triggered by an external
      * source Used to associate the event with a particular resource. For example, if
-     * the event was a ComponentNotification the resourceIdentifier could be the name
-     * of a particular component
+     * the event was a ServiceNotification the resourceIdentifier could be the name
+     * of a particular service
      */
     protected String resourceIdentifier = null;
 

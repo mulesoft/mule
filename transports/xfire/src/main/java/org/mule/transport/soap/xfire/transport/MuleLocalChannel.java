@@ -343,7 +343,7 @@ public class MuleLocalChannel extends AbstractChannel
         {
             MessageContext context = new MessageContext();
   
-            XFire xfire = (XFire)ctx.getComponent().getProperties().get(
+            XFire xfire = (XFire)ctx.getService().getProperties().get(
                 XFireConnector.XFIRE_PROPERTY);
 
             context.setService(xfire.getServiceRegistry().getService(getService(ctx)));

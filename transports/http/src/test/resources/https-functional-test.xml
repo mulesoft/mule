@@ -17,7 +17,7 @@
     <https:endpoint name="clientEndpoint" host="localhost" port="60202" synchronous="true" connector-ref="httpConnector"/>
 
     <model name="main">
-        <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <inbound-endpoint ref="clientEndpoint"/>
             </inbound>

@@ -22,7 +22,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -31,12 +30,13 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.AdminNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.message.DefaultExceptionPayload;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
 import org.mule.util.MapUtils;
@@ -53,7 +53,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>MuleManagerComponent</code> is a MuleManager interal server component
+ * <code>MuleManagerComponent</code> is a MuleManager interal server service
  * responsible for receiving remote requests and dispatching them locally. This
  * allows developer to tunnel requests through http ssl to a Mule instance behind a
  * firewall
@@ -130,7 +130,7 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
 
         if (destComponent != null)
         {
-            MuleSession session = new DefaultMuleSession(MuleServer.getMuleContext().getRegistry().lookupComponent(
+            MuleSession session = new DefaultMuleSession(MuleServer.getMuleContext().getRegistry().lookupService(
                 destComponent));
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
@@ -145,14 +145,14 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
 
             if (context.isSynchronous())
             {
-                result = session.getComponent().sendEvent(event);
+                result = session.getService().sendEvent(event);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 wireFormat.write(out, result, getEncoding());
                 return out.toByteArray();
             }
             else
             {
-                session.getComponent().dispatchEvent(event);
+                session.getService().dispatchEvent(event);
                 return null;
             }
         }
@@ -241,7 +241,7 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
     }
 
 
-    public static final Component getComponent(EndpointBuilder endpointBuilder,
+    public static final Service getService(EndpointBuilder endpointBuilder,
                                                     WireFormat wireFormat,
                                                     String encoding,
                                                     int eventTimeout,
@@ -249,26 +249,26 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
     {
         try
         {
-            Component component = new SedaComponent();
-            component.setName(MANAGER_COMPONENT_NAME);
-            component.setModel(muleContext.getRegistry().lookupSystemModel());
+            Service service = new SedaService();
+            service.setName(MANAGER_COMPONENT_NAME);
+            service.setModel(muleContext.getRegistry().lookupSystemModel());
 
             Map props = new HashMap();
             props.put("wireFormat", wireFormat);
             props.put("encoding", encoding);
             props.put("synchronousEventTimeout", new Integer(eventTimeout));
-            component.setServiceFactory(new PrototypeObjectFactory(MuleManagerComponent.class, props));
+            service.setServiceFactory(new PrototypeObjectFactory(MuleManagerComponent.class, props));
 
-            component.setMuleContext(muleContext);
-            //component.initialise();
+            service.setMuleContext(muleContext);
+            //service.initialise();
     
             endpointBuilder.setName(MANAGER_ENDPOINT_NAME);
             ImmutableEndpoint endpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getInboundEndpoint(endpointBuilder);
-            component.getInboundRouter().addEndpoint(endpoint);
+            service.getInboundRouter().addEndpoint(endpoint);
 
-            return component;
+            return service;
         }
         catch (Exception e)
         {

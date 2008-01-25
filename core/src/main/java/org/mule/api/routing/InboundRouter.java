@@ -16,7 +16,7 @@ import org.mule.api.MuleEvent;
 /**
  * <code>InboundRouter</code> defines an interface for an inbound Message
  * router. An inbound router is used to control how events are received by a
- * component. One or more of these routers can be associated with a
+ * service. One or more of these routers can be associated with a
  * InboundRouterCollection implementation.
  * 
  * @see InboundRouterCollection
@@ -30,15 +30,15 @@ public interface InboundRouter extends Router
      * router has either discarded the event of the event has been stored for further
      * processing. A reaosn for storing the event might be that other events in it's
      * correlation group are expected to be received. 2. Pass back an array of one or
-     * more events to be processed by the component. Often 1 event is returned, i.e.
+     * more events to be processed by the service. Often 1 event is returned, i.e.
      * in the case of event aggregation. The router may return an array of events if
      * a set of events have been resequenced or multiple events have been generated
      * from a single event.
      * 
      * @param event the event received by the inbound endpoint before it is passed to
-     *            the component
+     *            the service
      * @return null to indicate the event has been stored/destroyed or an array of
-     *         events to be processed by the component
+     *         events to be processed by the service
      * @throws MessagingException if an error occurs during processing of the event
      */
     MuleEvent[] process(MuleEvent event) throws MessagingException;

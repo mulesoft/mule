@@ -12,10 +12,10 @@ package org.mule.transport.ftp;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.file.FileConnector;
@@ -48,11 +48,11 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
     protected final Set currentFiles = Collections.synchronizedSet(new HashSet());
 
     public FtpMessageReceiver(Connector connector,
-                              Component component,
+                              Service service,
                               Endpoint endpoint,
                               long frequency) throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
 
         this.setFrequency(frequency);
 

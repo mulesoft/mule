@@ -12,10 +12,10 @@ package org.mule.management.mbeans;
 
 import org.mule.MuleServer;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
-import org.mule.component.AbstractComponent;
-import org.mule.management.stats.ComponentStatistics;
-import org.mule.model.seda.SedaComponent;
+import org.mule.api.service.Service;
+import org.mule.management.stats.ServiceStatistics;
+import org.mule.model.seda.SedaService;
+import org.mule.service.AbstractService;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -25,16 +25,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>ComponentService</code> exposes service information about a Mule Managed
- * component.
+ * <code>ServiceService</code> exposes service information about a Mule Managed
+ * service.
  */
-public class ComponentService implements ComponentServiceMBean, MBeanRegistration, ComponentStatsMBean
+public class ServiceService implements ServiceServiceMBean, MBeanRegistration, ServiceStatsMBean
 {
 
     /**
      * logger used by this class
      */
-    private static Log LOGGER = LogFactory.getLog(ComponentService.class);
+    private static Log LOGGER = LogFactory.getLog(ServiceService.class);
 
     private MBeanServer server;
 
@@ -44,9 +44,9 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     private ObjectName objectName;
 
-    private ComponentStatistics statistics;
+    private ServiceStatistics statistics;
 
-    public ComponentService(String name)
+    public ServiceService(String name)
     {
         this.name = name;
         this.statistics = getComponent().getStatistics();
@@ -55,10 +55,10 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     public int getQueueSize()
     {
-        Component c = getComponent();
-        if (c instanceof SedaComponent)
+        Service c = getComponent();
+        if (c instanceof SedaService)
         {
-            return ((SedaComponent)c).getQueueSize();
+            return ((SedaService)c).getQueueSize();
         }
         else
         {
@@ -67,14 +67,14 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
     }
 
     /**
-     * Pauses event processing for theComponent. Unlike stop(), a paused component
+     * Pauses event processing for theComponent. Unlike stop(), a paused service
      * will still consume messages from the underlying transport, but those messages
-     * will be queued until the component is resumed. <p/> In order to persist these
+     * will be queued until the service is resumed. <p/> In order to persist these
      * queued messages you can set the 'recoverableMode' property on the
      * Muleconfiguration to true. this causes all internal queues to store their
      * state.
      * 
-     * @throws org.mule.api.MuleException if the component failed to pause.
+     * @throws org.mule.api.MuleException if the service failed to pause.
      * @see org.mule.config.MuleConfiguration
      */
     public void pause() throws MuleException
@@ -83,10 +83,10 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
     }
 
     /**
-     * Resumes the Component that has been paused. If the component is not paused
+     * Resumes the Service that has been paused. If the service is not paused
      * nothing is executed.
      * 
-     * @throws org.mule.api.MuleException if the component failed to resume
+     * @throws org.mule.api.MuleException if the service failed to resume
      */
     public void resume() throws MuleException
     {
@@ -131,7 +131,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.management.mbeans.ComponentServiceMBean#getStatistics()
+     * @see org.mule.management.mbeans.ServiceServiceMBean#getStatistics()
      */
     public ObjectName getStatistics()
     {
@@ -162,7 +162,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
         {
             if (getComponent().getStatistics() != null)
             {
-                statsName = new ObjectName(objectName.getDomain() + ":type=org.mule.Statistics,component="
+                statsName = new ObjectName(objectName.getDomain() + ":type=org.mule.Statistics,service="
                                            + getName());
                 // unregister old version if exists
                 if (this.server.isRegistered(statsName))
@@ -170,7 +170,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
                     this.server.unregisterMBean(statsName);
                 }
 
-                this.server.registerMBean(new ComponentStats(getComponent().getStatistics()), this.statsName);
+                this.server.registerMBean(new ServiceStats(getComponent().getStatistics()), this.statsName);
             }
         }
         catch (Exception e)
@@ -195,7 +195,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
         }
         catch (Exception ex)
         {
-            LOGGER.error("Error unregistering ComponentService child " + statsName.getCanonicalName(), ex);
+            LOGGER.error("Error unregistering ServiceService child " + statsName.getCanonicalName(), ex);
         }
     }
 
@@ -209,12 +209,12 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
         // nothing to do
     }
 
-    private AbstractComponent getComponent()
+    private AbstractService getComponent()
     {
-        return (AbstractComponent)MuleServer.getMuleContext().getRegistry().lookupComponent(getName());
+        return (AbstractService)MuleServer.getMuleContext().getRegistry().lookupService(getName());
     }
 
-    // ///// Component stats impl /////////
+    // ///// Service stats impl /////////
 
     /**
      *

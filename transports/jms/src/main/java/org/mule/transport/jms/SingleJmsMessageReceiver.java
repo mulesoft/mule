@@ -10,9 +10,9 @@
 
 package org.mule.transport.jms;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 
 import javax.jms.Message;
@@ -24,10 +24,10 @@ import javax.jms.MessageListener;
 public class SingleJmsMessageReceiver extends JmsMessageReceiver implements MessageListener
 {
 
-    public SingleJmsMessageReceiver(Connector connector, Component component, Endpoint endpoint)
+    public SingleJmsMessageReceiver(Connector connector, Service service, Endpoint endpoint)
             throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
     }
 
 

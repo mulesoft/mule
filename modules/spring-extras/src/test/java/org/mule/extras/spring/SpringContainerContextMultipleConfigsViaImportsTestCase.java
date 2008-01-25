@@ -37,11 +37,11 @@ public class SpringContainerContextMultipleConfigsViaImportsTestCase extends Abs
         try
         {
             Object result = container.getComponent("apple2");
-            assertNotNull("Component should exist in container", result);
+            assertNotNull("Service should exist in container", result);
         }
         catch (ObjectNotFoundException e)
         {
-            fail("Component should exist in the container");
+            fail("Service should exist in the container");
         }
     }
 

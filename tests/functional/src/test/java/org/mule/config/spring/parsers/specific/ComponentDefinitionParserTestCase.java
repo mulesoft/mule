@@ -11,10 +11,10 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.api.MuleContext;
-import org.mule.api.component.Component;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.context.MuleContextFactory;
+import org.mule.api.service.Service;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.component.simple.StaticComponent;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -37,10 +37,10 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(
             "org/mule/config/spring/parsers/specific/component-ok-test.xml");
         muleContext = muleContextFactory.createMuleContext(configBuilder);
-        Component component = muleContext.getRegistry().lookupComponent("service");
-        validateCorrectComponentCreation(component);
-        assertEquals(SingletonObjectFactory.class, component.getServiceFactory().getClass());
-        assertEquals(1, component.getNestedRouter().getRouters().size());
+        Service service = muleContext.getRegistry().lookupService("service");
+        validateCorrectServiceCreation(service);
+        assertEquals(SingletonObjectFactory.class, service.getServiceFactory().getClass());
+        assertEquals(1, service.getNestedRouter().getRouters().size());
     }
 
     public void testShortcutComponent() throws Exception
@@ -48,10 +48,10 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(
             "org/mule/config/spring/parsers/specific/component-ok-test.xml");
         muleContext = muleContextFactory.createMuleContext(configBuilder);
-        Component component = muleContext.getRegistry().lookupComponent("service2");
-        validateCorrectComponentCreation(component);
-        assertEquals(PooledObjectFactory.class, component.getServiceFactory().getClass());
-        assertEquals(2, component.getNestedRouter().getRouters().size());
+        Service service = muleContext.getRegistry().lookupService("service2");
+        validateCorrectServiceCreation(service);
+        assertEquals(PooledObjectFactory.class, service.getServiceFactory().getClass());
+        assertEquals(2, service.getNestedRouter().getRouters().size());
     }
 
     public void testClassAttributeAndObjectFactory() throws Exception
@@ -73,14 +73,14 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         }
     }
 
-    protected void validateCorrectComponentCreation(Component component) throws Exception
+    protected void validateCorrectServiceCreation(Service service) throws Exception
     {
-        assertNotNull(component);
-        assertNotNull(component.getServiceFactory());
-        assertFalse(component.getServiceFactory().getOrCreate() instanceof PassThroughComponent);
-        assertTrue(component.getServiceFactory().getOrCreate() instanceof StaticComponent);
-        assertNotNull(component.getNestedRouter());
-        assertTrue(component.getNestedRouter().getRouters().get(0) instanceof DefaultNestedRouter);
+        assertNotNull(service);
+        assertNotNull(service.getServiceFactory());
+        assertFalse(service.getServiceFactory().getOrCreate() instanceof PassThroughComponent);
+        assertTrue(service.getServiceFactory().getOrCreate() instanceof StaticComponent);
+        assertNotNull(service.getNestedRouter());
+        assertTrue(service.getNestedRouter().getRouters().get(0) instanceof DefaultNestedRouter);
     }
 
     protected MuleContext createMuleContext() throws Exception

@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * A Base class for {@link org.mule.api.model.EntryPointResolver}. It provides parameters for
  * detemining if the payload of the message should be transformed first and whether void methods are
  * acceptible. It also provides a method cashe for those resolvers that use reflection to discover methods
- * on the component.
+ * on the service.
  */
 public abstract class AbstractEntryPointResolver implements EntryPointResolver
 {
@@ -67,7 +67,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
 
     protected Method getMethodByName(String methodName, MuleEventContext context)
     {
-        StringBuffer key = new StringBuffer(24).append(context.getComponent().getName())
+        StringBuffer key = new StringBuffer(24).append(context.getService().getName())
                 .append(".").append(methodName);
         Method method = (Method) methodCache.get(key);
         return method;
@@ -75,7 +75,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
 
     protected Method addMethodByName(Method method, MuleEventContext context)
     {
-        StringBuffer key = new StringBuffer(24).append(context.getComponent().getName())
+        StringBuffer key = new StringBuffer(24).append(context.getService().getName())
                 .append(".").append(method.getName());
         Method previousMethod = (Method) methodCache.putIfAbsent(key, method);
         return (previousMethod != null ? previousMethod : method);

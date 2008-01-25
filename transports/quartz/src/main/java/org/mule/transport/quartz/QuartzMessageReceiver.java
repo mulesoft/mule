@@ -11,10 +11,10 @@
 package org.mule.transport.quartz;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
@@ -33,7 +33,7 @@ import org.quartz.Trigger;
 
 /**
  * Listens for Quartz sheduled events using the Receiver Job and fires events to the
- * component associated with this receiver.
+ * service associated with this receiver.
  */
 public class QuartzMessageReceiver extends AbstractMessageReceiver
 {
@@ -43,10 +43,10 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
 
     private final QuartzConnector connector;
 
-    public QuartzMessageReceiver(Connector connector, Component component, Endpoint endpoint)
+    public QuartzMessageReceiver(Connector connector, Service service, Endpoint endpoint)
             throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
         this.connector = (QuartzConnector) connector;
     }
 

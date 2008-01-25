@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>TestServiceComponent</code> is a test WebServices component.
+ * <code>TestServiceComponent</code> is a test WebServices service.
  */
 public class TestServiceComponent extends FunctionalTestComponent
     implements EchoService, DateService, PeopleService, Disposable

@@ -10,7 +10,7 @@
 
 package org.mule.transport.soap.xfire;
 
-import org.mule.component.DefaultComponentExceptionStrategy;
+import org.mule.service.DefaultServiceExceptionStrategy;
 
 import org.codehaus.xfire.fault.FaultInfoException;
 
@@ -19,7 +19,7 @@ import org.codehaus.xfire.fault.FaultInfoException;
  * a Mule exception object.  This ensures the XFire serialiser/deserialiser can send the correct exception object
  * to the client.
  */
-public class XFireComponentExceptionStrategy extends DefaultComponentExceptionStrategy
+public class XFireComponentExceptionStrategy extends DefaultServiceExceptionStrategy
 {
     protected void defaultHandler(Throwable t)
     {

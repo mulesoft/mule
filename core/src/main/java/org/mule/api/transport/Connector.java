@@ -16,10 +16,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
-import org.mule.api.component.Component;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.service.Service;
 
 import java.beans.ExceptionListener;
 import java.io.OutputStream;
@@ -36,22 +36,22 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      * This creates a <code>MessageReceiver</code> associated with this endpoint
      * and registers it with the connector
      * 
-     * @param component the listening component
+     * @param service the listening service
      * @param endpoint the endpoint contains the listener endpointUri on which to
      *            listen on.
      * @throws Exception if the MessageReceiver cannot be created or the Receiver
      *             cannot be registered
      */
-    MessageReceiver registerListener(Component component, ImmutableEndpoint endpoint) throws Exception;
+    MessageReceiver registerListener(Service service, ImmutableEndpoint endpoint) throws Exception;
 
     /**
-     * @param component the listening component
+     * @param service the listening service
      * @param endpoint the associated endpointDescriptor with the listener
      * @throws Exception if the listener cannot be unregistered. If a listener is not
      *             associated with the given endpoint this will not throw an
      *             exception
      */
-    void unregisterListener(Component component, ImmutableEndpoint endpoint) throws Exception;
+    void unregisterListener(Service service, ImmutableEndpoint endpoint) throws Exception;
 
     /**
      * @return true if the endpoint is started

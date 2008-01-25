@@ -24,7 +24,7 @@ public class DuplicateRegistrationTestCase extends AbstractMuleTestCase
         assertEquals(0, components.size());
         
         final String componentName = "TEST_COMPONENT_1";
-        getTestComponent(componentName, Object.class);
+        getTestService(componentName, Object.class);
 
         components = muleContext.getRegistry().lookupComponents();
         assertEquals(1, components.size());
@@ -32,13 +32,13 @@ public class DuplicateRegistrationTestCase extends AbstractMuleTestCase
         // register it again with the same name
         try
         {
-            getTestComponent(componentName, Object.class);
-            fail("Trying to register a component with the same name must have thrown an exception.");
+            getTestService(componentName, Object.class);
+            fail("Trying to register a service with the same name must have thrown an exception.");
         }
         catch (RegistrationException e)
         {
             // expected
-            assertTrue("Exception message should contain component name", 
+            assertTrue("Exception message should contain service name", 
                        StringUtils.contains(e.getMessage(), componentName));
         }
 

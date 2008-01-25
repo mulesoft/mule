@@ -13,11 +13,11 @@ package org.mule.test.integration;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transformer.TransformerUtils;
@@ -43,9 +43,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent3RouterEndpoints() throws Exception
     {
         // test inbound
-        Component component = muleContext.getRegistry().lookupComponent("TestComponent3");
-        assertNotNull(component);
-        OutboundRouterCollection outboundRouter = component.getOutboundRouter();
+        Service service = muleContext.getRegistry().lookupService("TestComponent3");
+        assertNotNull(service);
+        OutboundRouterCollection outboundRouter = service.getOutboundRouter();
         assertNotNull(outboundRouter);
         assertEquals(2, outboundRouter.getRouters().size());
         // first Router
@@ -78,11 +78,11 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent4Endpoints() throws Exception
     {
         // test inbound
-        Component component = muleContext.getRegistry().lookupComponent("TestComponent4");
-        assertNotNull(component);
-        assertNotNull(component.getInboundRouter().getEndpoints());
-        assertEquals(1, component.getInboundRouter().getEndpoints().size());
-        Endpoint endpoint = (Endpoint)component.getInboundRouter().getEndpoints().get(0);
+        Service service = muleContext.getRegistry().lookupService("TestComponent4");
+        assertNotNull(service);
+        assertNotNull(service.getInboundRouter().getEndpoints());
+        assertEquals(1, service.getInboundRouter().getEndpoints().size());
+        Endpoint endpoint = (Endpoint)service.getInboundRouter().getEndpoints().get(0);
         assertNotNull(endpoint);
         assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("testEndpoint", endpoint.getName());
@@ -95,9 +95,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent4RouterEndpoints() throws Exception
     {
         // test inbound
-        Component component = muleContext.getRegistry().lookupComponent("TestComponent4");
-        assertNotNull(component);
-        OutboundRouterCollection outboundRouter = component.getOutboundRouter();
+        Service service = muleContext.getRegistry().lookupService("TestComponent4");
+        assertNotNull(service);
+        OutboundRouterCollection outboundRouter = service.getOutboundRouter();
         assertNotNull(outboundRouter);
         assertEquals(1, outboundRouter.getRouters().size());
         // first Router
@@ -120,9 +120,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
     public void testComponent5RouterEndpoints() throws Exception
     {
         // test inbound
-        Component component = muleContext.getRegistry().lookupComponent("TestComponent5");
-        assertNotNull(component);
-        OutboundRouterCollection outboundRouter = component.getOutboundRouter();
+        Service service = muleContext.getRegistry().lookupService("TestComponent5");
+        assertNotNull(service);
+        OutboundRouterCollection outboundRouter = service.getOutboundRouter();
         assertNotNull(outboundRouter);
         assertEquals(1, outboundRouter.getRouters().size());
         // first Router

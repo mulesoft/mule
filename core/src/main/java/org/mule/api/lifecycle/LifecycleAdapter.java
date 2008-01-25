@@ -11,13 +11,13 @@
 package org.mule.api.lifecycle;
 
 import org.mule.api.Interceptor;
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 
 /**
  * <code>LifecycleAdapter</code> is a wrapper around a pojo service that adds Lifecycle methods to the pojo. It also
- * associates the pojo service with its {@link Component} object.
+ * associates the pojo service with its {@link Service} object.
  *
- * @see Component
+ * @see Service
  */
 public interface LifecycleAdapter extends Lifecycle, Interceptor
 {
@@ -25,5 +25,5 @@ public interface LifecycleAdapter extends Lifecycle, Interceptor
 
     boolean isDisposed();
 
-    Component getComponent();
+    Service getService();
 }

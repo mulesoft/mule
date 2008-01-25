@@ -10,8 +10,8 @@
 
 package org.mule.test.spring;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.tck.FunctionalTestCase;
 
 public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
@@ -24,9 +24,9 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
 
     public void testProperties()
     {
-        Component component = muleContext.getRegistry().lookupComponent("service");
-        assertNotNull(component);
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) component.getInboundRouter().getEndpoints().get(0);
+        Service service = muleContext.getRegistry().lookupService("service");
+        assertNotNull(service);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getInboundRouter().getEndpoints().get(0);
         assertNotNull(endpoint);
 
         assertProperty(endpoint, "global-only", "global");

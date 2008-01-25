@@ -21,7 +21,7 @@ public class DisposeException extends LifecycleException
 
     /**
      * @param message   the exception message
-     * @param component the object that failed during a lifecycle method call
+     * @param service the object that failed during a lifecycle method call
      */
     public DisposeException(Message message, Disposable component)
     {
@@ -31,7 +31,7 @@ public class DisposeException extends LifecycleException
     /**
      * @param message   the exception message
      * @param cause     the exception that cause this exception to be thrown
-     * @param component the object that failed during a lifecycle method call
+     * @param service the object that failed during a lifecycle method call
      */
     public DisposeException(Message message, Throwable cause, Disposable component)
     {
@@ -40,7 +40,7 @@ public class DisposeException extends LifecycleException
 
     /**
      * @param cause     the exception that cause this exception to be thrown
-     * @param component the object that failed during a lifecycle method call
+     * @param service the object that failed during a lifecycle method call
      */
     public DisposeException(Throwable cause, Disposable component)
     {

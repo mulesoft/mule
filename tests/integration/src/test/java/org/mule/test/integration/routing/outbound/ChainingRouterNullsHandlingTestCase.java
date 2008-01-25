@@ -12,7 +12,7 @@ package org.mule.test.integration.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.ComponentException;
+import org.mule.api.service.ServiceException;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
@@ -43,9 +43,9 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         assertNotNull("Should've contained an exception payload", result.getExceptionPayload());
         Throwable exception = result.getExceptionPayload().getException();
         assertNotNull("Exception required", exception);
-        assertTrue("Wrong exception", exception instanceof ComponentException);
-        String compName = ((ComponentException) exception).getComponent().getName();
-        assertEquals("Exception raised in wrong component", "component2Fail", compName);
+        assertTrue("Wrong exception", exception instanceof ServiceException);
+        String compName = ((ServiceException) exception).getService().getName();
+        assertEquals("Exception raised in wrong service", "component2Fail", compName);
     }
 
     public void testFirstComponentFails() throws Exception {
@@ -57,8 +57,8 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         assertNotNull("Should've contained an exception payload", result.getExceptionPayload());
         Throwable exception = result.getExceptionPayload().getException();
         assertNotNull("Exception required", exception);
-        assertTrue("Wrong exception", exception instanceof ComponentException);
-        String compName = ((ComponentException) exception).getComponent().getName();
-        assertEquals("Exception raised in wrong component", "component1Fail", compName);
+        assertTrue("Wrong exception", exception instanceof ServiceException);
+        String compName = ((ServiceException) exception).getService().getName();
+        assertEquals("Exception raised in wrong service", "component1Fail", compName);
     }
 }

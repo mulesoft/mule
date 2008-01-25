@@ -94,7 +94,7 @@ public class AllStatistics
 
         while (it.hasNext())
         {
-            ((ComponentStatistics) it.next()).setEnabled(b);
+            ((ServiceStatistics) it.next()).setEnabled(b);
         }
     }
 
@@ -108,7 +108,7 @@ public class AllStatistics
         this.startTime = startTime;
     }
 
-    public synchronized void add(ComponentStatistics stat)
+    public synchronized void add(ServiceStatistics stat)
     {
         if (stat != null)
         {
@@ -116,7 +116,7 @@ public class AllStatistics
         }
     }
 
-    public synchronized void remove(ComponentStatistics stat)
+    public synchronized void remove(ServiceStatistics stat)
     {
         if (stat != null)
         {

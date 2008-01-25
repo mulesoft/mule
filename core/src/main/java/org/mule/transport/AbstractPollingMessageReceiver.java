@@ -11,9 +11,9 @@
 package org.mule.transport;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ObjectUtils;
@@ -48,10 +48,10 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
     protected final List schedules = new LinkedList();
 
     public AbstractPollingMessageReceiver(Connector connector,
-                                          Component component,
+                                          Service service,
                                           final ImmutableEndpoint endpoint) throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
     }
 
     protected void doStart() throws MuleException

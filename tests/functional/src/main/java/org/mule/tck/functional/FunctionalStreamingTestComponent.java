@@ -24,9 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A component that can be used by streaming functional tests. This component accepts an
+ * A service that can be used by streaming functional tests. This service accepts an
  * EventCallback that can be used to assert the state of the current event.  To access the
- * component when embedded in an (XML) model, make sure that the descriptor sets the
+ * service when embedded in an (XML) model, make sure that the descriptor sets the
  * singleton attribute true - see uses in TCP and FTP.
  *
  * Note that although this implements the full StreamingService interface, nothing is
@@ -168,8 +168,8 @@ public class FunctionalStreamingTestComponent implements Callable
 
         summary = result.toString();
 
-        String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                + context.getComponent().getName() + ". " + summary
+        String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
+                + context.getService().getName() + ". " + summary
                 + "\n callback: " + eventCallback,
                 '*', 80);
 

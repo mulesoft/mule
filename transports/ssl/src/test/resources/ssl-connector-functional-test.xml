@@ -19,7 +19,7 @@
 
     <model name="main">
 
-        <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaComponent">
+        <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <inbound-endpoint ref="in"/>
             </inbound>

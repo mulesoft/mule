@@ -31,11 +31,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>FunctionalTestComponent</code> is a component that can be used by
- * functional tests. This component accepts an EventCallback that can be used to
+ * <code>FunctionalTestComponent</code> is a service that can be used by
+ * functional tests. This service accepts an EventCallback that can be used to
  * assert the state of the current event.
  * <p/>
- * Also, this component fires {@link FunctionalTestNotification} via Mule for every message received.
+ * Also, this service fires {@link FunctionalTestNotification} via Mule for every message received.
  * Tests can register with Mule to receive these events by implementing
  * {@link FunctionalTestNotificationListener}.
  *
@@ -59,7 +59,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     private boolean asString = true;
 
     /**
-     * Keeps a list of any messages received on this component. Note that only references
+     * Keeps a list of any messages received on this service. Note that only references
      * to the messages (objects) are stored, so any subsequent changes to the objects
      * will change the history.
      */
@@ -87,8 +87,8 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         }
 
         String contents = context.transformMessageToString();
-        String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                + context.getComponent().getName() + ". Content is: "
+        String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
+                + context.getService().getName() + ". Content is: "
                 + StringMessageUtils.truncate(contents, 100, true), '*', 80);
 
         logger.info(msg);
@@ -108,7 +108,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
             if (isAsString())
             {
                 replyMessage = (addReceived ? received(contents) : contents)
-                        + (appendComponentName ? " " + context.getComponent().getName() : "");
+                        + (appendComponentName ? " " + context.getService().getName() : "");
             }
             else
             {
@@ -159,8 +159,8 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     {
         MuleEventContext context = RequestContext.getEventContext();
         String contents = data.toString();
-        String msg = StringMessageUtils.getBoilerPlate("Message Received in component: "
-                + context.getComponent().getName() + ". Content is: "
+        String msg = StringMessageUtils.getBoilerPlate("Message Received in service: "
+                + context.getService().getName() + ". Content is: "
                 + StringMessageUtils.truncate(contents, 100, true), '*', 80);
 
         logger.info(msg);
@@ -191,7 +191,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
             }
             else
             {
-                throw new DefaultMuleException(MessageFactory.createStaticMessage("Functional Test Component Exception"));
+                throw new DefaultMuleException(MessageFactory.createStaticMessage("Functional Test Service Exception"));
             }
         }
 
@@ -199,14 +199,14 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /**
-     * An event callback is called when a message is received by the component.
+     * An event callback is called when a message is received by the service.
      * An MuleEvent callback isn't strictly required but it is usfal for performing assertions
      * on the current message being received.
      * Note that the FunctionalTestComponent should be made a singleton
      * {@link org.mule.api.UMODescriptor#setSingleton} when using MuleEvent callbacks
      * <p/>
      * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this
-     * will deleiver a {@link FunctionalTestNotification} for every message received by this component
+     * will deleiver a {@link FunctionalTestNotification} for every message received by this service
      *
      * @return the callback to call when a message is received
      * @see org.mule.api.UMODescriptor
@@ -219,14 +219,14 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /**
-     * An event callback is called when a message is received by the component.
+     * An event callback is called when a message is received by the service.
      * An MuleEvent callback isn't strictly required but it is usfal for performing assertions
      * on the current message being received.
      * Note that the FunctionalTestComponent should be made a singleton
      * {@link org.mule.api.UMODescriptor#setSingleton} when using MuleEvent callbacks
      * <p/>
      * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this
-     * will deleiver a {@link FunctionalTestNotification} for every message received by this component
+     * will deleiver a {@link FunctionalTestNotification} for every message received by this service
      *
      * @param eventCallback the callback to call when a message is received
      * @see org.mule.api.UMODescriptor
@@ -243,7 +243,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * This can be done using the 'returnMessage' property. Note that you can return complex objects by
      * using the <container-property> element in the Xml configuration.
      *
-     * @return the message payload to always return from this component instance
+     * @return the message payload to always return from this service instance
      */
     public Object getReturnMessage()
     {
@@ -255,7 +255,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * This can be done using the 'returnMessage' property. Note that you can return complex objects by
      * using the <container-property> element in the Xml configuration.
      *
-     * @param returnMessage the message payload to always return from this component instance
+     * @param returnMessage the message payload to always return from this service instance
      */
     public void setReturnMessage(Object returnMessage)
     {
@@ -263,7 +263,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /**
-     * Sometimes you will want the component to always throw an exception, if this is the case you can
+     * Sometimes you will want the service to always throw an exception, if this is the case you can
      * set the 'throwException' property to true.
      *
      * @return throwException true if an exception should always be thrown from this instance.
@@ -276,7 +276,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /**
-     * Sometimes you will want the component to always throw an exception, if this is the case you can
+     * Sometimes you will want the service to always throw an exception, if this is the case you can
      * set the 'throwException' property to true.
      *
      * @param throwException true if an exception should always be thrown from this instance.
@@ -289,12 +289,12 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /**
-     * This will cause the component to append the compoent name to the end of the message
-     * returned from this component. This only works when processing String messages.
+     * This will cause the service to append the compoent name to the end of the message
+     * returned from this service. This only works when processing String messages.
      * This feature is useful when processing multiple messages using a pool of FunctionalTestComponents
      * to determine who processed the resulting message
      *
-     * @return true if the component name will be appended to the return message
+     * @return true if the service name will be appended to the return message
      */
     public boolean isAppendComponentName()
     {
@@ -302,12 +302,12 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /**
-     * This will cause the component to append the compoent name to the end of the message
-     * returned from this component. This only works when processing String messages.
+     * This will cause the service to append the compoent name to the end of the message
+     * returned from this service. This only works when processing String messages.
      * This feature is useful when processing multiple messages using a pool of FunctionalTestComponents
      * to determine who processed the resulting message
      *
-     * @param appendComponentName true if the component name will be appended to the return message
+     * @param appendComponentName true if the service name will be appended to the return message
      */
     public void setAppendComponentName(boolean appendComponentName)
     {
@@ -324,7 +324,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         this.enableMessageHistory = enableMessageHistory;
     }
 
-    /** If enableMessageHistory = true, returns the number of messages received by this component. */
+    /** If enableMessageHistory = true, returns the number of messages received by this service. */
     public int getReceivedMessages()
     {
         if (messageHistory != null)
@@ -338,9 +338,9 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     }
 
     /**
-     * If enableMessageHistory = true, returns a message received by the component in chronological order.
-     * For example, getReceivedMessage(1) returns the first message received by the component,
-     * getReceivedMessage(2) returns the second message received by the component, etc.
+     * If enableMessageHistory = true, returns a message received by the service in chronological order.
+     * For example, getReceivedMessage(1) returns the first message received by the service,
+     * getReceivedMessage(2) returns the second message received by the service, etc.
      */
     public Object getReceivedMessage(int number)
     {
@@ -355,7 +355,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         return message;
     }
 
-    /** If enableMessageHistory = true, returns the last message received by the component in chronological order. */
+    /** If enableMessageHistory = true, returns the last message received by the service in chronological order. */
     public Object getLastReceivedMessage()
     {
         if (messageHistory != null)

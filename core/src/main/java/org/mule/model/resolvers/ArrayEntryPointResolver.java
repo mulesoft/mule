@@ -14,7 +14,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.util.ClassUtils;
 
 /**
- * Will resolver entry point methods on a service component that accept a single array.
+ * Will resolver entry point methods on a service service that accept a single array.
  * i.e.
  * <code>public Object eat(Fruit[] fruit)</code>
  * <p/>

@@ -27,9 +27,9 @@ import org.springframework.context.ApplicationContextAware;
  * 
  *   <model>
  *       <service name="myOrangeService">
- *           <component>
+ *           <service>
  *               <spring-object bean="myBean"/>
- *           </component>
+ *           </service>
  *       </service>
  *   </model>
  *
@@ -39,9 +39,9 @@ import org.springframework.context.ApplicationContextAware;
  * 
  *   <model>
  *       <service name="myOrangeService">
- *           <component>
+ *           <service>
  *               <spring-object bean="myFactoryBean"/>
- *           </component>
+ *           </service>
  *       </service>
  *   </model>
  *

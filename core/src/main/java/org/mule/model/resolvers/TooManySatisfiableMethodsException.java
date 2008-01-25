@@ -15,7 +15,7 @@ import org.mule.config.i18n.CoreMessages;
 
 /**
  * <code>TooManySatisfiableMethodsException</code> is thrown by EntryPointResolvers
- * when the component passed has more than one method that meets the criteria of the
+ * when the service passed has more than one method that meets the criteria of the
  * configured EntryPointResolver.
  *
  * @see org.mule.api.model.EntryPointResolver

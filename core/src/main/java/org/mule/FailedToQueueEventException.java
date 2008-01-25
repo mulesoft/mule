@@ -11,37 +11,37 @@
 package org.mule;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
-import org.mule.api.component.ComponentException;
+import org.mule.api.service.Service;
+import org.mule.api.service.ServiceException;
 import org.mule.config.i18n.Message;
 
 /**
  * <code>FailedToQueueEventException</code> is thrown when an event cannot be put
- * on an internal component queue.
+ * on an internal service queue.
  */
 
-public class FailedToQueueEventException extends ComponentException
+public class FailedToQueueEventException extends ServiceException
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = -8368283988424746098L;
 
-    public FailedToQueueEventException(Message message, MuleMessage umoMessage, Component component)
+    public FailedToQueueEventException(Message message, MuleMessage umoMessage, Service service)
     {
-        super(message, umoMessage, component);
+        super(message, umoMessage, service);
     }
 
     public FailedToQueueEventException(Message message,
                                        MuleMessage umoMessage,
-                                       Component component,
+                                       Service service,
                                        Throwable cause)
     {
-        super(message, umoMessage, component, cause);
+        super(message, umoMessage, service, cause);
     }
 
-    public FailedToQueueEventException(MuleMessage umoMessage, Component component, Throwable cause)
+    public FailedToQueueEventException(MuleMessage umoMessage, Service service, Throwable cause)
     {
-        super(umoMessage, component, cause);
+        super(umoMessage, service, cause);
     }
 }

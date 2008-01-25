@@ -10,9 +10,9 @@
 
 package org.mule.api;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transformer.TransformerException;
@@ -128,12 +128,12 @@ public interface MuleEventContext
     void markTransactionForRollback() throws TransactionException;
 
     /**
-     * This will send an event via the configured outbound router on the component
+     * This will send an event via the configured outbound router on the service
      * 
      * @param message the message to send
      * @return the result of the send if any
      * @throws MuleException if there is no outbound endpoint configured on the
-     *             component or the events fails during dispatch
+     *             service or the events fails during dispatch
      */
     MuleMessage sendEvent(Object message) throws MuleException;
 
@@ -144,7 +144,7 @@ public interface MuleEventContext
      * 
      * @param message the message payload to send
      * @return the return Message from the call or null if there was no result
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     MuleMessage sendEvent(MuleMessage message) throws MuleException;
@@ -157,7 +157,7 @@ public interface MuleEventContext
      * @param message the event message payload to send
      * @param endpoint The endpointUri to disptch the event through
      * @return the return Message from the call or null if there was no result
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     MuleMessage sendEvent(MuleMessage message, EndpointURI endpoint) throws MuleException;
@@ -169,10 +169,10 @@ public interface MuleEventContext
      * 
      * @param message the event message payload to send
      * @param endpointName The endpoint name to disptch the event through. This will
-     *            be looked up first on the component configuration and then on the
+     *            be looked up first on the service configuration and then on the
      *            mule manager configuration
      * @return the return Message from the call or null if there was no result
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException;
@@ -185,13 +185,13 @@ public interface MuleEventContext
      * @param message the event message payload to send
      * @param endpoint The endpoint to disptch the event through.
      * @return the return Message from the call or null if there was no result
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     MuleMessage sendEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException;
 
     /**
-     * sends an event request via the configured outbound router for this component.
+     * sends an event request via the configured outbound router for this service.
      * This method return immediately, but the result of the event invocation
      * available from the returned a Future result that can be accessed later by the
      * the returned FutureMessageResult. the Future messageResult can be queried at
@@ -209,7 +209,7 @@ public interface MuleEventContext
     FutureMessageResult sendEventAsync(Object message, int timeout) throws MuleException;
 
     /**
-     * sends an event request via the configured outbound router for this component.
+     * sends an event request via the configured outbound router for this service.
      * This method return immediately, but the result of the event invocation
      * available from the returned a Future result that can be accessed later by the
      * the returned FutureMessageResult. the Future messageResult can be queried at
@@ -227,7 +227,7 @@ public interface MuleEventContext
     FutureMessageResult sendEventAsync(MuleMessage message, int timeout) throws MuleException;
 
     /**
-     * sends an event request via the configured outbound router for this component.
+     * sends an event request via the configured outbound router for this service.
      * This method return immediately, but the result of the event invocation
      * available from the returned a Future result that can be accessed later by the
      * the returned FutureMessageResult. the Future messageResult can be queried at
@@ -247,7 +247,7 @@ public interface MuleEventContext
         throws MuleException;
 
     /**
-     * sends an event request via the configured outbound router for this component.
+     * sends an event request via the configured outbound router for this service.
      * This method return immediately, but the result of the event invocation
      * available from the returned a Future result that can be accessed later by the
      * the returned FutureMessageResult. the Future messageResult can be queried at
@@ -257,7 +257,7 @@ public interface MuleEventContext
      * 
      * @param message the MuleMessage of the event
      * @param endpointName The endpoint name to disptch the event through. This will
-     *            be looked up first on the component configuration and then on the
+     *            be looked up first on the service configuration and then on the
      *            mule manager configuration
      * @param timeout how long to block in milliseconds waiting for a result
      * @return the result message if any of the invocation
@@ -270,21 +270,21 @@ public interface MuleEventContext
 
     /**
      * This will dispatch an event asynchronously via the configured outbound
-     * endpoint on the component for this session
+     * endpoint on the service for this session
      * 
      * @param message the message to send
      * @throws MuleException if there is no outbound endpoint configured on the
-     *             component or the events fails during dispatch
+     *             service or the events fails during dispatch
      */
     void dispatchEvent(MuleMessage message) throws MuleException;
 
     /**
      * This will dispatch an event asynchronously via the configured outbound
-     * endpoint on the component for this session
+     * endpoint on the service for this session
      * 
      * @param payload the message payloadto send
      * @throws MuleException if there is no outbound endpoint configured on the
-     *             component or the events fails during dispatch
+     *             service or the events fails during dispatch
      */
     void dispatchEvent(Object payload) throws MuleException;
 
@@ -294,9 +294,9 @@ public interface MuleEventContext
      * configured for the event
      * 
      * @param message the event message payload to send
-     * @param endpoint the endpointUri to dispatc the event to first on the component
+     * @param endpoint the endpointUri to dispatc the event to first on the service
      *            configuration and then on the mule manager configuration
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     void dispatchEvent(MuleMessage message, EndpointURI endpoint) throws MuleException;
@@ -308,9 +308,9 @@ public interface MuleEventContext
      * 
      * @param message the event message payload to send
      * @param endpointName The endpoint name to disptch the event through. This will
-     *            be looked up first on the component configuration and then on the
+     *            be looked up first on the service configuration and then on the
      *            mule manager configuration
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     void dispatchEvent(MuleMessage message, String endpointName) throws MuleException;
@@ -322,13 +322,13 @@ public interface MuleEventContext
      * 
      * @param message the event message payload to send
      * @param endpoint The endpoint name to disptch the event through.
-     * @throws MuleException if the event fails to be processed by the component or
+     * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
     void dispatchEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException;
 
     /**
-     * Requests a synchronous receive of an event on the component.
+     * Requests a synchronous receive of an event on the service.
      * 
      * @param endpoint the endpoint identifying the endpointUri on which the event
      *            will be received
@@ -339,7 +339,7 @@ public interface MuleEventContext
     MuleMessage receiveEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException;
 
     /**
-     * Requests a synchronous receive of an event on the component.
+     * Requests a synchronous receive of an event on the service.
      * 
      * @param endpointName the endpoint identifying the endpointUri on which the
      *            event will be received
@@ -350,7 +350,7 @@ public interface MuleEventContext
     MuleMessage receiveEvent(String endpointName, long timeout) throws MuleException;
 
     /**
-     * Requests a synchronous receive of an event on the component.
+     * Requests a synchronous receive of an event on the service.
      * 
      * @param endpoint the endpointUri on which the event will be received
      * @param timeout time in milliseconds before the request timesout
@@ -359,7 +359,7 @@ public interface MuleEventContext
      */
     MuleMessage receiveEvent(EndpointURI endpoint, long timeout) throws MuleException;
 
-    Component getComponent();
+    Service getService();
 
     /**
      * Determines whether the default processing for this event will be executed. By

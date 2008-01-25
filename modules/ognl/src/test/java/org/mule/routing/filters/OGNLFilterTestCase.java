@@ -68,7 +68,7 @@ public class OGNLFilterTestCase extends FunctionalTestCase
     {
         String expression =
                 ((OGNLFilter) ((FilteringOutboundRouter) muleContext.getRegistry().
-                        lookupComponent(SERVICE_NAME).getOutboundRouter().getRouters().get(0)).
+                        lookupService(SERVICE_NAME).getOutboundRouter().getRouters().get(0)).
                         getFilter()).getExpression();
 
         assertEquals(expression, OGNL_EXSPRESSION);

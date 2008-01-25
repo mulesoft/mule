@@ -13,7 +13,7 @@ package org.mule.api.context;
 import org.mule.config.i18n.CoreMessages;
 
 /**
- * <code>ObjectNotFoundException</code> is thrown when a reference to a component
+ * <code>ObjectNotFoundException</code> is thrown when a reference to a service
  * in a configured container is not found
  */
 public class ObjectNotFoundException extends ContainerException
@@ -24,7 +24,7 @@ public class ObjectNotFoundException extends ContainerException
     private static final long serialVersionUID = 5012452325639544484L;
 
     /**
-     * @param componentName the name of the component that could not be found
+     * @param componentName the name of the service that could not be found
      */
     public ObjectNotFoundException(String componentName)
     {
@@ -32,7 +32,7 @@ public class ObjectNotFoundException extends ContainerException
     }
 
     /**
-     * @param componentName the name of the component that could not be found
+     * @param componentName the name of the service that could not be found
      * @param cause the exception that cause this exception to be thrown
      */
     public ObjectNotFoundException(String componentName, Throwable cause)

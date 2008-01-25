@@ -10,10 +10,10 @@
 
 package org.mule.mule;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
+import org.mule.api.service.Service;
 import org.mule.component.simple.PassThroughComponent;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
@@ -23,7 +23,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 {
     public void testDescriptorDefaults() throws Exception
     {
-        Component component = new SedaComponent();
+        Service service = new SedaService();
 
         //TODO RM*
 //        MuleConfiguration config = new MuleConfiguration();
@@ -37,22 +37,22 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 //        assertEquals("1.0", descriptor.getVersion());
         // assertEquals(2, descriptor.getInitialisationPolicy());
 
-        //assertNull("Factory should be null but is " + component.getServiceFactory(), component.getServiceFactory());
-        assertNotNull(component.getServiceFactory());
-        assertEquals(SingletonObjectFactory.class, component.getServiceFactory().getClass());
-        component.getServiceFactory().initialise();
-        assertTrue(component.getServiceFactory().getOrCreate() instanceof PassThroughComponent);
-        assertNull(component.getName());
-        //assertEquals(0, component.getProperties().size());
+        //assertNull("Factory should be null but is " + service.getServiceFactory(), service.getServiceFactory());
+        assertNotNull(service.getServiceFactory());
+        assertEquals(SingletonObjectFactory.class, service.getServiceFactory().getClass());
+        service.getServiceFactory().initialise();
+        assertTrue(service.getServiceFactory().getOrCreate() instanceof PassThroughComponent);
+        assertNull(service.getName());
+        //assertEquals(0, service.getProperties().size());
     }
 
     // These validations seems a bit silly, IMHO.
 //    public void testDescriptorNullValidation() throws Exception
 //    {
-//        Component component = new SedaComponent();
+//        Service service = new SedaService();
 //        try
 //        {
-//            component.setExceptionListener(null);
+//            service.setExceptionListener(null);
 //            fail("setting exeption strategy to null should fail");
 //        }
 //        catch (RuntimeException e)
@@ -62,7 +62,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 //
 //        try
 //        {
-//            component.setName(null);
+//            service.setName(null);
 //            fail("setting name to null should fail");
 //        }
 //        catch (RuntimeException e)
@@ -72,7 +72,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 //
 //        try
 //        {
-//            component.setServiceFactory(null);
+//            service.setServiceFactory(null);
 //            fail("setting serviceFactory to null should fail");
 //        }
 //        catch (RuntimeException e)
@@ -84,19 +84,19 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
     public void testEndpointValidation() throws Exception
     {
-        Component component = getTestComponent("Terry", Orange.class);
+        Service service = getTestService("Terry", Orange.class);
         TestExceptionStrategy es = new TestExceptionStrategy();
-        component.setExceptionListener(es);
-        assertEquals(1, component.getOutboundRouter().getRouters().size());
+        service.setExceptionListener(es);
+        assertEquals(1, service.getOutboundRouter().getRouters().size());
         
         // TODO Why should there be an outbound endpoint configured?
-        //Endpoint ep = (Endpoint)((OutboundRouter)component.getOutboundRouter().getRouters().get(0)).getEndpoints().get(0);
+        //Endpoint ep = (Endpoint)((OutboundRouter)service.getOutboundRouter().getRouters().get(0)).getEndpoints().get(0);
         //assertNotNull(ep);
         //assertNotNull(ep.getConnector().getExceptionListener());
 
         // create receive endpoint
         Endpoint endpoint = getTestEndpoint("test2", Endpoint.ENDPOINT_TYPE_RECEIVER);
-        component.getInboundRouter().addEndpoint(endpoint);
+        service.getInboundRouter().addEndpoint(endpoint);
         // Add receive endpoint, this shoulbe set as default
         assertNotNull(endpoint.getConnector().getExceptionListener());
     }

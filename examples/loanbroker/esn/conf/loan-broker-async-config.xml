@@ -37,7 +37,7 @@
             types the catch all strategy is invoked, which simply passes the event to the component
             -->
             <inbound>
-                <custom-catch-all-strategy class="org.mule.routing.ComponentCatchAllStrategy"/>
+                <custom-catch-all-strategy class="org.mule.routing.ServiceCatchAllStrategy"/>
                 <!-- New requests from customers -->
                 <inbound-endpoint ref="CustomerRequests"/>
                 <!-- Loan quotes from banks -->

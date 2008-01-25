@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.component;
+package org.mule.api.service;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
@@ -30,15 +30,15 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * <code>Component</code> is the interal repesentation of a Mule Managed
- * component. It is responsible for managing the interaction of events to and from
- * the component as well as managing pooled resources.
+ * <code>Service</code> is the interal repesentation of a Mule Managed
+ * service. It is responsible for managing the interaction of events to and from
+ * the service as well as managing pooled resources.
  */
 
-public interface Component extends Serializable, Lifecycle, MuleContextAware, NamedObject
+public interface Service extends Serializable, Lifecycle, MuleContextAware, NamedObject
 {
     /**
-     * Makes an asynhronous event call to the component.
+     * Makes an asynhronous event call to the service.
      * 
      * @param event the event to consume
      * @throws MuleException if the event fails to be processed
@@ -46,8 +46,8 @@ public interface Component extends Serializable, Lifecycle, MuleContextAware, Na
     void dispatchEvent(MuleEvent event) throws MuleException;
 
     /**
-     * Makes a synhronous event call to the component. This event will be consumed by
-     * the component and a result returned.
+     * Makes a synhronous event call to the service. This event will be consumed by
+     * the service and a result returned.
      * 
      * @param event the event to consume
      * @return a MuleMessage containing the resulting message and properties
@@ -56,29 +56,29 @@ public interface Component extends Serializable, Lifecycle, MuleContextAware, Na
     MuleMessage sendEvent(MuleEvent event) throws MuleException;
 
     /**
-     * Determines whether this component has been started
+     * Determines whether this service has been started
      * 
-     * @return true is the component is started andready to receive events
+     * @return true is the service is started andready to receive events
      */
     boolean isStarted();
 
     /**
-     * Pauses event processing for a single Mule Component. Unlike stop(), a paused
-     * component will still consume messages from the underlying transport, but those
-     * messages will be queued until the component is resumed.
+     * Pauses event processing for a single Mule Service. Unlike stop(), a paused
+     * service will still consume messages from the underlying transport, but those
+     * messages will be queued until the service is resumed.
      */
     void pause() throws MuleException;
 
     /**
-     * Resumes a single Mule Component that has been paused. If the component is not
+     * Resumes a single Mule Service that has been paused. If the service is not
      * paused nothing is executed.
      */
     void resume() throws MuleException;
 
     /**
-     * True if the component is in a paused state, false otherwise
+     * True if the service is in a paused state, false otherwise
      * 
-     * @return True if the component is in a paused state, false otherwise
+     * @return True if the service is in a paused state, false otherwise
      */
     boolean isPaused();
     
@@ -101,22 +101,22 @@ public interface Component extends Serializable, Lifecycle, MuleContextAware, Na
     void setServiceFactory(ObjectFactory factory);
 
     /**
-     * Inbound Routers control how events are received by a component. If no router
+     * Inbound Routers control how events are received by a service. If no router
      * is set. A default will be used that uses the inboundProvider set on his
      * descriptor.
      *
-     * @return the inbound router for this component. This will always return a valid
+     * @return the inbound router for this service. This will always return a valid
      *         router.
      * @see InboundRouterCollection
      */
     InboundRouterCollection getInboundRouter();
 
     /**
-     * Outbound Routers control how events are published by a component once. the
+     * Outbound Routers control how events are published by a service once. the
      * event has been processed. If no router is set. A default will be used that
      * uses the outboundProvider set on his descriptor to route the event.
      *
-     * @return the outbound router for this component
+     * @return the outbound router for this service
      * @see OutboundRouterCollection
      */
     OutboundRouterCollection getOutboundRouter();
@@ -130,15 +130,15 @@ public interface Component extends Serializable, Lifecycle, MuleContextAware, Na
      * lot more efficient as independent tasks can be forked, execute concurrently
      * and then join before the request completes
      *
-     * @return the response router for this component
+     * @return the response router for this service
      * @see ResponseRouterCollection
      */
     ResponseRouterCollection getResponseRouter();
 
     /**
-     * Returns the initial state of this component
+     * Returns the initial state of this service
      *
-     * @return the initial state of this component
+     * @return the initial state of this service
      */
     String getInitialState();
 
@@ -163,21 +163,21 @@ public interface Component extends Serializable, Lifecycle, MuleContextAware, Na
     //void setServiceFactory(ObjectFactory serviceFactory);
 
     /**
-     * Inbound Routers control how events are received by a component. If no router
+     * Inbound Routers control how events are received by a service. If no router
      * is set. A default will be used that uses the inboundProvider set on his
      * descriptor.
      *
-     * @param router the inbound router for this component
+     * @param router the inbound router for this service
      * @see InboundRouterCollection
      */
     void setInboundRouter(InboundRouterCollection router);
 
     /**
-     * Outbound Routers control how events are published by a component once. the
+     * Outbound Routers control how events are published by a service once. the
      * event has been processed. If no router is set. A default will be used that
      * uses the outboundProvider set on his descriptor to route the event.
      *
-     * @param router the outbound router for this component
+     * @param router the outbound router for this service
      * @see OutboundRouterCollection
      */
     void setOutboundRouter(OutboundRouterCollection router);
@@ -191,15 +191,15 @@ public interface Component extends Serializable, Lifecycle, MuleContextAware, Na
      * lot more efficient as independent tasks can be forked, execute concurrently
      * and then join before the request completes
      *
-     * @param router the response router for this component
+     * @param router the response router for this service
      * @see org.mule.api.routing.ResponseRouterCollection
      */
     void setResponseRouter(ResponseRouterCollection router);
 
     /**
-     * Sets the initial state of this component
+     * Sets the initial state of this service
      *
-     * @param state the initial state of this component
+     * @param state the initial state of this service
      * @see org.mule.ImmutableMuleDescriptor#INITIAL_STATE_STARTED
      * @see org.mule.ImmutableMuleDescriptor#INITIAL_STATE_STOPPED
      * @see org.mule.ImmutableMuleDescriptor#INITIAL_STATE_PAUSED
@@ -236,7 +236,7 @@ public interface Component extends Serializable, Lifecycle, MuleContextAware, Na
      * By default this is null. When set this resolver will override the resolver on the model
      *
      * @return Null is a resolver set has not been set otherwise the resolver to use
-     *         on this component
+     *         on this service
      */
     EntryPointResolverSet getEntryPointResolverSet();
 
@@ -245,7 +245,7 @@ public interface Component extends Serializable, Lifecycle, MuleContextAware, Na
      * By default this is null. When set this resolver will override the resolver on the model
      *
      * @param resolverSet theresolver set to use when resolving entry points
-     *                    on this component
+     *                    on this service
      */
     void setEntryPointResolverSet(EntryPointResolverSet resolverSet);
 }

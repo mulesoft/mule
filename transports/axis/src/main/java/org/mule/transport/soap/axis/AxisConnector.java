@@ -11,7 +11,6 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.context.notification.ManagerNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.Endpoint;
@@ -19,12 +18,13 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ManagerNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.http.servlet.ServletConnector;
@@ -102,7 +102,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     private SimpleProvider clientProvider = null;
 
     private List beanTypes;
-    private Component axisComponent;
+    private Service axisComponent;
 
     //this will store the name of the descriptor of the current connector's AxisServiceComponent
     //private String specificAxisServiceComponentName;
@@ -300,7 +300,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
      * @return the key to store the newly created receiver against. In this case it
      *         is the component name, which is equivalent to the Axis service name.
      */
-    protected Object getReceiverKey(Component component, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service component, ImmutableEndpoint endpoint)
     {
         if (endpoint.getEndpointURI().getPort() == -1)
         {
@@ -323,17 +323,17 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             if (endpointKey.startsWith(umoEndpoint.getEndpointURI().getAddress()))
             {
                 logger.info("Unregistering Axis endpoint: " + endpointKey + " for service: "
-                        + receiver.getComponent().getName());
+                        + ((AxisMessageReceiver) receiver).getSoapService().getName());
             }
             try
             {
                 umoEndpoint.getConnector()
-                        .unregisterListener(receiver.getComponent(), receiver.getEndpoint());
+                        .unregisterListener(receiver.getService(), receiver.getEndpoint());
             }
             catch (Exception e)
             {
                 logger.error("Failed to unregister Axis endpoint: " + endpointKey + " for service: "
-                        + receiver.getComponent().getName() + ". Error is: "
+                        + receiver.getService().getName() + ". Error is: "
                         + e.getMessage(), e);
             }
         }
@@ -364,7 +364,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             axisComponent.getProperties().put(AXIS, axis);
         }
 
-        String serviceName = receiver.getComponent().getName();
+        String serviceName = ((AxisMessageReceiver) receiver).getSoapService().getName();
         // No determine if the endpointUri requires a new connector to be
         // registed in the case of http we only need to register the new endpointUri
         // if the port is different If we're using VM or Jms we just use the resource
@@ -443,14 +443,14 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
     // Another option would be to put it in the default-axis-config.xml (MULE-2102) with lazy-init="true" 
     // but that makes us depend on Spring.
     // Another consideration is how/when this implicit component gets disposed.
-    protected Component getOrCreateAxisComponent() throws MuleException
+    protected Service getOrCreateAxisComponent() throws MuleException
     {
-        Component c = muleContext.getRegistry().lookupComponent(AXIS_SERVICE_PROPERTY + getName());
+        Service c = muleContext.getRegistry().lookupService(AXIS_SERVICE_PROPERTY + getName());
 
         if (c == null)
         {
             // TODO MULE-2228 Simplify this API
-            c = new SedaComponent();
+            c = new SedaService();
             c.setName(AXIS_SERVICE_PROPERTY + getName());
             c.setModel(muleContext.getRegistry().lookupSystemModel());
             //muleContext.getRegistry().registerComponent(c);
@@ -635,7 +635,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             // component is registered.
             // The implication of this is that to add a new service and a
             // different http port the model needs to be restarted before the listener is available
-            if (muleContext.getRegistry().lookupComponent(AXIS_SERVICE_PROPERTY + getName()) == null)
+            if (muleContext.getRegistry().lookupService(AXIS_SERVICE_PROPERTY + getName()) == null)
             {
                 try
                 {
@@ -645,7 +645,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
                     {
                         axisComponent = getOrCreateAxisComponent();
                     }
-                    muleContext.getRegistry().registerComponent(axisComponent);
+                    muleContext.getRegistry().registerService(axisComponent);
 
                     // We have to perform a small hack here to rewrite servlet://
                     // endpoints with the

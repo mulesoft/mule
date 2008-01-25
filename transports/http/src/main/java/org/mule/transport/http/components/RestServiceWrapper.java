@@ -35,7 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This component can used to proxy REST style services as local Mule Components. It
+ * This service can used to proxy REST style services as local Mule Components. It
  * can be configured with a service URL plus a number of properties that allow you to
  * configure the parameters and error conditions on the service.
  */

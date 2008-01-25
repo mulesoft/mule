@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.component;
+package org.mule.api.service;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
@@ -16,52 +16,52 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>ComponentException</code> should be thrown when some action on a component
+ * <code>ServiceException</code> should be thrown when some action on a service
  * fails, such as starting or stopping
  */
 // @ThreadSafe
-public class ComponentException extends MessagingException
+public class ServiceException extends MessagingException
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = 56178344205041599L;
 
-    private final transient Component component;
+    private final transient Service service;
 
     /**
      * @param message the exception message
      */
-    public ComponentException(Message message, MuleMessage umoMessage, Component component)
+    public ServiceException(Message message, MuleMessage umoMessage, Service service)
     {
-        super(generateMessage(message, component), umoMessage);
-        this.component = component;
+        super(generateMessage(message, service), umoMessage);
+        this.service = service;
     }
 
     /**
      * @param message the exception message
      * @param cause the exception that cause this exception to be thrown
      */
-    public ComponentException(Message message, MuleMessage umoMessage, Component component, Throwable cause)
+    public ServiceException(Message message, MuleMessage umoMessage, Service service, Throwable cause)
     {
-        super(generateMessage(message, component), umoMessage, cause);
-        this.component = component;
+        super(generateMessage(message, service), umoMessage, cause);
+        this.service = service;
     }
 
-    public ComponentException(MuleMessage umoMessage, Component component, Throwable cause)
+    public ServiceException(MuleMessage umoMessage, Service service, Throwable cause)
     {
-        super(generateMessage(null, component), umoMessage, cause);
-        this.component = component;
+        super(generateMessage(null, service), umoMessage, cause);
+        this.service = service;
     }
 
-    public Component getComponent()
+    public Service getService()
     {
-        return component;
+        return service;
     }
 
-    private static Message generateMessage(Message previousMessage, Component component)
+    private static Message generateMessage(Message previousMessage, Service service)
     {
-        Message returnMessage = CoreMessages.componentCausedErrorIs(component);
+        Message returnMessage = CoreMessages.componentCausedErrorIs(service);
         if (previousMessage != null)
         {
             previousMessage.setNextMessage(returnMessage);

@@ -13,12 +13,12 @@ import org.mule.DefaultMuleMessage;
 import org.mule.ResponseOutputStream;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.DisposeException;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
@@ -57,10 +57,10 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 {
     private ServerSocket serverSocket = null;
 
-    public TcpMessageReceiver(Connector connector, Component component, ImmutableEndpoint endpoint)
+    public TcpMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
             throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
     }
 
     protected void doConnect() throws ConnectException
@@ -386,7 +386,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         protected void handleResults(List messages) throws Exception
         {            
             //should send back only if remote synch is set or no outbound endpoints
-            if (endpoint.isRemoteSync() || !component.getOutboundRouter().hasEndpoints())
+            if (endpoint.isRemoteSync() || !service.getOutboundRouter().hasEndpoints())
             {
                 for (Iterator iterator = messages.iterator(); iterator.hasNext();)
                 {

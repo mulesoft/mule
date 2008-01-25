@@ -15,9 +15,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.routing.InboundRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -34,7 +34,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         IdempotentReceiver router = new IdempotentReceiver();
 
         Mock session = MuleTestUtils.getMockSession();
-        Component testComponent = getTestComponent("test", Apple.class);
+        Service testService = getTestService("test", Apple.class);
 
         InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
 
@@ -47,16 +47,16 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         // called by idempotent receiver as this is the fist event it will try
         // and initialize the id store
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
 
         assertTrue(router.isMatch(event));
 
         session.expect("dispatchEvent", C.eq(event));
         // called by Inbound message router
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
 
         // called by idempotent receiver
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
         messageRouter.route(event);
 
         session.verify();
@@ -65,9 +65,9 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("sendEvent", C.eq(event), message);
         // called by idempotent receiver
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
         // called by Inbound message router
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
         MuleMessage result = messageRouter.route(event);
         assertNotNull(result);
         assertEquals(message, result);
@@ -75,7 +75,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 
         session.expect("toString");
         // called by idempotent receiver
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
 
         event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         // we've already received this message

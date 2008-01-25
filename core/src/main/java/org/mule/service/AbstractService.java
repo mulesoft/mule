@@ -8,16 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.component;
+package org.mule.service;
 
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
-import org.mule.api.component.ComponentAware;
-import org.mule.api.component.ComponentException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -34,13 +31,17 @@ import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.NestedRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
+import org.mule.api.service.Service;
+import org.mule.api.service.ServiceAware;
+import org.mule.api.service.ServiceException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.component.DefaultMuleProxy;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.context.notification.ComponentNotification;
-import org.mule.management.stats.ComponentStatistics;
+import org.mule.context.notification.ServiceNotification;
+import org.mule.management.stats.ServiceStatistics;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.inbound.InboundPassThroughRouter;
@@ -69,7 +70,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A base implementation for all UMOComponents in Mule
  */
-public abstract class AbstractComponent implements Component
+public abstract class AbstractService implements Service
 {
     
     /**
@@ -77,10 +78,10 @@ public abstract class AbstractComponent implements Component
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected ComponentStatistics stats = null;
+    protected ServiceStatistics stats = null;
 
     /**
-     * Determines if the component has been stopped
+     * Determines if the service has been stopped
      */
     protected AtomicBoolean stopped = new AtomicBoolean(true);
 
@@ -90,17 +91,17 @@ public abstract class AbstractComponent implements Component
     protected WaitableBoolean stopping = new WaitableBoolean(false);
 
     /**
-     * Determines if the component has been initilised
+     * Determines if the service has been initilised
      */
     protected AtomicBoolean initialised = new AtomicBoolean(false);
 
     /**
-     * The model in which this component is registered
+     * The model in which this service is registered
      */
     protected Model model;
 
     /**
-     * Determines if the component has been paused
+     * Determines if the service has been paused
      */
     protected WaitableBoolean paused = new WaitableBoolean(false);
 
@@ -109,14 +110,14 @@ public abstract class AbstractComponent implements Component
     protected EntryPointResolverSet entryPointResolverSet;
 
     /**
-     * The initial states that the component can be started in
+     * The initial states that the service can be started in
      */
     public static final String INITIAL_STATE_STOPPED = "stopped";
     public static final String INITIAL_STATE_STARTED = "started";
     public static final String INITIAL_STATE_PAUSED = "paused";
 
     /**
-     * The exception strategy used by the component.
+     * The exception strategy used by the service.
      */
     protected ExceptionListener exceptionListener;
 
@@ -127,7 +128,7 @@ public abstract class AbstractComponent implements Component
     protected ObjectFactory serviceFactory = new SingletonObjectFactory(PassThroughComponent.class);
 
     /**
-     * The component's name
+     * The service's name
      */
     protected String name;
 
@@ -140,7 +141,7 @@ public abstract class AbstractComponent implements Component
     protected ResponseRouterCollection responseRouter = new DefaultResponseRouterCollection();
 
     /**
-     * Determines the initial state of this component when the model starts. Can be
+     * Determines the initial state of this service when the model starts. Can be
      * 'stopped' or 'started' (default)
      */
     protected String initialState = INITIAL_STATE_STARTED;
@@ -148,7 +149,7 @@ public abstract class AbstractComponent implements Component
     protected List initialisationCallbacks = new ArrayList();
 
     /**
-     * Indicates whether a component has passed its initial startup state.
+     * Indicates whether a service has passed its initial startup state.
      */
     private AtomicBoolean beyondInitialState = new AtomicBoolean(false);
 
@@ -162,18 +163,18 @@ public abstract class AbstractComponent implements Component
     /**
      * For Spring only
      */
-    public AbstractComponent()
+    public AbstractService()
     {
         // nop
     }
 
     /**
-     * Initialise the component. The component will first create a Mule UMO from the
+     * Initialise the service. The service will first create a Mule UMO from the
      * UMODescriptor and then initialise a pool based on the attributes in the
      * UMODescriptor.
      *
      * @throws org.mule.api.lifecycle.InitialisationException
-     *          if the component fails
+     *          if the service fails
      *          to initialise
      */
     public final synchronized void initialise() throws InitialisationException
@@ -181,7 +182,7 @@ public abstract class AbstractComponent implements Component
         if (initialised.get())
         {
             throw new InitialisationException(
-                    CoreMessages.objectAlreadyInitialised("Component '" + name + "'"), this);
+                    CoreMessages.objectAlreadyInitialised("Service '" + name + "'"), this);
         }
 
         if (inboundRouter == null)
@@ -210,7 +211,7 @@ public abstract class AbstractComponent implements Component
         if (exceptionListener == null)
         {
             // TODO MULE-2102 This should be configured in the default template.
-            exceptionListener = new DefaultComponentExceptionStrategy(this);
+            exceptionListener = new DefaultServiceExceptionStrategy(this);
             ((MuleContextAware) exceptionListener).setMuleContext(muleContext);
             ((Initialisable) exceptionListener).initialise();
         }
@@ -228,31 +229,31 @@ public abstract class AbstractComponent implements Component
         stats.setInboundRouterStat(inboundRouter.getStatistics());
 
         initialised.set(true);
-        fireComponentNotification(ComponentNotification.COMPONENT_INITIALISED);
+        fireComponentNotification(ServiceNotification.SERVICE_INITIALISED);
 
     }
 
-    protected ComponentStatistics createStatistics()
+    protected ServiceStatistics createStatistics()
     {
-        return new ComponentStatistics(name);
+        return new ServiceStatistics(name);
     }
 
     protected void fireComponentNotification(int action)
     {
-        muleContext.fireNotification(new ComponentNotification(this, action));
+        muleContext.fireNotification(new ServiceNotification(this, action));
     }
 
     public void forceStop() throws MuleException
     {
         if (!stopped.get())
         {
-            logger.debug("Stopping Component");
+            logger.debug("Stopping Service");
             stopping.set(true);
-            fireComponentNotification(ComponentNotification.COMPONENT_STOPPING);
+            fireComponentNotification(ServiceNotification.SERVICE_STOPPING);
             doForceStop();
             stopped.set(true);
             stopping.set(false);
-            fireComponentNotification(ComponentNotification.COMPONENT_STOPPED);
+            fireComponentNotification(ServiceNotification.SERVICE_STOPPED);
         }
     }
 
@@ -260,18 +261,18 @@ public abstract class AbstractComponent implements Component
     {
         if (!stopped.get())
         {
-            logger.debug("Stopping Component");
+            logger.debug("Stopping Service");
             stopping.set(true);
-            fireComponentNotification(ComponentNotification.COMPONENT_STOPPING);
+            fireComponentNotification(ServiceNotification.SERVICE_STOPPING);
 
-            // Unregister Listeners for the component
+            // Unregister Listeners for the service
             unregisterListeners();
 
             doStop();
             stopped.set(true);
             initialised.set(false);
-            fireComponentNotification(ComponentNotification.COMPONENT_STOPPED);
-            logger.info("Mule Component " + name + " has been stopped successfully");
+            fireComponentNotification(ServiceNotification.SERVICE_STOPPED);
+            logger.info("Mule Service " + name + " has been stopped successfully");
         }
     }
 
@@ -279,96 +280,96 @@ public abstract class AbstractComponent implements Component
     {
         if (isStarted())
         {
-            logger.info("Component is already started: " + name);
+            logger.info("Service is already started: " + name);
             return;
         }
 
-        if (!beyondInitialState.get() && initialState.equals(AbstractComponent.INITIAL_STATE_STOPPED))
+        if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
         {
-            logger.info("Component " + name + " has not been started (initial state = 'stopped')");
+            logger.info("Service " + name + " has not been started (initial state = 'stopped')");
         }
-        else if (!beyondInitialState.get() && initialState.equals(AbstractComponent.INITIAL_STATE_PAUSED))
+        else if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_PAUSED))
         {
             start(/*startPaused*/true);
-            logger.info("Component " + name + " has been started and paused (initial state = 'paused')");
+            logger.info("Service " + name + " has been started and paused (initial state = 'paused')");
         }
         else
         {
             start(/*startPaused*/false);
-            logger.info("Component " + name + " has been started successfully");
+            logger.info("Service " + name + " has been started successfully");
         }
 
         beyondInitialState.set(true);
     }
 
     /**
-     * Starts a Mule Component.
+     * Starts a Mule Service.
      *
-     * @param startPaused - Start component in a "paused" state (messages are
+     * @param startPaused - Start service in a "paused" state (messages are
      *                    received but not processed).
      */
     protected void start(boolean startPaused) throws MuleException
     {
-        // Create the receivers for the component but do not start them yet.
+        // Create the receivers for the service but do not start them yet.
         registerListeners();
 
-        // We connect the receivers _before_ starting the component because there may
+        // We connect the receivers _before_ starting the service because there may
         // be
-        // some initialization required for the component which needs to have them
+        // some initialization required for the service which needs to have them
         // connected.
         // For example, the org.mule.transport.soap.glue.GlueMessageReceiver adds
         // InitialisationCallbacks within its doConnect() method (see MULE-804).
         connectListeners();
 
-        // Start (and pause) the component.
+        // Start (and pause) the service.
         if (stopped.get())
         {
             stopped.set(false);
             paused.set(false);
             doStart();
         }
-        fireComponentNotification(ComponentNotification.COMPONENT_STARTED);
+        fireComponentNotification(ServiceNotification.SERVICE_STARTED);
         if (startPaused)
         {
             pause();
         }
 
-        // We start the receivers _after_ starting the component because if a message
-        // gets routed to the component before it is started,
+        // We start the receivers _after_ starting the service because if a message
+        // gets routed to the service before it is started,
         // org.mule.model.AbstractComponent.dispatchEvent() will throw a
-        // ComponentException with message COMPONENT_X_IS_STOPPED (see MULE-526).
+        // ServiceException with message COMPONENT_X_IS_STOPPED (see MULE-526).
         startListeners();
     }
 
     /**
-     * Pauses event processing for a single Mule Component. Unlike stop(), a paused
-     * component will still consume messages from the underlying transport, but those
-     * messages will be queued until the component is resumed.
+     * Pauses event processing for a single Mule Service. Unlike stop(), a paused
+     * service will still consume messages from the underlying transport, but those
+     * messages will be queued until the service is resumed.
      */
     public final void pause() throws MuleException
     {
         doPause();
         paused.set(true);
-        fireComponentNotification(ComponentNotification.COMPONENT_PAUSED);
-        logger.info("Mule Component " + name + " has been paused successfully");
+        fireComponentNotification(ServiceNotification.SERVICE_PAUSED);
+        logger.info("Mule Service " + name + " has been paused successfully");
     }
 
     /**
-     * Resumes a single Mule Component that has been paused. If the component is not
+     * Resumes a single Mule Service that has been paused. If the service is not
      * paused nothing is executed.
      */
     public final void resume() throws MuleException
     {
         doResume();
         paused.set(false);
-        fireComponentNotification(ComponentNotification.COMPONENT_RESUMED);
-        logger.info("Mule Component " + name + " has been resumed successfully");
+        fireComponentNotification(ServiceNotification.SERVICE_RESUMED);
+        logger.info("Mule Service " + name + " has been resumed successfully");
     }
 
     /**
-     * Determines if the component is in a paused state
+     * Determines if the service is in a paused state
      *
-     * @return True if the component is in a paused state, false otherwise
+     * @return True if the service is in a paused state, false otherwise
      */
     public boolean isPaused()
     {
@@ -376,9 +377,9 @@ public abstract class AbstractComponent implements Component
     }
 
     /**
-     * Custom components can execute code necessary to put the component in a paused
+     * Custom components can execute code necessary to put the service in a paused
      * state here. If a developer overloads this method the doResume() method MUST
-     * also be overloaded to avoid inconsistent state in the component
+     * also be overloaded to avoid inconsistent state in the service
      *
      * @throws MuleException
      */
@@ -388,9 +389,9 @@ public abstract class AbstractComponent implements Component
     }
 
     /**
-     * Custom components can execute code necessary to resume a component once it has
+     * Custom components can execute code necessary to resume a service once it has
      * been paused If a developer overloads this method the doPause() method MUST
-     * also be overloaded to avoid inconsistent state in the component
+     * also be overloaded to avoid inconsistent state in the service
      *
      * @throws MuleException
      */
@@ -411,14 +412,14 @@ public abstract class AbstractComponent implements Component
         catch (MuleException e)
         {
             // TODO MULE-863: If this is an error, do something!
-            logger.error("Failed to stop component: " + name, e);
+            logger.error("Failed to stop service: " + name, e);
         }
         doDispose();
-        fireComponentNotification(ComponentNotification.COMPONENT_DISPOSED);
+        fireComponentNotification(ServiceNotification.SERVICE_DISPOSED);
         muleContext.getStatistics().remove(stats);
     }
 
-    public ComponentStatistics getStatistics()
+    public ServiceStatistics getStatistics()
     {
         return stats;
     }
@@ -427,7 +428,7 @@ public abstract class AbstractComponent implements Component
     {
         if (stopping.get() || stopped.get())
         {
-            throw new ComponentException(
+            throw new ServiceException(
                     CoreMessages.componentIsStopped(name),
                     event.getMessage(), this);
         }
@@ -438,7 +439,7 @@ public abstract class AbstractComponent implements Component
         }
         catch (InterruptedException e)
         {
-            throw new ComponentException(event.getMessage(), this, e);
+            throw new ServiceException(event.getMessage(), this, e);
         }
 
         // Dispatching event to an inbound endpoint
@@ -459,7 +460,7 @@ public abstract class AbstractComponent implements Component
             return;
         }
 
-        // Dispatching event to the component
+        // Dispatching event to the service
         if (stats.isEnabled())
         {
             stats.incReceivedEventASync();
@@ -467,7 +468,7 @@ public abstract class AbstractComponent implements Component
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("Component: " + name + " has received asynchronous event on: "
+            logger.debug("Service: " + name + " has received asynchronous event on: "
                     + event.getEndpoint().getEndpointURI());
         }
 
@@ -478,7 +479,7 @@ public abstract class AbstractComponent implements Component
     {
         if (stopping.get() || stopped.get())
         {
-            throw new ComponentException(
+            throw new ServiceException(
                     CoreMessages.componentIsStopped(name),
                     event.getMessage(), this);
         }
@@ -489,7 +490,7 @@ public abstract class AbstractComponent implements Component
         }
         catch (InterruptedException e)
         {
-            throw new ComponentException(event.getMessage(), this, e);
+            throw new ServiceException(event.getMessage(), this, e);
         }
 
         if (stats.isEnabled())
@@ -498,7 +499,7 @@ public abstract class AbstractComponent implements Component
         }
         if (logger.isDebugEnabled())
         {
-            logger.debug("Component: " + name + " has received synchronous event on: "
+            logger.debug("Service: " + name + " has received synchronous event on: "
                     + event.getEndpoint().getEndpointURI());
         }
         event = OptimizedRequestContext.unsafeSetEvent(event);
@@ -506,25 +507,25 @@ public abstract class AbstractComponent implements Component
     }
 
     /**
-     * Called before an event is sent or dispatched to a component, it will block
+     * Called before an event is sent or dispatched to a service, it will block
      * until resume() is called. Users can override this method if they want to
      * handle pausing differently e.g. implement a store and forward policy
      *
-     * @param event the current event being passed to the component
+     * @param event the current event being passed to the service
      * @throws InterruptedException if the thread is interrupted
      */
     protected void waitIfPaused(MuleEvent event) throws InterruptedException
     {
         if (logger.isDebugEnabled() && paused.get())
         {
-            logger.debug("Component: " + name
+            logger.debug("Service: " + name
                     + " is paused. Blocking call until resume is called");
         }
         paused.whenFalse(null);
     }
 
     /**
-     * @return the Mule descriptor name which is associated with the component
+     * @return the Mule descriptor name which is associated with the service
      */
     public String getName()
     {
@@ -553,11 +554,11 @@ public abstract class AbstractComponent implements Component
 
     protected void handleException(Exception e)
     {
-        if (exceptionListener instanceof DefaultComponentExceptionStrategy)
+        if (exceptionListener instanceof DefaultServiceExceptionStrategy)
         {
-            if (((DefaultComponentExceptionStrategy) exceptionListener).getComponent() == null)
+            if (((DefaultServiceExceptionStrategy) exceptionListener).getService() == null)
             {
-                ((DefaultComponentExceptionStrategy) exceptionListener).setComponent(this);
+                ((DefaultServiceExceptionStrategy) exceptionListener).setService(this);
             }
         }
         exceptionListener.exceptionThrown(e);
@@ -735,7 +736,7 @@ public abstract class AbstractComponent implements Component
     }
 
     /**
-     * Returns a list of all incoming endpoints on a component.
+     * Returns a list of all incoming endpoints on a service.
      */
     protected List getIncomingEndpoints()
     {
@@ -769,16 +770,16 @@ public abstract class AbstractComponent implements Component
     {
         if (serviceFactory == null)
         {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Component " + name + " has not been initialized properly, no serviceFactory."), this);
+            throw new InitialisationException(MessageFactory.createStaticMessage("Service " + name + " has not been initialized properly, no serviceFactory."), this);
         }
 
         Object component;
         try
         {
             component = serviceFactory.getOrCreate();
-            if (component instanceof ComponentAware)
+            if (component instanceof ServiceAware)
             {
-                ((ComponentAware) component).setComponent(this);
+                ((ServiceAware) component).setService(this);
             }
         }
         catch (Exception e)
@@ -911,7 +912,7 @@ public abstract class AbstractComponent implements Component
      * By default this is null. When set this resolver will override the resolver on the model
      *
      * @return Null is a resolver set has not been set otherwise the resolver to use
-     *         on this component
+     *         on this service
      */
     public EntryPointResolverSet getEntryPointResolverSet()
     {
@@ -923,7 +924,7 @@ public abstract class AbstractComponent implements Component
      * By default this is null. When set this resolver will override the resolver on the model
      *
      * @param resolverSet theresolver set to use when resolving entry points
-     *                    on this component
+     *                    on this service
      */
     public void setEntryPointResolverSet(EntryPointResolverSet resolverSet)
     {

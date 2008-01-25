@@ -22,12 +22,12 @@ import org.w3c.dom.Element;
  * {@link org.mule.component.simple.BridgeComponent},
  * {@link import org.mule.component.simple.EchoComponent} and
  * {@link import org.mule.component.simple.LogComponent}. This allows shortcuts
- * like for example <i>&lt;mule:bridge-component/&gt;</i> to be used instead of
- * having to use the <i>&lt;mule:component/&gt;</i> element and specify the class
+ * like for example <i>&lt;mule:bridge-service/&gt;</i> to be used instead of
+ * having to use the <i>&lt;mule:service/&gt;</i> element and specify the class
  * name (and scope) for built-in components that don't require configuration. <p/>
  * <b>This DefinitionParser should only be used for state-less components.</b> <p/>
  * In order to further customize components and use serviceFactory properties the
- * &lt;mule:component/&gt; element should be used.
+ * &lt;mule:service/&gt; element should be used.
  * 
  * @deprecated Use SimplePojoServiceDefinitionParser instead
  */

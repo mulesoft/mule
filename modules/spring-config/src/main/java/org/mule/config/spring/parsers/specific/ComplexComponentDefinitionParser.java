@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
  * to {@link org.mule.config.spring.parsers.delegate.SingleParentFamilyDefinitionParser}
  * with {@link org.mule.config.spring.parsers.delegate.MapDefinitionParserMutator}, allowing
  * a single element to be used to configure both the factory (if any confiuration is needed)
- * and set properties for the component.  Nested component contents will also be handled
+ * and set properties for the service.  Nested service contents will also be handled
  * correctly.
  *
  * <p>This is stateful, in a limited sense - it cannot be nested.</p>
@@ -79,17 +79,17 @@ public class ComplexComponentDefinitionParser extends AbstractDelegatingDefiniti
             // only.  this will search for the parent bean (which is presumably expecting a
             // factory to be injected) and wire itself up as the child.
             AbstractBeanDefinition objectFactoryDefn = objectFactoryParser.muleParse(element, parserContext);
-            // next we fake the parent for the component, since this is where the properties
+            // next we fake the parent for the service, since this is where the properties
             // will need to be injected
             componentParser.forceParent(objectFactoryDefn);
-            // now we do the initial parse for the component.  because this is wrapped in the
+            // now we do the initial parse for the service.  because this is wrapped in the
             // map mutator the properties are not set yet.  instead the bean assembler is stored
             // in the mutator
             AbstractBeanDefinition componentDefn1 = componentParser.muleParse(element, parserContext);
             state = POST_CHILDREN;
             // save the element to check below
             currentElement = element;
-            // we return the component definition, which will be associated with this element.
+            // we return the service definition, which will be associated with this element.
             // child nodes will then extend that definition.  once they are processed we will
             // be called again.
             return componentDefn1;

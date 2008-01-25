@@ -11,7 +11,6 @@ package org.mule.config.spring.handlers;
 
 import org.mule.DefaultExceptionStrategy;
 import org.mule.api.config.MuleProperties;
-import org.mule.component.DefaultComponentExceptionStrategy;
 import org.mule.component.simple.EchoComponent;
 import org.mule.component.simple.LogComponent;
 import org.mule.component.simple.NullComponent;
@@ -68,7 +67,7 @@ import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.model.resolvers.ReflectionEntryPointResolver;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.model.seda.SedaModel;
 import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.routing.ForwardingCatchAllStrategy;
@@ -107,6 +106,7 @@ import org.mule.routing.response.SingleResponseRouter;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
+import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.transaction.lookup.JBossTransactionManagerLookupFactory;
 import org.mule.transaction.lookup.JRunTransactionManagerLookupFactory;
@@ -165,7 +165,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //registerBeanDefinitionParser("mule-configuration", new MuleContextDefinitionParser());
         registerBeanDefinitionParser("component-threading-profile", new ThreadingProfileDefinitionParser("threadingProfile", MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE));
         registerBeanDefinitionParser("custom-exception-strategy", new ChildDefinitionParser("exceptionListener", null));
-        registerBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultComponentExceptionStrategy.class));
+        registerBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultServiceExceptionStrategy.class));
         registerBeanDefinitionParser("default-connector-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultExceptionStrategy.class));
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
         registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
@@ -257,8 +257,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("exclude-object-methods", new IgnoreObjectMethodsDefinitionParser());
 
         // Services
-        registerBeanDefinitionParser("seda-component", new ServiceDefinitionParser(SedaComponent.class));
-        registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaComponent.class));
+        registerBeanDefinitionParser("seda-service", new ServiceDefinitionParser(SedaService.class));
+        registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaService.class));
 
         // Pojo Components
         registerBeanDefinitionParser("component", new ComponentDefinitionParser());

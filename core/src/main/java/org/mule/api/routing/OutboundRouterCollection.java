@@ -16,7 +16,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 
 /**
- * <code>OutboundRouterCollection</code> is responsible for holding all outbound routers for a service component.
+ * <code>OutboundRouterCollection</code> is responsible for holding all outbound routers for a service service.
  */
 
 public interface OutboundRouterCollection extends RouterCollection

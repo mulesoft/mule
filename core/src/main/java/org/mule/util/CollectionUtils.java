@@ -28,7 +28,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
      * required.
      * 
      * @param objects a Collection of objects
-     * @param clazz the desired component type of the new array
+     * @param clazz the desired service type of the new array
      * @return <code>null</code> when objects is <code>null</code>, or a new
      *         array containing the elements of the source array which is typed to
      *         the given <code>clazz</code> parameter.

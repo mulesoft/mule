@@ -10,10 +10,10 @@
 
 package org.mule.test.components;
 
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.services.UniqueComponent;
-import org.mule.tck.testmodels.mule.TestSedaComponent;
+import org.mule.tck.testmodels.mule.TestSedaService;
 
 public class ComponentPoolingTestCase extends FunctionalTestCase
 {
@@ -24,68 +24,68 @@ public class ComponentPoolingTestCase extends FunctionalTestCase
 
     public void testConfigSanity() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("unique1");
-        assertTrue("Component should be a TestSedaComponent", c instanceof TestSedaComponent);
-        Object component = ((TestSedaComponent) c).getOrCreateService();
+        Service c = muleContext.getRegistry().lookupService("unique1");
+        assertTrue("Service should be a TestSedaService", c instanceof TestSedaService);
+        Object component = ((TestSedaService) c).getOrCreateService();
         assertNotNull(component);
-        assertTrue("Component should be of type UniqueComponent but is of type " + component.getClass(), component instanceof UniqueComponent);
+        assertTrue("Service should be of type UniqueComponent but is of type " + component.getClass(), component instanceof UniqueComponent);
         String id1 = ((UniqueComponent) component).getId();
         assertNotNull(id1);
     }
 
     public void testSimpleFactory() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("unique1");        
+        Service c = muleContext.getRegistry().lookupService("unique1");        
         
-        Object component = ((TestSedaComponent) c).getOrCreateService();
+        Object component = ((TestSedaService) c).getOrCreateService();
         String id1 = ((UniqueComponent) component).getId();
 
-        component = ((TestSedaComponent) c).getOrCreateService();
+        component = ((TestSedaService) c).getOrCreateService();
         String id2 = ((UniqueComponent) component).getId();
         
-        assertFalse("Component IDs " + id1 + " and " + id2 + " should be different", id1.equals(id2));
+        assertFalse("Service IDs " + id1 + " and " + id2 + " should be different", id1.equals(id2));
     }
 
     public void testSingletonFactoryWithClassName() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("unique2");        
+        Service c = muleContext.getRegistry().lookupService("unique2");        
         
-        Object component = ((TestSedaComponent) c).getOrCreateService();
+        Object component = ((TestSedaService) c).getOrCreateService();
         String id1 = ((UniqueComponent) component).getId();
 
-        component = ((TestSedaComponent) c).getOrCreateService();
+        component = ((TestSedaService) c).getOrCreateService();
         String id2 = ((UniqueComponent) component).getId();
         
-        assertTrue("Component IDs " + id1 + " and " + id2 + " should be the same", id1.equals(id2));
+        assertTrue("Service IDs " + id1 + " and " + id2 + " should be the same", id1.equals(id2));
     }
 
     public void testSingletonFactoryWithBean() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("unique3");        
+        Service c = muleContext.getRegistry().lookupService("unique3");        
         
-        Object component = ((TestSedaComponent) c).getOrCreateService();
+        Object component = ((TestSedaService) c).getOrCreateService();
         String id1 = ((UniqueComponent) component).getId();
 
-        component = ((TestSedaComponent) c).getOrCreateService();
+        component = ((TestSedaService) c).getOrCreateService();
         String id2 = ((UniqueComponent) component).getId();
         
-        assertTrue("Component IDs " + id1 + " and " + id2 + " should be the same", id1.equals(id2));
+        assertTrue("Service IDs " + id1 + " and " + id2 + " should be the same", id1.equals(id2));
     }
 
 //    public void testPoolingDisabled() throws Exception
 //    {
 //        Model model = muleContext.getRegistry().lookupModel("main");
-//        Component c = model.getComponent("unique4");        
+//        Service c = model.getComponent("unique4");        
 //        
-//        MuleProxy proxy = ((TestSedaComponent) c).getProxy();
-//        Object component = ((TestMuleProxy) proxy).getComponent();
-//        String id1 = ((UniqueComponent) component).getId();
+//        MuleProxy proxy = ((TestSedaService) c).getProxy();
+//        Object service = ((TestMuleProxy) proxy).getComponent();
+//        String id1 = ((UniqueComponent) service).getId();
 //
-//        proxy = ((TestSedaComponent) c).getProxy();
-//        component = ((TestMuleProxy) proxy).getComponent();
-//        String id2 = ((UniqueComponent) component).getId();
+//        proxy = ((TestSedaService) c).getProxy();
+//        service = ((TestMuleProxy) proxy).getComponent();
+//        String id2 = ((UniqueComponent) service).getId();
 //        
-//        assertTrue("Component IDs " + id1 + " and " + id2 + " should be the same", id1.equals(id2));
+//        assertTrue("Service IDs " + id1 + " and " + id2 + " should be the same", id1.equals(id2));
 //    }
 
 }

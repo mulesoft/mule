@@ -11,15 +11,15 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleException;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 
 
 /**
- * Exposes some internals of the SedaComponent useful for unit testing.
+ * Exposes some internals of the SedaService useful for unit testing.
  */
-public class TestSedaComponent extends SedaComponent
+public class TestSedaService extends SedaService
 {
-    public TestSedaComponent()
+    public TestSedaService()
     {
         super();
     }

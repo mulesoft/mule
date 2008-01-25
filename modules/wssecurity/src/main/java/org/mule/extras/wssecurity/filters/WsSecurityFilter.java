@@ -88,7 +88,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
         throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
         EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
     {
-        Map properties = event.getSession().getComponent().getProperties();
+        Map properties = event.getSession().getService().getProperties();
         if (properties.containsKey("xfire"))
         {
             XFire server = (XFire)properties.get("xfire");
@@ -195,7 +195,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
         else if (properties.containsKey(AxisConnector.AXIS))
         {
             AxisServer server = (AxisServer)event.getSession()
-                .getComponent()
+                .getService()
                 .getProperties()
                 .get(AxisConnector.AXIS);
             MuleConfigProvider provider = (MuleConfigProvider)server.getConfig();
@@ -237,7 +237,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
         if (event.getEndpoint().getConnector() instanceof XFireConnector)
         {
             XFireConnector connector = (XFireConnector)event.getEndpoint().getConnector();
-            Map properties = event.getSession().getComponent().getProperties();
+            Map properties = event.getSession().getService().getProperties();
             XFire server = (XFire)properties.get("xfire");
 
             if (server == null)

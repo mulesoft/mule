@@ -10,8 +10,8 @@
 
 package org.mule.transport.multicast;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.transport.AbstractConnector;
@@ -23,12 +23,12 @@ public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTes
 {
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        Mock mockComponent = new Mock(Component.class);
+        Mock mockComponent = new Mock(Service.class);
         mockComponent.expectAndReturn("getResponseTransformer", null);
         mockComponent.expectAndReturn("getResponseRouter", null);
 
         return new MulticastMessageReceiver((AbstractConnector)endpoint.getConnector(),
-            (Component)mockComponent.proxy(), endpoint);
+            (Service)mockComponent.proxy(), endpoint);
     }
 
     public ImmutableEndpoint getEndpoint() throws Exception

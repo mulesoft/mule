@@ -17,7 +17,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.component.ComponentException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
@@ -25,12 +24,13 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.MuleProxy;
-import org.mule.component.AbstractComponent;
+import org.mule.api.service.ServiceException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.ServiceStatistics;
+import org.mule.service.AbstractService;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
@@ -42,11 +42,11 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
 /**
- * A Seda component runs inside a Seda Model and is responsible for managing a Seda
- * Queue and thread pool for a Mule sevice component. In Seda terms this is
+ * A Seda service runs inside a Seda Model and is responsible for managing a Seda
+ * Queue and thread pool for a Mule sevice service. In Seda terms this is
  * equivilent to a stage.
  */
-public class SedaComponent extends AbstractComponent implements Work, WorkListener
+public class SedaService extends AbstractService implements Work, WorkListener
 {
     /**
      * Serial version/
@@ -61,29 +61,29 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
     protected Integer queueTimeout;
 
     /**
-     * The threading profile to use for this component. If this is not set a default
+     * The threading profile to use for this service. If this is not set a default
      * will be provided by the server
      */
     protected ThreadingProfile threadingProfile;
 
     /**
-     * The queue profile to use for this component. If this is not set a default
+     * The queue profile to use for this service. If this is not set a default
      * will be provided by the server
      */
     protected QueueProfile queueProfile;
 
     /** For Spring only */
-    public SedaComponent()
+    public SedaService()
     {
         super();
     }
     
     /**
-     * Initialise the component. The component will first create a Mule UMO from the
+     * Initialise the service. The service will first create a Mule UMO from the
      * UMODescriptor and then initialise a pool based on the attributes in the
      * UMODescriptor.
      * 
-     * @throws org.mule.api.lifecycle.InitialisationException if the component fails
+     * @throws org.mule.api.lifecycle.InitialisationException if the service fails
      *             to initialise
      * @see org.mule.api.UMODescriptor
      */
@@ -114,9 +114,9 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         {
             if (name == null)
             {
-                throw new InitialisationException(MessageFactory.createStaticMessage("Component has no name to identify it"), this);
+                throw new InitialisationException(MessageFactory.createStaticMessage("Service has no name to identify it"), this);
             }
-            // Setup event Queue (used for VM execution).  The queue has the same name as the component.
+            // Setup event Queue (used for VM execution).  The queue has the same name as the service.
             queueProfile.configureQueue(name, muleContext.getQueueManager());
         }
         catch (InitialisationException e)
@@ -126,7 +126,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         catch (Throwable e)
         {
             throw new InitialisationException(
-                CoreMessages.objectFailedToInitialise("Component Queue"), e, this);
+                CoreMessages.objectFailedToInitialise("Service Queue"), e, this);
         }
     }
 
@@ -171,7 +171,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         catch (Exception e)
         {
             throw new LifecycleException(
-                CoreMessages.failedToStart("Component: " + name), e, this);
+                CoreMessages.failedToStart("Service: " + name), e, this);
         }
     }
 
@@ -188,14 +188,14 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
     protected void doDispatch(MuleEvent event) throws MuleException
     {
-        // Dispatching event to the component
+        // Dispatching event to the service
         if (stats.isEnabled())
         {
             stats.incReceivedEventASync();
         }
         if (logger.isDebugEnabled())
         {
-            logger.debug("Component: " + name + " has received asynchronous event on: "
+            logger.debug("Service: " + name + " has received asynchronous event on: "
                             + event.getEndpoint().getEndpointURI());
         }
 
@@ -246,7 +246,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         }
         catch (Exception e)
         {
-            throw new ComponentException(event.getMessage(), this, e);
+            throw new ServiceException(event.getMessage(), this, e);
         }
         finally
         {
@@ -257,7 +257,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
             catch (Exception e)
             {
                 // noinspection ThrowFromFinallyBlock
-                throw new ComponentException(event.getMessage(), this, e);
+                throw new ServiceException(event.getMessage(), this, e);
             }
         }
         return result;
@@ -269,14 +269,14 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         Queue queue = session.getQueue(name);
         if (queue == null)
         {
-            logger.warn(new InitialisationException(MessageFactory.createStaticMessage("Queue " + name + " not created for component " + name), this));
+            logger.warn(new InitialisationException(MessageFactory.createStaticMessage("Queue " + name + " not created for service " + name), this));
             return -1;
         }
         return queue.size();
     }
 
     /**
-     * While the component isn't stopped this runs a continuous loop checking for new
+     * While the service isn't stopped this runs a continuous loop checking for new
      * events in the queue.
      */
     public void run()
@@ -290,7 +290,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         {
             try
             {
-                // Wait if the component is paused
+                // Wait if the service is paused
                 paused.whenFalse(null);
 
                 // If we're doing a draining stop, read all events from the queue
@@ -314,7 +314,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
 
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Component: " + name + " dequeued event on: "
+                        logger.debug("Service: " + name + " dequeued event on: "
                                         + event.getEndpoint().getEndpointURI());
                     }
 
@@ -351,7 +351,7 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                 }
                 else if (e instanceof NoSuchElementException)
                 {
-                    handleException(new ComponentException(CoreMessages.proxyPoolTimedOut(),
+                    handleException(new ServiceException(CoreMessages.proxyPoolTimedOut(),
                         (event == null ? null : event.getMessage()), this, e));
                 }
                 else if (e instanceof MuleException)
@@ -361,14 +361,14 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
                 else if (e instanceof WorkException)
                 {
                     handleException(
-                        new ComponentException(
+                        new ServiceException(
                             CoreMessages.eventProcessingFailedFor(name),
                             (event == null ? null : event.getMessage()), this, e));
                 }
                 else
                 {
                     handleException(
-                        new ComponentException(
+                        new ServiceException(
                             CoreMessages.failedToGetPooledObject(),
                             (event == null ? null : event.getMessage()), this, e));
                 }
@@ -391,11 +391,11 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         Queue queue = session.getQueue(name);
         if (queue == null)
         {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Queue " + name + " not created for component " + name), this);
+            throw new InitialisationException(MessageFactory.createStaticMessage("Queue " + name + " not created for service " + name), this);
         }
         if (logger.isDebugEnabled())
         {
-            logger.debug("Component " + name + " putting event on queue " + name + ": " + event);
+            logger.debug("Service " + name + " putting event on queue " + name + ": " + event);
         }
         queue.put(event);
     }
@@ -406,15 +406,15 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         Queue queue = session.getQueue(name);
         if (queue == null)
         {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Queue " + name + " not created for component " + name), this);
+            throw new InitialisationException(MessageFactory.createStaticMessage("Queue " + name + " not created for service " + name), this);
         }
         if (logger.isDebugEnabled())
         {
-            //logger.debug("Component " + name + " polling queue " + name + ", timeout = " + queueTimeout);
+            //logger.debug("Service " + name + " polling queue " + name + ", timeout = " + queueTimeout);
         }
         if (getQueueTimeout() == null)
         {
-            throw new InitialisationException(CoreMessages.noComponentQueueTimeoutSet(this), this);
+            throw new InitialisationException(CoreMessages.noServiceQueueTimeoutSet(this), this);
         }
         else
         {
@@ -474,9 +474,9 @@ public class SedaComponent extends AbstractComponent implements Work, WorkListen
         }
     }
 
-    protected ComponentStatistics createStatistics()
+    protected ServiceStatistics createStatistics()
     {
-        return new ComponentStatistics(getName(), threadingProfile.getMaxThreadsActive());
+        return new ServiceStatistics(getName(), threadingProfile.getMaxThreadsActive());
     }
 
     public Object getInstance() throws MuleException

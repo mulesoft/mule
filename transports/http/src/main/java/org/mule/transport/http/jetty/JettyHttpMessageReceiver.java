@@ -14,13 +14,13 @@ import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -46,11 +46,11 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 
     private Server httpServer;
 
-    public JettyHttpMessageReceiver(Connector connector, Component component, Endpoint endpoint)
+    public JettyHttpMessageReceiver(Connector connector, Service service, Endpoint endpoint)
             throws CreateException
     {
 
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
 
         if ("rest".equals(endpoint.getEndpointURI().getScheme()))
         {
@@ -86,7 +86,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                     .getRegistry()
                     .lookupEndpointFactory()
                     .getInboundEndpoint(endpointBuilder);
-                scon.registerListener(component, ep);
+                scon.registerListener(service, ep);
             }
             catch (Exception e)
             {

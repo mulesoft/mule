@@ -11,10 +11,10 @@
 package org.mule.lifecycle;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.lifecycle.LifecycleAdapter;
 import org.mule.api.lifecycle.LifecycleAdapterFactory;
 import org.mule.api.model.EntryPointResolverSet;
+import org.mule.api.service.Service;
 
 /**
  * <code>DefaultLifecycleAdapterFactory</code> creates a DefaultLifeCycleAdapter.  Users can
@@ -40,10 +40,10 @@ public class DefaultLifecycleAdapterFactory implements LifecycleAdapterFactory
      *      org.mule.api.UMODescriptor)
      */
     public LifecycleAdapter create(Object pojoService,
-                                      Component component,
+                                      Service service,
                                       EntryPointResolverSet resolver) throws MuleException
     {
-        return new DefaultLifecycleAdapter(pojoService, component, resolver);
+        return new DefaultLifecycleAdapter(pojoService, service, resolver);
     }
 
 }

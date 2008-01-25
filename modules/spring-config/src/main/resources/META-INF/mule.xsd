@@ -297,7 +297,7 @@
                         <xsd:restriction base="xsd:NMTOKEN">
                             <xsd:enumeration value="MANAGER"/>
                             <xsd:enumeration value="MODEL"/>
-                            <xsd:enumeration value="COMPONENT"/>
+                            <xsd:enumeration value="SERVICE"/>
                             <xsd:enumeration value="SECURITY"/>
                             <xsd:enumeration value="MANAGEMENT"/>
                             <xsd:enumeration value="ADMIN"/>
@@ -327,7 +327,7 @@
                         <xsd:restriction base="xsd:NMTOKEN">
                             <xsd:enumeration value="MANAGER"/>
                             <xsd:enumeration value="MODEL"/>
-                            <xsd:enumeration value="COMPONENT"/>
+                            <xsd:enumeration value="SERVICE"/>
                             <xsd:enumeration value="SECURITY"/>
                             <xsd:enumeration value="MANAGEMENT"/>
                             <xsd:enumeration value="ADMIN"/>
@@ -366,7 +366,7 @@
                         <xsd:restriction base="xsd:NMTOKEN">
                             <xsd:enumeration value="MANAGER"/>
                             <xsd:enumeration value="MODEL"/>
-                            <xsd:enumeration value="COMPONENT"/>
+                            <xsd:enumeration value="SERVICE"/>
                             <xsd:enumeration value="SECURITY"/>
                             <xsd:enumeration value="MANAGEMENT"/>
                             <xsd:enumeration value="ADMIN"/>
@@ -395,7 +395,7 @@
                         <xsd:restriction base="xsd:NMTOKEN">
                             <xsd:enumeration value="MANAGER"/>
                             <xsd:enumeration value="MODEL"/>
-                            <xsd:enumeration value="COMPONENT"/>
+                            <xsd:enumeration value="SERVICE"/>
                             <xsd:enumeration value="SECURITY"/>
                             <xsd:enumeration value="MANAGEMENT"/>
                             <xsd:enumeration value="ADMIN"/>

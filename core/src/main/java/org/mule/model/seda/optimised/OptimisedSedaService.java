@@ -13,13 +13,13 @@ package org.mule.model.seda.optimised;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.model.MuleProxy;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 
 /**
- * Same as <code>SedaComponent</code> except that it assumes that components implement the Callable 
+ * Same as <code>SedaService</code> except that it assumes that components implement the Callable 
  * interface and therefore does away with the reflection and introspection on objects.
  */
-public class OptimisedSedaComponent extends SedaComponent
+public class OptimisedSedaService extends SedaService
 {
     /**
      * Serial version
@@ -29,7 +29,7 @@ public class OptimisedSedaComponent extends SedaComponent
     /**
      * Default constructor
      */
-    public OptimisedSedaComponent()
+    public OptimisedSedaService()
     {
         super();
     }

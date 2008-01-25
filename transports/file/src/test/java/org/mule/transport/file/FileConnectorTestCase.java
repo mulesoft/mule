@@ -82,8 +82,8 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 //        connector.setPollingFrequency(POLLING_FREQUENCY);
 //
 //        Endpoint endpoint = getTestEndpoint("simple", ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
-//        Component component = getTestComponent(descriptor);
-//        MessageReceiver receiver = connector.createReceiver(component, endpoint);
+//        Service service = getTestComponent(descriptor);
+//        MessageReceiver receiver = connector.createReceiver(service, endpoint);
 //        assertEquals("Connector's polling frequency must not be ignored.", POLLING_FREQUENCY,
 //            ((FileMessageReceiver)receiver).getFrequency());
 //    }
@@ -104,8 +104,8 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 //        props.put(FileConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
 //        endpoint.setProperties(props);
 //
-//        Component component = getTestComponent(descriptor);
-//        MessageReceiver receiver = connector.createReceiver(component, endpoint);
+//        Service service = getTestComponent(descriptor);
+//        MessageReceiver receiver = connector.createReceiver(service, endpoint);
 //        assertEquals("Polling frequency endpoint override must not be ignored.", POLLING_FREQUENCY_OVERRIDE,
 //            ((FileMessageReceiver)receiver).getFrequency());
 //    }

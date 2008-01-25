@@ -10,12 +10,12 @@
 
 package org.mule.management;
 
-import org.mule.api.context.notification.ComponentNotificationListener;
+import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ManagerNotificationListener;
 import org.mule.api.context.notification.ModelNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.context.notification.ComponentNotification;
+import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ManagerNotification;
 import org.mule.context.notification.ModelNotification;
@@ -93,11 +93,11 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     public void testStandardNotificationsWithSubscription() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
-        muleContext.registerListener(new ComponentNotificationListener()
+        muleContext.registerListener(new ServiceNotificationListener()
         {
             public void onNotification(ServerNotification notification)
             {
-                if (notification.getAction() == ComponentNotification.COMPONENT_STARTED)
+                if (notification.getAction() == ServiceNotification.SERVICE_STARTED)
                 {
                     componentStartedCount.incrementAndGet();
                     assertEquals("component1", notification.getResourceIdentifier());
@@ -106,8 +106,8 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
             }
         }, "component1");
 
-        getTestComponent("component2", Apple.class);
-        getTestComponent("component1", Apple.class);
+        getTestService("component2", Apple.class);
+        getTestService("component1", Apple.class);
 
 
         // Wait for the notifcation event to be fired as they are queued
@@ -119,11 +119,11 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
     {
         final CountDownLatch latch = new CountDownLatch(2);
 
-        muleContext.registerListener(new ComponentNotificationListener()
+        muleContext.registerListener(new ServiceNotificationListener()
         {
             public void onNotification(ServerNotification notification)
             {
-                if (notification.getAction() == ComponentNotification.COMPONENT_STARTED)
+                if (notification.getAction() == ServiceNotification.SERVICE_STARTED)
                 {
                     componentStartedCount.incrementAndGet();
                     assertFalse("noMatchComponent".equals(notification.getResourceIdentifier()));
@@ -133,9 +133,9 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         }, "component*");
 
         //Components automatically get registered
-        getTestComponent("component2", Apple.class);
-        getTestComponent("component1", Apple.class);
-        getTestComponent("noMatchComponent", Apple.class);
+        getTestService("component2", Apple.class);
+        getTestService("component1", Apple.class);
+        getTestService("noMatchComponent", Apple.class);
 
         // Wait for the notifcation event to be fired as they are queued
         latch.await(2000, TimeUnit.MILLISECONDS);

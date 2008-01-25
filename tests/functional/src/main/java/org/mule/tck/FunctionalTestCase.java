@@ -12,9 +12,9 @@ package org.mule.tck;
 
 import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
-import org.mule.api.component.Component;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.service.Service;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.tck.functional.FunctionalTestComponent;
 
@@ -62,14 +62,14 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     
     protected Object getPojoServiceForComponent(String componentName) throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent(componentName);
+        Service c = muleContext.getRegistry().lookupService(componentName);
         if (c != null)
         {
             return c.getServiceFactory().getOrCreate();
         }
         else
         {
-            throw new RegistrationException("Component " + componentName + " not found in Registry");
+            throw new RegistrationException("Service " + componentName + " not found in Registry");
         }
     }
 }

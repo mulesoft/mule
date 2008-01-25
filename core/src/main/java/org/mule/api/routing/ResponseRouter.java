@@ -17,7 +17,7 @@ import org.mule.api.MuleMessage;
  * <code>ResponseRouter</code> is a router that handles response flow. Response
  * Aggregators are used to collect responses that are usually sent to replyTo
  * endpoints set on outbound routers. When an event is sent out via an outbound
- * router, the response router will block the response flow on an Component until
+ * router, the response router will block the response flow on an Service until
  * the Response Router resolves a reply or times out.
  */
 
@@ -37,17 +37,17 @@ public interface ResponseRouter extends Router
 
     /**
      * Called by the Mule framework once the outbound router has been processed on a
-     * component the Message passed in is the response message from the component (or
+     * service the Message passed in is the response message from the service (or
      * outbount router if a response was returned). This method is invoked to signal
-     * that the event flow for the component has completed and what ever message is
+     * that the event flow for the service has completed and what ever message is
      * returned from this method with be sent back as the response. This method will
      * block until the correct response for the given Message has been received.
      * 
-     * @param message The processed message from the Component
+     * @param message The processed message from the Service
      * @return the response message sent back to the callee
      * @throws RoutingException
      * @see MuleMessage
-     * @see org.mule.api.component.Component
+     * @see org.mule.api.service.Service
      */
     MuleMessage getResponse(MuleMessage message) throws RoutingException;
 

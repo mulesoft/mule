@@ -33,7 +33,7 @@ public class SpringContainerContextMultipleConfigsTestCase extends AbstractConta
         assertNotNull(container);
 
         Object result = container.getComponent("apple2");
-        assertNotNull("Component should exist in container", result);
+        assertNotNull("Service should exist in container", result);
     }
 
     public ContainerContext getContainerContext() throws ConfigurationException

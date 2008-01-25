@@ -19,9 +19,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.AbstractMuleTestCase;
@@ -171,7 +171,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
-        public Component getComponent()
+        public Service getService()
         {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }

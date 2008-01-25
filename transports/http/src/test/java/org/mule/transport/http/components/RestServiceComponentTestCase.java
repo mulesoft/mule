@@ -13,7 +13,7 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.components.RestServiceWrapper;
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 
 public class RestServiceComponentTestCase extends FunctionalTestCase
 {
@@ -29,8 +29,8 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
     public void testResetServiceNamespaceHandler() throws Exception
     {
 
-        Component component = muleContext.getRegistry().lookupComponent(SERVICE_NAME);
-        Object object = component.getServiceFactory().getOrCreate();
+        Service service = muleContext.getRegistry().lookupService(SERVICE_NAME);
+        Object object = service.getServiceFactory().getOrCreate();
         assertEquals(object.getClass().getName(), RestServiceWrapper.class.getName());
         RestServiceWrapper restServiceWrapper = (RestServiceWrapper) object;
         assertEquals(restServiceWrapper.getServiceUrl(), SERVICE_URL);

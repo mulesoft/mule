@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * A simple bridge component for testing entry point resolution
+ * A simple bridge service for testing entry point resolution
  */
 public class SimpleStreamingBean
 {

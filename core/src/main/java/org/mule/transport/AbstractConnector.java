@@ -19,7 +19,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.component.Component;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
@@ -30,6 +29,7 @@ import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connectable;
 import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
@@ -1040,16 +1040,16 @@ public abstract class AbstractConnector
         }
     }
 
-    public MessageReceiver registerListener(Component component, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver registerListener(Service service, ImmutableEndpoint endpoint) throws Exception
     {
         if (endpoint == null)
         {
             throw new IllegalArgumentException("The endpoint cannot be null when registering a listener");
         }
 
-        if (component == null)
+        if (service == null)
         {
-            throw new IllegalArgumentException("The component cannot be null when registering a listener");
+            throw new IllegalArgumentException("The service cannot be null when registering a listener");
         }
 
         EndpointURI endpointUri = endpoint.getEndpointURI();
@@ -1058,10 +1058,10 @@ public abstract class AbstractConnector
             throw new ConnectorException(CoreMessages.endpointIsNullForListener(), this);
         }
 
-        logger.info("Registering listener: " + component.getName() + " on endpointUri: "
+        logger.info("Registering listener: " + service.getName() + " on endpointUri: "
                         + endpointUri.toString());
 
-        MessageReceiver receiver = this.getReceiver(component, endpoint);
+        MessageReceiver receiver = this.getReceiver(service, endpoint);
 
         if (receiver != null)
         {
@@ -1070,13 +1070,13 @@ public abstract class AbstractConnector
         else
         {
 
-            receiver = this.createReceiver(component, endpoint);
-            Object receiverKey = getReceiverKey(component, endpoint);
+            receiver = this.createReceiver(service, endpoint);
+            Object receiverKey = getReceiverKey(service, endpoint);
             receiver.setReceiverKey(receiverKey.toString());
             //Since we're managing the creation we also need to initialise
             receiver.initialise();
             receivers.put(receiverKey, receiver);
-            // receivers.put(getReceiverKey(component, endpoint), receiver);
+            // receivers.put(getReceiverKey(service, endpoint), receiver);
         }
 
         return receiver;
@@ -1085,22 +1085,22 @@ public abstract class AbstractConnector
     /**
      * The method determines the key used to store the receiver against.
      *
-     * @param component the component for which the endpoint is being registered
-     * @param endpoint the endpoint being registered for the component
+     * @param service the service for which the endpoint is being registered
+     * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against
      */
-    protected Object getReceiverKey(Component component, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
     {
         return StringUtils.defaultIfEmpty(endpoint.getEndpointURI().getFilterAddress(), endpoint
             .getEndpointURI().getAddress());
     }
 
-    public final void unregisterListener(Component component, ImmutableEndpoint endpoint) throws Exception
+    public final void unregisterListener(Service service, ImmutableEndpoint endpoint) throws Exception
     {
-        if (component == null)
+        if (service == null)
         {
             throw new IllegalArgumentException(
-                "The component must not be null when you unregister a listener");
+                "The service must not be null when you unregister a listener");
         }
 
         if (endpoint == null)
@@ -1122,7 +1122,7 @@ public abstract class AbstractConnector
 
         if (receivers != null && !receivers.isEmpty())
         {
-            MessageReceiver receiver = (MessageReceiver)receivers.remove(getReceiverKey(component,
+            MessageReceiver receiver = (MessageReceiver)receivers.remove(getReceiverKey(service,
                 endpoint));
             if (receiver != null)
             {
@@ -1315,11 +1315,11 @@ public abstract class AbstractConnector
         return false;
     }
 
-    public MessageReceiver getReceiver(Component component, ImmutableEndpoint endpoint)
+    public MessageReceiver getReceiver(Service service, ImmutableEndpoint endpoint)
     {
         if (receivers != null)
         {
-            Object key = getReceiverKey(component, endpoint);
+            Object key = getReceiverKey(service, endpoint);
             if (key != null)
             {
                 return (MessageReceiver) receivers.get(key);
@@ -2092,20 +2092,20 @@ public abstract class AbstractConnector
     /**
      * Create a Message receiver for this connector
      *
-     * @param component the component that will receive events from this receiver,
+     * @param service the service that will receive events from this receiver,
      *            the listener
      * @param endpoint the endpoint that defies this inbound communication
      * @return an instance of the message receiver defined in this connectors'
      *         {@link org.mule.transport.service.TransportServiceDescriptor}
-     *         initialised using the component and endpoint.
+     *         initialised using the service and endpoint.
      * @throws Exception if there is a problem creating the receiver. This exception
      *             really depends on the underlying transport, thus any exception
      *             could be thrown
      */
-    protected MessageReceiver createReceiver(Component component, ImmutableEndpoint endpoint)
+    protected MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint)
         throws Exception
     {
-        return getServiceDescriptor().createMessageReceiver(this, component, endpoint);
+        return getServiceDescriptor().createMessageReceiver(this, service, endpoint);
     }
 
     /**

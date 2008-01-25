@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * The <code>BusinessErrorManager</code> is the UMO Component that processes 
+ * The <code>BusinessErrorManager</code> is the UMO Service that processes 
  * exceptions of type org.mule.samples.errorhandler.exceptions.BusinessException.
  * The business method simply reports the errors and stops any further processing.
  */

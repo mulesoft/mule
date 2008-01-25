@@ -11,12 +11,12 @@
 package org.mule.components.script;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
-import org.mule.api.component.ComponentAware;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.service.Service;
+import org.mule.api.service.ServiceAware;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.monitor.FileListener;
@@ -30,13 +30,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>AbstractScriptComponent</code> is a component that can execute scripts as
- * components in Mule. This component also supports reloading if the script file
+ * <code>AbstractScriptComponent</code> is a service that can execute scripts as
+ * components in Mule. This service also supports reloading if the script file
  * changes (providing the file is on the file system)
  * 
  */
 public abstract class AbstractScriptComponent
-    implements Lifecycle, ComponentAware, FileListener, Callable
+    implements Lifecycle, ServiceAware, FileListener, Callable
 {
     public static final int DEFAULT_RELOAD_INTERVAL_MS = 60000;
 
@@ -48,13 +48,13 @@ public abstract class AbstractScriptComponent
 
     private String scriptText = null;
     private boolean autoReload = true;
-    protected Component component;
+    protected Service service;
     private FileMonitor monitor;
     private long reloadInterval = DEFAULT_RELOAD_INTERVAL_MS;
 
-    public void setComponent(Component component) throws ConfigurationException
+    public void setService(Service service) throws ConfigurationException
     {
-        this.component = component;
+        this.service = service;
     }
 
     public void initialise() throws InitialisationException
@@ -66,8 +66,8 @@ public abstract class AbstractScriptComponent
             {
                 extension = "." + extension;
             }
-            setScript(component.getName() + extension);
-            logger.info("script name is not set, using default: " + component.getName() + extension);
+            setScript(service.getName() + extension);
+            logger.info("script name is not set, using default: " + service.getName() + extension);
         }
 
         if (getScriptText() != null)
@@ -88,7 +88,7 @@ public abstract class AbstractScriptComponent
                 monitor = new FileMonitor(reloadInterval);
                 monitor.addFile(f);
                 monitor.addListener(this);
-                logger.debug("Component script is reloadable");
+                logger.debug("Service script is reloadable");
             }
             else
             {

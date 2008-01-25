@@ -11,10 +11,10 @@
 package org.mule.config.spring.processors;
 
 import org.mule.api.agent.Agent;
-import org.mule.api.component.Component;
 import org.mule.api.context.ContainerContext;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.model.Model;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.MuleEndpoint;
@@ -67,11 +67,11 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
                 endpoint.setName(name);
             }
         }
-        else if (o instanceof Component)
+        else if (o instanceof Service)
         {
-            if (((Component)o).getName() == null || overwrite)
+            if (((Service)o).getName() == null || overwrite)
             {
-                ((Component)o).setName(s);
+                ((Service)o).setName(s);
             }
         }
         else if (o instanceof Model)

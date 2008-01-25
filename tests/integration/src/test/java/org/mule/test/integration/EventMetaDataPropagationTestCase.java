@@ -18,11 +18,11 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -50,23 +50,23 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase impleme
 
     public void testEventMetaDataPropagation() throws MuleException
     {
-        Component component = muleContext.getRegistry().lookupComponent("component1");
-        OutboundRouter outboundRouter = (OutboundRouter) component.getOutboundRouter().getRouters().get(0);
+        Service service = muleContext.getRegistry().lookupService("component1");
+        OutboundRouter outboundRouter = (OutboundRouter) service.getOutboundRouter().getRouters().get(0);
         Endpoint endpoint = (Endpoint) outboundRouter.getEndpoints().get(0);
         List transformers = new ArrayList();
         transformers.add(DummyTransformer.class);
         endpoint.setTransformers(transformers);
         
-        MuleSession session = new DefaultMuleSession(component);
+        MuleSession session = new DefaultMuleSession(service);
 
-        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent"), (ImmutableEndpoint)component
+        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent"), (ImmutableEndpoint)service
                 .getInboundRouter().getEndpoints().get(0), session, true);
         session.sendEvent(event);
     }
 
     public Object onCall(MuleEventContext context) throws Exception
     {
-        if ("component1".equals(context.getComponent().getName()))
+        if ("component1".equals(context.getService().getName()))
         {
             Map props = new HashMap();
             props.put("stringParam", "param1");

@@ -10,26 +10,26 @@
 
 package org.mule.tck.providers;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 
 public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCase
 {
-    protected Component component;
+    protected Service service;
     protected ImmutableEndpoint endpoint;
 
     protected void doSetUp() throws Exception
     {
-        component = getTestComponent("orange", Orange.class);
+        service = getTestService("orange", Orange.class);
         endpoint = getEndpoint();
     }
 
     public void testCreate() throws Exception
     {
-        Component component = getTestComponent("orange", Orange.class);
+        Service service = getTestService("orange", Orange.class);
         ImmutableEndpoint endpoint = getTestEndpoint("Test", ImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         MessageReceiver receiver = getMessageReceiver();
 
@@ -48,16 +48,16 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
 
         try
         {
-            receiver.setComponent(null);
-            fail("component cannot be set to null");
+            receiver.setService(null);
+            fail("service cannot be set to null");
         }
         catch (IllegalArgumentException e)
         {
             // expected
         }
 
-        receiver.setComponent(component);
-        assertNotNull(receiver.getComponent());
+        receiver.setService(service);
+        assertNotNull(receiver.getService());
         receiver.setEndpoint(endpoint);
         assertNotNull(receiver.getEndpoint());
 

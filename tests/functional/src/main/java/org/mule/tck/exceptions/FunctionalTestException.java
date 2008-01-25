@@ -16,7 +16,7 @@ public class FunctionalTestException extends DefaultMuleException
 {
     public FunctionalTestException()
     {
-        super("Functional Test Component Exception");
+        super("Functional Test Service Exception");
     }
 }
 

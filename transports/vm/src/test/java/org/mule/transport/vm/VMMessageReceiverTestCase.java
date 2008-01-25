@@ -23,7 +23,7 @@ public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        receiver = new VMMessageReceiver(endpoint.getConnector(), component, endpoint);
+        receiver = new VMMessageReceiver(endpoint.getConnector(), service, endpoint);
     }
 
     /*

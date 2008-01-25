@@ -13,9 +13,9 @@ package org.mule.transport.cxf;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.ComponentException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.ServiceException;
 import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
@@ -72,7 +72,7 @@ public class MuleInvoker implements Invoker
             if (message.getExceptionPayload() != null)
             {
                 Throwable cause = message.getExceptionPayload().getException();
-                if (cause instanceof ComponentException)
+                if (cause instanceof ServiceException)
                 {
                     cause = cause.getCause();
                 }

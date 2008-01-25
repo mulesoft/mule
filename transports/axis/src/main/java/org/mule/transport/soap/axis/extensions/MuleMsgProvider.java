@@ -12,7 +12,7 @@ package org.mule.transport.soap.axis.extensions;
 
 import org.mule.RegistryContext;
 import org.mule.RequestContext;
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.transport.soap.axis.AxisConnector;
 import org.mule.transport.soap.axis.AxisMessageReceiver;
 import org.mule.transport.soap.axis.AxisServiceProxy;
@@ -69,14 +69,14 @@ public class MuleMsgProvider extends MsgProvider
         {
             throw new AxisFault("Could not find Mule registered service: " + s);
         }
-        Class[] classes = AxisServiceProxy.getInterfacesForComponent(receiver.getComponent());
+        Class[] classes = AxisServiceProxy.getInterfacesForComponent(receiver.getService());
         return AxisServiceProxy.createProxy(receiver, true, classes);
     }
 
     protected Class getServiceClass(String s, SOAPService soapService, MessageContext messageContext)
         throws AxisFault
     {
-        Component component = RegistryContext.getRegistry().lookupComponent(soapService.getName());
+        Service component = RegistryContext.getRegistry().lookupService(soapService.getName());
         try
         {
             Class[] classes = AxisServiceProxy.getInterfacesForComponent(component);

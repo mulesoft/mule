@@ -10,7 +10,6 @@
 
 package org.mule.api;
 
-import org.mule.api.component.Invocation;
 
 /**
  * <code>Interceptor</code> is based on a similar concept of servlet filters and
@@ -24,7 +23,7 @@ public interface Interceptor
      * Invoked by the previous interceptor in the chain
      * 
      * @param invocation the invocation containing info about the current message and
-     *            component
+     *            service
      * @return A result message that may have been altered by this invocation
      * @throws MuleException if the invocation fails
      */

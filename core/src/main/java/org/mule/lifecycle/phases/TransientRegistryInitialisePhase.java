@@ -11,12 +11,12 @@ package org.mule.lifecycle.phases;
 
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.model.Model;
 import org.mule.api.registry.Registry;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.lifecycle.DefaultLifecyclePhase;
@@ -53,7 +53,7 @@ public class TransientRegistryInitialisePhase extends DefaultLifecyclePhase
         initOrderedObjects.add(new NotificationLifecycleObject(Transformer.class));
         initOrderedObjects.add(new NotificationLifecycleObject(ImmutableEndpoint.class));
         initOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        initOrderedObjects.add(new NotificationLifecycleObject(Component.class));
+        initOrderedObjects.add(new NotificationLifecycleObject(Service.class));
         initOrderedObjects.add(new NotificationLifecycleObject(Model.class));
 
         initOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));

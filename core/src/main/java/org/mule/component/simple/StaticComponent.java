@@ -19,9 +19,9 @@ import org.mule.util.IOUtils;
 import java.io.IOException;
 
 /**
- * A component that will return a static data object as a result. This is useful for
+ * A service that will return a static data object as a result. This is useful for
  * testing with expected results. The data returned can be read from a file or set as
- * a property on this component.
+ * a property on this service.
  */
 public class StaticComponent implements Callable, Initialisable
 {

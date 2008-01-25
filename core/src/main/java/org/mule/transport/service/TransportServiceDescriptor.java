@@ -11,10 +11,10 @@
 package org.mule.transport.service;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.registry.ServiceDescriptor;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
@@ -41,11 +41,11 @@ public interface TransportServiceDescriptor extends ServiceDescriptor
     public SessionHandler createSessionHandler() throws TransportServiceException;
 
     public MessageReceiver createMessageReceiver(Connector connector,
-                                                             Component component,
+                                                             Service service,
                                                              ImmutableEndpoint endpoint) throws MuleException;
 
     public MessageReceiver createMessageReceiver(Connector connector,
-                                                             Component component,
+                                                             Service service,
                                                              ImmutableEndpoint endpoint,
                                                              Object[] args) throws MuleException;
 

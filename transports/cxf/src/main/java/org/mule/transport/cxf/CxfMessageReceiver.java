@@ -11,13 +11,13 @@
 package org.mule.transport.cxf;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.cxf.i18n.CxfMessages;
@@ -54,10 +54,10 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     private Server server;
     private boolean bridge;
 
-    public CxfMessageReceiver(Connector Connector, Component component, Endpoint Endpoint)
+    public CxfMessageReceiver(Connector Connector, Service service, Endpoint Endpoint)
         throws CreateException
     {
-        super(Connector, component, Endpoint);
+        super(Connector, service, Endpoint);
         connector = (CxfConnector) Connector;
     }
 
@@ -142,7 +142,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
             addIgnoredMethods(svcFac, Disposable.class.getName());
 
             String name = (String) endpointProps.get(CxfConstants.NAME);
-            // check if there is the namespace property on the component
+            // check if there is the namespace property on the service
             String namespace = (String) endpointProps.get(CxfConstants.NAMESPACE);
 
             // HACK because CXF expects a QName for the service
@@ -246,7 +246,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            return component.getServiceFactory().getOrCreate().getClass();
+            return service.getServiceFactory().getOrCreate().getClass();
         }
         catch (Exception e)
         {

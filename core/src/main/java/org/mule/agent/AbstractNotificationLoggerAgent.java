@@ -13,7 +13,7 @@ package org.mule.agent;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.context.notification.AdminNotificationListener;
-import org.mule.api.context.notification.ComponentNotificationListener;
+import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ManagementNotificationListener;
@@ -224,7 +224,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         }
         if (!ignoreComponentNotifications)
         {
-            ServerNotificationListener l = new ComponentNotificationListener()
+            ServerNotificationListener l = new ServiceNotificationListener()
             {
                 public void onNotification(ServerNotification notification)
                 {

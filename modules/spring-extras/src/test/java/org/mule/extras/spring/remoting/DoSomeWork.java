@@ -11,7 +11,7 @@
 package org.mule.extras.spring.remoting;
 
 /**
- * A server-side component to receive and process ComplexData.
+ * A server-side service to receive and process ComplexData.
  */
 public class DoSomeWork implements WorkInterface
 {

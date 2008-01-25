@@ -12,10 +12,10 @@ package org.mule.api.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 
 import java.io.OutputStream;
@@ -44,9 +44,9 @@ public interface MessageReceiver extends Lifecycle, Connectable
      */
     // void handleException(Object message, Throwable exception);
     /**
-     * @return the component associated with the receiver
+     * @return the service associated with the receiver
      */
-    Component getComponent();
+    Service getService();
 
     /**
      * @param endpoint the endpoint to listen on
@@ -55,12 +55,12 @@ public interface MessageReceiver extends Lifecycle, Connectable
     void setEndpoint(ImmutableEndpoint endpoint);
 
     /**
-     * @param component the component to associate with the receiver. When data is
-     *            received the component <code>dispatchEvent</code> or
+     * @param service the service to associate with the receiver. When data is
+     *            received the service <code>dispatchEvent</code> or
      *            <code>sendEvent</code> is used to dispatch the data to the
      *            relivant UMO.
      */
-    void setComponent(Component component);
+    void setService(Service service);
 
     void setConnector(Connector connector);
 

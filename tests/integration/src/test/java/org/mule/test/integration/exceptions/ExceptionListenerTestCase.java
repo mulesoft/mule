@@ -73,7 +73,7 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
 
         client.dispatch("vm://component.in", "test", null);
 
-        message = client.request("vm://component.out", 2000);
+        message = client.request("vm://service.out", 2000);
         assertNull(message);
 
         message = client.request("vm://error.queue", 2000);

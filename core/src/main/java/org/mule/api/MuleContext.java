@@ -122,7 +122,7 @@ public interface MuleContext extends Lifecycle
      * @param l                  the listener to register
      * @param resourceIdentifier a particular resource name for the given type
      *                           of listener For example, the resourceName could be the name of
-     *                           a component if the listener was a ComponentNotificationListener
+     *                           a service if the listener was a ServiceNotificationListener
      */
     void registerListener(ServerNotificationListener l, String resourceIdentifier) throws NotificationException;
 
@@ -213,7 +213,7 @@ public interface MuleContext extends Lifecycle
 
     /**
      * Sets the queue manager used by mule for queuing events. This is used for
-     * component queues
+     * service queues
      *
      * @param queueManager
      * @throws RegistrationException 
@@ -223,7 +223,7 @@ public interface MuleContext extends Lifecycle
 
     /**
      * Gets the queue manager used by mule for queuing events. This is used for
-     * component queues.
+     * service queues.
      *
      * @return
      *

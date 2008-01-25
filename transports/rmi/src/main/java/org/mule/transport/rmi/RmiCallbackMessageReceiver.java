@@ -12,10 +12,10 @@ package org.mule.transport.rmi;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageReceiver;
@@ -49,10 +49,10 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
     private int port;
 
 
-    public RmiCallbackMessageReceiver(Connector connector, Component component, Endpoint endpoint)
+    public RmiCallbackMessageReceiver(Connector connector, Service service, Endpoint endpoint)
             throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
         this.connector = (RmiConnector) connector;
 
         logger.debug("Initializing with endpoint " + endpoint);

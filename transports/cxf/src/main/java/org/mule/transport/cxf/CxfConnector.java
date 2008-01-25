@@ -11,17 +11,17 @@
 package org.mule.transport.cxf;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.context.notification.ManagerNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.context.notification.ManagerNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -57,7 +57,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
     private Bus bus;
     private String configurationLocation;
     private String defaultFrontend = CxfConstants.JAX_WS_FRONTEND;
-    private List<SedaComponent> components = new ArrayList<SedaComponent>();
+    private List<SedaService> components = new ArrayList<SedaService>();
     
     public CxfConnector()
     {
@@ -174,7 +174,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         Server server = cxfReceiver.getServer();
 
         // TODO MULE-2228 Simplify this API
-        SedaComponent c = new SedaComponent();
+        SedaService c = new SedaService();
         c.setName(CXF_SERVICE_COMPONENT_NAME + server.getEndpoint().getService().getName() + c.hashCode());            
         c.setModel(muleContext.getRegistry().lookupSystemModel());
         
@@ -182,7 +182,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         svcComponent.setBus(bus);
         
         SingletonObjectFactory of = new SingletonObjectFactory(svcComponent);
-        of.setComponent(c);
+        of.setService(c);
         of.initialise();
         c.setServiceFactory(of);
         
@@ -248,17 +248,17 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
     /**
      * The method determines the key used to store the receiver against.
      * 
-     * @param component the component for which the endpoint is being registered
-     * @param endpoint the endpoint being registered for the component
+     * @param service the service for which the endpoint is being registered
+     * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against. In this case it
-     *         is the component name, which is equivilent to the Axis service name.
+     *         is the service name, which is equivilent to the Axis service name.
      */
     @Override
-    protected Object getReceiverKey(Component component, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
     {
         if (endpoint.getEndpointURI().getPort() == -1)
         {
-            return component.getName();
+            return service.getName();
         }
         else
         {
@@ -268,22 +268,22 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
 
     public void onNotification(ServerNotification event)
     {
-        // We need to register the CXF service component once the model
+        // We need to register the CXF service service once the model
         // starts because
         // when the model starts listeners on components are started, thus
         // all listener
         // need to be registered for this connector before the CXF service
-        // component is registered. The implication of this is that to add a
+        // service is registered. The implication of this is that to add a
         // new service and a
         // different http port the model needs to be restarted before the
         // listener is available
         if (event.getAction() == ManagerNotification.MANAGER_STARTED)
         {
-            for (Component c : components)
+            for (Service c : components)
             {
                 try
                 {
-                    muleContext.getRegistry().registerComponent(c);
+                    muleContext.getRegistry().registerService(c);
                 }
                 catch (MuleException e)
                 {

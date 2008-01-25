@@ -18,7 +18,7 @@
     </bean>
 
     <!-- "implementation" is a class name -->
-    <bean class="org.mule.model.seda.SedaComponent" depends-on="main" name="orange1">
+    <bean class="org.mule.model.seda.SedaService" depends-on="main" name="orange1">
         <property name="name" value="orange1"/>
         <property name="serviceFactory">
             <bean class="org.mule.util.object.PrototypeObjectFactory">
@@ -29,7 +29,7 @@
     </bean>
 
     <!-- "implementation" is a container reference -->
-    <bean class="org.mule.model.seda.SedaComponent" depends-on="main" name="orange2">
+    <bean class="org.mule.model.seda.SedaService" depends-on="main" name="orange2">
         <property name="name" value="orange2"/>
         <property name="serviceFactory">
             <bean class="org.mule.util.object.SingletonObjectFactory">

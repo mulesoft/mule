@@ -10,7 +10,7 @@
 
 package org.mule.examples.loanbroker.esn;
 
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.examples.loanbroker.tests.AbstractLoanBrokerTestCase;
 import org.mule.model.seda.SedaModel;
 
@@ -43,8 +43,8 @@ public class VMLoanBrokerSynchronousFunctionalTestCase extends AbstractLoanBroke
 
     protected void assertComponent(SedaModel model, String name)
     {
-        Component component = muleContext.getRegistry().lookupComponent(name);
-        assertNotNull(name + " missing", component);
+        Service service = muleContext.getRegistry().lookupService(name);
+        assertNotNull(name + " missing", service);
     }
 
 }

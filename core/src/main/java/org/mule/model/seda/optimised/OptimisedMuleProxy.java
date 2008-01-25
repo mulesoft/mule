@@ -17,15 +17,15 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.ModelException;
 import org.mule.api.model.MuleProxy;
+import org.mule.api.service.Service;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.ServiceStatistics;
 import org.mule.util.queue.QueueSession;
 
 import org.apache.commons.logging.Log;
@@ -51,14 +51,14 @@ public class OptimisedMuleProxy implements MuleProxy
     /**
      * holds the UMO descriptor
      */
-    private Component component;
+    private Service service;
 
     /**
      * Determines if the proxy is suspended
      */
     private boolean suspended = true;
 
-    private ComponentStatistics stat = null;
+    private ServiceStatistics stat = null;
 
     private Callable pojoService;
 
@@ -69,13 +69,13 @@ public class OptimisedMuleProxy implements MuleProxy
      * Constructs a Proxy using the UMO's AbstractMessageDispatcher and the UMO
      * itself
      * 
-     * @param component the underlying object that with receive events
-     * @param component the Component descriptor associated with the component
+     * @param service the underlying object that with receive events
+     * @param service the Service descriptor associated with the service
      */
-    public OptimisedMuleProxy(Callable pojoService, Component component)
+    public OptimisedMuleProxy(Callable pojoService, Service service)
         throws MuleException
     {
-        this.component = component;
+        this.service = service;
         this.pojoService = pojoService;
     }
 
@@ -92,7 +92,7 @@ public class OptimisedMuleProxy implements MuleProxy
             catch (Exception e)
             {
                 throw new ModelException(
-                    CoreMessages.failedToStart("Component '" + component.getName() + "'"), e);
+                    CoreMessages.failedToStart("Service '" + service.getName() + "'"), e);
             }
         }
 
@@ -117,7 +117,7 @@ public class OptimisedMuleProxy implements MuleProxy
             catch (Exception e)
             {
                 throw new ModelException(
-                    CoreMessages.failedToStop("Component '" + component.getName() + "'"), e);
+                    CoreMessages.failedToStop("Service '" + service.getName() + "'"), e);
             }
         }
     }
@@ -150,12 +150,12 @@ public class OptimisedMuleProxy implements MuleProxy
         this.event = event;
     }
 
-    public ComponentStatistics getStatistics()
+    public ServiceStatistics getStatistics()
     {
         return stat;
     }
 
-    public void setStatistics(ComponentStatistics stat)
+    public void setStatistics(ServiceStatistics stat)
     {
         this.stat = stat;
     }
@@ -171,7 +171,7 @@ public class OptimisedMuleProxy implements MuleProxy
     {
         if (logger.isTraceEnabled())
         {
-            logger.trace("MuleProxy: sync call for Mule UMO " + component.getName());
+            logger.trace("MuleProxy: sync call for Mule UMO " + service.getName());
         }
 
         MuleMessage returnMessage = null;
@@ -211,9 +211,9 @@ public class OptimisedMuleProxy implements MuleProxy
                     // if (context != null) {
                     // returnMessage.addProperties(context);
                     // }
-                    if (component.getOutboundRouter().hasEndpoints())
+                    if (service.getOutboundRouter().hasEndpoints())
                     {
-                        MuleMessage outboundReturnMessage = component.getOutboundRouter().route(
+                        MuleMessage outboundReturnMessage = service.getOutboundRouter().route(
                             returnMessage, event.getSession(), event.isSynchronous());
                         if (outboundReturnMessage != null)
                         {
@@ -222,24 +222,24 @@ public class OptimisedMuleProxy implements MuleProxy
                     }
                     else
                     {
-                        logger.debug("Outbound router on component '" + component.getName()
+                        logger.debug("Outbound router on service '" + service.getName()
                                      + "' doesn't have any endpoints configured.");
                     }
                 }
 
                 // Process Response Router
-                // if (returnMessage != null && component.getResponseRouter() !=
+                // if (returnMessage != null && service.getResponseRouter() !=
                 // null) {
                 // logger.debug("Waiting for response router message");
                 // returnMessage =
-                // component.getResponseRouter().getResponse(returnMessage);
+                // service.getResponseRouter().getResponse(returnMessage);
                 // }
                 //
                 // // process repltyTo if there is one
                 // if (returnMessage != null && replyToHandler != null) {
                 // String requestor = (String)
                 // returnMessage.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-                // if ((requestor != null && !requestor.equals(component.getName()))
+                // if ((requestor != null && !requestor.equals(service.getName()))
                 // || requestor == null) {
                 // replyToHandler.processReplyTo(event, returnMessage, replyTo);
                 // }
@@ -269,7 +269,7 @@ public class OptimisedMuleProxy implements MuleProxy
             {
                 handleException(
                     new MessagingException(
-                        CoreMessages.eventProcessingFailedFor(component.getName()), 
+                        CoreMessages.eventProcessingFailedFor(service.getName()), 
                         event.getMessage(), e));
             }
         }
@@ -301,12 +301,12 @@ public class OptimisedMuleProxy implements MuleProxy
      */
     public void handleException(Exception exception)
     {
-        component.getExceptionListener().exceptionThrown(exception);
+        service.getExceptionListener().exceptionThrown(exception);
     }
 
     public String toString()
     {
-        return "optimised proxy for: " + component.toString();
+        return "optimised proxy for: " + service.toString();
     }
 
     /**
@@ -366,7 +366,7 @@ public class OptimisedMuleProxy implements MuleProxy
     {
         if (logger.isTraceEnabled())
         {
-            logger.trace("MuleProxy: async onEvent for Mule UMO " + component.getName());
+            logger.trace("MuleProxy: async onEvent for Mule UMO " + service.getName());
         }
 
         try
@@ -382,7 +382,7 @@ public class OptimisedMuleProxy implements MuleProxy
                 // event.getEndpoint().getConnector()).getReplyToHandler();
                 // }
                 // InterceptorsInvoker invoker = new
-                // InterceptorsInvoker(interceptorList, component,
+                // InterceptorsInvoker(interceptorList, service,
                 // event.getMessage());
 
                 // do stats
@@ -400,14 +400,14 @@ public class OptimisedMuleProxy implements MuleProxy
                 event = RequestContext.getEvent();
                 if (result != null && !event.isStopFurtherProcessing())
                 {
-                    component.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
+                    service.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
                 }
 
                 // process repltyTo if there is one
                 // if (result != null && replyToHandler != null) {
                 // String requestor = (String)
                 // result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-                // if ((requestor != null && !requestor.equals(component.getName()))
+                // if ((requestor != null && !requestor.equals(service.getName()))
                 // || requestor == null) {
                 // replyToHandler.processReplyTo(event, result, replyTo);
                 // }
@@ -434,7 +434,7 @@ public class OptimisedMuleProxy implements MuleProxy
             {
                 handleException(
                     new MessagingException(
-                        CoreMessages.eventProcessingFailedFor(component.getName()), 
+                        CoreMessages.eventProcessingFailedFor(service.getName()), 
                         event.getMessage(), e));
             }
         }
@@ -443,7 +443,7 @@ public class OptimisedMuleProxy implements MuleProxy
 
             try
             {
-                //component.getServiceFactory().release(umo);
+                //service.getServiceFactory().release(umo);
             }
             catch (Exception e2)
             {

@@ -12,7 +12,7 @@ package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -22,7 +22,7 @@ public class CustomNamespaceHandler extends NamespaceHandlerSupport
     public void init()
     {
         registerBeanDefinitionParser("model", new OrphanDefinitionParser(true));
-        registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaComponent.class));
+        registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaService.class));
     }
 
 }

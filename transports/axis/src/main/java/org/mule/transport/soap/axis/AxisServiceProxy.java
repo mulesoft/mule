@@ -12,14 +12,14 @@ package org.mule.transport.soap.axis;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.config.ExceptionHelper;
 import org.mule.transport.AbstractMessageReceiver;
@@ -131,7 +131,7 @@ public class AxisServiceProxy
         AxisServiceProxy.properties.set(properties);
     }
 
-    public static Class[] getInterfacesForComponent(Component component)
+    public static Class[] getInterfacesForComponent(Service component)
         throws MuleException, ClassNotFoundException
     {
         Class[] interfaces;

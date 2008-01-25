@@ -18,11 +18,11 @@ import org.mule.api.lifecycle.LifecycleAdapterFactory;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
-import org.mule.component.DefaultComponentExceptionStrategy;
 import org.mule.context.notification.ModelNotification;
 import org.mule.lifecycle.DefaultLifecycleAdapterFactory;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
+import org.mule.service.DefaultServiceExceptionStrategy;
 
 import java.beans.ExceptionListener;
 import java.util.Collection;
@@ -48,7 +48,7 @@ public abstract class AbstractModel implements Model
     private LifecycleAdapterFactory lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
     private AtomicBoolean initialised = new AtomicBoolean(false);
     private AtomicBoolean started = new AtomicBoolean(false);
-    private ExceptionListener exceptionListener = new DefaultComponentExceptionStrategy();
+    private ExceptionListener exceptionListener = new DefaultServiceExceptionStrategy();
 
     protected transient Log logger = LogFactory.getLog(getClass());
     protected MuleContext muleContext;
@@ -144,7 +144,7 @@ public abstract class AbstractModel implements Model
     /**
      * Stops any registered components
      *
-     * @throws MuleException if a Component fails tcomponent
+     * @throws MuleException if a Service fails tcomponent
      */
     public void stop() throws MuleException
     {

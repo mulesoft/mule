@@ -32,7 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A JSR 223 Script component. Allows any JSR 223 compliant script engines such as
+ * A JSR 223 Script service. Allows any JSR 223 compliant script engines such as
  * javaScript, Groovy or Rhino to be embedded as Mule components.
  */
 public class Scriptable implements Initialisable

@@ -20,7 +20,7 @@ import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
 /**
- * A test component that reads inbound attachments and sends an attachment back. This class is only suitable
+ * A test service that reads inbound attachments and sends an attachment back. This class is only suitable
  * for the VMAttachementsTestCase.
  */
 public class AttachmentsComponent implements Callable

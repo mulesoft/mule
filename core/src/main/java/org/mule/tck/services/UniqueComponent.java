@@ -16,7 +16,7 @@ import org.mule.util.UUID;
 import org.mule.util.object.Identifiable;
 
 /**
- * Each instance of this component should contain a unique ID.  
+ * Each instance of this service should contain a unique ID.  
  * Useful for testing object pools.
  */
 public class UniqueComponent implements Callable, Identifiable

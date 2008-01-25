@@ -10,16 +10,16 @@
 package org.mule.management.stats;
 
 /**
- * TODO MULE-2233 Pooling functionality has been abstracted out of the SedaComponent. 
+ * TODO MULE-2233 Pooling functionality has been abstracted out of the SedaService. 
  * This class should be updated accordingly.
  */
-public class SedaComponentStatistics extends ComponentStatistics
+public class SedaServiceStatistics extends ServiceStatistics
 {
     private int componentPoolMaxSize = 0;
     private int componentPoolAbsoluteMaxSize = 0;
     private int componentPoolSize = 0;
 
-    public SedaComponentStatistics(String name, int threadPoolSize, int componentPoolsize)
+    public SedaServiceStatistics(String name, int threadPoolSize, int componentPoolsize)
     {
         super(name, threadPoolSize);
         this.componentPoolMaxSize = componentPoolsize;

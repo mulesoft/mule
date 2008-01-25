@@ -13,12 +13,12 @@ package org.mule.ra;
 import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.model.Model;
+import org.mule.api.service.Service;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
@@ -167,12 +167,12 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 // Create Endpoint
                 ImmutableEndpoint endpoint = createMessageInflowEndpoint(muleActivationSpec);
 
-                // Create Component
-                Component component = createJcaComponent(endpointFactory, model, endpoint);
+                // Create Service
+                Service service = createJcaService(endpointFactory, model, endpoint);
 
-                // Keep reference to JcaComponent descriptor for endpointDeactivation
+                // Keep reference to JcaService descriptor for endpointDeactivation
                 MuleEndpointKey key = new MuleEndpointKey(endpointFactory, muleActivationSpec);
-                endpoints.put(key, component);
+                endpoints.put(key, service);
             }
             catch (Exception e)
             {
@@ -197,8 +197,8 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         {
             MuleActivationSpec muleActivationSpec = (MuleActivationSpec) activationSpec;
             MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec) activationSpec);
-            Component component = (Component) endpoints.remove(key);
-            if (component == null)
+            Service service = (Service) endpoints.remove(key);
+            if (service == null)
             {
                 logger.warn("No endpoint was registered with key: " + key);
                 return;
@@ -217,7 +217,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
             try
             {
-                muleContext.getRegistry().unregisterComponent(component.getName());
+                muleContext.getRegistry().unregisterComponent(service.getName());
             }
             catch (MuleException e)
             {
@@ -267,22 +267,22 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         }
     }
 
-    protected Component createJcaComponent(MessageEndpointFactory endpointFactory,
+    protected Service createJcaService(MessageEndpointFactory endpointFactory,
                                               JcaModel model,
                                               ImmutableEndpoint endpoint) throws MuleException
     {
-        String name = "JcaComponent#" + endpointFactory.hashCode();
-        Component component = new JcaComponent(new DelegateWorkManager(bootstrapContext.getWorkManager()));
-        component.setName(name);
-        component.getInboundRouter().addEndpoint(endpoint);
+        String name = "JcaService#" + endpointFactory.hashCode();
+        Service service = new JcaService(new DelegateWorkManager(bootstrapContext.getWorkManager()));
+        service.setName(name);
+        service.getInboundRouter().addEndpoint(endpoint);
 
         // Set endpointFactory rather than endpoint here, so we can obtain a
         // new endpoint instance from factory for each incoming message in
         // JcaComponet as reccomended by JCA specification
-        component.setServiceFactory(new SingletonObjectFactory(endpointFactory));
-        component.setModel(model);
-        muleContext.getRegistry().registerComponent(component);
-        return component;
+        service.setServiceFactory(new SingletonObjectFactory(endpointFactory));
+        service.setModel(model);
+        muleContext.getRegistry().registerService(service);
+        return service;
     }
 
     protected ImmutableEndpoint createMessageInflowEndpoint(MuleActivationSpec muleActivationSpec)
@@ -292,7 +292,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(
             muleActivationSpec.getEndpoint()), muleContext);
 
-        // Use asynchronous endpoint as we need to dispatch to component
+        // Use asynchronous endpoint as we need to dispatch to service
         // rather than send.
         endpointBuilder.setSynchronous(false);
 

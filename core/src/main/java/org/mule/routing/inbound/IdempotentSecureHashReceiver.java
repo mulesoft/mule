@@ -22,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * <code>IdempotentSecureHashReceiver</code> ensures that only unique messages are
- * received by a component. It does this by calculating the SHA-256 hash of the message
+ * received by a service. It does this by calculating the SHA-256 hash of the message
  * itself. This provides a value with an infinitesimally small chance of a collision. This
  * can be used to filter message duplicates. Please keep in mind that the hash is
  * calculated over the entire byte array representing the message, so any leading or

@@ -9,8 +9,8 @@
  */
 package org.mule.config.spring;
 
-import org.mule.api.component.Component;
 import org.mule.api.routing.Router;
+import org.mule.api.service.Service;
 import org.mule.routing.inbound.ForwardingConsumer;
 import org.mule.routing.inbound.IdempotentSecureHashReceiver;
 import org.mule.routing.inbound.InboundPassThroughRouter;
@@ -53,7 +53,7 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
 
     protected Router lookupInboundRouterFromService(String serviceName) throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent(serviceName);
+        Service c = muleContext.getRegistry().lookupService(serviceName);
         assertNotNull(c);
         List routers = c.getInboundRouter().getRouters();
         assertEquals(1, routers.size());

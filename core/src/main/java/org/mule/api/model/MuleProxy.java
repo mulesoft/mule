@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.ServiceStatistics;
 import org.mule.util.queue.QueueSession;
 
 import javax.resource.spi.work.Work;
@@ -35,9 +35,9 @@ public interface MuleProxy extends Work, Startable, Stoppable, Disposable
      */
     void onEvent(QueueSession session, MuleEvent event);
 
-    ComponentStatistics getStatistics();
+    ServiceStatistics getStatistics();
 
-    void setStatistics(ComponentStatistics stat);
+    void setStatistics(ServiceStatistics stat);
 
     /**
      * Makes a synchronous call on the UMO

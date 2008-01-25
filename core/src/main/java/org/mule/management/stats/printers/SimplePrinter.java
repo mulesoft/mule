@@ -35,12 +35,12 @@ public class SimplePrinter extends AbstractTablePrinter
         for (int i = 1; i < table.length; i++)
         {
             println();
-            println("---- Component Statistics ----");
+            println("---- Service Statistics ----");
             for (int j = 0; j < table[0].length; j++)
             {
                 println(table[0][j] + ": " + table[i][j]);
             }
-            println("---- End Component Statistics ----");
+            println("---- End Service Statistics ----");
         }
     }
 }

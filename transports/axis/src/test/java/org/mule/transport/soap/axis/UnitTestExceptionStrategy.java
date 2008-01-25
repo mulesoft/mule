@@ -11,12 +11,12 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleMessage;
-import org.mule.component.DefaultComponentExceptionStrategy;
+import org.mule.service.DefaultServiceExceptionStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UnitTestExceptionStrategy extends DefaultComponentExceptionStrategy
+public class UnitTestExceptionStrategy extends DefaultServiceExceptionStrategy
 {
     /**
      * Record all exceptions that this ExceptionStrategy handles so Unit Test

@@ -21,8 +21,8 @@ import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReplyToHandler;
-import org.mule.component.AbstractComponent;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.service.AbstractService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +78,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
             {
                 logger.info("reply to sent: " + endpoint);
             }
-            ((AbstractComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
+            ((AbstractService) event.getService()).getStatistics().incSentReplyToEvent();
         }
         catch (Exception e)
         {

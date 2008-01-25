@@ -10,12 +10,12 @@
 
 package org.mule.test.spring;
 
-import org.mule.api.component.Component;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.routing.outbound.AbstractOutboundRouter;
@@ -61,7 +61,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyExtractorConfig() throws Exception
     {
-        Component d = muleContext.getRegistry().lookupComponent("propertyExtractorTestComponent");
+        Service d = muleContext.getRegistry().lookupService("propertyExtractorTestComponent");
         assertNotNull(d);
         OutboundRouterCollection router = d.getOutboundRouter();
         assertNotNull(router);
@@ -77,7 +77,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyExtractorResponseRouterConfig() throws Exception
     {
-        Component d = muleContext.getRegistry().lookupComponent("propertyExtractorResponseRouterTestComponent");
+        Service d = muleContext.getRegistry().lookupService("propertyExtractorResponseRouterTestComponent");
         assertNotNull(d);
         ResponseRouterCollection router = d.getResponseRouter();
         assertNotNull(router);
@@ -93,7 +93,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testPropertyTypesConfig() throws Exception
     {
-        Component c = muleContext.getRegistry().lookupComponent("testPropertiesComponent");
+        Service c = muleContext.getRegistry().lookupService("testPropertiesComponent");
         assertNotNull(c);
         Object obj = c.getServiceFactory().getOrCreate();
         assertNotNull(obj);
@@ -104,7 +104,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 
     public void testEndpointURIParamsConfig()
     {
-        Component d = muleContext.getRegistry().lookupComponent("testPropertiesComponent");
+        Service d = muleContext.getRegistry().lookupService("testPropertiesComponent");
         assertNotNull(d);
         final InboundRouterCollection router = d.getInboundRouter();
         assertNotNull(router);
@@ -187,9 +187,9 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
 //        assertEquals(0, tp.getPoolExhaustedAction());
 //        assertEquals(60001, tp.getThreadTTL());
 //
-//        Component component = muleContext.getRegistry().lookupComponent("appleComponent2");
-//        assertTrue("component must be SedaComponent to get threading profile", component instanceof SedaComponent);
-//        tp = ((SedaComponent) component).getThreadingProfile();
+//        Service service = muleContext.getRegistry().lookupComponent("appleComponent2");
+//        assertTrue("service must be SedaService to get threading profile", service instanceof SedaService);
+//        tp = ((SedaService) service).getThreadingProfile();
 //        assertEquals(6, tp.getMaxBufferSize());
 //        assertEquals(12, tp.getMaxThreadsActive());
 //        assertEquals(6, tp.getMaxThreadsIdle());

@@ -21,11 +21,11 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
@@ -60,10 +60,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
-    public HttpMessageReceiver(Connector connector, Component component, ImmutableEndpoint endpoint)
+    public HttpMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
             throws CreateException
     {
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
     }
 
     // @Override
@@ -321,7 +321,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     HttpResponse expected = new HttpResponse();
                     expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
                     final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected), endpoint,
-                            new DefaultMuleSession(component), true);
+                            new DefaultMuleSession(service), true);
                     RequestContext.setEvent(event);
                     conn.writeResponse(transformResponse(expected));
                 }
@@ -343,7 +343,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
             response.setBodyString(HttpMessages.cannotBindToAddress(failedPath).toString());
             RequestContext.setEvent(new DefaultMuleEvent(new DefaultMuleMessage(response), endpoint,
-                    new DefaultMuleSession(component), true));
+                    new DefaultMuleSession(service), true));
             // The DefaultResponseTransformer will set the necessary headers
             return transformResponse(response);
         }

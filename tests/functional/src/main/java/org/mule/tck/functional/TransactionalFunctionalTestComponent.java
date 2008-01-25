@@ -16,7 +16,7 @@ import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.MessageFactory;
 
 /**
- * This component is useful for unit tests involving transactionality because it
+ * This service is useful for unit tests involving transactionality because it
  * will roll back the current transaction upon message arrival.  
  */
 public class TransactionalFunctionalTestComponent extends FunctionalTestComponent

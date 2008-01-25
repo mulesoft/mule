@@ -12,7 +12,7 @@ package org.mule.transport.jms.integration;
 
 
 /**
- * There is a separate transaction for each component  
+ * There is a separate transaction for each service  
  * when single transaction(action: BEGIN_OR_JOIN) and jms transport are used
  */
 public class JmsSingleTransactionComponentTestCase extends AbstractJmsFunctionalTestCase

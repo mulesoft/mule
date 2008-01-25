@@ -11,10 +11,10 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.config.ExceptionHelper;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.MuleTestUtils;
@@ -46,7 +46,7 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
     }
 
     /**
-     * The Axis service requires that the component implements at least one interface
+     * The Axis service requires that the service implements at least one interface
      * This just tests that we get the correct exception if no interfaces are
      * implemented
      * 
@@ -57,11 +57,11 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
         try
         {
             // TODO MULE-2228 Simplify this API
-            Component c = MuleTestUtils.getTestComponent("testComponentWithoutInterfaces", ComponentWithoutInterfaces.class, null, muleContext, false);
+            Service c = MuleTestUtils.getTestService("testComponentWithoutInterfaces", ComponentWithoutInterfaces.class, null, muleContext, false);
             ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getEndpoint(
                 new MuleEndpointURI(getComponentWithoutInterfacesEndpoint()), Endpoint.ENDPOINT_TYPE_RECEIVER);
             c.getInboundRouter().addEndpoint(ep);
-            muleContext.getRegistry().registerComponent(c);
+            muleContext.getRegistry().registerService(c);
             fail("Expected exception");
         }
         catch (MuleException e)

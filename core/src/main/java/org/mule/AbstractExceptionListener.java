@@ -159,7 +159,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     /**
      * The initialise method is call every time the Exception stategy is assigned to
-     * a component or connector. This implementation ensures that initialise is
+     * a service or connector. This implementation ensures that initialise is
      * called only once. The actual initialisation code is contained in the
      * <code>doInitialise()</code> method.
      * 
@@ -228,9 +228,9 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 EndpointURI endpointUri = null;
                 if (ctx != null)
                 {
-                    if (ctx.getComponent() != null)
+                    if (ctx.getService() != null)
                     {
-                        component = ctx.getComponent().getName();
+                        component = ctx.getService().getName();
                     }
                     endpointUri = ctx.getEndpointURI();
                 }
@@ -400,7 +400,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * reference to the object that failed which can be used for more informative
      * logging.
      * 
-     * @param component the object that failed during a lifecycle call
+     * @param service the object that failed during a lifecycle call
      * @param e the top level exception thrown. This may or may not be the
      *            <code>LifecycleException</code> but a lifecycle exception will be
      *            present in the exception stack.

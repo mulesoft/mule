@@ -10,7 +10,7 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.ServiceStatistics;
 import org.mule.management.stats.RouterStatistics;
 
 import javax.management.MBeanRegistration;
@@ -21,15 +21,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>ComponentStats</code> TODO
+ * <code>ServiceStats</code> TODO
  */
-public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
+public class ServiceStats implements ServiceStatsMBean, MBeanRegistration
 {
 
     /**
      * logger used by this class
      */
-    private static Log LOGGER = LogFactory.getLog(ComponentStats.class);
+    private static Log LOGGER = LogFactory.getLog(ServiceStats.class);
 
     private MBeanServer server;
 
@@ -37,9 +37,9 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
     private ObjectName inboundName;
     private ObjectName outboundName;
 
-    private ComponentStatistics statistics;
+    private ServiceStatistics statistics;
 
-    public ComponentStats(ComponentStatistics statistics)
+    public ServiceStats(ServiceStatistics statistics)
     {
         this.statistics = statistics;
     }
@@ -222,7 +222,7 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
             RouterStatistics is = this.statistics.getInboundRouterStat();
             if (is != null)
             {
-                inboundName = new ObjectName(name.getDomain() + ":type=org.mule.Statistics,component="
+                inboundName = new ObjectName(name.getDomain() + ":type=org.mule.Statistics,service="
                                              + statistics.getName() + ",router=inbound");
                 // unregister old version if exists
                 if (this.server.isRegistered(inboundName))
@@ -234,7 +234,7 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
             RouterStatistics os = this.statistics.getOutboundRouterStat();
             if (os != null)
             {
-                outboundName = new ObjectName(name.getDomain() + ":type=org.mule.Statistics,component="
+                outboundName = new ObjectName(name.getDomain() + ":type=org.mule.Statistics,service="
                                               + statistics.getName() + ",router=outbound");
                 // unregister old version if exists
                 if (this.server.isRegistered(outboundName))
@@ -277,7 +277,7 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
         }
         catch (Exception ex)
         {
-            LOGGER.error("Error unregistering ComponentStats child " + inboundName.getCanonicalName(), ex);
+            LOGGER.error("Error unregistering ServiceStats child " + inboundName.getCanonicalName(), ex);
         }
         try
         {
@@ -288,14 +288,14 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
         }
         catch (Exception ex)
         {
-            LOGGER.error("Error unregistering ComponentStats child " + inboundName.getCanonicalName(), ex);
+            LOGGER.error("Error unregistering ServiceStats child " + inboundName.getCanonicalName(), ex);
         }
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.management.mbeans.ComponentStatsMBean#getInboundRouter()
+     * @see org.mule.management.mbeans.ServiceStatsMBean#getInboundRouter()
      */
     public ObjectName getRouterInbound()
     {
@@ -305,7 +305,7 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.management.mbeans.ComponentStatsMBean#getOutboundRouter()
+     * @see org.mule.management.mbeans.ServiceStatsMBean#getOutboundRouter()
      */
     public ObjectName getRouterOutbound()
     {

@@ -10,7 +10,7 @@
 
 package org.mule.modules.xml.config;
 
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.outbound.FilteringXmlMessageSplitter;
 import org.mule.routing.outbound.RoundRobinXmlSplitter;
@@ -44,8 +44,8 @@ public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
 
     protected Object getRouter(String name, Class clazz)
     {
-        Component component = muleContext.getRegistry().lookupComponent(name);
-        List routers = component.getOutboundRouter().getRouters();
+        Service service = muleContext.getRegistry().lookupService(name);
+        List routers = service.getOutboundRouter().getRouters();
         assertEquals(1, routers.size());
         assertTrue(routers.get(0).getClass().getName(), clazz.isAssignableFrom(routers.get(0).getClass()));
         return routers.get(0);

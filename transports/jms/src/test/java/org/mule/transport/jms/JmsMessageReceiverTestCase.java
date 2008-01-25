@@ -56,7 +56,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public void testReceive() throws Exception
     {
         JmsMessageReceiver receiver = (JmsMessageReceiver)getMessageReceiver();
-        assertNotNull(receiver.getComponent());
+        assertNotNull(receiver.getService());
         assertNotNull(receiver.getConnector());
         assertNotNull(receiver.getEndpoint());
         // hmm how do we unit test a message receive
@@ -70,7 +70,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
      */
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        return new JmsMessageReceiver(endpoint.getConnector(), getTestComponent("orange", Orange.class), endpoint);
+        return new JmsMessageReceiver(endpoint.getConnector(), getTestService("orange", Orange.class), endpoint);
     }
 
     public Object getValidMessage() throws Exception

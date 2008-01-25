@@ -10,9 +10,9 @@
 
 package org.mule.api;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
 
 import java.io.OutputStream;
@@ -155,18 +155,18 @@ public interface MuleEvent
     ImmutableEndpoint getEndpoint();
 
     /**
-     * Retrieves the component session for the current event
+     * Retrieves the service session for the current event
      * 
-     * @return the component session for the event
+     * @return the service session for the event
      */
     MuleSession getSession();
 
     /**
-     * Retrieves the component for the current event
+     * Retrieves the service for the current event
      * 
-     * @return the component for the event
+     * @return the service for the event
      */
-    Component getComponent();
+    Service getService();
 
     /**
      * Determines whether the default processing for this event will be executed. By

@@ -8,12 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.component;
+package org.mule.api;
 
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.api.service.Service;
 
 /**
  * <code>Invocation</code> represents a link in an interceptor chain. Interceptors
@@ -25,13 +23,13 @@ public class Invocation
 {
     /** The components descriptor */
     // @GuardedBy(itself)
-    private final Component component;
+    private final Service service;
 
     /** the next invocation in the chain */
     // @GuardedBy(itself)
     private final Invocation invocation;
 
-    /** The current message for the component */
+    /** The current message for the service */
     // @GuardedBy(this)
     private MuleMessage message;
 
@@ -42,9 +40,9 @@ public class Invocation
      * @param message the current message
      * @param invocation the next invocation in the chain or null.
      */
-    public Invocation(Component component, MuleMessage message, Invocation invocation)
+    public Invocation(Service service, MuleMessage message, Invocation invocation)
     {
-        this.component = component;
+        this.service = service;
         this.message = message;
         this.invocation = invocation;
     }
@@ -61,13 +59,13 @@ public class Invocation
     }
 
     /**
-     * Returns the descriptor for the component associated with this invocation
+     * Returns the descriptor for the service associated with this invocation
      * 
-     * @return the descriptor for the component associated with this invocation
+     * @return the descriptor for the service associated with this invocation
      */
-    public Component getComponent()
+    public Service getService()
     {
-        return component;
+        return service;
     }
 
     public MuleEvent getEvent()

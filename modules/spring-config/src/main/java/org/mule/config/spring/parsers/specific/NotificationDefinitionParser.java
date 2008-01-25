@@ -11,7 +11,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.api.context.notification.AdminNotificationListener;
-import org.mule.api.context.notification.ComponentNotificationListener;
+import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
 import org.mule.api.context.notification.ExceptionNotificationListener;
@@ -28,7 +28,7 @@ import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
 import org.mule.context.notification.AdminNotification;
-import org.mule.context.notification.ComponentNotification;
+import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ExceptionNotification;
@@ -68,7 +68,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         EVENT_MAP = new HashMap();
         EVENT_MAP.put("MANAGER", ManagerNotification.class.getName());
         EVENT_MAP.put("MODEL", ModelNotification.class.getName());
-        EVENT_MAP.put("COMPONENT", ComponentNotification.class.getName());
+        EVENT_MAP.put("SERVICE", ServiceNotification.class.getName());
         EVENT_MAP.put("SECURITY", SecurityNotification.class.getName());
         EVENT_MAP.put("MANAGEMENT", ManagementNotification.class.getName());
         EVENT_MAP.put("ADMIN", AdminNotification.class.getName());
@@ -82,7 +82,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         INTERFACE_MAP = new HashMap();
         INTERFACE_MAP.put("MANAGER", ManagerNotificationListener.class.getName());
         INTERFACE_MAP.put("MODEL", ModelNotificationListener.class.getName());
-        INTERFACE_MAP.put("COMPONENT", ComponentNotificationListener.class.getName());
+        INTERFACE_MAP.put("SERVICE", ServiceNotificationListener.class.getName());
         INTERFACE_MAP.put("SECURITY", SecurityNotificationListener.class.getName());
         INTERFACE_MAP.put("MANAGEMENT", ManagementNotificationListener.class.getName());
         INTERFACE_MAP.put("ADMIN", AdminNotificationListener.class.getName());

@@ -58,7 +58,7 @@
         <mule:notifications>
             <mule:notification event="MANAGER"/>
             <mule:notification event="MODEL"/>
-            <mule:notification event="COMPONENT"/>
+            <mule:notification event="SERVICE"/>
             <mule:notification event="SECURITY"/>
             <mule:notification event="MANAGEMENT"/>
             <mule:notification event="ADMIN"/>

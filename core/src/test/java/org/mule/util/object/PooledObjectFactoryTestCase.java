@@ -10,9 +10,9 @@
 
 package org.mule.util.object;
 
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.config.PoolingProfile;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.services.UniqueComponent;
@@ -231,8 +231,8 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         String id3 = ((UniqueComponent) obj).getId();
         assertNotNull(id3);
 
-        assertFalse("Component IDs " + id1 + " and " + id2 + " should be different", id1.equals(id2));
-        assertFalse("Component IDs " + id2 + " and " + id3 + " should be different", id2.equals(id3));
+        assertFalse("Service IDs " + id1 + " and " + id2 + " should be different", id1.equals(id2));
+        assertFalse("Service IDs " + id2 + " and " + id3 + " should be different", id2.equals(id3));
     }
 
     public void testOnRemoveCallsDispose() throws Exception
@@ -251,7 +251,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         model.setMuleContext(muleContext);
         muleContext.applyLifecycle(model);
         
-        Component c = new SedaComponent();
+        Service c = new SedaService();
         c.setName("test");
         PooledObjectFactory of = new PooledObjectFactory(Orange.class, getDefaultPoolingProfile());
         of.initialise();        
@@ -300,7 +300,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         String id2 = obj2.getId();
         assertNotNull(id2);
 
-        assertFalse("Component IDs " + id1 + " and " + id2 + " should be different", id1.equals(id2));
+        assertFalse("Service IDs " + id1 + " and " + id2 + " should be different", id1.equals(id2));
 
         Identifiable obj1A = (Identifiable)of.lookup(id1);
         assertNotNull(obj1A);

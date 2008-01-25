@@ -11,8 +11,8 @@
 package org.mule.transport.file.issues;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.extras.client.MuleClient;
 import org.mule.transport.file.AbstractFileFunctionalTestCase;
 
@@ -29,7 +29,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         File target = initForRequest();
 
         // add a receiver endpoint that will poll the readFromDirectory
-        Component relay = muleContext.getRegistry().lookupComponent("relay");
+        Service relay = muleContext.getRegistry().lookupService("relay");
         assertNotNull(relay);
         String url = fileToUrl(target) + "?connector=receiveConnector";
         logger.debug(url);

@@ -21,7 +21,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
@@ -32,12 +31,13 @@ import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.filter.ObjectFilter;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.extras.spring.i18n.SpringMessages;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.model.seda.SedaModel;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.AbstractConnector;
@@ -162,7 +162,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     /**
      * The mule instance compoennt for the Multicaster
      */
-    protected Component component;
+    protected Service service;
 
     /**
      * The filter used to match subscriptions
@@ -500,7 +500,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 else
                 {
                     MuleSession session = new DefaultMuleSession(message,
-                        ((AbstractConnector)endpoint.getConnector()).getSessionHandler(), component);
+                        ((AbstractConnector)endpoint.getConnector()).getSessionHandler(), service);
                     RequestContext.setEvent(new DefaultMuleEvent(message, endpoint, session, false));
                     // transform if necessary
                     if (endpoint.getTransformers() != null)
@@ -542,7 +542,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             // See if there has been a discriptor explicitly configured
             if (applicationContext.containsBean(EVENT_MULTICASTER_DESCRIPTOR_NAME))
             {
-                component = (Component)applicationContext.getBean(EVENT_MULTICASTER_DESCRIPTOR_NAME);
+                service = (Service)applicationContext.getBean(EVENT_MULTICASTER_DESCRIPTOR_NAME);
             }
             // If the mule manager has been initialised in the contain
             // there is not need to do anything here
@@ -560,7 +560,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 // TODO MULE-2494
                 //registerEndpointMappings();
             }
-            // tell mule to load component definitions from spring
+            // tell mule to load service definitions from spring
             //SpringContainerContext containerContext = new SpringContainerContext();
             //containerContext.setBeanFactory(applicationContext);
 
@@ -590,17 +590,17 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     protected void registerMulticasterComponent() throws MuleException
     {
         // A discriptor hasn't been explicitly configured, so create a default
-        if (component == null)
+        if (service == null)
         {
-            component = getDefaultComponent();
-            setSubscriptionsOnComponent(component);
-            //component.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
-            muleContext.getRegistry().registerComponent(component);
-            component = muleContext.getRegistry().lookupComponent(component.getName());
+            service = getDefaultService();
+            setSubscriptionsOnService(service);
+            //service.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
+            muleContext.getRegistry().registerService(service);
+            service = muleContext.getRegistry().lookupService(service.getName());
         }
     }
 
-    protected void setSubscriptionsOnComponent(Component component) throws MuleException
+    protected void setSubscriptionsOnService(Service service) throws MuleException
     {
         String[] subscriptions;
         List endpoints = new ArrayList();
@@ -639,9 +639,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     endpoint);
 
                 // check whether the endpoint has already been set on the MuleEventMulticastor
-                if (component.getInboundRouter().getEndpoint(ep.getName()) == null)
+                if (service.getInboundRouter().getEndpoint(ep.getName()) == null)
                 {
-                    component.getInboundRouter().addEndpoint(ep);
+                    service.getInboundRouter().addEndpoint(ep);
                 }
             }
         }
@@ -778,10 +778,10 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
     }
 
-    protected Component getDefaultComponent() throws MuleException
+    protected Service getDefaultService() throws MuleException
     {
         // When the the beanFactory is refreshed all the beans get
-        // reloaded so we need to unregister the component from Mule
+        // reloaded so we need to unregister the service from Mule
         Model model = muleContext.getRegistry().lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
         if(model==null)
         {
@@ -789,23 +789,23 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
             muleContext.getRegistry().registerModel(model);
         }
-        Component component = muleContext.getRegistry().lookupComponent(EVENT_MULTICASTER_DESCRIPTOR_NAME);
-        if (component != null)
+        Service service = muleContext.getRegistry().lookupService(EVENT_MULTICASTER_DESCRIPTOR_NAME);
+        if (service != null)
         {
-            muleContext.getRegistry().unregisterComponent(component.getName());
+            muleContext.getRegistry().unregisterComponent(service.getName());
         }
-        component = new SedaComponent();
-        component.setName(EVENT_MULTICASTER_DESCRIPTOR_NAME);
+        service = new SedaService();
+        service.setName(EVENT_MULTICASTER_DESCRIPTOR_NAME);
         if (subscriptions == null)
         {
             logger.info("No receive endpoints have been set, using default '*'");
-            component.getInboundRouter().addEndpoint(
+            service.getInboundRouter().addEndpoint(
                 muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vm://*"));
         }
         else
         {
             // Set multiple inbound subscriptions on the descriptor
-            InboundRouterCollection messageRouter = component.getInboundRouter();
+            InboundRouterCollection messageRouter = service.getInboundRouter();
 
             for (int i = 0; i < subscriptions.length; i++)
             {
@@ -821,8 +821,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
         // TODO RM: Need to put the actual instance here (not just the name reference), 
         // please review whether the following is correct?
-        component.setServiceFactory(new PrototypeObjectFactory(MuleEventMulticaster.class));
-        return component;
+        service.setServiceFactory(new PrototypeObjectFactory(MuleEventMulticaster.class));
+        return service;
     }
 
     protected ObjectFilter createFilter(String pattern)

@@ -11,7 +11,6 @@
 package org.mule.config.i18n;
 
 import org.mule.AbstractExceptionListener;
-import org.mule.api.component.Component;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -19,6 +18,7 @@ import org.mule.api.model.EntryPointResolver;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.ResponseRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.MuleManifest;
 import org.mule.util.ClassUtils;
@@ -1000,9 +1000,9 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 248, tx.getClass());
     }
 
-    public static Message noComponentQueueTimeoutSet(Component component)
+    public static Message noServiceQueueTimeoutSet(Service service)
     {
-        return createMessage(BUNDLE_PATH, 249, component);
+        return createMessage(BUNDLE_PATH, 249, service);
     }
 
     public static Message failedToProcessExtractorFunction(String name)

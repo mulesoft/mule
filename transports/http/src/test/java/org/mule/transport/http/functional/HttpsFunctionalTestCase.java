@@ -15,7 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.testmodels.mule.TestSedaComponent;
+import org.mule.tck.testmodels.mule.TestSedaService;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpsConnector;
 
@@ -33,8 +33,8 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 
     public void testSend() throws Exception
     {
-        final TestSedaComponent testSedaComponent = (TestSedaComponent) muleContext.getRegistry().lookupComponent("testComponent");
-        FunctionalTestComponent testComponent = (FunctionalTestComponent) testSedaComponent.getOrCreateService();
+        final TestSedaService testSedaService = (TestSedaService) muleContext.getRegistry().lookupService("testComponent");
+        FunctionalTestComponent testComponent = (FunctionalTestComponent) testSedaService.getOrCreateService();
         assertNotNull(testComponent);
 
         final AtomicBoolean callbackMade = new AtomicBoolean(false);

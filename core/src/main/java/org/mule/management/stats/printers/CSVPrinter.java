@@ -15,7 +15,7 @@ import java.io.Writer;
 import java.util.Collection;
 
 /**
- * <code>CSVPrinter</code> prints component stats in CSV format
+ * <code>CSVPrinter</code> prints service stats in CSV format
  */
 public class CSVPrinter extends AbstractTablePrinter
 {

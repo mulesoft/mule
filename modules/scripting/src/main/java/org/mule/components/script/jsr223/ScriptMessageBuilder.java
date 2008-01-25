@@ -24,12 +24,12 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 /**
- * A message builder component that can execute message building as a script.
+ * A message builder service that can execute message building as a script.
  */
 public class ScriptMessageBuilder extends AbstractMessageBuilder implements Initialisable
 {
 
-    /** Delegating script component that actually does the work */
+    /** Delegating script service that actually does the work */
     protected Scriptable scriptable;
 
     public ScriptMessageBuilder()
@@ -65,7 +65,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
     {
         namespace.put("request", request);
         namespace.put("response", response);
-        namespace.put("component", component);
+        namespace.put("service", service);
         namespace.put("componentNamespace", namespace);
         namespace.put("log", logger);
     }
@@ -119,7 +119,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
     {
         namespace.put("context", context);
         namespace.put("message", context.getMessage());
-        namespace.put("descriptor", context.getComponent());
+        namespace.put("descriptor", context.getService());
         namespace.put("componentNamespace", namespace);
         namespace.put("log", logger);
         namespace.put("result", new Object());

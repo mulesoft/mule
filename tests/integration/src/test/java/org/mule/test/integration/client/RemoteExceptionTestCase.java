@@ -61,7 +61,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         ExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
         assertTrue(exceptionPayload.getRootException() instanceof DefaultMuleException);
-        assertEquals("Functional Test Component Exception", exceptionPayload.getRootException().getMessage());
+        assertEquals("Functional Test Service Exception", exceptionPayload.getRootException().getMessage());
     }
 
 }

@@ -15,7 +15,7 @@ import org.mule.management.stats.printers.SimplePrinter;
 
 import java.io.PrintWriter;
 
-public class ComponentStatistics implements Statistics
+public class ServiceStatistics implements Statistics
 {
     /**
      * Serial version
@@ -47,7 +47,7 @@ public class ComponentStatistics implements Statistics
     private RouterStatistics inboundRouterStat = null;
     private RouterStatistics outboundRouterStat = null;
 
-    public ComponentStatistics(String name)
+    public ServiceStatistics(String name)
     {
         this(name, 0);
     }
@@ -57,7 +57,7 @@ public class ComponentStatistics implements Statistics
      *
      * @param name
      */
-    public ComponentStatistics(String name, int threadPoolSize)
+    public ServiceStatistics(String name, int threadPoolSize)
     {
         super();
         this.name = name;

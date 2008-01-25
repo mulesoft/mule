@@ -10,9 +10,9 @@
 
 package org.mule.transport.http;
 
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.transport.http.HttpMessageReceiver;
@@ -25,12 +25,12 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        Mock mockComponent = new Mock(Component.class);
+        Mock mockComponent = new Mock(Service.class);
         mockComponent.expectAndReturn("getResponseTransformer", null);
         mockComponent.expectAndReturn("getResponseRouter", null);
 
         return new HttpMessageReceiver(endpoint.getConnector(),
-            (Component)mockComponent.proxy(), endpoint);
+            (Service)mockComponent.proxy(), endpoint);
     }
 
     public ImmutableEndpoint getEndpoint() throws Exception

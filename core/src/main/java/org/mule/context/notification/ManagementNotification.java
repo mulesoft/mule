@@ -31,7 +31,7 @@ public class ManagementNotification extends ServerNotification
     public static final int MANAGEMENT_NODE_PING = MANAGEMENT_EVENT_ACTION_START_RANGE + 2;
 
     static {
-        registerAction("component queue exhausted", MANAGEMENT_COMPONENT_QUEUE_EXHAUSTED);
+        registerAction("service queue exhausted", MANAGEMENT_COMPONENT_QUEUE_EXHAUSTED);
         registerAction("node ping", MANAGEMENT_NODE_PING);
     }
 

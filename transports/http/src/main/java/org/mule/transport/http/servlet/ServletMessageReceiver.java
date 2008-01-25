@@ -11,9 +11,9 @@
 package org.mule.transport.http.servlet;
 
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractMessageReceiver;
 
@@ -25,11 +25,11 @@ import org.mule.transport.AbstractMessageReceiver;
 
 public class ServletMessageReceiver extends AbstractMessageReceiver
 {
-    public ServletMessageReceiver(Connector connector, Component component, Endpoint endpoint)
+    public ServletMessageReceiver(Connector connector, Service service, Endpoint endpoint)
             throws CreateException
     {
 
-        super(connector, component, endpoint);
+        super(connector, service, endpoint);
 
     }
 

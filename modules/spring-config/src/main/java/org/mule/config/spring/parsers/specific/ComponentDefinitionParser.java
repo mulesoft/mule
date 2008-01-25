@@ -53,11 +53,11 @@ public class ComponentDefinitionParser extends AbstractParallelDelegatingDefinit
 }
 
 /**
- * Given that the component object-factory is extensible and new object factory types can be implemented and
+ * Given that the service object-factory is extensible and new object factory types can be implemented and
  * used by substitution, the only extensible way of checking for the existence of an object-factory child
  * element is by exclusion.<br>
- * This pre-processor checks for the existence of a <i>"class"</i> attribute on the component, and throws an
- * exception if the component has any child elements that are not binding's.
+ * This pre-processor checks for the existence of a <i>"class"</i> attribute on the service, and throws an
+ * exception if the service has any child elements that are not binding's.
  */
 class CheckExclusiveClassAttributeObjectFactory implements PreProcessor
 {

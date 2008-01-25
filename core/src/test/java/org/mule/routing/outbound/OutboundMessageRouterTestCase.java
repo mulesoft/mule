@@ -32,7 +32,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
     public void testOutboundMessageRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        session.expectAndReturn("getComponent", getTestComponent());
+        session.expectAndReturn("getService", getTestService());
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
         assertNotNull(messageRouter.getCatchAllStrategy());
@@ -75,7 +75,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         message = new DefaultMuleMessage(new IllegalArgumentException());
 
-        session.expectAndReturn("getComponent", getTestComponent());
+        session.expectAndReturn("getService", getTestService());
         session.expect("dispatchEvent", C.eq(message, endpoint2));
         messageRouter.route(message, (MuleSession)session.proxy(), false);
         session.verify();
@@ -89,8 +89,8 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         // now the message should be routed twice to different endpoints
         message = new DefaultMuleMessage("testing multiple routing");
-        session.expectAndReturn("getComponent", getTestComponent());
-        session.expectAndReturn("getComponent", getTestComponent());
+        session.expectAndReturn("getService", getTestService());
+        session.expectAndReturn("getService", getTestService());
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
@@ -144,7 +144,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         messageRouter.setCatchAllStrategy(strategy);
 
-        MuleSession session = getTestSession(getTestComponent());
+        MuleSession session = getTestSession(getTestService());
 
         messageRouter.route(new DefaultMuleMessage("hello"), session, true);
         assertEquals(1, catchAllCount[0]);
@@ -165,7 +165,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
     public void testCorrelation() throws Exception
     {
         FilteringOutboundRouter filterRouter = new FilteringOutboundRouter();
-        MuleSession session = getTestSession(getTestComponent());
+        MuleSession session = getTestSession(getTestService());
         MuleMessage message = new DefaultMuleMessage(new DefaultMessageAdapter(new StringBuffer()));
         Endpoint endpoint = getTestEndpoint("test", "sender");
         filterRouter.setMessageProperties(session, message, endpoint);

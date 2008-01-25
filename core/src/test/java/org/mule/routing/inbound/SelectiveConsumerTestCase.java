@@ -15,9 +15,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.routing.InboundRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
@@ -35,7 +35,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
     public void testSelectiveConsumer() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        Component testComponent = getTestComponent("test", Apple.class);
+        Service testService = getTestService("test", Apple.class);
 
         InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
         SelectiveConsumer router = new SelectiveConsumer();
@@ -53,20 +53,20 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(event));
 
         session.expect("dispatchEvent", C.eq(event));
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
         messageRouter.route(event);
         session.verify();
 
         event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), true);
 
         session.expectAndReturn("sendEvent", C.eq(event), message);
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
         MuleMessage result = messageRouter.route(event);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
 
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
         session.expectAndReturn("toString", "");
         message = new DefaultMuleMessage(new Exception());
 
@@ -80,7 +80,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
     public void testSelectiveConsumerWithTransformer() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        Component testComponent = getTestComponent("test", Apple.class);
+        Service testService = getTestService("test", Apple.class);
 
         InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
         SelectiveConsumer router = new SelectiveConsumer();
@@ -99,20 +99,20 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(event));
 
         session.expect("dispatchEvent", C.eq(event));
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
         messageRouter.route(event);
         session.verify();
 
         event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), true);
 
         session.expectAndReturn("sendEvent", C.eq(event), message);
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
         MuleMessage result = messageRouter.route(event);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
 
-        session.expectAndReturn("getComponent", testComponent);
+        session.expectAndReturn("getService", testService);
         session.expectAndReturn("toString", "");
         message = new DefaultMuleMessage("Hello String");
 

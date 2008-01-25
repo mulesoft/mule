@@ -11,10 +11,10 @@
 package org.mule.transport.email.connectors;
 
 import org.mule.api.MuleEventContext;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
+import org.mule.api.service.Service;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.functional.EventCallback;
@@ -67,15 +67,15 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
             }
         });
 
-        Component component = MuleTestUtils.getTestComponent(uniqueName("testComponent"), FunctionalTestComponent.class, props, muleContext, /*initialize*/false);
+        Service service = MuleTestUtils.getTestService(uniqueName("testComponent"), FunctionalTestComponent.class, props, muleContext, /*initialize*/false);
         ImmutableEndpoint ep = 
             muleContext.getRegistry().lookupEndpointFactory()
                 .getInboundEndpoint(getTestEndpointURI());
         InboundRouterCollection inboundRouter = new DefaultInboundRouterCollection();
         inboundRouter.addEndpoint(ep);
-        component.setInboundRouter(inboundRouter);
-        muleContext.getRegistry().registerComponent(component);
-        //muleContext.applyLifecycle(component);
+        service.setInboundRouter(inboundRouter);
+        muleContext.getRegistry().registerService(service);
+        //muleContext.applyLifecycle(service);
         if (!muleContext.isStarted())
         {
             muleContext.start();

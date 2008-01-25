@@ -299,7 +299,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
             String name = element.getAttribute(ATTRIBUTE_NAME);
             if (getRegistry().containsBeanDefinition(name))
             {
-                throw new IllegalArgumentException("A component named " + name + " already exists.");
+                throw new IllegalArgumentException("A service named " + name + " already exists.");
             }
         }
     }

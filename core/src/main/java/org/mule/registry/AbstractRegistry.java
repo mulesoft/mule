@@ -14,7 +14,6 @@ import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
-import org.mule.api.component.Component;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -27,6 +26,7 @@ import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -412,29 +412,29 @@ public abstract class AbstractRegistry implements Registry
         return (Agent) lookupObject(name);
     }
 
-    public Component lookupComponent(String name)
+    public Service lookupService(String name)
     {
-        return (Component) lookupObject(name);
+        return (Service) lookupObject(name);
     }
 
-    public Collection/*<Component>*/ lookupComponents()
+    public Collection/*<Service>*/ lookupComponents()
     {
-        return lookupObjects(Component.class);
+        return lookupObjects(Service.class);
     }
 
-    public Collection/*<Component>*/ lookupComponents(String model)
+    public Collection/*<Service>*/ lookupComponents(String model)
     {
-        Collection/*<Component>*/ components = lookupComponents();
+        Collection/*<Service>*/ components = lookupComponents();
         List modelComponents = new ArrayList();
         Iterator it = components.iterator();
-        Component component;
+        Service service;
         while (it.hasNext())
         {
-            component = (Component) it.next();
+            service = (Service) it.next();
             // TODO Make this comparison more robust.
-            if (model.equals(component.getModel().getName()))
+            if (model.equals(service.getModel().getName()))
             {
-                modelComponents.add(component);
+                modelComponents.add(service);
             }
         }
         return modelComponents;

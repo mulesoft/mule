@@ -13,17 +13,17 @@ package org.mule.test.integration.transport.jdbc;
 
 import org.mule.DefaultExceptionStrategy;
 import org.mule.api.MuleEventContext;
-import org.mule.api.component.Component;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.context.notification.TransactionNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
@@ -75,7 +75,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         };
 
         // Start the server
-        initialiseComponent(TransactionConfig.ACTION_ALWAYS_BEGIN, callback);
+        initialiseService(TransactionConfig.ACTION_ALWAYS_BEGIN, callback);
         muleContext.start();
 
         execSqlUpdate("INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (1, '" + DEFAULT_MESSAGE
@@ -101,13 +101,13 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         assertNull(obj[0]);
     }
 
-    public Component initialiseComponent(byte txBeginAction, EventCallback callback) throws Exception
+    public Service initialiseService(byte txBeginAction, EventCallback callback) throws Exception
     {
 
-        Component component = new SedaComponent();
-        component.setExceptionListener(new DefaultExceptionStrategy());
-        component.setName("testComponent");
-        component.setServiceFactory(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class));
+        Service service = new SedaService();
+        service.setExceptionListener(new DefaultExceptionStrategy());
+        service.setName("testComponent");
+        service.setServiceFactory(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class));
 
         TransactionFactory tf = getTransactionFactory();
         TransactionConfig txConfig = new MuleTransactionConfig();
@@ -127,19 +127,19 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         ImmutableEndpoint outProvider = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointBuilder2);
         
-        component.setOutboundRouter(new DefaultOutboundRouterCollection());
+        service.setOutboundRouter(new DefaultOutboundRouterCollection());
         OutboundPassThroughRouter router = new OutboundPassThroughRouter();
         router.addEndpoint(outProvider);
-        component.getOutboundRouter().addRouter(router);
-        component.setInboundRouter(new DefaultInboundRouterCollection());
-        component.getInboundRouter().addEndpoint(endpoint);
+        service.getOutboundRouter().addRouter(router);
+        service.setInboundRouter(new DefaultInboundRouterCollection());
+        service.getInboundRouter().addEndpoint(endpoint);
 
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
-        component.setProperties(props);
-        component.setModel(model);
-        muleContext.getRegistry().registerComponent(component);
-        return component;
+        service.setProperties(props);
+        service.setModel(model);
+        muleContext.getRegistry().registerService(service);
+        return service;
     }
 
     public void onNotification(ServerNotification notification)

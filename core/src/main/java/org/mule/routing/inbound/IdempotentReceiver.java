@@ -18,7 +18,7 @@ import org.mule.config.i18n.CoreMessages;
 
 /**
  * <code>IdempotentReceiver</code> ensures that only unique messages are received by a
- * component. It does this by checking the unique ID of the incoming message. Note that
+ * service. It does this by checking the unique ID of the incoming message. Note that
  * the underlying endpoint must support unique message IDs for this to work, otherwise a
  * <code>UniqueIdNotSupportedException</code> is thrown.<br>
  * By default this implementation uses an instance of
@@ -86,7 +86,7 @@ public class IdempotentReceiver extends SelectiveConsumer
     {
         if (assignedComponentName == null && idStore == null)
         {
-            this.assignedComponentName = event.getComponent().getName();
+            this.assignedComponentName = event.getService().getName();
             this.idStore = this.createMessageIdStore();
         }
     }
@@ -102,7 +102,7 @@ public class IdempotentReceiver extends SelectiveConsumer
     {
         if (idStore == null)
         {
-            // we need to load this on the first request as we need the component name
+            // we need to load this on the first request as we need the service name
             synchronized (this)
             {
                 this.initialize(event);
@@ -122,13 +122,13 @@ public class IdempotentReceiver extends SelectiveConsumer
     // @Override
     public MuleEvent[] process(MuleEvent event) throws MessagingException
     {
-        String eventComponentName = event.getComponent().getName();
+        String eventComponentName = event.getService().getName();
         if (!assignedComponentName.equals(eventComponentName))
         {
             IllegalArgumentException iex = new IllegalArgumentException(
-                "This receiver is assigned to component: " + assignedComponentName
-                                + " but has received an event for component: " + eventComponentName
-                                + ". Please check your config to make sure each component"
+                "This receiver is assigned to service: " + assignedComponentName
+                                + " but has received an event for service: " + eventComponentName
+                                + ". Please check your config to make sure each service"
                                 + "has its own instance of IdempotentReceiver.");
             throw new RoutingException(event.getMessage(), event.getEndpoint(), iex);
         }

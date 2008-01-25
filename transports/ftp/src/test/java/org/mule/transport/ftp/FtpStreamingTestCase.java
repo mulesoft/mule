@@ -88,7 +88,7 @@ public class FtpStreamingTestCase extends AbstractFtpServerTestCase
         logger.info("received message: " + payload);
         assertEquals(TEST_MESSAGE, new String(payload.getPayload()));
 
-        // poll and pull back through test component
+        // poll and pull back through test service
         latch.await(getTimeout(), TimeUnit.MILLISECONDS);
         assertEquals("Received stream; length: 16; 'Test...sage'", message.get());
     }

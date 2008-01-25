@@ -14,7 +14,6 @@ import org.mule.DefaultExceptionStrategy;
 import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.DefaultMuleException;
-import org.mule.api.component.Component;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -25,9 +24,10 @@ import org.mule.api.routing.NestedRouter;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.endpoint.MuleEndpoint;
-import org.mule.model.seda.SedaComponent;
+import org.mule.model.seda.SedaService;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.logic.AndFilter;
@@ -119,15 +119,15 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals("UTF-8-TEST", endpoint.getEncoding());
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
-        Component component = muleContext.getRegistry().lookupComponent("appleComponent2");
-        assertNotNull(component);
+        Service service = muleContext.getRegistry().lookupService("appleComponent2");
+        assertNotNull(service);
     }
 
     public void testExceptionStrategy2()
     {
-        Component component = muleContext.getRegistry().lookupComponent("appleComponent");
-        assertNotNull(component.getExceptionListener());
-        assertTrue(DefaultExceptionStrategy.class.isAssignableFrom(component.getExceptionListener().getClass()));
+        Service service = muleContext.getRegistry().lookupService("appleComponent");
+        assertNotNull(service.getExceptionListener());
+        assertTrue(DefaultExceptionStrategy.class.isAssignableFrom(service.getExceptionListener().getClass()));
     }
 
     // @Override
@@ -157,9 +157,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testOutboundRouterConfig2()
     {
         // test outbound message router
-        Component component = muleContext.getRegistry().lookupComponent("appleComponent");
-        assertNotNull(component.getOutboundRouter());
-        OutboundRouterCollection router = component.getOutboundRouter();
+        Service service = muleContext.getRegistry().lookupService("appleComponent");
+        assertNotNull(service.getOutboundRouter());
+        OutboundRouterCollection router = service.getOutboundRouter();
         assertNotNull(router.getCatchAllStrategy());
         assertEquals(2, router.getRouters().size());
         // check first Router
@@ -196,9 +196,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 
     public void testInboundRouterConfig2()
     {
-        Component component = muleContext.getRegistry().lookupComponent("appleComponent");
-        assertNotNull(component.getInboundRouter());
-        InboundRouterCollection messageRouter = component.getInboundRouter();
+        Service service = muleContext.getRegistry().lookupService("appleComponent");
+        assertNotNull(service.getInboundRouter());
+        InboundRouterCollection messageRouter = service.getInboundRouter();
         assertNotNull(messageRouter.getCatchAllStrategy());
         assertEquals(2, messageRouter.getRouters().size());
         InboundRouter router = (InboundRouter) messageRouter.getRouters().get(0);
@@ -231,7 +231,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         // for the connector
         int connectorMaxBufferSize = 2;
 
-        // for the component
+        // for the service
         int componentMaxBufferSize = 6;
         int componentMaxThreadsActive = 12;
         int componentMaxThreadsIdle = 6;
@@ -245,7 +245,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(defaultThreadPoolExhaustedAction, tp.getPoolExhaustedAction());
         assertEquals(defaultThreadTTL, tp.getThreadTTL());
 
-        // test component threading profile defaults
+        // test service threading profile defaults
         tp = RegistryContext.getConfiguration().getDefaultComponentThreadingProfile();
         assertEquals(defaultMaxBufferSize, tp.getMaxBufferSize());
         assertEquals(defaultMaxThreadsActive, tp.getMaxThreadsActive());
@@ -264,10 +264,10 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(defaultThreadPoolExhaustedAction, tp.getPoolExhaustedAction());
         assertEquals(defaultThreadTTL, tp.getThreadTTL());
 
-        // test per-component values
-        Component component = muleContext.getRegistry().lookupComponent("appleComponent2");
-        assertTrue("component must be SedaComponent to get threading profile", component instanceof SedaComponent);
-        tp = ((SedaComponent) component).getThreadingProfile();
+        // test per-service values
+        Service service = muleContext.getRegistry().lookupService("appleComponent2");
+        assertTrue("service must be SedaService to get threading profile", service instanceof SedaService);
+        tp = ((SedaService) service).getThreadingProfile();
         // these values are configured
         assertEquals(componentMaxBufferSize, tp.getMaxBufferSize());
         assertEquals(componentMaxThreadsActive, tp.getMaxThreadsActive());
@@ -325,8 +325,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testEndpointProperties() throws Exception
     {
         // test transaction config
-        Component component = muleContext.getRegistry().lookupComponent("appleComponent2");
-        MuleEndpoint inEndpoint = (MuleEndpoint) component.getInboundRouter().getEndpoint(
+        Service service = muleContext.getRegistry().lookupService("appleComponent2");
+        MuleEndpoint inEndpoint = (MuleEndpoint) service.getInboundRouter().getEndpoint(
                 "transactedInboundEndpoint");
         assertNotNull(inEndpoint);
         assertNotNull(inEndpoint.getProperties());
@@ -364,7 +364,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testNestedRouterProxyCreation() throws ObjectNotFoundException
     {
         //Test that the proxy object was created and set on the service object
-        Component orange = muleContext.getRegistry().lookupComponent("orangeComponent");
+        Service orange = muleContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(orange);
         NestedRouter r = (NestedRouter) orange.getNestedRouter().getRouters().get(0);
         assertNotNull(r);

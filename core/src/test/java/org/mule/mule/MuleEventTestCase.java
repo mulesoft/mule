@@ -35,7 +35,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     {
         String data = "Test Data";
 
-        DefaultMuleEvent event = (DefaultMuleEvent)getTestEvent(data, getTestComponent("orange", Orange.class));
+        DefaultMuleEvent event = (DefaultMuleEvent)getTestEvent(data, getTestService("orange", Orange.class));
         RequestContext.setEvent(event);
         
         assertEquals("MuleEvent data should equal " + data, data, event.getMessage().getPayload());
@@ -81,7 +81,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         Endpoint endpoint = getTestEndpoint("Test", Endpoint.ENDPOINT_TYPE_SENDER);
         endpoint.setTransformers(CollectionUtils.singletonList(new TestEventTransformer()));
         DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data), endpoint,
-            getTestSession(getTestComponent("apple", Apple.class)), true,
+            getTestSession(getTestService("apple", Apple.class)), true,
             new ResponseOutputStream(System.out));
 
         assertNotNull(event.getId());
@@ -117,12 +117,12 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         endpoint = getTestEndpoint("Test", Endpoint.ENDPOINT_TYPE_SENDER);
         props = new Properties();
         endpoint.setProperties(props);
-        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
+        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
         assertNull(event.getMessage().getProperty("prop"));
 
         // in previous event => previous event
         prevEvent.getMessage().setProperty("prop", "value0");
-        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
+        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
         assertEquals("value0", event.getMessage().getProperty("prop"));
 
         // TODO check if this fragment can be removed
@@ -140,7 +140,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         props.put("prop", "value1");
         msg = new DefaultMuleMessage("payload", props);
         endpoint = getTestEndpoint("Test", Endpoint.ENDPOINT_TYPE_SENDER);
-        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
+        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
         assertEquals("value1", event.getMessage().getProperty("prop"));
 
         // in previous event + endpoint + message => message
@@ -151,7 +151,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         Properties props2 = new Properties();
         props2.put("prop", "value2");
         endpoint.setProperties(props2);
-        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
+        event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
         assertEquals("value1", event.getMessage().getProperty("prop"));
 
     }

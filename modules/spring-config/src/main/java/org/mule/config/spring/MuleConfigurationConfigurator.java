@@ -48,7 +48,7 @@ public class MuleConfigurationConfigurator extends MuleConfiguration implements 
 //        <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0"/>
 //        <xsd:element name="default-dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"/>
 //        <xsd:element name="default-receiver-threading-profile" type="threadingProfileType" minOccurs="0"/>
-//        <xsd:element name="default-component-threading-profile" type="threadingProfileType" minOccurs="0"/>
+//        <xsd:element name="default-service-threading-profile" type="threadingProfileType" minOccurs="0"/>
 //        <xsd:element ref="abstract-storage" minOccurs="0"/>
 
     }

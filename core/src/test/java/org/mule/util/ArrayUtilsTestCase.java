@@ -27,7 +27,7 @@ public class ArrayUtilsTestCase extends AbstractMuleTestCase
         String[] a2 = (String[])ArrayUtils.toArrayOfComponentType(a, String.class);
         assertSame(a2, a);
 
-        // null component type is not allowed
+        // null service type is not allowed
         try
         {
             ArrayUtils.toArrayOfComponentType(a, null);

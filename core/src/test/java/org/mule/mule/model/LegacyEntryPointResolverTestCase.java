@@ -238,7 +238,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
         try
         {
             resolverSet.invoke(new Kiwi(), RequestContext.getEventContext());
-            fail("no such method on component");
+            fail("no such method on service");
         }
         catch (EntryPointNotFoundException e)
         {

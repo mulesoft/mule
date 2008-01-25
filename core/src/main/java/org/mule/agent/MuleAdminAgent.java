@@ -13,10 +13,10 @@ package org.mule.agent;
 import org.mule.AbstractAgent;
 import org.mule.RegistryContext;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -111,9 +111,9 @@ public class MuleAdminAgent extends AbstractAgent
             }
 
             // Check for override
-            if (muleContext.getRegistry().lookupComponent(MuleManagerComponent.MANAGER_COMPONENT_NAME) != null)
+            if (muleContext.getRegistry().lookupService(MuleManagerComponent.MANAGER_COMPONENT_NAME) != null)
             {
-                logger.info("Mule manager component has already been initialised, ignoring server url");
+                logger.info("Mule manager service has already been initialised, ignoring server url");
             }
             else
             {
@@ -144,10 +144,10 @@ public class MuleAdminAgent extends AbstractAgent
                     endpointBuilder.setConnector(connector);
                 }
                 logger.info("Registering Admin listener on: " + serverUri);
-                Component component = MuleManagerComponent.getComponent(endpointBuilder, wireFormat,
+                Service service = MuleManagerComponent.getService(endpointBuilder, wireFormat,
                     RegistryContext.getConfiguration().getDefaultEncoding(), RegistryContext.getConfiguration()
                         .getDefaultSynchronousEventTimeout(), muleContext);
-                muleContext.getRegistry().registerComponent(component);
+                muleContext.getRegistry().registerService(service);
             }
         }
         catch (MuleException e)

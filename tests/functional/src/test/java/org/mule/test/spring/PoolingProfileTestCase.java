@@ -10,7 +10,7 @@
 
 package org.mule.test.spring;
 
-import org.mule.api.component.Component;
+import org.mule.api.service.Service;
 import org.mule.config.PoolingProfile;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.object.ObjectFactory;
@@ -53,7 +53,7 @@ public class PoolingProfileTestCase  extends FunctionalTestCase
     protected void doTest(String service, int exhausted, int initialisation,
                           int active, int idle, long wait)
     {
-        Component c = muleContext.getRegistry().lookupComponent(service);
+        Service c = muleContext.getRegistry().lookupService(service);
         assertNotNull(service, c);
         ObjectFactory of = c.getServiceFactory();
         assertTrue(of instanceof PooledObjectFactory);

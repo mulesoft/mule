@@ -49,7 +49,7 @@ public class XFireMessageReceiverFunctionalTestCase extends FunctionalTestCase
             "xfireConnector");
         Map map = umoConnector.getReceivers();
         XFireMessageReceiver receiver = (XFireMessageReceiver) map.get("http://localhost:63081/services/echoServiceWsdlPortType");
-        Field field = XFireMessageReceiver.class.getDeclaredField("service");
+        Field field = XFireMessageReceiver.class.getDeclaredField("xfireService");
         field.setAccessible(true);
         Service service = (Service) field.get(receiver);
         QName qname = (QName) service.getProperty(ObjectServiceFactory.PORT_TYPE);

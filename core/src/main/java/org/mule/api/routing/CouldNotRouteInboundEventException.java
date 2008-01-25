@@ -15,7 +15,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>CouldNotRouteInboundEventException</code> thrown if the current component
+ * <code>CouldNotRouteInboundEventException</code> thrown if the current service
  * cannot accept the inbound event.
  */
 

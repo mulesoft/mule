@@ -22,7 +22,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.component.Component;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleProperties;
@@ -33,6 +32,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
 import org.mule.config.MuleConfiguration;
@@ -281,7 +281,7 @@ public class MuleClient implements Disposable
     /**
      * sends an event synchronously to a components
      * 
-     * @param component the name of the Mule components to send to
+     * @param service the name of the Mule components to send to
      * @param transformers a comma separated list of transformers to apply to the
      *            result message
      * @param payload the object that is the payload of the event
@@ -312,10 +312,10 @@ public class MuleClient implements Disposable
     public MuleMessage sendDirect(String componentName, String transformers, MuleMessage message)
         throws MuleException
     {
-        Component component = muleContext.getRegistry().lookupComponent(componentName);
-        if (component == null)
+        Service service = muleContext.getRegistry().lookupService(componentName);
+        if (service == null)
         {
-            throw new MessagingException(CoreMessages.objectNotRegistered("Component", componentName),
+            throw new MessagingException(CoreMessages.objectNotRegistered("Service", componentName),
                 message);
         }
         List trans = null;
@@ -328,8 +328,8 @@ public class MuleClient implements Disposable
         {
             logger.warn("The mule muleContext is running synchronously, a null message payload will be returned");
         }
-        MuleSession session = new DefaultMuleSession(component);
-        ImmutableEndpoint endpoint = getDefaultClientEndpoint(component, message.getPayload());
+        MuleSession session = new DefaultMuleSession(service);
+        ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload());
         MuleEvent event = new DefaultMuleEvent(message, endpoint, session, true);
 
         if (logger.isDebugEnabled())
@@ -337,7 +337,7 @@ public class MuleClient implements Disposable
             logger.debug("MuleClient sending event direct to: " + componentName + ". MuleEvent is: " + event);
         }
 
-        MuleMessage result = event.getComponent().sendEvent(event);
+        MuleMessage result = event.getService().sendEvent(event);
 
         if (logger.isDebugEnabled())
         {
@@ -355,7 +355,7 @@ public class MuleClient implements Disposable
     /**
      * dispatches an event asynchronously to the components
      * 
-     * @param component the name of the Mule components to dispatch to
+     * @param service the name of the Mule components to dispatch to
      * @param payload the object that is the payload of the event
      * @param messageProperties any properties to be associated with the payload. as
      *            null
@@ -377,14 +377,14 @@ public class MuleClient implements Disposable
      */
     public void dispatchDirect(String componentName, MuleMessage message) throws MuleException
     {
-        Component component = muleContext.getRegistry().lookupComponent(componentName);
-        if (component == null)
+        Service service = muleContext.getRegistry().lookupService(componentName);
+        if (service == null)
         {
-            throw new MessagingException(CoreMessages.objectNotRegistered("Component", componentName),
+            throw new MessagingException(CoreMessages.objectNotRegistered("Service", componentName),
                 message);
         }
-        MuleSession session = new DefaultMuleSession(component);
-        ImmutableEndpoint endpoint = getDefaultClientEndpoint(component, message.getPayload());
+        MuleSession session = new DefaultMuleSession(service);
+        ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload());
         MuleEvent event = new DefaultMuleEvent(message, endpoint, session, true);
 
         if (logger.isDebugEnabled())
@@ -392,7 +392,7 @@ public class MuleClient implements Disposable
             logger.debug("MuleClient dispatching event direct to: " + componentName + ". MuleEvent is: " + event);
         }
 
-        event.getComponent().dispatchEvent(event);
+        event.getService().dispatchEvent(event);
     }
 
     /**
@@ -490,7 +490,7 @@ public class MuleClient implements Disposable
      * Users can endpoint a url to a remote Mule server in the constructor of a Mule
      * client, by default the default Mule server url tcp://localhost:60504 is used.
      * 
-     * @param component the name of the Mule components to send to
+     * @param service the name of the Mule components to send to
      * @param transformers a comma separated list of transformers to apply to the
      *            result message
      * @param payload the object that is the payload of the event
@@ -516,7 +516,7 @@ public class MuleClient implements Disposable
      * Users can endpoint a url to a remote Mule server in the constructor of a Mule
      * client, by default the default Mule server url tcp://localhost:60504 is used.
      * 
-     * @param component the name of the Mule components to send to
+     * @param service the name of the Mule components to send to
      * @param transformers a comma separated list of transformers to apply to the
      *            result message
      * @param message the message to send
@@ -772,11 +772,11 @@ public class MuleClient implements Disposable
         return muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
     }
 
-    protected ImmutableEndpoint getDefaultClientEndpoint(Component component, Object payload)
+    protected ImmutableEndpoint getDefaultClientEndpoint(Service service, Object payload)
         throws MuleException
     {
         // as we are bypassing the message transport layer we need to check that
-        ImmutableEndpoint endpoint = (Endpoint) component.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (Endpoint) service.getInboundRouter().getEndpoints().get(0);
         if (endpoint != null)
         {
             if (endpoint.getTransformers() != null)
@@ -860,20 +860,20 @@ public class MuleClient implements Disposable
      * given url. By default the ThreadingProfile for the components will be set so
      * that there will only be one thread of execution.
      * 
-     * @param component any java object, Mule will it's endpointUri discovery to
+     * @param service any java object, Mule will it's endpointUri discovery to
      *            determine which event to invoke based on the evnet payload type
      * @param name The identifying name of the components. This can be used to later
      *            unregister it
      * @param listenerEndpoint The url endpointUri to listen to
      * @throws MuleException
      * @deprecated Use the RegistryContext to get the registry and register the
-     *             component there
+     *             service there
      */
     public void registerComponent(Object component, String name, EndpointURI listenerEndpoint)
         throws MuleException
     {
         throw new UnsupportedOperationException("registerComponent");
-        // builder.registerComponentInstance(component, name, listenerEndpoint,
+        // builder.registerComponentInstance(service, name, listenerEndpoint,
         // null);
     }
 
@@ -882,7 +882,7 @@ public class MuleClient implements Disposable
      * on the given urls. By default the ThreadingProfile for the components will be
      * set so that there will only be one thread of execution.
      * 
-     * @param component any java object, Mule will it's endpointUri discovery to
+     * @param service any java object, Mule will it's endpointUri discovery to
      *            determine which event to invoke based on the evnet payload type
      * @param name The identifying name of the components. This can be used to later
      *            unregister it
@@ -890,7 +890,7 @@ public class MuleClient implements Disposable
      * @param sendEndpoint The url endpointUri to dispatch to
      * @throws MuleException
      * @deprecated Use the RegistryContext to get the registry and register the
-     *             component there
+     *             service there
      */
     public void registerComponent(Object component,
                                   String name,
@@ -898,7 +898,7 @@ public class MuleClient implements Disposable
                                   MuleEndpointURI sendEndpoint) throws MuleException
     {
         throw new UnsupportedOperationException("registerComponent");
-        // builder.registerComponentInstance(component, name, listenerEndpoint,
+        // builder.registerComponentInstance(service, name, listenerEndpoint,
         // sendEndpoint);
     }
 
@@ -917,7 +917,7 @@ public class MuleClient implements Disposable
      *             started
      * @see org.mule.api.model.Model
      * @deprecated Use the RegistryContext to get the registry and register the
-     *             component there
+     *             service there
      */
     // public void registerComponent(UMODescriptor descriptor) throws MuleException
     // {
@@ -936,7 +936,7 @@ public class MuleClient implements Disposable
      *             exception.
      * @see org.mule.api.model.Model
      * @deprecated Use the RegistryContext to get the registry and register the
-     *             component there
+     *             service there
      */
     public void unregisterComponent(String name) throws MuleException
     {

@@ -15,7 +15,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 
 /**
- * <code>AlreadyInitialisedException</code> is thrown when a component or connector
+ * <code>AlreadyInitialisedException</code> is thrown when a service or connector
  * has already been initialised.
  */
 

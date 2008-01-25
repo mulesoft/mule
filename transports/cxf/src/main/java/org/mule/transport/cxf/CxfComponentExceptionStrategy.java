@@ -10,7 +10,7 @@
 
 package org.mule.transport.cxf;
 
-import org.mule.component.DefaultComponentExceptionStrategy;
+import org.mule.service.DefaultServiceExceptionStrategy;
 
 import org.apache.cxf.interceptor.Fault;
 
@@ -19,7 +19,7 @@ import org.apache.cxf.interceptor.Fault;
  * to be passed as-is, not wrapped in a Mule exception object. This ensures the XFire
  * serialiser/deserialiser can send the correct exception object to the client.
  */
-public class CxfComponentExceptionStrategy extends DefaultComponentExceptionStrategy
+public class CxfComponentExceptionStrategy extends DefaultServiceExceptionStrategy
 {
     protected void defaultHandler(Throwable t)
     {

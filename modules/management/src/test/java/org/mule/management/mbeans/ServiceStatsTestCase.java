@@ -12,13 +12,13 @@ package org.mule.management.mbeans;
 
 import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.management.stats.SedaComponentStatistics;
+import org.mule.management.stats.SedaServiceStatistics;
 
 import java.util.Set;
 
 import javax.management.ObjectName;
 
-public class ComponentStatsTestCase extends AbstractMuleJmxTestCase
+public class ServiceStatsTestCase extends AbstractMuleJmxTestCase
 {
     public void testUndeploy() throws Exception
     {
@@ -26,10 +26,10 @@ public class ComponentStatsTestCase extends AbstractMuleJmxTestCase
 
         // inbound/outbound router statistics are required
 
-        final SedaComponentStatistics statistics = new SedaComponentStatistics("TEST_IN", 0, 0);
+        final SedaServiceStatistics statistics = new SedaServiceStatistics("TEST_IN", 0, 0);
         statistics.setInboundRouterStat(new RouterStatistics(RouterStatistics.TYPE_INBOUND));
         statistics.setOutboundRouterStat(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
-        ComponentStats stats = new ComponentStats(statistics);
+        ServiceStats stats = new ServiceStats(statistics);
 
         final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_NAME");
         mBeanServer.registerMBean(stats, name);
@@ -37,9 +37,9 @@ public class ComponentStatsTestCase extends AbstractMuleJmxTestCase
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);
 
         // Expecting following mbeans to be registered:
-        // 1) org.mule.management.mbeans.ComponentStats@TEST_DOMAIN_1:type=TEST_NAME
-        // 2) org.mule.management.mbeans.RouterStats@TEST_DOMAIN_1:type=org.mule.Statistics,component=TEST_IN,router=inbound
-        // 3) org.mule.management.mbeans.RouterStats@TEST_DOMAIN_1:type=org.mule.Statistics,component=TEST_IN,router=outbound
+        // 1) org.mule.management.mbeans.ServiceStats@TEST_DOMAIN_1:type=TEST_NAME
+        // 2) org.mule.management.mbeans.RouterStats@TEST_DOMAIN_1:type=org.mule.Statistics,service=TEST_IN,router=inbound
+        // 3) org.mule.management.mbeans.RouterStats@TEST_DOMAIN_1:type=org.mule.Statistics,service=TEST_IN,router=outbound
         assertEquals("Unexpected components registered in the domain.", 3, mbeans.size());
 
         mBeanServer.unregisterMBean(name);
