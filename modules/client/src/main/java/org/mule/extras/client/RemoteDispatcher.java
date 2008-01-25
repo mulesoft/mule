@@ -31,8 +31,8 @@ import org.mule.api.transport.DispatchException;
 import org.mule.context.notification.AdminNotification;
 import org.mule.security.MuleCredentials;
 import org.mule.transformer.wire.SerializationWireFormat;
+import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
-import org.mule.util.MuleObjectHelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -176,7 +176,7 @@ public class RemoteDispatcher implements Disposable
 
         if (transformers != null)
         {
-            result.setTransformers(MuleObjectHelper.getTransformers(transformers, ","));
+            result.setTransformers(TransformerUtils.getTransformers(transformers));
         }
 
         result.execute();

@@ -103,7 +103,6 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
 
     public Service initialiseService(byte txBeginAction, EventCallback callback) throws Exception
     {
-
         Service service = new SedaService();
         service.setExceptionListener(new DefaultExceptionStrategy());
         service.setName("testComponent");
@@ -134,9 +133,13 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         service.setInboundRouter(new DefaultInboundRouterCollection());
         service.getInboundRouter().addEndpoint(endpoint);
 
-        HashMap props = new HashMap();
-        props.put("eventCallback", callback);
-        service.setProperties(props);
+        // these tests no longer work - they need replacing with config driven tests
+        // furthemore, nothing is read from service properties any more
+        // (except for axis and xfire related hacks)
+        // so i am removing the code below since it's a pointless call to a deprecated method
+//        HashMap props = new HashMap();
+//        props.put("eventCallback", callback);
+//        service.setProperties(props);
         service.setModel(model);
         muleContext.getRegistry().registerService(service);
         return service;

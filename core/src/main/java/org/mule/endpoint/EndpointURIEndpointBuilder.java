@@ -24,6 +24,12 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
         // blank
     }
 
+    /**
+     * Called from Spring
+     *
+     * @param global The global endpoint "template"
+     * @throws EndpointException
+     */
     public EndpointURIEndpointBuilder(EndpointURIEndpointBuilder global) throws EndpointException
     {
         // can't (concisely) use setters where null is a possibility

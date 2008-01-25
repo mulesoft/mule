@@ -26,13 +26,15 @@ public class AcegiAuthenticationNamespaceHandlerTestCase extends FunctionalTestC
 
     public void testAcegi()
     {
-        Collection endpoints = muleContext.getRegistry().getEndpoints();
-        Iterator it = endpoints.iterator();
-        while (it.hasNext())
-        {
-            Endpoint endpoint = (Endpoint) it.next();
-            logger.debug(endpoint.getName() + " : " + endpoint);
-        }
+        // this code doesn't test anything and uses a deprecated api.  was this a joke?
+//        Collection endpoints = muleContext.getRegistry().getEndpoints();
+//        Iterator it = endpoints.iterator();
+//        while (it.hasNext())
+//        {
+//            Endpoint endpoint = (Endpoint) it.next();
+//            logger.debug(endpoint.getName() + " : " + endpoint);
+//        }
+        
     }
 
 }

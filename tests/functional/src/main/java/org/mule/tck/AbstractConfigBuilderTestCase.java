@@ -181,8 +181,9 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         Filter filter2 = ((FilteringOutboundRouter) route2).getFilter();
         assertNotNull(filter2);
         assertTrue(filter2 instanceof AndFilter);
-        Filter left = ((AndFilter) filter2).getLeftFilter();
-        Filter right = ((AndFilter) filter2).getRightFilter();
+        assertEquals(2,  ((AndFilter) filter2).getFilters().size());
+        Filter left = (Filter) ((AndFilter) filter2).getFilters().get(0);
+        Filter right = (Filter) ((AndFilter) filter2).getFilters().get(1);
         assertNotNull(left);
         assertTrue(left instanceof RegExFilter);
         assertEquals("the quick brown (.*)", ((RegExFilter) left).getPattern());

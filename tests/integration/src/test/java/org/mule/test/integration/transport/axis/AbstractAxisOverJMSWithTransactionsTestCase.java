@@ -12,22 +12,28 @@ package org.mule.test.integration.transport.axis;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.Connector;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.soap.axis.AxisConnector;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 
 public abstract class AbstractAxisOverJMSWithTransactionsTestCase extends FunctionalTestCase
 {
 
-    public void testTransactionPropertiesOnEndpoint() throws Exception {
-        Object[] connectorArray = muleContext.getRegistry().getConnectors().toArray();
+    public void testTransactionPropertiesOnEndpoint() throws Exception
+    {
+        Collection connectors = muleContext.getRegistry().lookupObjects(Connector.class);
         AxisConnector connector = null;
-        for (int i = 0; i < connectorArray.length; i++)
+        for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
         {
-            if (connectorArray[i] instanceof AxisConnector)
+            Connector candidate = (Connector) iterator.next();
+            if (candidate instanceof AxisConnector)
             {
-                connector = (AxisConnector)connectorArray[i];
+                connector = (AxisConnector) candidate;
             }
         }
         assertNotNull(connector);

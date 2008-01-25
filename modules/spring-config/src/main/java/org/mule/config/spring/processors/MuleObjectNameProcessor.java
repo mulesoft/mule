@@ -18,7 +18,6 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.MuleEndpoint;
-import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 
 import org.springframework.beans.BeansException;
@@ -36,11 +35,7 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
 
     public Object postProcessBeforeInitialization(Object o, String s) throws BeansException
     {
-        if (MuleObjectHelper.class.getName().equals(s))
-        {
-            return o;
-        }
-        
+
         if (o instanceof Connector)
         {
             if (((Connector)o).getName() == null || overwrite)

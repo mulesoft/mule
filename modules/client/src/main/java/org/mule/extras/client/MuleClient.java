@@ -46,7 +46,6 @@ import org.mule.security.MuleCredentials;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
-import org.mule.util.MuleObjectHelper;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -321,7 +320,7 @@ public class MuleClient implements Disposable
         List trans = null;
         if (transformers != null)
         {
-            trans = MuleObjectHelper.getTransformers(transformers, ",");
+            trans = TransformerUtils.getTransformers(transformers);
         }
 
         if (!RegistryContext.getConfiguration().isDefaultSynchronousEndpoints())
@@ -545,7 +544,7 @@ public class MuleClient implements Disposable
 
         if (StringUtils.isNotBlank(transformers))
         {
-            result.setTransformers(MuleObjectHelper.getTransformers(transformers, ","));
+            result.setTransformers(TransformerUtils.getTransformers(transformers));
         }
 
         result.execute();
@@ -700,7 +699,7 @@ public class MuleClient implements Disposable
      */
     public MuleMessage request(String url, String transformers, long timeout) throws MuleException
     {
-        return request(url, MuleObjectHelper.getTransformers(transformers, ","), timeout);
+        return request(url, TransformerUtils.getTransformers(transformers), timeout);
     }
 
     /**

@@ -37,7 +37,6 @@ import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapCombiner;
-import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectNameHelper;
 import org.mule.util.StringUtils;
 
@@ -210,9 +209,10 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected String getName(ImmutableEndpoint endpoint)
     {
-        String uriName = uriBuilder.getEndpoint().getEndpointName();
-        return name != null ? name :
-                (StringUtils.isNotEmpty(uriName) ? uriName : ObjectNameHelper.getEndpointName(endpoint));
+        // uriBuilder cannot return an endpoint with an endpoint name (which is deprecated anyway)
+        // so we don't use it here
+//        String uriName = uriBuilder.getEndpoint().getEndpointName();
+        return name != null ? name : ObjectNameHelper.getEndpointName(endpoint);
     }
 
     protected Map getProperties()
@@ -420,7 +420,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         try
         {
-            return MuleObjectHelper.getTransformers(transformers, ",");
+            return TransformerUtils.getTransformers(transformers);
         }
         catch (DefaultMuleException e)
         {

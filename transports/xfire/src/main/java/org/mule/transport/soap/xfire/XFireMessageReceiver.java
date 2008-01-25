@@ -61,7 +61,8 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            Map props = new HashMap(service.getProperties());
+//            Map props = new HashMap(service.getProperties());
+            Map props = new HashMap();
             props.putAll(endpoint.getProperties());
 
             // convert port Type to QName if specified
@@ -74,7 +75,8 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             }
 
             // check if there is the namespace property on the service
-            String namespace = (String) service.getProperties().get(SoapConstants.SOAP_NAMESPACE_PROPERTY);
+//            String namespace = (String) service.getProperties().get(SoapConstants.SOAP_NAMESPACE_PROPERTY);
+            String namespace = null;
 
             // check for namespace set as annotation
             if (connector.isEnableJSR181Annotations())
@@ -117,7 +119,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 rewriteProperty(props, "schemas");
             }
 
-            serviceInterfaces = (List)service.getProperties().get(SoapConstants.SERVICE_INTERFACES);
+//            serviceInterfaces = (List)service.getProperties().get(SoapConstants.SERVICE_INTERFACES);
             Class exposedInterface;
 
             if (serviceInterfaces == null)
@@ -136,7 +138,8 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 }
             }
 
-            String wsdlUrl = (String) service.getProperties().get(SoapConstants.WSDL_URL_PROPERTY);
+//            String wsdlUrl = (String) service.getProperties().get(SoapConstants.WSDL_URL_PROPERTY);
+            String wsdlUrl = null;
 
             if (StringUtils.isBlank(wsdlUrl))
             {

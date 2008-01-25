@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleUrlStreamHandlerFactory extends Object implements URLStreamHandlerFactory
 {
+    
     private static final String HANDLER_PKGS_SYSTEM_PROPERTY = "java.protocol.handler.pkgs";
     private static final Log log = LogFactory.getLog(MuleUrlStreamHandlerFactory.class);
     

@@ -156,10 +156,6 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         String methodNames = "*";
 
         Map methods = (Map) endpoint.getProperties().get(AxisConnector.SOAP_METHODS);
-        if (methods == null)
-        {
-            methods = (Map) service.getProperties().get(AxisConnector.SOAP_METHODS);
-        }
         if (methods != null)
         {
             Iterator i = methods.keySet().iterator();

@@ -11,15 +11,20 @@
 package org.mule.transformer;
 
 import org.mule.api.MuleException;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.transformer.simple.VoidTransformer;
 import org.mule.transport.service.TransportFactoryException;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.CollectionUtils;
+import org.mule.RegistryContext;
+import org.mule.config.i18n.CoreMessages;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -28,6 +33,8 @@ import org.apache.commons.logging.LogFactory;
 
 public class TransformerUtils
 {
+
+    public static final String COMMA = ",";
 
     // Undefined transformers are "special" - they seem to indicate that either the endpoint is under
     // construction, or that a value will be supplied later.  They are not the same as an empty list,
@@ -170,6 +177,39 @@ public class TransformerUtils
                 return serviceDescriptor.createOutboundTransformers();
             }
         });
+    }
+
+    /**
+     * Builds a list of UMOTransformers.
+     *
+     * @param names - a list of transformers separated by commans
+     * @return a list (possibly empty) of transformers or
+     * {@link TransformerUtils#UNDEFINED} if the names list is null
+     * @throws org.mule.api.DefaultMuleException
+     */
+    public static List getTransformers(String names) throws DefaultMuleException
+    {
+        if (null != names)
+        {
+            List transformers = new LinkedList();
+            StringTokenizer st = new StringTokenizer(names, COMMA);
+            while (st.hasMoreTokens())
+            {
+                String key = st.nextToken().trim();
+                Transformer transformer = RegistryContext.getRegistry().lookupTransformer(key);
+
+                if (transformer == null)
+                {
+                    throw new DefaultMuleException(CoreMessages.objectNotRegistered("Transformer", key));
+                }
+                transformers.add(transformer);
+            }
+            return transformers;
+        }
+        else
+        {
+            return UNDEFINED;
+        }
     }
 
 }

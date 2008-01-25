@@ -159,8 +159,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         ImmutableEndpoint endpoint = null;
         if (null != getMuleContext() && null != getMuleContext().getRegistry())
         {
-            endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getEndpoint(uri,
-                ImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+            endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri.getAddress());
         }
         if (null != endpoint)
         {
