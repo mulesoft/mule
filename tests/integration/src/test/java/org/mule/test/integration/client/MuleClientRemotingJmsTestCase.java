@@ -19,6 +19,10 @@ import org.mule.tck.FunctionalTestCase;
 
 public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
 {
+
+    public static int WAIT_TO_RECEIVE = 1000;
+    public static int WAIT_TO_RESTART = 3000;
+
     public MuleClientRemotingJmsTestCase()
     {
         setDisposeManagerPerSuite(true);
@@ -36,35 +40,40 @@ public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
-        MuleMessage message = dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test Client Send message",
-            null);
+        MuleMessage message =
+                dispatcher.sendToRemoteComponent("TestReceiverUMO", "Test Client Send message", null);
         assertNotNull(message);
         assertEquals("Received: Test Client Send message", message.getPayload());
     }
 
-    public void testClientSendAndReceiveRemote() throws Exception
+    public void testClientDispatchAndReceiveRemote() throws Exception
     {
+        // without this we get intermittent failures "sending to a deleted queue", which seems to
+        // be the previous server.
+        Thread.sleep(WAIT_TO_RESTART);
+        
         String remoteEndpoint = "vm://vmRemoteProvider/remote.queue";
         // Will connect to the server using jms://jmsSysProvider/mule.sys.queue
         MuleClient client = new MuleClient();
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
-        MuleMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);
+        MuleMessage message = dispatcher.receiveRemote(remoteEndpoint, WAIT_TO_RECEIVE);
         assertNull(message);
-        // We do a send instead of a dispatch here so the operation is
-        // synchronous
-        // thus eaiser to test
-        dispatcher.sendRemote(remoteEndpoint, "Test Remote Message 2", null);
 
-        message = dispatcher.receiveRemote(remoteEndpoint, 1000);
+        // this used to be sendRemote, with the return value discarded and a comment
+        // saying it made the test easier.  afaict that must have been some other attempt
+        // to work around the problem that WAIT_TO_RESTART addresses?
+        dispatcher.dispatchRemote(remoteEndpoint, "Test Remote Message 2", null);
+
+        message = dispatcher.receiveRemote(remoteEndpoint, WAIT_TO_RECEIVE);
         assertNotNull(message);
         assertEquals("Test Remote Message 2", message.getPayload());
-
     }
 
     public String getServerUrl()
     {
         return "jms://jmsSysProvider/mule.sys.queue";
     }
+
 }

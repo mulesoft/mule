@@ -15,7 +15,6 @@
     <!-- this connector simulates an existing endpoint on a remote server -->
     <vm:connector name="vmRemoteConnector" queueEvents="true" />
 
-
     <!-- Testing with ActiveMq -->
     <jms:activemq-connector name="jmsConnector" specification="1.1" />
 
@@ -36,5 +35,6 @@
             </outbound>
         </service>
     </model>
+
 </mule>
 
