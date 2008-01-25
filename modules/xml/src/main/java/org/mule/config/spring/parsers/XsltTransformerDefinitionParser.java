@@ -13,18 +13,18 @@ package org.mule.config.spring.parsers;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.transformers.xml.XsltTransformer;
+import org.mule.xml.util.XMLUtils;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.springframework.beans.factory.xml.ParserContext;
 
 public class XsltTransformerDefinitionParser extends MuleOrphanDefinitionParser
 {
@@ -72,7 +72,7 @@ public class XsltTransformerDefinitionParser extends MuleOrphanDefinitionParser
             Source source = new DOMSource(dom);
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             Result result = new StreamResult(output);
-            TransformerFactory.newInstance().newTransformer().transform(source, result);
+            XMLUtils.getTransformer().transform(source, result);
             return output.toString();
         }
         catch (Exception e)

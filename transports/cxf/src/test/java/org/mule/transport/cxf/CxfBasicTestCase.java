@@ -14,6 +14,9 @@ import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.IOUtils;
+import org.mule.xml.util.XMLUtils;
+
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.custommonkey.xmlunit.XMLUnit;
 
@@ -27,6 +30,14 @@ public class CxfBasicTestCase extends FunctionalTestCase
         super.doSetUp();
         echoWsdl = IOUtils.getResourceAsString("xfire-echo-service.wsdl", getClass());
         XMLUnit.setIgnoreWhitespace(true);
+        try
+        {
+            XMLUnit.getTransformerFactory();
+        }
+        catch (TransformerFactoryConfigurationError e)
+        {
+            XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
+        }
     }
 
     public void testEchoService() throws Exception

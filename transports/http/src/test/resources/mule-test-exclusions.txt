@@ -11,3 +11,11 @@ org.mule.transport.http.issues.StreamingDownloadMule1389TestCase
 
 # MULE-2208
 org.mule.transport.http.functional.HttpsFunctionalTestCase
+
+# javax.xml.transform.TransformerConfigurationException: Could not compile stylesheet
+#   at com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl.newTemplates(TransformerFactoryImpl.java:829)
+#
+# com.sun.org.apache.bcel.internal.generic.ClassGenException: Branch target offset too large for short
+#
+# Explanation at: http://jakarta.apache.org/bcel/faq.html
+org.mule.transport.http.functional.HttpContentLengthPropagationTestCase

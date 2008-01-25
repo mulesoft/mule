@@ -374,6 +374,7 @@ Assembly descriptor for the full Mule distribution.
         <!-- Transports -->
         <include>org.mule.transports:mule-transport-axis</include>
         <include>org.mule.transports:mule-transport-bpm</include>
+        <include>org.mule.transports:mule-transport-cxf</include>
         <include>org.mule.transports:mule-transport-ejb</include>
         <include>org.mule.transports:mule-transport-email</include>
         <include>org.mule.transports:mule-transport-file</include>
@@ -394,13 +395,11 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-xfire</include>
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
-        <include>org.mule.modules:mule-module-1to2migration</include>
         <include>org.mule.modules:mule-module-acegi</include>
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-jaas</include>
         <include>org.mule.modules:mule-module-jbossts</include>
-        <include>org.mule.modules:mule-module-jotm</include>
         <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
@@ -433,6 +432,7 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transports-all</exclude>
         <exclude>org.mule.transports:mule-transport-axis</exclude>
         <exclude>org.mule.transports:mule-transport-bpm</exclude>
+        <exclude>org.mule.transports:mule-transport-cxf</exclude>
         <exclude>org.mule.transports:mule-transport-ejb</exclude>
         <exclude>org.mule.transports:mule-transport-email</exclude>
         <exclude>org.mule.transports:mule-transport-file</exclude>
@@ -456,13 +456,11 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.modules:mule-modules-all</exclude>
         <exclude>org.mule.modules:mule-module-boot</exclude>
         <exclude>org.mule.modules:mule-module-builders</exclude>
-        <exclude>org.mule.modules:mule-module-1to2migration</exclude>
         <exclude>org.mule.modules:mule-module-acegi</exclude>
         <exclude>org.mule.modules:mule-module-client</exclude>
         <exclude>org.mule.modules:mule-module-jaas</exclude>
         <exclude>org.mule.modules:mule-module-jbossts</exclude>
         <exclude>org.mule.modules:mule-module-jca</exclude>
-        <exclude>org.mule.modules:mule-module-jotm</exclude>
         <exclude>org.mule.modules:mule-module-management</exclude>
         <exclude>org.mule.modules:mule-module-ognl</exclude>
         <exclude>org.mule.modules:mule-module-pgp</exclude>

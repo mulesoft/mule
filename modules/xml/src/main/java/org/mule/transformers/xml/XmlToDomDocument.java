@@ -12,11 +12,11 @@ package org.mule.transformers.xml;
 
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.xml.util.XMLUtils;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 
 import org.w3c.dom.Document;
 
@@ -43,7 +43,7 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
                 holder = getResultHolder(Document.class);
             }
 
-            Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
+            Transformer idTransformer = XMLUtils.getTransformer();
             idTransformer.setOutputProperty(OutputKeys.ENCODING, encoding);
             idTransformer.transform(sourceDoc, holder.getResult());
 

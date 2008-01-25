@@ -94,10 +94,14 @@
             <artifactId>axis-jaxrpc</artifactId>
             <version>1.4</version>
         </dependency>
+        <!-- This library causes conflicts with the SAAJ library used by CXF,
+          and the decision was made to make CXF work OOTB.  Therefore the 
+          axis-saaj library must be provided manually on the classpath -->
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis-saaj</artifactId>
             <version>1.4</version>
+            <scope>provided</scope>
         </dependency>
         <!-- In Axis 1.4, this is a runtime dependency so we need to pull
              it in explicitly -->

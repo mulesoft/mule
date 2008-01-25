@@ -11,6 +11,9 @@
 package org.mule.transformers.xml;
 
 import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.xml.util.XMLUtils;
+
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
@@ -26,6 +29,14 @@ public abstract class AbstractXmlTransformerTestCase extends AbstractTransformer
         super();
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setXSLTVersion("2.0");
+        try
+        {
+            XMLUnit.getTransformerFactory();
+        }
+        catch (TransformerFactoryConfigurationError e)
+        {
+            XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
+        }
     }
 
     // @Override

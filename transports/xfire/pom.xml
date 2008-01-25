@@ -94,12 +94,22 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
+                <!-- we want the newer version below -->
                 <exclusion>
-                    <!-- we want the newer version below -->
                     <groupId>woodstox</groupId>
                     <artifactId>wstx-asl</artifactId>
                 </exclusion>
+                <!-- Use newer version below to avoid conflict with CXF -->
+                <exclusion>
+                    <groupId>org.apache.ws.commons</groupId>
+                    <artifactId>XmlSchema</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.schema</groupId>
+            <artifactId>XmlSchema</artifactId>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.xfire</groupId>

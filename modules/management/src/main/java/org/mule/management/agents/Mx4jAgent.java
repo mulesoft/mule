@@ -24,6 +24,7 @@ import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
+import org.mule.xml.util.XMLUtils;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import mx4j.log.CommonsLogger;
 import mx4j.log.Log;
@@ -109,7 +111,16 @@ public class Mx4jAgent extends AbstractAgent
         adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
 
         // Set the XSLT Processor with any local overrides
-        XSLTProcessor processor = new XSLTProcessor();
+        XSLTProcessor processor;
+        try
+        {
+            processor = new XSLTProcessor();
+        }
+        catch (TransformerFactoryConfigurationError e)
+        {
+            System.setProperty("javax.xml.transform.TransformerFactory", XMLUtils.TRANSFORMER_FACTORY_JDK5);
+            processor = new XSLTProcessor();
+        }
 
         if (StringUtils.isNotBlank(xslFilePath))
         {

@@ -19,6 +19,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
+import org.mule.xml.util.XMLUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,7 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
@@ -261,7 +263,15 @@ public class XsltTransformer extends AbstractXmlTransformer
             else
             {
                 // fall back to JDK default
-                factory = TransformerFactory.newInstance();
+                try
+                {
+                    factory = TransformerFactory.newInstance();
+                }
+                catch (TransformerFactoryConfigurationError e)
+                {
+                    System.setProperty("javax.xml.transform.TransformerFactory", XMLUtils.TRANSFORMER_FACTORY_JDK5);
+                    factory = TransformerFactory.newInstance();
+                }
             }
 
             factory.setURIResolver(new URIResolver()

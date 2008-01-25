@@ -14,11 +14,13 @@ import org.mule.api.component.simple.EchoService;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.IOUtils;
+import org.mule.xml.util.XMLUtils;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.codehaus.xfire.client.XFireProxyFactory;
 import org.codehaus.xfire.service.Service;
@@ -41,6 +43,14 @@ public class XFireMessageReceiverFunctionalTestCase extends FunctionalTestCase
     {
         echoWsdl = IOUtils.getResourceAsString("xfire-advanced-echo-service.wsdl", getClass());
         XMLUnit.setIgnoreWhitespace(true);
+        try
+        {
+            XMLUnit.getTransformerFactory();
+        }
+        catch (TransformerFactoryConfigurationError e)
+        {
+            XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
+        }
     }
 
     public void testQname() throws Exception

@@ -10,6 +10,11 @@
 
 package org.mule.xml.util;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+
 import org.dom4j.io.DOMReader;
 import org.w3c.dom.Document;
 
@@ -18,7 +23,8 @@ import org.w3c.dom.Document;
  */
 public class XMLUtils
 {
-
+        public static final String TRANSFORMER_FACTORY_JDK5 = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
+        
     /**
      * Converts a DOM to an XML string.
      */
@@ -27,4 +33,30 @@ public class XMLUtils
         return new DOMReader().read(dom).asXML();
     }
 
+    /**
+     * @return a new XSLT transformer
+     * @throws TransformerConfigurationException if no TransformerFactory can be located in the
+     * runtime environment.
+     */
+    public static Transformer getTransformer() throws TransformerConfigurationException
+    {
+        TransformerFactory tf;
+        try
+        {
+            tf = TransformerFactory.newInstance();
+        }
+        catch (TransformerFactoryConfigurationError e)
+        {
+            System.setProperty("javax.xml.transform.TransformerFactory", TRANSFORMER_FACTORY_JDK5);
+            tf = TransformerFactory.newInstance();
+        }
+        if (tf != null)
+        {
+            return tf.newTransformer();
+        }
+        else
+        {
+            throw new TransformerConfigurationException("Unable to instantiate a TransformerFactory");
+        }
+    }
 }

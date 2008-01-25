@@ -11,6 +11,7 @@
 package org.mule.transformers.xml;
 
 import org.mule.transformer.AbstractTransformer;
+import org.mule.xml.util.XMLUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -289,7 +290,7 @@ public abstract class AbstractXmlTransformer extends AbstractTransformer
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
 
-        Transformer idTransformer = TransformerFactory.newInstance().newTransformer();
+        Transformer idTransformer = XMLUtils.getTransformer();
         idTransformer.setOutputProperty(OutputKeys.ENCODING, outputEncoding);
         idTransformer.transform(src, result);
         return writer.getBuffer().toString();

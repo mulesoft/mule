@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.IOUtils;
+import org.mule.xml.util.XMLUtils;
 
 import com.ibm.wsdl.xml.WSDLReaderImpl;
 
@@ -22,6 +23,7 @@ import javax.wsdl.Definition;
 import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.custommonkey.xmlunit.XMLUnit;
 
@@ -33,6 +35,14 @@ public class XFireBasicTestCase extends FunctionalTestCase
     {
         echoWsdl = IOUtils.getResourceAsString("xfire-echo-service.wsdl", getClass());
         XMLUnit.setIgnoreWhitespace(true);
+        try
+        {
+            XMLUnit.getTransformerFactory();
+        }
+        catch (TransformerFactoryConfigurationError e)
+        {
+            XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
+        }
         //This cause the noLocalBinding to fail, need to ask DanD about it
         //setDisposeManagerPerSuite(true);
     }
