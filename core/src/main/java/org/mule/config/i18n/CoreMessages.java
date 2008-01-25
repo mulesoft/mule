@@ -1048,7 +1048,7 @@ public class CoreMessages extends MessageFactory
 
     public static Message configurationBuilderSuccess(ConfigurationBuilder configurationBuilder, int numResources)
     {
-        return createMessage(BUNDLE_PATH, 257, configurationBuilder.getClass().getName(), numResources);
+        return createMessage(BUNDLE_PATH, 257, configurationBuilder.getClass().getName(), new Integer(numResources));
     }
     
     public static Message configurationBuilderSuccess(ConfigurationBuilder configurationBuilder, String resources)

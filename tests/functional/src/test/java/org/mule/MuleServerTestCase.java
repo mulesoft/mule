@@ -19,7 +19,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
 
     private MuleServer muleServer;
 
-    @Override
+    //@Override
     protected MuleContext createMuleContext() throws Exception
     {
         return null;
