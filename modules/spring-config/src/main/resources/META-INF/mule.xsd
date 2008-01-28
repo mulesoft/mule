@@ -1288,9 +1288,9 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-entry-point-resolver-set" type="customEntrypointResolverSetType"
+    <xsd:element name="custom-entry-point-resolver-set" type="customEntryPointResolverSetType"
                  substitutionGroup="abstract-entry-point-resolver-set"/>
-    <xsd:complexType name="customEntrypointResolverSetType">
+    <xsd:complexType name="customEntryPointResolverSetType">
         <xsd:complexContent>
             <xsd:extension base="abstractEntryPointResolverSetType">
                 <xsd:sequence>
