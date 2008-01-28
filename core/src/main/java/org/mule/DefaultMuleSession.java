@@ -226,7 +226,7 @@ public final class DefaultMuleSession implements MuleSession
      */
     public void dispatchEvent(MuleEvent event) throws MuleException
     {
-        if (event.getEndpoint().canSend())
+        if (event.getEndpoint().isOutbound())
         {
             try
             {
@@ -293,7 +293,7 @@ public final class DefaultMuleSession implements MuleSession
             event.setTimeout(timeout);
         }
 
-        if (event.getEndpoint().canSend())
+        if (event.getEndpoint().isOutbound())
         {
             try
             {

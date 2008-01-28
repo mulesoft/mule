@@ -56,7 +56,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals("/C:/temp", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         // assertTrue(provider.getTransformer() instanceof ObjectToFileMessage);
-        assertEquals(Endpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
+        assertTrue(endpoint.isOutbound());
 
         // second Router
         OutboundRouter router2 = (OutboundRouter)outboundRouter.getRouters().get(1);
@@ -65,13 +65,13 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
-        assertEquals(Endpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
+        assertTrue(endpoint.isOutbound());
 
         endpoint = (Endpoint)router2.getEndpoints().get(1);
         assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("test.queue2", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
-        assertEquals(Endpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
+        assertTrue(endpoint.isOutbound());
 
     }
 
@@ -89,7 +89,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals("queue4", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
-        assertEquals(Endpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
+        assertTrue(endpoint.isInbound());
     }
 
     public void testComponent4RouterEndpoints() throws Exception
@@ -107,14 +107,14 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals("udp", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("udp://localhost:56731", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers())); 
-        assertEquals(Endpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
+        assertTrue(endpoint.isOutbound());
 
         endpoint = (Endpoint)router.getEndpoints().get(1);
         assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("yet.another.queue", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
-        assertEquals(Endpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
+        assertTrue(endpoint.isOutbound());
     }
 
     public void testComponent5RouterEndpoints() throws Exception
@@ -132,13 +132,13 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals(TcpConnector.TCP, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("tcp://localhost:45431", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers())); 
-        assertEquals(Endpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
+        assertTrue(endpoint.isOutbound());
 
         endpoint = (Endpoint)router.getEndpoints().get(1);
         assertEquals(TcpConnector.TCP, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("tcp://localhost:45432", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers())); 
-        assertEquals(Endpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
+        assertTrue(endpoint.isOutbound());
     }
 
     public void testEndpointFromURI() throws Exception
@@ -147,7 +147,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
             "test://hello?remoteSync=true&remoteSyncTimeout=2002");
         assertTrue(ep.isRemoteSync());
         assertEquals(2002, ep.getRemoteSyncTimeout());
-        assertEquals(Endpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+        assertTrue(ep.isInbound());
 
         // Test MuleEvent timeout proporgation
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("hello"), ep, MuleTestUtils.getTestSession(), false);

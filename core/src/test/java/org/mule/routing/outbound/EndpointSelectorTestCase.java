@@ -56,9 +56,9 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
     {
         super.doSetUp();
         session = MuleTestUtils.getMockSession();
-        dest1 = getTestEndpoint("dest1", Endpoint.ENDPOINT_TYPE_SENDER);
-        dest2 = getTestEndpoint("dest2", Endpoint.ENDPOINT_TYPE_SENDER);
-        dest3 = getTestEndpoint("dest3", Endpoint.ENDPOINT_TYPE_SENDER);
+        dest1 = getTestOutboundEndpoint("dest1");
+        dest2 = getTestOutboundEndpoint("dest2");
+        dest3 = getTestOutboundEndpoint("dest3");
 
         List endpoints = new ArrayList();
         endpoints.add(dest1);

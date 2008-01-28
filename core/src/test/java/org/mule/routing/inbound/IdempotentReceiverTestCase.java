@@ -43,7 +43,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage("test event");
 
-        Endpoint endpoint = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint = getTestOutboundEndpoint("Test1Provider");
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         // called by idempotent receiver as this is the fist event it will try
         // and initialize the id store

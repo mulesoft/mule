@@ -62,7 +62,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     public void testEventTransformer() throws Exception
     {
         String data = "Test Data";
-        Endpoint endpoint = getTestEndpoint("Test", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint = getTestOutboundEndpoint("Test");
         endpoint.setTransformers(CollectionUtils.singletonList(new TestEventTransformer()));
         MuleEvent event = getTestEvent(data, endpoint);
         RequestContext.setEvent(event);
@@ -78,7 +78,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     public void testEventRewrite() throws Exception
     {
         String data = "Test Data";
-        Endpoint endpoint = getTestEndpoint("Test", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint = getTestOutboundEndpoint("Test");
         endpoint.setTransformers(CollectionUtils.singletonList(new TestEventTransformer()));
         DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data), endpoint,
             getTestSession(getTestService("apple", Apple.class)), true,
@@ -114,7 +114,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         prevEvent = getTestEvent("payload");
         props = new Properties();
         msg = new DefaultMuleMessage("payload", props);
-        endpoint = getTestEndpoint("Test", Endpoint.ENDPOINT_TYPE_SENDER);
+        endpoint = getTestOutboundEndpoint("Test");
         props = new Properties();
         endpoint.setProperties(props);
         event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
@@ -139,7 +139,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         props = new Properties();
         props.put("prop", "value1");
         msg = new DefaultMuleMessage("payload", props);
-        endpoint = getTestEndpoint("Test", Endpoint.ENDPOINT_TYPE_SENDER);
+        endpoint = getTestOutboundEndpoint("Test");
         event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
         assertEquals("value1", event.getMessage().getProperty("prop"));
 
@@ -161,7 +161,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
      */
     public void testNoPasswordNoNullPointerException() throws Exception
     {
-        Endpoint endpoint = getTestEndpoint("AuthTest", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint = getTestOutboundEndpoint("AuthTest");
         // provide the username, but not the password, as is the case for SMTP
         // cannot set SMTP endpoint type, because the module doesn't have this
         // dependency

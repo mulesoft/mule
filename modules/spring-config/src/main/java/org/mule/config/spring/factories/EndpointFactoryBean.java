@@ -27,13 +27,16 @@ public class EndpointFactoryBean extends EndpointURIEndpointBuilder
     implements FactoryBean, MuleContextAware, Initialisable
 {
 
+    // as in ImmutableMuleEndpoint (but those not public)
+    public static final String ENDPOINT_TYPE_SENDER = "sender";
+    public static final String ENDPOINT_TYPE_RECEIVER = "receiver";
+
     public static final String ALWAYS_CREATE_STRING = "ALWAYS_CREATE";
     public static final String NEVER_CREATE_STRING = "NEVER_CREATE";
 
     protected final Log logger = LogFactory.getLog(getClass());
 
     private String type;
-    private String createConnectorAsString;
 
     public EndpointFactoryBean()
     {
@@ -42,12 +45,12 @@ public class EndpointFactoryBean extends EndpointURIEndpointBuilder
 
     public Object getObject() throws Exception
     {
-        if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
+        if (ENDPOINT_TYPE_RECEIVER.equals(type))
         {
             logger.debug("Endpont type is \"receiver\", building inbound endpoint");
             return buildInboundEndpoint();
         }
-        else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
+        else if (ENDPOINT_TYPE_SENDER.equals(type))
         {
             logger.debug("Endpont type is \"sender\", building inbound endpoint");
             return buildOutboundEndpoint();
@@ -79,8 +82,4 @@ public class EndpointFactoryBean extends EndpointURIEndpointBuilder
         this.type = type;
     }
 
-    public void setCreateConnectorAsString(String createConnectorAsString)
-    {
-        this.createConnectorAsString = createConnectorAsString;
-    }
 }

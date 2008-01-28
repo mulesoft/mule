@@ -34,9 +34,9 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         try
         {
             ImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
-            assertEquals(ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
-            assertFalse(ep.canSend());
-            assertTrue(ep.canRequest());
+            assertTrue(ep.isInbound());
+            assertFalse(ep.isOutbound());
+            assertTrue(ep.isInbound());
             assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
             assertTrue(ep.getTransformers().get(0) instanceof TestInboundTransformer);
             assertTrue(TransformerUtils.isDefined(ep.getResponseTransformers()));
@@ -56,9 +56,9 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         try
         {
             ImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
-            assertEquals(ImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
-            assertTrue(ep.canSend());
-            assertFalse(ep.canRequest());
+            assertTrue(ep.isOutbound());
+            assertTrue(ep.isOutbound());
+            assertFalse(ep.isInbound());
             assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
             assertTrue(ep.getTransformers().get(0) instanceof TestOutboundTransformer);
             assertTrue(TransformerUtils.isDefined(ep.getResponseTransformers()));

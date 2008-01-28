@@ -16,7 +16,6 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transport.udp.UdpConnector;
 
 import java.net.DatagramPacket;
 
@@ -44,7 +43,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
-        Endpoint endpoint = getTestEndpoint("Test", Endpoint.ENDPOINT_TYPE_RECEIVER);
+        Endpoint endpoint = getTestInboundEndpoint("Test");
         Connector connector = getConnector();
 
         try
@@ -59,7 +58,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
             // expected
         }
 
-        endpoint = getTestEndpoint("Test", Endpoint.ENDPOINT_TYPE_RECEIVER);
+        endpoint = getTestInboundEndpoint("Test");
         try
         {
             endpoint.setEndpointURI(null);

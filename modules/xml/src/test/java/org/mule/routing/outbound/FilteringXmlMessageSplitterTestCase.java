@@ -40,11 +40,11 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         // setup endpoints
-        endpoint1 = getTestEndpoint("Test1Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        endpoint1 = getTestOutboundEndpoint("Test1Endpoint");
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
-        endpoint2 = getTestEndpoint("Test2Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        endpoint2 = getTestOutboundEndpoint("Test2Endpoint");
         endpoint2.setEndpointURI(new MuleEndpointURI("test://endpointUri.2"));
-        endpoint3 = getTestEndpoint("Test3Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        endpoint3 = getTestOutboundEndpoint("Test3Endpoint");
         endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
 
         // setup splitter
@@ -119,7 +119,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         final String invalidSchemaLocation = "non-existent.xsd";
         Mock session = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestEndpoint("Test1Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Endpoint");
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
 
         FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();

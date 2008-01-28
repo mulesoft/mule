@@ -75,14 +75,19 @@ public interface EndpointFactory extends MuleContextAware
 
     /**
      * @param endpointUri
-     * @param endpointType
-     * @param muleContext
      * @return
      * @throws MuleException
      * @deprecated
      */
-    ImmutableEndpoint getEndpoint(EndpointURI endpointUri,
-                                        String endpointType) throws MuleException;
+    ImmutableEndpoint getInboundEndpoint(EndpointURI endpointUri) throws MuleException;
+
+    /**
+     * @param endpointUri
+     * @return
+     * @throws MuleException
+     * @deprecated
+     */
+    ImmutableEndpoint getOutboundEndpoint(EndpointURI endpointUri) throws MuleException;
 
     /**
      * Used to retrieve the an EndpointBuilder equal to the one would be used to create an endpoint.<br/><br/>

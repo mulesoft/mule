@@ -32,17 +32,8 @@ import java.util.Map;
 public interface ImmutableEndpoint extends Serializable, Initialisable, MessageDispatching, MessageRequesting
 {
 
-    String INITIAL_STATE_STARTED = "started";
-    String INITIAL_STATE_STOPPED = "stopped";
-
-    /** The endpoint is outbound */
-    String ENDPOINT_TYPE_SENDER = "sender";
-
-    /** The endpoint is indound */
-    String ENDPOINT_TYPE_RECEIVER = "receiver";
-
-    /** The endpoit is a global endpoint */
-    public static final String ENDPOINT_TYPE_GLOBAL = "global";
+    public static final String INITIAL_STATE_STARTED = "started";
+    public static final String INITIAL_STATE_STOPPED = "stopped";
 
     /**
      * This specifess the communication endpointUri. This will have a different format
@@ -71,20 +62,6 @@ public interface ImmutableEndpoint extends Serializable, Initialisable, MessageD
      *         specified
      */
     String getEncoding();
-
-    /**
-     * Determines whether the message endpoint is a sender or receiver or both. The
-     * possible values are-
-     * <ul>
-     * <li>sender - PROVIDER_TYPE_SENDER</li>
-     * <li>receiver - PROVIDER_TYPE_RECEIVER</li>
-     * <li>senderAndReceiver - PROVIDER_TYPE_SENDER_AND_RECEIVER</li>
-     * </ul>
-     * The default is 'senderAndReceiver'.
-     *
-     * @return the endpoint type
-     */
-    String getType();
 
     /**
      * The endpoint that will be used to send the message on. It is important that
@@ -155,14 +132,14 @@ public interface ImmutableEndpoint extends Serializable, Initialisable, MessageD
      *
      * @return true if it has been configured to send events, false otherwise
      */
-    boolean canSend();
+    boolean isOutbound();
 
     /**
      * Determines whether this endpoint can be used to receive events
      *
      * @return true if it has been configured to receive events, false otherwise
      */
-    boolean canRequest();
+    boolean isInbound();
 
     /**
      * Returns the transaction configuration for this endpoint

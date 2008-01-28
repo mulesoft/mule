@@ -58,19 +58,6 @@ public interface Endpoint extends ImmutableEndpoint
     void setEncoding(String endpointEncoding);
 
     /**
-     * Determines whether the message endpoint is a sender or receiver or both. The
-     * possible values are-
-     * <ul>
-     * <li>sender - PROVIDER_TYPE_SENDER</li>
-     * <li>receiver - PROVIDER_TYPE_RECEIVER</li>
-     * <li>senderAndReceiver - PROVIDER_TYPE_SENDER_AND_RECEIVER</li>
-     * </ul>
-     * 
-     * @param type the endpoint type
-     */
-    void setType(String type);
-
-    /**
      * The endpoint that will be used to send the message on. It is important that
      * the endpointUri and the connection correlate i.e. if your endpointUri is a jms
      * queue your connection must be a JMS endpoint.

@@ -34,11 +34,11 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
-        Endpoint endpoint2 = getTestEndpoint("Test2Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
         endpoint2.setEndpointURI(new MuleEndpointURI("test://endpointUri.2"));
-        Endpoint endpoint3 = getTestEndpoint("Test3Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint3 = getTestOutboundEndpoint("Test3Provider");
         endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
 
         // Dummy message splitter

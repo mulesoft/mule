@@ -42,7 +42,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy();
         try
         {
-            strategy.setEndpoint(getTestEndpoint("testProvider", Endpoint.ENDPOINT_TYPE_SENDER));
+            strategy.setEndpoint(getTestOutboundEndpoint("testProvider"));
             fail("Illegal operation exception should have been thrown");
         }
         catch (Exception e)

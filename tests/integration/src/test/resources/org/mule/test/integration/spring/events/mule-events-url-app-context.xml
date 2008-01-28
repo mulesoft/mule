@@ -17,12 +17,11 @@
         </property>
     </bean>
 
-    <bean id="emailEndpoint" class="org.mule.endpoint.MuleEndpoint">
+    <bean id="emailEndpoint" class="org.mule.endpoint.InboundEndpoint">
         <property name="name" value="email"/>
         <property name="connector">
             <ref local="mailConnector"/>
         </property>
-        <property name="type" value="receiver"/>
         <property name="endpointURI" value="pop3://user@lotsofmail.org"/>
     </bean>
 

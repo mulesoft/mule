@@ -305,10 +305,10 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(2, messageRouter.getEndpoints().size());
         Endpoint ep = (Endpoint) messageRouter.getEndpoints().get(0);
         assertEquals("response1", ep.getEndpointURI().getAddress());
-        assertEquals(Endpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+        assertTrue(ep.isInbound());
         ep = (Endpoint) messageRouter.getEndpoints().get(1);
         assertEquals("AppleResponseQueue", ep.getEndpointURI().getAddress());
-        assertEquals(Endpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+        assertTrue(ep.isInbound());
     }
 
     /* excluded - dep on management

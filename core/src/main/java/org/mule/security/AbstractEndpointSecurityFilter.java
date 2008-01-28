@@ -113,19 +113,17 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
             throw new InitialisationException(CoreMessages.objectIsNull("Endpoint"), this);
         }
 
-        if (endpoint.canRequest())
+        if (endpoint.isInbound())
         {
             inbound = true;
         }
-        else if (endpoint.canSend())
+        else if (endpoint.isOutbound())
         {
             inbound = false;
         }
         else
         {
-            throw new InitialisationException(CoreMessages.authEndpointTypeForFilterMustBe(
-                ImmutableEndpoint.ENDPOINT_TYPE_SENDER + " or " + ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER,
-                endpoint.getType()), this);
+            throw new InitialisationException(CoreMessages.authEndpointMustSendOrReceive(), this);
         }
         doInitialise();
     }

@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class EndpointService implements EndpointServiceMBean
 {
+
     /**
      * logger used by this class
      */
@@ -59,7 +60,7 @@ public class EndpointService implements EndpointServiceMBean
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("Endpoint").getMessage());
         }
-        if (receiver == null && Endpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
+        if (receiver == null && endpoint.isInbound())
         {
             throw new IllegalArgumentException(
                 "Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");
@@ -107,14 +108,19 @@ public class EndpointService implements EndpointServiceMBean
         }
     }
 
+    public boolean isInbound()
+    {
+        return endpoint.isInbound();
+    }
+
+    public boolean isOutbound()
+    {
+        return endpoint.isOutbound();
+    }
+
     public boolean isSynchronous()
     {
         return endpoint.isSynchronous();
-    }
-
-    public String getType()
-    {
-        return endpoint.getType();
     }
 
     public String getComponentName()

@@ -37,10 +37,10 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
         assertNotNull(messageRouter.getCatchAllStrategy());
 
-        Endpoint endpoint1 = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
-        Endpoint endpoint2 = getTestEndpoint("Test2Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
         assertNotNull(endpoint2);
 
         FilteringOutboundRouter router1 = new FilteringOutboundRouter();
@@ -167,7 +167,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         FilteringOutboundRouter filterRouter = new FilteringOutboundRouter();
         MuleSession session = getTestSession(getTestService());
         MuleMessage message = new DefaultMuleMessage(new DefaultMessageAdapter(new StringBuffer()));
-        Endpoint endpoint = getTestEndpoint("test", "sender");
+        Endpoint endpoint = getTestOutboundEndpoint("test");
         filterRouter.setMessageProperties(session, message, endpoint);
         assertNotNull(message.getCorrelationId());
     }

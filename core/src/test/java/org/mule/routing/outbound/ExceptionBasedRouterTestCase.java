@@ -149,9 +149,9 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestEndpoint("TestFailEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint");
         endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
-        Endpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint");
         endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
@@ -185,9 +185,9 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestEndpoint("TestFailEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint");
         endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
-        Endpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint");
         endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
@@ -220,9 +220,9 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestEndpoint("TestFailEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint");
         endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
-        Endpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint");
         endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();

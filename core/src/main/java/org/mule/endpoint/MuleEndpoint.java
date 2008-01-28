@@ -33,7 +33,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
  * <code>MuleEndpoint</code> describes a Provider in the Mule Server. A endpoint is
  * a grouping of an endpoint, an endpointUri and a transformer.
  */
-public class MuleEndpoint extends ImmutableMuleEndpoint implements Endpoint, MuleContextAware
+public abstract class MuleEndpoint extends ImmutableMuleEndpoint implements Endpoint, MuleContextAware
 {
     private static final long serialVersionUID = 3883445445846168147L;
     
@@ -60,10 +60,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements Endpoint, Mul
         }
 
         this.endpointUri = endpointUri;
-        if (endpointUri != null)
-        {
-            properties.putAll(endpointUri.getParams());
-        }
+        properties.putAll(endpointUri.getParams());
         try
         {
             endpointUri.initialise();
@@ -77,11 +74,6 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements Endpoint, Mul
     public void setEncoding(String endpointEncoding)
     {
         this.endpointEncoding = endpointEncoding;
-    }
-
-    public void setType(String type)
-    {
-        this.type = type;
     }
 
     public void setConnector(Connector connector)
@@ -242,9 +234,9 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements Endpoint, Mul
         this.connectionStrategy = connectionStrategy;
     }
 
-
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
+
 }

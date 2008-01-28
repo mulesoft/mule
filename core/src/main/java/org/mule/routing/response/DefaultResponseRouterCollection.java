@@ -136,7 +136,7 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
     {
         if (endpoint != null)
         {
-            if (!ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
+            if (!endpoint.isInbound())
             {
                 throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseInboundEndpoints(
                     this, endpoint));
@@ -170,7 +170,7 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
             for (Iterator it = this.endpoints.iterator(); it.hasNext();)
             {
                 ImmutableEndpoint endpoint=(ImmutableEndpoint) it.next();
-                if (!ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType()))
+                if (!endpoint.isInbound())
                 {
                     throw new InvalidEndpointTypeException(CoreMessages.responseRouterMustUseInboundEndpoints(
                         this, endpoint));

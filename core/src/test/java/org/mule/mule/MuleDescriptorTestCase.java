@@ -95,7 +95,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
         //assertNotNull(ep.getConnector().getExceptionListener());
 
         // create receive endpoint
-        Endpoint endpoint = getTestEndpoint("test2", Endpoint.ENDPOINT_TYPE_RECEIVER);
+        Endpoint endpoint = getTestInboundEndpoint("test2");
         service.getInboundRouter().addEndpoint(endpoint);
         // Add receive endpoint, this shoulbe set as default
         assertNotNull(endpoint.getConnector().getExceptionListener());

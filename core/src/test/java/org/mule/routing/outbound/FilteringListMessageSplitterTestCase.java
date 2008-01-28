@@ -28,7 +28,7 @@ public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
         Service testService = getTestService("test", Apple.class);
         MuleSession session = getTestSession(testService);
 
-        Endpoint endpoint = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint = getTestOutboundEndpoint("Test1Provider");
 
         FilteringListMessageSplitter router = new FilteringListMessageSplitter();
         router.setFilter(null);

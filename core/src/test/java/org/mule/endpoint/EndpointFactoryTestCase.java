@@ -31,7 +31,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             ImmutableEndpoint ep = endpointFactory.getInboundEndpoint(uri);
             assertEquals(InboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-            assertEquals(ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+            assertTrue(ep.isInbound());
         }
         catch (Exception e)
         {
@@ -51,7 +51,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             ImmutableEndpoint ep = endpointFactory.getInboundEndpoint(uri);
             assertEquals(InboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-            assertEquals(ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+            assertTrue(ep.isInbound());
         }
         catch (Exception e)
         {
@@ -71,7 +71,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             ImmutableEndpoint ep = endpointFactory.getInboundEndpoint(uri);
             assertEquals(InboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-            assertEquals(ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+            assertTrue(ep.isInbound());
         }
         catch (Exception e)
         {
@@ -89,7 +89,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             ImmutableEndpoint ep = endpointFactory.getOutboundEndpoint(uri);
             assertEquals(OutboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-            assertEquals(ImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
+            assertTrue(ep.isOutbound());
         }
         catch (Exception e)
         {
@@ -109,7 +109,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             ImmutableEndpoint ep = endpointFactory.getOutboundEndpoint(uri);
             assertEquals(OutboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-            assertEquals(ImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
+            assertTrue(ep.isOutbound());
         }
         catch (Exception e)
         {
@@ -129,7 +129,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             ImmutableEndpoint ep = endpointFactory.getOutboundEndpoint(uri);
             assertEquals(OutboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-            assertEquals(ImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
+            assertTrue(ep.isOutbound());
         }
         catch (Exception e)
         {
@@ -147,7 +147,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             ImmutableEndpoint ep = endpointFactory.getInboundEndpoint(builder);
             assertEquals(InboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-            assertEquals(ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+            assertTrue(ep.isInbound());
         }
         catch (Exception e)
         {
@@ -165,7 +165,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
             ImmutableEndpoint ep = endpointFactory.getOutboundEndpoint(builder);
             assertEquals(OutboundEndpoint.class, ep.getClass());
             assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-            assertEquals(ImmutableEndpoint.ENDPOINT_TYPE_SENDER, ep.getType());
+            assertTrue(ep.isOutbound());
         }
         catch (Exception e)
         {

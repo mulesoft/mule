@@ -29,7 +29,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     public void testRecipientListRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        Endpoint endpoint1 = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
         List recipients = new ArrayList();
@@ -78,7 +78,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
         List recipients = new ArrayList();

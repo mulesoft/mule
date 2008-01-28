@@ -27,7 +27,9 @@ public interface EndpointServiceMBean
 
     void disconnect() throws Exception;
 
-    String getType();
+    boolean isInbound();
+
+    boolean isOutbound();
 
     boolean isSynchronous();
 

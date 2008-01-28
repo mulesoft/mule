@@ -30,7 +30,7 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
     public void testCreate() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
-        ImmutableEndpoint endpoint = getTestEndpoint("Test", ImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test");
         MessageReceiver receiver = getMessageReceiver();
 
         assertNotNull(receiver.getEndpoint());

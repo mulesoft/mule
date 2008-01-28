@@ -65,14 +65,14 @@ public class DynamicEndpointURIEndpoint implements ImmutableEndpoint
         this.dynamicEndpointURI = dynamicEndpointURI;
     }
 
-    public boolean canRequest()
+    public boolean isInbound()
     {
-        return endpoint.canRequest();
+        return endpoint.isInbound();
     }
 
-    public boolean canSend()
+    public boolean isOutbound()
     {
-        return endpoint.canSend();
+        return endpoint.isOutbound();
     }
 
     public void dispatch(MuleEvent event) throws DispatchException
@@ -153,11 +153,6 @@ public class DynamicEndpointURIEndpoint implements ImmutableEndpoint
     public List getTransformers()
     {
         return endpoint.getTransformers();
-    }
-
-    public String getType()
-    {
-        return endpoint.getType();
     }
 
     public void initialise() throws InitialisationException

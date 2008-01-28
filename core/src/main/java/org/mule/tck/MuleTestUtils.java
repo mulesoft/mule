@@ -19,6 +19,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleSession;
+import org.mule.api.MuleException;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
@@ -55,17 +56,73 @@ import java.util.Map;
  */
 public final class MuleTestUtils
 {
-    public static Endpoint getTestEndpoint(String name, String type, MuleContext context) throws Exception
+
+//    public static Endpoint getTestEndpoint(String name, String type, MuleContext context) throws Exception
+//    {
+//        Map props = new HashMap();
+//        props.put("name", name);
+//        props.put("type", type);
+//        props.put("endpointURI", new MuleEndpointURI("test://test"));
+//        props.put("connector", "testConnector");
+//        // need to build endpoint this way to avoid depenency to any endpoint jars
+//        AbstractConnector connector = null;
+//        connector = (AbstractConnector)ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
+//            AbstractMuleTestCase.class).newInstance();
+//
+//        connector.setName("testConnector");
+//        connector.setMuleContext(context);
+//        context.applyLifecycle(connector);
+//
+//        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://test", context);
+//        endpointBuilder.setConnector(connector);
+//        endpointBuilder.setName(name);
+//        if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
+//        {
+//            return (Endpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
+//        }
+//        else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
+//        {
+//            return (Endpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+//        }
+//        else
+//        {
+//            throw new IllegalArgumentException("The endpoint type: " + type + "is not recognized.");
+//
+//        }
+//    }
+
+    public static Endpoint getTestInboundEndpoint(String name, final MuleContext context) throws Exception
+    {
+        return getTestEndpoint(name, context, new EndpointSource()
+        {
+            public Endpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                return (Endpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            }
+        });
+    }
+
+    public static Endpoint getTestOutboundEndpoint(String name, final MuleContext context) throws Exception
+    {
+        return getTestEndpoint(name, context, new EndpointSource()
+        {
+            public Endpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                return (Endpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+            }
+        });
+    }
+
+    private static Endpoint getTestEndpoint(String name, MuleContext context, EndpointSource source) throws Exception
     {
         Map props = new HashMap();
         props.put("name", name);
-        props.put("type", type);
         props.put("endpointURI", new MuleEndpointURI("test://test"));
         props.put("connector", "testConnector");
         // need to build endpoint this way to avoid depenency to any endpoint jars
-        AbstractConnector connector = null;
-        connector = (AbstractConnector)ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
-            AbstractMuleTestCase.class).newInstance();
+        AbstractConnector connector =
+                (AbstractConnector)ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
+                        AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");
         connector.setMuleContext(context);
@@ -74,28 +131,76 @@ public final class MuleTestUtils
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://test", context);
         endpointBuilder.setConnector(connector);
         endpointBuilder.setName(name);
-        if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
-        {
-            return (Endpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
-        }
-        else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
-        {
-            return (Endpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
-        }
-        else
-        {
-            throw new IllegalArgumentException("The endpoint type: " + type + "is not recognized.");
+        return source.getEndpoint(endpointBuilder);
+    }
 
-        }
+    private interface EndpointSource
+    {
+        Endpoint getEndpoint(EndpointBuilder builder) throws MuleException;
     }
     
-    public static Endpoint getTestSchemeMetaInfoEndpoint(String name, String type, String protocol, MuleContext context)
+//    public static Endpoint getTestSchemeMetaInfoEndpoint(String name, String type, String protocol, MuleContext context)
+//        throws Exception
+//    {
+//        // need to build endpoint this way to avoid depenency to any endpoint jars
+//        AbstractConnector connector = null;
+//        connector = (AbstractConnector) ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
+//            AbstractMuleTestCase.class).newInstance();
+//
+//        connector.setName("testConnector");
+//        connector.setMuleContext(context);
+//        context.applyLifecycle(connector);
+//        connector.registerSupportedProtocol(protocol);
+//
+//        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test:" + protocol + "://test", context);
+//        endpointBuilder.setConnector(connector);
+//        endpointBuilder.setName(name);
+//        if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
+//        {
+//            return (Endpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
+//        }
+//        else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
+//        {
+//            return (Endpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+//        }
+//        else
+//        {
+//            throw new IllegalArgumentException("The endpoint type: " + type + "is not recognized.");
+//
+//        }
+//    }
+
+    public static Endpoint getTestSchemeMetaInfoInboundEndpoint(String name, String protocol, final MuleContext context)
+            throws Exception
+    {
+            return getTestSchemeMetaInfoEndpoint(name, protocol, context, new EndpointSource()
+            {
+                public Endpoint getEndpoint(EndpointBuilder builder) throws MuleException
+                {
+                    return (Endpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                }
+            });
+    }
+
+    public static Endpoint getTestSchemeMetaInfoOutboundEndpoint(String name, String protocol, final MuleContext context)
+            throws Exception
+    {
+            return getTestSchemeMetaInfoEndpoint(name, protocol, context, new EndpointSource()
+            {
+                public Endpoint getEndpoint(EndpointBuilder builder) throws MuleException
+                {
+                    return (Endpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                }
+            });
+    }
+
+    private static Endpoint getTestSchemeMetaInfoEndpoint(String name, String protocol, MuleContext context, EndpointSource source)
         throws Exception
     {
         // need to build endpoint this way to avoid depenency to any endpoint jars
-        AbstractConnector connector = null;
-        connector = (AbstractConnector) ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
-            AbstractMuleTestCase.class).newInstance();
+        AbstractConnector connector =
+                (AbstractConnector) ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
+                        AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");
         connector.setMuleContext(context);
@@ -105,19 +210,7 @@ public final class MuleTestUtils
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test:" + protocol + "://test", context);
         endpointBuilder.setConnector(connector);
         endpointBuilder.setName(name);
-        if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
-        {
-            return (Endpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
-        }
-        else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
-        {
-            return (Endpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
-        }
-        else
-        {
-            throw new IllegalArgumentException("The endpoint type: " + type + "is not recognized.");
-
-        }
+        return source.getEndpoint(endpointBuilder);
     }
 
     /** Supply no service, no endpoint */
@@ -129,7 +222,7 @@ public final class MuleTestUtils
     /** Supply service but no endpoint */
     public static MuleEvent getTestEvent(Object data, Service service, MuleContext context) throws Exception
     {
-        return getTestEvent(data, service, getTestEndpoint("test1", Endpoint.ENDPOINT_TYPE_SENDER, context), context);
+        return getTestEvent(data, service, getTestOutboundEndpoint("test1", context), context);
     }
 
     /** Supply endpoint but no service */

@@ -62,42 +62,6 @@ public class DefaultEndpointFactory implements EndpointFactory
         return getOutboundEndpoint(endpointBuilder);
     }
 
-    /** @deprecated */
-    public ImmutableEndpoint getEndpoint(EndpointURI uri, String type)
-        throws MuleException
-    {
-        logger.debug("DefaultEndpointFactory request for endpoint of type: " + type + ", for uri: " + uri);
-        EndpointBuilder endpointBuilder = null;
-        // IF EndpointURI has a name lookup
-        if (uri.getEndpointName() != null)
-        {
-            endpointBuilder = lookupEndpointBuilder(uri.getEndpointName());
-            if (endpointBuilder == null)
-            {
-                throw new IllegalArgumentException("The endpoint with name: " + uri.getEndpointName()
-                                                   + "was not found.");
-            }
-        }
-        else
-        {
-            logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
-            endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
-        }
-        if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
-        {
-            return getInboundEndpoint(endpointBuilder);
-        }
-        else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
-        {
-            return getOutboundEndpoint(endpointBuilder);
-        }
-        else
-        {
-            throw new IllegalArgumentException("The endpoint type: " + type + "is not recognized.");
-
-        }
-    }
-
     protected EndpointBuilder lookupEndpointBuilder(String endpointName)
     {
         logger.debug("Looking up EndpointBuilder with name:" + endpointName + " in registry");
@@ -152,4 +116,53 @@ public class DefaultEndpointFactory implements EndpointFactory
     {
         this.muleContext = context;
     }
+
+    public ImmutableEndpoint getInboundEndpoint(EndpointURI uri) throws MuleException
+    {
+        return getEndpoint(uri, new EndpointSource()
+        {
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                return getInboundEndpoint(builder);
+            }
+        });
+    }
+
+    public ImmutableEndpoint getOutboundEndpoint(EndpointURI uri) throws MuleException
+    {
+        return getEndpoint(uri, new EndpointSource()
+        {
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                return getOutboundEndpoint(builder);
+            }
+        });
+    }
+
+    protected ImmutableEndpoint getEndpoint(EndpointURI uri, EndpointSource source) throws MuleException
+    {
+        logger.debug("DefaultEndpointFactory request for endpoint for: " + uri);
+        EndpointBuilder endpointBuilder = null;
+        if (uri.getEndpointName() != null)
+        {
+            endpointBuilder = lookupEndpointBuilder(uri.getEndpointName());
+            if (endpointBuilder == null)
+            {
+                throw new IllegalArgumentException("The endpoint with name: " + uri.getEndpointName()
+                                                   + "was not found.");
+            }
+        }
+        else
+        {
+            logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
+            endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
+        }
+        return source.getEndpoint(endpointBuilder);
+    }
+
+    private interface EndpointSource
+    {
+        ImmutableEndpoint getEndpoint(EndpointBuilder endpointBuilder) throws MuleException;
+    }
+
 }

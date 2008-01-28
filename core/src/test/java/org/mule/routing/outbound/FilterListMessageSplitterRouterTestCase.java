@@ -35,13 +35,13 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestEndpoint("Test1endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint1 = getTestOutboundEndpoint("Test1endpoint");
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
         endpoint1.setFilter(new PayloadTypeFilter(Apple.class));
-        Endpoint endpoint2 = getTestEndpoint("Test2Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint");
         endpoint2.setEndpointURI(new MuleEndpointURI("test://endpointUri.2"));
         endpoint2.setFilter(new PayloadTypeFilter(Orange.class));
-        Endpoint endpoint3 = getTestEndpoint("Test3Endpoint", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint");
         endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
 
         FilteringListMessageSplitter router = new FilteringListMessageSplitter();

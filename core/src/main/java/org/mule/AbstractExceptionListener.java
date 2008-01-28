@@ -87,7 +87,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
     {
         if (endpoint != null)
         {
-            if (!endpoint.canSend())
+            if (!endpoint.isOutbound())
             {
                 throw new InvalidEndpointTypeException(CoreMessages.exceptionListenerMustUseOutboundEndpoint(
                     this, endpoint));

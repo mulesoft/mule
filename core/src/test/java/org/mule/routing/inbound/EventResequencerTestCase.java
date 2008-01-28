@@ -46,7 +46,7 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
         MuleMessage message2 = new DefaultMuleMessage("test event B");
         MuleMessage message3 = new DefaultMuleMessage("test event C");
 
-        Endpoint endpoint = getTestEndpoint("Test1Provider", Endpoint.ENDPOINT_TYPE_SENDER);
+        Endpoint endpoint = getTestOutboundEndpoint("Test1Provider");
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, (MuleSession)session.proxy(), false);
         MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, (MuleSession)session.proxy(), false);
         MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, (MuleSession)session.proxy(), false);

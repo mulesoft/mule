@@ -458,9 +458,14 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         // template method
     }
 
-    public static Endpoint getTestEndpoint(String name, String type) throws Exception
+    public static Endpoint getTestInboundEndpoint(String name) throws Exception
     {
-        return MuleTestUtils.getTestEndpoint(name, type, muleContext);
+        return MuleTestUtils.getTestInboundEndpoint(name, muleContext);
+    }
+
+    public static Endpoint getTestOutboundEndpoint(String name) throws Exception
+    {
+        return MuleTestUtils.getTestOutboundEndpoint(name, muleContext);
     }
 
     public static MuleEvent getTestEvent(Object data, Service service) throws Exception

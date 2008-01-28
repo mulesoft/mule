@@ -13,7 +13,6 @@ package org.mule.ra;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.Endpoint;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.component.simple.EchoComponent;
 import org.mule.model.ModelFactory;
@@ -57,7 +56,7 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
     public void testSendEvent() throws Exception
     {
         service.start();
-        Endpoint endpoint = getTestEndpoint("jcaInFlowEndpoint", ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
+        Endpoint endpoint = getTestInboundEndpoint("jcaInFlowEndpoint");
         MuleEvent event = getTestEvent("Message", endpoint);
 
         try
@@ -73,7 +72,7 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
     public void testDispatchEvent() throws Exception
     {
         service.start();
-        Endpoint endpoint = getTestEndpoint("jcaInFlowEndpoint", ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
+        Endpoint endpoint = getTestInboundEndpoint("jcaInFlowEndpoint");
         MuleEvent event = getTestEvent("Message", endpoint);
 
         service.dispatchEvent(event);

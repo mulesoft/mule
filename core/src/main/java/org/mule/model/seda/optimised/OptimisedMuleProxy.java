@@ -177,7 +177,7 @@ public class OptimisedMuleProxy implements MuleProxy
         MuleMessage returnMessage = null;
         try
         {
-            if (event.getEndpoint().canRequest())
+            if (event.getEndpoint().isInbound())
             {
                 // RequestContext.setEvent(event);
                 // Object replyTo = event.getMessage().getReplyTo();
@@ -371,7 +371,7 @@ public class OptimisedMuleProxy implements MuleProxy
 
         try
         {
-            if (event.getEndpoint().canRequest())
+            if (event.getEndpoint().isInbound())
             {
                 // dispatch the next receiver
                 event = RequestContext.setEvent(event);

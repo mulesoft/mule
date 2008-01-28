@@ -227,7 +227,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             ImmutableEndpoint umoEndpoint = (ImmutableEndpoint) iterator.next();
-            if (!umoEndpoint.canSend())
+            if (!umoEndpoint.isOutbound())
             {
                 throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
                     this, umoEndpoint));
@@ -238,7 +238,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
     public void addEndpoint(ImmutableEndpoint endpoint)
     {
-        if (!endpoint.canSend())
+        if (!endpoint.isOutbound())
         {
             throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
                 this, endpoint));

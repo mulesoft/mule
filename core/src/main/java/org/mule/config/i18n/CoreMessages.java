@@ -554,9 +554,9 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 135, user);
     }
 
-    public static Message authEndpointTypeForFilterMustBe(String expected, String actual)
+    public static Message authEndpointMustSendOrReceive()
     {
-        return createMessage(BUNDLE_PATH, 136, expected, actual);
+        return createMessage(BUNDLE_PATH, 136);
     }
 
     public static Message transactionManagerAlreadySet()

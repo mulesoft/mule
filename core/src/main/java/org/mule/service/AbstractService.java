@@ -446,7 +446,7 @@ public abstract class AbstractService implements Service
         // in the DefaultMuleSession#dispatchEvent
         ImmutableEndpoint endpoint = event.getEndpoint();
 
-        if (!endpoint.canRequest())
+        if (!endpoint.isInbound())
         {
             try
             {

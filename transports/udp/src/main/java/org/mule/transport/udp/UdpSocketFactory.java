@@ -38,7 +38,7 @@ public class UdpSocketFactory implements KeyedPoolableObjectFactory
         ImmutableEndpoint ep = (ImmutableEndpoint)key;
         DatagramSocket socket;
 
-        if(ep.getType() == ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER)
+        if(ep.isInbound())
         {
             int port = ep.getEndpointURI().getPort();
             String host = ep.getEndpointURI().getHost();

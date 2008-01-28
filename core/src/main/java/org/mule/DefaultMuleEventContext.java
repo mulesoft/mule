@@ -250,8 +250,8 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(MuleMessage message, EndpointURI endpointUri) throws MuleException
     {
-        ImmutableEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getEndpoint(
-            endpointUri, ImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+        ImmutableEndpoint endpoint =
+                getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointUri);
 
         // If synchronous receive has not been explicitly set, default it to
         // true
@@ -464,8 +464,8 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public void dispatchEvent(MuleMessage message, EndpointURI endpointUri) throws MuleException
     {
-        ImmutableEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getEndpoint(
-            endpointUri, ImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+        ImmutableEndpoint endpoint =
+                getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointUri);
         session.dispatchEvent(message, endpoint);
     }
 
@@ -539,8 +539,8 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage receiveEvent(EndpointURI endpointUri, long timeout) throws MuleException
     {
-        ImmutableEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getEndpoint(
-            endpointUri, ImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+        ImmutableEndpoint endpoint =
+                getMuleContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointUri);
         return session.receiveEvent(endpoint, timeout);
     }
 
@@ -563,7 +563,6 @@ public class DefaultMuleEventContext implements MuleEventContext
      * dispatched.
      * 
      * @return Returns true is the user has set stopFurtherProcessing.
-     * @see org.mule.api.context.UMOManager
      * @see org.mule.api.MuleEventContext
      * @see org.mule.api.lifecycle.Callable
      */

@@ -45,9 +45,9 @@ import org.apache.commons.logging.LogFactory;
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server. A endpoint is a grouping of
  * an endpoint, an endpointUri and a transformer.
  */
-public class ImmutableMuleEndpoint implements ImmutableEndpoint
+public abstract class ImmutableMuleEndpoint implements ImmutableEndpoint
 {
-    
+
     private static final long serialVersionUID = -1650380871293160973L;
 
     /**
@@ -79,11 +79,6 @@ public class ImmutableMuleEndpoint implements ImmutableEndpoint
      * The name for the endpoint
      */
     protected String name = null;
-
-    /**
-     * Determines whether the endpoint is a receiver or sender or both
-     */
-    protected String type;
 
     /**
      * Any additional properties for the endpoint
@@ -167,11 +162,6 @@ public class ImmutableMuleEndpoint implements ImmutableEndpoint
         return endpointEncoding;
     }
 
-    public String getType()
-    {
-        return type;
-    }
-
     public Connector getConnector()
     {
         return connector;
@@ -235,7 +225,8 @@ public class ImmutableMuleEndpoint implements ImmutableEndpoint
         }
 
         return ClassUtils.getClassName(getClass()) + "{endpointUri=" + sanitizedEndPointUri + ", connector="
-               + connector + ", transformer=" + transformers.get() + ", name='" + name + "'" + ", type='" + type + "'"
+               + connector + ", transformer=" + transformers.get() + ", name='" + name + "'"
+               + ", isInbound=" + isInbound() + ", isOutbound=" + isOutbound()
                + ", properties=" + properties + ", transactionConfig=" + transactionConfig + ", filter=" + filter
                + ", deleteUnacceptedMessages=" + deleteUnacceptedMessages + ", initialised=" + initialised
                + ", securityFilter=" + securityFilter + ", synchronous=" + synchronous + ", initialState="
@@ -246,16 +237,6 @@ public class ImmutableMuleEndpoint implements ImmutableEndpoint
     public String getProtocol()
     {
         return connector.getProtocol();
-    }
-
-    public boolean canRequest()
-    {
-        return getType().equals(ENDPOINT_TYPE_RECEIVER);
-    }
-
-    public boolean canSend()
-    {
-        return getType().equals(ENDPOINT_TYPE_SENDER);
     }
 
     public TransactionConfig getTransactionConfig()
@@ -293,7 +274,8 @@ public class ImmutableMuleEndpoint implements ImmutableEndpoint
             return false;
         }
         // MULE-1551 - transformer excluded from comparison here
-        return getType().equals(immutableMuleProviderDescriptor.getType());
+        return isInbound() == immutableMuleProviderDescriptor.isInbound() &&
+                isOutbound() == immutableMuleProviderDescriptor.isOutbound();
     }
 
     public int hashCode()
@@ -302,7 +284,8 @@ public class ImmutableMuleEndpoint implements ImmutableEndpoint
         result = appendHash(result, endpointUri);
         // MULE-1551 - transformer excluded from hash here
         result = appendHash(result, name);
-        result = appendHash(result, getType());
+        result = appendHash(result, Boolean.valueOf(isInbound()));
+        result = appendHash(result, Boolean.valueOf(isOutbound()));
         return result;
     }
 
