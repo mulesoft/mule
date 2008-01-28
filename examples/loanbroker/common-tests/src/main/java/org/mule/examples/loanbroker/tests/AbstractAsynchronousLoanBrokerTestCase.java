@@ -148,7 +148,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
                 {
                     try
                     {
-                        result = client.request("CustomerResponses", 2000);
+                        result = client.request("CustomerResponses", getDelay());
                     }
                     catch (MuleException e)
                     {
