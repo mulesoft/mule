@@ -9,13 +9,32 @@
                        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
     <vm:connector name="vm" queueEvents="true" numberOfConcurrentTransactedReceivers="1"/>
+    <vm:connector name="vmOnFly" queueEvents="false" numberOfConcurrentTransactedReceivers="1"/>
 
     <spring:bean name="txFactory" class="org.mule.transport.vm.VMTransactionFactory"/>
 
     <model name="main">
         <service name="testService">
             <inbound>
-                <vm:inbound-endpoint address="vm://in">
+                <vm:inbound-endpoint address="vm://in" connector-ref="vm">
+                    <transaction action="BEGIN_OR_JOIN">
+                        <transaction-factory ref="txFactory"/>
+                    </transaction>
+                </vm:inbound-endpoint>
+            </inbound>
+
+            <component class="org.mule.transport.vm.functional.VmTransactionTestCase$TestComponent"/>
+
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://out" connector-ref="vm"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="testService2">
+            <inbound>
+                <vm:inbound-endpoint address="vm://sync" connector-ref="vm">
                     <transaction action="BEGIN_OR_JOIN">
                         <transaction-factory ref="txFactory"/>
                     </transaction>
@@ -30,6 +49,25 @@
                 </outbound-pass-through-router>
             </outbound>
         </service>
+
+        <service name="testService3">
+            <inbound>
+                <vm:inbound-endpoint address="vm://in3" connector-ref="vmOnFly">
+                    <transaction action="BEGIN_OR_JOIN">
+                        <transaction-factory ref="txFactory"/>
+                    </transaction>
+                </vm:inbound-endpoint>
+            </inbound>
+
+            <component class="org.mule.transport.vm.functional.VmTransactionTestCase$TestComponent"/>
+
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://outt3" connector-ref="vm"/>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
     </model>
 
 </mule>

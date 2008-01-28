@@ -14,28 +14,62 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class VmTransactionTestCase extends FunctionalTestCase
 {
+    protected static volatile boolean success = true;
+    protected static final Log logger = LogFactory.getLog(VmTransactionTestCase.class);
+
     protected String getConfigResources()
     {
         return "vm/vm-transaction.xml";
     }
 
-    public void testTransaction() throws Exception
+    public void testTransactionQueueEventsTrue() throws Exception
     {
+        success = true;
         MuleClient client = new MuleClient();
-        client.dispatch("vm://in", "TEST", null);
-        MuleMessage message = client.request("vm://out", 10000);
+        client.dispatch("vm://in?connector=vm", "TEST", null);
+        MuleMessage message = client.request("vm://out?connector=vm", 10000);
         assertNotNull(message);
+        assertTrue(success);
 
     }
+
+    public void testTransactionSyncEndpoint() throws Exception
+    {
+        success = true;
+        MuleClient client = new MuleClient();
+        MuleMessage message = client.send("vm://sync?connector=vm", "TEST", null);
+        assertNotNull(message);
+        assertTrue(success);
+
+    }
+
+    public void testTransactionQueueEventsFalse() throws Exception
+    {
+        success = true;
+        MuleClient client = new MuleClient();
+        client.dispatch("vm://int3?connector=vmOnFly", "TEST", null);
+        MuleMessage message = client.request("vm://outt3?connector=vm", 10000);
+        assertNotNull(message);
+        assertTrue(success);
+
+    }
+
 
     public static class TestComponent
     {
 
         public Object process(Object a) throws Exception
         {
-            assertNotNull(TransactionCoordination.getInstance().getTransaction());
+            if (TransactionCoordination.getInstance().getTransaction() == null)
+            {
+                success = false;
+                logger.error("Transction is null");
+            }
             return a;
         }
 
