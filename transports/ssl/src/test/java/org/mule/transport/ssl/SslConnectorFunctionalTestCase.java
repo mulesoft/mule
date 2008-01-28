@@ -18,7 +18,6 @@ import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.ssl.SslConnector;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -114,7 +113,7 @@ public class SslConnectorFunctionalTestCase extends FunctionalTestCase
     }
 
 
-    public void xtestDispatchAndReply() throws Exception
+    public void testDispatchAndReply() throws Exception
     {
 
         final CountDownLatch callbackCount = new CountDownLatch(1);
