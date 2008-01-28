@@ -9,6 +9,8 @@
  */
 package org.mule.transport.jms.xa;
 
+import org.mule.transaction.XaTransaction;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -59,20 +61,20 @@ public class ConnectionInvocationHandler implements InvocationHandler
         if (method.getName().equals("createSession"))
         {
             XASession xas = ((XAConnection) xaConnection).createXASession();
-            return Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[]{Session.class},
+            return Proxy.newProxyInstance(Session.class.getClassLoader(), new Class[]{Session.class, XaTransaction.MuleXaObject.class},
                                           new SessionInvocationHandler(xas));
         }
         else if (method.getName().equals("createQueueSession"))
         {
             XAQueueSession xaqs = ((XAQueueConnection) xaConnection).createXAQueueSession();
             return Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                          new Class[]{QueueSession.class}, new SessionInvocationHandler(xaqs));
+                                          new Class[]{QueueSession.class, XaTransaction.MuleXaObject.class}, new SessionInvocationHandler(xaqs));
         }
         else if (method.getName().equals("createTopicSession"))
         {
             XATopicSession xats = ((XATopicConnection) xaConnection).createXATopicSession();
             return Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                          new Class[]{TopicSession.class}, new SessionInvocationHandler(xats));
+                                          new Class[]{TopicSession.class, XaTransaction.MuleXaObject.class}, new SessionInvocationHandler(xats));
         }
         else
         {

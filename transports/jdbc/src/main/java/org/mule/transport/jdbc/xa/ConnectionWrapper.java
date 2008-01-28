@@ -28,6 +28,7 @@ import java.sql.Statement;
 import java.util.Map;
 
 import javax.sql.XAConnection;
+import javax.transaction.xa.XAResource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,12 +36,13 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Using for unification XAConnection and Connection
  */
-public class ConnectionWrapper implements Connection
+public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
 {
     private final XAConnection xaConnection;
     private Connection connection;
     private volatile boolean enlisted = false;
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected static final transient Log logger = LogFactory.getLog(ConnectionWrapper.class);
+    private volatile boolean reuseObject = false;
 
     public ConnectionWrapper(XAConnection xaCon) throws SQLException
     {
@@ -470,6 +472,34 @@ public class ConnectionWrapper implements Connection
         }
     }
 
+    public boolean delist() throws Exception
+    {
+        if (!isEnlisted())
+        {
+            return false;
+        }
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Delistment request: " + this);
+        }
+
+        Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+        if (transaction == null)
+        {
+            throw new IllegalTransactionStateException(CoreMessages.noMuleTransactionAvailable());
+        }
+        if (!(transaction instanceof XaTransaction))
+        {
+            throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(transaction));
+        }
+        if (isEnlisted())
+        {
+            enlisted = !((XaTransaction) transaction).delistResource(xaConnection.getXAResource(), XAResource.TMSUCCESS);
+        }
+        return !isEnlisted();
+    }
+
+
     public boolean isEnlisted()
     {
         return enlisted;
@@ -478,5 +508,20 @@ public class ConnectionWrapper implements Connection
     public void setEnlisted(boolean enlisted)
     {
         this.enlisted = enlisted;
+    }
+
+    public boolean isReuseObject()
+    {
+        return reuseObject;
+    }
+
+    public void setReuseObject(boolean reuseObject)
+    {
+        this.reuseObject = reuseObject;
+    }
+
+    public Object getTargetObject()
+    {
+        return xaConnection;
     }
 }

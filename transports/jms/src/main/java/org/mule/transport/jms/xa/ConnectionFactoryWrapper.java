@@ -35,7 +35,7 @@ public class ConnectionFactoryWrapper
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(ConnectionFactoryWrapper.class);
+    protected static final transient Log logger = LogFactory.getLog(ConnectionFactoryWrapper.class);
 
     protected final Object factory;
 

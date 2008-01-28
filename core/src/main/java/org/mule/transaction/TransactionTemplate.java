@@ -74,7 +74,7 @@ public class TransactionTemplate
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Transaction action is ACTION_ALWAYS_BEGIN, " +
-                                 "cuurent TX: " + tx);
+                                 "current TX: " + tx);
                 }
                 if (tx.isXA())
                 {

@@ -18,6 +18,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.XaTransaction;
 import org.mule.transport.ConnectException;
 import org.mule.transport.SingleAttemptConnectionStrategy;
 import org.mule.transport.TransactedPollingMessageReceiver;
@@ -324,6 +325,9 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             if (ctx.session == null)
             {
                 ctx.session = this.connector.getSession(endpoint);
+                //set reuse flag
+                ((XaTransaction.MuleXaObject) ctx.session).setReuseObject(reuseSession);
+
             }
 
             // Create destination

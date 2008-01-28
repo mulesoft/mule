@@ -39,12 +39,26 @@ import org.apache.commons.logging.LogFactory;
 
 public class SessionInvocationHandler implements InvocationHandler
 {
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected static final transient Log logger = LogFactory.getLog(SessionInvocationHandler.class);
 
     private XASession xaSession;
     private XAResource xaResource;
     private volatile boolean enlisted = false;
+    private volatile boolean reuseObject = false;
     private final Reference underlyingObject;
+    private static final Method SESSION_CLOSE_METHOD;
+
+    static
+    {
+        try
+        {
+            SESSION_CLOSE_METHOD = Session.class.getMethod("close", null);
+        }
+        catch (NoSuchMethodException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 
     public SessionInvocationHandler(XASession xaSession) throws JMSException
     {
@@ -81,8 +95,33 @@ public class SessionInvocationHandler implements InvocationHandler
         }
         if (underlyingObject.get() == null)
         {
-            throw new IllegalStateException("Underlying xaSession is null, XASession " + xaSession);
+            throw new IllegalStateException("Underlying session is null, XASession " + xaSession);
         }
+
+        // processing method from MuleXaObject
+        if (XaTransaction.MuleXaObject.DELIST_METHOD_NAME.equals(method.getName()))
+        {
+            return Boolean.valueOf(delist());
+        }
+        else if (XaTransaction.MuleXaObject.SET_REUSE_OBJECT_METHOD_NAME.equals(method.getName()))
+        {
+            reuseObject = ((Boolean) args[0]).booleanValue();
+            return null;
+        }
+        else if (XaTransaction.MuleXaObject.IS_REUSE_OBJECT_METHOD_NAME.equals(method.getName()))
+        {
+            return Boolean.valueOf(reuseObject);
+        }
+        else if (XaTransaction.MuleXaObject.GET_TARGET_OBJECT_METHOD_NAME.equals(method.getName()))
+        {
+            return getTargetObject();
+        }
+        else if (XaTransaction.MuleXaObject.CLOSE_METHOD_NAME.equals(method.getName()))
+        {
+            return SESSION_CLOSE_METHOD.invoke(underlyingObject.get(), args);
+        }
+        //close will be directly called on session object
+
         Object result = method.invoke(underlyingObject.get(), args);
 
         if (result instanceof TopicSubscriber)
@@ -150,6 +189,41 @@ public class SessionInvocationHandler implements InvocationHandler
             enlisted = ((XaTransaction) transaction).enlistResource(xaResource);
         }
     }
+
+    public boolean delist() throws Exception
+    {
+        if (!isEnlisted())
+        {
+            return false;
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Delistment request: " + this);
+        }
+
+        Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+        if (transaction == null)
+        {
+            throw new IllegalTransactionStateException(CoreMessages.noMuleTransactionAvailable());
+        }
+        if (!(transaction instanceof XaTransaction))
+        {
+            throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(transaction));
+        }
+
+        if (isEnlisted())
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Delisting resource " + xaResource + " in xa transaction " + transaction);
+            }
+
+            enlisted = !((XaTransaction) transaction).delistResource(xaResource, XAResource.TMSUCCESS);
+        }
+        return !isEnlisted();
+    }
+
 
     public boolean isEnlisted()
     {

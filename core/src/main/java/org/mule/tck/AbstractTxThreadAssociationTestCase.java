@@ -62,7 +62,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
         // Remove the TX-thread association. The only public API to achieve it is suspend(),
         // technically we never resume the same transaction (TX forget).
         Transaction suspended = tm.suspend();
-        assertTrue("Wron TX suspended?.", suspended.equals(tx));
+        assertTrue("Wrong TX suspended?.", suspended.equals(tx));
         assertNull("TX should've been disassociated from the thread.", tm.getTransaction());
 
         // should be no-op and never fail
@@ -165,6 +165,9 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
                             Transaction currentTx = tm.suspend();
                             assertTrue(currentTx.equals(secondTx));
                             tm.resume(firstTx);
+                            assertEquals(firstTx, tm.getTransaction());
+                            assertEquals(firstTx.getStatus(), Status.STATUS_ACTIVE);
+                            assertEquals(secondTx.getStatus(), Status.STATUS_ACTIVE);
                             Transaction a = tm.suspend();
                             assertTrue(a.equals(firstTx));
                             tm.resume(secondTx);
