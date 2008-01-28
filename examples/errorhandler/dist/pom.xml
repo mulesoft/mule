@@ -299,7 +299,7 @@
                                     <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.apache.activemq</groupId> 
+                                    <groupId>org.apache.activemq</groupId>
                                     <artifactId>activemq-core</artifactId>
                                     <version>${activemqVersion}</version>
                                 </artifactItem>
@@ -318,6 +318,28 @@
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>pre-test</id>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <tasks>
+                                <copy todir="${project.build.testOutputDirectory}">
+                                    <fileset dir="${basedir}/conf">
+                                        <include name="*"/>
+                                    </fileset>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
