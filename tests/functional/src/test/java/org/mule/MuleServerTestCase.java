@@ -70,4 +70,13 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         muleServer.initialize();
     }
 
+    public void testMuleServerMultipleSpringConfigArgs() throws Exception
+    {
+        MuleServer muleServer = new MuleServer(new String[]{"-config",
+            "mule-config.xml,org/mule/test/spring/config1/test-xml-mule2-config.xml"});
+        assertEquals("mule-config.xml,org/mule/test/spring/config1/test-xml-mule2-config.xml", muleServer.getConfigurationResources());
+//        assertEquals("org.mule.config.builders.AutoConfigurationBuilder", muleServer.getConfigBuilderClassName());
+//        muleServer.initialize();
+    }
+
 }

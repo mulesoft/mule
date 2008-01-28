@@ -27,11 +27,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     protected String defaultConfigResource = "default-mule-config.xml";
 
     protected ApplicationContext parentContext;
+    private boolean first = true;
 
     public SpringXmlConfigurationBuilder(String configResources, ApplicationContext parentContext)
     {
-        super(configResources);
-        this.parentContext = parentContext;
+        this (new String[]{configResources}, parentContext);
     }
 
     public SpringXmlConfigurationBuilder(String[] configResources, ApplicationContext parentContext)
@@ -50,11 +50,25 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         this(configResources, null);
     }
 
+    public SpringXmlConfigurationBuilder(String configResources, boolean first)
+    {
+        this(configResources, null);
+        this.first = first;
+    }
+
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
-        String[] all = new String[configResources.length + 1];
-        all[0] = defaultConfigResource;
-        System.arraycopy(configResources, 0, all, 1, configResources.length);
+        String[] all;
+        if (first)
+        {
+            all = new String[configResources.length + 1];
+            all[0] = defaultConfigResource;
+            System.arraycopy(configResources, 0, all, 1, configResources.length);
+        }
+        else
+        {
+            all = configResources;
+        }
         createSpringParentRegistry(muleContext, muleContext.getRegistry(), all);
     }
 

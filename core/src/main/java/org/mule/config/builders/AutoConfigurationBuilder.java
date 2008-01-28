@@ -56,6 +56,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         ConfigurationBuilder configurationBuilder = null;
 
         boolean remoteURL = false;
+        boolean springFirst = true;
         String resourceExtension = null;
 
         // Work out if the resouce is a non-file url
@@ -107,7 +108,9 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
             try
             {
                 configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
-                    "org.mule.config.spring.SpringXmlConfigurationBuilder", new Object[]{resource});
+                    "org.mule.config.spring.SpringXmlConfigurationBuilder",
+                        new Object[]{resource, Boolean.valueOf(springFirst)});
+                springFirst = false;
             }
             catch (Exception e)
             {
@@ -120,7 +123,9 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
             try
             {
                 configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
-                    "org.mule.config.spring.SpringXmlConfigurationBuilder", new Object[]{resource});
+                    "org.mule.config.spring.SpringXmlConfigurationBuilder",
+                        new Object[]{resource, Boolean.valueOf(springFirst)});
+                springFirst = false;
             }
             catch (Exception e)
             {
