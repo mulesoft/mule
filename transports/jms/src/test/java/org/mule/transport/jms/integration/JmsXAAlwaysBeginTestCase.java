@@ -45,14 +45,11 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
         send(scenarioNoTx);
         receive(scenarioNoTx);
         receive(scenarioNoTx);
-        receive(scenarioNoTx);
-        receive(scenarioNoTx);
 
         scenarioNoTx.setRecieve(false);
         receive(scenarioNoTx);
         assertEquals(committedTx.size(), 0);
-        //TODO why did I get 4 messages, if maxRedelivery had been set to 1
-        assertEquals(rolledbackTx.size(), 4);
+        assertEquals(rolledbackTx.size(), 2);
     }
 
 

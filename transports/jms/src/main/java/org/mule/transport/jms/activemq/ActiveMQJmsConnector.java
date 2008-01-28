@@ -28,7 +28,7 @@ public class ActiveMQJmsConnector extends JmsConnector
 {
     public static final String ACTIVEMQ_CONNECTION_FACTORY_CLASS = "org.apache.activemq.ActiveMQConnectionFactory";
     public static final String DEFAULT_BROKER_URL = "vm://localhost?broker.persistent=false&broker.useJmx=false";
-    
+
     private String brokerURL = DEFAULT_BROKER_URL;
 
     /**
@@ -44,8 +44,20 @@ public class ActiveMQJmsConnector extends JmsConnector
     {
         try
         {
-            return (ConnectionFactory) 
-                ClassUtils.instanciateClass(ACTIVEMQ_CONNECTION_FACTORY_CLASS, new Object[]{getBrokerURL()});
+            ConnectionFactory connectionFactory = (ConnectionFactory)
+                    ClassUtils.instanciateClass(ACTIVEMQ_CONNECTION_FACTORY_CLASS, new Object[]{getBrokerURL()});
+            try
+            {
+                Method getRedeliveryPolicyMethod = connectionFactory.getClass().getMethod("getRedeliveryPolicy", new Class[]{});
+                Object redeliveryPolicy = getRedeliveryPolicyMethod.invoke(connectionFactory, new Object[]{});
+                Method setMaximumRedeliveriesMethod = redeliveryPolicy.getClass().getMethod("setMaximumRedeliveries", new Class[]{Integer.TYPE});
+                setMaximumRedeliveriesMethod.invoke(redeliveryPolicy, new Object[]{new Integer(getMaxRedelivery())});
+            }
+            catch (Exception e)
+            {
+                logger.error("Can not set MaxRedelivery parameter to RedeliveryPolicy " + e);
+            }
+            return connectionFactory;
         }
         catch (Exception e)
         {
