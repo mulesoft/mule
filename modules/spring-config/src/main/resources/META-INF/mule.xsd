@@ -1269,7 +1269,7 @@
         <xsd:choice>
             <xsd:element ref="abstract-entry-point-resolver-set" minOccurs="0"/>
             <!-- we could allow many of these, but it looks ugly -->
-            <xsd:element ref="abstract-entrypoint-resolver" minOccurs="0"/>
+            <xsd:element ref="abstract-entry-point-resolver" minOccurs="0"/>
         </xsd:choice>
     </xsd:group>
 
@@ -1282,7 +1282,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractEntryPointResolverSetType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-entrypoint-resolver" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element ref="abstract-entry-point-resolver" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -1301,12 +1301,12 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-entrypoint-resolver" abstract="true" type="abstractEntryPointResolverType"/>
-    <xsd:element name="callable-entry-point-resolver" type="abstractEntryPointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
+    <xsd:element name="abstract-entry-point-resolver" abstract="true" type="abstractEntryPointResolverType"/>
+    <xsd:element name="callable-entry-point-resolver" type="abstractEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
     <xsd:complexType name="abstractEntryPointResolverType"/>
 
     <xsd:element name="custom-entry-point-resolver" type="customEntryPointResolverType"
-                 substitutionGroup="abstract-entrypoint-resolver"/>
+                 substitutionGroup="abstract-entry-point-resolver"/>
     <xsd:complexType name="customEntryPointResolverType">
         <xsd:complexContent>
             <xsd:extension base="abstractEntryPointResolverType">
@@ -1327,7 +1327,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="property-entry-point-resolver" type="propertyEntryPointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
+    <xsd:element name="property-entry-point-resolver" type="propertyEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
     <xsd:complexType name="propertyEntryPointResolverType">
         <xsd:complexContent>
             <xsd:extension base="baseEntryPointResolverType">
@@ -1336,7 +1336,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="method-entry-point-resolver" type="methodEntryPointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
+    <xsd:element name="method-entry-point-resolver" type="methodEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
     <xsd:complexType name="methodEntryPointResolverType">
         <xsd:complexContent>
             <xsd:extension base="baseEntryPointResolverType">
@@ -1347,7 +1347,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="reflection-entry-point-resolver" type="reflectionEntryPointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
+    <xsd:element name="reflection-entry-point-resolver" type="reflectionEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
     <xsd:complexType name="reflectionEntryPointResolverType">
         <xsd:complexContent>
             <xsd:extension base="baseEntryPointResolverType">
@@ -1359,8 +1359,8 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="array-entry-point-resolver" type="complexEntryPointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
-    <xsd:element name="no-arguments-entry-point-resolver" type="complexEntryPointResolverType" substitutionGroup="abstract-entrypoint-resolver"/>
+    <xsd:element name="array-entry-point-resolver" type="complexEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
+    <xsd:element name="no-arguments-entry-point-resolver" type="complexEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
     <xsd:complexType name="complexEntryPointResolverType">
         <xsd:complexContent>
             <xsd:extension base="reflectionEntryPointResolverType">
