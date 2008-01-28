@@ -25,7 +25,6 @@ import java.net.Socket;
 public class ResponseOutputStream extends BufferedOutputStream
 {
 
-    private boolean used = false;
     private Socket socket = null;
 
     public ResponseOutputStream(OutputStream stream)
@@ -37,29 +36,6 @@ public class ResponseOutputStream extends BufferedOutputStream
     {
         super(stream);
         this.socket = socket;
-    }
-
-    public void write(int b) throws IOException
-    {
-        super.write(b);
-        used = true;
-    }
-
-    public synchronized void write(byte b[], int off, int len) throws IOException
-    {
-        super.write(b, off, len);
-        used = true;
-    }
-
-    public void write(byte b[]) throws IOException
-    {
-        super.write(b);
-        used = true;
-    }
-
-    public boolean isUsed()
-    {
-        return used;
     }
 
     public Socket getSocket()
