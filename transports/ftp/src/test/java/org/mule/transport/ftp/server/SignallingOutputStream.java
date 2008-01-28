@@ -32,6 +32,16 @@ public class SignallingOutputStream extends OutputStream
         delegate.write(b);
     }
 
+    public void write(byte b[]) throws IOException
+    {
+        delegate.write(b);
+    }
+
+    public void write(byte b[], int off, int len) throws IOException
+    {
+        delegate.write(b, off, len);
+    }
+
     // @Override
     public void close() throws IOException
     {
