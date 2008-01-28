@@ -158,4 +158,18 @@ public abstract class AbstractTransaction implements Transaction
         MuleServer.getMuleContext().fireNotification(notification);
     }
 
+    public boolean isXA()
+    {
+        return false;
+    }
+
+    public void resume() throws TransactionException
+    {
+        throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(this));
+    }
+
+    public javax.transaction.Transaction suspend() throws TransactionException
+    {
+        throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(this));
+    }
 }

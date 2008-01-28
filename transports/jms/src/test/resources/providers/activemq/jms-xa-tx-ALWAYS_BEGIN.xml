@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+        "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+<mule-configuration id="persistent_vmqueue_test" version="1.0">
+
+    <transaction-manager factory="org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
+
+    <connector name="vmQueue" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+            <property name="numberOfConcurrentTransactedReceivers" value="1"/>
+        </properties>
+    </connector>
+
+    <connector name="jmsConnectorXA" className="org.mule.providers.jms.activemq.ActiveMqJmsConnector">
+        <properties>
+            <property name="connectionFactoryClass" value="org.apache.activemq.ActiveMQXAConnectionFactory"/>
+            <map name="connectionFactoryProperties">
+                <property name="brokerURL" value="vm://localhost?broker.persistent=false&amp;broker.useJmx=false"/>
+            </map>
+            <property name="specification" value="1.1"/>
+            <property name="numberOfConcurrentTransactedReceivers" value="1"/>
+            <property name="maxRedelivery" value="1"/>
+        </properties>
+    </connector>
+
+    <model name="TEST">
+        <mule-descriptor name="Pre"
+                         implementation="org.mule.test.integration.providers.jms.functional.JmsXAAlwaysBeginTestCase$TestRollbackComponent"
+                         singleton="true">
+            <inbound-router>
+                <endpoint address="jms://in">
+                    <transaction action="BEGIN_OR_JOIN"
+                                 factory="org.mule.transaction.XaTransactionFactory"/>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jms://out" connector="jmsConnectorXA">
+                        <transaction action="ALWAYS_BEGIN"
+                                     factory="org.mule.transaction.XaTransactionFactory"/>
+                    </endpoint>
+                </router>
+            </outbound-router>
+
+            <threading-profile maxThreadsActive="1"/>
+            <pooling-profile maxActive="1"/>
+        </mule-descriptor>
+
+    </model>
+</mule-configuration>

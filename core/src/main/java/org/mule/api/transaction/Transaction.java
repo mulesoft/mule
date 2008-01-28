@@ -62,4 +62,21 @@ public interface Transaction
     void setRollbackOnly() throws TransactionException;
 
     boolean isRollbackOnly() throws TransactionException;
+
+    boolean isXA();
+
+    /**
+     * Resume the XA transaction
+     *
+     * @throws TransactionException if any error
+     */
+    void resume() throws TransactionException;
+
+    /**
+     * Suspend the XA transaction
+     *
+     * @return
+     * @throws TransactionException if any error
+     */
+    javax.transaction.Transaction suspend() throws TransactionException;
 }
