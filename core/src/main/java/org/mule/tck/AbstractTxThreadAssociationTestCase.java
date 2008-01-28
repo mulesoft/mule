@@ -111,6 +111,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
      */
     public void testAlwaysBeginXaTransactionSuspendResume() throws Exception
     {
+        muleContext.setTransactionManager(tm);
         assertNull("There sould be no current transaction associated.", tm.getTransaction());
 
         // don't wait for ages, has to be set before TX is begun
