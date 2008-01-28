@@ -17,9 +17,7 @@ import org.mule.util.ClassUtils;
 public class MuleServerTestCase extends AbstractMuleTestCase
 {
 
-    private MuleServer muleServer;
-
-    //@Override
+    // @Override
     protected MuleContext createMuleContext() throws Exception
     {
         return null;
@@ -27,7 +25,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
 
     public void testMuleServer() throws Exception
     {
-        muleServer = new MuleServer();
+        MuleServer muleServer = new MuleServer();
         assertEquals(ClassUtils.getResource("mule-config.xml", MuleServer.class).toString(),
             muleServer.getConfigurationResources());
         assertEquals("org.mule.config.builders.AutoConfigurationBuilder", muleServer.getConfigBuilderClassName());
@@ -36,7 +34,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
 
     public void testMuleServerResource() throws Exception
     {
-        muleServer = new MuleServer("org/mule/test/spring/config1/test-xml-mule2-config.xml");
+        MuleServer muleServer = new MuleServer("org/mule/test/spring/config1/test-xml-mule2-config.xml");
         assertEquals("org/mule/test/spring/config1/test-xml-mule2-config.xml", muleServer.getConfigurationResources());
         assertEquals("org.mule.config.builders.AutoConfigurationBuilder", muleServer.getConfigBuilderClassName());
         muleServer.initialize();
@@ -47,6 +45,16 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         MuleServer muleServer = new MuleServer(new String[]{"-config",
             "org/mule/test/spring/config1/test-xml-mule2-config.xml"});
         assertEquals("org/mule/test/spring/config1/test-xml-mule2-config.xml", muleServer.getConfigurationResources());
+        assertEquals("org.mule.config.builders.AutoConfigurationBuilder", muleServer.getConfigBuilderClassName());
+        muleServer.initialize();
+    }
+
+    public void testMuleServerMultipleSpringConfigArgs() throws Exception
+    {
+        MuleServer muleServer = new MuleServer(new String[]{"-config",
+            "mule-config.xml,org/mule/test/spring/config1/test-xml-mule2-config.xml"});
+        assertEquals("mule-config.xml,org/mule/test/spring/config1/test-xml-mule2-config.xml",
+            muleServer.getConfigurationResources());
         assertEquals("org.mule.config.builders.AutoConfigurationBuilder", muleServer.getConfigBuilderClassName());
         muleServer.initialize();
     }
@@ -68,15 +76,6 @@ public class MuleServerTestCase extends AbstractMuleTestCase
             muleServer.getConfigurationResources());
         assertEquals("org.mule.config.spring.SpringXmlConfigurationBuilder", muleServer.getConfigBuilderClassName());
         muleServer.initialize();
-    }
-
-    public void testMuleServerMultipleSpringConfigArgs() throws Exception
-    {
-        MuleServer muleServer = new MuleServer(new String[]{"-config",
-            "mule-config.xml,org/mule/test/spring/config1/test-xml-mule2-config.xml"});
-        assertEquals("mule-config.xml,org/mule/test/spring/config1/test-xml-mule2-config.xml", muleServer.getConfigurationResources());
-//        assertEquals("org.mule.config.builders.AutoConfigurationBuilder", muleServer.getConfigBuilderClassName());
-//        muleServer.initialize();
     }
 
 }

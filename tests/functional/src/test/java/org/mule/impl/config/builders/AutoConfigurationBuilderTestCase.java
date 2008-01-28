@@ -53,24 +53,25 @@ public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
     // {
     // // TODO
     // }
-
-    public void testConfigureUnkownExtension() throws ConfigurationException
-    {
-        ConfigurationBuilder configurationBuilder = new AutoConfigurationBuilder("my.dtd");
-
-        try
-        {
-            configurationBuilder.configure(muleContext);
-        }
-        catch (ConfigurationException ce)
-        {
-            assertEquals(
-                "No suitable configuration builder for resource \"my.dtd\" found.  Check you have configuration module ion your classpath and are using correct file extension.",
-                ce.getCause().getMessage());
-        }
-        catch (Exception e)
-        {
-            fail("Exception unexpected:" + e);
-        }
-    }
+    //
+    // public void testConfigureUnkownExtension() throws ConfigurationException
+    // {
+    // ConfigurationBuilder configurationBuilder = new AutoConfigurationBuilder("my.dtd");
+    //
+    // try
+    // {
+    // configurationBuilder.configure(muleContext);
+    // }
+    // catch (ConfigurationException ce)
+    // {
+    // assertEquals(
+    // "No suitable configuration builder for resource \"my.dtd\" found. Check you have configuration module
+    // ion your classpath and are using correct file extension.",
+    // ce.getCause().getMessage());
+    // }
+    // catch (Exception e)
+    // {
+    //            fail("Exception unexpected:" + e);
+    //        }
+    //    }
 }

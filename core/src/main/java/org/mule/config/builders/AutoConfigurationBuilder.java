@@ -16,9 +16,6 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,10 +35,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 
     protected void doConfigure(MuleContext muleContext) throws ConfigurationException
     {
-        for (int i = 0; i < configResources.length; i++)
-        {
-            autoConfigure(muleContext, configResources[i]);
-        }
+        autoConfigure(muleContext, configResources);
     }
 
     /**
@@ -50,82 +44,29 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
      * @return
      * @throws ConfigurationException
      */
-    protected void autoConfigure(MuleContext muleContext, String resource) throws ConfigurationException
+    protected void autoConfigure(MuleContext muleContext, String[] configResources) throws ConfigurationException
     {
 
         ConfigurationBuilder configurationBuilder = null;
 
-        boolean remoteURL = false;
-        boolean springFirst = true;
-        String resourceExtension = null;
-
-        // Work out if the resouce is a non-file url
-        try
-        {
-            URL url = new URL(resource);
-            String protocol = url.getProtocol();
-            if (!protocol.equals("file"))
-            {
-                remoteURL = true;
-            }
-            else
-            {
-                remoteURL = false;
-            }
-        }
-        catch (MalformedURLException e1)
-        {
-            remoteURL = false;
-        }
-
-        // And the file name/extension
-        if (!remoteURL)
-        {
-            String[] splitResouce = resource.split("\\.");
-            if (splitResouce.length >= 2)
-            {
-                resourceExtension = splitResouce[splitResouce.length - 1];
-            }
-        }
-
-        // Resolve configuration builder
-        if (remoteURL
-            && ClassUtils.isClassOnPath("org.mule.galaxy.mule2.config.GalaxyConfigurationBuilder", this.getClass()))
+        if (ClassUtils.isClassOnPath("org.mule.config.spring.SpringXmlConfigurationBuilder", this.getClass()))
         {
             try
             {
                 configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
-                    "org.mule.galaxy.mule2.config.GalaxyConfigurationBuilder", new Object[]{resource});
+                    "org.mule.config.spring.SpringXmlConfigurationBuilder", new Object[]{configResources});
             }
             catch (Exception e)
             {
                 throw new ConfigurationException(e);
             }
         }
-        else if (ClassUtils.isClassOnPath("org.mule.config.spring.SpringXmlConfigurationBuilder", this.getClass())
-                 && "xml".equals(resourceExtension))
+        else if (ClassUtils.isClassOnPath("org.mule.config.scripting.ScriptingConfigurationBuilder", this.getClass()))
         {
             try
             {
                 configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
-                    "org.mule.config.spring.SpringXmlConfigurationBuilder",
-                        new Object[]{resource, Boolean.valueOf(springFirst)});
-                springFirst = false;
-            }
-            catch (Exception e)
-            {
-                throw new ConfigurationException(e);
-            }
-        }
-        else if (ClassUtils.isClassOnPath("org.mule.config.scripting.ScriptingConfigurationBuilder", this.getClass())
-                 && "groovy".equals(resourceExtension))
-        {
-            try
-            {
-                configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
-                    "org.mule.config.spring.SpringXmlConfigurationBuilder",
-                        new Object[]{resource, Boolean.valueOf(springFirst)});
-                springFirst = false;
+                    "org.mule.config.spring.SpringXmlConfigurationBuilder", new Object[]{configResources});
             }
             catch (Exception e)
             {
@@ -134,8 +75,9 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         }
         else
         {
-            throw new ConfigurationException(CoreMessages.configurationBuilderNoMatching(resource));
+            throw new ConfigurationException(CoreMessages.configurationBuilderNoMatching(createConfigResourcesString()));
         }
         configurationBuilder.configure(muleContext);
     }
+
 }

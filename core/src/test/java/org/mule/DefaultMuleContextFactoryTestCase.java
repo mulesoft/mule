@@ -127,7 +127,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         catch (ConfigurationException e)
         {
             assertEquals(
-                "No suitable configuration builder for resource \"my-resource.xml\" found.  Check you have configuration module ion your classpath and are using correct file extension.",
+                "No suitable configuration builder for resource \"[my-resource.xml]\" found.  Check you have configuration module ion your classpath and are using correct file extension.",
                 e.getCause().getMessage());
         }
         assertNull(muleContext);
@@ -148,7 +148,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         catch (ConfigurationException e)
         {
             assertEquals(
-                "No suitable configuration builder for resource \"my-resource.xml\" found.  Check you have configuration module ion your classpath and are using correct file extension.",
+                "No suitable configuration builder for resource \"[my-resource.xml]\" found.  Check you have configuration module ion your classpath and are using correct file extension.",
                 e.getCause().getMessage());
         }
 
