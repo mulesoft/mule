@@ -56,6 +56,18 @@ public class ResponseOutputStream extends BufferedOutputStream
         used = true;
     }
 
+    public synchronized void write(byte b[], int off, int len) throws IOException
+    {
+        super.write(b, off, len);
+        used = true;
+    }
+
+    public void write(byte b[]) throws IOException
+    {
+        super.write(b);
+        used = true;
+    }
+
     public byte[] getBytes() throws IOException
     {
         if (isDefault)
