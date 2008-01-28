@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
- <version>2.1.0-M1-SNAPSHOT</version>
+        <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-email</artifactId>
     <!--<packaging>bundle</packaging>-->
@@ -26,6 +26,22 @@
         </dependency>
 
         <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>mail</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
@@ -41,12 +57,6 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>icegreen</groupId>
-            <artifactId>greenmail</artifactId>
-            <version>1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
