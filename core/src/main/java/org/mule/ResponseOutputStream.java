@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
-
 /**
  * <code>ResponseOutputStream</code> is an output stream associated with the
  * currently received event. Note that if the stream is from a socket the socket is
@@ -27,17 +25,8 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 public class ResponseOutputStream extends BufferedOutputStream
 {
 
-    private static ByteArrayOutputStream defaultStream = new ByteArrayOutputStream();
-
     private boolean used = false;
-    private boolean isDefault = false;
     private Socket socket = null;
-
-    public ResponseOutputStream()
-    {
-        super(defaultStream);
-        isDefault = true;
-    }
 
     public ResponseOutputStream(OutputStream stream)
     {
@@ -66,16 +55,6 @@ public class ResponseOutputStream extends BufferedOutputStream
     {
         super.write(b);
         used = true;
-    }
-
-    public byte[] getBytes() throws IOException
-    {
-        if (isDefault)
-        {
-            flush();
-            return defaultStream.toByteArray();
-        }
-        return null;
     }
 
     public boolean isUsed()
