@@ -825,7 +825,7 @@
                     <aggregate>true</aggregate>
                     <!-- Link to the external online JavaDoc -->
                     <links>
-                        <link>http://java.sun.com/j2se/1.4.2/docs/api/</link>
+                        <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
                         <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
                         <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.7.0/docs/api/</link>
                         <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
@@ -849,8 +849,8 @@
                             <packages>org.mule.extras.*:org.mule.components.*</packages>
                         </group>
                         <group>
-                            <title>Transports (a.k.a. Providers)</title>
-                            <packages>org.mule.providers.*</packages>
+                            <title>Transports</title>
+                            <packages>org.mule.transport.*</packages>
                         </group>
                         <group>
                             <title>Testing Framework</title>
