@@ -70,7 +70,6 @@ mule-module-scripting
 mule-module-spring-config
 mule-module-spring-extras
 mule-module-xml
-mule-tests-functional
 mule-transport-axis
 mule-transport-bpm
 mule-transport-cxf
