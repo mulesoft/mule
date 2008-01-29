@@ -22,10 +22,10 @@
             <version>${muleVersion}</version>
         </dependency>
         <dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-spring-config</artifactId>
-			<version>${version}</version>
-		</dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
+        </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-xfire</artifactId>
@@ -45,6 +45,13 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-stream</artifactId>
             <version>${muleVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${muleVersion}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

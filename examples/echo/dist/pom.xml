@@ -30,11 +30,18 @@
             <artifactId>mule-transport-xfire</artifactId>
             <version>${muleVersion}</version>
         </dependency>
+
         <!-- Better testing of XML -->
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <version>1.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${muleVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

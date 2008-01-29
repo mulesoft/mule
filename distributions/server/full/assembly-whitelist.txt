@@ -70,6 +70,7 @@ junit-3.8.2
 log4j-1.2.14
 mockobjects-core-0.09
 mule-core
+mule-core-tests
 mule-example-echo
 mule-example-errorhandler
 mule-example-hello
