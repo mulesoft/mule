@@ -46,23 +46,28 @@ public class ActiveMQJmsConnector extends JmsConnector
         {
             ConnectionFactory connectionFactory = (ConnectionFactory)
                     ClassUtils.instanciateClass(ACTIVEMQ_CONNECTION_FACTORY_CLASS, new Object[]{getBrokerURL()});
-            try
-            {
-                Method getRedeliveryPolicyMethod = connectionFactory.getClass().getMethod("getRedeliveryPolicy", new Class[]{});
-                Object redeliveryPolicy = getRedeliveryPolicyMethod.invoke(connectionFactory, new Object[]{});
-                Method setMaximumRedeliveriesMethod = redeliveryPolicy.getClass().getMethod("setMaximumRedeliveries", new Class[]{Integer.TYPE});
-                setMaximumRedeliveriesMethod.invoke(redeliveryPolicy, new Object[]{new Integer(getMaxRedelivery())});
-            }
-            catch (Exception e)
-            {
-                logger.error("Can not set MaxRedelivery parameter to RedeliveryPolicy " + e);
-            }
+            applyVendorSpecificConnectionFactoryProperties(connectionFactory);
             return connectionFactory;
         }
         catch (Exception e)
         {
             logger.warn(e);
             return null;
+        }
+    }
+
+    protected void applyVendorSpecificConnectionFactoryProperties(ConnectionFactory connectionFactory)
+    {
+        try
+        {
+            Method getRedeliveryPolicyMethod = connectionFactory.getClass().getMethod("getRedeliveryPolicy", new Class[]{});
+            Object redeliveryPolicy = getRedeliveryPolicyMethod.invoke(connectionFactory, new Object[]{});
+            Method setMaximumRedeliveriesMethod = redeliveryPolicy.getClass().getMethod("setMaximumRedeliveries", new Class[]{Integer.TYPE});
+            setMaximumRedeliveriesMethod.invoke(redeliveryPolicy, new Object[]{new Integer(getMaxRedelivery())});
+        }
+        catch (Exception e)
+        {
+            logger.error("Can not set MaxRedelivery parameter to RedeliveryPolicy " + e);
         }
     }
 

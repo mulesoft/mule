@@ -5,6 +5,4 @@
 # MULE-2868
 org.mule.transport.jms.issues.JmsRemoteSyncMule2868TestCase
 
-# Merge. Temporary. Old config
-org.mule.transport.jms.integration.JmsXAAlwaysBeginTestCase
 

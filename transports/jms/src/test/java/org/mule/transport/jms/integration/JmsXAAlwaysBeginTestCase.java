@@ -12,12 +12,6 @@ package org.mule.transport.jms.integration;
 
 import java.util.List;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
@@ -41,13 +35,10 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 
     public void testAlwaysBeginTx() throws Exception
     {
-        CurrentScenario scenarioNoTx = new CurrentScenario(DEFAULT_INPUT_MQ_QUEUE_NAME, DEFAULT_OUTPUT_MQ_QUEUE_NAME, true);
         send(scenarioNoTx);
         receive(scenarioNoTx);
         receive(scenarioNoTx);
-
-        scenarioNoTx.setRecieve(false);
-        receive(scenarioNoTx);
+        receive(scenarioNotReceive);
         assertEquals(committedTx.size(), 0);
         assertEquals(rolledbackTx.size(), 2);
     }
@@ -128,71 +119,4 @@ public class JmsXAAlwaysBeginTestCase extends AbstractJmsFunctionalTestCase
 
         protected int _timeout = 0;
     }
-
-    class CurrentScenario extends AbstractScenario
-    {
-
-        private String inputQueue;
-        private String outputQueue;
-        private boolean recieve = true;
-
-        public CurrentScenario(String inputQueue, String outputQueue, boolean recieve)
-        {
-            this.inputQueue = inputQueue;
-            this.outputQueue = outputQueue;
-        }
-
-        public String getInputQueue()
-        {
-            return inputQueue;
-        }
-
-        public String getOutputQueue()
-        {
-            return outputQueue;
-        }
-
-        public boolean isRecieve()
-        {
-            return recieve;
-        }
-
-        public void setRecieve(boolean recieve)
-        {
-            this.recieve = recieve;
-        }
-
-        public void send(Session session, MessageProducer producer) throws JMSException
-        {
-            producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
-        }
-
-        public Message receive(Session session, MessageConsumer consumer) throws JMSException
-        {
-            Message message = consumer.receive(TIMEOUT);
-            if (isRecieve())
-            {
-                assertNotNull(message);
-                assertTrue(TextMessage.class.isAssignableFrom(message.getClass()));
-                assertEquals(((TextMessage) message).getText(), DEFAULT_OUTPUT_MESSAGE);
-            }
-            else
-            {
-                assertNull(message);
-            }
-            return message;
-        }
-
-        public boolean isTransacted()
-        {
-            return false;
-        }
-
-        protected void applyTransaction(Session session) throws JMSException
-        {
-            //do nothink
-        }
-    }
-
-
 }
