@@ -1,9 +1,11 @@
 @echo off
 setlocal
-REM There is no need to call this if you set the MULE_HOME in your environment properties
-REM but you must also define MULE_LIB for the example (see below)
-REM or specify the config as a file: URI (see README.txt)
-if "%MULE_HOME%" == "" SET MULE_HOME=%~dp0..\..
+
+if exist "%MULE_HOME%" goto :continue
+echo You must set the environment variable MULE_HOME to the location of your Mule install in order to run this example. 
+goto :eof
+
+:continue
 if "%MULE_BASE%" == "" SET MULE_BASE=%MULE_HOME%
 
 REM This extends the classpath to include the configuration directory
