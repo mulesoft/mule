@@ -10,14 +10,14 @@
 
 package org.mule.transport.${TransportNameLower}.transformers;
 
-import org.mule.transformer.AbstractEventAwareTransformer;
+import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.MuleEventContext;
 
 /**
  * <code>${outboundTransformer}</code> TODO Document
  */
-public class ${outboundTransformer} extends AbstractEventAwareTransformer
+public class ${outboundTransformer} extends AbstractMessageAwareTransformer
 {
 
     /* For general guidelines on writing transports see
@@ -40,16 +40,9 @@ public class ${outboundTransformer} extends AbstractEventAwareTransformer
         */
     }
 
-    public Object transform(Object src, String encoding, MuleEventContext context) throws TransformerException
+    public Object transform(MuleMessage message, String encoding) throws TransformerException
     {
-        /* IMPLEMENTATION NOTE: If you only have a single source type
-           registered you can cast the 'src' object directly to that type,
-           otherwise you need to check the instance type of 'src' for each
-           registered source type */
-
-        // TODO Transformer the source object here.  You have access to the
-        // Current message (including //headers and attachments from the
-        // context.getMessage())
+        // TODO Transformer the message here.  See comments in {@link AbstractMessageAwareTransformer}
 
         // Make sure you return a transfromed object that matches the
         // returnClass type

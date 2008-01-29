@@ -41,10 +41,7 @@ public class EmailMessageToString extends AbstractTransformer
         {
             /*
              * Other information about the message such as cc addresses, attachments
-             * are handled by the mail message adapter. If Transformers need access
-             * to these properties they should extends from
-             * AbstractEventAwareTransformer and extract these properties from the
-             * passed MuleEventContext
+             * are handled by the mail message adapter.
              */
 
             // For this impl we just pass back the email content
