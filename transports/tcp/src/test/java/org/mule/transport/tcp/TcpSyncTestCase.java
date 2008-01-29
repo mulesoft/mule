@@ -52,9 +52,11 @@ public class TcpSyncTestCase extends FunctionalTestCase
 
     public void testSyncResponseOfBufferSize() throws Exception
     {
+        int size = 1024 * 16;
         TcpConnector tcp = (TcpConnector)muleContext.getRegistry().lookupConnector("tcpConnector");
-        tcp.setBufferSize(1024 * 16);
-        byte[] data = fillBuffer(new byte[tcp.getBufferSize()]);
+        tcp.setSendBufferSize(size);
+        tcp.setReceiveBufferSize(size);
+        byte[] data = fillBuffer(new byte[size]);
         MuleMessage message = send(data);
         assertNotNull(message);
         byte[] response = message.getPayloadAsBytes();
@@ -64,9 +66,11 @@ public class TcpSyncTestCase extends FunctionalTestCase
 
     public void testManySyncResponseOfBufferSize() throws Exception
     {
+        int size = 1024 * 16;
         TcpConnector tcp = (TcpConnector)muleContext.getRegistry().lookupConnector("tcpConnector");
-        tcp.setBufferSize(1024 * 16);
-        byte[] data = fillBuffer(new byte[tcp.getBufferSize()]);
+        tcp.setSendBufferSize(size);
+        tcp.setReceiveBufferSize(size);
+        byte[] data = fillBuffer(new byte[size]);
         for (int i = 0; i < 20; ++i)
         {
             MuleMessage message = send(data);

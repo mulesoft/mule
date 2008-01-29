@@ -66,9 +66,6 @@ public abstract class AbstractTransformer implements Transformer
      */
     protected final List sourceTypes = new CopyOnWriteArrayList();
 
-    /** This is the following transformer in the chain of transformers. */
-    protected Transformer nextTransformer;
-
     /**
      * Determines whether the transformer will throw an exception if the message
      * passed is is not supported or the return tye is incorrect
@@ -206,7 +203,7 @@ public abstract class AbstractTransformer implements Transformer
         String encoding = null;
 
         Object payload = src;
-        MessageAdapter adapter = null;
+        MessageAdapter adapter;
         if (src instanceof MessageAdapter)
         {
             encoding = ((MessageAdapter) src).getEncoding();

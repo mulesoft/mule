@@ -88,4 +88,12 @@ public class QNamePropertyEditor extends PropertyEditorSupport
             }
         }
     }
+
+    public static QName convert(String value)
+    {
+        QNamePropertyEditor editor = new QNamePropertyEditor();
+        editor.setAsText(value);
+        return (QName) editor.getValue();
+    }
+
 }

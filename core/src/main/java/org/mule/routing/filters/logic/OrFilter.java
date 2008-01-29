@@ -27,7 +27,6 @@ public class OrFilter extends AbstractFilterCollection
     }
 
     /**
-     * @deprecated
      * @param left
      * @param right
      */

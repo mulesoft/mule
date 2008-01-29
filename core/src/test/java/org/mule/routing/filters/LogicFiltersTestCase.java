@@ -16,6 +16,10 @@ import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.filters.logic.OrFilter;
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.util.List;
+import java.util.Collections;
+import java.util.LinkedList;
+
 public class LogicFiltersTestCase extends AbstractMuleTestCase
 {
 
@@ -59,15 +63,13 @@ public class LogicFiltersTestCase extends AbstractMuleTestCase
     public void testOrFilter()
     {
         OrFilter filter = new OrFilter();
-        assertNull(filter.getLeftFilter());
-        assertNull(filter.getRightFilter());
+        assertEquals(0, filter.getFilters().size());
         assertFalse(filter.accept(new DefaultMuleMessage("foo")));
 
         WildcardFilter left = new WildcardFilter("blah.blah.*");
         WildcardFilter right = new WildcardFilter("blah.b*");
         filter = new OrFilter(left, right);
-        assertNotNull(filter.getLeftFilter());
-        assertNotNull(filter.getRightFilter());
+        assertEquals(2, filter.getFilters().size());
 
         assertTrue(filter.accept(new DefaultMuleMessage("blah.blah.blah")));
         assertTrue(right.accept(new DefaultMuleMessage("blah.blah")));
@@ -76,8 +78,10 @@ public class LogicFiltersTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept(new DefaultMuleMessage("blah.x.blah")));
 
         filter = new OrFilter();
-        filter.setLeftFilter(left);
-        filter.setRightFilter(right);
+        LinkedList filters = new LinkedList();
+        filters.addLast(left);
+        filters.addLast(right);
+        filter.setFilters(filters);
 
         assertTrue(filter.accept(new DefaultMuleMessage("blah.blah.blah")));
         assertTrue(filter.accept(new DefaultMuleMessage("blah.blah")));

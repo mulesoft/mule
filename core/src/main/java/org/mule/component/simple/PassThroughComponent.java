@@ -15,9 +15,7 @@ import org.mule.api.lifecycle.Callable;
 
 /**
  * <code>PassThroughComponent</code> will simply return the payload back as the result.
- * Normally {@link BridgeComponent} should be used since it removes the slight overhead of
- * invoking the service object by never actually causing an invocation; however,
- * interceptors will only be invoked using this class.
+ * This typically you don't need to specify this, since it is used by default.
  */
 public class PassThroughComponent implements Callable
 {

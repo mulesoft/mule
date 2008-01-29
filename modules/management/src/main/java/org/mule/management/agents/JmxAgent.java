@@ -366,7 +366,7 @@ public class JmxAgent extends AbstractAgent
     protected void registerModelServices() throws NotCompliantMBeanException, MBeanRegistrationException,
                                                   InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        for (Iterator iterator = muleContext.getRegistry().getModels().iterator(); iterator.hasNext();)
+        for (Iterator iterator = muleContext.getRegistry().lookupObjects(Model.class).iterator(); iterator.hasNext();)
         {
             Model model = (Model) iterator.next();
             ModelServiceMBean serviceMBean = new ModelService(model);
@@ -419,7 +419,7 @@ public class JmxAgent extends AbstractAgent
     protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        Iterator iter = muleContext.getRegistry().getConnectors().iterator();
+        Iterator iter = muleContext.getRegistry().lookupObjects(Connector.class).iterator();
         Connector connector;
         while (iter.hasNext())
         {
@@ -462,7 +462,7 @@ public class JmxAgent extends AbstractAgent
                                                 MBeanRegistrationException,
                                                 InstanceAlreadyExistsException
     {
-        Iterator iter = muleContext.getRegistry().getConnectors().iterator();
+        Iterator iter = muleContext.getRegistry().lookupObjects(Connector.class).iterator();
         while (iter.hasNext())
         {
             Connector connector = (Connector) iter.next();

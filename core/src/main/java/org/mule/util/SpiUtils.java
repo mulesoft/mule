@@ -59,7 +59,7 @@ public class SpiUtils
 
     public static Properties findServiceDescriptor(String path, String name, Class currentClass)
     {
-        if(!name.endsWith(".properties"))
+        if (!name.endsWith(".properties"))
         {
             name += ".properties";
         }

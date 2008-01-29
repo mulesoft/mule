@@ -15,7 +15,6 @@ org.mule.test.integration.routing.replyto.ReplytoChainIntegration4TestCase
 
 # More testing on these: not recorded in Jira yet
 org.mule.test.usecases.axis.AxisClientWithComplexTypesTestCase
-#org.mule.test.integration.EventMetaDataPropagationTestCase
 org.mule.test.integration.VisualizerServiceTestCase
 
 org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
@@ -48,7 +47,7 @@ org.mule.test.integration.transport.jdbc.JdbcTransactionalXaFunctionalTestCase
 # MULE-2747
 org.mule.test.integration.transport.xmpp.XmppFunctionalTestCase
 
-org.mule.test.integration.EventMetaDataPropagationTestCase
+#org.mule.test.integration.EventMetaDataPropagationTestCase
 org.mule.test.integration.message.AttachmentsPropagationTestCase
 org.mule.test.integration.transaction.XATransactionsWithSpringDAO
 # Convert transacted endpoint to XML config

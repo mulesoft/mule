@@ -750,7 +750,7 @@ public class DefaultMuleContext implements MuleContext
         // Mule Agents
         message.add(" ");
         //List agents
-        Collection agents = RegistryContext.getRegistry().getAgents();
+        Collection agents = RegistryContext.getRegistry().lookupObjects(Agent.class);
         if (agents.size() == 0)
         {
             message.add(CoreMessages.agentsRunning().getMessage() + " "

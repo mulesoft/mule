@@ -1867,8 +1867,7 @@ public abstract class AbstractConnector
 
     public MuleMessage request(String uri, long timeout) throws Exception
     {
-        return request(getMuleContext().getRegistry().lookupEndpointFactory()
-                .getInboundEndpoint(uri),
+        return request(getMuleContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(uri),
                 timeout);
     }
 

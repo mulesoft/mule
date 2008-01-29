@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <model name="model">
+
+        <service name="component1">
+            <inbound>
+                <vm:inbound-endpoint path="component1"/>
+            </inbound>
+            <component class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyComponent"/>
+            <outbound>
+                <outbound-pass-through-router>
+                    <vm:outbound-endpoint path="component2">
+                        <custom-transformer class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyTransformer"/>
+                    </vm:outbound-endpoint>
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="component2">
+            <inbound>
+                <vm:inbound-endpoint path="component2"/>
+            </inbound>
+            <component class="org.mule.test.integration.EventMetaDataPropagationTestCase$DummyComponent"/>
+        </service>
+
+    </model>
+
+</mule>

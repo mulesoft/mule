@@ -153,7 +153,7 @@ public class TransportFactory
     {
         Connector connector;
         Connector resultConnector = null;
-        Collection connectors = RegistryContext.getRegistry().getConnectors();
+        Collection connectors = RegistryContext.getRegistry().lookupObjects(Connector.class);
         for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
         {
             connector = (Connector)iterator.next();

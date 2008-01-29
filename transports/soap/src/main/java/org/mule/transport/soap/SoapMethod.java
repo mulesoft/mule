@@ -10,7 +10,7 @@
 
 package org.mule.transport.soap;
 
-import org.mule.config.converters.QNameConverter;
+import org.mule.config.spring.editors.QNamePropertyEditor;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -31,11 +31,10 @@ public class SoapMethod
     private List namedParameters = new ArrayList();
     private QName returnType;
     private Class returnClass = Object.class;
-    private static QNameConverter converter = new QNameConverter();
 
     public SoapMethod(String methodName, String paramsString) throws ClassNotFoundException
     {
-        this((QName)converter.convert(QName.class, methodName), paramsString);
+        this(QNamePropertyEditor.convert(methodName), paramsString);
     }
 
     /**
@@ -47,7 +46,7 @@ public class SoapMethod
      */
     public SoapMethod(String methodName, List params) throws ClassNotFoundException
     {
-        this((QName)converter.convert(QName.class, methodName), params);
+        this(QNamePropertyEditor.convert(methodName), params);
     }
 
     public SoapMethod(QName methodName, String paramsString) throws ClassNotFoundException
@@ -83,7 +82,7 @@ public class SoapMethod
                 {
                     if (type.startsWith("qname{"))
                     {
-                        returnType = (QName)converter.convert(QName.class, type);
+                        returnType = QNamePropertyEditor.convert(type);
                     }
                     else
                     {
@@ -97,19 +96,19 @@ public class SoapMethod
                 else
                 {
                     String mode = tokenizer.nextToken();
-                    QName paramName = null;
+                    QName paramName;
                     if (name.startsWith("qname{"))
                     {
-                        paramName = (QName)converter.convert(QName.class, name);
+                        paramName = QNamePropertyEditor.convert(name);
                     }
                     else
                     {
                         paramName = new QName(getName().getNamespaceURI(), name, getName().getPrefix());
                     }
-                    QName qtype = null;
+                    QName qtype;
                     if (type.startsWith("qname{"))
                     {
-                        qtype = (QName)converter.convert(QName.class, type);
+                        qtype = QNamePropertyEditor.convert(type);
                     }
                     else
                     {

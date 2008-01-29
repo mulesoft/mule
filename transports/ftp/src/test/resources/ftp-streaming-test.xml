@@ -26,9 +26,6 @@
                     <retry-connection-strategy retryCount="3" retryFrequency="2000"/>
                 </inbound-endpoint>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.component.simple.PassThroughComponent"/>
-            </component>
             <outbound>
                 <outbound-pass-through-router>
                     <ftp:outbound-endpoint user="anonymous" password="email" host="localhost" port="60197">

@@ -20,9 +20,6 @@
             <inbound>
                 <tcp:inbound-endpoint host="localhost" port="65432" synchronous="true"/>
             </inbound>
-            <component>
-                <singleton-object class="org.mule.component.simple.PassThroughComponent"/>
-            </component>            
             <outbound>
                 <outbound-pass-through-router>
                     <tcp:outbound-endpoint host="localhost" port="65433" synchronous="true"/>

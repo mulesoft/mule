@@ -13,8 +13,7 @@
     <!--<mgmt:jmx-server id="jmx"/>-->
 
     <custom-transformer name="ArrayToLenderList" class="org.mule.transformer.simple.ObjectToString"
-                        returnClass="java.lang.String">
-    </custom-transformer>
+                        returnClass="java.lang.String"/>
 
     <!--<spring:bean id="creditProfileLookup" class="org.mule.routing.MuleEndpointProxy">-->
     <!--<endpoint address="xfire:http://localhost:8081/service/CreditAgency?method=getCreditProfile"/>-->

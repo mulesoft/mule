@@ -14,9 +14,8 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
-import org.mule.config.converters.QNameConverter;
+import org.mule.config.spring.editors.QNamePropertyEditor;
 import org.mule.transport.AbstractMessageReceiver;
-import org.mule.transport.soap.SoapConstants;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.StringUtils;
@@ -69,8 +68,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             if (props.containsKey(PORT_TYPE))
             {
                 Object value = props.get(PORT_TYPE);
-                QNameConverter converter = new QNameConverter(true);
-                QName portTypeQName = (QName) converter.convert(QName.class, value);
+                QName portTypeQName = QNamePropertyEditor.convert((String) value);
                 props.put(PORT_TYPE, portTypeQName);
             }
 

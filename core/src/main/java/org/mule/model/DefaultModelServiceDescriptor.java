@@ -41,7 +41,7 @@ public class DefaultModelServiceDescriptor extends AbstractServiceDescriptor imp
         if (modelClass != null)
         {
             try {
-                Model model = (Model)ClassUtils.instanciateClass(modelClass, ClassUtils.NO_ARGS, ModelFactory.class);
+                Model model = (Model)ClassUtils.instanciateClass(modelClass, ClassUtils.NO_ARGS, getClass());
                 BeanUtils.populateWithoutFail(model, properties, false);
                 return model;
             }
