@@ -44,8 +44,7 @@ take effect.
 +-----------------------+
 | CONFIGURATION BUILDER |
 +-----------------------+
-
-By default, the "org.mule.config.builders.MuleXmlConfigurationBuilder" class 
+By default, the "org.mule.config.spring.SpringXmlConfigurationBuilder" class 
 will be used to interpret your configuration file(s).  If you wish to use a 
 different configuration builder, you can specify it using the "-builder" option.  
 For example, to use the Scripting configuration builder you could specify:
