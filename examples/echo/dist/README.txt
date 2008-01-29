@@ -1,19 +1,20 @@
 +--------------+
 | Echo Example |
 +--------------+
-This example demonstrates how to expose a Mule component over multiple transports,
-in this case as an Axis web sevice and via System.in (request) and System.out (response).
+This example demonstrates how to expose a Mule component over multiple 
+transports, in this case as an Axis web sevice and via System.in (request) and 
+System.out (response).
 
 For more information, refer to http://www.muledocs.org/Examples
 
 +---------------------+
 | Running the example |
 +---------------------+
-Simply use the shell script (Unix/Linux) or batch file (Windows) provided in this directory to run 
-the example.
+Simply use the shell script (Unix/Linux) or batch file (Windows) provided in 
+this directory to run the example.
 
-Alternatively, if you have added Mule to your executable path as recommended in INSTALL.txt, you 
-can run the example from the command line as follows:
+Alternatively, if you have added Mule to your executable path as recommended in 
+INSTALL.txt, you can run the example from the command line as follows:
 
     Linux / Unix
     ------------
