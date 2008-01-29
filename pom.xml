@@ -820,7 +820,7 @@
                     <maxmemory>512m</maxmemory>
                     <charset>ISO-8859-1</charset>
                     <encoding>ISO-8859-1</encoding>
-                    <source>1.4</source>
+                    <source>1.5</source>
                     <!-- aggregate all when built from the top-level directory -->
                     <aggregate>true</aggregate>
                     <!-- Link to the external online JavaDoc -->
