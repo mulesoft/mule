@@ -1,14 +1,10 @@
 #! /bin/sh
 
-# There is no need to call this if you set the MULE_HOME in your environment
-# but you must also define MULE_LIB for the example (see below)
-# or specify the config as a file: URI (see README.txt)
+# The variable is not actually needed to run the example, but it is needed to 
+# build the example, and if you haven't built the example, you can't run it. 
 if [ -z "$MULE_HOME" ] ; then
-  # find the name of the real MULE_HOME which is two levels up
-  MULE_HOME=`pwd`
-  MULE_HOME=`dirname "$MULE_HOME"`
-  MULE_HOME=`dirname "$MULE_HOME"`
-  export MULE_HOME
+  echo "You must set the environment variable MULE_HOME to the location of your Mule install in order to run this example." 
+  exit 1
 fi
 
 # If MULE_BASE is not set, make it MULE_HOME
@@ -17,8 +13,9 @@ if [ -z "$MULE_BASE" ] ; then
   export MULE_BASE
 fi
 
-# This extends the classpath to include the configuration directory
-# Any changes to the files in ./conf will take precedence over those deployed to $MULE_HOME/lib/user
+# This extends the classpath to include the configuration directory.
+# Any changes to the files in ./conf will take precedence over those deployed 
+# to $MULE_HOME/lib/user
 MULE_LIB=./conf
 export MULE_LIB
 
