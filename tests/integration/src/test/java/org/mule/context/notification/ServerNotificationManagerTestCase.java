@@ -10,48 +10,33 @@
 
 package org.mule.context.notification;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.MuleException;
 import org.mule.api.service.Service;
 import org.mule.extras.client.MuleClient;
 
-import java.util.Iterator;
-
-public class ServerNotificationManagerTestCase extends FunctionalTestCase
+public class ServerNotificationManagerTestCase extends AbstractNotificationManagerTestCase
 {
 
     public static final String MULE_SYSTEM_MODEL = "_muleSystemModel";
     public static final String MODEL = "the-model";
     public static final String SERVICE = "the-service";
-    private NotificationLogger notifications;
 
     protected String getConfigResources()
     {
         return "org/mule/test/integration/notifications/server-notification-manager-test.xml";
     }
 
-    public void testNotifications() throws MuleException
+    public void doTest() throws Exception
     {
         MuleClient client = new MuleClient();
         assertNotNull(client.send("vm://in", "hello world", null));
-        Service service = muleContext.getRegistry().lookupService("the-service");
+        Service service = muleContext.getRegistry().lookupService(SERVICE);
         service.pause();
         service.resume();
-
-        notifications = (NotificationLogger) muleContext.getRegistry().lookupObject("notificationLogger");
-        // currently the main testing is done during shutdown
     }
 
-    protected void suitePostTearDown() throws Exception
+    public RestrictedNode getSpecification()
     {
-        // allow shutdown to complete (or get concurrent mod errors and/or miss notifications)
-        Thread.sleep(2000L);
-        logNotifications();
-
-        // we miss everything before model init as cannot register listener before that point
-        // (if we use xml config)
-        RestrictedNode spec = new Node()
+        return new Node()
                 .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISING, MULE_SYSTEM_MODEL)
                         .serial(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISED, MULE_SYSTEM_MODEL)))
                 .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISING, MODEL)
@@ -92,7 +77,10 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
                             .serial(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MODEL)))
                         .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSING, MULE_SYSTEM_MODEL)
                             .serial(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MULE_SYSTEM_MODEL))));
+    }
 
+    public void validateSpecification(RestrictedNode spec) throws Exception
+    {
         verifyAllNotifications(spec, ModelNotification.class,
                 ModelNotification.MODEL_INITIALISING, ModelNotification.MODEL_INITIALISED);
         // no model/listener notifications
@@ -105,48 +93,6 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
                 ManagerNotification.MANAGER_STARTING, ManagerNotification.MANAGER_STOPPED_MODELS);
 
         assertExpectedNotifications(spec);
-    }
-
-    protected void logNotifications()
-    {
-        logger.info("Number of notifications: " + notifications.getNotifications().size());
-        for (Iterator iterator = notifications.getNotifications().iterator(); iterator.hasNext();)
-        {
-            ServerNotification notification = (ServerNotification) iterator.next();
-            logger.info(notification);
-        }
-    }
-
-    /**
-     * This is destructive - do not use spec after calling this routine
-     */
-    protected void assertExpectedNotifications(RestrictedNode spec)
-    {
-        for (Iterator iterator = notifications.getNotifications().iterator(); iterator.hasNext();)
-        {
-            ServerNotification notification = (ServerNotification) iterator.next();
-            switch (spec.match(notification))
-            {
-            case Node.SUCCESS:
-                break;
-            case Node.FAILURE:
-                fail("Could not match " + notification);
-                break;
-            case Node.EMPTY:
-                fail("Extra notification: " + notification);
-            }
-        }
-    }
-
-    protected void verifyAllNotifications(RestrictedNode spec, Class clazz, int from, int to)
-    {
-        for (int action = from; action <= to; ++action)
-        {
-            if (!spec.contains(clazz, action))
-            {
-                fail("Specification missed action " + action + " for class " + clazz);
-            }
-        }
     }
 
 }
