@@ -188,11 +188,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-jotm</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-management</artifactId>
             <version>${version}</version>
         </dependency>
@@ -204,11 +199,6 @@
         <!-- dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-osgi</artifactId>
-            <version>${version}</version>
-        </dependency -->
-        <!-- dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-persistence</artifactId>
             <version>${version}</version>
         </dependency -->
         <dependency>

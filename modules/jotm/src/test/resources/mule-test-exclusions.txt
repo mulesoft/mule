@@ -1,2 +1,0 @@
-# this class was in src/main/java before so the test never ran anyway
-org.mule.extras.jotm.JotmTxThreadAssociationTestCase
