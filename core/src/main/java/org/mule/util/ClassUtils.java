@@ -89,7 +89,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         {
             public Object run()
             {
-                return Thread.currentThread().getContextClassLoader().getResource(resourceName);
+                final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                return cl != null ? cl.getResource(resourceName) : null;
             }
         });
 
@@ -126,7 +127,8 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             {
                 try
                 {
-                    return Thread.currentThread().getContextClassLoader().getResources(resourceName);
+                    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                    return cl != null ? cl.getResources(resourceName) : null;
                 }
                 catch (IOException e)
                 {
@@ -199,7 +201,9 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             {
                 try
                 {
-                    return Thread.currentThread().getContextClassLoader().loadClass(className);
+                    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                    return cl != null ? cl.loadClass(className) : null;
+
                 }
                 catch (ClassNotFoundException e)
                 {
