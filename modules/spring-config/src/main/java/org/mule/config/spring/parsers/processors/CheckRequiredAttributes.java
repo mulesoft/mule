@@ -57,6 +57,8 @@ public class CheckRequiredAttributes implements PreProcessor
                     {
                         buffer.append(", ");
                     }
+                    // don't translate to alias because the error message is in terms of the attributes
+                    // the user enters - we don't want to expose the details of translations
                     buffer.append(attributes[attribute]);
                 }
             }
@@ -73,8 +75,6 @@ public class CheckRequiredAttributes implements PreProcessor
         for (int i = 0; i < attributes.getLength(); i++)
         {
             String alias = SpringXMLUtils.attributeName((Attr) attributes.item(i));
-            // don't translate to alias because the error message is in terms of the attributes
-            // the user enters - we don't want to expose the details of translations
             if (knownAttributes.containsKey(alias))
             {
                 Integer index = (Integer) knownAttributes.get(alias);

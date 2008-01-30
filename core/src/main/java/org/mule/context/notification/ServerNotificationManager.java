@@ -23,6 +23,7 @@ import org.mule.util.ClassUtils;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Collections;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -276,12 +277,12 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
 
     public Map getInterfaceToTypes()
     {
-        return configuration.getInterfaceToTypes();
+        return Collections.unmodifiableMap(configuration.getInterfaceToTypes());
     }
 
     public Collection getListeners()
     {
-        return configuration.getListeners();
+        return Collections.unmodifiableCollection(configuration.getListeners());
     }
 
 }

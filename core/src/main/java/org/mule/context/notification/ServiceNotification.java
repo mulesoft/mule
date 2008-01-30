@@ -16,10 +16,7 @@ import org.mule.api.service.Service;
 /**
  * <code>ServiceNotification</code> is fired when an event such as the service
  * starting occurs. The payload of this event will always be a reference to the
- * service Descriptor.
- * 
- * @see org.mule.MuleDescriptor
- * @see org.mule.api.UMODescriptor
+ * service.
  */
 public class ServiceNotification extends ServerNotification
 {
@@ -36,13 +33,13 @@ public class ServiceNotification extends ServerNotification
     public static final int SERVICE_STOPPING = SERVICE_EVENT_ACTION_START_RANGE + 7;
 
     static {
-        registerAction("initialised", SERVICE_INITIALISED);
-        registerAction("started", SERVICE_STARTED);
-        registerAction("stopping", SERVICE_STOPPING);
-        registerAction("stopped", SERVICE_STOPPED);
-        registerAction("paused", SERVICE_PAUSED);
-        registerAction("resumed", SERVICE_RESUMED);
-        registerAction("disposed", SERVICE_DISPOSED);
+        registerAction("service initialised", SERVICE_INITIALISED);
+        registerAction("service started", SERVICE_STARTED);
+        registerAction("service stopping", SERVICE_STOPPING);
+        registerAction("service stopped", SERVICE_STOPPED);
+        registerAction("service paused", SERVICE_PAUSED);
+        registerAction("service resumed", SERVICE_RESUMED);
+        registerAction("service disposed", SERVICE_DISPOSED);
     }
 
     public ServiceNotification(Service message, int action)
