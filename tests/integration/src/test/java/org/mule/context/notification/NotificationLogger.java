@@ -24,7 +24,7 @@ public class NotificationLogger
 
     private LinkedList notifications = new LinkedList();
 
-    public void onNotification(ServerNotification notification)
+    public synchronized void onNotification(ServerNotification notification)
     {
         notifications.addLast(notification);
     }
