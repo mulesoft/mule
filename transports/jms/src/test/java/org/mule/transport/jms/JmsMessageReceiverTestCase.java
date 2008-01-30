@@ -16,8 +16,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsMessageReceiver;
 

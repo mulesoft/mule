@@ -11,7 +11,7 @@
 package org.mule.transport.http;
 
 import org.mule.api.transport.Connector;
-import org.mule.tck.providers.AbstractConnectorTestCase;
+import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.http.servlet.ServletConnector;
 
 public class ServletConnectorTestCase extends AbstractConnectorTestCase

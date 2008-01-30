@@ -14,7 +14,7 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.context.ContainerContext;
 import org.mule.container.MuleContainerContext;
-import org.mule.tck.model.AbstractContainerContextTestCase;
+import org.mule.context.AbstractContainerContextTestCase;
 
 
 /**

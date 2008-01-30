@@ -11,7 +11,7 @@
 package org.mule.transformer.codec;
 
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.transformer.AbstractTransformerTestCase;
 
 public class XMLEntityTransformersTestCase extends AbstractTransformerTestCase
 {

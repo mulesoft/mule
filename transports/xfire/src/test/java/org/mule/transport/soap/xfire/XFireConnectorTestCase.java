@@ -11,7 +11,7 @@
 package org.mule.transport.soap.xfire;
 
 import org.mule.api.transport.Connector;
-import org.mule.tck.providers.AbstractConnectorTestCase;
+import org.mule.transport.AbstractConnectorTestCase;
 
 public class XFireConnectorTestCase extends AbstractConnectorTestCase
 {

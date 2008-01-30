@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * Given an endpoint ({@link #getTestEndpointURI()}) this waits for up to 10 seconds,
  * hoping to receive the message stored in the mail server.  It also runs the unit tests
- * defined way down in {@link org.mule.tck.providers.AbstractConnectorTestCase}.
+ * defined way down in {@link org.mule.transport.AbstractConnectorTestCase}.
  */
 public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMailConnectorFunctionalTestCase
 {

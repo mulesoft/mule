@@ -11,7 +11,7 @@
 package org.mule.transport.rmi;
 
 import org.mule.api.transport.Connector;
-import org.mule.tck.providers.AbstractConnectorTestCase;
+import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.rmi.RmiConnector;
 
 public class RmiConnectorTestCase extends AbstractConnectorTestCase

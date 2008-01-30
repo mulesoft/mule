@@ -12,7 +12,7 @@ package org.mule.transport.jms;
 
 import org.mule.api.MessagingException;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.transport.jms.JmsConstants;
 import org.mule.transport.jms.JmsMessageAdapter;
 

@@ -15,9 +15,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.transformer.AbstractTransformerTestCase;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

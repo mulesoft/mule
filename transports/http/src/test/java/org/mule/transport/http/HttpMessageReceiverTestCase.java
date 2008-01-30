@@ -14,7 +14,7 @@ import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.providers.AbstractMessageReceiverTestCase;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.http.HttpMessageReceiver;
 import org.mule.transport.http.transformers.UMOMessageToHttpResponse;
 import org.mule.util.CollectionUtils;

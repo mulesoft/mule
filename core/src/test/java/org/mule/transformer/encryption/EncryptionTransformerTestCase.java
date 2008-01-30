@@ -14,7 +14,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.api.transformer.Transformer;
 import org.mule.security.PasswordBasedEncryptionStrategy;
-import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.transformer.AbstractTransformerTestCase;
 
 import java.util.Arrays;
 

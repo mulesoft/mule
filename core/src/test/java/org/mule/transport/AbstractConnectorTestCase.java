@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.tck.providers;
+package org.mule.transport;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;

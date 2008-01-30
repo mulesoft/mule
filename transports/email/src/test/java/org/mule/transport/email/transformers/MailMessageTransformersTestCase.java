@@ -14,8 +14,8 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.Transformer;
 import org.mule.lifecycle.AlreadyInitialisedException;
-import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transport.email.transformers.EmailMessageToString;
 import org.mule.transport.email.transformers.StringToEmailMessage;
 

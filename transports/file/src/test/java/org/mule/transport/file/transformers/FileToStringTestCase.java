@@ -12,7 +12,7 @@ package org.mule.transport.file.transformers;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transport.file.transformers.FileToString;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;

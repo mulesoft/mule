@@ -15,7 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageTypeNotSupportedException;
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.transport.DefaultMessageAdapter;
 
 /**

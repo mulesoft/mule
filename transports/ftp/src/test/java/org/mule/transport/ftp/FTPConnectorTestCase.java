@@ -16,8 +16,8 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.transport.AbstractConnectorTestCase;
 
 import java.util.Properties;
 

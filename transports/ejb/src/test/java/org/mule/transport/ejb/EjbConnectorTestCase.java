@@ -11,7 +11,7 @@
 package org.mule.transport.ejb;
 
 import org.mule.api.transport.Connector;
-import org.mule.tck.providers.AbstractConnectorTestCase;
+import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.ejb.EjbConnector;
 
 public class EjbConnectorTestCase extends AbstractConnectorTestCase

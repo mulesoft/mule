@@ -10,7 +10,7 @@
 
 package org.mule.transport.email.connectors;
 
-import org.mule.tck.providers.AbstractConnectorTestCase;
+import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.email.GreenMailUtilities;
 
 import com.icegreen.greenmail.util.ServerSetup;

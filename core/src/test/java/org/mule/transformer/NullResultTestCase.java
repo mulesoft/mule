@@ -12,7 +12,6 @@ package org.mule.transformer;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transport.NullPayload;
 
 public class NullResultTestCase extends AbstractTransformerTestCase

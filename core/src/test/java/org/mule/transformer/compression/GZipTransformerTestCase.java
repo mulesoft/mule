@@ -12,7 +12,7 @@ package org.mule.transformer.compression;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.util.compression.GZipCompression;
 
 import java.io.Serializable;

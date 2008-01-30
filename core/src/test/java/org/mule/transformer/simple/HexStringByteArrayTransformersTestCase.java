@@ -12,7 +12,7 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.transformer.AbstractTransformerTestCase;
 
 import java.util.Arrays;
 

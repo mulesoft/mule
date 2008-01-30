@@ -12,7 +12,7 @@ package org.mule.transport.http;
 
 import org.mule.api.MessagingException;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.transport.http.servlet.HttpRequestMessageAdapter;
 
 import java.io.BufferedReader;

@@ -12,7 +12,7 @@ package org.mule.transport.vm;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.providers.AbstractMessageReceiverTestCase;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.vm.VMMessageReceiver;
 
 public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase

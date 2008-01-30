@@ -11,8 +11,8 @@
 package org.mule.transformer.simple;
 
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.transformer.AbstractTransformerTestCase;
 
 import org.apache.commons.lang.SerializationUtils;
 

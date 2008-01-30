@@ -14,8 +14,8 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.stdio.StdioMessageReceiver;
 
 public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCase

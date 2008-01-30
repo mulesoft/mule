@@ -14,8 +14,8 @@ import org.mule.api.endpoint.Endpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.tcp.TcpConnector;
 
 public class TcpConnectorTestCase extends AbstractConnectorTestCase

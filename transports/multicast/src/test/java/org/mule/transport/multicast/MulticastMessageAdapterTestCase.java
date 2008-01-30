@@ -11,7 +11,7 @@
 package org.mule.transport.multicast;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.transport.multicast.MulticastMessageAdapter;
 import org.mule.api.MessagingException;
 import org.mule.api.transport.MessageAdapter;

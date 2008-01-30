@@ -207,6 +207,13 @@
             <version>1.6.5</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
         <!-- Needed for common SOAP test classes -->
         <dependency>
             <groupId>org.mule.transports</groupId>

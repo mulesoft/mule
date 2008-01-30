@@ -11,7 +11,7 @@
 package org.mule.transformer.codec;
 
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.util.Base64;
 
 public class Base64TransformersTestCase extends AbstractTransformerTestCase

@@ -13,7 +13,7 @@ package org.mule.transport.email.adapters;
 import org.mule.api.MessagingException;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.transport.MessageAdapter;
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.transport.AbstractMessageAdapterTestCase;
 import org.mule.transport.email.MailMessageAdapter;
 
 import java.util.Properties;

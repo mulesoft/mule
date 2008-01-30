@@ -11,7 +11,7 @@
 package org.mule.transport.xmpp;
 
 import org.mule.api.transport.Connector;
-import org.mule.tck.providers.AbstractConnectorTestCase;
+import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.xmpp.XmppConnector;
 
 import org.jivesoftware.smack.packet.Message;

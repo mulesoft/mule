@@ -8,13 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.tck;
+package org.mule.transformer;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 
 import java.util.Arrays;

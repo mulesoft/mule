@@ -11,7 +11,7 @@
 package org.mule.transport.stdio;
 
 import org.mule.api.transport.Connector;
-import org.mule.tck.providers.AbstractConnectorTestCase;
+import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.stdio.PromptStdioConnector;
 
 public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase

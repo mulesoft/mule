@@ -13,8 +13,8 @@ package org.mule.container;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.context.ContainerContext;
 import org.mule.container.EjbContainerContext;
+import org.mule.context.AbstractContainerContextTestCase;
 import org.mule.jndi.MuleInitialContextFactory;
-import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.HashMap;

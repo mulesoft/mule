@@ -11,7 +11,7 @@
 package org.mule.transformer.simple;
 
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.transformer.AbstractTransformerTestCase;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -11,7 +11,7 @@
 package org.mule.transport.quartz;
 
 import org.mule.api.transport.Connector;
-import org.mule.tck.providers.AbstractConnectorTestCase;
+import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.quartz.QuartzConnector;
 
 public class QuartzConnectorTestCase extends AbstractConnectorTestCase

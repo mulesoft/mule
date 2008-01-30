@@ -13,7 +13,7 @@ package org.mule.transport.ssl;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.providers.AbstractMessageReceiverTestCase;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.ssl.SslMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;

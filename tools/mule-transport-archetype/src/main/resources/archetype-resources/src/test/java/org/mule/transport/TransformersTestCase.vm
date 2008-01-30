@@ -10,7 +10,7 @@
 
 package org.mule.transport.${TransportNameLower}.transformers;
 
-import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.api.transformer.Transformer;
 
 
@@ -23,7 +23,7 @@ public class ${TransportName}TransformersTestCase extends AbstractTransformerTes
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.tck.AbstractTransformerTestCase#getTestData()
+     * @see org.mule.transformer.AbstractTransformerTestCase#getTestData()
      */
     public Object getTestData()
     {
@@ -35,7 +35,7 @@ public class ${TransportName}TransformersTestCase extends AbstractTransformerTes
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.tck.AbstractTransformerTestCase#getResultData()
+     * @see org.mule.transformer.AbstractTransformerTestCase#getResultData()
      */
     public Object getResultData()
     {
@@ -52,7 +52,7 @@ public class ${TransportName}TransformersTestCase extends AbstractTransformerTes
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.tck.AbstractTransformerTestCase#getTransformers()
+     * @see org.mule.transformer.AbstractTransformerTestCase#getTransformers()
      */
     public Transformer getTransformer()
     {
@@ -70,7 +70,7 @@ public class ${TransportName}TransformersTestCase extends AbstractTransformerTes
     /*
      * (non-Javadoc)
      *
-     * @see org.mule.tck.AbstractTransformerTestCase#getRoundTripTransformer()
+     * @see org.mule.transformer.AbstractTransformerTestCase#getRoundTripTransformer()
      */
     public Transformer getRoundTripTransformer()
     {

@@ -13,8 +13,8 @@ package org.mule.transport.tcp;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.tcp.TcpMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;
