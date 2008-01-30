@@ -17,10 +17,10 @@ m.matches()
 String wrapperConfDir = m[0]
 
 File wrapperAdditionalConfFile = new File(wrapperConfDir + 'wrapper-additional.conf')
-boolean debugEnabled = args.findIndexOf { '-debug'.equalsIgnoreCase(it)} < args.size()
+boolean debugEnabled = args.findIndexOf { '-debug'.equalsIgnoreCase(it)} > -1
 int profileArgIndex = args.findIndexOf { '-profile'.equalsIgnoreCase(it)}
-boolean profileEnabled = profileArgIndex < args.size()
-boolean adHocOptionsAvailable = args.findIndexOf { it.startsWith('-M') } < args.size()
+boolean profileEnabled = profileArgIndex > -1
+boolean adHocOptionsAvailable = args.findIndexOf { it.startsWith('-M') } > -1
 
 paramIndex = 0
 
