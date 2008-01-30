@@ -41,7 +41,7 @@ cxf-rt-transports-http-2.0.1-incubator
 cxf-rt-transports-local-2.0.1-incubator
 cxf-tools-common-2.0.1-incubator
 dom4j-1.4
-groovy-all-1.5.1
+groovy-all-1.5.2
 groovy-engine-1.1-jdk14
 hibernate-3.2.2.ga
 javassist-3.6.ga
