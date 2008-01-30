@@ -13,6 +13,7 @@ package org.mule.context.notification;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.MuleException;
+import org.mule.api.service.Service;
 import org.mule.extras.client.MuleClient;
 
 import java.util.Iterator;
@@ -34,6 +35,9 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         assertNotNull(client.send("vm://in", "hello world", null));
+        Service service = muleContext.getRegistry().lookupService("the-service");
+        service.pause();
+        service.resume();
 
         notifications = (NotificationLogger) muleContext.getRegistry().lookupObject("notificationLogger");
         // currently the main testing is done during shutdown
@@ -63,6 +67,8 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
                 .serial(new Node(ManagerNotification.class, ManagerNotification.MANAGER_STARTED_MODELS))
                 .serial(new Node(ServiceNotification.class, ServiceNotification.SERVICE_STARTED, SERVICE))
                 .serial(new Node(ManagerNotification.class, ManagerNotification.MANAGER_STARTED))
+                .serial(new Node(ServiceNotification.class, ServiceNotification.SERVICE_PAUSED, SERVICE))
+                .serial(new Node(ServiceNotification.class, ServiceNotification.SERVICE_RESUMED, SERVICE))
                 .serial(new Node(ManagerNotification.class, ManagerNotification.MANAGER_DISPOSING))
                 .serial(new Node(ManagerNotification.class, ManagerNotification.MANAGER_STOPPING))
                 .serial(new Node(ManagerNotification.class, ManagerNotification.MANAGER_STOPPING_MODELS)
@@ -93,15 +99,11 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         verifyAllNotifications(spec, ModelNotification.class,
                 ModelNotification.MODEL_STARTING, ModelNotification.MODEL_DISPOSED);
         verifyAllNotifications(spec, ServiceNotification.class,
-                ServiceNotification.SERVICE_INITIALISED, ServiceNotification.SERVICE_STOPPED);
-        // no service pause/resume
-        verifyAllNotifications(spec, ServiceNotification.class,
-                ServiceNotification.SERVICE_DISPOSED, ServiceNotification.SERVICE_STOPPING);
+                ServiceNotification.SERVICE_INITIALISED, ServiceNotification.SERVICE_STOPPING);
         // no manager initialising or initialised
         verifyAllNotifications(spec, ManagerNotification.class,
                 ManagerNotification.MANAGER_STARTING, ManagerNotification.MANAGER_STOPPED_MODELS);
 
-        // this is destructive - run it *after* verifying contents
         assertExpectedNotifications(spec);
     }
 
@@ -115,6 +117,9 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         }
     }
 
+    /**
+     * This is destructive - do not use spec after calling this routine
+     */
     protected void assertExpectedNotifications(RestrictedNode spec)
     {
         for (Iterator iterator = notifications.getNotifications().iterator(); iterator.hasNext();)
