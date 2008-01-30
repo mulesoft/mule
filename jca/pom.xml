@@ -44,10 +44,6 @@
             <type>pom</type>
             <exclusions>
                 <exclusion>
-                    <groupId>jotm</groupId>
-                    <artifactId>jotm</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.objectweb.carol</groupId>
                     <artifactId>carol</artifactId>
                 </exclusion>
