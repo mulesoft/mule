@@ -1,5 +1,5 @@
 /*
- * $Id: XFireConnectorTestCase.java 3903 2006-11-17 21:05:19Z holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

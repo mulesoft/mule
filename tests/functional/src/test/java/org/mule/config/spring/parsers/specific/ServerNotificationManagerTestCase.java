@@ -1,5 +1,5 @@
 /*
- * $Id: ServerNotificationManagerTestCase.java 10004 2007-12-05 20:10:01Z acooke $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

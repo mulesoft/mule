@@ -1,5 +1,5 @@
 /*
- * $Id: XFireConnectorVMFunctionalTestCase.java 5597 2007-03-15 12:54:56Z Lajos $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

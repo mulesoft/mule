@@ -1,5 +1,5 @@
 /*
- * $Id: FunctionalStreamingTestComponent.java 8474 2007-09-18 16:44:27Z dandiep $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

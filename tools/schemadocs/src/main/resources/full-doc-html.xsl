@@ -4,7 +4,7 @@
    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
    >
 
-    <!-- $Id: full-doc-html.xsl 9354 2007-10-25 13:56:12Z acooke $ -->
+    <!-- $Id$ -->
 
     <!-- an initial experiment at generating a "complete" doc
          output way too complex, problems with loops etc -->

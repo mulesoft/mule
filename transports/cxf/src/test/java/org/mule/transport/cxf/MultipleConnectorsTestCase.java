@@ -1,5 +1,5 @@
 /*
- * $Id: XFireMultipleConnectorsTestCase.java 5750 2007-03-21 12:44:43Z Lajos $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

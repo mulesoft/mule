@@ -1,5 +1,5 @@
 /*
- * $Id: HttpMethodTestCase.java 7963 2007-08-21 08:53:15Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

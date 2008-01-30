@@ -1,5 +1,5 @@
 /*
- * $Id: TestXFireComponent.java 6305 2007-05-04 02:54:41Z aperepel $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

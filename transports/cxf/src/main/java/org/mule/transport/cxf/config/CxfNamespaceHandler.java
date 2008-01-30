@@ -1,5 +1,5 @@
 /*
- * $Id: XFireNamespaceHandler.java 7167 2007-06-19 19:57:12Z acooke $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

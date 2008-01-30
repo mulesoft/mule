@@ -1,5 +1,5 @@
 /*
- * $Id: QuartzFunctionalTestCase.java 8077 2007-08-27 20:15:25Z aperepel $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

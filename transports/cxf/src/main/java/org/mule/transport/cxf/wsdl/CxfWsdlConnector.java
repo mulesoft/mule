@@ -1,5 +1,5 @@
 /*
- * $Id: XFireWsdlConnector.java 4350 2006-12-20 16:34:49Z holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

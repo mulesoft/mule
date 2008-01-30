@@ -1,5 +1,5 @@
 /*
- * $Id: MuleModelTestCase.java 8911 2007-10-05 19:52:25Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

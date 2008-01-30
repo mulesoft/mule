@@ -1,5 +1,5 @@
 /*
- * $Id: XFireConnectorHttpFunctionalTestCase.java 5619 2007-03-15 19:14:13Z Lajos $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

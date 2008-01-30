@@ -1,5 +1,5 @@
 /*
- * $Id: XFireWsdlMessageDispatcher.java 6306 2007-05-04 03:02:55Z aperepel $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

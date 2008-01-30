@@ -1,5 +1,5 @@
 /*
- * $Id: CxfConnector.java 6612 2007-05-18 05:28:06Z hasari $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

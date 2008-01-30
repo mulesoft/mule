@@ -1,5 +1,5 @@
 /*
- * $Id: XFireMessageReceiver.java 6106 2007-04-20 13:28:24Z Lajos $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

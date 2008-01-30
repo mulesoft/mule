@@ -1,5 +1,5 @@
 /*
- * $Id: CxfMessages.java 6446 2007-05-10 09:33:21Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

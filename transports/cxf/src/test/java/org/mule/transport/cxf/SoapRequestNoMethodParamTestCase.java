@@ -1,5 +1,5 @@
 /*
- * $Id: XFireSoapRequestNoMethodParamTestCase.java 6402 2007-05-08 20:39:39Z Lajos $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: XFireMuleSession.java 6464 2007-05-10 14:04:36Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

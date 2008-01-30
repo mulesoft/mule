@@ -1,5 +1,5 @@
 /*
- * $Id: XFireSoapEndpointTestCase.java 3904 2006-11-17 21:06:02Z holger $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

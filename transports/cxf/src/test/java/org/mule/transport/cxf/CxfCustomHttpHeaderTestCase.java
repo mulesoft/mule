@@ -1,5 +1,5 @@
 /*
- * $Id: XFireCustomHttpHeaderTestCase.java 5500 2007-03-09 19:32:36Z Lajos $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

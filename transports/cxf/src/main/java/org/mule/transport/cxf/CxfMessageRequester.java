@@ -1,5 +1,5 @@
 /*
- * $Id: CxfMessageRequester.java 9935 2007-11-28 18:47:01Z acooke $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

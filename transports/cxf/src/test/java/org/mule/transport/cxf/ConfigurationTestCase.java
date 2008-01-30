@@ -1,5 +1,5 @@
 /*
- * $Id: XFireBasicTestCase.java 6659 2007-05-23 04:05:51Z hasari $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

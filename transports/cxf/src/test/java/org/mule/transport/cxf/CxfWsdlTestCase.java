@@ -1,5 +1,5 @@
 /*
- * $Id: XFireWsdlTestCase.java 6489 2007-05-11 14:00:13Z Lajos $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: XFireServiceComponent.java 6617 2007-05-20 20:24:44Z hasari $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
