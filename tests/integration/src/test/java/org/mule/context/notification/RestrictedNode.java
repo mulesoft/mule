@@ -23,4 +23,6 @@ interface RestrictedNode
 
     public int match(ServerNotification notification);
 
+    public boolean contains(Class clazz, int action);
+
 }

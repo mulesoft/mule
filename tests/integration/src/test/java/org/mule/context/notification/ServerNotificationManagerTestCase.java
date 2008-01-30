@@ -44,9 +44,10 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         // allow shutdown to complete (or get concurrent mod errors and/or miss notifications)
         Thread.sleep(2000L);
         logNotifications();
+
         // we miss everything before model init as cannot register listener before that point
         // (if we use xml config)
-        assertExpectedNotifications(new Node()
+        RestrictedNode spec = new Node()
                 .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISING, MULE_SYSTEM_MODEL)
                         .serial(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISED, MULE_SYSTEM_MODEL)))
                 .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_INITIALISING, MODEL)
@@ -84,7 +85,24 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
                         .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSING, MODEL)
                             .serial(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MODEL)))
                         .parallel(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSING, MULE_SYSTEM_MODEL)
-                            .serial(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MULE_SYSTEM_MODEL)))));
+                            .serial(new Node(ModelNotification.class, ModelNotification.MODEL_DISPOSED, MULE_SYSTEM_MODEL))));
+
+        verifyAllNotifications(spec, ModelNotification.class,
+                ModelNotification.MODEL_INITIALISING, ModelNotification.MODEL_INITIALISED);
+        // no model/listener notifications
+        verifyAllNotifications(spec, ModelNotification.class,
+                ModelNotification.MODEL_STARTING, ModelNotification.MODEL_DISPOSED);
+        verifyAllNotifications(spec, ServiceNotification.class,
+                ServiceNotification.SERVICE_INITIALISED, ServiceNotification.SERVICE_STOPPED);
+        // no service pause/resume
+        verifyAllNotifications(spec, ServiceNotification.class,
+                ServiceNotification.SERVICE_DISPOSED, ServiceNotification.SERVICE_STOPPING);
+        // no manager initialising or initialised
+        verifyAllNotifications(spec, ManagerNotification.class,
+                ManagerNotification.MANAGER_STARTING, ManagerNotification.MANAGER_STOPPED_MODELS);
+
+        // this is destructive - run it *after* verifying contents
+        assertExpectedNotifications(spec);
     }
 
     protected void logNotifications()
@@ -97,12 +115,12 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         }
     }
 
-    protected void assertExpectedNotifications(RestrictedNode expected)
+    protected void assertExpectedNotifications(RestrictedNode spec)
     {
         for (Iterator iterator = notifications.getNotifications().iterator(); iterator.hasNext();)
         {
             ServerNotification notification = (ServerNotification) iterator.next();
-            switch (expected.match(notification))
+            switch (spec.match(notification))
             {
             case Node.SUCCESS:
                 break;
@@ -111,6 +129,17 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
                 break;
             case Node.EMPTY:
                 fail("Extra notification: " + notification);
+            }
+        }
+    }
+
+    protected void verifyAllNotifications(RestrictedNode spec, Class clazz, int from, int to)
+    {
+        for (int action = from; action <= to; ++action)
+        {
+            if (!spec.contains(clazz, action))
+            {
+                fail("Specification missed action " + action + " for class " + clazz);
             }
         }
     }

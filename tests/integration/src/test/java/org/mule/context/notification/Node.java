@@ -26,6 +26,9 @@ import java.util.Iterator;
  *
  * <p>Note that nested nodes may themselves have structure and that empty nodes are available, which can
  * help group dependencies.
+ *
+ * <p>More exactly, we specify a tree and a traversal - the traversal is hardcoded below, and implicit in
+ * the instructions above.
  */
 class Node implements RestrictedNode
 {
@@ -36,7 +39,7 @@ class Node implements RestrictedNode
     public static final int EMPTY = 2;
 
     // the data for this node
-    private Class clazz;
+    private Class clazz = null;
     private int action;
     private String id;
     private boolean nodeOk = false;
@@ -159,6 +162,29 @@ class Node implements RestrictedNode
         return clazz.equals(notification.getClass())
                 && action == notification.getAction()
                 && (null == id || id.equals(notification.getResourceIdentifier()));
+    }
+
+    public boolean contains(Class clazz, int action)
+    {
+        if (null != this.clazz && this.clazz.equals(clazz) && this.action == action)
+        {
+            return true;
+        }
+        for (Iterator children = parallel.iterator(); children.hasNext();)
+        {
+            if (((RestrictedNode) children.next()).contains(clazz, action))
+            {
+                return true;
+            }
+        }
+        for (Iterator children = serial.iterator(); children.hasNext();)
+        {
+            if (((RestrictedNode) children.next()).contains(clazz, action))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
