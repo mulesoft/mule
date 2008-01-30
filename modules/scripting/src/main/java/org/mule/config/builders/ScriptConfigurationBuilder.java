@@ -13,7 +13,6 @@ package org.mule.config.builders;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.components.script.jsr223.Scriptable;
-import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.config.builders.i18n.BuildersMessages;
 
 import javax.script.Bindings;
@@ -62,6 +61,8 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
 
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
+        this.muleContext = muleContext;
+        
         for (int i = 0; i < configResources.length; i++)
         {
             String configResource = configResources[i];

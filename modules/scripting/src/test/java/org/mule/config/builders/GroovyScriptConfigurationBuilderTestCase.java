@@ -28,7 +28,7 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
     {
         try
         {
-            return new ScriptConfigurationBuilder("groovy");
+            return new ScriptConfigurationBuilder("groovy", getConfigResources());
         }
         catch (MuleException e)
         {
