@@ -91,8 +91,6 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationManag
         // no manager initialising or initialised
         verifyAllNotifications(spec, ManagerNotification.class,
                 ManagerNotification.MANAGER_STARTING, ManagerNotification.MANAGER_STOPPED_MODELS);
-
-        assertExpectedNotifications(spec);
     }
 
 }
