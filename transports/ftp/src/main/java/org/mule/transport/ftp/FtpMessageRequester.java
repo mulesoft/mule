@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.AbstractMessageRequester;
+import org.mule.transport.file.FileConnector;
 
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -118,8 +119,11 @@ public class FtpMessageRequester extends AbstractMessageRequester
             {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
-            return new DefaultMuleMessage(connector.getMessageAdapter(baos.toByteArray()));
 
+            MuleMessage reply = new DefaultMuleMessage(connector.getMessageAdapter(baos.toByteArray()));
+            reply.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
+            reply.setProperty(FileConnector.PROPERTY_FILE_SIZE, new Long(file.getSize()));
+            return reply;
         }
         finally
         {
