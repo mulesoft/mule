@@ -120,7 +120,3 @@ org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 # MULE-2745
 # How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
 org.mule.test.integration.persistence.FilePersistenceTestCase
-
-# requires the removed JOTM module. Might as well be removed completely?
-org.mule.test.integration.transaction.XAResourceManagerTestCase
-

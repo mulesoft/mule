@@ -11,6 +11,7 @@
 package org.mule.test.integration.transport.jdbc;
 
 import org.mule.api.transaction.TransactionFactory;
+import org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
 
@@ -18,28 +19,18 @@ import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 
 import org.enhydra.jdbc.standard.StandardXADataSource;
-import org.objectweb.jotm.Current;
-import org.objectweb.jotm.Jotm;
+
 
 public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase
 {
-
     private TransactionManager txManager;
 
     protected void doSetUp() throws Exception
     {
-        // check for already active JOTM instance
-        txManager = Current.getCurrent();
-        // if none found, create new local JOTM instance
-        if (txManager == null)
-        {
-            new Jotm(true, false);
-            txManager = Current.getCurrent();
-        }
+        txManager = new JBossArjunaTransactionManagerFactory().create();
         super.doSetUp();
-       muleContext.setTransactionManager(txManager);
+        muleContext.setTransactionManager(txManager);
     }
-
     protected TransactionFactory getTransactionFactory()
     {
         return new XaTransactionFactory();
@@ -53,5 +44,4 @@ public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransacti
         ds.setTransactionManager(txManager);
         return new DataSourceWrapper(ds, txManager);
     }
-
 }

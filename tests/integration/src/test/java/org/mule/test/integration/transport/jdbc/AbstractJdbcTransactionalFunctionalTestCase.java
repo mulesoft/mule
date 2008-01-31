@@ -31,8 +31,6 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.util.object.PrototypeObjectFactory;
 
-import java.util.HashMap;
-
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractJdbcTransactionalFunctionalTestCase extends AbstractJdbcFunctionalTestCase  implements TransactionNotificationListener
