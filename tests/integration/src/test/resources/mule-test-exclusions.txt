@@ -120,3 +120,6 @@ org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 # MULE-2745
 # How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
 org.mule.test.integration.persistence.FilePersistenceTestCase
+
+# Pending (acooke)
+org.mule.context.notification.ServerNotificationManagerTestCase
