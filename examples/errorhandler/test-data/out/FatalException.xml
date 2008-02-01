@@ -1,4 +1,4 @@
-<org.mule.samples.errorhandler.ExceptionBean>
+<org.mule.example.errorhandler.ExceptionBean>
   <cause>
     <detailMessage>Some IO exception</detailMessage>
     <exceptionClass>java.io.IOException</exceptionClass>
@@ -18,4 +18,4 @@
     <cause class="java.io.IOException" reference="../../cause/originalException"/>
     <detailMessage>Some fatal exception</detailMessage>
   </originalException>
-</org.mule.samples.errorhandler.ExceptionBean>
+</org.mule.example.errorhandler.ExceptionBean>

@@ -29,7 +29,7 @@
                 <inbound-endpoint transformer-refs="HttpRequestToParameter2" address="servlet://restPUTTest"/>
             </inbound>
             <component>
-                <pooled-object class="org.mule.samples.rest.RestTester">
+                <pooled-object class="org.mule.example.rest.RestTester">
                     <property key="prefix" value="Received "/>
                 </pooled-object>
             </component>

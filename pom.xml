@@ -894,7 +894,7 @@
                         </group>
                         <group>
                             <title>Examples</title>
-                            <packages>org.mule.samples.*:org.mule.examples.*</packages>
+                            <packages>org.mule.example.*:org.mule.examples.*</packages>
                         </group>
                     </groups>
                 </configuration>
