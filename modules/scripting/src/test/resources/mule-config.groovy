@@ -27,14 +27,13 @@ import org.mule.routing.response.DefaultResponseRouterCollection
 import org.mule.service.DefaultServiceExceptionStrategy
 import org.mule.util.queue.QueueManager
 import org.mule.util.queue.TransactionalQueueManager
-import org.mule.util.queue.CachingPersistenceStrategy
 import org.mule.util.queue.MemoryPersistenceStrategy
 import org.mule.security.MuleSecurityManager
 import org.mule.endpoint.DefaultEndpointFactory
 import org.mule.api.config.MuleProperties;
 
 QueueManager queueManager = new TransactionalQueueManager();
-queueManager.persistenceStrategy = new CachingPersistenceStrategy(new MemoryPersistenceStrategy())
+queueManager.persistenceStrategy = new MemoryPersistenceStrategy()
 muleContext.registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
 muleContext.registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
 muleContext.registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
