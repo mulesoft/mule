@@ -8,23 +8,21 @@
  * LICENSE.txt file.
  */
 
-package org.mule.samples.errorhandler;
+package org.mule.example.hello;
 
-import org.mule.tck.FunctionalTestCase;
-
-public class ErrorHandlerTestCase extends FunctionalTestCase
+/**
+ * <code>Greeter</code> TODO (document class)
+ * 
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
+ */
+public class Greeter
 {
-    protected String getConfigResources()
-    {
-        return "error-config.xml";
-    }
+    String greeting = "Hello ";
 
-    public void testConfigSanity()
+    public void greet(NameString person)
     {
-        // empty
+        person.setGreeting(greeting);
+
     }
-    
-    // TODO Create a test to copy files from test-data/out to test-data/in
 }
-
-

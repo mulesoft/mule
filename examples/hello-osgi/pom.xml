@@ -38,7 +38,7 @@
                             org.mule.umo.transformer
                         </Import-Package>
                         <Private-Package>
-                            org.mule.samples.hello.*
+                            org.mule.example.hello.*
                         </Private-Package>
                     </instructions>
                 </configuration>

@@ -82,7 +82,7 @@ the different components are made from the loan broker component (a la hub and s
         The loan broker is used to receive loan requests
         -->
         <mule-descriptor name="LoanBroker"
-                         implementation="org.mule.samples.loanbroker.AsyncLoanBroker">
+                         implementation="org.mule.example.loanbroker.AsyncLoanBroker">
 
             <!--
             This router uses the BankQuoteAggregator for events of type BankQuote, for all other
@@ -92,8 +92,8 @@ the different components are made from the loan broker component (a la hub and s
                 <catch-all-strategy className="org.mule.routing.ServiceCatchAllStrategy"/>
                 <endpoint address="LoanBrokerRequests"/>
                 <endpoint address="LoanBrokerQuotes"/>
-                <router className="org.mule.samples.loanbroker.routers.BankQuotesAggregator">
-                    <filter expectedType="org.mule.samples.loanbroker.LoanQuote"
+                <router className="org.mule.example.loanbroker.routers.BankQuotesAggregator">
+                    <filter expectedType="org.mule.example.loanbroker.LoanQuote"
                             className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </inbound-router>
@@ -108,7 +108,7 @@ the different components are made from the loan broker component (a la hub and s
         The credit agency service will get the credit profile for a customer
         -->
         <mule-descriptor name="CreditAgencyService"
-                         implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
+                         implementation="org.mule.example.loanbroker.DefaultCreditAgencyService">
             <inbound-router>
                 <endpoint address="CreditAgencyReceiver"/>
             </inbound-router>
@@ -123,7 +123,7 @@ the different components are made from the loan broker component (a la hub and s
         The Lender service is used to determine which banks to contact for a quote
         -->
         <mule-descriptor name="LenderService"
-                         implementation="org.mule.samples.loanbroker.DefaultLenderService">
+                         implementation="org.mule.example.loanbroker.DefaultLenderService">
             <inbound-router>
                 <endpoint address="LenderService"/>
             </inbound-router>
@@ -147,31 +147,31 @@ the different components are made from the loan broker component (a la hub and s
         replyTo property which will be used by Mule to route the responses back
         to the LoanBrokerQuotes destination
         -->
-        <mule-descriptor name="Bank1" implementation="org.mule.samples.loanbroker.Bank">
+        <mule-descriptor name="Bank1" implementation="org.mule.example.loanbroker.Bank">
             <inbound-router>
                 <endpoint address="Bank1"/>
             </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="Bank2" implementation="org.mule.samples.loanbroker.Bank">
+        <mule-descriptor name="Bank2" implementation="org.mule.example.loanbroker.Bank">
             <inbound-router>
                 <endpoint address="Bank2"/>
             </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="Bank3" implementation="org.mule.samples.loanbroker.Bank">
+        <mule-descriptor name="Bank3" implementation="org.mule.example.loanbroker.Bank">
             <inbound-router>
                 <endpoint address="Bank3"/>
             </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="Bank4" implementation="org.mule.samples.loanbroker.Bank">
+        <mule-descriptor name="Bank4" implementation="org.mule.example.loanbroker.Bank">
             <inbound-router>
                 <endpoint address="Bank4"/>
             </inbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="Bank5" implementation="org.mule.samples.loanbroker.Bank">
+        <mule-descriptor name="Bank5" implementation="org.mule.example.loanbroker.Bank">
             <inbound-router>
                 <endpoint address="Bank5"/>
             </inbound-router>

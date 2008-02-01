@@ -1,4 +1,4 @@
-<org.mule.samples.errorhandler.ExceptionBean>
+<org.mule.example.errorhandler.ExceptionBean>
   <detailMessage>Some default exception</detailMessage>
   <exceptionClass>org.mule.api.DefaultMuleException</exceptionClass>
   <stackTrace>
@@ -10,4 +10,4 @@
     <string>java.lang.reflect.Method.invoke(Method.java:324)</string>
     <string>com.intellij.rt.execution.application.AppMain.main(AppMain.java:78)</string>
   </stackTrace>
-</org.mule.samples.errorhandler.ExceptionBean>
+</org.mule.example.errorhandler.ExceptionBean>

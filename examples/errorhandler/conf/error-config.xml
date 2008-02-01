@@ -19,7 +19,7 @@
         The example consists of two components: ExceptionManager and BusinessErrorManager.
     </description>
     
-    <spring:bean id="errorManager" class="org.mule.samples.errorhandler.ErrorManager">
+    <spring:bean id="errorManager" class="org.mule.example.errorhandler.ErrorManager">
         <spring:property name="handlers">
             <spring:list>
                 <spring:ref local="fatalHandler"/>
@@ -29,21 +29,21 @@
         </spring:property>
     </spring:bean>
     
-    <spring:bean id="defaultHandler" class="org.mule.samples.errorhandler.handlers.DefaultHandler">
+    <spring:bean id="defaultHandler" class="org.mule.example.errorhandler.handlers.DefaultHandler">
         <spring:property name="endpointName" value="ExceptionFileWriter"/>
         <spring:property name="errorManager">
             <spring:ref local="errorManager"/>
         </spring:property>
     </spring:bean>
 
-    <spring:bean id="fatalHandler" class="org.mule.samples.errorhandler.handlers.FatalHandler">
+    <spring:bean id="fatalHandler" class="org.mule.example.errorhandler.handlers.FatalHandler">
         <spring:property name="endpointName" value="ExceptionEmailer"/>
         <spring:property name="errorManager">
             <spring:ref local="errorManager"/>
         </spring:property>
     </spring:bean>
 
-    <spring:bean id="businessHandler" class="org.mule.samples.errorhandler.handlers.BusinessHandler">
+    <spring:bean id="businessHandler" class="org.mule.example.errorhandler.handlers.BusinessHandler">
         <spring:property name="endpointName" value="ExceptionQueue"/>
         <spring:property name="errorManager">
             <spring:ref local="errorManager"/>
@@ -73,19 +73,19 @@
     <jms:jmsmessage-to-object-transformer name="JMSMessageToObject"/>
     <custom-transformer name="XMLToExceptionBean"
                              class="org.mule.transformers.xml.XmlToObject"
-                             returnClass="org.mule.samples.errorhandler.ExceptionBean"/>
+                             returnClass="org.mule.example.errorhandler.ExceptionBean"/>
     <custom-transformer name="ExceptionBeanToXML" 
                              class="org.mule.transformers.xml.ObjectToXml"
                              returnClass="java.lang.String"/>
     <custom-transformer name="ExceptionBeanToErrorMessage" 
-                             class="org.mule.samples.errorhandler.ExceptionBeanToErrorMessage"
-                             returnClass="org.mule.samples.errorhandler.ErrorMessage"/>
+                             class="org.mule.example.errorhandler.ExceptionBeanToErrorMessage"
+                             returnClass="org.mule.example.errorhandler.ErrorMessage"/>
     <custom-transformer name="ErrorMessageToException" 
-                             class="org.mule.samples.errorhandler.ErrorMessageToException"
+                             class="org.mule.example.errorhandler.ErrorMessageToException"
                              returnClass="java.lang.Throwable"/>
     <custom-transformer name="ErrorMessageToExceptionBean" 
-                             class="org.mule.samples.errorhandler.ErrorMessageToExceptionBean"
-                             returnClass="org.mule.samples.errorhandler.ExceptionBean"/>
+                             class="org.mule.example.errorhandler.ErrorMessageToExceptionBean"
+                             returnClass="org.mule.example.errorhandler.ExceptionBean"/>
 
     <model name="errorhandler-test">
         <!-- 
@@ -106,7 +106,7 @@
             </inbound>
             
             <component>
-                <pooled-object class="org.mule.samples.errorhandler.ErrorManager">
+                <pooled-object class="org.mule.example.errorhandler.ErrorManager">
                     <properties>
                         <spring:entry key="handlers">
                             <spring:list>
@@ -140,7 +140,7 @@
                 <filtering-router transformer-refs="ErrorMessageToException">
                     <outbound-endpoint address="jms://exception.queue"
                                    transformer-refs="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
-                    <payload-type-filter expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
+                    <payload-type-filter expectedType="org.mule.example.errorhandler.exceptions.BusinessException"/>
                 </filtering-router>
             </outbound>
         </service>
@@ -150,7 +150,7 @@
                 <inbound-endpoint address="jms://exception.queue"
                                transformer-refs="JMSMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"/>
             </inbound>
-            <component class="org.mule.samples.errorhandler.BusinessErrorManager"/>
+            <component class="org.mule.example.errorhandler.BusinessErrorManager"/>
         </service>
     </model>
 </mule>

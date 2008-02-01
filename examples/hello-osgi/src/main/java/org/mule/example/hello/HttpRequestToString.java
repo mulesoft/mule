@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.samples.hello;
+package org.mule.example.hello;
 
 import java.io.UnsupportedEncodingException;
 

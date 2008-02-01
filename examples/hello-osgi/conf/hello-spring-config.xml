@@ -32,28 +32,28 @@
     </spring:bean>
     <osgi:service ref="BytesToString" interface="org.mule.umo.transformer.UMOTransformer"/>
 
-    <spring:bean id="HttpToString" class="org.mule.samples.hello.HttpRequestToString">
+    <spring:bean id="HttpToString" class="org.mule.example.hello.HttpRequestToString">
         <spring:property name="returnClass">
             <spring:value>java.lang.String</spring:value>
         </spring:property>
     </spring:bean>
     <osgi:service ref="HttpToString" interface="org.mule.umo.transformer.UMOTransformer"/>
 
-    <spring:bean id="StringToNameString" class="org.mule.samples.hello.StringToNameString">
+    <spring:bean id="StringToNameString" class="org.mule.example.hello.StringToNameString">
         <spring:property name="returnClass">
-            <spring:value>org.mule.samples.hello.NameString</spring:value>
+            <spring:value>org.mule.example.hello.NameString</spring:value>
         </spring:property>
     </spring:bean>
     <osgi:service ref="StringToNameString" interface="org.mule.umo.transformer.UMOTransformer"/>
 
-    <spring:bean id="NameStringToChatString" class="org.mule.samples.hello.NameStringToChatString">
+    <spring:bean id="NameStringToChatString" class="org.mule.example.hello.NameStringToChatString">
         <spring:property name="returnClass">
-            <spring:value>org.mule.samples.hello.ChatString</spring:value>
+            <spring:value>org.mule.example.hello.ChatString</spring:value>
         </spring:property>
     </spring:bean>
     <osgi:service ref="NameStringToChatString" interface="org.mule.umo.transformer.UMOTransformer"/>
 
-    <spring:bean id="ChatStringToString" class="org.mule.samples.hello.ChatStringToString">
+    <spring:bean id="ChatStringToString" class="org.mule.example.hello.ChatStringToString">
         <spring:property name="returnClass">
             <spring:value>java.lang.String</spring:value>
         </spring:property>
@@ -97,7 +97,7 @@
     This is the actual bean used by the GreeterUMO. Notice that it is a singleton.  This
     important when component pooling is used (which it is by default).
     -->
-    <spring:bean id="Greeter" class="org.mule.samples.hello.Greeter"/>
+    <spring:bean id="Greeter" class="org.mule.example.hello.Greeter"/>
 
     <spring:bean id="ChitChatUMO" class="org.mule.impl.MuleDescriptor">
         <spring:property name="inboundEndpoint">
@@ -131,5 +131,5 @@
     This is the actual bean used by the ChitChatUMO. Notice that it is a singleton.  This
     important when component pooling is used (which it is by default).
     -->
-    <spring:bean id="ChitChatter" class="org.mule.samples.hello.ChitChatter"/>
+    <spring:bean id="ChitChatter" class="org.mule.example.hello.ChitChatter"/>
 </mule>
