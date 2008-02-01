@@ -12,7 +12,6 @@ import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.model.seda.SedaModel;
 import org.mule.security.MuleSecurityManager;
-import org.mule.util.queue.CachingPersistenceStrategy;
 import org.mule.util.queue.MemoryPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
@@ -48,7 +47,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP,
             new SimpleRegistryBootstrap());
         QueueManager queueManager = new TransactionalQueueManager();
-        queueManager.setPersistenceStrategy(new CachingPersistenceStrategy(new MemoryPersistenceStrategy()));
+        queueManager.setPersistenceStrategy(new MemoryPersistenceStrategy());
         registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
         registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
         registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());

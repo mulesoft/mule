@@ -31,7 +31,7 @@ import org.mule.util.object.PooledObjectFactory;
 public class XFireEchoConfigutationBuilder extends AbstractConfigurationBuilder implements ConfigurationBuilder
 {
 
-    @Override
+    // @Override
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
         // Set defaults

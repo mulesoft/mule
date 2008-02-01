@@ -44,7 +44,7 @@ public class XFireEchoProgramaticTestCase extends AxisEchoTestCase
         return "xfire";
     }
     
-    @Override
+    // @Override
     protected ConfigurationBuilder getBuilder() throws Exception
     {
       return new XFireEchoConfigutationBuilder();
