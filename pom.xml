@@ -59,7 +59,7 @@
                     <version>${version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.mule.examples</groupId>
+                    <groupId>org.mule.example</groupId>
                     <artifactId>mule-example-hello-osgi</artifactId>
                     <version>${version}</version>
                 </dependency>
