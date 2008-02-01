@@ -44,10 +44,10 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.extras.spring.config,
-                                    org.mule.extras.spring.events,
-                                    org.mule.extras.spring.remoting,
-                                    org.mule.extras.spring.transaction
+                                    org.mule.module.spring.config,
+                                    org.mule.module.spring.events,
+                                    org.mule.module.spring.remoting,
+                                    org.mule.module.spring.transaction
                                 </Export-Package>
                             </instructions>
                         </configuration>

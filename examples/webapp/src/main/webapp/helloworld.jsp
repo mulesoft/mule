@@ -1,4 +1,4 @@
-<%@ page import="org.mule.extras.client.MuleClient,
+<%@ page import="org.mule.module.client.MuleClient,
                  org.mule.api.MuleMessage"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 

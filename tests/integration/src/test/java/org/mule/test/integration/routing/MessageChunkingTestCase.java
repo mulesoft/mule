@@ -14,7 +14,7 @@ package org.mule.test.integration.routing;
 import org.mule.api.context.notification.MessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.MessageNotification;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;

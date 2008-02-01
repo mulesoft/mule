@@ -11,7 +11,7 @@
 package org.mule.transport.quartz.jobs;
 
 import org.mule.api.MuleException;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.i18n.QuartzMessages;

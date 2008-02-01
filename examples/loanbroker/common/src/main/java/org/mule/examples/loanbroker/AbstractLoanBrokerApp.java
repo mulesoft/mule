@@ -18,7 +18,7 @@ import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.examples.loanbroker.messages.Customer;
 import org.mule.examples.loanbroker.messages.CustomerQuoteRequest;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 
 import java.io.IOException;
 import java.util.ArrayList;

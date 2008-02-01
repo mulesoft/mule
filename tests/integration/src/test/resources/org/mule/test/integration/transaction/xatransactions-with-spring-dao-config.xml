@@ -5,13 +5,13 @@
 <mule-configuration id="test" version="1.0">
     
     <!-- Container context -->
-    <container-context name="spring" className="org.mule.extras.spring.SpringContainerContext">
+    <container-context name="spring" className="org.mule.module.spring.SpringContainerContext">
         <properties>
             <property name="configFile" value="org/mule/test/integration/transaction/xatransaction-with-spring-datasource.xml"/>
         </properties>
     </container-context>
 
-    <transaction-manager factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
+    <transaction-manager factory="org.mule.module.jotm.JotmTransactionManagerFactory"/>
 
     <connector name="jmsXAConnector" className="org.mule.transport.jms.activemq.ActiveMqJmsConnector">
         <properties>

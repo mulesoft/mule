@@ -2,7 +2,7 @@
 <beans>
     
     <!-- Transaction management for XA transactions involving multiple JDBC and/or JMS -->
-    <bean id="jotmFactory" class="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
+    <bean id="jotmFactory" class="org.mule.module.jotm.JotmTransactionManagerFactory"/>
     <bean id="jotm" factory-bean="jotmFactory" factory-method="create"/>
  
      <!-- This def is used for Spring/Hibernate usage from within Components.

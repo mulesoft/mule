@@ -43,7 +43,7 @@ to interpret your configuration file(s).  If you wish to use a different configu
 builder, you can specify it using the "-builder" option.  For example, to use the Spring
 configuration builder you could specify:
 
-mule -config my-config.xml -builder org.mule.extras.spring.SpringConfigurationBuilder
+mule -config my-config.xml -builder org.mule.module.spring.SpringConfigurationBuilder
 
 Since the Spring configuration builder is so commonly used, a shortcut has been created
 for it, so you can even abbreviate the above with:

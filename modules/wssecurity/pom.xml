@@ -24,7 +24,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.extras.wssecurity.*
+                                    org.mule.module.wssecurity.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

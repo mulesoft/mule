@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.transaction;
 
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 public class OutboundTransactionsTestCase extends FunctionalTestCase

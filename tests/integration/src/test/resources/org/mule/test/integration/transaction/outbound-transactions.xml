@@ -7,7 +7,7 @@
     <mule-environment-properties synchronous="false" synchronousEventTimeout="5000" />
 
     <!-- Embed Spring configuration to create a Jms Connection factory -->
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
+    <container-context className="org.mule.module.spring.SpringContainerContext">
         <properties>
             <text-property name="configuration">
                 <![CDATA[
@@ -24,7 +24,7 @@
 
     <!-- Transaction manager -->
     <transaction-manager
-        factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
+        factory="org.mule.module.jotm.JotmTransactionManagerFactory"/>
 
     <connector name="jmsConnector" className="org.mule.transport.jms.activemq.ActiveMqJmsConnector">
         <properties>

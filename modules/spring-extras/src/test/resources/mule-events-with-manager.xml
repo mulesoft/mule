@@ -7,14 +7,14 @@
 
     <mule-environment-properties/>
     
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
+    <container-context className="org.mule.module.spring.SpringContainerContext">
         <properties>
             <property name="configFile" value="mule-events-app-context-with-ref-props.xml"/>
         </properties>
     </container-context>
 
     <connector name="TestConnector"
-        className="org.mule.extras.spring.events.TestConnectorWithContainerDependents">
+        className="org.mule.module.spring.events.TestConnectorWithContainerDependents">
         <properties>
             <container-property name="containerProp"
                 reference="apple"/>

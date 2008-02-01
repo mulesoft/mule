@@ -18,7 +18,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.AbstractConnector;
 

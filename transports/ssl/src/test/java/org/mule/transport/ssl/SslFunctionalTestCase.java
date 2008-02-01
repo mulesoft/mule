@@ -12,7 +12,7 @@ package org.mule.transport.ssl;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.service.Service;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.EventCallback;

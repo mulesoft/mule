@@ -3,8 +3,8 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-    <bean id="muleManager" class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean"/>
-    <bean id="muleNameProcessor" class="org.mule.extras.spring.config.MuleObjectNameProcessor"/>
+    <bean id="muleManager" class="org.mule.module.spring.config.AutowireUMOManagerFactoryBean"/>
+    <bean id="muleNameProcessor" class="org.mule.module.spring.config.MuleObjectNameProcessor"/>
 
     <bean id="vmConnector" class="org.mule.transport.vm.VMConnector">
         <property name="queueTimeout"><value>42</value></property>

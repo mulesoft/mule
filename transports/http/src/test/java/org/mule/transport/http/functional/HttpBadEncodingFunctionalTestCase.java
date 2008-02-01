@@ -12,7 +12,7 @@ package org.mule.transport.http.functional;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.transport.http.HttpConnector;
 
 public class HttpBadEncodingFunctionalTestCase extends HttpEncodingFunctionalTestCase

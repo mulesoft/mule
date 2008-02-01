@@ -11,7 +11,7 @@
 package org.mule.test.usecases.sync;
 
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 public class TcpJmsResponseTestCase extends FunctionalTestCase

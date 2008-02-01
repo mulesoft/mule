@@ -5,7 +5,7 @@
 <mule-configuration id="InjectionProblem" version="1.0">
 
      <!-- embed Spring configuration to create a Jms Connection factory -->
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
+    <container-context className="org.mule.module.spring.SpringContainerContext">
         <properties>
             <text-property name="configuration">
                 <![CDATA[

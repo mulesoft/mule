@@ -14,7 +14,7 @@
     <!-- The Mule implementation of the Spring ApplicationEventMulticaster.  On startup the
 application context will look in the container for a bean called applicationEventMulticaster and
 register it as the spring context event multicaster  -->
-    <bean id="applicationEventMulticaster" class="org.mule.extras.spring.events.MuleEventMulticaster">
+    <bean id="applicationEventMulticaster" class="org.mule.module.spring.events.MuleEventMulticaster">
         <property name="asynchronous" value="true"/>
     </bean>
 

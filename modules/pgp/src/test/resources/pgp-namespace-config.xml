@@ -8,13 +8,13 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/pgp/2.0 http://www.mulesource.org/schema/mule/pgp/2.0/mule-pgp.xsd">
 
-    <spring:bean id="pgpKeyManager" class="org.mule.extras.pgp.PGPKeyRingImpl" init-method="initialise">
+    <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl" init-method="initialise">
         <spring:property name="publicKeyRingFileName" value="serverPublic.gpg"/>
         <spring:property name="secretKeyRingFileName" value="serverPrivate.gpg"/>
         <spring:property name="secretAliasId" value="0x6168F39C"/>
         <spring:property name="secretPassphrase" value="TestingPassphrase"/>
     </spring:bean>
-    <spring:bean id="fakeCredentialAccessor" class="org.mule.extras.pgp.FakeCredentialAccessor" />
+    <spring:bean id="fakeCredentialAccessor" class="org.mule.module.pgp.FakeCredentialAccessor" />
 	
     <pgp:security-manager>
         <pgp:security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>

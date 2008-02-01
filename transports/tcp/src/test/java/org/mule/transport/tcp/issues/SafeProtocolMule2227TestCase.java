@@ -11,7 +11,7 @@
 package org.mule.transport.tcp.issues;
 
 import org.mule.api.MuleException;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.transport.tcp.protocols.SafeProtocolTestCase;
 
 public class SafeProtocolMule2227TestCase extends SafeProtocolTestCase

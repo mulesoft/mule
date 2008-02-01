@@ -10,7 +10,7 @@
 
 package org.mule.transport.quartz;
 
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.jobs.MuleClientReceiveJob;

@@ -11,7 +11,7 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.servlet.MuleReceiverServlet;

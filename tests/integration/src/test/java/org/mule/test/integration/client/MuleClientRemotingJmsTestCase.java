@@ -13,8 +13,8 @@ package org.mule.test.integration.client;
 
 import org.mule.RegistryContext;
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
-import org.mule.extras.client.RemoteDispatcher;
+import org.mule.module.client.MuleClient;
+import org.mule.module.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
 
 public class MuleClientRemotingJmsTestCase extends FunctionalTestCase

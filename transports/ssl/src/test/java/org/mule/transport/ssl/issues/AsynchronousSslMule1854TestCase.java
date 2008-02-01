@@ -11,7 +11,7 @@
 package org.mule.transport.ssl.issues;
 
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 public class AsynchronousSslMule1854TestCase extends FunctionalTestCase {

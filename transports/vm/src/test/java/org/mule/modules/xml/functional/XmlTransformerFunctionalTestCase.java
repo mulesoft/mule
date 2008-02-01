@@ -12,7 +12,7 @@ package org.mule.modules.xml.functional;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.w3c.dom.Document;

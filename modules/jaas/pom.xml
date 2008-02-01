@@ -58,7 +58,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.extras.jaas.*
+                                    org.mule.module.jaas.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

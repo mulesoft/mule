@@ -5,12 +5,12 @@
 
 <mule-configuration id="endpoint_test" version="1.0">
 
-    <container-context name="spring1" className="org.mule.extras.spring.SpringContainerContext">
+    <container-context name="spring1" className="org.mule.module.spring.SpringContainerContext">
         <properties>
             <property name="configFile" value="org/mule/test/integration/config/spring-config.xml"/>
         </properties>
     </container-context>
-    <container-context name="spring2" className="org.mule.extras.spring.SpringContainerContext">
+    <container-context name="spring2" className="org.mule.module.spring.SpringContainerContext">
         <properties>
             <property name="configFile" value="org/mule/test/integration/config/spring2-config.xml"/>
         </properties>

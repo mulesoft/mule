@@ -17,7 +17,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.Message;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.rmi.RmiConnector;
 import org.mule.transport.rmi.i18n.RmiMessages;

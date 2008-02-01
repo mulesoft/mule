@@ -9,7 +9,7 @@
     <spring:bean id="muleManager" class="org.mule.modules.osgi.MuleSoaManager"/>
 
     <!-- Used to set mule object names to their corresponding bean id -->
-    <spring:bean id="muleNameProcessor" class="org.mule.extras.spring.MuleObjectNameProcessor"/>
+    <spring:bean id="muleNameProcessor" class="org.mule.module.spring.MuleObjectNameProcessor"/>
 
     <spring:bean id="fileConnector" class="org.mule.providers.file.FileConnector">
         <spring:property name="pollingFrequency" value="1000"/>

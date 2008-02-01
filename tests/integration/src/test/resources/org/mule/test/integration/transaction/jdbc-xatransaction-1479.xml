@@ -10,7 +10,7 @@
     </mule-environment-properties>
 
     <!-- Container context -->
-    <container-context name="spring" className="org.mule.extras.spring.SpringContainerContext">
+    <container-context name="spring" className="org.mule.module.spring.SpringContainerContext">
         <properties>
             <property name="configFile"
                       value="org/mule/test/integration/transaction/jdbc-xatransaction-1479-spring.xml"/>

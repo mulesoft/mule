@@ -12,7 +12,7 @@ package org.mule.test.integration.transport.jms;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 public class NestedRouterTestCase extends FunctionalTestCase

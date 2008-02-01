@@ -18,7 +18,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.registry.Registry;
 import org.mule.endpoint.MuleEndpoint;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.AbstractConnector;
 

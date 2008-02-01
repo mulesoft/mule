@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-    <bean id="pgpKeyManager" class="org.mule.extras.pgp.PGPKeyRingImpl" init-method="initialise">
+    <bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl" init-method="initialise">
         <property name="publicKeyRingFileName" value="serverPublic.gpg"/>
         <property name="secretKeyRingFileName" value="serverPrivate.gpg"/>
         <property name="secretAliasId" value="0x6168F39C"/>
         <property name="secretPassphrase" value="TestingPassphrase"/>
     </bean>
-    <bean id="fakeCredentialAccessor" class="org.mule.extras.pgp.FakeCredentialAccessor" />
+    <bean id="fakeCredentialAccessor" class="org.mule.module.pgp.FakeCredentialAccessor" />
 </beans>

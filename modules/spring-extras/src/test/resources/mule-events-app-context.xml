@@ -22,7 +22,7 @@
     <!-- The Mule implementation of ApplicationEventMulticaster.  On startup the application
     context will look in the container for a bean called applicationEventMulticaster and
     register it as the spring context event multicaster -->
-    <bean id="applicationEventMulticaster" class="org.mule.extras.spring.events.MuleEventMulticaster">
+    <bean id="applicationEventMulticaster" class="org.mule.module.spring.events.MuleEventMulticaster">
         <property name="subscriptions">
             <list>
                 <value>vm://*</value>
@@ -38,7 +38,7 @@
     <!-- this bean implements MuleSubscriptioneventListener which means it will receive any events published
     on enpoints that start with event.
     -->
-    <bean id="testSubscribingEventBean1" class="org.mule.extras.spring.events.TestSubscriptionEventBean">
+    <bean id="testSubscribingEventBean1" class="org.mule.module.spring.events.TestSubscriptionEventBean">
         <property name="subscriptions">
             <list>
                 <value>vm://event.*</value>
@@ -49,7 +49,7 @@
     <!-- this bean implements MuleSubscriptioneventListener which means it will receive any events published
     on enpoint test.event.bean.2. note that the enpoint is mapped further up in the config
     -->
-    <bean id="testSubscribingEventBean2" class="org.mule.extras.spring.events.TestSubscriptionEventBean">
+    <bean id="testSubscribingEventBean2" class="org.mule.module.spring.events.TestSubscriptionEventBean">
         <property name="subscriptions">
             <list>
                 <value>vm://testBean2</value>
@@ -60,15 +60,15 @@
     <!-- this is a bean that implements the ApplicationListener.  This bean will receive
     all events except Mule events
     -->
-    <bean id="testEventSpringBean" class="org.mule.extras.spring.events.TestApplicationEventBean"/>
+    <bean id="testEventSpringBean" class="org.mule.module.spring.events.TestApplicationEventBean"/>
 
     <!-- this is a bean that implements the ApplicationListener and MuleEventListener.  This bean will receive
     all events
     -->
-    <bean id="testAllEventBean" class="org.mule.extras.spring.events.TestAllEventBean"/>
+    <bean id="testAllEventBean" class="org.mule.module.spring.events.TestAllEventBean"/>
 
     <!-- This bean implements MuleEventListener which means it will receive all Mule events regardless
     of the endpoint they were published on
     -->
-    <bean id="testNonSubscribingMuleEventBean" class="org.mule.extras.spring.events.TestMuleEventBean"/>
+    <bean id="testNonSubscribingMuleEventBean" class="org.mule.module.spring.events.TestMuleEventBean"/>
 </beans>

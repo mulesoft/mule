@@ -12,7 +12,7 @@ package org.mule.test.integration.persistence;
 
 
 import org.mule.RegistryContext;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.FileUtils;
 

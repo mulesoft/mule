@@ -11,7 +11,7 @@
 package org.mule.transport.ftp;
 
 import org.mule.api.MuleEventContext;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
 import org.mule.transport.ftp.server.NamedPayload;

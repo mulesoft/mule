@@ -10,7 +10,7 @@
 
     <container-context
             name="spring"
-            className="org.mule.extras.spring.SpringContainerContext">
+            className="org.mule.module.spring.SpringContainerContext">
         <properties>
             <property name="configResources" value="test-application-context.xml,test-application-context-2.xml"/>
         </properties>

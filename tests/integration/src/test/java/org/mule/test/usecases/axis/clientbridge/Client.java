@@ -16,7 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 
 public class Client
 {

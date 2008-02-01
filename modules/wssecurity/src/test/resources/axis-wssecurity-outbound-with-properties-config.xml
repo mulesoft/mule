@@ -14,7 +14,7 @@
   	   http://www.mulesource.org/schema/mule/wssecurity/2.0 http://www.mulesource.org/schema/mule/wssecurity/2.0/mule-wssecurity.xsd
        http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
 
-    <spring:bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
+    <spring:bean id="passwords" class="org.mule.module.wssecurity.callbackhandlers.PasswordContainer">
         <spring:constructor-arg>
             <spring:props>
                 <spring:prop key="mulealias">mulepassword</spring:prop>
@@ -44,7 +44,7 @@
                             <wssecurity:property key="encryptionPropFile" value="out-encrypted-security.properties"/>
                             <wssecurity:property key="user" value="mulealias"/>
                             <wssecurity:property key="passwordCallbackClass"
-                                                 value="org.mule.extras.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
+                                                 value="org.mule.module.wssecurity.callbackhandlers.MuleWsSecurityCallbackHandler"/>
                         </wssecurity:security-filter>
                     </outbound-endpoint>
                 </outbound-pass-through-router>

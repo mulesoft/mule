@@ -13,7 +13,7 @@ package org.mule.transport.file.issues;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.transport.file.AbstractFileFunctionalTestCase;
 
 import java.io.File;

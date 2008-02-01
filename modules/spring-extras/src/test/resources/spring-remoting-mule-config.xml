@@ -8,7 +8,7 @@
     <!--
         Define a Spring context and we can have our POJOs come from there
         -->
-    <container-context className='org.mule.extras.spring.SpringContainerContext'>
+    <container-context className='org.mule.module.spring.SpringContainerContext'>
         <properties>
             <property name='configFile' value='remoting-applicationContext.xml'/>
         </properties>
@@ -19,13 +19,13 @@
             Transform a byte[] from an Http request into a Spring RemoteInvocation instance.
             -->
         <transformer name="springInputXform"
-            className="org.mule.extras.spring.remoting.ObjectToRemoteInvocationTransformer"/>
+            className="org.mule.module.spring.remoting.ObjectToRemoteInvocationTransformer"/>
         <!--
             Convert an Object to a Spring RemoteInvocationResult and then into a byte[]
             for return to the caller via Http.
             -->
         <transformer name="springOutputXform"
-            className="org.mule.extras.spring.remoting.ObjectToRemoteInvocationResultTransformer"/>
+            className="org.mule.module.spring.remoting.ObjectToRemoteInvocationResultTransformer"/>
     </transformers>
 
     <model name="main">
@@ -35,7 +35,7 @@
             the requested method on a POJO specified by "serviceClass".
             -->
         <mule-descriptor name="doSomeWorkViaSpring"
-            implementation="org.mule.extras.spring.remoting.SpringRemoteInvokerComponent">
+            implementation="org.mule.module.spring.remoting.SpringRemoteInvokerComponent">
 
             <!--
                 Listen on 8003 for Http requests.
@@ -68,7 +68,7 @@
                 <!--
                     Set the serviceInterface property of Spring's RemoteInvocationBasedExporter
                     -->
-                <property name="serviceInterface" value="org.mule.extras.spring.remoting.WorkInterface"/>
+                <property name="serviceInterface" value="org.mule.module.spring.remoting.WorkInterface"/>
                 <!--
                     Set other properties of Spring's RemoteInvocationBasedExporter
                     i.e. registerTraceInterceptor and remoteInvocationExecutor

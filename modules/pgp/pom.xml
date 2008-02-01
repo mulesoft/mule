@@ -96,7 +96,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.extras.pgp.*
+                                    org.mule.module.pgp.*
                                 </Export-Package>
                             </instructions>
                         </configuration>

@@ -11,7 +11,7 @@
 package org.mule.transport.bpm.jbpm;
 
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.transport.bpm.BPMS;
 import org.mule.transport.bpm.jbpm.Jbpm;
 import org.mule.util.NumberUtils;

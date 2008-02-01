@@ -5,7 +5,7 @@
 
 <mule-configuration id="http_test" version="1.0">
 
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
+    <container-context className="org.mule.module.spring.SpringContainerContext">
         <properties>
             <text-property name="configuration">
                 <![CDATA[

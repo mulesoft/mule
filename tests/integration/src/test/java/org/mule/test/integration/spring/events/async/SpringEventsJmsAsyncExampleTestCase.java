@@ -13,7 +13,7 @@ package org.mule.test.integration.spring.events.async;
 import org.mule.RegistryContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.test.integration.spring.events.Order;

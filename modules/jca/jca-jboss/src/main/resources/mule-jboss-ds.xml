@@ -31,7 +31,7 @@
             Uncomment and override with custom settings, don't edit ra.xml directly.
 
         <config-property name="ConfigurationBuilder"
-                         type="java.lang.String">org.mule.extras.spring.config.SpringConfigurationBuilder</config-property>
+                         type="java.lang.String">org.mule.module.spring.config.SpringConfigurationBuilder</config-property>
         <config-property name="Configurations"
                          type="java.lang.String">my-custom-mule-config.xml</config-property>
         -->

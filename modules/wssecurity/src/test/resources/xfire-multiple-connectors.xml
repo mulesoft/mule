@@ -16,7 +16,7 @@
 
     <configuration defaultSynchronousEndpoints="false"/>
 
-    <spring:bean id="passwords" class="org.mule.extras.wssecurity.callbackhandlers.PasswordContainer">
+    <spring:bean id="passwords" class="org.mule.module.wssecurity.callbackhandlers.PasswordContainer">
         <spring:constructor-arg>
             <spring:props>
                 <spring:prop key="mulealias">mulepassword</spring:prop>

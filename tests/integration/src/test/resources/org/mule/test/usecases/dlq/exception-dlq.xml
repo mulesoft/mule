@@ -8,7 +8,7 @@
     <mule-environment-properties/>
 
      <!-- embed Spring configuration to create a Jms Connection factory -->
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
+    <container-context className="org.mule.module.spring.SpringContainerContext">
         <properties>
             <text-property name="configuration">
                 <![CDATA[
@@ -25,7 +25,7 @@
         </properties>
     </container-context>
 
-    <transaction-manager factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
+    <transaction-manager factory="org.mule.module.jotm.JotmTransactionManagerFactory"/>
 
     <!-- Testing with ActiveMq -->
     <connector name="jmsConnector" className="org.mule.transport.jms.JmsConnector">

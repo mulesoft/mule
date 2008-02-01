@@ -12,7 +12,7 @@ package org.mule.transport.jdbc.functional;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 
 import java.io.Serializable;

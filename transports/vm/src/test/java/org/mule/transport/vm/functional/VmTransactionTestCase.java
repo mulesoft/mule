@@ -10,7 +10,7 @@
 package org.mule.transport.vm.functional;
 
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 

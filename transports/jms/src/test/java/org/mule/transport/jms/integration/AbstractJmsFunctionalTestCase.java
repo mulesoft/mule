@@ -10,7 +10,7 @@
 package org.mule.transport.jms.integration;
 
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 import javax.jms.Connection;

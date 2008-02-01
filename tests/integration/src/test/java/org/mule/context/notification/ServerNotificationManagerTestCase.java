@@ -11,7 +11,7 @@
 package org.mule.context.notification;
 
 import org.mule.api.service.Service;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 
 public class ServerNotificationManagerTestCase extends AbstractNotificationManagerTestCase
 {

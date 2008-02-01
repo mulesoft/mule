@@ -3,5 +3,5 @@
 #
 
 # these fail unless a security patch is applied to JAVA_HOME/lib
-org.mule.extras.pgp.KeyBasedEncryptionStrategyTestCase
-org.mule.extras.pgp.PGPSecurityFilterTestCase
+org.mule.module.pgp.KeyBasedEncryptionStrategyTestCase
+org.mule.module.pgp.PGPSecurityFilterTestCase

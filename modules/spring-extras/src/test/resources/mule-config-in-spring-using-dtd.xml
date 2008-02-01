@@ -2,8 +2,8 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
-    <bean id="muleManager" class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean"/>
-    <bean id="muleNameProcessor" class="org.mule.extras.spring.config.MuleObjectNameProcessor"/>
+    <bean id="muleManager" class="org.mule.module.spring.config.AutowireUMOManagerFactoryBean"/>
+    <bean id="muleNameProcessor" class="org.mule.module.spring.config.MuleObjectNameProcessor"/>
 
     <bean id="vmConnector" class="org.mule.transport.vm.VMConnector">
         <property name="queueTimeout"><value>42</value></property>

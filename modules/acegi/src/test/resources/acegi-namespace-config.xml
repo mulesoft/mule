@@ -35,7 +35,7 @@
          through a custom provider.  in normal use it should be set just once, through
          the acegi schema - this is just for extra test coverage -->
 
-    <spring:bean id="explicitCreation1" class="org.mule.extras.acegi.AcegiProviderAdapter">
+    <spring:bean id="explicitCreation1" class="org.mule.module.acegi.AcegiProviderAdapter">
         <spring:property name="delegate" ref="daoAuthenticationProvider"/>
         <spring:property name="name" value="customProvider"/>
     </spring:bean>
@@ -44,7 +44,7 @@
         <custom-security-provider name="willNotOverwriteName" provider-ref="explicitCreation1"/>
     </security-manager>
 
-    <spring:bean id="explicitCreation2" class="org.mule.extras.acegi.AcegiProviderAdapter">
+    <spring:bean id="explicitCreation2" class="org.mule.module.acegi.AcegiProviderAdapter">
         <spring:property name="delegate" ref="daoAuthenticationProvider"/>
     </spring:bean>
 

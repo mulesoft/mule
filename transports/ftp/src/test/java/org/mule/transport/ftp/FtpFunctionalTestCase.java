@@ -11,7 +11,7 @@
 package org.mule.transport.ftp;
 
 import org.mule.api.MuleMessage;
-import org.mule.extras.client.MuleClient;
+import org.mule.module.client.MuleClient;
 import org.mule.transport.file.FileConnector;
 import org.mule.transport.ftp.server.NamedPayload;
 

@@ -13,7 +13,7 @@
    <!-- The Mule implementation of the Spring ApplicationEventMulticaster.  On startup the
    application context will look in the container for a bean called applicationEventMulticaster and
    register it as the spring context event multicaster  -->
-   <spring:bean id="applicationEventMulticaster" class="org.mule.extras.spring.events.MuleEventMulticaster"/>
+   <spring:bean id="applicationEventMulticaster" class="org.mule.module.spring.events.MuleEventMulticaster"/>
 
    <!-- Our ourderManager bean -->
     <spring:bean id="orderManager" class="org.mule.test.integration.spring.events.OrderManagerBean">

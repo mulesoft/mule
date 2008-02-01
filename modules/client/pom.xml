@@ -46,7 +46,7 @@
                         <configuration>
                             <instructions>
                                 <Export-Package>
-                                    org.mule.extras.client.*
+                                    org.mule.module.client.*
                                 </Export-Package>
                             </instructions>
                         </configuration>
