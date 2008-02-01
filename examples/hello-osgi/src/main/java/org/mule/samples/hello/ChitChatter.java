@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.example.hello;
+package org.mule.samples.hello;
 
 /**
  * <code>ChitChatter</code> TODO (document class)

@@ -3,7 +3,7 @@
 <xsl:stylesheet version="1.0" xmlns:sq="http://www.webserviceX.NET/" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:template match="/sq:string/sq:StockQuotes/sq:Stock">
-        <org.mule.example.stockquote.StockQuote>
+        <org.mule.samples.stockquote.StockQuote>
             <name><xsl:value-of select="sq:Name"/></name>
             <symbol><xsl:value-of select="sq:Symbol"/></symbol>
             <date><xsl:value-of select="sq:Date"/><xsl:text> </xsl:text><xsl:value-of select="sq:Time"/></date>
@@ -14,6 +14,6 @@
             <low><xsl:value-of select="sq:Low"/></low>
             <volume><xsl:value-of select="sq:Volume"/></volume>
             <previousClose><xsl:value-of select="sq:PreviousClose"/></previousClose>
-        </org.mule.example.stockquote.StockQuote>
+        </org.mule.samples.stockquote.StockQuote>
     </xsl:template>
 </xsl:stylesheet>

@@ -40,10 +40,10 @@
         determine which method to call on our components based on the return types of these
         transformers.
     -->
-    <custom-transformer name="StdinToNameString" class="org.mule.example.hello.StdinToNameString"/>
-    <custom-transformer name="NameStringToChatString" class="org.mule.example.hello.NameStringToChatString"/>
-    <custom-transformer name="ChatStringToString" class="org.mule.example.hello.ChatStringToString"/>
-    <custom-transformer name="ExceptionToString" class="org.mule.example.hello.ExceptionToString"/>
+    <custom-transformer name="StdinToNameString" class="org.mule.samples.hello.StdinToNameString"/>
+    <custom-transformer name="NameStringToChatString" class="org.mule.samples.hello.NameStringToChatString"/>
+    <custom-transformer name="ChatStringToString" class="org.mule.samples.hello.ChatStringToString"/>
+    <custom-transformer name="ExceptionToString" class="org.mule.samples.hello.ExceptionToString"/>
 
     <!--
         An interceptor is a piece of code that can be configued to execute
@@ -72,12 +72,12 @@
                 <stdio:inbound-endpoint system="IN" transformer-refs="StdinToNameString"/>
             </inbound>
             
-            <component class="org.mule.example.hello.Greeter"/>
+            <component class="org.mule.samples.hello.Greeter"/>
 
             <outbound>
                 <filtering-router>
                     <vm:outbound-endpoint path="chitchatter"/>
-                    <payload-type-filter expectedType="org.mule.example.hello.NameString"/>
+                    <payload-type-filter expectedType="org.mule.samples.hello.NameString"/>
                 </filtering-router>
                 
                 <filtering-router>
@@ -105,7 +105,7 @@
                 <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString"/>
             </inbound>
                 
-            <component class="org.mule.example.hello.ChitChatter"/>
+            <component class="org.mule.samples.hello.ChitChatter"/>
 
             <outbound>
                 <outbound-pass-through-router>

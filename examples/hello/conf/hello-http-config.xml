@@ -37,11 +37,11 @@
         System.out.println("response = " + response.getPayload());
     -->
  
-    <custom-transformer name="StringToNameString" class="org.mule.example.hello.StringToNameString"/>
-    <custom-transformer name="NameStringToChatString" class="org.mule.example.hello.NameStringToChatString"/>
-    <custom-transformer name="ChatStringToString" class="org.mule.example.hello.ChatStringToString"/>
-    <custom-transformer name="HttpRequestToNameString" class="org.mule.example.hello.HttpRequestToNameString"/>
-    <custom-transformer name="ExceptionToString" class="org.mule.example.hello.ExceptionToString"/>
+    <custom-transformer name="StringToNameString" class="org.mule.samples.hello.StringToNameString"/>
+    <custom-transformer name="NameStringToChatString" class="org.mule.samples.hello.NameStringToChatString"/>
+    <custom-transformer name="ChatStringToString" class="org.mule.samples.hello.ChatStringToString"/>
+    <custom-transformer name="HttpRequestToNameString" class="org.mule.samples.hello.HttpRequestToNameString"/>
+    <custom-transformer name="ExceptionToString" class="org.mule.samples.hello.ExceptionToString"/>
     <custom-transformer name="HttpRequestToParameter" class="org.mule.transport.http.servlet.HttpRequestToParameter"/>
 
     <!-- workaround for http://mule.mulesource.org/jira/browse/MULE-1827 -->
@@ -70,12 +70,12 @@
                 <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" synchronous="true"/>
             </inbound>
 
-            <component class="org.mule.example.hello.Greeter"/>
+            <component class="org.mule.samples.hello.Greeter"/>
             
             <outbound>
                 <filtering-router>
                     <vm:outbound-endpoint path="chitchatter"/>
-                    <payload-type-filter expectedType="org.mule.example.hello.NameString"/>
+                    <payload-type-filter expectedType="org.mule.samples.hello.NameString"/>
                 </filtering-router>
                 
                 <filtering-router>
@@ -96,7 +96,7 @@
             <inbound>
                 <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString" responseTransformer-refs="ChatStringToString" synchronous="true"/>
             </inbound>
-            <component class="org.mule.example.hello.ChitChatter"/>
+            <component class="org.mule.samples.hello.ChitChatter"/>
         </service>
 
         <!-- This error handler returns user error messages to caller. Errors could also be routed elsewhere,

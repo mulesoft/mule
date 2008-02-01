@@ -48,7 +48,7 @@
 
             <!--<async-reply-router timeout="10000" failOnTimeout="false">-->
             <!--<endpoint address="vm://LoanBrokerQuotes"/>-->
-            <!--<custom-async-reply-router class="org.mule.example.loanbroker.routers.BankQuotesResponseAggregator"/>-->
+            <!--<custom-async-reply-router class="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>-->
             <!--</async-reply-router>-->
         </service>
 

@@ -8,15 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.example.hello;
+package org.mule.samples.hello;
 
 import java.io.Serializable;
 
 /**
  * <code>ChatString</code> TODO (document class)
- * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
  */
 public class ChatString implements Serializable
 {

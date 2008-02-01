@@ -8,29 +8,28 @@
  * LICENSE.txt file.
  */
 
-package org.mule.example.hello;
+package org.mule.samples.hello;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>NameStringToChatString</code> cnverts from a NameString object to a
- * ChatString object
+ * <code>StringToNameString</code> converts from a String to a NameString object
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class NameStringToChatString extends AbstractTransformer
+public class StringToNameString extends AbstractTransformer
 {
     /**
      * Serial version
      */
-    private static final long serialVersionUID = 6223698853238962982L;
+    private static final long serialVersionUID = -408128452488674866L;
 
-    public NameStringToChatString()
+    public StringToNameString()
     {
         super();
-        this.registerSourceType(NameString.class);
+        this.registerSourceType(String.class);
     }
 
     /*
@@ -40,13 +39,13 @@ public class NameStringToChatString extends AbstractTransformer
      */
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
-        ChatString string = new ChatString();
-        NameString ns = (NameString)src;
-        string.append(ns.getGreeting());
-        String name = ns.getName();
-        // strip out the new line from the console
-        name = name.replaceAll("\n", "");
-        string.append(name);
-        return string;
+        String name = (String)src;
+        int i = name.indexOf("\r");
+        if (i > -1)
+        {
+            name = name.substring(0, i);
+        }
+        return new NameString(name);
     }
+
 }
