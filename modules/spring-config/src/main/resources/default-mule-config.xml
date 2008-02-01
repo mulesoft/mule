@@ -76,11 +76,16 @@
 
     <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager">
         <property name="persistenceStrategy">
+            <bean class="org.mule.util.queue.MemoryPersistenceStrategy"/>
+<!--
+            CachingPersistenceStrategy was removed in r10660,r10661
+
             <bean class="org.mule.util.queue.CachingPersistenceStrategy">
                 <constructor-arg>
                     <bean class="org.mule.util.queue.MemoryPersistenceStrategy"/>
                 </constructor-arg>
             </bean>
+-->
         </property>
     </bean>
 
