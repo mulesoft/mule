@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.ra.i18n;
+package org.mule.module.jca.i18n;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;

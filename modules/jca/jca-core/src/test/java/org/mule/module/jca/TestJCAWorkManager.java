@@ -9,7 +9,7 @@
  */
 
 
-package org.mule.ra;
+package org.mule.module.jca;
 
 import java.util.ArrayList;
 import java.util.List;

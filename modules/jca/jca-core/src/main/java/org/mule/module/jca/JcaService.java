@@ -8,13 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.ra;
+package org.mule.module.jca;
 
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MessagingException;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.ObjectNotFoundException;
@@ -22,7 +22,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.ServiceException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.ra.i18n.JcaMessages;
+import org.mule.module.jca.i18n.JcaMessages;
 import org.mule.service.AbstractService;
 
 import javax.resource.spi.UnavailableException;

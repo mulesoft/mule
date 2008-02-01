@@ -16,6 +16,6 @@
         <security-config use="none">
             <!-- TODO XSD validation complains about no content here -->
         </security-config>
-        <connectionfactory-interface>org.mule.ra.MuleConnectionFactory</connectionfactory-interface>
+        <connectionfactory-interface>org.mule.module.jca.MuleConnectionFactory</connectionfactory-interface>
     </connector-factory>
 </oc4j-connector-factories>

@@ -26,7 +26,7 @@
         <!-- This should go in sync with the currently built Mule version -->
         <!-- <rar-name>mule-jca-${version}.rar</rar-name> -->
         <rar-name>mule-jca-jboss-${version}.rar</rar-name>
-        <connection-definition>org.mule.ra.MuleConnectionFactory</connection-definition>
+        <connection-definition>org.mule.module.jca.MuleConnectionFactory</connection-definition>
         <!--
             Uncomment and override with custom settings, don't edit ra.xml directly.
 

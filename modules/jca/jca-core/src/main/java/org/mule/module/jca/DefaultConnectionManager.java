@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.ra;
+package org.mule.module.jca;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

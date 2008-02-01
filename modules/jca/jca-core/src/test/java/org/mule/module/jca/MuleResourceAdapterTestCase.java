@@ -9,7 +9,7 @@
  */
 
 
-package org.mule.ra;
+package org.mule.module.jca;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.Endpoint;

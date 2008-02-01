@@ -14,7 +14,7 @@
     </resourceadapter-instance>
     <outbound-resourceadapter>
       <connection-definition>
-        <connectionfactory-interface>org.mule.ra.MuleConnectionFactory</connectionfactory-interface>
+        <connectionfactory-interface>org.mule.module.jca.MuleConnectionFactory</connectionfactory-interface>
         <connectiondefinition-instance>
           <name>DefaultMuleConnectionFactory</name>
 <!--          <implemented-interface>org.mule.ra.MuleConnectionFactory</implemented-interface>-->

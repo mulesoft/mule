@@ -8,10 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.ra;
+package org.mule.module.jca;
 
 import org.mule.config.MuleManifest;
-import org.mule.ra.i18n.JcaMessages;
+import org.mule.module.jca.i18n.JcaMessages;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.ManagedConnectionMetaData;

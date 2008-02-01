@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.ra;
+package org.mule.module.jca;
 
 import org.mule.RegistryContext;
 import org.mule.api.MuleContext;

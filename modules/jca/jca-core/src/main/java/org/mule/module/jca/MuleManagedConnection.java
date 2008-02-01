@@ -8,9 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.ra;
+package org.mule.module.jca;
 
-import org.mule.ra.i18n.JcaMessages;
+import org.mule.module.jca.i18n.JcaMessages;
 import org.mule.security.MuleCredentials;
 
 import java.io.PrintWriter;

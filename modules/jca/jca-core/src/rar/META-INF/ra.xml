@@ -32,7 +32,7 @@
         <license-required>true</license-required>
     </license>
     <resourceadapter>
-        <resourceadapter-class>org.mule.ra.MuleResourceAdapter</resourceadapter-class>
+        <resourceadapter-class>org.mule.module.jca.MuleResourceAdapter</resourceadapter-class>
 
         <config-property>
             <description>
@@ -77,11 +77,11 @@
         </config-property>
         <outbound-resourceadapter>
             <connection-definition>
-                <managedconnectionfactory-class>org.mule.ra.MuleManagedConnectionFactory</managedconnectionfactory-class>
-                <connectionfactory-interface>org.mule.ra.MuleConnectionFactory</connectionfactory-interface>
-                <connectionfactory-impl-class>org.mule.ra.DefaultMuleConnectionFactory</connectionfactory-impl-class>
-                <connection-interface>org.mule.ra.MuleConnection</connection-interface>
-                <connection-impl-class>org.mule.ra.DefaultMuleConnection</connection-impl-class>
+                <managedconnectionfactory-class>org.mule.module.jca.MuleManagedConnectionFactory</managedconnectionfactory-class>
+                <connectionfactory-interface>org.mule.module.jca.MuleConnectionFactory</connectionfactory-interface>
+                <connectionfactory-impl-class>org.mule.module.jca.DefaultMuleConnectionFactory</connectionfactory-impl-class>
+                <connection-interface>org.mule.module.jca.MuleConnection</connection-interface>
+                <connection-impl-class>org.mule.module.jca.DefaultMuleConnection</connection-impl-class>
             </connection-definition>
             <transaction-support>NoTransaction</transaction-support>
             <authentication-mechanism>
@@ -96,7 +96,7 @@
                 <messagelistener>
                     <messagelistener-type>org.mule.api.lifecycle.Callable</messagelistener-type>
                     <activationspec>
-                        <activationspec-class>org.mule.ra.MuleActivationSpec</activationspec-class>
+                        <activationspec-class>org.mule.module.jca.MuleActivationSpec</activationspec-class>
                         <required-config-property>
                             <description>
                             A valid Mule endpoint URI such as,

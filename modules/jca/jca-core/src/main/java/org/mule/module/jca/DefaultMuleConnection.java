@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.ra;
+package org.mule.module.jca;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleEvent;
@@ -24,7 +24,7 @@ import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.client.i18n.ClientMessages;
-import org.mule.ra.i18n.JcaMessages;
+import org.mule.module.jca.i18n.JcaMessages;
 import org.mule.security.MuleCredentials;
 import org.mule.transport.AbstractConnector;
 
