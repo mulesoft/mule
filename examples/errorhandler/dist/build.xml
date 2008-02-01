@@ -12,12 +12,12 @@
 
     <property name="dir.java" value="src"/>
     <property name="dir.conf" value="conf"/>
-    <property name="dir.resources" value="resources"/>
+    <property name="dir.resources" value="${dir.java}/main/resources"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
 
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
-    
+
     <property name="url.apache.repo" value="http://people.apache.org/repo/m2-incubating-repository"/>
 
     <target name="clean"
@@ -86,6 +86,7 @@
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
             <fileset dir="${dir.conf}"/>
+            <fileset dir="${dir.resources}"/>
         </copy>
     </target>
 
