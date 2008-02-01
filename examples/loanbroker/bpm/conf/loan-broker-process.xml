@@ -67,7 +67,7 @@
     <!-- Prepare a quote request to send to the banks which includes the customer's credit info. -->
     <state name="prepareLoanQuoteRequest">
         <event type="node-enter">
-            <action class="org.mule.examples.loanbroker.bpm.actions.PrepareLoanQuoteRequest" />
+            <action class="org.mule.example.loanbroker.bpm.actions.PrepareLoanQuoteRequest" />
             <action class="org.mule.transport.bpm.jbpm.actions.Continue" />
         </event>
         <transition to="sendToBank" />
@@ -110,7 +110,7 @@
     <state name="validateLoanQuote">
         <event type="node-enter">
             <action class="org.mule.transport.bpm.jbpm.actions.ValidateMessageType">
-                <expectedType>org.mule.examples.loanbroker.messages.LoanQuote</expectedType>
+                <expectedType>org.mule.example.loanbroker.messages.LoanQuote</expectedType>
             </action>
             <!-- We could perform additional data validation here
             <action class="com.mycompany.process.actions.ValidateMessageData" />

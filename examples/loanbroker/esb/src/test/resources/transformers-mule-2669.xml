@@ -10,7 +10,7 @@
                http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd">
 
     <custom-transformer name="SetLendersAsRecipients"
-                        class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
+                        class="org.mule.example.loanbroker.transformers.SetLendersAsRecipients"/>
     <custom-transformer name="ObjectToJMSMessage"
                         class="org.mule.transport.jms.transformers.ObjectToJMSMessage"/>
     <custom-transformer name="JMSMessageToObject"
@@ -30,7 +30,7 @@
                                   synchronous="true"
                                   transformer-refs="JMSMessageToObject SetLendersAsRecipients ObjectToJMSMessage"/>
             </inbound>
-            <component class="org.mule.examples.loanbroker.issues.SimpleEchoComponent"/>
+            <component class="org.mule.example.loanbroker.issues.SimpleEchoComponent"/>
         </service>
     </model>
 

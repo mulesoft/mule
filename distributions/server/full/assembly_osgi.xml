@@ -234,7 +234,7 @@ Assembly descriptor for the full Mule distribution.
       <!-- No version number  -->
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
-        <include>org.mule.examples:mule-example-hello-osgi</include>
+        <include>org.mule.example:mule-example-hello-osgi</include>
       </includes>
     </dependencySet>
   </dependencySets>

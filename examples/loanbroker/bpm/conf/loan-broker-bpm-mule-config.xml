@@ -52,7 +52,7 @@
                 <!-- Incoming message = CreditProfile -->
                 <inbound-endpoint ref="CreditProfiles" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.DefaultLoanBroker" />
+            <component class="org.mule.example.loanbroker.DefaultLoanBroker" />
             <outbound>
                 <filtering-router>
                     <outbound-endpoint ref="ProcessEngine" synchronous="false" />
@@ -65,7 +65,7 @@
             <inbound>
                 <inbound-endpoint ref="ProcessEngine" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.DefaultLoanBroker" />
+            <component class="org.mule.example.loanbroker.DefaultLoanBroker" />
             <outbound>
                 <endpoint-selector-router selectorProperty="endpoint">
                     <!-- Outgoing message = Customer -->
@@ -97,7 +97,7 @@
             <inbound>
                 <inbound-endpoint ref="CreditAgency" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency" />
+            <component class="org.mule.example.loanbroker.credit.DefaultCreditAgency" />
             <outbound>
                 <filtering-router>
                     <outbound-endpoint ref="CreditProfiles" />
@@ -110,19 +110,19 @@
             <inbound>
                 <inbound-endpoint ref="BigBank" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
+            <component class="org.mule.example.loanbroker.bank.Bank" />
         </service>
         <service name="AMediumBank">
             <inbound>
                 <inbound-endpoint ref="MediumBank" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
+            <component class="org.mule.example.loanbroker.bank.Bank" />
         </service>
         <service name="ASmallBank">
             <inbound>
                 <inbound-endpoint ref="SmallBank" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
+            <component class="org.mule.example.loanbroker.bank.Bank" />
         </service>
     </model>
 

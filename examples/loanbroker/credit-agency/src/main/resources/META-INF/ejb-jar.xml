@@ -7,9 +7,9 @@
     <enterprise-beans>
       <session>
           <ejb-name>/local/CreditAgency</ejb-name>
-          <home>org.mule.examples.loanbroker.credit.CreditAgencyHome</home>
-          <remote>org.mule.examples.loanbroker.credit.CreditAgency</remote>
-          <ejb-class>org.mule.examples.loanbroker.credit.CreditAgencyBean</ejb-class>
+          <home>org.mule.example.loanbroker.credit.CreditAgencyHome</home>
+          <remote>org.mule.example.loanbroker.credit.CreditAgency</remote>
+          <ejb-class>org.mule.example.loanbroker.credit.CreditAgencyBean</ejb-class>
           <session-type>Stateless</session-type>
           <transaction-type>Bean</transaction-type>
       </session>

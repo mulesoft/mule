@@ -19,7 +19,7 @@
         <spring:property name="propertyName" value="customerRequest.customer" />
     </custom-transformer>
 
-    <custom-transformer name="SetLendersAsRecipients" class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
+    <custom-transformer name="SetLendersAsRecipients" class="org.mule.example.loanbroker.transformers.SetLendersAsRecipients"/>
 
     <vm:endpoint name="CustomerRequests" path="customer.requests" connector-ref="syncVm"/>
     <vm:endpoint name="LoanBrokerQuotes" path="loan.quotes" connector-ref="syncVm"/>

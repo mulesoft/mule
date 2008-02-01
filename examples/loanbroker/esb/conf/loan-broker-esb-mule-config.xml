@@ -34,13 +34,13 @@
     <jms:activemq-connector name="jmsConnector" />
 
     <custom-transformer name="RestRequestToCustomerRequest"
-                             class="org.mule.examples.loanbroker.transformers.RestRequestToCustomerRequest" />
+                             class="org.mule.example.loanbroker.transformers.RestRequestToCustomerRequest" />
     <custom-transformer name="LoanQuoteRequestToCreditProfileArgs"
-                             class="org.mule.examples.loanbroker.transformers.LoanQuoteRequestToCreditProfileArgs" />
+                             class="org.mule.example.loanbroker.transformers.LoanQuoteRequestToCreditProfileArgs" />
     <custom-transformer name="CreditProfileXmlToCreditProfile"
-                             class="org.mule.examples.loanbroker.transformers.CreditProfileXmlToCreditProfile" />
+                             class="org.mule.example.loanbroker.transformers.CreditProfileXmlToCreditProfile" />
     <custom-transformer name="SetLendersAsRecipients"
-                             class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients" />
+                             class="org.mule.example.loanbroker.transformers.SetLendersAsRecipients" />
     <jms:object-to-jmsmessage-transformer name="ObjectToJMSMessage" />
 
     <endpoint name="CustomerRequestsREST" address="jetty:rest://localhost:8888/loanbroker" />
@@ -83,7 +83,7 @@
                 <inbound-endpoint ref="CustomerRequests" />
             </inbound>
 
-            <component class="org.mule.examples.loanbroker.AsynchronousLoanBroker" />
+            <component class="org.mule.example.loanbroker.AsynchronousLoanBroker" />
 
             <outbound>
                 <outbound-pass-through-router>
@@ -93,7 +93,7 @@
 
             <async-reply timeout="10000">
                 <inbound-endpoint ref="LoanQuotes" />
-                <custom-async-reply-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator" />
+                <custom-async-reply-router class="org.mule.example.loanbroker.routers.BankQuotesResponseAggregator" />
             </async-reply>
         </service>
 
@@ -135,7 +135,7 @@
             <inbound>
                 <inbound-endpoint ref="LenderService" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.lender.DefaultLender" />
+            <component class="org.mule.example.loanbroker.lender.DefaultLender" />
         </service>
 
         <service name="BankingGatewayService">
@@ -162,35 +162,35 @@
             <inbound>
                 <inbound-endpoint ref="Bank1In" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
+            <component class="org.mule.example.loanbroker.bank.Bank" />
         </service>
 
         <service name="TheBank2">
             <inbound>
                 <inbound-endpoint ref="Bank2In" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
+            <component class="org.mule.example.loanbroker.bank.Bank" />
         </service>
 
         <service name="TheBank3">
             <inbound>
                 <inbound-endpoint ref="Bank3In" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
+            <component class="org.mule.example.loanbroker.bank.Bank" />
         </service>
 
         <service name="TheBank4">
             <inbound>
                 <inbound-endpoint ref="Bank4In" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
+            <component class="org.mule.example.loanbroker.bank.Bank" />
         </service>
 
         <service name="TheBank5">
             <inbound>
                 <inbound-endpoint ref="Bank5In" />
             </inbound>
-            <component class="org.mule.examples.loanbroker.bank.Bank" />
+            <component class="org.mule.example.loanbroker.bank.Bank" />
         </service>
     </model>
 </mule>

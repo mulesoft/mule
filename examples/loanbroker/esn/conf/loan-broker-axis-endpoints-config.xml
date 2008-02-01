@@ -18,19 +18,19 @@
     <!-- for some reason Axis auto typing doesn't always work and you need to define the top-level
          bean types for the objects you're passing around -->
     <axis:connector name="axisConnector">
-        <axis:bean-type interface="org.mule.examples.loanbroker.messages.CreditProfile"/>
-        <axis:bean-type interface="org.mule.examples.loanbroker.messages.CreditProfile"/>
-        <axis:bean-type interface="org.mule.examples.loanbroker.messages.Customer"/>
-        <axis:bean-type interface="org.mule.examples.loanbroker.messages.CustomerQuoteRequest"/>
-        <axis:bean-type interface="org.mule.examples.loanbroker.messages.LoanBrokerQuoteRequest"/>
-        <axis:bean-type interface="org.mule.examples.loanbroker.messages.LoanQuote"/>
+        <axis:bean-type interface="org.mule.example.loanbroker.messages.CreditProfile"/>
+        <axis:bean-type interface="org.mule.example.loanbroker.messages.CreditProfile"/>
+        <axis:bean-type interface="org.mule.example.loanbroker.messages.Customer"/>
+        <axis:bean-type interface="org.mule.example.loanbroker.messages.CustomerQuoteRequest"/>
+        <axis:bean-type interface="org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest"/>
+        <axis:bean-type interface="org.mule.example.loanbroker.messages.LoanQuote"/>
     </axis:connector>
 
     <custom-transformer name="ExtractCustomer" class="org.mule.transformer.simple.GetBeanProperty">
         <spring:property name="propertyName" value="customerRequest.customer" />
     </custom-transformer>
 
-    <custom-transformer name="SetLendersAsRecipients" class="org.mule.examples.loanbroker.transformers.SetLendersAsRecipients"/>
+    <custom-transformer name="SetLendersAsRecipients" class="org.mule.example.loanbroker.transformers.SetLendersAsRecipients"/>
 
     <vm:endpoint name="CustomerRequests" path="customer.requests" connector-ref="syncVm"/>
     <vm:endpoint name="LoanBrokerQuotes" path="loan.quotes" connector-ref="syncVm"/>

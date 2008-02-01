@@ -30,8 +30,8 @@
                      <inbound-endpoint ref="CustomerRequests"/>
                  </inbound>
 
-                 <component class="org.mule.examples.loanbroker.esn.SynchronousLoanBroker">
-                     <binding interface="org.mule.examples.loanbroker.credit.CreditAgencyService">
+                 <component class="org.mule.example.loanbroker.esn.SynchronousLoanBroker">
+                     <binding interface="org.mule.example.loanbroker.credit.CreditAgencyService">
                          <outbound-endpoint ref="CreditAgency"/>
                      </binding>
                  </component>
@@ -44,7 +44,7 @@
 
                  <async-reply timeout="10000">
                      <inbound-endpoint ref="LoanBrokerQuotes"/>
-                     <custom-async-reply-router class="org.mule.examples.loanbroker.routers.BankQuotesResponseAggregator"/>
+                     <custom-async-reply-router class="org.mule.example.loanbroker.routers.BankQuotesResponseAggregator"/>
                  </async-reply>
              </service>
 
@@ -55,7 +55,7 @@
                  <inbound>
                      <inbound-endpoint ref="CreditAgencyIn"/>
                  </inbound>
-                 <component class="org.mule.examples.loanbroker.credit.DefaultCreditAgency"/>
+                 <component class="org.mule.example.loanbroker.credit.DefaultCreditAgency"/>
              </service>
 
              <!--
@@ -65,7 +65,7 @@
                  <inbound>
                      <inbound-endpoint ref="LenderService"/>
                  </inbound>
-                 <component class="org.mule.examples.loanbroker.lender.DefaultLender"/>
+                 <component class="org.mule.example.loanbroker.lender.DefaultLender"/>
                  <outbound>
                      <outbound-pass-through-router>
                          <outbound-endpoint ref="BankGateway" transformer-refs="SetLendersAsRecipients"/>
@@ -98,35 +98,35 @@
                  <inbound>
                      <inbound-endpoint ref="Bank1In"/>
                  </inbound>
-                 <component class="org.mule.examples.loanbroker.bank.Bank"/>
+                 <component class="org.mule.example.loanbroker.bank.Bank"/>
              </service>
 
              <service name="TheBank2">
                  <inbound>
                      <inbound-endpoint ref="Bank2In"/>
                  </inbound>
-                 <component class="org.mule.examples.loanbroker.bank.Bank"/>
+                 <component class="org.mule.example.loanbroker.bank.Bank"/>
              </service>
 
              <service name="TheBank3">
                  <inbound>
                      <inbound-endpoint ref="Bank3In"/>
                  </inbound>
-                 <component class="org.mule.examples.loanbroker.bank.Bank"/>
+                 <component class="org.mule.example.loanbroker.bank.Bank"/>
              </service>
 
              <service name="TheBank4">
                  <inbound>
                      <inbound-endpoint ref="Bank4In"/>
                  </inbound>
-                 <component class="org.mule.examples.loanbroker.bank.Bank"/>
+                 <component class="org.mule.example.loanbroker.bank.Bank"/>
              </service>
 
              <service name="TheBank5">
                  <inbound>
                      <inbound-endpoint ref="Bank5In"/>
                  </inbound>
-                 <component class="org.mule.examples.loanbroker.bank.Bank"/>
+                 <component class="org.mule.example.loanbroker.bank.Bank"/>
              </service>
 
          </model>
