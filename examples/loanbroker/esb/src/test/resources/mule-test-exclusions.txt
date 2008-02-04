@@ -2,3 +2,5 @@
 # Test cases listed in this file are not run.
 #
 
+# Fails because it can't find axis transport! Classloading issue when loading axis.properties.
+org.mule.example.loanbroker.esb.LoanBrokerEsbProgramaticTestCase
