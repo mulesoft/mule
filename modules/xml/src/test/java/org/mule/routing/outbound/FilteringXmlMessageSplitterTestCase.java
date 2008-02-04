@@ -69,7 +69,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload);
     }
-    
+
     public void testStringPayloadXmlMessageSplitterWithoutXsd() throws Exception
     {
         xmlSplitter.setExternalSchemaLocation(null);
@@ -88,6 +88,13 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
     public void testByteArrayPayloadXmlMessageSplitter() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
+        internalTestSuccessfulXmlSplitter(payload.getBytes());
+    }
+
+    public void testByteArrayPayloadCorrelateNever() throws Exception
+    {
+        String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
+        xmlSplitter.setEnableCorrelation(AbstractOutboundRouter.ENABLE_CORRELATION_NEVER);
         internalTestSuccessfulXmlSplitter(payload.getBytes());
     }
 
@@ -192,10 +199,19 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
             final Object payload = message.getPayload();
             assertTrue("Wrong class type for node.", payload instanceof Document);
 
-            Document node = (Document)payload;
+            // MULE-2963
+            if (xmlSplitter.enableCorrelation == AbstractOutboundRouter.ENABLE_CORRELATION_NEVER)
+            {
+                assertEquals(-1, message.getCorrelationGroupSize());                
+            }
+            else
+            {
+                // the purchase order document contains two parts
+                assertEquals(2, message.getCorrelationGroupSize());
+            }
 
+            Document node = (Document) payload;
             final String partNumber = node.getRootElement().attributeValue("partNum");
-
             return "872-AA".equals(partNumber) || "926-AA".equals(partNumber);
         }
     }
