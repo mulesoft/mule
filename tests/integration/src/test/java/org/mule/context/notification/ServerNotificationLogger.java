@@ -18,20 +18,9 @@ import org.mule.api.context.notification.ModelNotificationListener;
 import java.util.List;
 import java.util.LinkedList;
 
-public class NotificationLogger
+public class ServerNotificationLogger
+        extends AbstractNotificationLogger
         implements ServiceNotificationListener, ManagerNotificationListener, ModelNotificationListener
 {
 
-    private LinkedList notifications = new LinkedList();
-
-    public synchronized void onNotification(ServerNotification notification)
-    {
-        notifications.addLast(notification);
-    }
-
-    public List getNotifications()
-    {
-        return notifications;
-    }
-    
 }

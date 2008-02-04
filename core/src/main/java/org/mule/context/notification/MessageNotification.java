@@ -57,7 +57,6 @@ public class MessageNotification extends ServerNotification
         super(cloneMessage(resource), action);
         resourceIdentifier = identifier;
         this.endpoint = endpoint;
-
     }
 
     protected static MuleMessage cloneMessage(MuleMessage message)

@@ -11,11 +11,15 @@
 package org.mule.context.notification;
 
 import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.context.notification.BlockingServerEvent;
 
 import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Iterator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * We test notifications by defining a "tree" of expected responses (this is needed because the system is
@@ -42,7 +46,10 @@ class Node implements RestrictedNode
     private Class clazz = null;
     private int action;
     private String id;
+    private boolean isIdDefined = false; // allow null IDs to be specified
     private boolean nodeOk = false;
+
+    protected final transient Log logger = LogFactory.getLog(this.getClass());
 
     // any of these can run after this
     private Set parallel = new HashSet();
@@ -54,6 +61,7 @@ class Node implements RestrictedNode
         this.clazz = clazz;
         this.action = action;
         this.id = id;
+        isIdDefined = true;
     }
 
     public Node(Class clazz, int action)
@@ -68,12 +76,37 @@ class Node implements RestrictedNode
 
     public Node parallel(RestrictedNode node)
     {
+        if (null != node.getNotificationClass() &&
+            BlockingServerEvent.class.isAssignableFrom(node.getNotificationClass()))
+        {
+            logger.warn("Registered blocking event as parallel: " + node);
+        }
+        parallel.add(node);
+        return this;
+    }
+
+    /**
+     * Avoid warnings when we need to add a synch event as parallel for other reasons
+     * (typically because there's more than one model generating some event) 
+     */
+    public Node parallelSynch(RestrictedNode node)
+    {
+        if (null != node.getNotificationClass() &&
+            !BlockingServerEvent.class.isAssignableFrom(node.getNotificationClass()))
+        {
+            throw new IllegalStateException("Node " + node + " is not a synch event");
+        }
         parallel.add(node);
         return this;
     }
 
     public RestrictedNode serial(RestrictedNode node)
     {
+        if (null != node.getNotificationClass() &&
+                !BlockingServerEvent.class.isAssignableFrom(node.getNotificationClass()))
+        {
+            logger.warn("Registered non-blocking event as serial: " + node);
+        }
         serial.addLast(node);
         return this;
     }
@@ -161,7 +194,9 @@ class Node implements RestrictedNode
     {
         return clazz.equals(notification.getClass())
                 && action == notification.getAction()
-                && (null == id || id.equals(notification.getResourceIdentifier()));
+                && (!isIdDefined ||
+                (null == id && null == notification.getResourceIdentifier()) ||
+                (null != id && id.equals(notification.getResourceIdentifier())));
     }
 
     public boolean contains(Class clazz, int action)
@@ -185,6 +220,46 @@ class Node implements RestrictedNode
             }
         }
         return false;
+    }
+
+    public RestrictedNode getAnyRemaining()
+    {
+        if (! nodeOk)
+        {
+            return this;
+        }
+        for (Iterator children = parallel.iterator(); children.hasNext();)
+        {
+            RestrictedNode any = ((RestrictedNode) children.next()).getAnyRemaining();
+            if (null != any)
+            {
+                return any;
+            }
+        }
+        for (Iterator children = serial.iterator(); children.hasNext();)
+        {
+            RestrictedNode any = ((RestrictedNode) children.next()).getAnyRemaining();
+            if (null != any)
+            {
+                return any;
+            }
+        }
+        return null;
+    }
+
+    public boolean isExhausted()
+    {
+        return null == getAnyRemaining();
+    }
+
+    public Class getNotificationClass()
+    {
+        return clazz;
+    }
+
+    public String toString()
+    {
+        return clazz + ": " + action + (isIdDefined ? ": " + id : "");
     }
 
 }

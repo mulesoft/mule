@@ -25,4 +25,13 @@ interface RestrictedNode
 
     public boolean contains(Class clazz, int action);
 
+    public boolean isExhausted();
+
+    /**
+     * @return Any remaining node
+     */
+    public RestrictedNode getAnyRemaining();
+
+    Class getNotificationClass();
+
 }
