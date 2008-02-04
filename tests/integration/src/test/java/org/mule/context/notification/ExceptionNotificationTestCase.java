@@ -15,8 +15,6 @@ import org.mule.module.client.MuleClient;
 public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
 {
 
-    public static final String SERVICE_1 = "the-service";
-
     protected String getConfigResources()
     {
         return "org/mule/test/integration/notifications/exception-notification-test.xml";
