@@ -4,13 +4,6 @@
     <display-name>Mule</display-name>
     <description>Mule Web App Samples</description>
 
-    <!-- Classpath within the servlet context.  Mule will attempt to load config 
-         files from here first, and then from the remaining classpath. -->
-    <context-param>
-        <param-name>org.mule.webapp.classpath</param-name>
-        <param-value>/WEB-INF/classes</param-value>
-    </context-param>
-
     <context-param>
         <param-name>org.mule.config</param-name>
         <param-value>

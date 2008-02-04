@@ -18,7 +18,6 @@ import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.util.StringUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -48,13 +47,6 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
      */
     public static final String INIT_PARAMETER_MULE_CONFIG = "org.mule.config";
 
-    /**
-     * Classpath within the servlet context (e.g., "WEB-INF/classes"). Mule will
-     * attempt to load config files from here first, and then from the remaining
-     * classpath.
-     */
-    public static final String INIT_PARAMETER_WEBAPP_CLASSPATH = "org.mule.webapp.classpath";
-
     private MuleContext muleContext;
 
     protected transient final Log logger = LogFactory.getLog(MuleXmlBuilderContextListener.class);
@@ -77,15 +69,9 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
             System.out.println("Mule config file(s): " + config);
         }
 
-        String webappClasspath = context.getInitParameter(INIT_PARAMETER_WEBAPP_CLASSPATH);
-        if (StringUtils.isBlank(webappClasspath))
-        {
-            webappClasspath = null;
-        }
-
         try
         {
-            muleContext = createManager(config, webappClasspath, context);
+            muleContext = createManager(config, context);
             muleContext.start();
         }
         catch (MuleException ex)
@@ -114,7 +100,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
      * @return A configured UMOManager instance
      * @throws InitialisationException 
      */
-    protected MuleContext createManager(String configResource, String webappClasspath, ServletContext context)
+    protected MuleContext createManager(String configResource, ServletContext context)
         throws ConfigurationException, InitialisationException
     {
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context, configResource);
