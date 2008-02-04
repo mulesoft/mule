@@ -45,16 +45,11 @@ public abstract class AbstractMessageRequester extends AbstractConnectable imple
         {
             // Make sure we are connected
             connectionStrategy.connect(this);
-            if (connector.isEnableMessageEvents())
-            {
-                connector.fireNotification(new MessageNotification(null, endpoint, null,
-                    MessageNotification.MESSAGE_REQUESTED));
-            }
             MuleMessage result = doRequest(timeout);
             if (result != null && connector.isEnableMessageEvents())
             {
                 connector.fireNotification(new MessageNotification(result, endpoint, null,
-                    MessageNotification.MESSAGE_RECEIVED));
+                    MessageNotification.MESSAGE_REQUESTED));
             }
             return result;
         }

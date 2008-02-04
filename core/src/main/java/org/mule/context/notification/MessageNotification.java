@@ -61,17 +61,10 @@ public class MessageNotification extends ServerNotification
 
     protected static MuleMessage cloneMessage(MuleMessage message)
     {
-        if (null != message)
+        // TODO we probably need to support deep cloning here
+        synchronized (message)
         {
-            // TODO we probably need to support deep cloning here
-            synchronized (message)
-            {
-                return new DefaultMuleMessage(message.getPayload(), message);
-            }
-        }
-        else
-        {
-            return null;
+            return new DefaultMuleMessage(message.getPayload(), message);
         }
     }
 

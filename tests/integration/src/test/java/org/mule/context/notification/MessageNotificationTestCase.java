@@ -39,9 +39,8 @@ public class MessageNotificationTestCase extends AbstractNotificationTestCase
                 .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_RECEIVED, SERVICE_1))
                 .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_DISPATCHED, CLIENT))
                 .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_RECEIVED, SERVICE_2))
-                .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_REQUESTED, CLIENT))
                 .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_DISPATCHED, SERVICE_2))
-                .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_RECEIVED, CLIENT));
+                .parallel(new Node(MessageNotification.class, MessageNotification.MESSAGE_REQUESTED, CLIENT));
     }
 
     public void validateSpecification(RestrictedNode spec) throws Exception
