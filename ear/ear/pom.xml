@@ -52,7 +52,7 @@
         </dependency>
         <!-- do not bundle any modules -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-modules-all</artifactId>
             <version>${version}</version>
             <type>pom</type>

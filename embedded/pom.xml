@@ -63,7 +63,7 @@
             <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-modules-all</artifactId>
             <version>${version}</version>
             <type>pom</type>
