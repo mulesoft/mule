@@ -65,8 +65,8 @@ public class MuleBundleTest extends ConfigurableBundleCreatorTests {
             localMavenArtifact("org.ops4j.pax.logging", "jcl","0.9.4"),
             // Mule
             localMavenArtifact("org.mule", "mule-core","2.0-REGISTRY"),
-            localMavenArtifact("org.mule.modules", "mule-module-osgi","2.0-REGISTRY")
-            //localMavenArtifact("org.mule.examples", "mule-example-hello-osgi","2.0-REGISTRY")
+            localMavenArtifact("org.mule.module", "mule-module-osgi","2.0-REGISTRY")
+            //localMavenArtifact("org.mule.example", "mule-example-hello-osgi","2.0-REGISTRY")
         };
     }
 

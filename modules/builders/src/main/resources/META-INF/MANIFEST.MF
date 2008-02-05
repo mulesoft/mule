@@ -1,2 +1,2 @@
-Bundle-SymbolicName: org.mule.modules.builders
+Bundle-SymbolicName: org.mule.module.builders
 Export-Package: org.mule.config.builders, org.mule.config.converters

@@ -16,7 +16,7 @@
     
     <dependencies>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-osgi</artifactId>
             <version>${version}</version>
             <scope>provided</scope>

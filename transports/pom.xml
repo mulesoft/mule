@@ -20,7 +20,7 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${version}</version>
             <scope>provided</scope>
@@ -56,13 +56,13 @@
                         <configuration>
                             <instructions>
                                 <Bundle-Category>Mule Transport</Bundle-Category>
-                                <Bundle-Activator>org.mule.modules.osgi.TransportActivator</Bundle-Activator>
+                                <Bundle-Activator>org.mule.module.osgi.TransportActivator</Bundle-Activator>
                                 <!-- The Bundle-Activator can't be imported from another bundle,
                                     so we need to have a local copy of it. -->
                                 <Private-Package>
-                                    org.mule.modules.osgi
+                                    org.mule.module.osgi
                                 </Private-Package>
-                                <!-- Since org.mule.modules.osgi is included as a private package,
+                                <!-- Since org.mule.module.osgi is included as a private package,
                                     we need to explicitly declare its imports (they aren't
                                     automatically generated.
                                     Note: manifest settings don't get merged with the parent, so

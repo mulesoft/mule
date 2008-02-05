@@ -1,2 +1,2 @@
-Bundle-SymbolicName: org.mule.modules.osgi
-Export-Package: org.mule.modules.osgi, org.mule.modules.osgi.util
+Bundle-SymbolicName: org.mule.module.osgi
+Export-Package: org.mule.module.osgi, org.mule.module.osgi.util

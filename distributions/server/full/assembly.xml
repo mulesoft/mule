@@ -346,7 +346,7 @@ Assembly descriptor for the full Mule distribution.
       <!-- No version number  -->
 <!--       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping> -->
       <includes>
-        <include>org.mule.modules:mule-module-boot</include>
+        <include>org.mule.module:mule-module-boot</include>
         <include>commons-cli:commons-cli</include>
         <include>tanukisoft:wrapper</include>
       </includes>
@@ -395,20 +395,20 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-xfire</include>
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
-        <include>org.mule.modules:mule-module-acegi</include>
-        <include>org.mule.modules:mule-module-builders</include>
-        <include>org.mule.modules:mule-module-client</include>
-        <include>org.mule.modules:mule-module-jaas</include>
-        <include>org.mule.modules:mule-module-jbossts</include>
-        <include>org.mule.modules:mule-module-management</include>
-        <include>org.mule.modules:mule-module-ognl</include>
-        <include>org.mule.modules:mule-module-pgp</include>
-        <include>org.mule.modules:mule-module-scripting</include>
-        <include>org.mule.modules:mule-module-spring-config</include>
-        <include>org.mule.modules:mule-module-spring-extras</include>
+        <include>org.mule.module:mule-module-acegi</include>
+        <include>org.mule.module:mule-module-builders</include>
+        <include>org.mule.module:mule-module-client</include>
+        <include>org.mule.module:mule-module-jaas</include>
+        <include>org.mule.module:mule-module-jbossts</include>
+        <include>org.mule.module:mule-module-management</include>
+        <include>org.mule.module:mule-module-ognl</include>
+        <include>org.mule.module:mule-module-pgp</include>
+        <include>org.mule.module:mule-module-scripting</include>
+        <include>org.mule.module:mule-module-spring-config</include>
+        <include>org.mule.module:mule-module-spring-extras</include>
         <!-- MULE-2917 -->
-        <!-- include>org.mule.modules:mule-module-wssecurity</include -->
-        <include>org.mule.modules:mule-module-xml</include>
+        <!-- include>org.mule.module:mule-module-wssecurity</include -->
+        <include>org.mule.module:mule-module-xml</include>
         <!-- Tools -->
         <include>org.mule.tools:mule-tools-visualizer</include>
       </includes>
@@ -453,21 +453,21 @@ Assembly descriptor for the full Mule distribution.
         <exclude>org.mule.transports:mule-transport-xfire</exclude>
         <exclude>org.mule.transports:mule-transport-xmpp</exclude>
         <!-- Modules -->
-        <exclude>org.mule.modules:mule-modules-all</exclude>
-        <exclude>org.mule.modules:mule-module-boot</exclude>
-        <exclude>org.mule.modules:mule-module-builders</exclude>
-        <exclude>org.mule.modules:mule-module-acegi</exclude>
-        <exclude>org.mule.modules:mule-module-client</exclude>
-        <exclude>org.mule.modules:mule-module-jaas</exclude>
-        <exclude>org.mule.modules:mule-module-jbossts</exclude>
-        <exclude>org.mule.modules:mule-module-jca</exclude>
-        <exclude>org.mule.modules:mule-module-management</exclude>
-        <exclude>org.mule.modules:mule-module-ognl</exclude>
-        <exclude>org.mule.modules:mule-module-pgp</exclude>
-        <exclude>org.mule.modules:mule-module-scripting</exclude>
-        <exclude>org.mule.modules:mule-module-spring</exclude>
-        <!-- include>org.mule.modules:mule-module-wssecurity</include -->
-        <exclude>org.mule.modules:mule-module-xml</exclude>
+        <exclude>org.mule.module:mule-modules-all</exclude>
+        <exclude>org.mule.module:mule-module-boot</exclude>
+        <exclude>org.mule.module:mule-module-builders</exclude>
+        <exclude>org.mule.module:mule-module-acegi</exclude>
+        <exclude>org.mule.module:mule-module-client</exclude>
+        <exclude>org.mule.module:mule-module-jaas</exclude>
+        <exclude>org.mule.module:mule-module-jbossts</exclude>
+        <exclude>org.mule.module:mule-module-jca</exclude>
+        <exclude>org.mule.module:mule-module-management</exclude>
+        <exclude>org.mule.module:mule-module-ognl</exclude>
+        <exclude>org.mule.module:mule-module-pgp</exclude>
+        <exclude>org.mule.module:mule-module-scripting</exclude>
+        <exclude>org.mule.module:mule-module-spring</exclude>
+        <!-- include>org.mule.module:mule-module-wssecurity</include -->
+        <exclude>org.mule.module:mule-module-xml</exclude>
         <!-- Examples -->
         <exclude>org.mule.example:mule-examples-all</exclude>
         <exclude>org.mule.example:mule-example-echo</exclude>

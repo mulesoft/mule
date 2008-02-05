@@ -11,7 +11,7 @@
 package org.mule.test.integration.transport.jdbc;
 
 import org.mule.api.transaction.TransactionFactory;
-import org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory;
+import org.mule.module.jboss.transactions.JBossArjunaTransactionManagerFactory;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.transport.jdbc.xa.DataSourceWrapper;
 

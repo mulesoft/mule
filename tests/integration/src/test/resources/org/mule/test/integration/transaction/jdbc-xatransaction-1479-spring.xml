@@ -2,7 +2,7 @@
 <beans>
 
     <!-- Transaction management for XA transactions involving multiple JDBC and/or JMS -->
-    <bean id="transactionManagerFactory" class="org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
+    <bean id="transactionManagerFactory" class="org.mule.module.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
     <bean id="transactionManager" factory-bean="transactionManagerFactory" factory-method="create"/>
 
 

@@ -110,7 +110,7 @@
         <pack name="Standard library" id="standard library" required="yes" conditionid="show.lib.standard">
             <description>Contains the standard Mule Library</description>
             <file src="../distribution/lib" targetdir="$INSTALL_PATH"/> 
-            <executable targetfile="$INSTALL_PATH/lib/boot:$INSTALL_PATH/lib/opt:$INSTALL_PATH/lib/mule" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
+            <executable targetfile="$INSTALL_PATH/lib/boot:$INSTALL_PATH/lib/opt:$INSTALL_PATH/lib/mule" class="org.mule.module.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
                 <args>
                     <arg value="$INSTALL_PATH"/>
                 </args>
@@ -119,12 +119,12 @@
         <pack name="Full Library" id="full library" required="yes" conditionid="show.lib.full">
             <description> Contains the standard Mule Library plus the third party libraries not distributed with mule</description>
             <file src="../distribution/lib" targetdir="$INSTALL_PATH"/>
-            <executable targetfile="$INSTALL_PATH/lib/boot:$INSTALL_PATH/lib/opt:$INSTALL_PATH/lib/mule" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
+            <executable targetfile="$INSTALL_PATH/lib/boot:$INSTALL_PATH/lib/opt:$INSTALL_PATH/lib/mule" class="org.mule.module.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
                 <args>
                       <arg value="$INSTALL_PATH"/>
                 </args>
             </executable>
-            <executable targetfile="$INSTALL_PATH/lib/boot:$INSTALL_PATH/lib/opt:$INSTALL_PATH/lib/mule" class="org.mule.modules.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
+            <executable targetfile="$INSTALL_PATH/lib/boot:$INSTALL_PATH/lib/opt:$INSTALL_PATH/lib/mule" class="org.mule.module.boot.GuiInstallerLicenseHandler" failure="abort" type="jar" stage="postinstall" keep="true">
                 <args>
                     <arg value="$INSTALL_PATH"/>
                     <arg value="$PROXYHOST"/>

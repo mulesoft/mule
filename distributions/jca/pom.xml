@@ -38,7 +38,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-modules-all</artifactId>
             <version>${version}</version>
             <type>pom</type>
@@ -48,11 +48,11 @@
                     <artifactId>carol</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.mule.modules</groupId>
+                    <groupId>org.mule.module</groupId>
                     <artifactId>mule-module-boot</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.mule.modules</groupId>
+                    <groupId>org.mule.module</groupId>
                     <artifactId>mule-module-jbossts</artifactId>
                 </exclusion>
                 <exclusion>

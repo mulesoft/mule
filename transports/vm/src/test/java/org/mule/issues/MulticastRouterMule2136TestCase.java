@@ -13,11 +13,11 @@ package org.mule.issues;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.modules.xml.functional.AbstractXmlFunctionalTestCase;
+import org.mule.module.xml.functional.AbstractXmlFunctionalTestCase;
 
 
 /**
- * This is a simplified version of {@link org.mule.modules.xml.functional.XmlTransformerFunctionalTestCase}
+ * This is a simplified version of {@link org.mule.module.xml.functional.XmlTransformerFunctionalTestCase}
  * The {@link #testObjectXmlOut()} method hangs intermittently.
  */
 public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCase

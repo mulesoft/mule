@@ -19,7 +19,7 @@
     -->
 
     <!-- JOTM Transaction manager -->
-    <spring:bean name="ArjunaFactory" class="org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
+    <spring:bean name="ArjunaFactory" class="org.mule.module.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
 
     <spring:bean id="arjunaTM"
         factory-bean="ArjunaFactory" factory-method="create"/>

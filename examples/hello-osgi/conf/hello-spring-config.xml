@@ -6,7 +6,7 @@
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi-1.0-m3.xsd">
 
-    <spring:bean id="muleManager" class="org.mule.modules.osgi.MuleSoaManager"/>
+    <spring:bean id="muleManager" class="org.mule.module.osgi.MuleSoaManager"/>
 
     <!-- Used to set mule object names to their corresponding bean id -->
     <spring:bean id="muleNameProcessor" class="org.mule.module.spring.MuleObjectNameProcessor"/>

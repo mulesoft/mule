@@ -26,7 +26,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
         </dependency>

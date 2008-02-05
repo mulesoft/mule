@@ -28,7 +28,7 @@
                             org.mule.config.i18n,
                             org.mule.impl,
                             org.mule.impl.endpoint,
-                            org.mule.modules.osgi,
+                            org.mule.module.osgi,
                             org.mule.providers.file,
                             org.mule.providers.http,
                             org.mule.providers.http.transformers,

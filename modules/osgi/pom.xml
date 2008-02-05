@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.modules</groupId>
+        <groupId>org.mule.module</groupId>
         <artifactId>mule-modules</artifactId>
  <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
@@ -27,8 +27,8 @@
                             *
                         </Import-Package>-->
                         <Export-Package>
-                            org.mule.modules.osgi,
-                            org.mule.modules.osgi.util
+                            org.mule.module.osgi,
+                            org.mule.module.osgi.util
                         </Export-Package>
                     </instructions>
                 </configuration>

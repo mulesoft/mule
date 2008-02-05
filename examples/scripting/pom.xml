@@ -26,12 +26,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>

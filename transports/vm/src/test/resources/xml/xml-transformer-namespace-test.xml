@@ -47,7 +47,7 @@
             outputEncoding="foo"
             maxActiveTransformers="10"
             maxIdleTransformers="10"
-            transformerFactoryClass="org.mule.modules.xml.config.CustomXsltTransformerFactory"
+            transformerFactoryClass="org.mule.module.xml.config.CustomXsltTransformerFactory"
             xsl-file="file">
         <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
             <!-- test for this string in test -->

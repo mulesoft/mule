@@ -2,7 +2,7 @@
 <beans>
 
     <!-- JOTM Transaction manager -->
-    <bean name="ArjunaFactory" class="org.mule.modules.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
+    <bean name="ArjunaFactory" class="org.mule.module.jboss.transactions.JBossArjunaTransactionManagerFactory"/>
 
     <bean id="arjunaTM"
         factory-bean="ArjunaFactory" factory-method="create"/>

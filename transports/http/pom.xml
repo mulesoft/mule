@@ -36,7 +36,7 @@
                                 </Import-Package>
                                 <Export-Package>org.mule.transport.http.*</Export-Package>
                                 <Private-Package>
-                                    org.mule.modules.osgi, org.apache.commons.codec.*,
+                                    org.mule.module.osgi, org.apache.commons.codec.*,
                                     org.apache.commons.httpclient.*, org.mortbay.http.*, org.mortbay.jetty.*,
                                     org.mortbay.log, org.mortbay.xml, org.mortbay.util
                                 </Private-Package>
@@ -85,7 +85,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
             <scope>test</scope>
@@ -98,7 +98,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
             <scope>test</scope>

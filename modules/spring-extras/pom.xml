@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.modules</groupId>
+        <groupId>org.mule.module</groupId>
         <artifactId>mule-modules</artifactId>
         <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
@@ -85,13 +85,13 @@
 
         <!-- Used by MuleEventMulticaster -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-management</artifactId>
             <version>${version}</version>
         </dependency>
@@ -126,7 +126,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.module</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
             <scope>test</scope>
