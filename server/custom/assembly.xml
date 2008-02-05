@@ -39,7 +39,7 @@ Assembly descriptor for the minimal Mule distribution.
       <!-- No version number  -->
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
-        <include>org.mule.module:mule-module-boot</include>
+        <include>org.mule.modules:mule-module-boot</include>
         <include>tanukisoft:wrapper</include>
       </includes>
     </dependencySet>

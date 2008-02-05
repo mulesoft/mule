@@ -43,23 +43,23 @@ Assembly descriptor for the composite Mule library (jar).
         <include>org.mule.transports:mule-transport-xfire</include>
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
-        <include>org.mule.module:mule-module-1to2migration</include>
-        <include>org.mule.module:mule-module-acegi</include>
-        <include>org.mule.module:mule-module-boot</include>
-        <include>org.mule.module:mule-module-builders</include>
-        <include>org.mule.module:mule-module-client</include>
-        <include>org.mule.module:mule-module-i18n</include>
-        <include>org.mule.module:mule-module-jaas</include>
-        <include>org.mule.module:mule-module-jbossts</include>
-        <include>org.mule.module:mule-module-jotm</include>
-        <include>org.mule.module:mule-module-management</include>
-        <include>org.mule.module:mule-module-ognl</include>
-        <include>org.mule.module:mule-module-pgp</include>
-        <include>org.mule.module:mule-module-scripting</include>
-        <include>org.mule.module:mule-module-spring-config</include>
-        <include>org.mule.module:mule-module-spring-extras</include>
-        <!-- include>org.mule.module:mule-module-wssecurity</include -->
-        <include>org.mule.module:mule-module-xml</include>
+        <include>org.mule.modules:mule-module-1to2migration</include>
+        <include>org.mule.modules:mule-module-acegi</include>
+        <include>org.mule.modules:mule-module-boot</include>
+        <include>org.mule.modules:mule-module-builders</include>
+        <include>org.mule.modules:mule-module-client</include>
+        <include>org.mule.modules:mule-module-i18n</include>
+        <include>org.mule.modules:mule-module-jaas</include>
+        <include>org.mule.modules:mule-module-jbossts</include>
+        <include>org.mule.modules:mule-module-jotm</include>
+        <include>org.mule.modules:mule-module-management</include>
+        <include>org.mule.modules:mule-module-ognl</include>
+        <include>org.mule.modules:mule-module-pgp</include>
+        <include>org.mule.modules:mule-module-scripting</include>
+        <include>org.mule.modules:mule-module-spring-config</include>
+        <include>org.mule.modules:mule-module-spring-extras</include>
+        <!-- include>org.mule.modules:mule-module-wssecurity</include -->
+        <include>org.mule.modules:mule-module-xml</include>
       </includes>
       <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
       <excludes>

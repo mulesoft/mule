@@ -54,7 +54,7 @@
             <id>osgi</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.mule.module</groupId>
+                    <groupId>org.mule.modules</groupId>
                     <artifactId>mule-module-osgi</artifactId>
                     <version>${version}</version>
                 </dependency>
