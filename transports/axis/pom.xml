@@ -124,7 +124,7 @@
         </dependency>
         <!-- needed by the Axis Service component -->
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
@@ -135,7 +135,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
             <scope>test</scope>
@@ -159,7 +159,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-acegi</artifactId>
             <version>${version}</version>
             <scope>test</scope>

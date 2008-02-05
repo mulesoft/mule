@@ -167,62 +167,62 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-acegi</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jaas</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jbossts</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-management</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-ognl</artifactId>
             <version>${version}</version>
         </dependency>
         <!-- dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-osgi</artifactId>
             <version>${version}</version>
         </dependency -->
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-pgp</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-wssecurity</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
         </dependency>

@@ -91,7 +91,7 @@
         </dependency>
         <!-- required for the SOAP TCK classes -->
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
             <scope>test</scope>

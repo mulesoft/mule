@@ -157,17 +157,17 @@
             <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-modules-all</artifactId>
             <version>${version}</version>
             <type>pom</type>
             <exclusions>
                 <exclusion>
-                    <groupId>org.mule.module.jca</groupId>
+                    <groupId>org.mule.modules.jca</groupId>
                     <artifactId>mule-module-jca-generic</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.mule.module.jca</groupId>
+                    <groupId>org.mule.modules.jca</groupId>
                     <artifactId>mule-module-jca-jboss</artifactId>
                 </exclusion>
                 <exclusion>

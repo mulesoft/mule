@@ -51,7 +51,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-1to2migration</artifactId>
             <version>${version}</version>
         </dependency>

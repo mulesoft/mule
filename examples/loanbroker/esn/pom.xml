@@ -25,7 +25,7 @@
             <scope>test</scope>
         </dependency>
          <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${version}</version>
         </dependency>

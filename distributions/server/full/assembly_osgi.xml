@@ -136,7 +136,7 @@ Assembly descriptor for the full Mule distribution.
       <!-- No version number  -->
       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
-        <include>org.mule.module:mule-module-boot</include>
+        <include>org.mule.modules:mule-module-boot</include>
         <include>commons-cli:commons-cli</include>
         <include>tanukisoft:wrapper</include>
         <include>org.knopflerfish:osgi</include>
@@ -178,20 +178,20 @@ Assembly descriptor for the full Mule distribution.
         <include>org.mule.transports:mule-transport-xfire</include>
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
-        <include>org.mule.module:mule-module-acegi</include>
-        <include>org.mule.module:mule-module-builders</include>
-        <include>org.mule.module:mule-module-client</include>
-        <include>org.mule.module:mule-module-jaas</include>
-        <include>org.mule.module:mule-module-jotm</include>
-        <include>org.mule.module:mule-module-management</include>
-        <include>org.mule.module:mule-module-osgi</include>
-        <include>org.mule.module:mule-module-ognl</include>
-        <include>org.mule.module:mule-module-pgp</include>
-        <include>org.mule.module:mule-module-scripting</include>
-        <include>org.mule.module:mule-module-springcore</include>
-        <include>org.mule.module:mule-module-spring</include>
-        <include>org.mule.module:mule-module-util</include>
-        <include>org.mule.module:mule-module-xml</include>
+        <include>org.mule.modules:mule-module-acegi</include>
+        <include>org.mule.modules:mule-module-builders</include>
+        <include>org.mule.modules:mule-module-client</include>
+        <include>org.mule.modules:mule-module-jaas</include>
+        <include>org.mule.modules:mule-module-jotm</include>
+        <include>org.mule.modules:mule-module-management</include>
+        <include>org.mule.modules:mule-module-osgi</include>
+        <include>org.mule.modules:mule-module-ognl</include>
+        <include>org.mule.modules:mule-module-pgp</include>
+        <include>org.mule.modules:mule-module-scripting</include>
+        <include>org.mule.modules:mule-module-springcore</include>
+        <include>org.mule.modules:mule-module-spring</include>
+        <include>org.mule.modules:mule-module-util</include>
+        <include>org.mule.modules:mule-module-xml</include>
       </includes>
     </dependencySet>
 

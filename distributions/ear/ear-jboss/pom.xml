@@ -65,7 +65,7 @@
         </dependency>
         <!-- do not bundle any modules -->
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-modules-all</artifactId>
             <version>${version}</version>
             <type>pom</type>
@@ -79,13 +79,13 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule.module.jca</groupId>
+            <groupId>org.mule.modules.jca</groupId>
             <artifactId>mule-module-jca-jboss</artifactId>
             <version>${version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.module.jca</groupId>
+            <groupId>org.mule.modules.jca</groupId>
             <artifactId>mule-module-jca-core</artifactId>
             <version>${version}</version>
             <scope>provided</scope>

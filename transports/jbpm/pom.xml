@@ -37,7 +37,7 @@
 
         <!-- Only needed for Spring-based configuration -->
         <dependency>
-            <groupId>org.mule.module</groupId>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
             <!-- TODO Change this back to scope=test once 
