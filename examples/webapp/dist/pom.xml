@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mule.example</groupId>
+    <groupId>org.mule.examples</groupId>
     <artifactId>mule-example-webapp</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
@@ -82,7 +82,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.example</groupId>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-echo</artifactId>
             <version>${muleVersion}</version>
             <exclusions>
@@ -93,7 +93,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.mule.example</groupId>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-hello</artifactId>
             <version>${muleVersion}</version>
             <exclusions>
@@ -104,7 +104,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.mule.example</groupId>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-stockquote</artifactId>
             <version>${muleVersion}</version>
             <exclusions>
@@ -115,7 +115,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.mule.example</groupId>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-esn</artifactId>
             <version>${muleVersion}</version>
             <exclusions>

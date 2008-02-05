@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.example</groupId>
+        <groupId>org.mule.examples</groupId>
         <artifactId>mule-example-loanbroker-parent</artifactId>
         <version>1.0</version>
     </parent>
@@ -13,18 +13,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.example</groupId>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-common</artifactId>
             <version>${muleVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.example</groupId>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-common-tests</artifactId>
             <version>${muleVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.example</groupId>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-credit-agency</artifactId>
             <version>${muleVersion}</version>
         </dependency>

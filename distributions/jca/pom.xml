@@ -79,7 +79,7 @@
 
         <!-- re-declaration of dependencies that never ever may end up in the .rar -->
         <dependency>
-            <groupId>org.mule.example</groupId>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-examples-all</artifactId>
             <version>${version}</version>
             <type>pom</type>

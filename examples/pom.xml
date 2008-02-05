@@ -8,7 +8,7 @@
         <artifactId>mule</artifactId>
     <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
-    <groupId>org.mule.example</groupId>
+    <groupId>org.mule.examples</groupId>
     <artifactId>mule-examples</artifactId>
     <packaging>pom</packaging>
     <name>Mule Examples</name>
