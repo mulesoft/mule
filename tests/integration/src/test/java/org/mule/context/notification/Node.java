@@ -58,15 +58,15 @@ class Node implements RestrictedNode
 
     public Node(Class clazz, int action, String id)
     {
-        this.clazz = clazz;
-        this.action = action;
+        this(clazz, action);
         this.id = id;
         isIdDefined = true;
     }
 
     public Node(Class clazz, int action)
     {
-        this(clazz, action, null);
+        this.clazz = clazz;
+        this.action = action;
     }
 
     public Node()
