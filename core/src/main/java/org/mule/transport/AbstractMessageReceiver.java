@@ -594,6 +594,8 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
                 // This is a replyTo event for a current request
                 if (responseEndpoint)
                 {
+                    // Transform response message before it is processed by response router(s)
+                    muleEvent.transformMessage();
                     service.getResponseRouter().route(muleEvent);
                     return null;
                 }
