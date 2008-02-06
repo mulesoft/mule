@@ -206,7 +206,10 @@ public abstract class MessageFactory extends Object
     private static ResourceBundle getBundle(String bundlePath)
     {
         Locale locale = Locale.getDefault();
-        logger.debug("Loading resource bundle: " + bundlePath + " for locale " + locale);
+        if (logger.isTraceEnabled())
+        {
+            logger.trace("Loading resource bundle: " + bundlePath + " for locale " + locale);
+        }
         ResourceBundle bundle = ResourceBundle.getBundle(bundlePath, locale);
         return bundle;
     }
