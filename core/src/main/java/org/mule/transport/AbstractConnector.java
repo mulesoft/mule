@@ -628,28 +628,7 @@ public abstract class AbstractConnector
         if (dispatchers != null)
         {
             logger.debug("Disposing Dispatchers");
-
-            try
-            {
-                // disposeDispatcher() is also called from initialise() and
-                // JMSConnector.onNotification(), so we need to handle this
-                // differently
-                if (this.isDisposing())
-                {
-                    // close() implies clear()
-                    dispatchers.close();
-                }
-                else
-                {
-                    dispatchers.clear();
-                }
-            }
-            catch (Exception ex)
-            {
-                // TODO MULE-863: What should we really do?
-                // ignored
-            }
-
+            dispatchers.clear();
             logger.debug("Dispatchers Disposed");
         }
     }
@@ -659,26 +638,7 @@ public abstract class AbstractConnector
         if (requesters != null)
         {
             logger.debug("Disposing Requesters");
-
-            try
-            {
-                // may not be needed for requesters?
-                if (this.isDisposing())
-                {
-                    // close() implies clear()
-                    requesters.close();
-                }
-                else
-                {
-                    requesters.clear();
-                }
-            }
-            catch (Exception ex)
-            {
-                // TODO MULE-863: What should we really do?
-                // ignored
-            }
-
+             requesters.clear();
             logger.debug("Requesters Disposed");
         }
     }

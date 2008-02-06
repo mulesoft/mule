@@ -10,8 +10,8 @@
 
 package org.mule.transport.email.connectors;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.ResponseOutputStream;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -105,5 +105,34 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         assertEquals("did not receive 1 mail", 1, messages.length);
         assertMessageOk(messages[0]);
     }
-    
+
+
+    // MULE-2130 (Impossible to re-initialise SMTP connector)
+    public void testConnectorReinitialise() throws Exception
+    {
+        Connector c = getConnector();
+
+        c.start();
+        assertTrue(c.isStarted());
+
+        c.stop();
+        assertFalse(c.isStarted());
+
+        // are these supposed to work?
+        // - initialise() without dispose()
+        // - initialise() after dispose()
+
+//        c.dispose();
+//        assertFalse(c.isStarted());
+//        assertTrue(c.isDisposed());
+//
+//        c.initialise();
+//        assertFalse(c.isDisposed());
+//        assertFalse(c.isStarted());
+
+        c.start();
+        assertFalse(c.isDisposed());
+        assertTrue(c.isStarted());
+    }
+
 }
