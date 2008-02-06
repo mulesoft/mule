@@ -119,15 +119,16 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 
     public void testCreateMuleContextString() throws InitialisationException, ConfigurationException
     {
+        MuleContext muleContext = null;
         try
         {
-            MuleContext muleContext = muleContextFactory.createMuleContext("my-resource.xml");
+            muleContext = muleContextFactory.createMuleContext("my-resource.xml");
 
         }
         catch (ConfigurationException e)
         {
             assertEquals(
-                "No suitable configuration builder for resource \"[my-resource.xml]\" found.  Check you have configuration module ion your classpath and are using correct file extension.",
+                "No suitable configuration builder for resource \"[my-resource.xml]\" found.  Check you have configuration module in your classpath and are using correct file extension. (org.mule.api.config.ConfigurationException)",
                 e.getCause().getMessage());
         }
         assertNull(muleContext);
@@ -140,15 +141,16 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         properties.put("testKey1", "testValue1");
         properties.put("testKey2", "testValue2");
 
+        MuleContext muleContext = null;
         try
         {
-            MuleContext muleContext = muleContextFactory.createMuleContext("my-resource.xml", properties);
+            muleContext = muleContextFactory.createMuleContext("my-resource.xml", properties);
 
         }
         catch (ConfigurationException e)
         {
             assertEquals(
-                "No suitable configuration builder for resource \"[my-resource.xml]\" found.  Check you have configuration module ion your classpath and are using correct file extension.",
+                "No suitable configuration builder for resource \"[my-resource.xml]\" found.  Check you have configuration module in your classpath and are using correct file extension. (org.mule.api.config.ConfigurationException)",
                 e.getCause().getMessage());
         }
 
