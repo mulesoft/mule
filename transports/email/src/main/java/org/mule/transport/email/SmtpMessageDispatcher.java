@@ -79,27 +79,20 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected void doDispatch(MuleEvent event)
+    protected void doDispatch(MuleEvent event) throws Exception
     {
-        try
-        {
-            Object data = event.transformMessage();
+        Object data = event.transformMessage();
 
-            if (!(data instanceof Message))
-            {
-                throw new DispatchException(
-                    CoreMessages.transformUnexpectedType(data.getClass(), Message.class),
-                    event.getMessage(), event.getEndpoint());
-            }
-            else
-            {
-                // Check the message for any unset data and use defaults
-                sendMailMessage((Message) data);
-            }
-        }
-        catch (Exception e)
+        if (!(data instanceof Message))
         {
-            connector.handleException(e);
+            throw new DispatchException(
+                CoreMessages.transformUnexpectedType(data.getClass(), Message.class),
+                event.getMessage(), event.getEndpoint());
+        }
+        else
+        {
+            // Check the message for any unset data and use defaults
+            sendMailMessage((Message) data);
         }
     }
 
