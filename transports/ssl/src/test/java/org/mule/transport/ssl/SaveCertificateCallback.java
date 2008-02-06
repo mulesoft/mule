@@ -29,6 +29,8 @@ public class SaveCertificateCallback implements EventCallback
 
     public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
+        // putting a Thread.sleep here doesn't make this less reliable
+        // surely it would if it was thread scribbling?
         certificates.set(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
         called.set(true);
     }
