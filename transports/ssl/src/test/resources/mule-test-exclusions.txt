@@ -3,4 +3,4 @@
 #
 
 # MULE-2959
-org.mule.transport.ssl.SslCertificateTestCase
+#org.mule.transport.ssl.SslCertificateTestCase

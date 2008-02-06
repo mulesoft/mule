@@ -13,13 +13,15 @@ package org.mule.transport.ssl;
 import org.mule.tck.functional.EventCallback;
 import org.mule.api.MuleEventContext;
 
-import java.util.List;
-import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 public class SaveCertificateCallback implements EventCallback
 {
 
-    private List certificates;
+    private AtomicReference certificates;
+    private AtomicBoolean called;
 
     public SaveCertificateCallback()
     {
@@ -28,17 +30,24 @@ public class SaveCertificateCallback implements EventCallback
 
     public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
-        certificates.add(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
+        certificates.set(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
+        called.set(true);
     }
 
     public void clear()
     {
-        certificates = new LinkedList();
+        certificates = new AtomicReference();
+        called = new AtomicBoolean(false);
     }
 
-    public List getCertificates()
+    public boolean isCalled()
     {
-        return certificates;
+        return called.get();
+    }
+
+    public Object getCertificates()
+    {
+        return certificates.get();
     }
 
 }

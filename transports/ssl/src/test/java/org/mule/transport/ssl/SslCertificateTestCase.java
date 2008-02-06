@@ -11,13 +11,9 @@
 package org.mule.transport.ssl;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
-
-import java.util.List;
-import java.util.Iterator;
 
 public class SslCertificateTestCase extends FunctionalTestCase
 {
@@ -43,18 +39,15 @@ public class SslCertificateTestCase extends FunctionalTestCase
     protected void doTests(int n) throws Exception
     {
         SaveCertificateCallback callback = (SaveCertificateCallback) muleContext.getRegistry().lookupObject("certificates");
-        callback.clear();
         MuleClient client = new MuleClient();
         for (int i = 0; i < n; ++i)
         {
-            MuleMessage result = client.send("in", TEST_MESSAGE, null);
-            assertEquals(FunctionalTestComponent.received(TEST_MESSAGE), result.getPayloadAsString());
-        }
-        List certificates = callback.getCertificates();
-        assertEquals(n, certificates.size());
-        for (Iterator certs = certificates.iterator(); certs.hasNext();)
-        {
-            assertNotNull("Null certificate", certs.next());
+            callback.clear();
+            String msg = TEST_MESSAGE + n;
+            MuleMessage result = client.send("in", msg, null);
+            assertTrue(callback.isCalled());
+            assertNotNull("Null certificates", callback.getCertificates());
+            assertEquals(FunctionalTestComponent.received(msg), result.getPayloadAsString());
         }
     }
 
