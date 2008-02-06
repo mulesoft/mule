@@ -8,36 +8,31 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/ssl/2.0 http://www.mulesource.org/schema/mule/ssl/2.0/mule-ssl.xsd">
 
-    <!-- keepSendSocketOpen is required for the Async test case?  see TCP -->
-    <ssl:connector name="SslConnector" keepSendSocketOpen="true">
+    <ssl:connector name="SslConnector">
         <ssl:ssl-client clientKeyStore="clientKeyStore" clientKeyStorePassword="mulepassword"/>
         <ssl:ssl-key-store keyStore="serverKeystore" keyStorePassword="mulepassword" keyPassword="mulepassword"/>
         <ssl:ssl-server trustStore="trustStore" trustStorePassword="mulepassword"/>
     </ssl:connector>
 
-    <ssl:endpoint name="in" host="localhost" port="61655" synchronous="false"/>
+    <endpoint name="in" address="ssl://localhost:60195" synchronous="true"/>
+
+    <spring:bean name="certificates" class="org.mule.transport.ssl.SaveCertificateCallback"/>
 
     <model name="main">
 
-        <service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
+        <service name="service" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
-                <inbound-endpoint ref="in"/>
+                <ssl:inbound-endpoint ref="in"/>
             </inbound>
-
             <component>
-                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
+                <pooled-object class="org.mule.tck.functional.FunctionalTestComponent">
+                    <properties>
+                        <spring:entry key="eventCallback" value-ref="certificates"/>
+                    </properties>
+                </pooled-object>
             </component>
-            
-            <!-- This is just to avoid matching router warnings -->
-            <outbound>
-                <outbound-pass-through-router>
-                    <outbound-endpoint name="test1" address="test://test"/>
-                </outbound-pass-through-router>
-            </outbound>
         </service>
 
-
     </model>
-
 
 </mule>

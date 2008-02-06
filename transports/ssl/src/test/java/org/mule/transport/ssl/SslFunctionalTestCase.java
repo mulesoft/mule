@@ -22,7 +22,8 @@ import org.mule.tck.testmodels.mule.TestSedaService;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SslFunctionalTestCase extends FunctionalTestCase {
+public class SslFunctionalTestCase extends FunctionalTestCase 
+{
 
     protected static String TEST_MESSAGE = "Test Request";
     private static int NUM_MESSAGES = 100;
