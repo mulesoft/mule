@@ -17,18 +17,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.LinkedList;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.collections.list.SynchronizedList;
-
 public class SaveCertificatesCallback implements EventCallback
 {
 
-    private List certificates = Collections.synchronizedList(new LinkedList());;
+    private List certificates;
+
+    public SaveCertificatesCallback()
+    {
+        clear();
+    }
 
     public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
         certificates.add(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
+    }
+
+    public void clear()
+    {
+        certificates = Collections.synchronizedList(new LinkedList());
     }
 
     public List getCertificates()

@@ -25,7 +25,7 @@ public class SslCertificatesTestCase extends FunctionalTestCase
 {
 
     protected static String TEST_MESSAGE = "Test Request";
-    private static int NUM_MESSAGES = 1000;
+    private static int NUM_MESSAGES = 100;
 
     protected String getConfigResources()
     {
@@ -44,6 +44,9 @@ public class SslCertificatesTestCase extends FunctionalTestCase
 
     protected void doTests(int n) throws Exception
     {
+        SaveCertificatesCallback callback =
+                (SaveCertificatesCallback) muleContext.getRegistry().lookupObject("certificates");
+        callback.clear();
         MuleClient client = new MuleClient();
         for (int i = 0; i < n; ++i)
         {
@@ -51,9 +54,7 @@ public class SslCertificatesTestCase extends FunctionalTestCase
             MuleMessage result = client.send("in", msg, null);
             assertEquals(FunctionalTestComponent.received(msg), result.getPayloadAsString());
         }
-        Iterator certificates =
-                ((SaveCertificatesCallback)
-                        muleContext.getRegistry().lookupObject("certificates")).getCertificates().iterator();
+        Iterator certificates = callback.getCertificates().iterator();
         for (int i = 0; i < n; ++i)
         {
             assertTrue("No cert at " + i, certificates.hasNext());
