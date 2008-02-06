@@ -24,12 +24,7 @@ import org.apache.commons.collections.list.SynchronizedList;
 public class SaveCertificatesCallback implements EventCallback
 {
 
-    private List certificates;
-
-    public SaveCertificatesCallback()
-    {
-        certificates = Collections.synchronizedList(new LinkedList());
-    }
+    private List certificates = Collections.synchronizedList(new LinkedList());;
 
     public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
