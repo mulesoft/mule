@@ -142,7 +142,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
 
     protected ScriptEngine createScriptEngine()
     {
-        return scriptable.createScriptEngine();
+        return scriptable.createScriptEngineByName(scriptable.getScriptEngineName());
     }
 
 }

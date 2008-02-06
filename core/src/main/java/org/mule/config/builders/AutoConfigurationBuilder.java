@@ -15,6 +15,14 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,37 +55,49 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
     protected void autoConfigure(MuleContext muleContext, String[] configResources) throws ConfigurationException
     {
 
-        ConfigurationBuilder configurationBuilder = null;
+        Map configsMap = new LinkedHashMap();
 
-        if (ClassUtils.isClassOnPath("org.mule.config.spring.SpringXmlConfigurationBuilder", this.getClass()))
+        for (int i = 0; i < configResources.length; i++)
         {
-            try
+            String configExtension = StringUtils.substringAfterLast(configResources[i], ".");
+            List configs = (List) configsMap.get(configExtension);
+            if (configs == null)
             {
-                configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
-                    "org.mule.config.spring.SpringXmlConfigurationBuilder", new Object[]{configResources});
+                configs = new ArrayList();
+                configsMap.put(configExtension, configs);
             }
-            catch (Exception e)
+            configs.add(configResources[i]);
+        }
+
+        try
+        {
+            Properties props = new Properties();
+            props.load(ClassUtils.getResource("configuration-builders.properties", this.getClass()).openStream());
+
+            Iterator iterator = configsMap.entrySet().iterator();
+            while (iterator.hasNext())
             {
-                throw new ConfigurationException(e);
+                Map.Entry e = (Map.Entry) iterator.next();
+                String extension = (String) e.getKey();
+                List configs = (List) e.getValue();
+
+                String className = (String) props.get(extension);
+
+                if (!ClassUtils.isClassOnPath(className, this.getClass()))
+                {
+                    throw new ConfigurationException(CoreMessages.configurationBuilderNoMatching(createConfigResourcesString()));
+                }
+
+                String[] constructorArg = new String[configs.size()];
+                System.arraycopy(configs.toArray(), 0, constructorArg, 0, configs.size());
+                ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, new Object[]{constructorArg});
+                cb.configure(muleContext);
             }
         }
-        else if (ClassUtils.isClassOnPath("org.mule.config.scripting.ScriptingConfigurationBuilder", this.getClass()))
+        catch (Exception e)
         {
-            try
-            {
-                configurationBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
-                    "org.mule.config.spring.SpringXmlConfigurationBuilder", new Object[]{configResources});
-            }
-            catch (Exception e)
-            {
-                throw new ConfigurationException(e);
-            }
+            throw new ConfigurationException(e);
         }
-        else
-        {
-            throw new ConfigurationException(CoreMessages.configurationBuilderNoMatching(createConfigResourcesString()));
-        }
-        configurationBuilder.configure(muleContext);
     }
 
 }

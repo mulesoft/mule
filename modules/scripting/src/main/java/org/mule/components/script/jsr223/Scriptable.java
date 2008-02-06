@@ -59,17 +59,19 @@ public class Scriptable implements Initialisable
             {
                 if (scriptEngineName != null)
                 {
-                    scriptEngine = createScriptEngine();
+                    scriptEngine = createScriptEngineByName(scriptEngineName);
                 }
                 else if (scriptFile != null)
                 {
                     int i = scriptFile.lastIndexOf(".");
                     if (i > -1)
                     {
-                        setScriptEngineName(scriptFile.substring(i + 1));
-                        logger.info("Script Engine name not set.  Defaulting to file extension: "
-                                        + getScriptEngineName());
-                        scriptEngine = createScriptEngine();
+                        logger.info("Script Engine name not set. Guessing by file extension.");
+                        scriptEngine = createScriptEngineByExtension(scriptFile.substring(i + 1));
+                        if(scriptEngine != null)
+                        {
+                            setScriptEngineName(scriptEngine.getFactory().getEngineName());
+                        }
                     }
                 }
                 if (scriptEngine == null)
@@ -223,10 +225,13 @@ public class Scriptable implements Initialisable
         return result;
     }
 
-    protected ScriptEngine createScriptEngine()
+    protected ScriptEngine createScriptEngineByName(String name)
     {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        return manager.getEngineByName(scriptEngineName);
+        return new ScriptEngineManager().getEngineByName(name);
     }
 
+    protected ScriptEngine createScriptEngineByExtension(String ext)
+    {
+        return new ScriptEngineManager().getEngineByExtension(ext);
+    }
 }
