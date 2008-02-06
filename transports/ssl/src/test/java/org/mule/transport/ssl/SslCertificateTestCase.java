@@ -17,6 +17,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.List;
+import java.util.Iterator;
 
 public class SslCertificateTestCase extends FunctionalTestCase
 {
@@ -51,6 +52,10 @@ public class SslCertificateTestCase extends FunctionalTestCase
         }
         List certificates = callback.getCertificates();
         assertEquals(n, certificates.size());
+        for (Iterator certs = certificates.iterator(); certs.hasNext();)
+        {
+            assertNotNull("Null certificate", certs.next());
+        }
     }
 
 }
