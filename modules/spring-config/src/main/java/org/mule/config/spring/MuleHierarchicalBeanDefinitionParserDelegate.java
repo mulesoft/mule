@@ -116,15 +116,8 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
             boolean isRecurse;
             if (noRecurse)
             {
-                if (forceRecurse)
-                {
-                    // inconsistent control
-                    throw new IllegalStateException("Recursion requested and blocked");
-                }
-                else
-                {
-                    isRecurse = false;
-                }
+                // no recursion takes precedence, as recursion is set by default
+                isRecurse = false;
             }
             else
             {

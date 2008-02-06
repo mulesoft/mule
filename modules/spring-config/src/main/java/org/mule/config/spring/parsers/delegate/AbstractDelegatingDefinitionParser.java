@@ -16,6 +16,7 @@ import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.util.ArrayUtils;
 
 import java.util.Map;
@@ -45,14 +46,15 @@ public abstract class AbstractDelegatingDefinitionParser extends AbstractBeanDef
         this(new MuleDefinitionParser[0]);
     }
 
-    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
-    {
-        return muleParse(element, parserContext);
-    }
-
     protected AbstractDelegatingDefinitionParser(MuleDefinitionParser[] delegates)
     {
         this.delegates = delegates;
+        addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_FORCE_RECURSE);
+    }
+
+    protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
+    {
+        return muleParse(element, parserContext);
     }
 
     protected MuleDefinitionParserConfiguration addDelegate(MuleDefinitionParser delegate)

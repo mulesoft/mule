@@ -17,6 +17,7 @@ import org.mule.config.spring.parsers.assembly.DefaultBeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
+import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.util.ClassUtils;
 import org.mule.util.XMLUtils;
 
@@ -118,6 +119,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     public AbstractMuleBeanDefinitionParser()
     {
         addIgnored(ATTRIBUTE_ID);
+        addBeanFlag(MuleHierarchicalBeanDefinitionParserDelegate.MULE_FORCE_RECURSE);
     }
 
     public MuleDefinitionParserConfiguration addReference(String propertyName)
