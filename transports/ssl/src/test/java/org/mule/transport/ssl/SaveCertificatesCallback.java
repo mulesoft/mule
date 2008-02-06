@@ -28,17 +28,12 @@ public class SaveCertificatesCallback implements EventCallback
 
     public SaveCertificatesCallback()
     {
-        clear();
+        certificates = Collections.synchronizedList(new LinkedList());
     }
 
     public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
         certificates.add(context.getMessage().getProperty(SslConnector.LOCAL_CERTIFICATES));
-    }
-
-    public void clear()
-    {
-        certificates = Collections.synchronizedList(new LinkedList());
     }
 
     public List getCertificates()
