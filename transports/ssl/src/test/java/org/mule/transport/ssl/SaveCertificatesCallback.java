@@ -20,7 +20,8 @@ import java.util.LinkedList;
 public class SaveCertificatesCallback implements EventCallback
 {
 
-    private List certificates;
+    // volatile since this is a thread-safe collection (see holger)
+    private volatile List certificates;
 
     public SaveCertificatesCallback()
     {
