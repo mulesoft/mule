@@ -18,8 +18,6 @@ import org.mule.tck.FunctionalTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jms.TextMessage;
-
 public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
 {
     public ReplytoChainIntegration1TestCase()
@@ -41,9 +39,7 @@ public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         MuleMessage result = client.send("vm://pojo1", message, props);
         assertNotNull(result);
-        // TODO This assertion is incorrect a "TextMessage" should not be received here but
-        // rather just a sting payload.  See MULE-2869
-        assertEquals("Received: " + message, ((TextMessage)result.getPayload()).getText());
+        assertEquals("Received: " + message, result.getPayloadAsString());
     }
     
     public void testReplyToChainWithoutProps() throws Exception
@@ -53,9 +49,7 @@ public class ReplytoChainIntegration1TestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         MuleMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
-        // TODO This assertion is incorrect a "TextMessage" should not be received here but
-        // rather just a sting payload.  See MULE-2869
-        assertEquals("Received: " + message, ((TextMessage)result.getPayload()).getText());
+        assertEquals("Received: " + message, result.getPayloadAsString());
     }
 
 }
