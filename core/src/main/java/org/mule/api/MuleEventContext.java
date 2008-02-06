@@ -336,7 +336,7 @@ public interface MuleEventContext
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
      */
-    MuleMessage receiveEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException;
+    MuleMessage requestEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException;
 
     /**
      * Requests a synchronous receive of an event on the service.
@@ -347,7 +347,7 @@ public interface MuleEventContext
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
      */
-    MuleMessage receiveEvent(String endpointName, long timeout) throws MuleException;
+    MuleMessage requestEvent(String endpointName, long timeout) throws MuleException;
 
     /**
      * Requests a synchronous receive of an event on the service.
@@ -357,7 +357,7 @@ public interface MuleEventContext
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
      */
-    MuleMessage receiveEvent(EndpointURI endpoint, long timeout) throws MuleException;
+    MuleMessage requestEvent(EndpointURI endpoint, long timeout) throws MuleException;
 
     Service getService();
 

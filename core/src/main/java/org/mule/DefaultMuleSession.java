@@ -389,10 +389,10 @@ public final class DefaultMuleSession implements MuleSession
      * @see org.mule.api.MuleSession#receiveEvent(org.mule.api.endpoint.Endpoint,
      *      long, org.mule.api.MuleEvent)
      */
-    public MuleMessage receiveEvent(String endpointName, long timeout) throws MuleException
+    public MuleMessage requestEvent(String endpointName, long timeout) throws MuleException
     {
         ImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
-        return receiveEvent(endpoint, timeout);
+        return requestEvent(endpoint, timeout);
     }
 
     /*
@@ -401,7 +401,7 @@ public final class DefaultMuleSession implements MuleSession
      * @see org.mule.api.MuleSession#receiveEvent(org.mule.api.endpoint.Endpoint,
      *      long, org.mule.api.MuleEvent)
      */
-    public MuleMessage receiveEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException
+    public MuleMessage requestEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException
     {
         try
         {

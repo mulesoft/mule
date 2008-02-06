@@ -144,7 +144,7 @@ public interface MuleSession extends Serializable
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
      */
-    MuleMessage receiveEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException;
+    MuleMessage requestEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException;
 
     /**
      * Requests a synchronous receive of an event on the service
@@ -155,7 +155,7 @@ public interface MuleSession extends Serializable
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
      */
-    MuleMessage receiveEvent(String endpointName, long timeout) throws MuleException;
+    MuleMessage requestEvent(String endpointName, long timeout) throws MuleException;
 
     /**
      * Determines if this session is valid. A session becomes invalid if an exception

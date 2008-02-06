@@ -139,7 +139,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
                 .lookupEndpointFactory()
                 .getOutboundEndpoint(this.wsdlEndpoint);
 
-            MuleMessage replyWSDL = eventContext.receiveEvent(webServiceEndpoint, eventContext.getTimeout());
+            MuleMessage replyWSDL = eventContext.requestEvent(webServiceEndpoint, eventContext.getTimeout());
 
             wsdlString = replyWSDL.getPayloadAsString();
 

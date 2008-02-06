@@ -510,9 +510,9 @@ public class DefaultMuleEventContext implements MuleEventContext
      * @return The requested event or null if the request times out
      * @throws org.mule.api.MuleException if the request operation fails
      */
-    public MuleMessage receiveEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException
+    public MuleMessage requestEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException
     {
-        return session.receiveEvent(endpoint, timeout);
+        return session.requestEvent(endpoint, timeout);
     }
 
     /**
@@ -524,9 +524,9 @@ public class DefaultMuleEventContext implements MuleEventContext
      * @return The requested event or null if the request times out
      * @throws org.mule.api.MuleException if the request operation fails
      */
-    public MuleMessage receiveEvent(String endpointName, long timeout) throws MuleException
+    public MuleMessage requestEvent(String endpointName, long timeout) throws MuleException
     {
-        return session.receiveEvent(endpointName, timeout);
+        return session.requestEvent(endpointName, timeout);
     }
 
     /**
@@ -537,11 +537,11 @@ public class DefaultMuleEventContext implements MuleEventContext
      * @return The requested event or null if the request times out
      * @throws org.mule.api.MuleException if the request operation fails
      */
-    public MuleMessage receiveEvent(EndpointURI endpointUri, long timeout) throws MuleException
+    public MuleMessage requestEvent(EndpointURI endpointUri, long timeout) throws MuleException
     {
         ImmutableEndpoint endpoint =
                 getMuleContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointUri);
-        return session.receiveEvent(endpoint, timeout);
+        return session.requestEvent(endpoint, timeout);
     }
 
     /**
