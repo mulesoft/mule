@@ -12,7 +12,6 @@ package org.mule.util;
 
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.config.ExceptionHelper;
-import org.mule.model.ModelFactory;
 import org.mule.transport.service.TransportFactory;
 
 import java.io.IOException;
@@ -31,7 +30,6 @@ public class SpiUtils
     private static final Log logger = LogFactory.getLog(SpiUtils.class);
 
     public static final String SERVICE_ROOT = "META-INF/services/";
-    public static final String MODEL_SERVICE_PATH = "org/mule/models/";
     public static final String PROVIDER_SERVICE_PATH = "org/mule/providers/";
     public static final String EXCEPTION_SERVICE_PATH = "org/mule/config/";
 
@@ -40,10 +38,6 @@ public class SpiUtils
         if (type.equals(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE))
         {
             return findServiceDescriptor(PROVIDER_SERVICE_PATH, name, TransportFactory.class);
-        }
-        else if (type.equals(ServiceDescriptorFactory.MODEL_SERVICE_TYPE))
-        {
-            return findServiceDescriptor(MODEL_SERVICE_PATH, name, ModelFactory.class);
         }
         else if (type.equals(ServiceDescriptorFactory.EXCEPTION_SERVICE_TYPE))
         {

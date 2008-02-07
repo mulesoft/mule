@@ -6,7 +6,7 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"
        default-destroy-method="dispose" default-init-method="initialise">
 
-    <bean class="org.mule.model.ModelFactory"
+    <!-- bean class="org.mule.model.ModelFactory"
         factory-method="createModel"
         name="main">
         <constructor-arg index="0" type="java.lang.String">
@@ -15,7 +15,9 @@
         <constructor-arg index="1" type="java.lang.String">
             <value>main</value>
         </constructor-arg>
-    </bean>
+    </bean -->
+
+    <bean name="main" class="org.mule.model.seda.SedaModel"/>
 
     <!-- "implementation" is a class name -->
     <bean class="org.mule.model.seda.SedaService" depends-on="main" name="orange1">

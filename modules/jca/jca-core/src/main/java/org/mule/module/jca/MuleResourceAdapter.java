@@ -23,7 +23,6 @@ import org.mule.context.DefaultMuleContextFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.endpoint.URIBuilder;
-import org.mule.model.ModelFactory;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.SingletonObjectFactory;
 
@@ -260,7 +259,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         }
         else
         {
-            JcaModel jcaModel = (JcaModel) ModelFactory.createModel(JcaModel.JCA_MODEL_TYPE);
+            JcaModel jcaModel = new JcaModel();
             jcaModel.setName(modelName);
             muleContext.getRegistry().registerModel(jcaModel);
             return jcaModel;

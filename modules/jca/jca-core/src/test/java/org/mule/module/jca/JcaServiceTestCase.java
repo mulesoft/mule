@@ -15,7 +15,6 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.service.Service;
 import org.mule.component.simple.EchoComponent;
-import org.mule.model.ModelFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.object.SingletonObjectFactory;
 
@@ -33,7 +32,7 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
     {
         // Create and register JcaModel
         workManager = new TestJCAWorkManager();
-        JcaModel jcaModel = (JcaModel) ModelFactory.createModel(JcaModel.JCA_MODEL_TYPE);
+        JcaModel jcaModel = new JcaModel();
         muleContext.getRegistry().registerModel(jcaModel);
 
         // Create, register, initialise and start JcaService
