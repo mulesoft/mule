@@ -10,14 +10,15 @@
 
 package org.mule;
 
-import org.mule.api.MuleException;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.service.Service;
@@ -25,6 +26,8 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.URIBuilder;
 import org.mule.security.MuleCredentials;
 import org.mule.util.MapUtils;
 import org.mule.util.UUID;
@@ -32,7 +35,6 @@ import org.mule.util.UUID;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
@@ -595,30 +597,34 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     {
         if (transformers != null)
         {
+            // write the number of transformers to read when re-creating this object
+            out.writeInt(transformers.size());
+
             Iterator transformer = transformers.iterator();
             while (transformer.hasNext())
             {
                 out.writeObject(((Transformer) transformer.next()).getName());
             }
         }
+        else
+        {
+            // make sure that unmarshalTransformers knows the number of transformers to restore anyway
+            out.writeInt(0);
+        }
     }
 
     private List unmarshallTransformers(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         List transformers = new LinkedList();
-        try {
-            while (true)
+        
+        int count = in.readInt();
+        if (count > 0)
+        {
+            for (int i = 0; i < count; i++)
             {
                 String transformerName = (String) in.readObject();
                 transformers.add(RegistryContext.getRegistry().lookupTransformer(transformerName));
-            }
-        } catch (OptionalDataException e) {
-            // as far as i can tell, this must always report an error
-            // (and was like this before converting to transformer lists)
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Failed to load transformers from stream", e);
-            }
+            }            
         }
         return transformers;
     }
@@ -626,30 +632,33 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     private void writeObject(ObjectOutputStream out) throws IOException
     {
         out.defaultWriteObject();
-        //TODO DF: Serializale endpoints registry id (name?) rather than uri.
+
+        // TODO DF: If/when endpoints are kept in registry we should serializale endpoint registry 
+        // id/name rather than it's uri, this will mean that endpoint does not need to be recreated 
+        // and there will be no need to serialize transformers or other endpoint attributes here.
+
         out.writeObject(endpoint.getEndpointURI().toString());
-        //TODO DF: No need to marshall tranformers
-        //marshallTransformers(endpoint.getTransformers(), out);
+        this.marshallTransformers(endpoint.getTransformers(), out);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         logger = LogFactory.getLog(getClass());
         in.defaultReadObject();
+        
+        // TODO DF: If/when endpoints are kept in registry we should deserializale endpoint registry id/name
+        // and use it to lookup existing endpoint instance, rather than recreating the endpoint here. This
+        // will also mean that there won't be a need to serialize/deserialize endoint attributes such as
+        // transformers.
+
         String uri = (String) in.readObject();
-        //TODO DF: No need to unmarshall tranformers
-        //List transformers = unmarshallTransformers(in);
+        List transformers = this.unmarshallTransformers(in);
         try
         {
-            //TODO DF: Lookup existing endpoint from registry of correct type.
-            endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+            EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(uri), getMuleContext());
+            endpointBuilder.setTransformers(transformers);
+            endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
 
-            //TODO DF: No need to unmarshall tranformers
-            //if (TransformerUtils.isUndefined(endpoint.getTransformers()))
-            //{
-            //    //TODO DF: MULE-2291 Resolve pending endpoint mutability issues
-            //    ((Endpoint) endpoint).setTransformers(transformers);
-            //}
         }
         catch (MuleException e)
         {

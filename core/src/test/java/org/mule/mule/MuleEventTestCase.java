@@ -18,14 +18,20 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.Endpoint;
 import org.mule.api.security.Credentials;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.simple.ByteArrayToObject;
+import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.util.CollectionUtils;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class MuleEventTestCase extends AbstractMuleTestCase
@@ -171,13 +177,49 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertNull("Credentials must not be created for endpoints without a password.", credentials);
     }
 
+/*
+    public void testEventSerialization() throws Exception
+    {
+        Transformer trans1 = new TestEventTransformer();
+        trans1.setName("OptimusPrime");
+
+        Transformer trans2 = new TestEventTransformer();
+        trans2.setName("Bumblebee");
+
+        List transformers = new ArrayList();
+        transformers.add(trans1);
+        transformers.add(trans2);
+
+//        MuleManager.getInstance().registerTransformer(trans1);
+//        MuleManager.getInstance().registerTransformer(trans2);
+        
+        Endpoint endpoint = getTestOutboundEndpoint("Test");
+        endpoint.setTransformers(transformers);
+
+        MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
+
+        Serializable serialized = (Serializable)new SerializableToByteArray().transform(event);
+        assertNotNull(serialized);
+
+        // null out the endpoint transformer since we need to verify that it is set
+        // correctly when the event is recreated
+        // NOTE: unused, see note below
+        // endpoint.setTransformer(null);
+
+        MuleEvent deserialized = (MuleEvent)new ByteArrayToObject().transform(serialized);
+        assertNotNull(deserialized);
+
+        // NOTE: below we SHOULD be able to re-check that the exisiting endpoint's transformer
+        // is != null, but the lookup in MuleManager is broken and returns a new one :( 
+        List deserializedTransformers = deserialized.getEndpoint().getTransformers();
+        assertEquals(2, deserializedTransformers.size());
+        assertEquals(trans1.getName(), ((Transformer)deserializedTransformers.get(0)).getName());
+        assertEquals(trans2.getName(), ((Transformer)deserializedTransformers.get(1)).getName());
+    }
+*/
+
     private class TestEventTransformer extends AbstractTransformer
     {
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.mule.transformer.AbstractTransformer#doTransform(java.lang.Object)
-         */
         public Object doTransform(Object src, String encoding) throws TransformerException
         {
             return "Transformed Test Data";
