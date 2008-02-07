@@ -6,9 +6,11 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <!-- 
-        <mule-environment-properties enableMessageEvents="true" synchronous="true"/>
-    -->
+    <configuration serverId="server id" defaultSynchronousEndpoints="true"/>
+
+    <!-- the test registers notifications via java that we want the connector to respond to,
+         so disable caching -->
+    <notifications dynamic="true"/>
 
     <model name="main">
         <service name="Receiver">
@@ -32,4 +34,5 @@
             </component>
         </service>
     </model>
+    
 </mule>

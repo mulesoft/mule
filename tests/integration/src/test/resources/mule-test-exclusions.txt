@@ -57,10 +57,6 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # Unfinished 2.x implementation
 ##########################################################################
 
-# MULE-2192, 2474
-# probably a duplicate of MessageChunkingMule2192TestCase?
-org.mule.test.integration.routing.MessageChunkingTestCase
-
 # MULE-2881
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 
