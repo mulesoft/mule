@@ -67,7 +67,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
                 }
                 else
                 {
-                    dataBytes = data.toString().getBytes();
+                    dataBytes = data.toString().getBytes(event.getEncoding());
                 }
                 IOUtils.write(dataBytes, out);
             }

@@ -31,6 +31,7 @@ public class InMemoryIpRestrictor implements IpRestrictor, Component
      */
     public void configure(Configuration config)
     {
+        // nothing to do
     }
 
     /**
@@ -61,6 +62,7 @@ public class InMemoryIpRestrictor implements IpRestrictor, Component
      */
     public void setPermissions(Object[][] permissions)
     {
+        // nothing to do
     }
 
     /**
@@ -68,5 +70,6 @@ public class InMemoryIpRestrictor implements IpRestrictor, Component
      */
     public void dispose()
     {
+        // nothing to do
     }
 }
