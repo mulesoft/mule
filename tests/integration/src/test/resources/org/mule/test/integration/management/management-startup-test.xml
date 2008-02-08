@@ -15,7 +15,7 @@
     <!-- this seems to duplicate the agent below
          (afaict it was not in original config - suspect it was added by andrew p while trying to work round previous problem
          see http://fisheye.codehaus.org/browse/mule/branches/mule-2.x/tests/functional/src/test/resources/org/mule/test/spring/test-xml-mule2-config.xml?r1=7725&r2=7727) -->
-    <!-- <mgmt:jmx-default-config name="jmxConfig"/> -->
+    <!-- <mgmt:jmx-default-config name="jmxAgent"/> -->
     <mgmt:rmi-server name="rmiAgent" serverUri="rmi://localhost:1100"/>
     <mgmt:jmx-server name="jmxAgent">
         <mgmt:connector-server url="service:jmx:rmi:///jndi/rmi://localhost:1100/server" rebind="true"/>
