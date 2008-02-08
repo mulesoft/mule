@@ -25,9 +25,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.SerializationUtils;
 
-/**
- * This was pulled from integration tests, but isn't going to work until MULE-2474 is fixed
- */
 public class MessageChunkingMule2192TestCase extends FunctionalTestCase
 {
 
@@ -124,8 +121,7 @@ public class MessageChunkingMule2192TestCase extends FunctionalTestCase
             public void onNotification(ServerNotification notification)
             {
                 // Not strictly necessary to test for this as when we register the
-                // listener we
-                // supply the ComponentName as the subscription filter
+                // listener we supply the ComponentName as the subscription filter
                 assertEquals("ChunkingReceiver", notification.getResourceIdentifier());
                 // Test that we have received all chunks in the correct order
                 Object reply = ((FunctionalTestNotification)notification).getReplyMessage();
@@ -135,8 +131,7 @@ public class MessageChunkingMule2192TestCase extends FunctionalTestCase
         }, "ChunkingReceiver");
 
         // Listen to Message Notifications on the Chunking receiver so we can
-        // determine how
-        // many message parts have been received
+        // determine how many message parts have been received
         muleContext.registerListener(new MessageNotificationListener()
         {
             public void onNotification(ServerNotification notification)

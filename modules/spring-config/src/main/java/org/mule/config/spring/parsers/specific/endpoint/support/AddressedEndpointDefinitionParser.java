@@ -18,7 +18,9 @@ import org.mule.config.spring.parsers.generic.AttributePropertiesDefinitionParse
 import org.mule.config.spring.parsers.processors.BlockAttribute;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
+import org.mule.config.MuleConfiguration;
 import org.mule.endpoint.URIBuilder;
+import org.mule.endpoint.AbstractEndpointBuilder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,7 +42,8 @@ public class AddressedEndpointDefinitionParser extends AbstractSingleParentFamil
     public static final boolean PROTOCOL = ChildAddressDefinitionParser.PROTOCOL;
     public static final String PROPERTIES = "properties";
     public static final String[] RESTRICTED_ENDPOINT_ATTRIBUTES =
-            new String[]{"synchronous", "remoteSync", "remoteSyncTimeout", "encoding",
+            new String[]{MuleConfiguration.SYNCHRONOUS_PROPERTY, AbstractEndpointBuilder.PROPERTY_REMOTE_SYNC,
+                    AbstractEndpointBuilder.PROPERTY_REMOTE_SYNC_TIMEOUT, "encoding",
                     "connector", "createConnector", "transformer", "responseTransformer"};
 
     // this is an example of parsing a single element with several parsers.  in this case

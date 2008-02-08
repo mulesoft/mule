@@ -28,6 +28,7 @@ import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.config.MuleConfiguration;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -38,7 +39,6 @@ import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapCombiner;
 import org.mule.util.ObjectNameHelper;
-import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,16 +53,12 @@ import java.util.Properties;
  * endpoint instance itself. <br/> The use of a builder allows i) Endpoints to be configured once and created
  * in a repeatable fashion (global endpoints), ii) Allow for much more extensibility in endpoint creation for
  * transport specific endpoints, streaming endpoints etc.<br/>
-
  */
 public abstract class AbstractEndpointBuilder implements EndpointBuilder
 {
- 
-    public static final int GET_OR_CREATE_CONNECTOR = 0;
-    public static final int ALWAYS_CREATE_CONNECTOR = 1;
 
-    public static final int NEVER_CREATE_CONNECTOR = 2;
-    public static final int USE_CONNECTOR = 3;
+    public static final String PROPERTY_REMOTE_SYNC = "remoteSync";
+    public static final String PROPERTY_REMOTE_SYNC_TIMEOUT = "remoteSyncTimeout";
 
     protected URIBuilder uriBuilder;
     protected Connector connector;
@@ -98,6 +94,11 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected void configureEndpoint(MuleEndpoint ep) throws InitialisationException, EndpointException
     {
+        // use an explicit value here to avoid caching
+        Map properties = getProperties();
+        // this sets values used below, if they appear as properties
+        setPropertiesFromProperties(properties);
+
         // protected String registryId = null; ??
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
@@ -106,9 +107,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         ep.setConnector(connector);
 
         // Do not inherit from connector
+        ep.setProperties(properties);
         ep.setSecurityFilter(getSecurityFilter());
         ep.setTransactionConfig(getTransactionConfig());
-        ep.setProperties(getProperties());
         ep.setName(getName(ep));
 
         // Can inherit from connector
@@ -130,6 +131,37 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             ep.setSynchronous(getSynchronous(connector, ep));
         }
         ep.setMuleContext(muleContext);
+    }
+
+    protected void setPropertiesFromProperties(Map properties)
+    {
+        synchronous = getBooleanProperty(properties, MuleConfiguration.SYNCHRONOUS_PROPERTY, synchronous);
+        remoteSync = getBooleanProperty(properties, PROPERTY_REMOTE_SYNC, remoteSync);
+        remoteSyncTimeout = getIntegerProperty(properties, PROPERTY_REMOTE_SYNC_TIMEOUT, remoteSyncTimeout);
+    }
+
+    public static Boolean getBooleanProperty(Map properties, String name, Boolean dflt)
+    {
+        if (properties.containsKey(name))
+        {
+            return Boolean.valueOf(Boolean.parseBoolean((String) properties.get(name)));
+        }
+        else
+        {
+            return dflt;
+        }
+    }
+
+    public static Integer getIntegerProperty(Map properties, String name, Integer dflt)
+    {
+        if (properties.containsKey(name))
+        {
+            return Integer.decode((String) properties.get(name));
+        }
+        else
+        {
+            return dflt;
+        }
     }
 
     protected ImmutableEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException
@@ -238,20 +270,11 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected boolean getRemoteSync(Connector connector)
     {
         return remoteSync != null ? remoteSync.booleanValue() : getDefaultRemoteSync(connector);
-
     }
 
     protected boolean getDefaultRemoteSync(Connector connector)
     {
-        // what is this for?!
-        if (connector == null || connector.isRemoteSyncEnabled())
-        {
-            return false;
-        }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     protected boolean getDeleteUnacceptedMessages(Connector connector)
@@ -645,26 +668,25 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     
     public int hashCode()
     {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((connectionStrategy == null) ? 0 : connectionStrategy.hashCode());
-        result = prime * result + ((connector == null) ? 0 : connector.hashCode());
-        result = prime * result + ((createConnector == null) ? 0 : createConnector.hashCode());
-        result = prime * result + ((deleteUnacceptedMessages == null) ? 0 : deleteUnacceptedMessages.hashCode());
-        result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
-        result = prime * result + ((uriBuilder == null) ? 0 : uriBuilder.getEndpoint().hashCode());
-        result = prime * result + ((filter == null) ? 0 : filter.hashCode());
-        result = prime * result + ((initialState == null) ? 0 : initialState.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((properties == null) ? 0 : properties.hashCode());
-        result = prime * result + ((remoteSync == null) ? 0 : remoteSync.hashCode());
-        result = prime * result + ((remoteSyncTimeout == null) ? 0 : remoteSyncTimeout.hashCode());
-        result = prime * result + ((responseTransformers == null) ? 0 : responseTransformers.hashCode());
-        result = prime * result + ((securityFilter == null) ? 0 : securityFilter.hashCode());
-        result = prime * result + ((synchronous == null) ? 0 : synchronous.hashCode());
-        result = prime * result + ((transactionConfig == null) ? 0 : transactionConfig.hashCode());
-        result = prime * result + ((transformers == null) ? 0 : transformers.hashCode());
-        return result;
+        return ClassUtils.hash(new Object[]{
+                connectionStrategy,
+                connector,
+                createConnector,
+                deleteUnacceptedMessages,
+                encoding,
+                uriBuilder,
+                filter,
+                initialState,
+                name,
+                properties,
+                remoteSync,
+                remoteSyncTimeout,
+                responseTransformers,
+                securityFilter,
+                synchronous,
+                transactionConfig,
+                transformers
+        });
     }
 
     public boolean equals(Object obj)

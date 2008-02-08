@@ -32,7 +32,6 @@ public interface EndpointURI extends Serializable, Initialisable
 
     String PROPERTY_ENDPOINT_NAME = "endpointName";
     String PROPERTY_ENDPOINT_URI = "address";
-    String PROPERTY_CREATE_CONNECTOR = "createConnector";
     String PROPERTY_CONNECTOR_NAME = "connector";
     String PROPERTY_TRANSFORMERS = "transformers";
     String PROPERTY_RESPONSE_TRANSFORMERS = "responseTransformers";

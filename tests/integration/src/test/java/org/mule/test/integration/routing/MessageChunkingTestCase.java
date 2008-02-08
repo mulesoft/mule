@@ -72,8 +72,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
             public void onNotification(ServerNotification notification)
             {
                 // Not strictly necessary to test for this as when we register the
-                // listener we
-                // supply the ComponentName as the subscription filter
+                // listener we supply the ComponentName as the subscription filter
                 assertEquals("ChunkingReceiver", notification.getResourceIdentifier());
                 // Test that we have received all chunks in the correct order
                 Object reply = ((FunctionalTestNotification)notification).getEventContext()
@@ -90,8 +89,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         }, "ChunkingReceiver");
 
         // Listen to Message Notifications on the Chunking receiver so we can
-        // determine how
-        // many message parts have been received
+        // determine how many message parts have been received
         muleContext.registerListener(new MessageNotificationListener()
         {
             public void onNotification(ServerNotification notification)
@@ -121,10 +119,9 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         muleContext.registerListener(new FunctionalTestNotificationListener()
         {
             public void onNotification(ServerNotification notification)
-            {
+            {                                                        
                 // Not strictly necessary to test for this as when we register the
-                // listener we
-                // supply the ComponentName as the subscription filter
+                // listener we supply the ComponentName as the subscription filter
                 assertEquals("ChunkingReceiver", notification.getResourceIdentifier());
                 // Test that we have received all chunks in the correct order
                 Object reply = ((FunctionalTestNotification)notification).getReplyMessage();
@@ -134,8 +131,7 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         }, "ChunkingReceiver");
 
         // Listen to Message Notifications on the Chunking receiver so we can
-        // determine how
-        // many message parts have been received
+        // determine how many message parts have been received
         muleContext.registerListener(new MessageNotificationListener()
         {
             public void onNotification(ServerNotification notification)

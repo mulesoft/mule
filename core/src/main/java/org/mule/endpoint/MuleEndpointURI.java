@@ -22,6 +22,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.ClassUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -235,7 +236,6 @@ public class MuleEndpointURI implements EndpointURI
         p.putAll(getParams());
         p.remove(PROPERTY_ENDPOINT_NAME);
         p.remove(PROPERTY_ENDPOINT_URI);
-        p.remove(PROPERTY_CREATE_CONNECTOR);
         p.remove(PROPERTY_TRANSFORMERS);
         return p;
     }
@@ -441,78 +441,32 @@ public class MuleEndpointURI implements EndpointURI
         {
             return false;
         }
-
-        final MuleEndpointURI muleEndpointURI = (MuleEndpointURI) o;
-
-        if (address != null ? !address.equals(muleEndpointURI.address) : muleEndpointURI.address != null)
-        {
-            return false;
-        }
-        if (connectorName != null
-                        ? !connectorName.equals(muleEndpointURI.connectorName)
-                        : muleEndpointURI.connectorName != null)
-        {
-            return false;
-        }
-        if (endpointName != null
-                        ? !endpointName.equals(muleEndpointURI.endpointName)
-                        : muleEndpointURI.endpointName != null)
-        {
-            return false;
-        }
-        if (filterAddress != null
-                        ? !filterAddress.equals(muleEndpointURI.filterAddress)
-                        : muleEndpointURI.filterAddress != null)
-        {
-            return false;
-        }
-        if (params != null ? !params.equals(muleEndpointURI.params) : muleEndpointURI.params != null)
-        {
-            return false;
-        }
-        if (resourceInfo != null
-                        ? !resourceInfo.equals(muleEndpointURI.resourceInfo)
-                        : muleEndpointURI.resourceInfo != null)
-        {
-            return false;
-        }
-        if (schemeMetaInfo != null
-                        ? !schemeMetaInfo.equals(muleEndpointURI.schemeMetaInfo)
-                        : muleEndpointURI.schemeMetaInfo != null)
-        {
-            return false;
-        }
-        if (transformers != null
-                        ? !transformers.equals(muleEndpointURI.transformers)
-                        : muleEndpointURI.transformers != null)
-        {
-            return false;
-        }
-        if (responseTransformers != null
-                        ? !responseTransformers.equals(muleEndpointURI.responseTransformers)
-                        : muleEndpointURI.responseTransformers != null)
-        {
-            return false;
-        }
-        if (uri != null ? !uri.equals(muleEndpointURI.uri) : muleEndpointURI.uri != null)
-        {
-            return false;
-        }
-
-        return true;
+        MuleEndpointURI muleEndpointURI = (MuleEndpointURI) o;
+        return ClassUtils.equal(address, muleEndpointURI.address) &&
+                ClassUtils.equal(connectorName, muleEndpointURI.connectorName) &&
+                ClassUtils.equal(endpointName, muleEndpointURI.endpointName) &&
+                ClassUtils.equal(filterAddress, muleEndpointURI.filterAddress) &&
+                ClassUtils.equal(params, muleEndpointURI.params) &&
+                ClassUtils.equal(resourceInfo, muleEndpointURI.resourceInfo) &&
+                ClassUtils.equal(schemeMetaInfo, muleEndpointURI.schemeMetaInfo) &&
+                ClassUtils.equal(transformers, muleEndpointURI.transformers) &&
+                ClassUtils.equal(responseTransformers, muleEndpointURI.responseTransformers) &&
+                ClassUtils.equal(uri, muleEndpointURI.uri);
     }
 
     public int hashCode()
     {
-        int result = (address != null ? address.hashCode() : 0);
-        result = 29 * result + (filterAddress != null ? filterAddress.hashCode() : 0);
-        result = 29 * result + (endpointName != null ? endpointName.hashCode() : 0);
-        result = 29 * result + (connectorName != null ? connectorName.hashCode() : 0);
-        result = 29 * result + (transformers != null ? transformers.hashCode() : 0);
-        result = 29 * result + (responseTransformers != null ? responseTransformers.hashCode() : 0);
-        result = 29 * result + (params != null ? params.hashCode() : 0);
-        result = 29 * result + (uri != null ? uri.hashCode() : 0);
-        result = 29 * result + (schemeMetaInfo != null ? schemeMetaInfo.hashCode() : 0);
-        return 29 * result + (resourceInfo != null ? resourceInfo.hashCode() : 0);
+        return ClassUtils.hash(new Object[]{
+                address,
+                filterAddress,
+                endpointName,
+                connectorName,
+                transformers,
+                responseTransformers,
+                params,
+                uri,
+                schemeMetaInfo,
+                resourceInfo
+        });
     }
 }

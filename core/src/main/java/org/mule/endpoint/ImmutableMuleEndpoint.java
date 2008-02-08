@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,12 +69,12 @@ public abstract class ImmutableMuleEndpoint implements ImmutableEndpoint
     /**
      * The transformers used to transform the incoming or outgoing data
      */
-    protected AtomicReference transformers = new AtomicReference(TransformerUtils.UNDEFINED);
+    protected AtomicReference transformers = new AtomicReference(new LinkedList());
 
     /**
      * The transformers used to transform the incoming or outgoing data
      */
-    protected AtomicReference responseTransformers = new AtomicReference(TransformerUtils.UNDEFINED);
+    protected AtomicReference responseTransformers = new AtomicReference(new LinkedList());
 
     /**
      * The name for the endpoint
@@ -280,19 +281,9 @@ public abstract class ImmutableMuleEndpoint implements ImmutableEndpoint
 
     public int hashCode()
     {
-        int result = appendHash(0, connector);
-        result = appendHash(result, endpointUri);
         // MULE-1551 - transformer excluded from hash here
-        result = appendHash(result, name);
-        result = appendHash(result, Boolean.valueOf(isInbound()));
-        result = appendHash(result, Boolean.valueOf(isOutbound()));
-        return result;
-    }
-
-    private int appendHash(int hash, Object component)
-    {
-        int delta = component != null ? component.hashCode() : 0;
-        return 29 * hash + delta;
+        return ClassUtils.hash(new Object[]{connector, endpointUri, name,
+                Boolean.valueOf(isInbound()), Boolean.valueOf(isOutbound())});
     }
 
     public Filter getFilter()
@@ -303,14 +294,6 @@ public abstract class ImmutableMuleEndpoint implements ImmutableEndpoint
     public boolean isDeleteUnacceptedMessages()
     {
         return deleteUnacceptedMessages;
-    }
-
-    protected void setTransformersIfUndefined(AtomicReference reference, List transformers)
-    {
-        TransformerUtils.discourageNullTransformers(transformers);
-        if(transformers.size()==0) transformers = TransformerUtils.UNDEFINED;
-        reference.compareAndSet(TransformerUtils.UNDEFINED, transformers);
-        updateTransformerEndpoints(reference);
     }
 
     // TODO - remove (or fix)

@@ -398,7 +398,7 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
         // endpoint
         serviceEndpointbuilder.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
 
-        // TODO Do we really need to modify the existing receiver endpoint? What happnes if we don't security,
+        // TODO Do we really need to modify the existing receiver endpoint? What happens if we don't security,
         // filters and transformers will get invoked twice?
         EndpointBuilder receiverEndpointBuilder = new EndpointURIEndpointBuilder(receiver.getEndpoint(),
             muleContext);

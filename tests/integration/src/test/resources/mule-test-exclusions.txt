@@ -61,7 +61,7 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 
 # MULE-2740
-org.mule.test.integration.MuleEndpointConfigurationTestCase
+#org.mule.test.integration.MuleEndpointConfigurationTestCase
 
 ##########################################################################
 # Mule 2.x-specific failures
