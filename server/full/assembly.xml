@@ -12,12 +12,6 @@ Assembly descriptor for the full Mule distribution.
     <fileSet>
       <directory>../src/main/resources</directory>
       <outputDirectory></outputDirectory>
-      <excludes>
-          <!-- A separate assembly-osgi.xml is used for OSGi -->
-          <exclude>**/osgi/**</exclude>
-          <!-- also exclude the Knopflerfish config files -->
-          <exclude>**/*.xargs</exclude>
-      </excludes>
     </fileSet>
 
     <!-- Make binary directories executable. -->
@@ -344,11 +338,12 @@ Assembly descriptor for the full Mule distribution.
     <dependencySet>
       <outputDirectory>lib/boot</outputDirectory>
       <!-- No version number  -->
-<!--       <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping> -->
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <includes>
         <include>org.mule.modules:mule-module-boot</include>
         <include>commons-cli:commons-cli</include>
         <include>tanukisoft:wrapper</include>
+        <include>org.knopflerfish:framework</include>
       </includes>
       <!-- no XML -->
       <excludes>
@@ -362,11 +357,8 @@ Assembly descriptor for the full Mule distribution.
     <!-- Mule libraries -->
     <dependencySet>
       <outputDirectory>lib/mule</outputDirectory>
-      <!--
-        Uncomment if you encounter startup failures as described in
-        http://mule.mulesource.org/jira/browse/MULE-1153
-      -->
-      <!-- outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping -->
+      <!-- No version number  -->
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <scope>runtime</scope>
       <includes>
         <!-- Core -->
@@ -421,95 +413,6 @@ Assembly descriptor for the full Mule distribution.
       </excludes>
     </dependencySet>
 
-    <!-- Non-Mule libraries -->
-    <dependencySet>
-      <outputDirectory>lib/opt</outputDirectory>
-      <scope>runtime</scope>
-      <excludes>
-        <!-- Core -->
-        <exclude>org.mule:mule-core</exclude>
-        <!-- Transports -->
-        <exclude>org.mule.transports:mule-transports-all</exclude>
-        <exclude>org.mule.transports:mule-transport-axis</exclude>
-        <exclude>org.mule.transports:mule-transport-bpm</exclude>
-        <exclude>org.mule.transports:mule-transport-cxf</exclude>
-        <exclude>org.mule.transports:mule-transport-ejb</exclude>
-        <exclude>org.mule.transports:mule-transport-email</exclude>
-        <exclude>org.mule.transports:mule-transport-file</exclude>
-        <exclude>org.mule.transports:mule-transport-ftp</exclude>
-        <exclude>org.mule.transports:mule-transport-http</exclude>
-        <exclude>org.mule.transports:mule-transport-jbpm</exclude>
-        <exclude>org.mule.transports:mule-transport-jdbc</exclude>
-        <exclude>org.mule.transports:mule-transport-jms</exclude>
-        <exclude>org.mule.transports:mule-transport-multicast</exclude>
-        <exclude>org.mule.transports:mule-transport-quartz</exclude>
-        <exclude>org.mule.transports:mule-transport-rmi</exclude>
-        <exclude>org.mule.transports:mule-transport-soap</exclude>
-        <exclude>org.mule.transports:mule-transport-ssl</exclude>
-        <exclude>org.mule.transports:mule-transport-stdio</exclude>
-        <exclude>org.mule.transports:mule-transport-tcp</exclude>
-        <exclude>org.mule.transports:mule-transport-udp</exclude>
-        <exclude>org.mule.transports:mule-transport-vm</exclude>
-        <exclude>org.mule.transports:mule-transport-xfire</exclude>
-        <exclude>org.mule.transports:mule-transport-xmpp</exclude>
-        <!-- Modules -->
-        <exclude>org.mule.modules:mule-modules-all</exclude>
-        <exclude>org.mule.modules:mule-module-boot</exclude>
-        <exclude>org.mule.modules:mule-module-builders</exclude>
-        <exclude>org.mule.modules:mule-module-acegi</exclude>
-        <exclude>org.mule.modules:mule-module-client</exclude>
-        <exclude>org.mule.modules:mule-module-jaas</exclude>
-        <exclude>org.mule.modules:mule-module-jbossts</exclude>
-        <exclude>org.mule.modules:mule-module-jca</exclude>
-        <exclude>org.mule.modules:mule-module-management</exclude>
-        <exclude>org.mule.modules:mule-module-ognl</exclude>
-        <exclude>org.mule.modules:mule-module-pgp</exclude>
-        <exclude>org.mule.modules:mule-module-scripting</exclude>
-        <exclude>org.mule.modules:mule-module-spring</exclude>
-        <!-- include>org.mule.modules:mule-module-wssecurity</include -->
-        <exclude>org.mule.modules:mule-module-xml</exclude>
-        <!-- Examples -->
-        <exclude>org.mule.examples:mule-examples-all</exclude>
-        <exclude>org.mule.examples:mule-example-echo</exclude>
-        <exclude>org.mule.examples:mule-example-errorhandler</exclude>
-        <exclude>org.mule.examples:mule-example-hello</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-common</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-esn</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-bpm</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
-        <exclude>org.mule.examples:mule-example-scripting</exclude>
-        <exclude>org.mule.examples:mule-example-stockquote</exclude>
-        <!-- Workaround, see comment for "<packaging>jar</packaging>" in the pom.xml -->
-        <exclude>org.mule.distributions:mule-full</exclude>
-        <!-- TODO The following exclusions shouldn't be necessary here if they are kept 
-        out in their originating POMs, need to do some transitive dependency debugging
-        to figure out who is dragging them into the distro. -->
-        <exclude>org.mule.tests:mule-tests-functional</exclude>
-        <exclude>javax.activation:activation</exclude>
-        <exclude>javax.mail:mail</exclude>
-        <exclude>commons-logging:commons-logging</exclude>
-        <!-- these two are already in lib/boot -->
-        <exclude>commons-cli:commons-cli</exclude>
-        <exclude>tanukisoft:wrapper</exclude>
-
-        <exclude>org.apache.activemq:activemq-core</exclude>
-        <exclude>org.apache.activemq:activeio-core</exclude>
-
-        <!-- this lib is provided separately in 'profiler' distribution -->
-        <exclude>com.yourkit:yjp-controller-api-redist</exclude>
-
-        <!-- Tools -->
-        <exclude>org.mule.tools:mule-tools-visualizer</exclude>
-
-        <!-- no XML -->
-        <exclude>xml-apis:xml-apis</exclude>
-        <exclude>xerces:xercesImpl</exclude>
-        <exclude>xerces:xml-serializer</exclude>
-        <exclude>xalan:xalan</exclude>
-      </excludes>
-    </dependencySet>
-
     <!-- Mule examples -->
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
@@ -539,6 +442,8 @@ Assembly descriptor for the full Mule distribution.
 
     <dependencySet>
       <outputDirectory>lib/user</outputDirectory>
+      <!-- No version number  -->
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
       <scope>test</scope>
       <includes>
         <include>org.mule.tests:mule-tests-core</include>
