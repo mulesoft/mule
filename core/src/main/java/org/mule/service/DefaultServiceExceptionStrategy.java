@@ -113,10 +113,7 @@ public class DefaultServiceExceptionStrategy extends DefaultExceptionStrategy
         this.service = service;
         if (service instanceof AbstractService)
         {
-            if (statistics != null)
-            {
-                this.statistics = ((AbstractService) service).getStatistics();
-            }
+            this.statistics = ((AbstractService)service).getStatistics();
         }
     }
 }
