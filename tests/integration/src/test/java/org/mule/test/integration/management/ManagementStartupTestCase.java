@@ -25,8 +25,7 @@ public class ManagementStartupTestCase extends FunctionalTestCase
     public void testAgentConfiguration() throws MuleException
     {
         JmxAgent agent = (JmxAgent)muleContext.getRegistry().lookupAgent("jmxAgent");
-         assertNotNull(agent);
-        //TODO RM* Add this back in. Currently failing because of a JMX issue where the AllStatistics MBean is registered twice
+        assertNotNull(agent);
         assertNotNull(agent.getConnectorServerUrl());
         assertEquals("service:jmx:rmi:///jndi/rmi://localhost:1100/server", agent.getConnectorServerUrl());
         assertNotNull(agent.getConnectorServerProperties());
