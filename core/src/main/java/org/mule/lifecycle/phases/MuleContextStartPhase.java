@@ -49,7 +49,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Model.class, ManagerNotification.class,
-                ManagerNotification.MANAGER_STARTING_MODELS,ManagerNotification.MANAGER_STARTED_MODELS));
+                ManagerNotification.MANAGER_STARTING_MODELS, ManagerNotification.MANAGER_STARTED_MODELS));
         startOrderedObjects.add(new NotificationLifecycleObject(Service.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 

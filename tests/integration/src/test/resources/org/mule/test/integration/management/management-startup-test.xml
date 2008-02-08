@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:util="http://www.springframework.org/schema/util"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
+      xmlns:mgmt="http://www.mulesource.org/schema/mule/management/2.0"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
+       http://www.mulesource.org/schema/mule/management/2.0 http://www.mulesource.org/schema/mule/management/2.0/mule-management.xsd">
+
+    <!-- this seems to duplicate the agent below
+         (afaict it was not in original config - suspect it was added by andrew p while trying to work round previous problem
+         see http://fisheye.codehaus.org/browse/mule/branches/mule-2.x/tests/functional/src/test/resources/org/mule/test/spring/test-xml-mule2-config.xml?r1=7725&r2=7727) -->
+    <!-- <mgmt:jmx-default-config name="jmxConfig"/> -->
+    <mgmt:rmi-server name="rmiAgent"/>
+    <mgmt:jmx-server name="jmxAgent">
+        <mgmt:connector-server url="service:jmx:rmi:///jndi/rmi://localhost:1099/server" rebind="true"/>
+    </mgmt:jmx-server>
+
+    <mgmt:chainsaw-notifications chainsawHost="localhost" chainsawPort="20202" name="chainsaw">
+        <mgmt:level-mapping eventId="ModelNotification.stop" severity="WARN"/> 
+    </mgmt:chainsaw-notifications>
+
+</mule>
+        

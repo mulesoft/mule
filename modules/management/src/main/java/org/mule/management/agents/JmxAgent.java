@@ -71,8 +71,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>JmxAgent</code> registers MUle Jmx management beans with an MBean
- * server.
+ * <code>JmxAgent</code> registers Mule Jmx management beans with an MBean server.
  */
 public class JmxAgent extends AbstractAgent
 {

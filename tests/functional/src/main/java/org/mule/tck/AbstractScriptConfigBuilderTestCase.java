@@ -311,7 +311,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(ep.isInbound());
     }
 
-    /* excluded - dep on management
+    /* moved to ManagementStartupTestCase in integration
 
     public void _testAgentConfiguration() throws MuleException
     {
