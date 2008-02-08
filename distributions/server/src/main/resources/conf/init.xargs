@@ -41,9 +41,10 @@
 -install boot/osgi/logcommands/logcommands-2.0.0.jar
 -install boot/osgi/cm_cmd/cm_cmd-2.0.0.jar
 -install boot/osgi/consoletty/consoletty-2.0.0.jar
--install boot/osgi/consoletelnet/consoletelnet-2.0.0.jar
+-install boot/osgi/consoletelnet/consoletelnet-2.0.1.jar
 
 -initlevel 6
+-install boot/osgi/remotefw/remotefw_api-2.0.0.jar
 -install boot/osgi/desktop/desktop_all-2.0.0.jar
 
 -initlevel 7
@@ -60,7 +61,7 @@
 -start boot/osgi/useradmin/useradmin_all-2.0.0.jar
 -start boot/osgi/bundlerepository/bundlerepository_all-2.0.0.jar
 -start boot/osgi/consoletty/consoletty-2.0.0.jar
--start boot/osgi/consoletelnet/consoletelnet-2.0.0.jar
+-start boot/osgi/consoletelnet/consoletelnet-2.0.1.jar
 -start boot/osgi/frameworkcommands/frameworkcommands-2.0.0.jar
 -start boot/osgi/logcommands/logcommands-2.0.0.jar
 -start boot/osgi/cm_cmd/cm_cmd-2.0.0.jar
@@ -73,53 +74,53 @@
 # Common Java libraries
 #############################################################
 -initlevel 8
--istart mule/mule-module-util.jar
+#-istart mule/mule-module-util.jar
 
 #############################################################
 # PAX Logging - supports log4j, commons-logging, and slf4j APIs
 #############################################################
--istart opt/api-jdk14.jar
--istart opt/service-jdk14.jar
--istart opt/log4j-jdk14.jar
--istart opt/jcl-jdk14.jar
--istart opt/slf4j-jdk14.jar
+#-istart opt/api-jdk14.jar
+#-istart opt/service-jdk14.jar
+#-istart opt/log4j-jdk14.jar
+#-istart opt/jcl-jdk14.jar
+#-istart opt/slf4j-jdk14.jar
 
 #############################################################
 # Spring 
 #############################################################
 -initlevel 9
 # Spring Dependencies
--istart opt/aopalliance.osgi.jar
--istart opt/asm.osgi.jar
--istart opt/aspectjrt.osgi.jar
+#-istart opt/aopalliance.osgi.jar
+#-istart opt/asm.osgi.jar
+#-istart opt/aspectjrt.osgi.jar
 # -istart opt/cglib-nodep.osgi.jar
 # -istart opt/commons-attributes.osgi.jar
 # Spring
--istart opt/spring-core.jar
--istart opt/spring-aop.jar
--istart opt/spring-context.jar
--istart opt/spring-beans.jar
--istart opt/spring-jmx.jar
+#-istart opt/spring-core.jar
+#-istart opt/spring-aop.jar
+#-istart opt/spring-context.jar
+#-istart opt/spring-beans.jar
+#-istart opt/spring-jmx.jar
 # Spring OSGi
--istart opt/spring-osgi-core-mule.jar
--istart opt/spring-osgi-extender-mule.jar
--istart opt/spring-osgi-io.jar
+#-istart opt/spring-osgi-core-mule.jar
+#-istart opt/spring-osgi-extender-mule.jar
+#-istart opt/spring-osgi-io.jar
 
 #############################################################
 # Mule
 #############################################################
 -initlevel 10
 # Core
--istart mule/mule-core.jar
--istart mule/mule-module-osgi.jar
+#-istart mule/mule-core.jar
+#-istart mule/mule-module-osgi.jar
 # Transports
--istart mule/mule-transport-file.jar
--istart mule/mule-transport-tcp.jar
--istart mule/mule-transport-http.jar
+#-istart mule/mule-transport-file.jar
+#-istart mule/mule-transport-tcp.jar
+#-istart mule/mule-transport-http.jar
 	      
 #############################################################
 # User Application
 #############################################################
 -initlevel 11
 # Install but don't start the examples
--install user/mule-example-hello-osgi.jar
+#-install user/mule-example-hello-osgi.jar

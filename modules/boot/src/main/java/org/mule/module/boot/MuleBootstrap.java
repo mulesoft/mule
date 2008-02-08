@@ -21,7 +21,6 @@ import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
 import org.tanukisoftware.wrapper.WrapperSimpleApp;
 
@@ -36,9 +35,6 @@ import org.tanukisoftware.wrapper.WrapperSimpleApp;
 public class MuleBootstrap
 {
     private static final String MULE_MODULE_BOOT_POM_FILE_PATH = "META-INF/maven/org.mule.module/mule-module-boot/pom.properties";
-
-    public static final String MAIN_CLASS_MULE_SERVER = "org.mule.module.boot.MuleServerWrapper";
-    public static final String MAIN_CLASS_OSGI_FRAMEWORK = "org.mule.module.osgi.OsgiFrameworkWrapper";
 
     public static final String CLI_OPTIONS[][] = {
             {"main", "true", "Main Class"},
@@ -64,13 +60,13 @@ public class MuleBootstrap
         {
             boolean startGui = !commandLine.hasOption("nogui");
             System.out.println("Starting the OSGi Framework...");
-            WrapperManager.start(new OsgiFrameworkWrapper(startGui), remainingArgs);
+            WrapperManager.start(new KnopflerfishFrameworkWrapper(startGui), remainingArgs);
         }
-        else if (mainClassName == null || mainClassName.equals(MAIN_CLASS_MULE_SERVER))
+        else if (mainClassName == null || mainClassName.equals(MuleServerWrapper.class.getName()))
         {
             prepareBootstrapPhase();
             System.out.println("Starting the Mule Server...");
-            WrapperManager.start((WrapperListener) Class.forName(MAIN_CLASS_MULE_SERVER).newInstance(), remainingArgs);
+            WrapperManager.start(new MuleServerWrapper(), remainingArgs);
         }
         else
         {

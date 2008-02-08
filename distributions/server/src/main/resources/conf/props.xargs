@@ -25,14 +25,19 @@
 -Dorg.knopflerfish.framework.debug.classloader=false
 -Dorg.knopflerfish.framework.debug.startlevel=false
 -Dorg.knopflerfish.framework.debug.ldap=false
+-Dorg.knopflerfish.framework.debug.service_reference=false
+-Dorg.knopflerfish.framework.debug.bundle_resource=false
 
 # Comma-separated list of packges exported by system classloader
--Dorg.osgi.framework.system.packages=
-#-Dorg.osgi.framework.system.packages=com.ccg.net.ethernet,com.sun.*,javax.crypto.*,javax.naming.*,javax.net.*,javax.security.*,javax.xml.namespace,javax.xml.transform,org.xml.sax,sun.*
+-Dorg.osgi.framework.system.packages=javax.accessibility,javax.net,\
+        javax.net.ssl,javax.swing,javax.swing.border,javax.swing.event,\
+        javax.swing.filechooser,javax.swing.plaf,javax.swing.plaf.basic,\
+        javax.swing.plaf.metal,javax.swing.table,javax.swing.text,\
+        javax.swing.tree
 
 # Comma-separated list of packages that may be loaded by system classloader
 -Dorg.osgi.framework.bootdelegation=*
-#-Dorg.osgi.framework.bootdelegation=com.ccg.net.ethernet,com.sun.*,javax.crypto.*,javax.naming.*,javax.net.*,javax.security.*,javax.xml.namespace,javax.xml.transform,org.xml.sax,sun.*
+#-Dorg.osgi.framework.bootdelegation=sun.*,com.sun.*
 
 # Web server properties
 -Dorg.knopflerfish.http.dnslookup=false
