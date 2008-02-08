@@ -28,7 +28,7 @@ public class ManagementStartupTestCase extends FunctionalTestCase
          assertNotNull(agent);
         //TODO RM* Add this back in. Currently failing because of a JMX issue where the AllStatistics MBean is registered twice
         assertNotNull(agent.getConnectorServerUrl());
-        assertEquals("service:jmx:rmi:///jndi/rmi://localhost:1099/server", agent.getConnectorServerUrl());
+        assertEquals("service:jmx:rmi:///jndi/rmi://localhost:1100/server", agent.getConnectorServerUrl());
         assertNotNull(agent.getConnectorServerProperties());
         assertEquals("true", agent.getConnectorServerProperties().get("jmx.remote.jndi.rebind"));
     }
