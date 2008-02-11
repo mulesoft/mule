@@ -96,7 +96,7 @@ mx4j-impl-2.1.1
 mx4j-remote-2.1.1
 mx4j-tools-2.1.1
 neethi-2.0
-ognl-2.7.1
+ognl-2.7.2
 org.mortbay.jetty-5.1.12
 oro-2.0.7
 quartz-all-1.6.0
