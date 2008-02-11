@@ -117,5 +117,5 @@ org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 # How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?
 org.mule.test.integration.persistence.FilePersistenceTestCase
 
-# Pending - message requested not generated
-#org.mule.context.notification.MessageNotificationTestCase;
+# MULE-2105
+org.mule.test.integration.management.ManagementStartupTestCase

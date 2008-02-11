@@ -617,4 +617,5 @@ public class JmxAgent extends AbstractAgent
             this.credentials.putAll(newCredentials);
         }
     }
+    
 }

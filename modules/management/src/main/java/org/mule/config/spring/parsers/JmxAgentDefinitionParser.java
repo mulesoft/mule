@@ -21,9 +21,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/**
- * TODO
- */
 public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
     public static final String CONNECTOR_SERVER = "connector-server";
@@ -34,11 +31,13 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
         addAlias("server", "mBeanServer");
     }
 
-    protected Class getBeanClass(Element element) {
+    protected Class getBeanClass(Element element)
+    {
         return JmxAgent.class;
     }
 
-    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
+    protected void postProcess(ParserContext context, BeanAssembler assembler, Element element)
+    {
         NodeList childNodes = element.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node node = childNodes.item(i);
@@ -54,4 +53,5 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
         }
         super.postProcess(context, assembler, element);
     }
+
 }
