@@ -50,7 +50,7 @@ def base = "http://www.mulesource.org/schema/mule/"
 
 // the structure of xsd locations
 def corexsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule\.xsd/
-def servicexsd = /.*(\/|\\)core(\/|\\).*(\/|\\)mule-(.*)\.xsd/
+def servicexsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 def testxsd = /.*(\/|\\)tests(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-test\.xsd/
 def otherxsd = /.*(\/|\\)(transports|modules)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 
