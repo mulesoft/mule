@@ -118,4 +118,4 @@ org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 org.mule.test.integration.persistence.FilePersistenceTestCase
 
 # MULE-2105
-org.mule.test.integration.management.ManagementStartupTestCase
+#org.mule.test.integration.management.ManagementStartupTestCase

@@ -27,7 +27,7 @@ public class ManagementStartupTestCase extends FunctionalTestCase
         JmxAgent agent = (JmxAgent)muleContext.getRegistry().lookupAgent("jmxAgent");
         assertNotNull(agent);
         assertNotNull(agent.getConnectorServerUrl());
-        assertEquals("service:jmx:rmi:///jndi/rmi://localhost:1100/server", agent.getConnectorServerUrl());
+        assertEquals("service:jmx:rmi:///jndi/rmi://0.0.0.0:1100/server", agent.getConnectorServerUrl());
         assertNotNull(agent.getConnectorServerProperties());
         assertEquals("true", agent.getConnectorServerProperties().get("jmx.remote.jndi.rebind"));
     }
