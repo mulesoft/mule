@@ -144,7 +144,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         if (properties.containsKey(name))
         {
-            return Boolean.valueOf(Boolean.parseBoolean((String) properties.get(name)));
+            return Boolean.valueOf((String) properties.get(name));
         }
         else
         {
