@@ -72,12 +72,14 @@
                 <artifactId>mule-assembly-verifier</artifactId>
                 <!-- version is managed in the pluginManagement of the toplevel pom -->
                 <executions>
+                    <!-- Disable for now since this will completely change for OSGi.
                     <execution>
                         <phase>verify</phase>
                         <goals>
                             <goal>verify</goal>
                         </goals>
                     </execution>
+                    -->
                 </executions>
                 <configuration>
                     <projectOutputFile>mule-${version}.zip</projectOutputFile>
