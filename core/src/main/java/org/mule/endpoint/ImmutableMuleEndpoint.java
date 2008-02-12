@@ -256,27 +256,27 @@ public abstract class ImmutableMuleEndpoint implements ImmutableEndpoint
             return false;
         }
 
-        final ImmutableMuleEndpoint immutableMuleProviderDescriptor = (ImmutableMuleEndpoint) o;
+        final ImmutableMuleEndpoint other = (ImmutableMuleEndpoint) o;
 
-        if (!connector.getName().equals(immutableMuleProviderDescriptor.connector.getName()))
+        if (!connector.getName().equals(other.connector.getName()))
         {
             return false;
         }
-        if (endpointUri != null && immutableMuleProviderDescriptor.endpointUri != null
-                                                                                      ? !endpointUri.getAddress()
-                                                                                          .equals(
-                                                                                              immutableMuleProviderDescriptor.endpointUri.getAddress())
-                                                                                      : immutableMuleProviderDescriptor.endpointUri != null)
+
+        if (endpointUri != null && other.endpointUri != null
+                        ? !endpointUri.getAddress().equals(other.endpointUri.getAddress())
+                        : other.endpointUri != null)
         {
             return false;
         }
-        if (!name.equals(immutableMuleProviderDescriptor.name))
+
+        if (!name.equals(other.name))
         {
             return false;
         }
+
         // MULE-1551 - transformer excluded from comparison here
-        return isInbound() == immutableMuleProviderDescriptor.isInbound() &&
-                isOutbound() == immutableMuleProviderDescriptor.isOutbound();
+        return isInbound() == other.isInbound() && isOutbound() == other.isOutbound();
     }
 
     public int hashCode()
