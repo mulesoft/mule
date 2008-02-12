@@ -67,7 +67,19 @@ public class NestedInvocationHandler implements InvocationHandler
             return toString();
         }
 
-        MuleMessage message = new DefaultMuleMessage(args);
+        MuleMessage message;
+
+        if (args.length == 1)
+        {
+            message = new DefaultMuleMessage(args[0]);
+        }
+        else
+        {
+            message = new DefaultMuleMessage(args);
+        }
+        
+        
+
         NestedRouter router = (NestedRouter) routers.get(method.getName());
         if (router == null)
         {

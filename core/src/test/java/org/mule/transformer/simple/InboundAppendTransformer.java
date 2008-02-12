@@ -8,16 +8,18 @@
  * LICENSE.txt file.
  */
 
-package org.mule.issues;
+package org.mule.transformer.simple;
 
 import org.mule.transformer.simple.StringAppendTransformer;
 
-public class OutboundAppendTransformer extends StringAppendTransformer
+public class InboundAppendTransformer  extends StringAppendTransformer
 {
 
-    public OutboundAppendTransformer()
+    public InboundAppendTransformer()
     {
-        super(" outbound");
+        super(" inbound");
     }
 
 }
+
+

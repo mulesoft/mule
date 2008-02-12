@@ -10,8 +10,8 @@
 
     <vm:connector name="default">
         <service-overrides
-                inboundTransformer="org.mule.issues.InboundAppendTransformer"
-                outboundTransformer="org.mule.issues.OutboundAppendTransformer"/>
+                inboundTransformer="org.mule.transformer.simple.InboundAppendTransformer"
+                outboundTransformer="org.mule.transformer.simple.OutboundAppendTransformer"/>
     </vm:connector>
 
     <vm:connector name="queue" queueEvents="true"/>

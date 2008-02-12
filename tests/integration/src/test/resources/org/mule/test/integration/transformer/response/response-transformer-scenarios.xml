@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:jms="http://www.mulesource.org/schema/mule/jms/2.0"
+    xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.0"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
+       http://www.mulesource.org/schema/mule/jms/2.0 http://www.mulesource.org/schema/mule/jms/2.0/mule-jms.xsd
+              http://www.mulesource.org/schema/mule/vm/2.0 http://www.mulesource.org/schema/mule/vm/2.0/mule-vm.xsd">
+
+    <jms:activemq-connector name="jmsConnector" />
+
+    <vm:connector name="default">
+        <service-overrides inboundTransformer="org.mule.transformer.simple.InboundAppendTransformer"
+            outboundTransformer="org.mule.transformer.simple.OutboundAppendTransformer"
+            responseTransformer="org.mule.transformer.simple.ResponseAppendTransformer" />
+    </vm:connector>
+
+    <custom-transformer name="customResponse" class="org.mule.transformer.simple.StringAppendTransformer">
+        <spring:property name="message" value=" customResponse" />
+    </custom-transformer>
+
+    <custom-transformer class="org.mule.tck.functional.StringAppendTestTransformer" name="StringAppendTestTransformer" />
+
+    <model name="model">
+
+        <service name="XFireSync">
+            <inbound>
+                <inbound-endpoint address="xfire:http://localhost:4444/services" synchronous="true"
+                    responseTransformer-refs="customResponse" />
+            </inbound>
+            <echo-component />
+        </service>
+
+        <service name="AxisSync">
+            <inbound>
+                <inbound-endpoint address="axis:http://localhost:4445/services/AxisSync" synchronous="true"
+                    responseTransformer-refs="customResponse" />
+            </inbound>
+            <echo-component />
+        </service>
+
+        <service name="VmSync">
+            <inbound>
+                <inbound-endpoint address="vm://sync" synchronous="true" />
+            </inbound>
+            <echo-component />
+        </service>
+
+        <service name="VmSyncResponseTransformer">
+            <inbound>
+                <inbound-endpoint address="vm://syncResponseTransformer" synchronous="true"
+                    responseTransformer-refs="customResponse" />
+            </inbound>
+            <echo-component />
+        </service>
+
+        <service name="HttpSync">
+            <inbound>
+                <inbound-endpoint address="http://localhost:4446" synchronous="true" />
+            </inbound>
+            <echo-component />
+        </service>
+
+        <service name="HttpSyncResponseTransformer">
+            <inbound>
+                <inbound-endpoint address="http://localhost:4447" synchronous="true"
+                    responseTransformer-refs="customResponse" />
+            </inbound>
+            <echo-component />
+        </service>
+
+        <service name="JMSSync">
+            <inbound>
+                <inbound-endpoint address="jms://sync" synchronous="true" responseTransformer-refs="customResponse" />
+            </inbound>
+            <echo-component />
+        </service>
+
+        <service name="VmSyncOutboundEndpointResponseTransformer">
+            <inbound>
+                <inbound-endpoint address="vm://syncOutboundEndpointResponseTransformer" synchronous="true" />
+            </inbound>
+            <echo-component />
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" synchronous="true" />
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="JmsSync">
+            <inbound>
+                <inbound-endpoint address="vm://jmsSync" synchronous="true" />
+            </inbound>
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="jms://echo" />
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="JmsSyncOutboundEndpointResponseTransformer">
+            <inbound>
+                <inbound-endpoint address="vm://jmsSyncOutboundEndpointResponseTransformer" synchronous="true" />
+            </inbound>
+            <outbound>
+                <outbound-pass-through-router>
+                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" />
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="JmsRemoteSyncOutboundEndpointResponseTransformer">
+            <inbound>
+                <inbound-endpoint address="vm://jmsRemoteSyncOutboundEndpointResponseTransformer" remoteSync="true" />
+            </inbound>
+            <outbound>
+                <outbound-pass-through-router>
+                    <!-- remoteSync shouldn't need to be set on outbound endpoint is it is set on inbound endpoint -->
+                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" remoteSync="true" />
+                </outbound-pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="ChainedRouterOutboundEndpointResponseTransformer">
+            <inbound>
+                <inbound-endpoint address="vm://chainedRouterOutboundEndpointResponseTransformer" synchronous="true" />
+            </inbound>
+            <outbound>
+                <chaining-router>
+                    <outbound-endpoint address="vm://echo" />
+                    <outbound-endpoint address="jms://echo" />
+                    <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" />
+                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" />
+                </chaining-router>
+            </outbound>
+        </service>
+
+        <service name="NestedRouterOutboundEndpointResponseTransformer">
+            <inbound>
+                <inbound-endpoint address="vm://nestedRouterOutboundEndpointResponseTransformer" synchronous="true" />
+            </inbound>
+            <component>
+                <singleton-object class="org.mule.test.integration.transformer.response.NestedRouterComponent" />
+                <binding interface="org.mule.test.integration.transformer.response.BindingInterface" method="hello1">
+                    <outbound-endpoint address="vm://echo" responseTransformer-refs="customResponse" remoteSync="true" />
+                </binding>
+                <binding interface="org.mule.test.integration.transformer.response.BindingInterface" method="hello2">
+                    <outbound-endpoint address="jms://echo" responseTransformer-refs="customResponse" remoteSync="true" />
+                </binding>
+            </component>
+        </service>
+
+        <service name="VmEchoService">
+            <inbound>
+                <inbound-endpoint address="vm://echo" />
+            </inbound>
+            <echo-component />
+        </service>
+
+        <service name="JmsEchoService">
+            <inbound>
+                <inbound-endpoint address="jms://echo" />
+            </inbound>
+            <echo-component />
+        </service>
+
+
+
+    </model>
+
+</mule>
