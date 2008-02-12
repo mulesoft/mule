@@ -17,12 +17,12 @@
 
         <service name="JmsQueueComponent">
             <inbound>
-                <inbound-endpoint address="vm://in" />
+                <inbound-endpoint address="vm://in"  remoteSync="true"/>
             </inbound>
             <bridge-component />
             <outbound>
                 <outbound-pass-through-router>
-                    <outbound-endpoint address="jms://echo.in" remoteSync="true" />
+                    <outbound-endpoint address="jms://echo.in" />
                 </outbound-pass-through-router>
             </outbound>
         </service>

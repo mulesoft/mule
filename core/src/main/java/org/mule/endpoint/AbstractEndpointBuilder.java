@@ -11,8 +11,8 @@
 package org.mule.endpoint;
 
 import org.mule.RegistryContext;
-import org.mule.api.MuleContext;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
@@ -26,9 +26,9 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
+import org.mule.config.MuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.config.MuleConfiguration;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -169,7 +169,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         InboundEndpoint ep = new InboundEndpoint();
         configureEndpoint(ep);
         ep.setTransformers(getInboundTransformers(ep.getConnector(), ep.getEndpointURI()));
-        ep.setResponseTransformers(getResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
+        ep.setResponseTransformers(getInboundEndpointResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
         return ep;
     }
 
@@ -178,7 +178,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         OutboundEndpoint ep = new OutboundEndpoint();
         configureEndpoint(ep);
         ep.setTransformers(getOutboundTransformers(ep.getConnector(), ep.getEndpointURI()));
-        ep.setResponseTransformers(getResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
+        ep.setResponseTransformers(getOutboundEndpointResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
         return ep;
     }
 
@@ -243,7 +243,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         // uriBuilder cannot return an endpoint with an endpoint name (which is deprecated anyway)
         // so we don't use it here
-//        String uriName = uriBuilder.getEndpoint().getEndpointName();
+        // String uriName = uriBuilder.getEndpoint().getEndpointName();
         return name != null ? name : ObjectNameHelper.getEndpointName(endpoint);
     }
 
@@ -406,7 +406,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    protected List getResponseTransformers(Connector connector, EndpointURI endpointURI)
+    protected List getInboundEndpointResponseTransformers(Connector connector, EndpointURI endpointURI)
         throws TransportFactoryException
     {
         // #1 Transformers set on builder
@@ -422,8 +422,26 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             return transformers;
         }
 
-        // #3 Default Transformer
+        // #3 Default Connector Response Transformer
         return getDefaultResponseTransformers(connector);
+    }
+
+    protected List getOutboundEndpointResponseTransformers(Connector connector, EndpointURI endpointURI)
+        throws TransportFactoryException
+    {
+        // #1 Transformers set on builder
+        if (TransformerUtils.isDefined(responseTransformers))
+        {
+            return responseTransformers;
+        }
+
+        // #2 Transformer specified on uri
+        List transformers = getTransformersFromString(endpointURI.getResponseTransformers());
+        if (TransformerUtils.isDefined(transformers))
+        {
+            return transformers;
+        }
+        return TransformerUtils.UNDEFINED;
     }
 
     protected List getDefaultResponseTransformers(Connector connector) throws TransportFactoryException

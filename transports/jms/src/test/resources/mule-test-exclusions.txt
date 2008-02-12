@@ -1,8 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-
-# MULE-2868
-org.mule.transport.jms.issues.JmsRemoteSyncMule2868TestCase
-
-

@@ -61,8 +61,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
             assertFalse(ep.isInbound());
             assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
             assertTrue(ep.getTransformers().get(0) instanceof TestOutboundTransformer);
-            assertTrue(TransformerUtils.isDefined(ep.getResponseTransformers()));
-            assertTrue(ep.getResponseTransformers().get(0) instanceof TestResponseTransformer);
+            assertTrue(TransformerUtils.isUndefined(ep.getResponseTransformers()));
             testDefaultCommonEndpointAttributes(ep);
         }
         catch (Exception e)

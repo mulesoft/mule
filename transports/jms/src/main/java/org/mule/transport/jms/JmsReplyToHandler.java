@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.service.AbstractService;
+import org.mule.transformer.TransformerUtils;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.StringMessageUtils;
@@ -66,19 +67,22 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             //This is a work around for JmsTransformers where the current endpoint needs
             //to be set on the transformer so that a JMSMEssage can be created correctly
             Class srcType = returnMessage.getPayload().getClass();
-            for (Iterator iterator = getTransformers().iterator(); iterator.hasNext();)
+            if (TransformerUtils.isDefined(getTransformers()))
             {
-                Transformer t = (Transformer)iterator.next();
-                if(t.isSourceTypeSupported(srcType))
+                for (Iterator iterator = getTransformers().iterator(); iterator.hasNext();)
                 {
-                    if(t.getEndpoint()==null)
+                    Transformer t = (Transformer) iterator.next();
+                    if (t.isSourceTypeSupported(srcType))
                     {
-                        t.setEndpoint(getEndpoint(event, "jms://temporary"));
-                        break;
+                        if (t.getEndpoint() == null)
+                        {
+                            t.setEndpoint(getEndpoint(event, "jms://temporary"));
+                            break;
+                        }
                     }
                 }
+                returnMessage.applyTransformers(getTransformers());
             }
-            returnMessage.applyTransformers(getTransformers());
             Object payload = returnMessage.getPayload();
 
             if (replyToDestination instanceof Topic && replyToDestination instanceof Queue
