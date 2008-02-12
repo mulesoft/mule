@@ -31,7 +31,7 @@ public class InboundEndpointFactoryBean extends AbstractEndpointFactoryBean
 
     public Object doGetObject() throws Exception
     {
-        return buildInboundEndpoint();
+        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(this);
     }
 
 }

@@ -10,8 +10,8 @@
 
 package org.mule.endpoint;
 
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
@@ -26,7 +26,7 @@ public class MuleCopiedEndpointURITestCase extends AbstractMuleTestCase
     {
 
         // Create and test values
-        Endpoint endpoint = MuleTestUtils.getTestSchemeMetaInfoOutboundEndpoint("testEndpoint", "protocol", muleContext);
+        ImmutableEndpoint endpoint = MuleTestUtils.getTestSchemeMetaInfoOutboundEndpoint("testEndpoint", "protocol", muleContext);
         EndpointURI endpointUri = endpoint.getEndpointURI();
         assertEquals("protocol", endpointUri.getScheme());
         assertEquals("test", endpointUri.getSchemeMetaInfo());

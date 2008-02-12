@@ -10,7 +10,7 @@
 
 package org.mule.mule;
 
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.model.seda.SedaService;
@@ -95,7 +95,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
         //assertNotNull(ep.getConnector().getExceptionListener());
 
         // create receive endpoint
-        Endpoint endpoint = getTestInboundEndpoint("test2");
+        ImmutableEndpoint endpoint = getTestInboundEndpoint("test2");
         service.getInboundRouter().addEndpoint(endpoint);
         // Add receive endpoint, this shoulbe set as default
         assertNotNull(endpoint.getConnector().getExceptionListener());

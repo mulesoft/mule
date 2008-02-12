@@ -13,8 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
-import org.mule.endpoint.MuleEndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
@@ -31,21 +30,18 @@ import org.dom4j.DocumentHelper;
 
 public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 {
-    private Endpoint endpoint1;
-    private Endpoint endpoint2;
-    private Endpoint endpoint3;
+    private ImmutableEndpoint endpoint1;
+    private ImmutableEndpoint endpoint2;
+    private ImmutableEndpoint endpoint3;
     private FilteringXmlMessageSplitter xmlSplitter;
 
     // @Override
     protected void doSetUp() throws Exception
     {
         // setup endpoints
-        endpoint1 = getTestOutboundEndpoint("Test1Endpoint");
-        endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
-        endpoint2 = getTestOutboundEndpoint("Test2Endpoint");
-        endpoint2.setEndpointURI(new MuleEndpointURI("test://endpointUri.2"));
-        endpoint3 = getTestOutboundEndpoint("Test3Endpoint");
-        endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
+        endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
+        endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2");
+        endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
 
         // setup splitter
         xmlSplitter = new FilteringXmlMessageSplitter();
@@ -126,8 +122,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         final String invalidSchemaLocation = "non-existent.xsd";
         Mock session = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Endpoint");
-        endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
 
         FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();
         splitter.setValidateSchema(true);

@@ -16,22 +16,15 @@ import org.mule.RequestContext;
 import org.mule.ResponseOutputStream;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
-import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.AbstractTransformer;
-import org.mule.transformer.simple.ByteArrayToObject;
-import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.util.CollectionUtils;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 public class MuleEventTestCase extends AbstractMuleTestCase
@@ -68,8 +61,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     public void testEventTransformer() throws Exception
     {
         String data = "Test Data";
-        Endpoint endpoint = getTestOutboundEndpoint("Test");
-        endpoint.setTransformers(CollectionUtils.singletonList(new TestEventTransformer()));
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test",CollectionUtils.singletonList(new TestEventTransformer()));
         MuleEvent event = getTestEvent(data, endpoint);
         RequestContext.setEvent(event);
         
@@ -84,8 +76,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     public void testEventRewrite() throws Exception
     {
         String data = "Test Data";
-        Endpoint endpoint = getTestOutboundEndpoint("Test");
-        endpoint.setTransformers(CollectionUtils.singletonList(new TestEventTransformer()));
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test", CollectionUtils.singletonList(new TestEventTransformer()));
         DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data), endpoint,
             getTestSession(getTestService("apple", Apple.class)), true,
             new ResponseOutputStream(System.out));
@@ -113,16 +104,15 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         MuleEvent prevEvent;
         Properties props;
         MuleMessage msg;
-        Endpoint endpoint;
+        ImmutableEndpoint endpoint;
         MuleEvent event;
 
         // nowhere
         prevEvent = getTestEvent("payload");
         props = new Properties();
         msg = new DefaultMuleMessage("payload", props);
-        endpoint = getTestOutboundEndpoint("Test");
         props = new Properties();
-        endpoint.setProperties(props);
+        endpoint = getTestOutboundEndpoint("Test", null, null, null, props);
         event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
         assertNull(event.getMessage().getProperty("prop"));
 
@@ -156,7 +146,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
         Properties props2 = new Properties();
         props2.put("prop", "value2");
-        endpoint.setProperties(props2);
+        endpoint = getTestOutboundEndpoint("Test", null, null, null, props2);
         event = new DefaultMuleEvent(msg, endpoint, prevEvent.getService(), prevEvent);
         assertEquals("value1", event.getMessage().getProperty("prop"));
 
@@ -167,11 +157,10 @@ public class MuleEventTestCase extends AbstractMuleTestCase
      */
     public void testNoPasswordNoNullPointerException() throws Exception
     {
-        Endpoint endpoint = getTestOutboundEndpoint("AuthTest");
         // provide the username, but not the password, as is the case for SMTP
         // cannot set SMTP endpoint type, because the module doesn't have this
         // dependency
-        endpoint.setEndpointURI(new MuleEndpointURI("test://john.doe@xyz.fr"));
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("AuthTest", "test://john.doe@xyz.fr");
         MuleEvent event = getTestEvent(new Object(), endpoint);
         Credentials credentials = event.getCredentials();
         assertNull("Credentials must not be created for endpoints without a password.", credentials);

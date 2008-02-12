@@ -10,10 +10,10 @@
 
 package org.mule.module.client;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleEvent;
-import org.mule.MuleServer;
+import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MessagingException;
@@ -25,7 +25,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -775,7 +774,7 @@ public class MuleClient implements Disposable
         throws MuleException
     {
         // as we are bypassing the message transport layer we need to check that
-        ImmutableEndpoint endpoint = (Endpoint) service.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getInboundRouter().getEndpoints().get(0);
         if (endpoint != null)
         {
             if (endpoint.getTransformers() != null)

@@ -12,7 +12,7 @@ package org.mule.transport.rmi;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -47,7 +47,7 @@ public class RmiMessageReceiver extends AbstractPollingMessageReceiver
 
     public RmiMessageReceiver(Connector connector,
                               Service service,
-                              Endpoint endpoint,
+                              ImmutableEndpoint endpoint,
                               long frequency) throws CreateException
     {
         super(connector, service, endpoint);

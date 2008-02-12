@@ -15,7 +15,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.endpoint.MuleEndpointURI;
@@ -61,7 +61,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         Mock dispatcher = new Mock(MessageDispatcher.class);
         Mock connector = MuleTestUtils.getMockConnector();
         MuleEvent event = getTestEvent("UncaughtEvent");
-        strategy.setEndpoint((Endpoint)endpoint.proxy());
+        strategy.setEndpoint((ImmutableEndpoint)endpoint.proxy());
 
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
@@ -99,7 +99,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         Mock dispatcher = new Mock(MessageDispatcher.class);
         Mock connector = MuleTestUtils.getMockConnector();
         MuleEvent event = getTestEvent("UncaughtEvent");
-        strategy.setEndpoint((Endpoint)endpoint.proxy());
+        strategy.setEndpoint((ImmutableEndpoint) endpoint.proxy());
 
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));

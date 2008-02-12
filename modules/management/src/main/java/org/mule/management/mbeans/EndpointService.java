@@ -10,7 +10,6 @@
 
 package org.mule.management.mbeans;
 
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;

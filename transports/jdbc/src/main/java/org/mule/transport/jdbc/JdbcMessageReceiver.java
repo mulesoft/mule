@@ -12,7 +12,7 @@ package org.mule.transport.jdbc;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -40,7 +40,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 
     public JdbcMessageReceiver(Connector connector,
                                Service service,
-                               Endpoint endpoint,
+                               ImmutableEndpoint endpoint,
                                String readStmt,
                                String ackStmt) throws CreateException
     {

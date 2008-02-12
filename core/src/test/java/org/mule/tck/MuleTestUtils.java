@@ -18,13 +18,13 @@ import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
-import org.mule.api.MuleSession;
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionFactory;
@@ -34,13 +34,14 @@ import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.model.seda.SedaService;
 import org.mule.model.seda.SedaModel;
+import org.mule.model.seda.SedaService;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.ObjectFactory;
@@ -49,6 +50,7 @@ import org.mule.util.object.SingletonObjectFactory;
 import com.mockobjects.dynamic.Mock;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -91,52 +93,101 @@ public final class MuleTestUtils
 //        }
 //    }
 
-    public static Endpoint getTestInboundEndpoint(String name, final MuleContext context) throws Exception
+    public static ImmutableEndpoint getTestInboundEndpoint(String name, final MuleContext context) throws Exception
     {
-        return getTestEndpoint(name, context, new EndpointSource()
+        return getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
         {
-            public Endpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
-                return (Endpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                return (ImmutableEndpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             }
         });
     }
 
-    public static Endpoint getTestOutboundEndpoint(String name, final MuleContext context) throws Exception
+    public static ImmutableEndpoint getTestOutboundEndpoint(String name, final MuleContext context) throws Exception
     {
-        return getTestEndpoint(name, context, new EndpointSource()
+        return getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
         {
-            public Endpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
-                return (Endpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                return (ImmutableEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
             }
         });
     }
+    
+    public static ImmutableEndpoint getTestInboundEndpoint(String name,
+                                                            final MuleContext context,
+                                                            String uri,
+                                                            List transformers,
+                                                            Filter filter,
+                                                            Map properties) throws Exception
+    {
+        return getTestEndpoint(name, uri, transformers, filter, properties, context, new EndpointSource()
+        {
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                return (ImmutableEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+            }
+        });
+    }
+    
+    public static ImmutableEndpoint getTestOutboundEndpoint(String name,
+                                                            final MuleContext context,
+                                                            String uri,
+                                                            List transformers,
+                                                            Filter filter,
+                                                            Map properties) throws Exception
+    {
+        return getTestEndpoint(name, uri, transformers, filter, properties, context, new EndpointSource()
+        {
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                return (ImmutableEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+            }
+        });
+    }
+    
 
-    private static Endpoint getTestEndpoint(String name, MuleContext context, EndpointSource source) throws Exception
+    private static ImmutableEndpoint getTestEndpoint(String name,
+                                                     String uri,
+                                                     List transformers,
+                                                     Filter filter,
+                                                     Map properties,
+                                                     MuleContext context,
+                                                     EndpointSource source) throws Exception
     {
         Map props = new HashMap();
         props.put("name", name);
         props.put("endpointURI", new MuleEndpointURI("test://test"));
         props.put("connector", "testConnector");
         // need to build endpoint this way to avoid depenency to any endpoint jars
-        AbstractConnector connector =
-                (AbstractConnector)ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
-                        AbstractMuleTestCase.class).newInstance();
+        AbstractConnector connector = (AbstractConnector) ClassUtils.loadClass(
+            "org.mule.tck.testmodels.mule.TestConnector", AbstractMuleTestCase.class).newInstance();
 
         connector.setName("testConnector");
         connector.setMuleContext(context);
         context.applyLifecycle(connector);
-
-        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://test", context);
+        
+        String endpoingUri = uri == null ? "test://test" : uri;
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoingUri, context);
         endpointBuilder.setConnector(connector);
         endpointBuilder.setName(name);
+        if (TransformerUtils.isDefined(transformers))
+        {
+            endpointBuilder.setTransformers(transformers);
+        }
+
+        if (properties != null)
+        {
+            endpointBuilder.setProperties(properties);
+        }
+        endpointBuilder.setFilter(filter);
         return source.getEndpoint(endpointBuilder);
     }
 
     private interface EndpointSource
     {
-        Endpoint getEndpoint(EndpointBuilder builder) throws MuleException;
+        ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException;
     }
     
 //    public static Endpoint getTestSchemeMetaInfoEndpoint(String name, String type, String protocol, MuleContext context)
@@ -170,31 +221,31 @@ public final class MuleTestUtils
 //        }
 //    }
 
-    public static Endpoint getTestSchemeMetaInfoInboundEndpoint(String name, String protocol, final MuleContext context)
+    public static ImmutableEndpoint getTestSchemeMetaInfoInboundEndpoint(String name, String protocol, final MuleContext context)
             throws Exception
     {
             return getTestSchemeMetaInfoEndpoint(name, protocol, context, new EndpointSource()
             {
-                public Endpoint getEndpoint(EndpointBuilder builder) throws MuleException
+                public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
                 {
-                    return (Endpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                    return (ImmutableEndpoint) context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
                 }
             });
     }
 
-    public static Endpoint getTestSchemeMetaInfoOutboundEndpoint(String name, String protocol, final MuleContext context)
+    public static ImmutableEndpoint getTestSchemeMetaInfoOutboundEndpoint(String name, String protocol, final MuleContext context)
             throws Exception
     {
             return getTestSchemeMetaInfoEndpoint(name, protocol, context, new EndpointSource()
             {
-                public Endpoint getEndpoint(EndpointBuilder builder) throws MuleException
+                public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
                 {
-                    return (Endpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                    return (ImmutableEndpoint) context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
                 }
             });
     }
 
-    private static Endpoint getTestSchemeMetaInfoEndpoint(String name, String protocol, MuleContext context, EndpointSource source)
+    private static ImmutableEndpoint getTestSchemeMetaInfoEndpoint(String name, String protocol, MuleContext context, EndpointSource source)
         throws Exception
     {
         // need to build endpoint this way to avoid depenency to any endpoint jars
@@ -354,7 +405,7 @@ public final class MuleTestUtils
 
     public static Mock getMockEndpoint()
     {
-        return new Mock(Endpoint.class, "umoEndpoint");
+        return new Mock(ImmutableEndpoint.class, "umoEndpoint");
     }
 
     public static Mock getMockEndpointURI()
@@ -371,4 +422,6 @@ public final class MuleTestUtils
     {
         return new Mock(TransactionFactory.class, "umoTransactionFactory");
     }
+
+
 }

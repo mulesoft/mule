@@ -11,7 +11,7 @@
 package org.mule.transport.cxf;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
@@ -54,7 +54,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     private Server server;
     private boolean bridge;
 
-    public CxfMessageReceiver(Connector Connector, Service service, Endpoint Endpoint)
+    public CxfMessageReceiver(Connector Connector, Service service, ImmutableEndpoint Endpoint)
         throws CreateException
     {
         super(Connector, service, Endpoint);

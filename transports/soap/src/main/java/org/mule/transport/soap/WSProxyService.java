@@ -15,7 +15,6 @@ import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
@@ -176,7 +175,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
         if (service != null)
         {        
             OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRouters().get(0);
-            Endpoint endpoint = (Endpoint)router.getEndpoints().get(0);
+            ImmutableEndpoint endpoint = (ImmutableEndpoint)router.getEndpoints().get(0);
             this.urlWebservice = endpoint.getEndpointURI().getAddress();
     
             // remove any params from the url

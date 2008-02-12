@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.OutputHandler;
@@ -239,7 +238,7 @@ public class MuleUniversalConduit extends AbstractConduit
         LOGGER.info("Sending message to " + uri);
         try
         {
-            Endpoint ep = (Endpoint) RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+            ImmutableEndpoint ep = (ImmutableEndpoint) RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
 
             result = sendStream(sp, ep);
 

@@ -15,7 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 
@@ -24,8 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.dom4j.Document;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
+import org.dom4j.Document;
+
+import sun.rmi.transport.Endpoint;
 
 /**
  * This router will split the Xml message into parts based on the xpath expression
@@ -49,7 +52,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                 MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
             initialise(message);
 
-            Endpoint endpoint;
+            ImmutableEndpoint endpoint;
             MuleMessage result = null;
             Document part;
             List parts = (List)nodesContext.get();
@@ -74,7 +77,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                 }
                 else
                 {
-                    endpoint = (Endpoint)getEndpoints().get(epCounter.next());
+                    endpoint = (ImmutableEndpoint)getEndpoints().get(epCounter.next());
                 }
 
                 if (endpoint == null)
@@ -130,11 +133,11 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
      * @param message the current message being processed
      * @return the message part to dispatch
      */
-    protected Endpoint getEndpointForMessage(MuleMessage message)
+    protected ImmutableEndpoint getEndpointForMessage(MuleMessage message)
     {
         for (int i = 0; i < endpoints.size(); i++)
         {
-            Endpoint endpoint = (Endpoint)endpoints.get(i);
+            ImmutableEndpoint endpoint = (ImmutableEndpoint)endpoints.get(i);
 
             try
             {
@@ -165,7 +168,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
         return null;
     }
 
-    public void addEndpoint(Endpoint endpoint)
+    public void addEndpoint(ImmutableEndpoint endpoint)
     {
         if (endpoint.getFilter() != null && !enableEndpointFiltering)
         {

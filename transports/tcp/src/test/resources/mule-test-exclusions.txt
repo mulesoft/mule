@@ -20,3 +20,7 @@ org.mule.transport.tcp.integration.MuleMessageProtocolChunkingTestCase
 
 # MULE-2730
 org.mule.transport.tcp.issues.SynchStreamingMule1687TestCase
+
+
+
+#org.mule.transport.tcp.issues.KeepSendSocketOpenMule1491TestCase

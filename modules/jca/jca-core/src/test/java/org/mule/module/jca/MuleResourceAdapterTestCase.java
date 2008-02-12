@@ -12,7 +12,6 @@
 package org.mule.module.jca;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
@@ -149,7 +148,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         testEndpoint(service);
 
         // Check endpoint
-        Endpoint endpoint2 = (Endpoint) service.getInboundRouter().getEndpoints().get(0);
+        ImmutableEndpoint endpoint2 = (ImmutableEndpoint) service.getInboundRouter().getEndpoints().get(0);
         assertEquals(endpoint, endpoint2);
 
         // Check service implementation
@@ -221,7 +220,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
     protected void testEndpoint(Service service)
     {
         InboundRouterCollection inboundRouterCollection = service.getInboundRouter();
-        Endpoint endpoint = (Endpoint) inboundRouterCollection.getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) inboundRouterCollection.getEndpoints().get(0);
         testEndpoint(endpoint);
     }
 

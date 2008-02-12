@@ -11,7 +11,7 @@
 package org.mule.example.loanbroker.bank;
 
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceAware;
 import org.mule.config.i18n.MessageFactory;
@@ -77,7 +77,7 @@ public class Bank implements ServiceAware, Serializable, BankService
         }
         // TODO This gives us the endpoint the bank is listening on, but the endpoint for sending to the bank 
         // is different in the ESB config ("Bank1In" vs. "Bank1")
-        this.endpoint = ((Endpoint) endpoints.get(0)).getName();
+        this.endpoint = ((ImmutableEndpoint) endpoints.get(0)).getName();
     }
 
     public LoanQuote getLoanQuote(LoanBrokerQuoteRequest request)

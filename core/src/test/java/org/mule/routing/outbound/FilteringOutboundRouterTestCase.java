@@ -13,10 +13,8 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.TransformerException;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
@@ -40,7 +38,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
         FilteringOutboundRouter router = new FilteringOutboundRouter();
@@ -93,9 +91,8 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://foo?[barValue]");
         assertNotNull(endpoint1);
-        endpoint1.setEndpointURI(new MuleEndpointURI("test://foo?[barValue]"));
 
         FilteringOutboundRouter router = new FilteringOutboundRouter();
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);

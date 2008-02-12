@@ -12,11 +12,11 @@ package org.mule.routing.inbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.routing.AggregationException;
@@ -44,7 +44,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
         MuleMessage message2 = new DefaultMuleMessage("test event B");
         MuleMessage message3 = new DefaultMuleMessage("test event C");
 
-        Endpoint endpoint = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session, false);
         MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session, false);
         MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session, false);

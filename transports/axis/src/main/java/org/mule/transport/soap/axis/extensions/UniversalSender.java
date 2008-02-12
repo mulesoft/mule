@@ -21,7 +21,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -308,7 +307,7 @@ public class UniversalSender extends BasicHandler
             OutboundRouter r = (OutboundRouter)iterator.next();
             for (Iterator iterator1 = r.getEndpoints().iterator(); iterator1.hasNext();)
             {
-                Endpoint endpoint = (Endpoint)iterator1.next();
+                ImmutableEndpoint endpoint = (ImmutableEndpoint)iterator1.next();
                 endpointsCache.put(endpoint.getEndpointURI().getAddress(), endpoint);
             }
         }

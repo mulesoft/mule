@@ -13,9 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.StringUtils;
@@ -34,12 +32,9 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
-        endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
-        Endpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
-        endpoint2.setEndpointURI(new MuleEndpointURI("test://endpointUri.2"));
-        Endpoint endpoint3 = getTestOutboundEndpoint("Test3Provider");
-        endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://endpointUri.1");
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://endpointUri.2");
+        ImmutableEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://endpointUri.3");
 
         // Dummy message splitter
         AbstractMessageSplitter router = new AbstractMessageSplitter()

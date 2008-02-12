@@ -11,7 +11,7 @@
 package org.mule.test.spring;
 
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
@@ -111,7 +111,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         final List endpoints = router.getEndpoints();
         assertNotNull(endpoints);
         assertFalse(endpoints.isEmpty());
-        final Endpoint inboundEndpoint = (Endpoint) endpoints.get(0);
+        final ImmutableEndpoint inboundEndpoint = (ImmutableEndpoint) endpoints.get(0);
         assertNotNull(inboundEndpoint);
         final List transformers = inboundEndpoint.getTransformers();
         assertFalse(transformers.isEmpty());

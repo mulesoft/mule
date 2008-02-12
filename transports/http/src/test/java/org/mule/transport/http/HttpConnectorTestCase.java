@@ -10,13 +10,11 @@
 
 package org.mule.transport.http;
 
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.http.HttpConnector;
 import org.mule.transport.tcp.TcpConnector;
 
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
@@ -45,20 +43,9 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
-        Endpoint endpoint = (Endpoint) muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             getTestEndpointURI());
 
-        try
-        {
-            endpoint.setEndpointURI(null);
-            fail("cannot register with empty endpointUri");
-        }
-        catch (Exception e)
-        {
-            /* expected */
-        }
-
-        endpoint.setEndpointURI(new MuleEndpointURI(getTestEndpointURI()));
         getConnector().registerListener(service, endpoint);
     }
 

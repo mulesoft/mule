@@ -13,7 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.tck.AbstractMuleTestCase;
@@ -33,10 +33,10 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
-        Endpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
         assertNotNull(endpoint2);
 
         MulticastingRouter router = new MulticastingRouter();

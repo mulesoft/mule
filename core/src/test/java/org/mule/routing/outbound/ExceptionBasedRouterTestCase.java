@@ -14,11 +14,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.RegExFilter;
@@ -149,10 +147,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint");
-        endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
-        Endpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint");
-        endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.addEndpoint(endpoint1);
@@ -185,10 +181,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint");
-        endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
-        Endpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint");
-        endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.addEndpoint(endpoint1);
@@ -220,10 +214,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint");
-        endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
-        Endpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint");
-        endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.addEndpoint(endpoint1);

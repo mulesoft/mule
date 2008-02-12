@@ -15,7 +15,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -43,7 +43,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage("test event");
 
-        Endpoint endpoint = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         // called by idempotent receiver as this is the fist event it will try
         // and initialize the id store

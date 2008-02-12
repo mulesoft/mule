@@ -13,7 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -47,9 +47,9 @@ import java.util.Map;
 public class EndpointSelectorTestCase extends AbstractMuleTestCase
 {
     Mock session;
-    Endpoint dest1;
-    Endpoint dest2;
-    Endpoint dest3;
+    ImmutableEndpoint dest1;
+    ImmutableEndpoint dest2;
+    ImmutableEndpoint dest3;
     EndpointSelector router;
 
     protected void doSetUp() throws Exception

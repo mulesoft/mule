@@ -15,8 +15,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
@@ -58,7 +58,7 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URL_NOWSDL, muleContext);
         endpointBuilder.setProperty("wsdlUrl", TEST_URL_WSDL);
-        Endpoint endpoint = (Endpoint) muleContext.getRegistry()
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleContext.getRegistry()
             .lookupEndpointFactory()
             .getOutboundEndpoint(endpointBuilder);
 

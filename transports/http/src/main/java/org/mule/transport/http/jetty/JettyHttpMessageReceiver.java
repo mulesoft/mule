@@ -15,7 +15,6 @@ import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -46,7 +45,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 
     private Server httpServer;
 
-    public JettyHttpMessageReceiver(Connector connector, Service service, Endpoint endpoint)
+    public JettyHttpMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
             throws CreateException
     {
 

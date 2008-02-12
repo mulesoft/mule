@@ -10,7 +10,6 @@
 
 package org.mule.transport.ftp;
 
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
@@ -56,7 +55,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
      */
     public void testConnectorPollingFrequency() throws Exception
     {
-        Endpoint endpoint = getTestInboundEndpoint("mock");
+        ImmutableEndpoint endpoint = getTestInboundEndpoint("mock");
         Service service = getTestService("apple", Apple.class);
         FtpConnector connector = (FtpConnector)getConnector();
         MessageReceiver receiver = connector.createReceiver(service, endpoint);
@@ -69,12 +68,11 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
      */
     public void testPollingFrequencyEndpointOverride() throws Exception
     {
-        Endpoint endpoint = getTestInboundEndpoint("mock");
-
         Properties props = new Properties();
         // Endpoint wants String-typed properties
         props.put(FtpConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
-        endpoint.setProperties(props);
+        
+        ImmutableEndpoint endpoint = getTestInboundEndpoint("mock", null, null, null, props);
 
         Service service = getTestService("apple", Apple.class);
         FtpConnector connector = (FtpConnector)getConnector();

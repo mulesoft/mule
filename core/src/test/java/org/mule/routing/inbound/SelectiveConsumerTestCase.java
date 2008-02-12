@@ -15,7 +15,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -48,7 +48,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         assertEquals(filter, router.getFilter());
         MuleMessage message = new DefaultMuleMessage("test event");
 
-        Endpoint endpoint = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         assertTrue(router.isMatch(event));
 
@@ -93,8 +93,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         assertEquals(filter, router.getFilter());
         MuleMessage message = new DefaultMuleMessage("test event");
 
-        Endpoint endpoint = getTestOutboundEndpoint("Test1Provider");
-        endpoint.setTransformers(CollectionUtils.singletonList(new ObjectToByteArray()));
+        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider", CollectionUtils.singletonList(new ObjectToByteArray()));
         MuleEvent event = new DefaultMuleEvent(message, endpoint, (MuleSession) session.proxy(), false);
         assertTrue(router.isMatch(event));
 

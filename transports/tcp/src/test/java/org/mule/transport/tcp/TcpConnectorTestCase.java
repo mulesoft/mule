@@ -10,13 +10,13 @@
 
 package org.mule.transport.tcp;
 
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.endpoint.MuleEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.tcp.TcpConnector;
 
 public class TcpConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -43,7 +43,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
     {
         Service service = getTestService("orange", Orange.class);
         
-        Endpoint endpoint = (Endpoint) muleContext.getRegistry()
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(getTestEndpointURI());
 
@@ -51,7 +51,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
 
         try
         {
-            endpoint.setEndpointURI(null);
+            ((MuleEndpoint) endpoint).setEndpointURI(null);
             fail("endpointUri cannot be null");
         }
         catch (Exception e)
@@ -59,7 +59,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
             // expected
         }
 
-        endpoint.setEndpointURI(new MuleEndpointURI(getTestEndpointURI()));
+        ((MuleEndpoint) endpoint).setEndpointURI(new MuleEndpointURI(getTestEndpointURI()));
         connector.registerListener(service, endpoint);
     }
 

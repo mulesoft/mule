@@ -13,8 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
-import org.mule.endpoint.MuleEndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -35,14 +34,9 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("Test1endpoint");
-        endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
-        endpoint1.setFilter(new PayloadTypeFilter(Apple.class));
-        Endpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint");
-        endpoint2.setEndpointURI(new MuleEndpointURI("test://endpointUri.2"));
-        endpoint2.setFilter(new PayloadTypeFilter(Orange.class));
-        Endpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint");
-        endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1endpoint", "test://endpointUri.1", null, new PayloadTypeFilter(Apple.class), null);
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Endpoint", "test://endpointUri.2", null, new PayloadTypeFilter(Orange.class), null);
+        ImmutableEndpoint endpoint3 = getTestOutboundEndpoint("Test3Endpoint", "test://endpointUri.3");
 
         FilteringListMessageSplitter router = new FilteringListMessageSplitter();
         router.setFilter(new PayloadTypeFilter(List.class));

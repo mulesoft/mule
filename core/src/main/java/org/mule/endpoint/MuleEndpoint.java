@@ -12,9 +12,9 @@ package org.mule.endpoint;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
@@ -33,7 +33,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
  * <code>MuleEndpoint</code> describes a Provider in the Mule Server. A endpoint is
  * a grouping of an endpoint, an endpointUri and a transformer.
  */
-public abstract class MuleEndpoint extends ImmutableMuleEndpoint implements Endpoint, MuleContextAware
+public abstract class MuleEndpoint extends ImmutableMuleEndpoint implements ImmutableEndpoint, MuleContextAware
 {
     private static final long serialVersionUID = 3883445445846168147L;
     

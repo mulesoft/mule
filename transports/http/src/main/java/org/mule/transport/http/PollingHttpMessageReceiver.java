@@ -10,13 +10,13 @@
 
 package org.mule.transport.http;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -35,7 +35,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
     
     public PollingHttpMessageReceiver(Connector connector,
                                       Service service,
-                                      final Endpoint endpoint) throws CreateException
+                                      final ImmutableEndpoint endpoint) throws CreateException
     {
 
         super(connector, service, endpoint);

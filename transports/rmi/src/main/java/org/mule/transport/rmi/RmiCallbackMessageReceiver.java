@@ -12,8 +12,8 @@ package org.mule.transport.rmi;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -49,7 +49,7 @@ public class RmiCallbackMessageReceiver extends AbstractMessageReceiver
     private int port;
 
 
-    public RmiCallbackMessageReceiver(Connector connector, Service service, Endpoint endpoint)
+    public RmiCallbackMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
             throws CreateException
     {
         super(connector, service, endpoint);

@@ -11,9 +11,8 @@
 package org.mule.transport.http;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 
@@ -30,7 +29,7 @@ import javax.resource.spi.work.Work;
 public class HttpsMessageReceiver extends HttpMessageReceiver
 {
 
-    public HttpsMessageReceiver(Connector connector, Service service, Endpoint endpoint)
+    public HttpsMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
             throws CreateException
     {
         super(connector, service, endpoint);

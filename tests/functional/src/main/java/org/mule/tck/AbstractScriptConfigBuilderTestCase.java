@@ -13,7 +13,6 @@ package org.mule.tck;
 import org.mule.AbstractExceptionListener;
 import org.mule.api.MuleException;
 import org.mule.api.context.ObjectNotFoundException;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
@@ -118,7 +117,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(service.getExceptionListener());
 
         assertTrue(((AbstractExceptionListener) service.getExceptionListener()).getEndpoints().size() > 0);
-        Endpoint ep = (Endpoint) ((AbstractExceptionListener) service.getExceptionListener()).getEndpoints()
+        ImmutableEndpoint ep = (ImmutableEndpoint) ((AbstractExceptionListener) service.getExceptionListener()).getEndpoints()
                 .get(0);
 
         assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
@@ -149,7 +148,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(model.getExceptionListener() instanceof TestExceptionStrategy);
 
         assertTrue(((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().size() > 0);
-        Endpoint ep = (Endpoint) ((AbstractExceptionListener) model.getExceptionListener()).getEndpoints()
+        ImmutableEndpoint ep = (ImmutableEndpoint) ((AbstractExceptionListener) model.getExceptionListener()).getEndpoints()
                 .get(0);
 
         assertEquals("test://component.exceptions", ep.getEndpointURI().toString());
@@ -303,10 +302,10 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(router instanceof TestResponseAggregator);
         assertNotNull(messageRouter.getEndpoints());
         assertEquals(2, messageRouter.getEndpoints().size());
-        Endpoint ep = (Endpoint) messageRouter.getEndpoints().get(0);
+        ImmutableEndpoint ep = (ImmutableEndpoint) messageRouter.getEndpoints().get(0);
         assertEquals("response1", ep.getEndpointURI().getAddress());
         assertTrue(ep.isInbound());
-        ep = (Endpoint) messageRouter.getEndpoints().get(1);
+        ep = (ImmutableEndpoint) messageRouter.getEndpoints().get(1);
         assertEquals("AppleResponseQueue", ep.getEndpointURI().getAddress());
         assertTrue(ep.isInbound());
     }

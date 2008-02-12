@@ -11,8 +11,8 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
@@ -57,7 +57,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     protected AxisConnector connector;
     protected SOAPService soapService;
 
-    public AxisMessageReceiver(Connector connector, Service service, Endpoint endpoint)
+    public AxisMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
             throws CreateException
     {
 

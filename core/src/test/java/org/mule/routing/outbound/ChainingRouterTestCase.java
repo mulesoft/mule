@@ -13,7 +13,6 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.endpoint.DynamicEndpointURIEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
@@ -45,10 +44,10 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
-        Endpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
+        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider");
         assertNotNull(endpoint2);
 
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
@@ -78,9 +77,8 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
     public void testChainingOutboundRouterSynchronousWithTemplate() throws Exception
     {
-        Endpoint endpoint3 = getTestOutboundEndpoint("Test3Provider");
+        ImmutableEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://foo?[barValue]");
         assertNotNull(endpoint3);
-        endpoint3.setEndpointURI(new MuleEndpointURI("test://foo?[barValue]"));
         router.addEndpoint(endpoint3);
 
         Map m = new HashMap();
@@ -123,7 +121,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
     public void testBrokenChain() throws Exception
     {
         final MuleMessage message = new DefaultMuleMessage("test event");
-        final Endpoint endpoint1 = (Endpoint)endpoints.get(0);
+        final ImmutableEndpoint endpoint1 = (ImmutableEndpoint)endpoints.get(0);
         session.expect("sendEvent", C.eq(message, endpoint1));
         MuleMessage result = router.route(message, (MuleSession)session.proxy(), false);
         session.verify();

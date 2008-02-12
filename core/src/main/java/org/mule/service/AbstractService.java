@@ -11,12 +11,11 @@
 package org.mule.service;
 
 import org.mule.OptimizedRequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationCallback;
@@ -600,12 +599,12 @@ public abstract class AbstractService implements Service
 
     protected void registerListeners() throws MuleException
     {
-        Endpoint endpoint;
+        ImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (Endpoint) it.next();
+            endpoint = (ImmutableEndpoint) it.next();
             try
             {
                 endpoint.getConnector().registerListener(this, endpoint);
@@ -624,12 +623,12 @@ public abstract class AbstractService implements Service
 
     protected void unregisterListeners() throws MuleException
     {
-        Endpoint endpoint;
+        ImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (Endpoint) it.next();
+            endpoint = (ImmutableEndpoint) it.next();
             try
             {
                 endpoint.getConnector().unregisterListener(this, endpoint);
@@ -648,16 +647,16 @@ public abstract class AbstractService implements Service
 
     protected void startListeners() throws MuleException
     {
-        Endpoint endpoint;
+        ImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (Endpoint) it.next();
+            endpoint = (ImmutableEndpoint) it.next();
             MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                     endpoint);
             if (receiver != null && endpoint.getConnector().isStarted()
-                    && endpoint.getInitialState().equals(Endpoint.INITIAL_STATE_STARTED))
+                    && endpoint.getInitialState().equals(ImmutableEndpoint.INITIAL_STATE_STARTED))
             {
                 receiver.start();
             }
@@ -666,12 +665,12 @@ public abstract class AbstractService implements Service
 
     protected void stopListeners() throws MuleException
     {
-        Endpoint endpoint;
+        ImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (Endpoint) it.next();
+            endpoint = (ImmutableEndpoint) it.next();
             MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                     endpoint);
             if (receiver != null)
@@ -683,12 +682,12 @@ public abstract class AbstractService implements Service
 
     protected void connectListeners() throws MuleException
     {
-        Endpoint endpoint;
+        ImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (Endpoint) it.next();
+            endpoint = (ImmutableEndpoint) it.next();
             MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                     endpoint);
             if (receiver != null)
@@ -710,12 +709,12 @@ public abstract class AbstractService implements Service
 
     protected void disconnectListeners() throws MuleException
     {
-        Endpoint endpoint;
+        ImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (Endpoint) it.next();
+            endpoint = (ImmutableEndpoint) it.next();
             MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                     endpoint);
             if (receiver != null)

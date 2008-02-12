@@ -12,7 +12,6 @@ package org.mule.transport.http;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.Endpoint;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
@@ -21,20 +20,22 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.tcp.TcpConnector;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.io.UnsupportedEncodingException;
 
-import org.apache.commons.httpclient.HttpConnectionManager;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpState;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
-import org.apache.commons.codec.binary.Base64;
+
+import sun.rmi.transport.Endpoint;
 
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http requests

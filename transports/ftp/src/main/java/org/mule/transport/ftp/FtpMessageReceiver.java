@@ -12,8 +12,7 @@ package org.mule.transport.ftp;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.Endpoint;
-import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -49,7 +48,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 
     public FtpMessageReceiver(Connector connector,
                               Service service,
-                              Endpoint endpoint,
+                              ImmutableEndpoint endpoint,
                               long frequency) throws CreateException
     {
         super(connector, service, endpoint);

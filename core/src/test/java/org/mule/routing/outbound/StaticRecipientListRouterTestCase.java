@@ -13,7 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.Endpoint;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -29,7 +29,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     public void testRecipientListRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
-        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
         List recipients = new ArrayList();
@@ -53,18 +53,18 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         // The static recipient list router duplicates the message for each endpoint
         // so we can't
         // check for equality on the arguments passed to the dispatch / send methods
-        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.isA(Endpoint.class)));
-        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.isA(Endpoint.class)));
+        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)));
+        session.expect("dispatchEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)));
         router.route(message, (MuleSession)session.proxy(), false);
         session.verify();
 
         message = new DefaultMuleMessage("test event");
         router.getRecipients().add("test://recipient3");
-        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(Endpoint.class)),
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)),
             message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(Endpoint.class)),
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)),
             message);
-        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(Endpoint.class)),
+        session.expectAndReturn("sendEvent", C.args(C.isA(MuleMessage.class), C.isA(ImmutableEndpoint.class)),
             message);
         MuleMessage result = router.route(message, (MuleSession)session.proxy(), true);
         assertNotNull(result);
@@ -78,7 +78,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        Endpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
+        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider");
         assertNotNull(endpoint1);
 
         List recipients = new ArrayList();

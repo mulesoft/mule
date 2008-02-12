@@ -48,12 +48,12 @@ public class EndpointFactoryBean extends EndpointURIEndpointBuilder
         if (ENDPOINT_TYPE_RECEIVER.equals(type))
         {
             logger.debug("Endpont type is \"receiver\", building inbound endpoint");
-            return buildInboundEndpoint();
+            return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(this);
         }
         else if (ENDPOINT_TYPE_SENDER.equals(type))
         {
             logger.debug("Endpont type is \"sender\", building inbound endpoint");
-            return buildOutboundEndpoint();
+            return muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(this);
         }
         else
         {
