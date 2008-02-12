@@ -18,16 +18,13 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.service.Service;
-import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.endpoint.URIBuilder;
+import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.security.MuleCredentials;
 import org.mule.util.MapUtils;
 import org.mule.util.UUID;
@@ -39,8 +36,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.logging.Log;
@@ -593,77 +588,19 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return outputStream;
     }
 
-    private void marshallTransformers(List transformers, ObjectOutputStream out) throws IOException
-    {
-        if (transformers != null)
-        {
-            // write the number of transformers to read when re-creating this object
-            out.writeInt(transformers.size());
-
-            Iterator transformer = transformers.iterator();
-            while (transformer.hasNext())
-            {
-                out.writeObject(((Transformer) transformer.next()).getName());
-            }
-        }
-        else
-        {
-            // make sure that unmarshalTransformers knows the number of transformers to restore anyway
-            out.writeInt(0);
-        }
-    }
-
-    private List unmarshallTransformers(ObjectInputStream in) throws IOException, ClassNotFoundException
-    {
-        List transformers = new LinkedList();
-        
-        int count = in.readInt();
-        if (count > 0)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                String transformerName = (String) in.readObject();
-                transformers.add(RegistryContext.getRegistry().lookupTransformer(transformerName));
-            }            
-        }
-        return transformers;
-    }
-
     private void writeObject(ObjectOutputStream out) throws IOException
     {
         out.defaultWriteObject();
-
-        // TODO DF: If/when endpoints are kept in registry we should serializale endpoint registry 
-        // id/name rather than it's uri, this will mean that endpoint does not need to be recreated 
-        // and there will be no need to serialize transformers or other endpoint attributes here.
-
-        out.writeObject(endpoint.getEndpointURI().toString());
-        this.marshallTransformers(endpoint.getTransformers(), out);
+        out.writeInt(endpoint.hashCode());
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         logger = LogFactory.getLog(getClass());
         in.defaultReadObject();
-        
-        // TODO DF: If/when endpoints are kept in registry we should deserializale endpoint registry id/name
-        // and use it to lookup existing endpoint instance, rather than recreating the endpoint here. This
-        // will also mean that there won't be a need to serialize/deserialize endoint attributes such as
-        // transformers.
-
-        String uri = (String) in.readObject();
-        List transformers = this.unmarshallTransformers(in);
-        try
-        {
-            EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(uri), getMuleContext());
-            endpointBuilder.setTransformers(transformers);
-            endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
-
-        }
-        catch (MuleException e)
-        {
-            throw (IOException) new IOException(e.getMessage()).initCause(e);
-        }
+        int hashCode = in.readInt();
+        endpoint = RegistryContext.getRegistry().lookupEndpoint(
+            DefaultEndpointFactory.ENDPOINT_REGISTRY_PREFIX + hashCode);
     }
 
     /**

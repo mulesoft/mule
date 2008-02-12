@@ -11,13 +11,14 @@
 package org.mule.endpoint;
 
 import org.mule.RegistryContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.CoreMessages;
 
 import org.apache.commons.logging.Log;
@@ -28,10 +29,7 @@ public class DefaultEndpointFactory implements EndpointFactory
     /** logger used by this class */
     protected static final Log logger = LogFactory.getLog(DefaultEndpointFactory.class);
 
-    public static final int GET_OR_CREATE_CONNECTOR = 0;
-    public static final int ALWAYS_CREATE_CONNECTOR = 1;
-    public static final int NEVER_CREATE_CONNECTOR = 2;
-    public static final int USE_CONNECTOR = 3;
+    public static final String ENDPOINT_REGISTRY_PREFIX = "endpoint:";
 
     protected MuleContext muleContext;
     
@@ -77,15 +75,32 @@ public class DefaultEndpointFactory implements EndpointFactory
 
     public ImmutableEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException
     {
-        // TODO 1) Store in repo, 2) Register in registry, 3) Lifecycle ?
-        return builder.buildInboundEndpoint();
+        ImmutableEndpoint endpoint = builder.buildInboundEndpoint();
+        return registerEndpoint(endpoint);
     }
 
-    public ImmutableEndpoint getOutboundEndpoint(EndpointBuilder builder)
-        throws MuleException
+    public ImmutableEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException
     {
-        // TODO 1) Store in repo, 2) Register in registry, 3) Lifecycle ?
-        return builder.buildOutboundEndpoint();
+        ImmutableEndpoint endpoint = builder.buildOutboundEndpoint();
+        return registerEndpoint(endpoint);
+    }
+
+    /**
+     * 
+     * @param endpoint
+     * @return
+     * @throws RegistrationException
+     */
+    protected ImmutableEndpoint registerEndpoint(ImmutableEndpoint endpoint) throws RegistrationException
+    {
+        ImmutableEndpoint registryEndpoint = muleContext.getRegistry().lookupEndpoint(
+            ENDPOINT_REGISTRY_PREFIX + endpoint.hashCode());
+        if (registryEndpoint == null)
+        {
+            muleContext.getRegistry().registerObject(ENDPOINT_REGISTRY_PREFIX + endpoint.hashCode(), endpoint);
+            registryEndpoint = endpoint;
+        }
+        return registryEndpoint;
     }
 
     public EndpointBuilder getEndpointBuilder(String uri)
@@ -111,7 +126,7 @@ public class DefaultEndpointFactory implements EndpointFactory
         }
         return endpointBuilder;
     }
-    
+
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
