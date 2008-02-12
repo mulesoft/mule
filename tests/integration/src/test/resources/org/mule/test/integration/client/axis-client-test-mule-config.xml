@@ -18,7 +18,7 @@
                 <inbound-endpoint address="axis:http://localhost:38103/mule/services"/>
             </inbound>
             <component>
-                <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>
         </service>
 
@@ -27,7 +27,7 @@
                 <inbound-endpoint address="axis:http://localhost:38104/mule/services"/>
             </inbound>
             <component>
-                <singleton-object class="org.mule.test.integration.service.TestServiceComponent">
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent">
                     <property key="serviceInterfaces" value="org.mule.api.component.simple.EchoService"/>
                 </singleton-object>
             </component>
@@ -38,7 +38,7 @@
                 <inbound-endpoint address="axis:http://localhost:38104/mule/services"/>
             </inbound>
             <component>
-                <singleton-object class="org.mule.test.integration.service.TestServiceComponent"/>
+                <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>
         </service>
     </model>

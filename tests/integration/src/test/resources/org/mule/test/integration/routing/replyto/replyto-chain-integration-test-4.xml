@@ -62,7 +62,7 @@
 
         <!-- This component will append " Received" to the message so we know we're getting the correct one -->
         <mule-descriptor name="pojo3"
-            implementation="org.mule.test.integration.service.TestReceiver">
+            implementation="org.mule.tck.testmodels.services.TestReceiver">
             <inbound-router>
                 <endpoint address="vm://pojo3"/>
             </inbound-router>

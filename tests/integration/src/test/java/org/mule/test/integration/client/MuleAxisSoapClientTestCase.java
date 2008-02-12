@@ -13,7 +13,7 @@ package org.mule.test.integration.client;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.test.integration.service.Person;
+import org.mule.tck.testmodels.services.Person;
 
 public class MuleAxisSoapClientTestCase extends FunctionalTestCase
 {

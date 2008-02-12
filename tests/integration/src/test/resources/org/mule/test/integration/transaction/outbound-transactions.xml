@@ -37,7 +37,7 @@
     <model name="model">
 
         <mule-descriptor name="component1"
-            implementation="org.mule.test.integration.service.TestReceiver">
+            implementation="org.mule.tck.testmodels.services.TestReceiver">
             <inbound-router>
                 <endpoint address="vm://component1"/>
             </inbound-router>
@@ -55,7 +55,7 @@
         </mule-descriptor>
 
         <mule-descriptor name="component2"
-            implementation="org.mule.test.integration.service.TestReceiver">
+            implementation="org.mule.tck.testmodels.services.TestReceiver">
             <inbound-router>
                 <endpoint address="jms://component2">
                     <transaction action="ALWAYS_BEGIN" factory="org.mule.transport.jms.JmsTransactionFactory"/>

@@ -80,7 +80,7 @@
 
         <!-- This component will append " Received" to the message so we know we're getting the correct one -->
         <mule-descriptor name="pojo4"
-            implementation="org.mule.test.integration.service.TestReceiver">
+            implementation="org.mule.tck.testmodels.services.TestReceiver">
             <inbound-router>
                 <endpoint address="jms://pojo4"/>
             </inbound-router>

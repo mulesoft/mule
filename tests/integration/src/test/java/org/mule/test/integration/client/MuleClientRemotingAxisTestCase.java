@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.test.integration.service.Person;
+import org.mule.tck.testmodels.services.Person;
 import org.mule.transformers.xml.wire.XStreamWireFormat;
 
 public class MuleClientRemotingAxisTestCase extends FunctionalTestCase

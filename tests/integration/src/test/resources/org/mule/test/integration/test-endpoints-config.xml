@@ -41,7 +41,7 @@
             <inbound>
                 <inbound-endpoint address="test://localhost/test.queue" connector-ref="testConnector1" />
             </inbound>
-            <component class="org.mule.test.integration.service.TestComponent"/>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out" />
@@ -53,7 +53,7 @@
             <inbound>
                 <inbound-endpoint address="test://localhost/test.queue" connector-ref="testConnector2" transformer-refs="XmlToObject" />
             </inbound>
-            <component class="org.mule.test.integration.service.TestComponent"/>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
         </service>
 
         <!-- Test uri endpoints for send and receive and Uri endpoints on the outbound router -->
@@ -61,7 +61,7 @@
             <inbound>
                 <inbound-endpoint ref="testEndpoint"/>
             </inbound>
-            <component class="org.mule.test.integration.service.TestComponent"/>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <outbound>
                 <filtering-router>
                     <outbound-endpoint name="tcp1" address="tcp://localhost:60201"/>
@@ -81,7 +81,7 @@
                 <!-- inbound-endpoint address="vm://queue4" connector-ref="testConnector1" / -->
                 <inbound-endpoint address="vm://queue4"  connector-ref="vmConnector2" transformer-refs="ObjectToXml"/>
             </inbound>
-            <component class="org.mule.test.integration.service.TestComponent"/>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <outbound>
                 <filtering-router>
                     <outbound-endpoint address="udp://localhost:56731" />
@@ -94,7 +94,7 @@
             <inbound>
                 <inbound-endpoint address="vm://some.queue" connector-ref="vmConnector2" />
             </inbound>
-            <component class="org.mule.test.integration.service.TestComponent"/>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <outbound>
                 <filtering-router>
                     <outbound-endpoint ref="server1" />
@@ -104,7 +104,7 @@
         </service>
 
         <service name="TestComponent6">
-            <component class="org.mule.test.integration.service.TestComponent"/>
+            <component class="org.mule.tck.testmodels.services.TestComponent"/>
             <outbound>
                 <filtering-router>
                     <outbound-endpoint ref="server3" />

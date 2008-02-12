@@ -45,7 +45,7 @@
             <inbound>
                 <inbound-endpoint address="jms://pojo3"/>
             </inbound>
-            <component class="org.mule.test.integration.service.TestReceiver"/>
+            <component class="org.mule.tck.testmodels.services.TestReceiver"/>
         </service>
 
     </model>

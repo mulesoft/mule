@@ -27,7 +27,7 @@
             <inbound>
                 <inbound-endpoint address="vm://test.queue" />
             </inbound>
-            <component class="org.mule.test.integration.service.TestReceiver" />
+            <component class="org.mule.tck.testmodels.services.TestReceiver" />
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out" />

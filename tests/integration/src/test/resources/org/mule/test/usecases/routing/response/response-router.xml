@@ -86,7 +86,7 @@
                     <byte-array-to-string-transformer/>
                 </inbound-endpoint>
             </inbound>
-            <component class="org.mule.test.integration.service.TestReceiver"/>
+            <component class="org.mule.tck.testmodels.services.TestReceiver"/>
             <outbound>
                 <multicasting-router>
                     <outbound-endpoint address="file://temp/test-data/out"/>

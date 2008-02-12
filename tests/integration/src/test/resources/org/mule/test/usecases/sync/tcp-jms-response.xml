@@ -46,7 +46,7 @@
                 </inbound-endpoint>
             </inbound>
             <component>
-                <singleton-object class="org.mule.test.integration.service.TestReceiver" />
+                <singleton-object class="org.mule.tck.testmodels.services.TestReceiver" />
             </component>
         </service>
     </model>
