@@ -30,9 +30,9 @@ import org.mule.util.ClassUtils;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -139,8 +139,6 @@ public abstract class ImmutableMuleEndpoint implements ImmutableEndpoint
 
     protected String endpointEncoding;
 
-    protected String registryId = null;
-
     protected MuleContext muleContext;
 
     protected ConnectionStrategy connectionStrategy;
@@ -244,46 +242,37 @@ public abstract class ImmutableMuleEndpoint implements ImmutableEndpoint
     {
         return transactionConfig;
     }
-
-    public boolean equals(Object o)
+    
+    protected static boolean equal(Object a, Object b)
     {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof ImmutableMuleEndpoint))
-        {
-            return false;
-        }
+        return ClassUtils.equal(a, b);
+    }
 
-        final ImmutableMuleEndpoint other = (ImmutableMuleEndpoint) o;
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
-        if (!connector.getName().equals(other.connector.getName()))
-        {
-            return false;
-        }
-
-        if (endpointUri != null && other.endpointUri != null
-                        ? !endpointUri.getAddress().equals(other.endpointUri.getAddress())
-                        : other.endpointUri != null)
-        {
-            return false;
-        }
-
-        if (!name.equals(other.name))
-        {
-            return false;
-        }
-
-        // MULE-1551 - transformer excluded from comparison here
-        return isInbound() == other.isInbound() && isOutbound() == other.isOutbound();
+        final ImmutableMuleEndpoint other = (ImmutableMuleEndpoint) obj;
+        return equal(connectionStrategy, other.connectionStrategy) && equal(connector, other.connector)
+               && deleteUnacceptedMessages == other.deleteUnacceptedMessages
+               && equal(endpointEncoding, other.endpointEncoding) && equal(endpointUri, other.endpointUri)
+               && equal(filter, other.filter) && equal(initialState, other.initialState)
+               && equal(initialised, other.initialised) && equal(name, other.name)
+               && equal(properties, other.properties) && remoteSync == other.remoteSync
+               && equal(remoteSyncTimeout, other.remoteSyncTimeout)
+               && equal(responseTransformers, other.responseTransformers)
+               && equal(securityFilter, other.securityFilter) && synchronous == other.synchronous
+               && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
     }
 
     public int hashCode()
     {
-        // MULE-1551 - transformer excluded from hash here
-        return ClassUtils.hash(new Object[]{connector, endpointUri, name,
-                Boolean.valueOf(isInbound()), Boolean.valueOf(isOutbound())});
+        return ClassUtils.hash(new Object[]{connectionStrategy, connector,
+            deleteUnacceptedMessages ? Boolean.TRUE : Boolean.FALSE, endpointEncoding, endpointUri, filter,
+            initialState, initialised, name, properties, remoteSync ? Boolean.TRUE : Boolean.FALSE, remoteSyncTimeout,
+            responseTransformers, securityFilter, synchronous ? Boolean.TRUE : Boolean.FALSE, transactionConfig,
+            transformers});
     }
 
     public Filter getFilter()

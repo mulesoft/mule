@@ -22,5 +22,5 @@ org.mule.transport.tcp.integration.MuleMessageProtocolChunkingTestCase
 org.mule.transport.tcp.issues.SynchStreamingMule1687TestCase
 
 
-
-#org.mule.transport.tcp.issues.KeepSendSocketOpenMule1491TestCase
+#MULE-2984 This test is broken by this issue currently
+org.mule.transport.tcp.issues.KeepSendSocketOpenMule1491TestCase

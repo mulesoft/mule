@@ -684,6 +684,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     }
     
+    //TODO Equals() and hashCode() only needed for tests, move to tests
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{
@@ -707,6 +708,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         });
     }
 
+    //TODO Equals() and hashCode() only needed for tests, move to tests
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
