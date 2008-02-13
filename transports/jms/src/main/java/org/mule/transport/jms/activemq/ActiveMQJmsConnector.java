@@ -51,7 +51,7 @@ public class ActiveMQJmsConnector extends JmsConnector
         }
         catch (Exception e)
         {
-            logger.warn(e);
+            handleException(e);
             return null;
         }
     }

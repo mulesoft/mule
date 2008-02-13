@@ -8,13 +8,9 @@
        http://www.mulesource.org/schema/mule/client/2.0 http://www.mulesource.org/schema/mule/client/2.0/mule-client.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <client:remote-dispatcher-agent name="remoteAgent">
-        <client:remote-endpoint address="tcp://localhost:60504" synchronous="true"/>
+    <client:remote-dispatcher-agent name="foo">
+        <client:remote-endpoint address="test://localhost:50608"/>
+        <client:serialization-wire-format/>
     </client:remote-dispatcher-agent>
-    
-    <model name="main">
-        <service name="appleComponent">
-            <echo-component/>
-        </service>
-    </model>
+
 </mule>

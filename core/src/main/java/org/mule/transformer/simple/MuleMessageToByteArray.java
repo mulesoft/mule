@@ -16,9 +16,9 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.apache.commons.lang.SerializationUtils;
 
 /** TODO */
-public class UMOMessageToByteArray extends AbstractMessageAwareTransformer
+public class MuleMessageToByteArray extends AbstractMessageAwareTransformer
 {
-    public UMOMessageToByteArray()
+    public MuleMessageToByteArray()
     {
         registerSourceType(MuleMessage.class);
         setReturnClass(byte[].class);

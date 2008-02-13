@@ -10,14 +10,15 @@
 
 package org.mule.test.integration.client;
 
-public class MuleClientRemotingHttpTestCase extends MuleClientRemotingTestCase
+public class MuleClientRemotingHttpTestCase extends AbstractClientRemotingTestCase
 {
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/client/test-client-mule-config-remote-http.xml";
+        return "org/mule/test/integration/client/client-remote-dispatcher-common-config.xml, " +
+                "org/mule/test/integration/client/test-client-mule-config-remote-http.xml";
     }
 
-    public String getServerUrl()
+    public String getRemoteEndpointUri()
     {
         return "http://localhost:60504";
     }

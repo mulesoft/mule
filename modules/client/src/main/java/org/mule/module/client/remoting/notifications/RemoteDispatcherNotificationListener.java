@@ -8,15 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.context.notification;
+package org.mule.module.client.remoting.notifications;
 
+import org.mule.api.context.notification.ServerNotificationListener;
 
 /**
  * <code>ManagementNotificationListener</code> is an observer interface that
  * objects can use to receive notifications about the state of the Mule instance and
  * its resources
  */
-public interface AdminNotificationListener extends ServerNotificationListener
+public interface RemoteDispatcherNotificationListener extends ServerNotificationListener
 {
     // no methods
 }

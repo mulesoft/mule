@@ -161,7 +161,7 @@ public class MuleServer implements Runnable
         {
             logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
             // try to load the config as a file as well
-            URL configUrl = IOUtils.getResourceAsUrl(DEFAULT_CONFIGURATION, MuleServer.class, true);
+            URL configUrl = IOUtils.getResourceAsUrl(DEFAULT_CONFIGURATION, MuleServer.class, true, false);
             if (configUrl != null)
             {
                 config = configUrl.toExternalForm();

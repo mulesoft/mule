@@ -38,7 +38,6 @@ import org.mule.config.spring.parsers.specific.EnvironmentPropertyDefinitionPars
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ForwardingRouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
-import org.mule.config.spring.parsers.specific.MuleAdminAgentDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
@@ -155,7 +154,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //Common elements
         registerBeanDefinitionParser("configuration", new ConfigurationDefinitionParser());
         registerBeanDefinitionParser("environment-property", new EnvironmentPropertyDefinitionParser());
-        registerBeanDefinitionParser("admin-agent", new MuleAdminAgentDefinitionParser());
         registerBeanDefinitionParser("default-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE));
         registerBeanDefinitionParser("default-dispatcher-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE));
         registerBeanDefinitionParser("default-receiver-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));

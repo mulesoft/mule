@@ -11,6 +11,7 @@
 package org.mule.test.spring;
 
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -54,7 +55,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     }
 
     // @Override
-    public ConfigurationBuilder getBuilder()
+    public ConfigurationBuilder getBuilder() throws ConfigurationException
     {
         return new SpringXmlConfigurationBuilder(getConfigResources());
     }

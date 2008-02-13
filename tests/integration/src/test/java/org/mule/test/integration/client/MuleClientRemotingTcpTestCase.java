@@ -11,19 +11,18 @@
 package org.mule.test.integration.client;
 
 
-
-public class MuleClientRemotingJmsTestCase extends AbstractClientRemotingTestCase
+public class MuleClientRemotingTcpTestCase extends AbstractClientRemotingTestCase
 {
 
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/client-remote-dispatcher-common-config.xml, " +
-                "org/mule/test/integration/client/test-client-mule-config-remote-jms.xml";
+                "org/mule/test/integration/client/test-client-mule-config-remote-tcp.xml";
     }
 
     public String getRemoteEndpointUri()
     {
-        return "jms://mule.sys.queue";
+        return "tcp://localhost:60504";
     }
-
 }
+

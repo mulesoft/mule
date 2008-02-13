@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.context.notification;
+package org.mule.module.client.remoting.notifications;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.ServerNotification;
@@ -17,36 +17,42 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>AdminNotification</code> is used to invoke actions on a remote mule server
+ * <code>RemoteDispatcherNotification</code> is used to invoke actions on a remote mule server
  */
 
-public class AdminNotification extends ServerNotification
+public class RemoteDispatcherNotification extends ServerNotification
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = -53091546441476249L;
-    public static final int ACTION_RECEIVE = ADMIN_EVENT_ACTION_START_RANGE + 1;
-    public static final int ACTION_DISPATCH = ADMIN_EVENT_ACTION_START_RANGE + 2;
-    public static final int ACTION_SEND = ADMIN_EVENT_ACTION_START_RANGE + 3;
-    public static final int ACTION_INVOKE = ADMIN_EVENT_ACTION_START_RANGE + 4;
+
+    /** This is a low range since it was allocated before being refactred into the client module from core */
+    public static final int REMOTE_DISPATCHER_EVENT_ACTION_START_RANGE = 600;
+
+    public static final int ACTION_RECEIVE = REMOTE_DISPATCHER_EVENT_ACTION_START_RANGE + 1;
+    public static final int ACTION_DISPATCH = REMOTE_DISPATCHER_EVENT_ACTION_START_RANGE + 2;
+    public static final int ACTION_SEND = REMOTE_DISPATCHER_EVENT_ACTION_START_RANGE + 3;
+    public static final int ACTION_INVOKE = REMOTE_DISPATCHER_EVENT_ACTION_START_RANGE + 4;
+    public static final int ACTION_WIRE_FORMAT = REMOTE_DISPATCHER_EVENT_ACTION_START_RANGE + 5;
 
     static {
         registerAction("receive event", ACTION_RECEIVE);
         registerAction("dispatch event", ACTION_DISPATCH);
         registerAction("send event", ACTION_SEND);
-        registerAction("invoke service", ACTION_INVOKE);
+        registerAction("invoke component", ACTION_INVOKE);
+        registerAction("request wire format", ACTION_WIRE_FORMAT);
     }
 
     private Map properties = new HashMap();
     private MuleMessage message;
 
-    public AdminNotification(MuleMessage message, int action)
+    public RemoteDispatcherNotification(MuleMessage message, int action)
     {
         super(message, action);
     }
 
-    public AdminNotification(MuleMessage message, int action, String resourceIdentifier)
+    public RemoteDispatcherNotification(MuleMessage message, int action, String resourceIdentifier)
     {
         super(message, action, resourceIdentifier);
         this.message = message;

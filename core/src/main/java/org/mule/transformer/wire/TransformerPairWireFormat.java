@@ -39,6 +39,7 @@ public class TransformerPairWireFormat implements WireFormat
 
     protected Transformer inboundTransformer;
     protected Transformer outboundTransformer;
+    protected Class transferObjectClass;
 
     public Object read(InputStream in) throws MuleException
     {
@@ -67,6 +68,7 @@ public class TransformerPairWireFormat implements WireFormat
 
     public void write(OutputStream out, Object o, String encoding) throws MuleException
     {
+
         if (outboundTransformer == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("outboundTransformer").getMessage());
@@ -134,4 +136,8 @@ public class TransformerPairWireFormat implements WireFormat
         this.outboundTransformer = outboundTransformer;
     }
 
+    public void setTransferObjectClass(Class clazz)
+    {
+        transferObjectClass = clazz;
+    }
 }

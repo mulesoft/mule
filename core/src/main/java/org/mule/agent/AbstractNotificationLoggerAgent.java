@@ -12,7 +12,6 @@ package org.mule.agent;
 
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
-import org.mule.api.context.notification.AdminNotificationListener;
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
@@ -304,26 +303,6 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         if (!ignoreConnectionNotifications)
         {
             ServerNotificationListener l = new ConnectionNotificationListener()
-            {
-                public void onNotification(ServerNotification notification)
-                {
-                    logEvent(notification);
-                }
-            };
-            try
-            {
-               muleContext.registerListener(l);
-            }
-            catch (NotificationException e)
-            {
-                throw new InitialisationException(e, this);
-            }
-            listeners.add(l);
-        }
-
-        if (!ignoreAdminNotifications)
-        {
-            ServerNotificationListener l = new AdminNotificationListener()
             {
                 public void onNotification(ServerNotification notification)
                 {

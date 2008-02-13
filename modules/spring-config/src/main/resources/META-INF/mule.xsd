@@ -53,7 +53,6 @@
     <xsd:group name="rootElements">
         <xsd:choice>
             <xsd:element name="environment-property" type="environmentPropertyType"/>
-            <xsd:element name="admin-agent" type="adminAgentType"/>
             <xsd:element name="configuration" type="managementContextType"/>
             <xsd:element name="notifications" type="notificationManagerType"/>
             <xsd:element ref="description"/>
@@ -218,13 +217,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="adminAgentType">
-        <xsd:sequence>
-            <xsd:element ref="spring:property" minOccurs="0" maxOccurs="1"/>
-        </xsd:sequence>
-        <xsd:attribute name="serverUri" type="xsd:string"/>
-    </xsd:complexType>
-
     <xsd:complexType name="managementContextType">
         <xsd:sequence>
             <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0"/>
@@ -300,7 +292,6 @@
                             <xsd:enumeration value="SERVICE"/>
                             <xsd:enumeration value="SECURITY"/>
                             <xsd:enumeration value="MANAGEMENT"/>
-                            <xsd:enumeration value="ADMIN"/>
                             <xsd:enumeration value="CONNECTION"/>
                             <xsd:enumeration value="REGISTRY"/>
                             <xsd:enumeration value="CUSTOM"/>
@@ -330,7 +321,6 @@
                             <xsd:enumeration value="SERVICE"/>
                             <xsd:enumeration value="SECURITY"/>
                             <xsd:enumeration value="MANAGEMENT"/>
-                            <xsd:enumeration value="ADMIN"/>
                             <xsd:enumeration value="CONNECTION"/>
                             <xsd:enumeration value="REGISTRY"/>
                             <xsd:enumeration value="CUSTOM"/>
@@ -369,7 +359,6 @@
                             <xsd:enumeration value="SERVICE"/>
                             <xsd:enumeration value="SECURITY"/>
                             <xsd:enumeration value="MANAGEMENT"/>
-                            <xsd:enumeration value="ADMIN"/>
                             <xsd:enumeration value="CONNECTION"/>
                             <xsd:enumeration value="REGISTRY"/>
                             <xsd:enumeration value="CUSTOM"/>
@@ -398,7 +387,6 @@
                             <xsd:enumeration value="SERVICE"/>
                             <xsd:enumeration value="SECURITY"/>
                             <xsd:enumeration value="MANAGEMENT"/>
-                            <xsd:enumeration value="ADMIN"/>
                             <xsd:enumeration value="CONNECTION"/>
                             <xsd:enumeration value="REGISTRY"/>
                             <xsd:enumeration value="CUSTOM"/>

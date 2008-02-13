@@ -16,16 +16,16 @@
                 interface-class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface"/>
 
         <!-- adming events are routed to the test interface 2, but disabled for the usual admin listener -->
-        <notification event="ADMIN"
+        <notification event="SECURITY"
                 interface-class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestInterface2"/>
-        <disable-notification interface="ADMIN"/>
+        <disable-notification interface="SECURITY"/>
 
         <!-- this receives the simple test event -->
         <notification-listener ref="listener"/>
 
         <!-- the admin event should go to the test interface 2, but not to the disabled adming interface -->
         <notification-listener ref="listener2"/>
-        <notification-listener ref="adminListener"/>
+        <notification-listener ref="securityListener"/>
 
     </notifications>
 
@@ -33,7 +33,7 @@
                  class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener"/>
     <spring:bean name="listener2"
                  class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestListener2"/>
-    <spring:bean name="adminListener"
-                 class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestAdminListener"/>
+    <spring:bean name="securityListener"
+                 class="org.mule.config.spring.parsers.specific.ServerNotificationManagerTestCase$TestSecurityListener"/>
 
 </mule>

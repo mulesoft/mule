@@ -31,6 +31,21 @@ public class ClientMessages extends MessageFactory
     {
         return createMessage(BUNDLE_PATH, 3);
     }
+
+    public static Message unsupportedServerWireForat(String wireFormat)
+    {
+        return createMessage(BUNDLE_PATH, 4, wireFormat);
+    }
+
+    public static Message failedToDispatchActionNoResponseFromServer(String action, int timeout)
+    {
+        return createMessage(BUNDLE_PATH, 5, action, new Integer(timeout));
+    }
+
+    public static Message failedToDeserializeHandshakeFromServer()
+    {
+        return createMessage(BUNDLE_PATH, 6);
+    }
 }
 
 

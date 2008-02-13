@@ -6,4 +6,4 @@
 org.mule.transformers.xml.XmlUMOMessageTransformersTestCase
 
 # MULE-2881
-org.mule.transformers.xml.wire.XStreamWireFormatTestCase
+#org.mule.transformers.xml.wire.XStreamWireFormatTestCase

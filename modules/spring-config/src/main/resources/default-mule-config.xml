@@ -61,7 +61,6 @@
             <mule:notification event="SERVICE"/>
             <mule:notification event="SECURITY"/>
             <mule:notification event="MANAGEMENT"/>
-            <mule:notification event="ADMIN"/>
             <mule:notification event="CONNECTION"/>
             <mule:notification event="REGISTRY"/>
             <mule:notification event="CUSTOM"/>

@@ -108,7 +108,7 @@ public class MuleConfiguration
     private String workingDirectory;
 
     /** The configuration resources used to configure the MuleManager instance */
-    private String[] configResources = new String[]{};
+    private ConfigResource[] configResources = new ConfigResource[]{};
 
     /**
      * Whether the server instance is running in client mode, which means that some
@@ -239,17 +239,17 @@ public class MuleConfiguration
         this.workingDirectory = FileUtils.newFile(workingDirectory).getAbsolutePath().replaceAll("\\\\", "/");
     }
 
-    public String[] getConfigResources()
+    public ConfigResource[] getConfigResources()
     {
         return configResources;
     }
 
-    public void setConfigResources(String[] configResources)
+    public void setConfigResources(ConfigResource[] configResources)
     {
         if (configResources != null)
         {
             int current = this.configResources.length;
-            String[] newResources = new String[configResources.length + current];
+            ConfigResource[] newResources = new ConfigResource[configResources.length + current];
             System.arraycopy(this.configResources, 0, newResources, 0, current);
             System.arraycopy(configResources, 0, newResources, current, configResources.length);
             this.configResources = newResources;

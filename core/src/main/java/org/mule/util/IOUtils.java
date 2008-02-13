@@ -87,20 +87,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
                                                   boolean tryAsUrl) throws IOException
     {
 
-        URL url = getResourceAsUrl(resourceName, callingClass, tryAsFile);
-
-        // Try to load the resource itself as a URL.
-        if ((url == null) && (tryAsUrl))
-        {
-            try
-            {
-                url = new URL(resourceName);
-            }
-            catch (MalformedURLException e)
-            {
-                logger.debug("Unable to load resource as a URL: " + resourceName);
-            }
-        }
+        URL url = getResourceAsUrl(resourceName, callingClass, tryAsFile, tryAsUrl);
 
         if (url == null)
         {
@@ -122,7 +109,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils
      */
     public static URL getResourceAsUrl(final String resourceName, final Class callingClass)
     {
-        return getResourceAsUrl(resourceName, callingClass, true);
+        return getResourceAsUrl(resourceName, callingClass, true, true);
     }
 
     /**
@@ -132,11 +119,12 @@ public class IOUtils extends org.apache.commons.io.IOUtils
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      * @param tryAsFile - try to load the resource from the local file system
+     * @param tryAsUrl - try to load the resource as a Url string
      * @return an URL to the resource or null if resource not found
      */
     public static URL getResourceAsUrl(final String resourceName,
                                        final Class callingClass,
-                                       boolean tryAsFile)
+                                       boolean tryAsFile, boolean tryAsUrl)
     {
         if (resourceName == null)
         {
@@ -190,6 +178,17 @@ public class IOUtils extends org.apache.commons.io.IOUtils
             }
         }
 
+        if(url==null)
+        {
+            try
+            {
+                url = new URL(resourceName);
+            }
+            catch (MalformedURLException e)
+            {
+                //ignore
+            }
+        }
         return url;
     }
 

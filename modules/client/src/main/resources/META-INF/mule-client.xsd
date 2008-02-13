@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesource.org/schema/mule/client/2.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesource.org/schema/mule/core/2.0"
+            targetNamespace="http://www.mulesource.org/schema/mule/client/2.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
+                schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
+
+    <xsd:element name="remote-dispatcher-agent" type="remoteDispatcherAgentType" substitutionGroup="mule:abstract-extension"/>
+
+    <xsd:complexType name="remoteDispatcherAgentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractAgentType">
+                <xsd:sequence>
+                    <xsd:element name="remote-endpoint" type="mule:inboundEndpointType" minOccurs="0" maxOccurs="1"/>
+                    <xsd:group ref="defaultWireFormatElements"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+
+    </xsd:complexType>
+
+    <xsd:group name="defaultWireFormatElements">
+        <xsd:sequence>
+            <xsd:choice minOccurs="0" maxOccurs="1">
+                <xsd:element name="xml-wire-format"/>
+                <xsd:element name="serialization-wire-format"/>
+                <xsd:element name="custom-wire-format">
+                    <xsd:complexType>
+                        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:group>
+</xsd:schema>

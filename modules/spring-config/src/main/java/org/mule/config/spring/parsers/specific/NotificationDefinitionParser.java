@@ -10,7 +10,6 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.context.notification.AdminNotificationListener;
 import org.mule.api.context.notification.ServiceNotificationListener;
 import org.mule.api.context.notification.ConnectionNotificationListener;
 import org.mule.api.context.notification.CustomNotificationListener;
@@ -27,7 +26,6 @@ import org.mule.config.spring.parsers.assembly.configuration.PropertyConfigurati
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckRequiredAttributes;
-import org.mule.context.notification.AdminNotification;
 import org.mule.context.notification.ServiceNotification;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.CustomNotification;
@@ -71,7 +69,6 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         EVENT_MAP.put("SERVICE", ServiceNotification.class.getName());
         EVENT_MAP.put("SECURITY", SecurityNotification.class.getName());
         EVENT_MAP.put("MANAGEMENT", ManagementNotification.class.getName());
-        EVENT_MAP.put("ADMIN", AdminNotification.class.getName());
         EVENT_MAP.put("CONNECTION", ConnectionNotification.class.getName());
         EVENT_MAP.put("REGISTRY", RegistryNotification.class.getName());
         EVENT_MAP.put("CUSTOM", CustomNotification.class.getName());
@@ -85,7 +82,6 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser
         INTERFACE_MAP.put("SERVICE", ServiceNotificationListener.class.getName());
         INTERFACE_MAP.put("SECURITY", SecurityNotificationListener.class.getName());
         INTERFACE_MAP.put("MANAGEMENT", ManagementNotificationListener.class.getName());
-        INTERFACE_MAP.put("ADMIN", AdminNotificationListener.class.getName());
         INTERFACE_MAP.put("CONNECTION", ConnectionNotificationListener.class.getName());
         INTERFACE_MAP.put("REGISTRY", RegistryNotificationListener.class.getName());
         INTERFACE_MAP.put("CUSTOM", CustomNotificationListener.class.getName());

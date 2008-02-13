@@ -12,6 +12,7 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.registry.Registry;
+import org.mule.config.ConfigResource;
 import org.mule.util.ClassUtils;
 
 import java.io.IOException;
@@ -23,7 +24,9 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
 /**
  * <code>MuleApplicationContext</code> is a simple extension application context
@@ -36,8 +39,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
     public static final String LEGACY_BEAN_READER_CLASS = "org.mule.config.spring.MuleBeanDefinitionReader";
 
     private MuleContext muleContext;
-    private final Resource[] configResources;
-    private final String[] configLocations;
+    private Resource[] springResources;
 
     /**
      * Parses configuration files creating a spring ApplicationContext which is used
@@ -45,12 +47,12 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * the spring ApplicationContext
      * 
      * @param registry
-     * @param configLocations
+     * @param configResources
      * @see org.mule.config.spring.SpringRegistry
      */
-    public MuleApplicationContext(MuleContext muleContext, Registry registry, String[] configLocations)
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, ConfigResource[] configResources)
     {
-        this(muleContext, registry, configLocations, true);
+        this(muleContext, registry, configResources, true);
     }
     
     /**
@@ -63,36 +65,15 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * @param parent 
      * @see org.mule.config.spring.SpringRegistry
      */
-    public MuleApplicationContext(MuleContext muleContext, Registry registry, String[] configLocations, ApplicationContext parent)
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, ConfigResource[] configResources, ApplicationContext parent)
     {
         super(parent);
         setupParentSpringRegistry(registry);
         this.muleContext = muleContext;
-        this.configLocations = configLocations;
-        this.configResources = null;
+        this.springResources = convert(configResources);
         refresh();
     }
-    
-    /**
-     * Sets up TransientRegistry SpringRegistry parent relationship here. This is
-     * required here before "refresh()" rather than in the configuration builder
-     * after parsing the spring config because spring executes the initialize phase
-     * for objects it manages during "refresh()" and during intialization of mule
-     * artifacts need to be able to lookup other artifacts both in TransientRegistry
-     * and in spring (using SpringRegistry facade) by using the mule Registry
-     * interface.
-     * 
-     * @param registry
-     */
-    protected void setupParentSpringRegistry(Registry registry)
-    {
-        registry.setParent(new SpringRegistry(this));
-    }
-    
-    protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-        super.prepareBeanFactory(beanFactory);
-        beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
-    }
+
     
     /**
      * @param registry
@@ -105,17 +86,16 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 
     /**
      * @param registry
-     * @param configLocations
+     * @param configResources
      * @param refresh
      * @throws BeansException
      */
-    public MuleApplicationContext(MuleContext muleContext, Registry registry, String[] configLocations, boolean refresh)
-        throws BeansException
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, ConfigResource[] configResources, boolean refresh)
+            throws BeansException
     {
         this.muleContext = muleContext;
         setupParentSpringRegistry(registry);
-        this.configLocations = configLocations;
-        this.configResources = null;
+        this.springResources = convert(configResources);
         if (refresh)
         {
             refresh();
@@ -127,13 +107,12 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * @param configLocations
      * @param parent 
      */
-    public MuleApplicationContext(MuleContext muleContext, Registry registry, Resource[] configResources, ApplicationContext parent)
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, Resource[] springResources, ApplicationContext parent) throws IOException
     {
         super(parent);
         this.muleContext = muleContext;
         setupParentSpringRegistry(registry);
-        this.configLocations = null;
-        this.configResources = configResources;
+        this.springResources = springResources;
         refresh();
     }
 
@@ -143,29 +122,68 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
      * @param refresh
      * @throws BeansException 
      */
-    public MuleApplicationContext(MuleContext muleContext, Registry registry, Resource[] configResources, boolean refresh)
-        throws BeansException
+    public MuleApplicationContext(MuleContext muleContext, Registry registry, Resource[] springResources, boolean refresh)
+            throws BeansException
     {
         setupParentSpringRegistry(registry);
         this.muleContext = muleContext;
-        this.configLocations = null;
-        this.configResources = configResources;
+        this.springResources = springResources;
         if (refresh)
         {
             refresh();
         }
     }
 
-    //@Override
-    protected Resource[] getConfigResources()
+    /**
+     * Sets up TransientRegistry SpringRegistry parent relationship here. This is
+     * required here before "refresh()" rather than in the configuration builder
+     * after parsing the spring config because spring executes the initialize phase
+     * for objects it manages during "refresh()" and during intialization of mule
+     * artifacts need to be able to lookup other artifacts both in TransientRegistry
+     * and in spring (using SpringRegistry facade) by using the mule Registry
+     * interface.
+     *
+     * @param registry
+     */
+    protected void setupParentSpringRegistry(Registry registry)
     {
+        registry.setParent(new SpringRegistry(this));
+    }
+
+    protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+        super.prepareBeanFactory(beanFactory);
+        beanFactory.addBeanPostProcessor(new MuleContextPostProcessor(muleContext));
+    }
+
+    private Resource[] convert(ConfigResource[] resources)
+    {
+        Resource[] configResources = new Resource[resources.length];
+        for (int i = 0; i < resources.length; i++)
+        {
+            ConfigResource resource = resources[i];
+            if(resource.getUrl()!=null)
+            {
+                configResources[i] = new UrlResource(resource.getUrl());
+            }
+            else
+            {
+                try
+                {
+                    configResources[i] = new InputStreamResource(resource.getInputStream());
+                }
+                catch (IOException e)
+                {
+                    //ignore, should never happen
+                }
+            }
+        }
         return configResources;
     }
 
     //@Override
-    protected String[] getConfigLocations()
+    protected Resource[] getConfigResources()
     {
-        return configLocations;
+        return springResources;
     }
 
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
@@ -179,7 +197,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
             try
             {
                 beanDefinitionReader = (XmlBeanDefinitionReader) ClassUtils.instanciateClass(
-                        LEGACY_BEAN_READER_CLASS, new Object[] {beanFactory, configLocations});
+                        LEGACY_BEAN_READER_CLASS, new Object[] {beanFactory, springResources});
             }
             catch (Exception e)
             {
@@ -194,14 +212,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
         //add error reporting
         beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
-        if (configLocations != null)
-        {
-            beanDefinitionReader.loadBeanDefinitions(configLocations);
-        }
-        else
-        {
-            beanDefinitionReader.loadBeanDefinitions(configResources);
-        }
+        beanDefinitionReader.loadBeanDefinitions(springResources);
     }
 
     //@Override

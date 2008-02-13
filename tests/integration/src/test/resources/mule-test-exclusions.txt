@@ -19,7 +19,6 @@ org.mule.test.integration.VisualizerServiceTestCase
 
 org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
 
-#org.mule.test.integration.client.RemoteExceptionTestCase
 org.mule.test.integration.transaction.OutboundTransactionsTestCase
 
 # These tests work when run from the IDE (IntelliJ)
@@ -49,9 +48,6 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 ##########################################################################
 # Unfinished 2.x implementation
 ##########################################################################
-
-# MULE-2881
-org.mule.test.integration.client.MuleClientRemotingAxisTestCase
 
 # MULE-2740
 #org.mule.test.integration.MuleEndpointConfigurationTestCase

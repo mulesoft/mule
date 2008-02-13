@@ -177,6 +177,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <artifactId>geronimo-j2ee-management_1.0_spec</artifactId>
+            <groupId>org.apache.geronimo.specs</groupId>
+        </dependency>
     </dependencies>
 
     <profiles>

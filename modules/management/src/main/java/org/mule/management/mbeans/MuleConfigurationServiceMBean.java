@@ -10,6 +10,8 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.config.ConfigResource;
+
 /**
  * <code>MuleConfigurationServiceMBean</code> is a JMx service interface for the
  * Mule server configuration.
@@ -32,7 +34,7 @@ public interface MuleConfigurationServiceMBean
 
     public void setWorkingDirectory(String workingDirectory);
 
-    public String[] getConfigResources();
+    public ConfigResource[] getConfigResources();
 
     public int getTransactionTimeout();
 

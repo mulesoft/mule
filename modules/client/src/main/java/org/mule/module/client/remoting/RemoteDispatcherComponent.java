@@ -8,22 +8,21 @@
  * LICENSE.txt file.
  */
 
-package org.mule.agent;
+package org.mule.module.client.remoting;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
 import org.mule.MuleServer;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
-import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -31,12 +30,13 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.context.notification.AdminNotification;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.model.seda.SedaService;
+import org.mule.module.client.remoting.notifications.RemoteDispatcherNotification;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.NullPayload;
 import org.mule.util.MapUtils;
@@ -53,21 +53,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>MuleManagerComponent</code> is a MuleManager interal server service
+ * <code>RemoteDispatcherComponent</code> is a MuleManager interal server component
  * responsible for receiving remote requests and dispatching them locally. This
  * allows developer to tunnel requests through http ssl to a Mule instance behind a
  * firewall
  */
 
-public class MuleManagerComponent implements Callable, Initialisable, MuleContextAware
+public class RemoteDispatcherComponent implements Callable, Initialisable
 {
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(MuleManagerComponent.class);
+    protected static final Log logger = LogFactory.getLog(RemoteDispatcherComponent.class);
 
     public static final String MANAGER_COMPONENT_NAME = "_muleManagerComponent";
-    public static final String MANAGER_ENDPOINT_NAME = "_muleManagerEndpoint";
 
     /**
      * Use Serialization by default
@@ -78,8 +77,6 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
 
     protected int synchronousEventTimeout = 5000;
 
-    protected MuleContext muleContext;
-
     public void initialise() throws InitialisationException
     {
         if (wireFormat == null)
@@ -89,34 +86,47 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
     }
     public Object onCall(MuleEventContext context) throws Exception
     {
+        if(context.transformMessageToString().equals(ServerHandshake.SERVER_HANDSHAKE_PROPERTY))
+        {
+            return doHandshake(context);
+        }
+
         Object result;
-        logger.debug("Message received by MuleManagerComponent");
+        logger.debug("Message received by RemoteDispatcherComponent");
         ByteArrayInputStream in = new ByteArrayInputStream(context.transformMessageToBytes());
-        AdminNotification action = (AdminNotification) wireFormat.read(in);
-        if (AdminNotification.ACTION_INVOKE == action.getAction())
+        RemoteDispatcherNotification action = (RemoteDispatcherNotification) ((MuleMessage)wireFormat.read(in)).getPayload();
+
+        if (RemoteDispatcherNotification.ACTION_INVOKE == action.getAction())
         {
             result = invokeAction(action, context);
         }
-        else if (AdminNotification.ACTION_SEND == action.getAction() ||
-                 AdminNotification.ACTION_DISPATCH == action.getAction())
+        else if (RemoteDispatcherNotification.ACTION_SEND == action.getAction() ||
+                 RemoteDispatcherNotification.ACTION_DISPATCH == action.getAction())
         {
             result = sendAction(action, context);
         }
-        else if (AdminNotification.ACTION_RECEIVE == action.getAction())
+        else if (RemoteDispatcherNotification.ACTION_RECEIVE == action.getAction())
         {
             result = receiveAction(action, context);
         }
         else
         {
             result = handleException(null, new DefaultMuleException(
-                CoreMessages.eventTypeNotRecognised("AdminNotification:" + action.getAction())));
+                CoreMessages.eventTypeNotRecognised("RemoteDispatcherNotification:" + action.getAction())));
         }
         return result;
     }
 
-    protected Object invokeAction(AdminNotification action, MuleEventContext context) throws MuleException
+    protected ServerHandshake doHandshake(MuleEventContext context) throws TransformerException
     {
-        String destComponent = null;
+        ServerHandshake handshake  = new ServerHandshake();
+        handshake.setWireFormatClass(wireFormat.getClass().getName());
+        return handshake;
+    }
+
+    protected Object invokeAction(RemoteDispatcherNotification action, MuleEventContext context) throws MuleException
+    {
+        String destComponent;
         MuleMessage result = null;
         String endpoint = action.getResourceIdentifier();
         if (action.getResourceIdentifier().startsWith("mule:"))
@@ -135,11 +145,11 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type
-            MuleContext muleContext = MuleServer.getMuleContext();
-            EndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint(), muleContext);
+            MuleContext managementContext = MuleServer.getMuleContext();
+            EndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint(), managementContext);
             // TODO - is this correct? it stops any other transformer from being set
             builder.setTransformers(new LinkedList());
-            ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            ImmutableEndpoint ep = managementContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             MuleEvent event = new DefaultMuleEvent(action.getMessage(), ep, context.getSession(), context.isSynchronous());
             event = RequestContext.setEvent(event);
 
@@ -163,26 +173,26 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
         }
     }
 
-    protected Object sendAction(AdminNotification action, MuleEventContext context) throws MuleException
+    protected Object sendAction(RemoteDispatcherNotification action, MuleEventContext context) throws MuleException
     {
         MuleMessage result = null;
         ImmutableEndpoint endpoint = null;
-        MuleContext muleContext = context.getMuleContext();
+        MuleContext managementContext = context.getMuleContext();
         try
         {
-            if (AdminNotification.ACTION_DISPATCH == action.getAction())
+            if (RemoteDispatcherNotification.ACTION_DISPATCH == action.getAction())
             {
-                endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+                endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
                     action.getResourceIdentifier());
                 context.dispatchEvent(action.getMessage(), endpoint);
                 return null;
             }
             else
             {
-                EndpointFactory endpointFactory = muleContext.getRegistry().lookupEndpointFactory();
+                EndpointFactory endpointFactory = managementContext.getRegistry().lookupEndpointFactory();
                 EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(action.getResourceIdentifier());
                 endpointBuilder.setRemoteSync(true);
-                endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+                endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
                 result = context.sendEvent(action.getMessage(), endpoint);
                 if (result == null)
                 {
@@ -202,7 +212,7 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
         }
     }
 
-    protected Object receiveAction(AdminNotification action, MuleEventContext context) throws MuleException
+    protected Object receiveAction(RemoteDispatcherNotification action, MuleEventContext context) throws MuleException
     {
         MuleMessage result = null;
         try
@@ -241,31 +251,25 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
     }
 
 
-    public static final Service getService(EndpointBuilder endpointBuilder,
+    public static final Service getSerivce(ImmutableEndpoint endpoint,
                                                     WireFormat wireFormat,
                                                     String encoding,
                                                     int eventTimeout,
-                                                    MuleContext muleContext) throws MuleException
+                                                    MuleContext managementContext) throws MuleException
     {
         try
         {
             Service service = new SedaService();
             service.setName(MANAGER_COMPONENT_NAME);
-            service.setModel(muleContext.getRegistry().lookupSystemModel());
+            service.setModel(managementContext.getRegistry().lookupSystemModel());
 
             Map props = new HashMap();
             props.put("wireFormat", wireFormat);
             props.put("encoding", encoding);
             props.put("synchronousEventTimeout", new Integer(eventTimeout));
-            service.setServiceFactory(new PrototypeObjectFactory(MuleManagerComponent.class, props));
+            service.setServiceFactory(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props));
 
-            service.setMuleContext(muleContext);
-            //service.initialise();
-    
-            endpointBuilder.setName(MANAGER_ENDPOINT_NAME);
-            ImmutableEndpoint endpoint = muleContext.getRegistry()
-                .lookupEndpointFactory()
-                .getInboundEndpoint(endpointBuilder);
+            service.setMuleContext(managementContext);
             service.getInboundRouter().addEndpoint(endpoint);
 
             return service;
@@ -277,7 +281,7 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
     }
 
     /**
-     * Wraps an exception into a DefaultMuleMessage with an Exception payload and returns
+     * Wraps an exception into a MuleMessage with an Exception payload and returns
      * the Xml representation of it
      * 
      * @param result the result of the invocation or null if the exception occurred
@@ -337,10 +341,5 @@ public class MuleManagerComponent implements Callable, Initialisable, MuleContex
     public void setSynchronousEventTimeout(int synchronousEventTimeout)
     {
         this.synchronousEventTimeout = synchronousEventTimeout;
-    }
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-        
     }
 }

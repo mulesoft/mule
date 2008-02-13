@@ -11,7 +11,9 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.registry.Registry;
+import org.mule.config.ConfigResource;
 import org.mule.config.builders.AbstractResourceConfigurationBuilder;
 
 import org.springframework.beans.BeansException;
@@ -24,36 +26,47 @@ import org.springframework.context.ApplicationContext;
  */
 public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder
 {
-    protected String defaultConfigResource = "default-mule-config.xml";
+    protected String defaultConfigResourceName = "default-mule-config.xml";
 
     protected ApplicationContext parentContext;
 
-    public SpringXmlConfigurationBuilder(String configResources, ApplicationContext parentContext)
+    public SpringXmlConfigurationBuilder(String configResources, ApplicationContext parentContext) throws ConfigurationException
     {
         super(configResources);
         this.parentContext = parentContext;
     }
 
-    public SpringXmlConfigurationBuilder(String[] configResources, ApplicationContext parentContext)
+    public SpringXmlConfigurationBuilder(String[] configResources, ApplicationContext parentContext) throws ConfigurationException
     {
         super(configResources);
         this.parentContext = parentContext;
     }
 
-    public SpringXmlConfigurationBuilder(String[] configResources)
+    public SpringXmlConfigurationBuilder(String[] configResources) throws ConfigurationException
     {
         this(configResources, null);
     }
 
-    public SpringXmlConfigurationBuilder(String configResources)
+    public SpringXmlConfigurationBuilder(String configResources) throws ConfigurationException
+    {
+        this(configResources, null);
+    }
+
+    public SpringXmlConfigurationBuilder(ConfigResource[] configResources, ApplicationContext parentContext)
+    {
+        super(configResources);
+        this.parentContext = parentContext;
+    }
+
+    public SpringXmlConfigurationBuilder(ConfigResource[] configResources)
     {
         this(configResources, null);
     }
 
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
-        String[] all = new String[configResources.length + 1];
-        all[0] = defaultConfigResource;
+        ConfigResource[] all = new ConfigResource[configResources.length + 1];
+        all[0] = new ConfigResource(defaultConfigResourceName);
         System.arraycopy(configResources, 0, all, 1, configResources.length);
         createSpringParentRegistry(muleContext, muleContext.getRegistry(), all);
     }
@@ -69,7 +82,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
      * @param all
      * @see MuleApplicationContext#setupParentSpringRegistry(Registry registry
      */
-    protected void createSpringParentRegistry(MuleContext muleContext, Registry registry, String[] all)
+    protected void createSpringParentRegistry(MuleContext muleContext, Registry registry, ConfigResource[] all)
     {
         try
         {
@@ -91,9 +104,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         }
     }
 
-    public void setDefaultConfigResource(String defaultConfigResource)
+    public void setDefaultConfigResourceName(String defaultConfigResourceName)
     {
-        this.defaultConfigResource = defaultConfigResource;
+        this.defaultConfigResourceName = defaultConfigResourceName;
     }
 
     public void setParentContext(ApplicationContext parentContext)

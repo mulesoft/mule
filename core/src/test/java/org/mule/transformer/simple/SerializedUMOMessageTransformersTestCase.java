@@ -65,12 +65,12 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
 
     public Transformer getTransformer() throws Exception
     {
-        return new UMOMessageToByteArray();
+        return new MuleMessageToByteArray();
     }
 
     public Transformer getRoundTripTransformer() throws Exception
     {
-        return new ByteArrayToUMOMessage();
+        return new ByteArrayToMuleMessage();
     }
 
     public Object getTestData()

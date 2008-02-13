@@ -11,7 +11,9 @@
 package org.mule.config.builders;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationException;
 import org.mule.api.registry.Registry;
+import org.mule.config.ConfigResource;
 import org.mule.config.spring.MuleApplicationContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 
@@ -26,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ClassPathResource;
@@ -41,7 +44,7 @@ import org.springframework.web.context.support.ServletContextResource;
  * ServletContext and if this fails then it will attempt to load config resource from the classpath.
  * <li> ServletContext resources should be relative to the webapp root directory and start with '/'.
  * <li> Classpath resources should be in the webapp classpath and should not start with '/'.
- * 
+ *
  * @see org.mule.config.builders.SpringXmlConfigurationBuilder
  */
 public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBuilder
@@ -53,24 +56,31 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
 
     private ServletContext context;
 
-    public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String[] configResources)
+    public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String configResources) throws ConfigurationException
     {
         super(configResources);
         context = servletContext;
     }
 
-    public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String configResources)
+
+    public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String[] configResources) throws ConfigurationException
     {
         super(configResources);
         context = servletContext;
     }
 
-    protected void createSpringParentRegistry(MuleContext muleContext, Registry registry, String[] all)
+    public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, ConfigResource[] configResources)
+    {
+        super(configResources);
+        context = servletContext;
+    }
+
+    protected void createSpringParentRegistry(MuleContext muleContext, Registry registry, ConfigResource[] all)
     {
         Resource[] servletContextResources = new Resource[all.length];
         for (int i = 0; i < all.length; i++)
         {
-            servletContextResources[i] = new ServletContextOrClassPathResource(context, all[i]);
+            servletContextResources[i] = new ServletContextOrClassPathResource(context, all[i].getResourceName());
         }
 
         parentContext = loadParentContext(context);
@@ -93,13 +103,18 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
             registry.setParent(null);
             throw e;
         }
+        catch (IOException e)
+        {
+            registry.setParent(null);
+            throw new ApplicationContextException("Failed to load config resource", e);
+        }
     }
 
     /**
      * Used to lookup parent spring ApplicationContext. This allows a parent spring ApplicatonContet to be
      * provided in the same way you would configure a parent ApplicationContext for a spring
      * WebAppplicationContext
-     * 
+     *
      * @param servletContext
      * @return
      * @throws BeansException
@@ -118,8 +133,8 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
             BeanFactoryLocator locator = ContextSingletonBeanFactoryLocator.getInstance(locatorFactorySelector);
             if (logger.isDebugEnabled())
             {
-                logger.debug("Getting parent context definition: using parent context key of '" + parentContextKey
-                             + "' with BeanFactoryLocator");
+                logger.debug("Getting parent context definition: using parent context key of '"
+                        + parentContextKey + "' with BeanFactoryLocator");
             }
             parentContext = (ApplicationContext) locator.useBeanFactory(parentContextKey).getFactory();
         }

@@ -10,12 +10,16 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.context.notification.AdminNotificationListener;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.context.notification.AdminNotification;
+import org.mule.api.security.UnauthorisedException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.NullPayload;
 
 import java.util.Collection;
 
@@ -44,7 +48,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         ifaces = manager.getInterfaceToTypes().get(TestInterface2.class);
         assertNotNull(ifaces);
         assertTrue(ifaces instanceof Collection);
-        assertTrue(((Collection) ifaces).contains(AdminNotification.class));        
+        assertTrue(((Collection) ifaces).contains(SecurityNotification.class));
     }
 
     public void testSimpleNotification() throws InterruptedException
@@ -69,11 +73,11 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
                 (TestListener2) muleContext.getRegistry().lookupObject("listener2");
         assertNotNull(listener2);
         assertFalse(listener2.isCalled());
-        TestAdminListener adminListener =
-                (TestAdminListener) muleContext.getRegistry().lookupObject("adminListener");
+        TestSecurityListener adminListener =
+                (TestSecurityListener) muleContext.getRegistry().lookupObject("securityListener");
         assertNotNull(adminListener);
         assertFalse(adminListener.isCalled());
-        manager.fireNotification(new TestAdminEvent());
+        manager.fireNotification(new TestSecurityEvent());
         Thread.sleep(1000); // asynch events
         assertTrue(listener2.isCalled());
         assertFalse(adminListener.isCalled());
@@ -103,7 +107,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         {
             called = true;
         }
-        
+
     }
 
     protected static class TestListener2 implements TestInterface2
@@ -123,7 +127,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
 
     }
 
-   protected static class TestAdminListener implements AdminNotificationListener
+    protected static class TestSecurityListener implements SecurityNotificationListener
     {
 
         private boolean called = false;
@@ -150,14 +154,16 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
 
     }
 
-    protected static class TestAdminEvent extends AdminNotification
+    protected static class TestSecurityEvent extends SecurityNotification
     {
 
-        public TestAdminEvent()
+        public TestSecurityEvent()
         {
-            super(null, 0);
+            super(new UnauthorisedException(CoreMessages.createStaticMessage("dummy"),
+                    new DefaultMuleMessage(NullPayload.getInstance())), 0);
         }
 
     }
+
 
 }

@@ -21,7 +21,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
 {
     public MuleClientRemotingAxisTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeManagerPerSuite(false);
     }
 
     protected String getConfigResources()
@@ -32,8 +32,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38100");
-        dispatcher.setWireFormat(new XStreamWireFormat());
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
         try
         {
             MuleMessage result = dispatcher.sendRemote(
@@ -50,7 +49,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     public void testRequestResponseComplex() throws Exception
     {
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38100");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
         dispatcher.setWireFormat(new XStreamWireFormat());
 
         try
@@ -72,7 +71,7 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     public void testRequestResponseComplex2() throws Exception
     {
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38100");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("remoteEndpoint");
         dispatcher.setWireFormat(new XStreamWireFormat());
 
         try

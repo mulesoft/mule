@@ -19,7 +19,7 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "/org/mule/test/spring/inherited-properties-mule-2458-test.xml";
+        return "org/mule/test/spring/inherited-properties-mule-2458-test.xml";
     }
 
     public void testProperties()

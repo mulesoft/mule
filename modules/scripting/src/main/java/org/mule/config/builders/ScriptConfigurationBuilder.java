@@ -13,6 +13,7 @@ package org.mule.config.builders;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.components.script.jsr223.Scriptable;
+import org.mule.config.ConfigResource;
 import org.mule.config.builders.i18n.BuildersMessages;
 
 import javax.script.Bindings;
@@ -65,8 +66,8 @@ public class ScriptConfigurationBuilder extends AbstractResourceConfigurationBui
         
         for (int i = 0; i < configResources.length; i++)
         {
-            String configResource = configResources[i];
-            scriptComponent.setScriptFile(configResource);
+            ConfigResource configResource = configResources[i];
+            scriptComponent.setScriptFile(configResource.getResourceName());
             scriptComponent.initialise();
             Bindings ns = scriptComponent.getScriptEngine().createBindings();
             populateBindings(ns);

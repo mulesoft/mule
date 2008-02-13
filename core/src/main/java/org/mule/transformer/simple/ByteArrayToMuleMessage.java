@@ -11,12 +11,14 @@ package org.mule.transformer.simple;
 
 import org.mule.api.MuleMessage;
 
+import java.io.InputStream;
+
 /** TODO */
-public class ByteArrayToUMOMessage extends ByteArrayToObject
+public class ByteArrayToMuleMessage extends ByteArrayToSerializable
 {
-    public ByteArrayToUMOMessage()
+    public ByteArrayToMuleMessage()
     {
-        registerSourceType(byte[].class);
+        super();
         setReturnClass(MuleMessage.class);
     }
 }

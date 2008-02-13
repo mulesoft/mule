@@ -7,24 +7,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.impl.internal.admin;
+package org.mule.test.integration.client;
 
-import org.mule.agent.MuleAdminAgent;
+import org.mule.module.client.remoting.RemoteDispatcherAgent;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.wire.TransformerPairWireFormat;
 
-public class MuleAdminAgentConfigTestCase extends FunctionalTestCase
+public class RemoteDispatcherAgentConfigTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "mule-admin-agent.xml";
+        return "org/mule/test/integration/client/mule-admin-agent.xml";
     }
 
     public void testNonEmptyProperties() throws Exception
     {
-        MuleAdminAgent agent = (MuleAdminAgent) muleContext.getRegistry().lookupAgent("MuleAdmin");
-        assertNotNull(agent.getServerUri());
-        assertEquals("test://12345",agent.getServerUri());
+        RemoteDispatcherAgent agent = (RemoteDispatcherAgent) muleContext.getRegistry().lookupAgent("remoteDispatcher");
+        assertNotNull(agent.getEndpoint());
+        assertEquals("test://12345",agent.getEndpoint().getEndpointURI().toString());
         assertNotNull(agent.getWireFormat());
         assertTrue(agent.getWireFormat() instanceof TransformerPairWireFormat);
     }

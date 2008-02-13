@@ -10,6 +10,7 @@
 
 package org.mule.management.mbeans;
 
+import org.mule.config.ConfigResource;
 import org.mule.config.MuleConfiguration;
 
 /**
@@ -70,7 +71,7 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         muleConfiguration.setWorkingDirectory(workingDirectory);
     }
 
-    public String[] getConfigResources()
+    public ConfigResource[] getConfigResources()
     {
         return muleConfiguration.getConfigResources();
     }

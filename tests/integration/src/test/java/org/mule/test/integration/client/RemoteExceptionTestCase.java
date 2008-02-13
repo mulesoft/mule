@@ -32,7 +32,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
     public void testClientTransformerException() throws Exception
     {
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:5555");
         MuleMessage result = dispatcher.sendRemote("vm://test.queue.1", new Date(), null);
         assertNotNull(result);
         ExceptionPayload exceptionPayload = result.getExceptionPayload();
@@ -44,7 +44,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
     public void testClientMalformedEndpointException() throws Exception
     {
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:5555");
         MuleMessage result = dispatcher.sendRemote("test.queue.2", new Date(), null);
         assertNotNull(result);
         ExceptionPayload exceptionPayload = result.getExceptionPayload();
@@ -55,7 +55,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
     public void testClientComponentException() throws Exception
     {
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:5555");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:5555");
         MuleMessage result = dispatcher.sendRemote("vm://test.queue.2", new Date(), null);
         assertNotNull(result);
         ExceptionPayload exceptionPayload = result.getExceptionPayload();
