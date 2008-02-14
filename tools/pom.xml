@@ -19,6 +19,6 @@
         <module>bobberplus</module>
         <module>mule-transport-archetype</module>
         <module>mule-project-archetype</module>
-        <!--  <module>schemadocs</module> -->
+        <module>schemadocs</module>
     </modules>
 </project>

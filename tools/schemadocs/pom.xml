@@ -14,34 +14,6 @@
     <description>These are the tools used to generate docs from schema</description>
 
     <dependencies>
-
-        <!-- force this to run after distributions -->
-
-        <dependency>
-            <groupId>org.mule.distributions</groupId>
-            <artifactId>mule-custom</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.distributions</groupId>
-            <artifactId>mule-full</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.distributions</groupId>
-            <artifactId>mule-scripting-pack</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.distributions</groupId>
-            <artifactId>mule-profiler-pack</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
-
         <!-- dependency>
             <groupId>org.apache.myfaces.maven</groupId>
             <artifactId>wagon-maven-plugin</artifactId>
@@ -51,12 +23,6 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
             <version>${version}</version>
         </dependency>
 
@@ -213,6 +179,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
         </dependency>
@@ -230,12 +201,9 @@
 
     <profiles>
         <profile>
-
             <id>schemadocs</id>
-
             <build>
                 <plugins>
-
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
@@ -287,10 +255,8 @@
                             </execution>
                         </executions>
                     </plugin -->
-
                 </plugins>
             </build>
         </profile>
     </profiles>
-
 </project>
