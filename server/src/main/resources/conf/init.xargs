@@ -111,6 +111,7 @@
 -istart mule/mule-transport-vm.jar
 -istart mule/mule-transport-file.jar
 -istart mule/mule-transport-tcp.jar
+-istart mule/mule-transport-ssl.jar
 -istart mule/mule-transport-http.jar
 	      
 #############################################################
