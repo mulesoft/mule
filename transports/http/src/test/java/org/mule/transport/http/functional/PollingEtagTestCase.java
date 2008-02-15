@@ -19,10 +19,6 @@ public class PollingEtagTestCase extends FunctionalTestCase
 {
     private static final int WAIT_TIME = 2500;
 
-    public PollingEtagTestCase()
-    {
-    }
-
     protected String getConfigResources()
     {
         return "polling-etag-test.xml";

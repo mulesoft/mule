@@ -59,8 +59,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import sun.rmi.transport.Endpoint;
-
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and
  * receive events from a Mule Server. In most Mule applications events are triggered

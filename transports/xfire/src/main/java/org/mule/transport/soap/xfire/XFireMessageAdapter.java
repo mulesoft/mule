@@ -12,8 +12,6 @@ package org.mule.transport.soap.xfire;
 
 import org.mule.api.ThreadSafeAccess;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transformer.Transformer;
-import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transport.AbstractMessageAdapter;
 import org.mule.transport.soap.MuleSoapHeaders;
 
@@ -41,8 +39,6 @@ public class XFireMessageAdapter extends AbstractMessageAdapter
 
     private final Object payload;
     private MessageContext messageContext;
-
-    private Transformer trans = new SerializableToByteArray();
 
     public XFireMessageAdapter(Object message)
     {

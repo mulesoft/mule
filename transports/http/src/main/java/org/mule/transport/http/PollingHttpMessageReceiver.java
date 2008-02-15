@@ -52,11 +52,12 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
 
     protected void doDispose()
     {
-        // template method
+        // nothing to do
     }
 
     protected void doConnect() throws Exception
     {
+        // nothing to do
     }
 
     public void doDisconnect() throws Exception

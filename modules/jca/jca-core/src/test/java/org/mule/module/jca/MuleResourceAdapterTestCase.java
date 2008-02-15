@@ -85,6 +85,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         }
         catch (ResourceException e)
         {
+            // expected
         }
     }
 
@@ -116,6 +117,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         }
         catch (Exception e)
         {
+            // expected
         }
     }
 
@@ -199,6 +201,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         }
         catch (ResourceException e)
         {
+            // expected
         }
         assertEquals(0, resourceAdapter.endpoints.size());
     }

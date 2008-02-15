@@ -156,7 +156,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 for (int i = 0; i < inList.size(); i++)
                 {
                     Class clazz = ClassUtils.loadClass(inList.get(i).toString(), this.getClass());
-                    Handler handler = (Handler) clazz.getConstructor(null).newInstance(null);
+                    Handler handler = (Handler) clazz.getConstructor((Class[])null).newInstance((Object[])null);
                     xfireService.addInHandler(handler);
                 }
             }

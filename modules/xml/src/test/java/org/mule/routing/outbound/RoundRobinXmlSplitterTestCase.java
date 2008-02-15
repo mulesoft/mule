@@ -111,8 +111,6 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         final String invalidSchemaLocation = "non-existent.xsd";
         Mock session = MuleTestUtils.getMockSession();
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
-
         RoundRobinXmlSplitter splitter = new RoundRobinXmlSplitter();
         splitter.setValidateSchema(true);
         splitter.setExternalSchemaLocation(invalidSchemaLocation);

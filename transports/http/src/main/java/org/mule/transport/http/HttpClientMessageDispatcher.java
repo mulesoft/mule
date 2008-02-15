@@ -14,36 +14,27 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.ReceiveException;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.AbstractMessageDispatcher;
-import org.mule.transport.http.i18n.HttpMessages;
-import org.mule.transport.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 
@@ -58,14 +49,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     public static final int ERROR_STATUS_CODE_RANGE_START = 400;
     private final HttpConnector connector;
     private volatile HttpClient client = null;
-    private final Transformer receiveTransformer;
     private final Transformer sendTransformer;
 
     public HttpClientMessageDispatcher(ImmutableEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (HttpConnector) endpoint.getConnector();
-        this.receiveTransformer = new HttpClientMethodResponseToObject();
         this.sendTransformer = new ObjectToHttpClientMethodRequest();
     }
     

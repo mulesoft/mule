@@ -43,7 +43,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
     {
         Service service = getTestService("orange", Orange.class);
         
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleContext.getRegistry()
+        ImmutableEndpoint endpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(getTestEndpointURI());
 

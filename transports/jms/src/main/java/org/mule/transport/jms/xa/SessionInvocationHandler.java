@@ -52,7 +52,7 @@ public class SessionInvocationHandler implements InvocationHandler
     {
         try
         {
-            SESSION_CLOSE_METHOD = Session.class.getMethod("close", null);
+            SESSION_CLOSE_METHOD = Session.class.getMethod("close", (Class[])null);
         }
         catch (NoSuchMethodException e)
         {

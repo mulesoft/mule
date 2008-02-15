@@ -63,7 +63,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
                     // compile on JDK 1.4
                     Class target = System.class;
                     Method envMethod = target.getMethod("getenv", ArrayUtils.EMPTY_CLASS_ARRAY);
-                    environment = Collections.unmodifiableMap((Map) envMethod.invoke(target, (Class[]) null));
+                    environment = Collections.unmodifiableMap((Map) envMethod.invoke(target, (Object[]) null));
                 }
             }
             catch (Exception ex)

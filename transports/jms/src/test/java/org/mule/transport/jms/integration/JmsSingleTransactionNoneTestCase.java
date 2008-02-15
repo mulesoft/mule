@@ -7,13 +7,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.jms.integration;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+package org.mule.transport.jms.integration;
 
 /**
  * Send and recieve JmsMessage without any tx
@@ -31,6 +26,5 @@ public class JmsSingleTransactionNoneTestCase extends AbstractJmsFunctionalTestC
         receive(scenarioNoTx);
         receive(scenarioNotReceive);
     }
-
 
 }

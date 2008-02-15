@@ -122,8 +122,6 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
         final String invalidSchemaLocation = "non-existent.xsd";
         Mock session = MuleTestUtils.getMockSession();
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Endpoint", "test://endpointUri.1");
-
         FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();
         splitter.setValidateSchema(true);
         splitter.setExternalSchemaLocation(invalidSchemaLocation);

@@ -53,11 +53,13 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
     Scenario scenarioDeadLetter = new ScenarioDeadLetter();
     class ScenarioDeadLetter extends ScenarioCommit
     {
+        // @Override
         public String getOutputQueue()
         {
             return DEADLETTER_QUEUE_NAME;
         }
 
+        // @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             // Verify message got sent to dead letter queue.
@@ -76,25 +78,27 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
             applyTransaction(session);
             return message;
         }
-    };
+    }
     
     Scenario scenarioDeadLetterRollback = new ScenarioDeadLetterRollback();
     class ScenarioDeadLetterRollback extends ScenarioDeadLetter
     {
+        // @Override
         protected void applyTransaction(Session session) throws JMSException
         {
             session.rollback();
         }
-    };
+    }
 
     Scenario scenarioDeadLetterNotReceive = new ScenarioDeadLetterNotReceive();
     class ScenarioDeadLetterNotReceive extends ScenarioDeadLetter
     {
+        // @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             Message message = consumer.receive(SMALL_TIMEOUT);
             assertNull(message);
             return message;
         }
-    };
+    }
 }

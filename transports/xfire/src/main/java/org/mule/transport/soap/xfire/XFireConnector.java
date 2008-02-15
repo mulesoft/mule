@@ -243,8 +243,8 @@ public class XFireConnector extends AbstractConnector
 
                 if (transport == null)
                 {
-                    Constructor constructor = transportClazz.getConstructor(null);
-                    transport = (Transport) constructor.newInstance(null);
+                    Constructor constructor = transportClazz.getConstructor((Class[])null);
+                    transport = (Transport) constructor.newInstance((Object[])null);
                 }
             }
             catch (Exception e)
@@ -339,7 +339,7 @@ public class XFireConnector extends AbstractConnector
 
     protected void doStart() throws MuleException
     {
-
+        // template method
     }
 
     protected void doStop() throws MuleException
@@ -658,7 +658,7 @@ public class XFireConnector extends AbstractConnector
             transportClazz = ClassUtils.loadClass(getClientTransport(), getClass());
         }
 
-        Transport transport = (Transport)transportClazz.getConstructor(null).newInstance(null);
+        Transport transport = (Transport)transportClazz.getConstructor((Class[])null).newInstance((Object[])null);
         Client client = new Client(transport, service, endpoint.getEndpointURI().getUri().toString());
         client.setXFire(xfire);
         client.setEndpointUri(endpoint.getEndpointURI().getUri().toString());
@@ -676,7 +676,7 @@ public class XFireConnector extends AbstractConnector
             for (int i = 0; i < inList.size(); i++)
             {
                 Class clazz = ClassUtils.loadClass(inList.get(i).toString(), getClass());
-                Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                Handler handler = (Handler)clazz.getConstructor((Class[])null).newInstance((Object[])null);
                 client.addInHandler(handler);
             }
         }
@@ -687,7 +687,7 @@ public class XFireConnector extends AbstractConnector
             for (int i = 0; i < outList.size(); i++)
             {
                 Class clazz = ClassUtils.loadClass(outList.get(i).toString(), getClass());
-                Handler handler = (Handler)clazz.getConstructor(null).newInstance(null);
+                Handler handler = (Handler)clazz.getConstructor((Class[])null).newInstance((Object[])null);
                 client.addOutHandler(handler);
             }
         }

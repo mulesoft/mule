@@ -65,6 +65,7 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
         }
         catch (Exception e)
         {
+            // expected
         }
     }
 
@@ -89,7 +90,7 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
         }
         catch (MuleException e)
         {
-
+            // expected
         }
     }
 
@@ -102,6 +103,7 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
         }
         catch (MuleException e)
         {
+            // expected
         }
     }
 

@@ -10,19 +10,11 @@
 
 package org.mule.context.notification;
 
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.context.notification.ServiceNotificationListener;
-import org.mule.api.context.notification.ManagerNotificationListener;
-import org.mule.api.context.notification.ModelNotificationListener;
-import org.mule.api.context.notification.MessageNotificationListener;
 import org.mule.api.context.notification.ExceptionNotificationListener;
-
-import java.util.List;
-import java.util.LinkedList;
 
 public class ExceptionNotificationLogger
         extends AbstractNotificationLogger
         implements ExceptionNotificationListener
 {
-
+    // nothing to do here
 }

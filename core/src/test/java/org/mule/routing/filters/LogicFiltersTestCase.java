@@ -16,8 +16,6 @@ import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.filters.logic.OrFilter;
 import org.mule.tck.AbstractMuleTestCase;
 
-import java.util.List;
-import java.util.Collections;
 import java.util.LinkedList;
 
 public class LogicFiltersTestCase extends AbstractMuleTestCase

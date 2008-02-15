@@ -15,9 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 

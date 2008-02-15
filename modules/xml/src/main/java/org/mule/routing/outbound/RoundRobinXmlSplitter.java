@@ -28,8 +28,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 import org.dom4j.Document;
 
-import sun.rmi.transport.Endpoint;
-
 /**
  * This router will split the Xml message into parts based on the xpath expression
  * and route each new event to the endpoints on the router, one after the other.

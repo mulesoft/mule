@@ -106,7 +106,7 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         long timeEnd = System.currentTimeMillis();
         double speed = size / (double) (timeEnd - timeStart) * 1000 / ONE_MB;
         logger.info("Transfer speed " + speed + " MB/s (" + size + " B in " + (timeEnd - timeStart) + " ms)");
-        double usePercent = 100.0 * delta / ((double) size);
+        double usePercent = 100.0 * delta / size;
         logger.info("Memory delta " + delta + " B = " + usePercent + "%");
         assertTrue("Memory used too high", usePercent < 10);
 

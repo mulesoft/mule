@@ -15,13 +15,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.endpoint.URIBuilder;
 import org.mule.util.ClassUtils;
 import org.mule.util.object.SingletonObjectFactory;
@@ -287,7 +285,6 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     protected ImmutableEndpoint createMessageInflowEndpoint(MuleActivationSpec muleActivationSpec)
         throws MuleException
     {
-        EndpointURI uri = new MuleEndpointURI(muleActivationSpec.getEndpoint());
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(
             muleActivationSpec.getEndpoint()), muleContext);
 

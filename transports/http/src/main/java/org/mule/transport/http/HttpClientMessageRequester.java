@@ -19,7 +19,6 @@ import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.transport.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.util.StringUtils;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;

@@ -62,7 +62,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
     public void testFailOnExhaust() throws Exception
     {
         PoolingProfile pp = getDefaultPoolingProfile();
-        pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_BLOCK);
+        pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_WAIT);
         PooledObjectFactory of = new PooledObjectFactory(Orange.class, pp);
         of.initialise();        
 
@@ -89,7 +89,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
     public void testBlockExpiryOnExhaust() throws Exception
     {
         PoolingProfile pp = getDefaultPoolingProfile();
-        pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_BLOCK);
+        pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_WAIT);
         PooledObjectFactory of = new PooledObjectFactory(Orange.class, pp);
         of.initialise();        
 
@@ -125,7 +125,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
     public void testBlockOnExhaust() throws Exception
     {
         PoolingProfile pp = getDefaultPoolingProfile();
-        pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_BLOCK);
+        pp.setExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_WAIT);
         PooledObjectFactory of = new PooledObjectFactory(Orange.class, pp);
         of.initialise();        
         

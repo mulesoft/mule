@@ -71,7 +71,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         for (int i = 0; i < configResources.length; i++)
         {
             String configExtension = StringUtils.substringAfterLast(
-                ((ConfigResource)configResources[i]).getUrl().getFile(), ".");
+                (configResources[i]).getUrl().getFile(), ".");
             List configs = (List) configsMap.get(configExtension);
             if (configs == null)
             {

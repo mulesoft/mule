@@ -48,7 +48,7 @@ public class SlowInputStream extends InputStream
         contents = new int[bytes.length];
         for (int i = 0; i < bytes.length; ++i)
         {
-            contents[i] = (int) bytes[i];
+            contents[i] = bytes[i];
         }
     }
 

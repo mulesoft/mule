@@ -11,8 +11,6 @@ package org.mule.transformer.simple;
 
 import org.mule.api.MuleMessage;
 
-import java.io.InputStream;
-
 /** TODO */
 public class ByteArrayToMuleMessage extends ByteArrayToSerializable
 {

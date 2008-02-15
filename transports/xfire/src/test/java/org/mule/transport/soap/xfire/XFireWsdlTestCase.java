@@ -58,9 +58,8 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
 
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URL_NOWSDL, muleContext);
         endpointBuilder.setProperty("wsdlUrl", TEST_URL_WSDL);
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleContext.getRegistry()
-            .lookupEndpointFactory()
-            .getOutboundEndpoint(endpointBuilder);
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            endpointBuilder);
 
         MuleMessage message = new DefaultMuleMessage("test1");
         MuleSession session = new DefaultMuleSession(message, ((AbstractConnector) endpoint.getConnector())

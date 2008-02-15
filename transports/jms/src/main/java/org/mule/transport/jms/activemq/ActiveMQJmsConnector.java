@@ -96,18 +96,18 @@ public class ActiveMQJmsConnector extends JmsConnector
                 // there are no final methods, but a number of private ones, though
                 connection = (Connection) handler.getTargetObject();
                 Class realConnectionClass = connection.getClass();
-                cleanupMethod = realConnectionClass.getMethod("cleanup", null);
+                cleanupMethod = realConnectionClass.getMethod("cleanup", (Class[])null);
             }
             else
             {
-                cleanupMethod = clazz.getMethod("cleanup", null);
+                cleanupMethod = clazz.getMethod("cleanup", (Class[])null);
             }
 
             try
             {
                 if (cleanupMethod != null)
                 {
-                    cleanupMethod.invoke(connection, null);
+                    cleanupMethod.invoke(connection, (Object[])null);
                 }
             }
             finally

@@ -11,7 +11,6 @@
 package org.mule.transport.http.servlet;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;

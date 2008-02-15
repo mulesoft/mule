@@ -250,7 +250,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         {
             // do nothing
         }        
-    };
+    }
 
     Scenario scenarioCommit = new ScenarioCommit();
     class ScenarioCommit extends AbstractScenario
@@ -264,7 +264,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         {
             session.commit();
         }        
-    };
+    }
 
     Scenario scenarioRollback = new ScenarioRollback();
     class ScenarioRollback extends AbstractScenario
@@ -278,16 +278,17 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         {
             session.rollback();
         }        
-    };
+    }
 
     Scenario scenarioNotReceive = new ScenarioNotReceive();
     class ScenarioNotReceive extends NonTransactedScenario
     {
+        // @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             Message message = consumer.receive(SMALL_TIMEOUT);
             assertNull(message);
             return message;
         }
-    };
+    }
 }

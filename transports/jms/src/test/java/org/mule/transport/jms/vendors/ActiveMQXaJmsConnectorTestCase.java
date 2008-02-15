@@ -55,17 +55,17 @@ public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
                 // this is really an XA connection
                 connection = (Connection) handler.getTargetObject();
                 Class realConnectionClass = connection.getClass();
-                cleanupMethod = realConnectionClass.getMethod("cleanup", null);
+                cleanupMethod = realConnectionClass.getMethod("cleanup", (Class[])null);
             }
             else
             {
-                cleanupMethod = clazz.getMethod("cleanup", null);
+                cleanupMethod = clazz.getMethod("cleanup", (Class[])null);
             }
 
 
             if (cleanupMethod != null)
             {
-                cleanupMethod.invoke(connection, null);
+                cleanupMethod.invoke(connection, (Object[])null);
             }
         }
         finally

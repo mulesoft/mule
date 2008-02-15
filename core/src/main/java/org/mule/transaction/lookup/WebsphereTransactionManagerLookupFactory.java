@@ -83,8 +83,8 @@ public class WebsphereTransactionManagerLookupFactory implements TransactionMana
         }
         try
         {
-            Method method = clazz.getMethod("getTransactionManager", null);
-            transactionManager = (TransactionManager) method.invoke(null, null);
+            Method method = clazz.getMethod("getTransactionManager", (Class[])null);
+            transactionManager = (TransactionManager) method.invoke(null, (Object[])null);
         }
         catch (Exception ex)
         {

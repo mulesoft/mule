@@ -12,7 +12,5 @@ package org.mule.transport.rmi;
 
 public class DummySecurityManager extends SecurityManager
 {
-
-    
-
+    // nothing to do
 }
