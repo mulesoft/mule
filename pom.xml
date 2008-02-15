@@ -3,13 +3,16 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.mule</groupId>
-        <artifactId>mule</artifactId>
- <version>2.1.0-M1-SNAPSHOT</version>
-    </parent>
+    
+    <!-- 
+    Note that we do not inherit from the root POM so that the scope="provided" 
+    settings in the dependencyManagement section are not applied.  Otherwise we 
+    would not be able to make use of all-modules, all-transports, all-examples, 
+    and all-bundles to easily pull in the modules for the distros. 
+    -->
     <groupId>org.mule.distributions</groupId>
     <artifactId>mule-distributions</artifactId>
+    <version>2.1.0-M1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Mule Distributions</name>
 
@@ -28,6 +31,16 @@
     </distributionManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.mule.tools</groupId>
+                    <artifactId>mule-assembly-verifier</artifactId>
+                    <version>1.2</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -48,22 +61,4 @@
         <module>scripting</module>
         <module>server</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-osgi</artifactId>
-                    <version>${version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.mule.examples</groupId>
-                    <artifactId>mule-example-hello-osgi</artifactId>
-                    <version>${version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

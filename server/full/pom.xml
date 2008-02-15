@@ -104,6 +104,8 @@
                 <groupId>org.codehaus.mojo.groovy</groupId>
                 <artifactId>groovy-maven-plugin</artifactId>
                 <executions>
+<!-- TODO UNCOMMENT THIS!!!
+Disable temporarily to speed up build cycle during development
                     <execution>
                         <phase>generate-sources</phase>
                         <goals>
@@ -135,6 +137,7 @@
                             </source>
                         </configuration>
                     </execution>
+-->
                 </executions>
             </plugin>
             <!--
@@ -152,12 +155,20 @@
     </build>
 
     <dependencies>
+        <!-- Mule Core -->
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <!-- Include all Mule Example Apps -->
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-examples-all</artifactId>
             <version>${version}</version>
             <type>pom</type>
         </dependency>
+        <!-- Include all Mule Modules -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-modules-all</artifactId>
@@ -178,9 +189,17 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Include all Mule Transports -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transports-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+        </dependency>
+        <!-- Include all 3rd-party OSGi Bundles -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-bundles-all</artifactId>
             <version>${version}</version>
             <type>pom</type>
         </dependency>
@@ -200,6 +219,7 @@
                 </exclusion>
             </exclusions>
         </dependency> -->
+        
         <!--
             We need to register the endorsed XML jars as dependencies of the
             distribution, so that they can be referenced in the assembly as in/excludes.
@@ -237,144 +257,11 @@
             <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1</version>
+        </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <!-- The assembly changes for OSGi -->
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <finalName>mule-${version}</finalName>
-                            <descriptors>
-                                <descriptor>assembly_osgi.xml</descriptor>
-                            </descriptors>
-                            <appendAssemblyId>false</appendAssemblyId>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>assembly</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-            <!-- 
-                 Note: All stand-alone bundles (i.e., libraries which are not embedded within 
-                 some other bundle) need to be listed here in order to get them into the 
-                 distribution. 
-            -->
-            <dependencies>
-                <!-- Spring OSGi -->
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>spring-osgi-core</artifactId>
-                  <version>1.0-SNAPSHOT</version>
-                  <classifier>mule</classifier>
-                </dependency>
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>spring-osgi-extender</artifactId>
-                  <version>1.0-SNAPSHOT</version>
-                  <classifier>mule</classifier>
-                </dependency>
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>spring-osgi-io</artifactId>
-                  <version>1.0-SNAPSHOT</version>
-                </dependency>
-                <!-- Spring -->
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>spring-core</artifactId>
-                  <version>2.1-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>spring-aop</artifactId>
-                  <version>2.1-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>spring-context</artifactId>
-                  <version>2.1-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>spring-beans</artifactId>
-                  <version>2.1-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>spring-jmx</artifactId>
-                  <version>2.1-SNAPSHOT</version>
-                </dependency>
-                <!-- Spring dependencies -->
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>aopalliance.osgi</artifactId>
-                  <version>1.0-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>asm.osgi</artifactId>
-                  <version>2.2.2-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>aspectjrt.osgi</artifactId>
-                  <version>1.5.2a-SNAPSHOT</version>
-                </dependency>
-                <!-- These aren't working for some reason.
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>cglib-nodep.osgi</artifactId>
-                  <version>2.1.3-SNAPSHOT</version>
-                </dependency>
-                <dependency>
-                  <groupId>org.springframework.osgi</groupId>
-                  <artifactId>commons-attributes.osgi</artifactId>
-                  <version>2.2-SNAPSHOT</version>
-                </dependency>
-                -->
-                <!-- PAX Logging -->
-                <dependency>
-                  <groupId>org.ops4j.pax.logging</groupId>
-                  <artifactId>api</artifactId>
-                  <version>0.9.4</version>
-                  <classifier>jdk14</classifier>
-                </dependency>
-                <dependency>
-                  <groupId>org.ops4j.pax.logging</groupId>
-                  <artifactId>service</artifactId>
-                  <version>0.9.4</version>
-                  <classifier>jdk14</classifier>
-                </dependency>
-                <dependency>
-                  <groupId>org.ops4j.pax.logging</groupId>
-                  <artifactId>log4j</artifactId>
-                  <version>0.9.4</version>
-                  <classifier>jdk14</classifier>
-                </dependency>
-                <dependency>
-                  <groupId>org.ops4j.pax.logging</groupId>
-                  <artifactId>jcl</artifactId>
-                  <version>0.9.4</version>
-                  <classifier>jdk14</classifier>
-                </dependency>
-                <dependency>
-                  <groupId>org.ops4j.pax.logging</groupId>
-                  <artifactId>slf4j</artifactId>
-                  <version>0.9.4</version>
-                  <classifier>jdk14</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>
