@@ -10,6 +10,8 @@
 
 package org.mule.util;
 
+import org.mule.module.boot.MuleBootstrapUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,14 +27,8 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public final class JarUtils
 {
-    private static final Log logger = LogFactory.getLog(JarUtils.class);
-
     private JarUtils()
     {
         // utility class only
@@ -44,7 +40,7 @@ public final class JarUtils
         JarFile jarFileWrapper = null;
         if (jarFile != null)
         {
-            logger.debug("Reading jar entries from " + jarFile.getAbsolutePath());
+            //logger.debug("Reading jar entries from " + jarFile.getAbsolutePath());
             try
             {
                 jarFileWrapper = new JarFile(jarFile);
@@ -56,9 +52,9 @@ public final class JarUtils
                     ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
                     try
                     {
-                        IOUtils.copy(entryStream, byteArrayStream);
+                        MuleBootstrapUtils.copy(entryStream, byteArrayStream);
                         entries.put(zipEntry.getName(), byteArrayStream.toByteArray());
-                        logger.debug("Read jar entry " + zipEntry.getName() + " from " + jarFile.getAbsolutePath());
+                        //logger.debug("Read jar entry " + zipEntry.getName() + " from " + jarFile.getAbsolutePath());
                     }
                     finally
                     {
@@ -70,14 +66,7 @@ public final class JarUtils
             {
                 if (jarFileWrapper != null)
                 {
-                    try
-                    {
-                        jarFileWrapper.close();
-                    }
-                    catch (Exception ignore)
-                    {
-                        logger.debug(ignore);
-                    }
+                    jarFileWrapper.close();
                 }
             }
         }
@@ -104,7 +93,7 @@ public final class JarUtils
         
         if (jarFile != null) 
         {
-            logger.debug("Creating jar file " + jarFile.getAbsolutePath());
+            //logger.debug("Creating jar file " + jarFile.getAbsolutePath());
 
             try
             {
@@ -122,7 +111,7 @@ public final class JarUtils
                         JarEntry entry = new JarEntry(jarFilePath);
                         jarStream.putNextEntry(entry);
                         
-                        logger.debug("Adding jar entry " + jarFilePath + " to " + jarFile.getAbsolutePath());
+                        //logger.debug("Adding jar entry " + jarFilePath + " to " + jarFile.getAbsolutePath());
                         
                         if (content instanceof String)
                         {
@@ -146,25 +135,11 @@ public final class JarUtils
             {
                 if (jarStream != null)
                 {
-                    try
-                    {
-                        jarStream.close();
-                    }
-                    catch (Exception jarNotClosed)
-                    {
-                        logger.debug(jarNotClosed);
-                    }
+                    jarStream.close();
                 }
                 if (fileStream != null)
                 {
-                    try
-                    {
-                        fileStream.close();    
-                    }
-                    catch (Exception fileNotClosed)
-                    {
-                        logger.debug(fileNotClosed);
-                    }
+                    fileStream.close();    
                 }
             }
         }
@@ -181,20 +156,13 @@ public final class JarUtils
         try
         {
             fileContentStream = new FileInputStream(entry);
-            IOUtils.copy(fileContentStream, stream);         
+            MuleBootstrapUtils.copy(fileContentStream, stream);         
         }
         finally
         {
             if (fileContentStream != null)
             {
-                try
-                {
-                    fileContentStream.close();
-                }
-                catch (Exception fileContentNotClosed)
-                {
-                    logger.debug(fileContentNotClosed);
-                }
+                fileContentStream.close();
             }
         }
     }

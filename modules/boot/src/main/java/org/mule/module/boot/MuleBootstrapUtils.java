@@ -11,10 +11,17 @@
 package org.mule.module.boot;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.List;
 
@@ -126,5 +133,143 @@ public final class MuleBootstrapUtils
             this.username = username;
             this.password = password;
         }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // The following methods are intentionally duplicated from org.mule.util so that 
+    // mule-module-boot has no external dependencies at system startup.
+    //////////////////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * @see ClassUtils.getResource()
+     */
+    public static URL getResource(final String resourceName, final Class callingClass)
+    {
+        URL url = (URL) AccessController.doPrivileged(new PrivilegedAction()
+        {
+            public Object run()
+            {
+                final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                return cl != null ? cl.getResource(resourceName) : null;
+            }
+        });
+
+        if (url == null)
+        {
+            url = (URL) AccessController.doPrivileged(new PrivilegedAction()
+            {
+                public Object run()
+                {
+                    return MuleBootstrap.class.getClassLoader().getResource(resourceName);
+                }
+            });
+        }
+
+        if (url == null)
+        {
+            url = (URL) AccessController.doPrivileged(new PrivilegedAction()
+            {
+                public Object run()
+                {
+                    return callingClass.getClassLoader().getResource(resourceName);
+                }
+            });
+        }
+
+        return url;
+    }
+
+    /**
+     * @see FileUtils.renameFile()
+     */
+    public static boolean renameFile(File srcFile, File destFile) throws IOException
+    {
+        boolean isRenamed = false;
+        if (srcFile != null && destFile != null)
+        {
+            if (!destFile.exists())
+            {
+                if (srcFile.isFile())
+                {
+                    isRenamed = srcFile.renameTo(destFile);
+                    if (!isRenamed && srcFile.exists())
+                    {
+                        isRenamed = renameFileHard(srcFile, destFile);
+                    }
+                }
+            }
+        }
+        return isRenamed;
+    }
+    
+    /**
+     * @see FileUtils.renameFileHard()
+     */
+    public static boolean renameFileHard(File srcFile, File destFile) throws IOException
+    {
+        boolean isRenamed = false;
+        if (srcFile != null && destFile != null)
+        {
+            if (!destFile.exists())
+            {
+                if (srcFile.isFile())
+                {
+                    FileInputStream in = null;
+                    FileOutputStream out = null;
+                    try
+                    {
+                        in = new FileInputStream(srcFile);
+                        out = new FileOutputStream(destFile);
+                        out.getChannel().transferFrom(in.getChannel(), 0, srcFile.length());
+                        isRenamed = true;
+                    }
+                    finally
+                    {
+                        if (in != null)
+                        {
+                            in.close();
+                        }
+                        if (out != null)
+                        {
+                            out.close();
+                        }
+                    }
+                    if (isRenamed)
+                    {
+                        srcFile.delete();
+                    }
+                    else
+                    {
+                        destFile.delete();
+                    }
+                }
+            }
+        }
+        return isRenamed;
+    }
+
+    /**
+     * @see IOUtils.copy()
+     */
+    public static int copy(InputStream input, OutputStream output) throws IOException {
+        long count = copyLarge(input, output);
+        if (count > Integer.MAX_VALUE) {
+            return -1;
+        }
+        return (int) count;
+    }
+
+    /**
+     * @see IOUtils.copyLarge()
+     */
+    public static long copyLarge(InputStream input, OutputStream output) throws IOException {
+        byte[] buffer = new byte[1024 * 4];
+        long count = 0;
+        int n = 0;
+        while (-1 != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+            count += n;
+        }
+        return count;
     }
 }

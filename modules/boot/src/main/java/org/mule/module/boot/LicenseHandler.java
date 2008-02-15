@@ -10,10 +10,7 @@
 
 package org.mule.module.boot;
 
-import org.mule.util.ClassUtils;
-import org.mule.util.FileUtils;
 import org.mule.util.JarUtils;
-import org.mule.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,17 +19,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * This class has methods for displaying the EULA and saving the license acceptance
  * acknowledgment.
  */
 public final class LicenseHandler
 {
-    private static final Log logger = LogFactory.getLog(LicenseHandler.class);
-    
     private static final int MAX_ROWS_TO_DISPLAY = 80;
 
     private static final String DEFAULT_LICENSE_TYPE = "Common Public Attribution License Version 1.0 (CPAL)";
@@ -51,7 +43,7 @@ public final class LicenseHandler
     
     public static boolean isLicenseAccepted() throws Exception
     {
-        return ClassUtils.getResource(LICENSE_PROPERTIES_JAR_FILE_PATH, LicenseHandler.class) != null;
+        return MuleBootstrapUtils.getResource(LICENSE_PROPERTIES_JAR_FILE_PATH, LicenseHandler.class) != null;
     }
     
     public static File getLicenseFile()
@@ -113,7 +105,7 @@ public final class LicenseHandler
             }
             File tempJarFile = createTempLicenseJarFile(licenseInfo);
             MuleBootstrapUtils.getMuleLocalJarFile().delete();
-            FileUtils.renameFile(tempJarFile, MuleBootstrapUtils.getMuleLocalJarFile());
+            MuleBootstrapUtils.renameFile(tempJarFile, MuleBootstrapUtils.getMuleLocalJarFile());
         }
     }
 
@@ -158,14 +150,7 @@ public final class LicenseHandler
         {
             if (fileReader != null)
             {
-                try
-                {
-                    fileReader.close();
-                }
-                catch (Exception ignore)
-                {
-                    logger.debug("Error closing fileReader: " + ignore.getMessage());
-                }
+                fileReader.close();
             }
         }
         
@@ -177,10 +162,13 @@ public final class LicenseHandler
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         
         System.out.print("\n\nDo you accept the terms and conditions of this license agreement [y/n]?");
+        final String input = stdin.readLine();        
 
-        final String input = StringUtils.defaultString(stdin.readLine());
-
-        boolean hasAcccepted = input.toLowerCase().startsWith("y");
+        boolean hasAcccepted = false;
+        if (input != null && input.toLowerCase().startsWith("y"))
+        {
+            hasAcccepted = true;
+        }
         
         if (!hasAcccepted)
         {
@@ -230,11 +218,11 @@ public final class LicenseHandler
         
         public LicenseInfo(String licenseType, String licenseVersion)
         {
-            if (StringUtils.isNotBlank(licenseType))
+            if (licenseType != null && !licenseType.trim().equals(""))
             {
                 this.licenseType = licenseType;
             }
-            if (StringUtils.isNotBlank(licenseVersion))
+            if (licenseVersion != null && !licenseVersion.trim().equals(""))
             {
                 this.licenseVersion = licenseVersion;
             }
