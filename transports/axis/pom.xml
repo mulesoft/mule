@@ -13,44 +13,6 @@
     <name>SOAP Transport: Axis</name>
     <description>A Mule transport for Soap Connectivity using Axis.</description>
 
-    <profiles>
-        <profile>
-            <id>tests-external</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.mule.tests</groupId>
-                    <artifactId>mule-tests-external-axis</artifactId>
-                    <version>${version}</version>
-                    <type>war</type>
-                </dependency>
-                <dependency>
-                    <groupId>org.mule.tests</groupId>
-                    <artifactId>mule-tests-external-common</artifactId>
-                    <version>${version}</version>
-                    <type>jar</type>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <Export-Package>
-                                    org.mule.transport.soap.axis.*
-                                </Export-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -62,14 +24,15 @@
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
-
-        <!-- Needed for common SOAP test classes -->
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-soap</artifactId>
+            <artifactId>mule-transport-tcp</artifactId>
             <version>${version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-ssl</artifactId>
+            <version>${version}</version>
         </dependency>
 
         <dependency>
@@ -110,6 +73,18 @@
             <artifactId>axis-wsdl4j</artifactId>
             <version>1.5.1</version>
         </dependency>
+        <!-- needed by the Axis Service component -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+        </dependency>
+
+        <!-- Unit tests -->
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
@@ -122,18 +97,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- needed by the Axis Service component -->
+        <!-- Needed for common SOAP test classes -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
-        <!-- need to explicitly mark javax.mail as provided -->
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
@@ -258,4 +230,42 @@
            </exclusions>
         </dependency>
     </dependencies>
+    
+    <profiles>
+        <profile>
+            <id>tests-external</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.mule.tests</groupId>
+                    <artifactId>mule-tests-external-axis</artifactId>
+                    <version>${version}</version>
+                    <type>war</type>
+                </dependency>
+                <dependency>
+                    <groupId>org.mule.tests</groupId>
+                    <artifactId>mule-tests-external-common</artifactId>
+                    <version>${version}</version>
+                    <type>jar</type>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>osgi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <configuration>
+                            <instructions>
+                                <Export-Package>
+                                    org.mule.transport.soap.axis.*
+                                </Export-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

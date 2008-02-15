@@ -38,6 +38,15 @@
             <artifactId>mule-transport-soap</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-tcp</artifactId>
+            <version>${version}</version>
+        </dependency>
 
         <!-- CXF dependencies -->
         <dependency>
@@ -194,12 +203,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-testutils</artifactId>
-            <version>${cxfVersion}</version>
-            <scope>test</scope>
-        </dependency>
         <!-- For dynamic client, which compiles stuff on the fly -->
         <dependency>
             <groupId>ant</groupId>
@@ -207,6 +210,13 @@
             <version>1.6.5</version>
         </dependency>
 
+        <!-- Unit tests -->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-testutils</artifactId>
+            <version>${cxfVersion}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
@@ -222,8 +232,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-
-        <!-- for integration tests -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
@@ -236,14 +244,6 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Better testing of XML -->
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>

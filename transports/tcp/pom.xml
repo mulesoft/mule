@@ -9,7 +9,7 @@
         <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-tcp</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>TCP Transport</name>
     <description>A Mule transport for Tcp Connectivity. This transport supplies a tcp Server and client implementation.</description>
 
@@ -30,54 +30,12 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- Unit tests -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <Mule-Transports>
-                                    tcp
-                                </Mule-Transports>
-                                <Export-Package>
-                                    org.mule.transport.tcp.*,
-                                    META-INF.services.org.mule.i18n
-                                </Export-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

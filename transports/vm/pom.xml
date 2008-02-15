@@ -9,7 +9,7 @@
         <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-vm</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>VM Transport</name>
     <description>A Mule transport that enables event sending and receiving over VM or embedded memory queues. These
         queues can be persistent or transient.
@@ -17,27 +17,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${version}</version>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-xml</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- Unit tests -->
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
@@ -45,25 +33,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <Export-Package>
-                                    org.mule.transport.vm.*
-                                </Export-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

@@ -5,10 +5,10 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
- <version>2.1.0-M1-SNAPSHOT</version>
+        <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-file</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>File Transport</name>
     <description>
         A Mule transport for File Connectivity. This transport allows files to be read and written to
@@ -33,49 +33,12 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- Unit tests -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <Mule-Transports>file</Mule-Transports>
-                                <Export-Package>org.mule.transport.file.*</Export-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

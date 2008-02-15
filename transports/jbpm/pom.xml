@@ -111,6 +111,12 @@
             <version>0.9.0.4</version>
         </dependency>
 
+        <!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->
+        <dependency>
+            <groupId>commons-jxpath</groupId>
+            <artifactId>commons-jxpath</artifactId>
+        </dependency>
+        
         <!-- Simple Java DB for persistence -->
         <dependency>
             <groupId>org.apache.derby</groupId>

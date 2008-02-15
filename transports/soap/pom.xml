@@ -82,19 +82,5 @@
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- required for the SOAP TCK classes -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>

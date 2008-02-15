@@ -19,19 +19,13 @@
             <artifactId>quartz-all</artifactId>
             <version>1.6.0</version>
         </dependency>
-
-        <!-- The Mule client is needed for MuleClientReceiveJob and MuleClientDispatchJob -->
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
+
+        <!-- Unit tests -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
