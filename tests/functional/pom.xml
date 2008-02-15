@@ -14,30 +14,39 @@
     <description>Mule functional test framework (TCK)</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+        </dependency>
+        <!-- Needed for SpringXmlConfigurationBuilder and TestNamespaceHandler -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+        </dependency>
+        <!-- needed for org.springframework.beans.factory.FactoryBean interface -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
         <!-- required for JXPathFilter -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
-            <version>${version}</version>
         </dependency>
+
+        <!-- Unit tests -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
             <type>test-jar</type>
         </dependency>
-
         <!-- required for ConfigurationBuilders at runtime -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${version}</version>
             <scope>test</scope>
-        </dependency>
-       	<dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
-            <version>${version}</version>
         </dependency>
     </dependencies>
 </project>

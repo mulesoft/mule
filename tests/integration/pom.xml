@@ -16,211 +16,32 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- Include all Mule Modules -->
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-extras</artifactId>
+            <artifactId>mule-modules-all</artifactId>
             <version>${version}</version>
-            <scope>test</scope>
+            <type>pom</type>
+        </dependency>
+        <!-- Include all Mule Transports -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transports-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
         </dependency>
 
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-axis</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-ejb</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-email</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-file</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-ftp</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-http</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jdbc</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jms</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <!-- also include JMS tests -->
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jms</artifactId>
-            <version>${version}</version>
-            <type>test-jar</type>
-        </dependency>
-        <!-- also include SOAP tests -->
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-soap</artifactId>
-            <version>${version}</version>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-multicast</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-quartz</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-rmi</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-soap</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-ssl</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-stdio</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-tcp</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-udp</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-xfire</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-xmpp</artifactId>
-            <version>${version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-acegi</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-jbossts</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-ognl</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-pgp</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-extras</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-scripting</artifactId>
-            <version>${version}</version>
-        </dependency>
-
-        <!-- need to re-add hsqldb -->
-        <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>1.7.3.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- mule-module-spring does not pull in Hibernate, therefore we
-            have to include it for the tests. The list of exclusions is
-            the same as in tranport-bpm -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate</artifactId>
-            <version>3.1.3</version>
-            <exclusions>
-                <!-- We need commons-collections 3.2 -->
-                <exclusion>
-                    <groupId>commons-collections</groupId>
-                    <artifactId>commons-collections</artifactId>
-                </exclusion>
-                <!-- we like slf4j -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <!-- We've already got the geronimo-jta spec -->
-                <exclusion>
-                    <groupId>javax.transaction</groupId>
-                    <artifactId>jta</artifactId>
-                </exclusion>
-                <!-- Use the combined cglib-nodep instead of separate cglib and asm dependencies -->
-                <exclusion>
-                    <groupId>cglib</groupId>
-                    <artifactId>cglib</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>asm</groupId>
-                    <artifactId>asm-attrs</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
+        <!-- Used by ServerTools.java -->
         <dependency>
             <groupId>ant</groupId>
             <artifactId>ant</artifactId>
@@ -328,28 +149,5 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>2.1_3</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-        </dependency>
-        <!-- Better testing of XML -->
-        <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
 </project>
