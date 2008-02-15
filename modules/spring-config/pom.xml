@@ -9,78 +9,24 @@
         <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-spring-config</artifactId>
-    <!--<packaging>bundle</packaging>-->
+    <packaging>bundle</packaging>
     <name>Spring Config</name>
     <description>
         Mule Builder for use with Spring 2.X Namespace based XML
         configuration.
     </description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <!-- 
-                        TODO do not use mule-test-exclusions.txt for now as this module still
-                        needs to be sorted out
-                    -->
-                    <excludes>
-                        <exclude>**/*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <configuration>
-                            <instructions>
-                                <Export-Package>
-                                    org.mule.module.spring.config,
-                                    org.mule.module.spring.events,
-                                    org.mule.module.spring.remoting,
-                                    org.mule.module.spring.transaction
-                                </Export-Package>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <dependencies>
-        <!-- do not include the org.springframework:spring depencency kitchen sink
-            but rather include each spring module individually. This allows for
-            finer grained management of dependencies.
-        -->
-        <!-- Spring-based configuration is part of mule-core for 2.x -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${version}</version>
-        </dependency>
 
+        <!-- Unit tests -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>

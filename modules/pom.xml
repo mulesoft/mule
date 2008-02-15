@@ -16,6 +16,7 @@
 
     <modules>
         <module>acegi</module>
+        <module>all-bundles</module>
         <module>all-modules</module>
         <module>builders</module>
         <module>boot</module>
@@ -25,6 +26,7 @@
         <module>jca</module>
         <module>management</module>
         <module>ognl</module>
+        <module>osgi</module>
         <module>pgp</module>
         <module>scripting</module>
         <module>spring-extras</module>
@@ -32,13 +34,4 @@
         <module>wssecurity</module>
         <module>xml</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>osgi</id>
-            <modules>
-                <module>osgi</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

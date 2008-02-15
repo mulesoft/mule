@@ -17,27 +17,25 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
-                mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-context</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-tcp</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -112,7 +110,20 @@
             </exclusions>
         </dependency>
 
-        <!-- For unit tests only -->
+        <!-- Unit tests -->
+        <!-- TODO This can't be in the parent pom.xml because it creates a cyclic dependency: 
+                mule-tests-functional -> mule-module-builders -> mule-tests-functional -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>

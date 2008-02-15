@@ -15,17 +15,24 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-builders</artifactId>
-            <version>${version}</version>
+            <artifactId>mule-module-spring-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
         </dependency>
         <!-- Used by RemoteDispatcher -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
-            <version>${version}</version>
         </dependency>
 
+        <!-- Unit tests -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
