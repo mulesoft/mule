@@ -10,11 +10,12 @@
 
 package org.mule.module.osgi;
 
-import org.mule.config.ConfigurationException;
-import org.mule.config.i18n.Message;
-import org.mule.providers.service.TransportServiceDescriptor;
-import org.mule.registry.ServiceDescriptor;
-import org.mule.registry.ServiceDescriptorFactory;
+import org.mule.MuleServer;
+import org.mule.api.config.ConfigurationException;
+import org.mule.api.registry.ServiceDescriptor;
+import org.mule.api.registry.ServiceDescriptorFactory;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 
@@ -40,7 +41,7 @@ public class TransportActivator implements BundleActivator {
         String transportHeader = (String) headers.get(OSGI_HEADER_TRANSPORTS);
         if (transportHeader == null)
         {
-            throw new ConfigurationException(Message.createStaticMessage("Transport must declare its protocol as an OSGi header."));
+            throw new ConfigurationException(MessageFactory.createStaticMessage("Transport must declare its protocol as an OSGi header."));
         }
         String[] transports = StringUtils.splitAndTrim(transportHeader, ",");
 
@@ -53,12 +54,12 @@ public class TransportActivator implements BundleActivator {
             URL descriptorUrl = bc.getBundle().getEntry(descriptorPath);
             if (descriptorUrl == null)
             {
-                throw new ConfigurationException(Message.createStaticMessage("Unable to locate service descriptor file: " + descriptorPath));
+                throw new ConfigurationException(MessageFactory.createStaticMessage("Unable to locate service descriptor file: " + descriptorPath));
             }
             Properties props = new Properties();
             props.load(descriptorUrl.openStream());
             ServiceDescriptor descriptor = 
-                ServiceDescriptorFactory.create(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, transport, props, null);
+                ServiceDescriptorFactory.create(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, transport, props, null, MuleServer.getMuleContext().getRegistry());
     
             // Register the ServiceDescriptor as an OSGi Service.
             Hashtable osgiProps = new Hashtable();

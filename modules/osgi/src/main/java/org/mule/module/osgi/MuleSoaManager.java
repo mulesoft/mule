@@ -11,12 +11,11 @@
 package org.mule.module.osgi;
 
 
-import org.mule.config.i18n.Message;
-import org.mule.providers.service.TransportServiceDescriptor;
-import org.mule.registry.ServiceDescriptor;
-import org.mule.registry.ServiceException;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.ServiceDescriptor;
+import org.mule.api.registry.ServiceException;
+import org.mule.config.i18n.MessageFactory;
+import org.mule.transport.service.TransportServiceDescriptor;
 
 import java.util.Properties;
 
@@ -26,12 +25,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
-import org.springframework.osgi.context.BundleContextAware;
 
 /**
  * Service-based Mule Manager to be used in an OSGi environment.
  */
-public class MuleSoaManager extends MuleManager implements BundleContextAware
+public class MuleSoaManager /*extends MuleManager implements BundleContextAware*/
 {
     BundleContext context;
     
@@ -52,6 +50,7 @@ public class MuleSoaManager extends MuleManager implements BundleContextAware
      * @return The service descriptor or null if not found.
      */
     // //@Override
+    /*
     public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
     {
         try 
@@ -64,7 +63,7 @@ public class MuleSoaManager extends MuleManager implements BundleContextAware
             }
             else 
             {
-                throw new InitialisationException(Message.createStaticMessage("BundleContext has not been set for Manager."), this);
+                throw new InitialisationException(MessageFactory.createStaticMessage("BundleContext has not been set for Manager."), this);
             }
     
             // Match the service by name.
@@ -81,16 +80,15 @@ public class MuleSoaManager extends MuleManager implements BundleContextAware
         }
         catch (Exception e)
         {
-            throw new ServiceException(Message.createStaticMessage("Exception while looking up the service descriptor."), e);
+            throw new ServiceException(MessageFactory.createStaticMessage("Exception while looking up the service descriptor."), e);
         }
     }
         
-    public synchronized void initialise() throws UMOException
+    public synchronized void initialise() throws Exception
     {
         MuleManager.setInstance(this);
     }
     
-    /*
     public synchronized void initialise() throws UMOException
     {
         MuleManager.setInstance(manager);

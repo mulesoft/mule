@@ -37,6 +37,10 @@
     </build>
     
   <dependencies>
+        <dependency>
+          <groupId>org.mule</groupId>
+          <artifactId>mule-core</artifactId>
+        </dependency>
           <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_core</artifactId>
@@ -46,13 +50,6 @@
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_compendium</artifactId>
                 <version>1.0</version>
-        </dependency>
-        <!-- Needed for BundleContextAware interface -->
-        <dependency>
-          <groupId>org.springframework.osgi</groupId>
-          <artifactId>spring-osgi-core</artifactId>
-          <version>1.0-SNAPSHOT</version>
-          <!-- <classifier>mule</classifier> -->
         </dependency>
   </dependencies>
 </project>
