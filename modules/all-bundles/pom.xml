@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>2.1.0-M1-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-bundles-all</artifactId>
+    <packaging>pom</packaging>
+    <name>All 3rd-party OSGi Bundles</name>
+    <description>
+        This is a meta module that allows easy referencing of all 3rd-party OSGi bundles.
+        This is needed in the various distributions we publish.
+    </description>
+
+    <!-- 
+    When a new 3rd party library is added to the distro, it must be added in 3 places:
+       1. modules/all-bundles/pom.xml
+       2. distributions/server/full/assembly.xml
+       3. distributions/server/src/main/resources/conf/init.xargs
+    -->
+
+    <dependencies>
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+       <!-- backport-util library, packaged for OSGi -->
+       <dependency>
+          <groupId>org.springframework.osgi</groupId>
+          <artifactId>backport-util-concurrent</artifactId>
+          <version>3.0-SNAPSHOT</version>
+          <scope>runtime</scope>
+       </dependency> 
+       <!-- TODO Upgrade to latest version (3.0 or 3.1-SNAPSHOT ?) 
+       <dependency>
+          <groupId>org.springframework.osgi</groupId>
+          <artifactId>backport-util-concurrent.osgi</artifactId>
+          <version>3.1-SNAPSHOT</version>
+          <scope>runtime</scope>
+       </dependency> 
+       -->
+
+        <!-- PAX Logging -->
+        <dependency>
+              <groupId>org.ops4j.pax.logging</groupId>
+              <artifactId>pax-logging-api</artifactId>
+              <version>1.0.0</version>
+        </dependency>
+        <dependency>
+              <groupId>org.ops4j.pax.logging</groupId>
+              <artifactId>pax-logging-service</artifactId>
+              <version>1.0.0</version>
+        </dependency>
+        
+        <!-- TODO Include Apache Commons libs, Backport-Utils, others? -->
+        
+    </dependencies>
+</project>

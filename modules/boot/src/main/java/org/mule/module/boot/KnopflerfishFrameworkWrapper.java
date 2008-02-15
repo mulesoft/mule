@@ -49,23 +49,36 @@ public class KnopflerfishFrameworkWrapper implements WrapperListener
      */
     public Integer start( String[] args )
     {
+        String muleHome = System.getProperty("mule.home");
+        
         Properties osgiSysProps = new Properties();
-        // Directory where bundle state info. is stored.
-        // .xargs files will be read from the parent of this directory.
-        osgiSysProps.put("org.osgi.framework.dir", "../conf/knopflerfish");
-
+        // Directory where bundle state info. is stored (KF working directory)
+        // Note: .xargs files will be read from the parent of this directory.
+        osgiSysProps.put("org.osgi.framework.dir", muleHome + "/conf/knopflerfish");
+        // Prefix for searching for bundle URLs from console or command line
+        osgiSysProps.put("org.knopflerfish.gosg.jars", "file:" + muleHome + "/lib/");
+        
         for (Iterator iter = osgiSysProps.entrySet().iterator(); iter.hasNext();) {
             Map.Entry entry = (Map.Entry) iter.next();
             System.setProperty((String) entry.getKey(), (String) entry.getValue());
         }
 
         try {
-            Main.main(args);
             if (startGui) {
-                Main.main(new String[]{"-start", DESKTOP_BUNDLE});
+                Main.main(new String[]{
+                    "-xargs", muleHome + "/conf/osgi.properties",
+                    "-xargs", muleHome + "/conf/init.xargs",
+                    "-start", DESKTOP_BUNDLE});
+            }
+            else
+            {
+                Main.main(new String[]{
+                    "-xargs", muleHome + "/conf/osgi.properties",
+                    "-xargs", muleHome + "/conf/init.xargs"});
             }
             return null;
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             e.printStackTrace();
             return new Integer(1);
         }
