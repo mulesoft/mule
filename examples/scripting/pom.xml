@@ -12,18 +12,6 @@
     <name>Scripting Example</name>
     <description>A simple example that demonstrates Mule's JSR-223 Scripting support.</description>
 
-    <build>
-        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
-        <resources>
-            <resource>
-                <directory>conf</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -39,12 +27,6 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-stdio</artifactId>
             <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>

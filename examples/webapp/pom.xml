@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.examples</groupId>
         <artifactId>mule-examples</artifactId>
- <version>2.1.0-M1-SNAPSHOT</version>
+        <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-webapp</artifactId>
     <packaging>war</packaging>
@@ -22,16 +22,6 @@
         <!-- Default goal is to build the war and start it up in Jetty
              (surf to http://localhost:8090/mule-examples to test) -->
         <defaultGoal>jetty:run-war</defaultGoal>
-
-        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
-        <resources>
-            <resource>
-                <directory>conf</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
 
         <plugins>
             <plugin>
@@ -130,6 +120,23 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-builders</artifactId>
+            <version>${version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- For REST Servlet example -->
         <dependency>
@@ -147,6 +154,12 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
             <version>${version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>jetty</groupId>
+                    <artifactId>org.mortbay.jetty</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- For Jetty unit test --> 
@@ -155,13 +168,6 @@
           <artifactId>jetty</artifactId>
           <version>${jettyVersion}</version>
           <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
         </dependency>
     </dependencies>
 </project>

@@ -12,18 +12,6 @@
     <name>Stock Quotes Example</name>
     <description>This example demonstrates how to invoke an ASPX web service from Mule and transform the result using XSLT and deserialise the result to a StockQuote javabean. The examples demonstrates invoking the service using REST and SOAP.</description>
 
-    <build>
-        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
-        <resources>
-            <resource>
-                <directory>conf</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-    </build>
-
     <dependencies>
         <!-- we need both axis and xfire -->
         <dependency>
@@ -51,19 +39,9 @@
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- Use the SpringConfigurationBuilder as a workaround because the MuleXmlConfigurationBuilder
-        (Commons Digester) has issues when merging config files. -->        
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-extras</artifactId>
-            <version>${version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
+            <artifactId>mule-module-xml</artifactId>
         </dependency>
     </dependencies>
 </project>
