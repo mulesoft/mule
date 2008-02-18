@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Grabs all information from the MuleException type
  */
-public final class UMOExceptionReader implements ExceptionReader
+public final class MuleExceptionReader implements ExceptionReader
 {
 
     public String getMessage(Throwable t)

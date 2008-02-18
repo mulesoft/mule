@@ -105,7 +105,7 @@ public final class ExceptionHelper
                 return;
             }
 
-            registerExceptionReader(new UMOExceptionReader());
+            registerExceptionReader(new MuleExceptionReader());
             registerExceptionReader(new NamingExceptionReader());
             J2SE_VERSION = System.getProperty("java.specification.version");
 
