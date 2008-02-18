@@ -22,5 +22,11 @@
             <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <!-- Override scope="test" from parent -->
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
