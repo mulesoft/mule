@@ -31,12 +31,14 @@
                 <artifactId>mule-assembly-verifier</artifactId>
                 <!-- version is provided by the global pluginManagement -->
                 <executions>
+                    <!-- Disable for now since this will completely change for OSGi.
                     <execution>
                         <phase>verify</phase>
                         <goals>
                             <goal>verify</goal>
                         </goals>
                     </execution>
+                    -->
                 </executions>
                 <configuration>
                     <!-- Default is under src/main/resources, pull it to the root for this project -->
