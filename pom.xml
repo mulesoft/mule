@@ -56,6 +56,7 @@
         <cxfVersion>2.0.1-incubator</cxfVersion>
         <coberturaVersion>2.2</coberturaVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
+        <backportUtilConcurrentVersion>3.1</backportUtilConcurrentVersion>
     </properties>
 
     <!-- Declare all dependencies that are used in more than one module here. 
@@ -97,7 +98,7 @@
             <dependency>
                 <groupId>backport-util-concurrent</groupId>
                 <artifactId>backport-util-concurrent</artifactId>
-                <version>3.1</version>
+                <version>${backportUtilConcurrentVersion}</version>
                 <scope>provided</scope>
             </dependency>
  
@@ -544,6 +545,19 @@
                         <artifactId>junit</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <!-- OSGi Specification -->
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>osgi_R4_core</artifactId>
+                <version>1.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>osgi_R4_compendium</artifactId>
+                <version>1.0</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -1218,12 +1232,10 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi_R4_core</artifactId>
-            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi_R4_compendium</artifactId>
-            <version>1.0</version>
         </dependency>
 
         <!-- Unit tests -->
