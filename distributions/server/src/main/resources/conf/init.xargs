@@ -67,6 +67,9 @@
 -start boot/osgi/http/http_all-2.0.0.jar
 -start boot/osgi/httproot/httproot-2.0.0.jar
 
+# Needed for javax.microedition.io (somehow used by org.mule.util.XMLEntityCodec)
+-istart boot/osgi/io/io_all-2.0.0.jar
+
 #############################################################
 # 3rd party libraries
 #############################################################
