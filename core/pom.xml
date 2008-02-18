@@ -37,11 +37,6 @@
             <version>2.0.0</version>
             <classifier>asl</classifier>
         </dependency>
-        <!-- Needed for Log4jNotificationLoggerAgent -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
         <!-- TODO MULE-1947 Remove this since command-line parsing is limited to mule-module-boot -->
         <dependency>
             <groupId>commons-cli</groupId>
@@ -55,16 +50,18 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- These are used by the TCK, which will hopefully be in its own project some day -->
+
         <!-- Unit tests -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>
             <version>0.09</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
