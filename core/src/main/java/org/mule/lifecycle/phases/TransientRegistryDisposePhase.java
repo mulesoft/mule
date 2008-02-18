@@ -50,10 +50,16 @@ public class TransientRegistryDisposePhase extends DefaultLifecyclePhase
 //                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSING),
 //                ManagerNotification.getActionName(ManagerNotification.MANAGER_DISPOSED)));
         disposeOrderedObjects.add(new NotificationLifecycleObject(MuleContext.class));
-        // TODO MULE-2903 Fix again for OSGi: The hack for MULE-2903 (in NotificationLifecycleObject()) 
-        // throws an IllegalStateException when calling ClassUtils.initializeClass()
-//        disposeOrderedObjects.add(new NotificationLifecycleObject(Connector.class, ManagerNotification.class,
-//                ManagerNotification.MANAGER_DISPOSING_CONNECTORS,ManagerNotification.MANAGER_DISPOSED_CONNECTORS));
+        try
+        {
+            disposeOrderedObjects.add(new NotificationLifecycleObject(Connector.class, ManagerNotification.class,
+                    ManagerNotification.MANAGER_DISPOSING_CONNECTORS,ManagerNotification.MANAGER_DISPOSED_CONNECTORS));
+        }
+        catch (IllegalStateException e)
+        {
+            // TODO MULE-2903 Fix again for OSGi: The hack for MULE-2903 (in NotificationLifecycleObject()) 
+            // throws an IllegalStateException when calling ClassUtils.initializeClass()            
+        }
         disposeOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
         disposeOrderedObjects.add(new NotificationLifecycleObject(Model.class));
         disposeOrderedObjects.add(new NotificationLifecycleObject(Disposable.class));

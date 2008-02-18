@@ -48,10 +48,16 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         Set startOrderedObjects = new LinkedHashSet();
         startOrderedObjects.add(new NotificationLifecycleObject(Connector.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
-        // TODO MULE-2903 Fix again for OSGi: The hack for MULE-2903 (in NotificationLifecycleObject()) 
-        // throws an IllegalStateException when calling ClassUtils.initializeClass()
-//        startOrderedObjects.add(new NotificationLifecycleObject(Model.class, ManagerNotification.class,
-//                ManagerNotification.MANAGER_STARTING_MODELS, ManagerNotification.MANAGER_STARTED_MODELS));
+        try
+        {
+            startOrderedObjects.add(new NotificationLifecycleObject(Model.class, ManagerNotification.class,
+                ManagerNotification.MANAGER_STARTING_MODELS, ManagerNotification.MANAGER_STARTED_MODELS));
+        }
+        catch (IllegalStateException e)
+        {
+            // TODO MULE-2903 Fix again for OSGi: The hack for MULE-2903 (in NotificationLifecycleObject()) 
+            // throws an IllegalStateException when calling ClassUtils.initializeClass()            
+        }
         startOrderedObjects.add(new NotificationLifecycleObject(Service.class));
         startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 
