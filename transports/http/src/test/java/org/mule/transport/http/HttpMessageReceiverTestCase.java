@@ -16,7 +16,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-import org.mule.transport.http.transformers.UMOMessageToHttpResponse;
+import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 import org.mule.util.CollectionUtils;
 
 import com.mockobjects.dynamic.Mock;
@@ -35,7 +35,7 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public ImmutableEndpoint getEndpoint() throws Exception
     {
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("http://localhost:6789", muleContext);
-        endpointBuilder.setResponseTransformers(CollectionUtils.singletonList(new UMOMessageToHttpResponse()));
+        endpointBuilder.setResponseTransformers(CollectionUtils.singletonList(new MuleMessageToHttpResponse()));
         endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
         return endpoint;
     }

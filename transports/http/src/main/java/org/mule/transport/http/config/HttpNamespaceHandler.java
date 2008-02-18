@@ -23,7 +23,7 @@ import org.mule.transport.http.components.RestServiceWrapper;
 import org.mule.transport.http.transformers.HttpClientMethodResponseToObject;
 import org.mule.transport.http.transformers.HttpResponseToString;
 import org.mule.transport.http.transformers.ObjectToHttpClientMethodRequest;
-import org.mule.transport.http.transformers.UMOMessageToHttpResponse;
+import org.mule.transport.http.transformers.MuleMessageToHttpResponse;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><http:connector></code> elements.
@@ -46,6 +46,6 @@ public class HttpNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("http-client-response-to-object-transformer", new MuleOrphanDefinitionParser(HttpClientMethodResponseToObject.class, false));
         registerBeanDefinitionParser("http-response-to-string-transformer", new MuleOrphanDefinitionParser(HttpResponseToString.class, false));
         registerBeanDefinitionParser("object-to-http-client-request-transformer", new MuleOrphanDefinitionParser(ObjectToHttpClientMethodRequest.class, false));
-        registerBeanDefinitionParser("message-to-http-response-transformer", new MuleOrphanDefinitionParser(UMOMessageToHttpResponse.class, false));
+        registerBeanDefinitionParser("message-to-http-response-transformer", new MuleOrphanDefinitionParser(MuleMessageToHttpResponse.class, false));
     }
 }

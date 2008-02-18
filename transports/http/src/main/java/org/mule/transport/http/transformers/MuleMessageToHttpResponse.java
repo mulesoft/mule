@@ -13,6 +13,7 @@ package org.mule.transport.http.transformers;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.MuleManifest;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -40,7 +41,7 @@ import org.apache.commons.httpclient.HttpVersion;
  * response.
  */
 
-public class UMOMessageToHttpResponse extends AbstractMessageAwareTransformer
+public class MuleMessageToHttpResponse extends AbstractMessageAwareTransformer
 {
     public static final String CUSTOM_HEADER_PREFIX = "";
 
@@ -48,7 +49,7 @@ public class UMOMessageToHttpResponse extends AbstractMessageAwareTransformer
     private SimpleDateFormat format;
     private String server;
 
-    public UMOMessageToHttpResponse()
+    public MuleMessageToHttpResponse()
     {
         registerSourceType(Object.class);
         setReturnClass(HttpResponse.class);
@@ -56,7 +57,7 @@ public class UMOMessageToHttpResponse extends AbstractMessageAwareTransformer
 
 
     //@Override
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         format = new SimpleDateFormat(HttpConstants.DATE_FORMAT, Locale.US);
 
@@ -71,6 +72,7 @@ public class UMOMessageToHttpResponse extends AbstractMessageAwareTransformer
             server = MuleManifest.getProductName() + "/"
                      + MuleManifest.getProductVersion();
         }
+        return LifecycleTransitionResult.OK;
     }
 
     public Object transform(MuleMessage msg, String outputEncoding) throws TransformerException

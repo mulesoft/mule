@@ -80,7 +80,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         MuleMessage message = client.send("http://localhost:4446", "request", null);
         assertNotNull(message);
-        // Ensure UMOMessageToHttpResponse was used before sending response
+        // Ensure MuleMessageToHttpResponse was used before sending response
         assertTrue(message.getAdapter() instanceof HttpMessageAdapter);
         assertEquals("text/plain; charset=UTF-8", ((HttpMessageAdapter) message.getAdapter()).getHeader("Content-Type")
             .getValue());
@@ -92,7 +92,7 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
         MuleMessage message = client.send("http://localhost:4447", "request", null);
         assertNotNull(message);
-        // Ensure UMOMessageToHttpResponse was used before sending response
+        // Ensure MuleMessageToHttpResponse was used before sending response
         // NOTE: With http setting custom response transformer does not replace transport default, becasue
         // custom transformers are called in DefaultInternalMessageListener and http transformer perform
         // explict response transformer afterwards in HttpMessageReciever.doRequest(HttpRequest request,
