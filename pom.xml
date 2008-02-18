@@ -3,16 +3,13 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
-    <!-- 
-    Note that we do not inherit from the root POM so that the scope="provided" 
-    settings in the dependencyManagement section are not applied.  Otherwise we 
-    would not be able to make use of all-modules, all-transports, all-examples, 
-    and all-bundles to easily pull in the modules for the distros. 
-    -->
+    <parent>
+        <groupId>org.mule</groupId>
+        <artifactId>mule</artifactId>
+        <version>2.1.0-M1-SNAPSHOT</version>
+    </parent>
     <groupId>org.mule.distributions</groupId>
     <artifactId>mule-distributions</artifactId>
-    <version>2.1.0-M1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Mule Distributions</name>
 
