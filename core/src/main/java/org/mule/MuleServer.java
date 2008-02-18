@@ -392,13 +392,15 @@ public class MuleServer implements Runnable
      */
     public void shutdown()
     {
-        logger.info("Mule server shutting dow due to normal shutdown request");
-        List msgs = new ArrayList();
-        msgs.add(CoreMessages.normalShutdown());
-        msgs.add(CoreMessages.serverStartedAt(muleContext.getStartDate()).getMessage());
-        msgs.add(CoreMessages.serverShutdownAt(new Date()).getMessage());
-        String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
-        logger.info(shutdownMessage);
+        logger.info("Mule server shutting down due to normal shutdown request");
+        
+        // Isn't this the same info. as DefaultMuleContext.getEndSplash() ?
+//        List msgs = new ArrayList();
+//        msgs.add(CoreMessages.normalShutdown());
+//        msgs.add(CoreMessages.serverStartedAt(muleContext.getStartDate()).getMessage());
+//        msgs.add(CoreMessages.serverShutdownAt(new Date()).getMessage());
+//        String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
+//        logger.info(shutdownMessage);
 
         // make sure that Mule is shutdown correctly.
         muleContext.dispose();
