@@ -40,9 +40,11 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
         return client;
     }
 
-    public void testObjectOut() throws MuleException
+    public void testObjectOut() throws MuleException, InterruptedException
     {
         request(sendObject(), "object-out", Parent.class);
+        // wait a while, otherwise we pull down everything while it is still running
+        Thread.sleep(3000);
     }
 
     public void testObjectXmlOut() throws MuleException

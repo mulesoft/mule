@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.registry.Registry;
 import org.mule.config.ConfigResource;
 import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
 
 import java.io.IOException;
 
@@ -24,7 +25,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
@@ -169,7 +170,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
             {
                 try
                 {
-                    configResources[i] = new InputStreamResource(resource.getInputStream());
+                    configResources[i] = new ByteArrayResource(IOUtils.toByteArray(resource.getInputStream()));
                 }
                 catch (IOException e)
                 {

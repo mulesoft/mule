@@ -10,11 +10,11 @@
 
     <tcp:connector name="openConnector" keepSendSocketOpen="true"/>
 
-    <tcp:connector name="openConnectorLength" keepSendSocketOpen="true">
+    <tcp:connector name="openConnectorLength" keepSendSocketOpen="true" validateConnections="false">
         <tcp:length-protocol payloadOnly="true"/>
     </tcp:connector>
 
-    <tcp:connector name="closeConnectorLength">
+    <tcp:connector name="closeConnectorLength" validateConnections="false">
         <tcp:length-protocol payloadOnly="true"/>
     </tcp:connector>
 

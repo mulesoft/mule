@@ -60,13 +60,13 @@ public abstract class AbstractClientRemotingTestCase extends FunctionalTestCase
         RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getRemoteEndpointUri());
-        MuleMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);
+        MuleMessage message = dispatcher.receiveRemote(remoteEndpoint, 2000);
         assertNull(message);
         // We do a send instead of a dispatch here so the operation is
         // synchronous thus eaiser to test
         dispatcher.sendRemote(remoteEndpoint, "Test Remote Message 2", null);
 
-        message = dispatcher.receiveRemote(remoteEndpoint, 1000);
+        message = dispatcher.receiveRemote(remoteEndpoint, 3000);
         assertNotNull(message);
         assertEquals("Test Remote Message 2", message.getPayload());
     }
