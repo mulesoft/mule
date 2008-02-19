@@ -14,6 +14,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.component.builder.AbstractMessageBuilder;
 import org.mule.component.builder.MessageBuilderException;
 
@@ -57,8 +58,9 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
         return result;
     }
 
-    public void initialise() throws InitialisationException {
-        scriptable.initialise();
+    public LifecycleTransitionResult initialise() throws InitialisationException
+    {
+        return scriptable.initialise();
     }
 
     protected void populateBindings(Bindings namespace, MuleMessage request, MuleMessage response)

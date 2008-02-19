@@ -12,6 +12,7 @@ package org.mule.management.mbeans;
 
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transport.Connector;
 import org.mule.util.ObjectNameHelper;
 
@@ -73,9 +74,9 @@ public class ConnectorService implements ConnectorServiceMBean
         connector.dispose();
     }
 
-
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        connector.initialise();
+        return connector.initialise();
     }
+
 }

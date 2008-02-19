@@ -25,6 +25,7 @@ import java.util.Set;
 
 public interface LifecyclePhase
 {
+    
     String ALL_PHASES = "all";
 
     void fireLifecycle(MuleContext muleContext, String currentPhase) throws MuleException;
@@ -37,9 +38,9 @@ public interface LifecyclePhase
 
     void setOrderedLifecycleObjects(Set orderedLifecycleObjects);
 
-    Class[] getIgnorredObjectTypes();
+    Class[] getIgnoredObjectTypes();
 
-    void setIgnorredObjectTypes(Class[] ignorredObjectTypes);
+    void setIgnoredObjectTypes(Class[] ignorredObjectTypes);
 
     Class getLifecycleClass();
 
@@ -55,11 +56,12 @@ public interface LifecyclePhase
 
     boolean isPhaseSupported(String phase);
 
-    void applyLifecycle(Object o) throws LifecycleException;
+    LifecycleTransitionResult applyLifecycle(Object o) throws LifecycleException;
 
     public int getRegistryScope();
 
     public void setRegistryScope(int registryScope);
 
     public String getOppositeLifecyclePhase();
+
 }

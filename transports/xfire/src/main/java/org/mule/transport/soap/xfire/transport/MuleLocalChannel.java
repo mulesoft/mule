@@ -10,13 +10,12 @@
 
 package org.mule.transport.soap.xfire.transport;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleEventContext;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.WorkManager;
 import org.mule.message.DefaultExceptionPayload;
-import org.mule.transport.soap.xfire.XFireConnector;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
@@ -336,15 +335,13 @@ public class MuleLocalChannel extends AbstractChannel
         return serviceName;
     }
 
-    public Object onCall(MuleEventContext ctx) throws MuleException
+    public Object onCall(MuleEventContext ctx, XFire xfire) throws MuleException
     {
 
         try
         {
             MessageContext context = new MessageContext();
   
-            XFire xfire = (XFire)ctx.getService().getProperties().get(XFireConnector.XFIRE_PROPERTY);
-
             context.setService(xfire.getServiceRegistry().getService(getService(ctx)));
             context.setXFire(xfire);
 

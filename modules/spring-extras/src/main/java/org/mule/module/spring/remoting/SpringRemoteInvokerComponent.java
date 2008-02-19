@@ -14,6 +14,8 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 
@@ -61,7 +63,8 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
         delegate = new Delegate();
     }
 
-    public void initialise() throws InitialisationException {
+    public LifecycleTransitionResult initialise() throws InitialisationException
+    {
         if (serviceClass == null && serviceBean == null)
         {
             throw new InitialisationException(
@@ -97,6 +100,7 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
             delegate.setRemoteInvocationExecutor(remoteInvocationExecutor);
         }
         delegate.afterPropertiesSet();
+        return LifecycleTransitionResult.OK;
     }
 
     public Class getServiceClass()

@@ -129,6 +129,7 @@ public class GenericLifecycleManager implements LifecycleManager
 
     public void applyLifecycle(MuleContext muleContext, Object object) throws MuleException
     {
+        logger.debug("applying lifecycle to " + object);
         //String startingPhase = DefaultLifecyclePhase.PHASE_NAME;
         LifecyclePhase lcp;
         String phase;
@@ -138,6 +139,7 @@ public class GenericLifecycleManager implements LifecycleManager
             phase = (String) iterator.next();
             phaseIndex = (Integer) index.get(phase);
             lcp = (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
+            logger.debug("phase: " + lcp);
             lcp.applyLifecycle(object);
             //startingPhase = phase;
         }
@@ -146,6 +148,7 @@ public class GenericLifecycleManager implements LifecycleManager
         {
             phaseIndex = (Integer) index.get(getExecutingPhase());
             lcp = (LifecyclePhase) lifecycles.get(phaseIndex.intValue());
+            logger.debug("and executing: " + lcp);
             lcp.applyLifecycle(object);
         }
     }

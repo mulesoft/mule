@@ -13,6 +13,7 @@ package org.mule.container;
 import org.mule.api.context.ContainerException;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.registry.RegistrationException;
 import org.mule.util.TemplateParser;
 
@@ -50,7 +51,7 @@ public class PropertiesContainerContext extends AbstractContainerContext impleme
     }
 
     //@Override
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (properties != null)
         {
@@ -72,6 +73,7 @@ public class PropertiesContainerContext extends AbstractContainerContext impleme
             }
         }
         setSystemProperties(null);
+        return LifecycleTransitionResult.OK;
     }
 
     public Object match(String token)

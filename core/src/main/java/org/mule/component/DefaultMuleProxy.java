@@ -23,6 +23,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.LifecycleAdapter;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
 import org.mule.api.model.ModelException;
@@ -81,14 +82,14 @@ public class DefaultMuleProxy implements MuleProxy
         umo = model.getLifecycleAdapterFactory().create(pojoService, service, resolver);
     }
 
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
         checkDisposed();
         if (!umo.isStarted())
         {
             try
             {
-                umo.start();
+                return umo.start();
             }
             catch (Exception e)
             {
@@ -96,7 +97,7 @@ public class DefaultMuleProxy implements MuleProxy
                     CoreMessages.failedToStart("Service '" + service.getName() + "'"), e);
             }
         }
-
+        return LifecycleTransitionResult.OK;
     }
 
     public boolean isStarted()
@@ -104,14 +105,14 @@ public class DefaultMuleProxy implements MuleProxy
         return umo.isStarted();
     }
 
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
         checkDisposed();
         if (umo.isStarted())
         {
             try
             {
-                umo.stop();
+                return umo.stop();
             }
             catch (Exception e)
             {
@@ -119,6 +120,7 @@ public class DefaultMuleProxy implements MuleProxy
                     CoreMessages.failedToStop("Service '" + service.getName() + "'"), e);
             }
         }
+        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

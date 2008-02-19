@@ -12,6 +12,7 @@ package org.mule.util.object;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceAware;
 import org.mule.util.BeanUtils;
@@ -70,7 +71,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, ServiceAwa
         this.properties = properties;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (objectClass == null && objectClassName != null)
         {
@@ -83,6 +84,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, ServiceAwa
                 throw new InitialisationException(e, this);
             }
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /**

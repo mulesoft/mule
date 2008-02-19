@@ -64,6 +64,34 @@
         <property key="beanProperty2" value="12"/>
         <property key="containerProperty" value="myString"/>
     </endpoint>
+    
+    <endpoint name="endpointWithProps" address="test://endpointWithProps">
+    	<properties>
+    		<spring:entry key="brand" value="Juicy Baby!"/>
+    		<spring:entry key="segments" value="9"/>
+    		<spring:entry key="radius" value="4.21"/>
+			<spring:entry key="mapProperties">
+				<spring:map>
+				    <spring:entry key="prop1" value="prop1"/>
+			    	<spring:entry key="prop2" value="prop2"/>
+				</spring:map>
+			</spring:entry>
+			<spring:entry key="listProperties">
+				<spring:list>
+					<spring:value>prop1</spring:value>
+					<spring:value>prop2</spring:value>
+					<spring:value>prop3</spring:value>
+				</spring:list>
+			</spring:entry>
+			<spring:entry key="arrayProperties">
+				<spring:list>
+					<spring:value>prop4</spring:value>
+					<spring:value>prop5</spring:value>
+					<spring:value>prop6</spring:value>
+				</spring:list>
+			</spring:entry>
+    	</properties>
+    </endpoint>
 
     <!-- TODO RM*: Add an interceptor wrapper and use spring AOP to configure these -->
     <!--<interceptor-stack name="default">-->

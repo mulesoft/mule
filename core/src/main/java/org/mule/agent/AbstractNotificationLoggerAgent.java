@@ -23,6 +23,7 @@ import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.context.notification.NotificationException;
 
 import java.util.HashSet;
@@ -61,14 +62,14 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         super(name);
     }
 
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
-        // nothing to do
+        return LifecycleTransitionResult.OK;
     }
 
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
-        // nothing to do
+        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()
@@ -180,7 +181,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
         this.ignoreConnectionNotifications = ignoreConnectionNotifications;
     }
 
-    public final void initialise() throws InitialisationException    
+    public final LifecycleTransitionResult initialise() throws InitialisationException
     {
         doInitialise();
         if (!ignoreManagerNotifications)
@@ -343,7 +344,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
             }
             listeners.add(l);
         }
-
+        return LifecycleTransitionResult.OK;
     }
 
     protected abstract void doInitialise() throws InitialisationException;

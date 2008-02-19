@@ -29,6 +29,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.wire.WireFormat;
@@ -77,13 +78,15 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
     protected int synchronousEventTimeout = 5000;
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (wireFormat == null)
         {
             throw new InitialisationException(CoreMessages.objectIsNull("wireFormat"), this);
         }
+        return LifecycleTransitionResult.OK;
     }
+
     public Object onCall(MuleEventContext context) throws Exception
     {
         if(context.transformMessageToString().equals(ServerHandshake.SERVER_HANDSHAKE_PROPERTY))

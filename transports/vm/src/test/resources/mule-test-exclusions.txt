@@ -2,13 +2,6 @@
 # Test cases listed in this file are not run.
 #
 
-# MULE-2474
-#org.mule.issues.MessageChunkingMule2192TestCase
-
-# MULE-2131
-org.mule.issues.EndpointTransformerMule2131TestCase
-org.mule.issues.TransformerChainMule2131TestCase
-
 # MULE-2620
 org.mule.module.xml.functional.BeanPropertyExtractorMultipleEndpointsTestCase
 org.mule.module.xml.functional.BeanPropertyExtractorTestCase

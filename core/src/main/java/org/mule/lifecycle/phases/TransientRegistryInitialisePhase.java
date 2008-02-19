@@ -46,7 +46,7 @@ public class TransientRegistryInitialisePhase extends DefaultLifecyclePhase
     {
         super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
 
-        setIgnorredObjectTypes(ignorredObjects);
+        setIgnoredObjectTypes(ignorredObjects);
         Set initOrderedObjects = new LinkedHashSet();
         initOrderedObjects.add(new NotificationLifecycleObject(MuleContext.class));
         initOrderedObjects.add(new NotificationLifecycleObject(Connector.class));

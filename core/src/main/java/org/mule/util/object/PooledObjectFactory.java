@@ -12,6 +12,7 @@ package org.mule.util.object;
 
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.PoolingProfile;
 import org.mule.util.UUID;
 
@@ -54,7 +55,7 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
         this.poolingProfile = poolingProfile;
     }
     
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         super.initialise();
         GenericKeyedObjectPool.Config config = new GenericKeyedObjectPool.Config();
@@ -75,6 +76,7 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
         {
             throw new InitialisationException(e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     protected void applyInitialisationPolicy() throws Exception

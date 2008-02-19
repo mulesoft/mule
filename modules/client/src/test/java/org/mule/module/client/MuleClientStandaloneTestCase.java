@@ -22,9 +22,8 @@ public class MuleClientStandaloneTestCase extends AbstractMuleTestCase
         muleClient.dispatch("test://test", "message", null);
         muleClient.send("test://test", "message", null);
         muleClient.dispose();
-        // TODO MULE-2847
-        //assertFalse(muleClient.getMuleContext().isInitialised());
-        //assertFalse(muleClient.getMuleContext().isStarted());
+        assertFalse(muleClient.getMuleContext().isInitialised());
+        assertFalse(muleClient.getMuleContext().isStarted());
     }
 
 }

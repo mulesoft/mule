@@ -16,6 +16,7 @@ import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.util.ClassUtils;
 import org.mule.util.FileUtils;
 
@@ -82,14 +83,16 @@ public class ConfigScannerAgent extends AbstractAgent
         return getName() + " scanning for files in " + configDirName;
     }
 
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
         scannerThread = new ScannerThread();
         scannerThread.start();
+        return LifecycleTransitionResult.OK;
     }
 
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
+        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()
@@ -104,7 +107,7 @@ public class ConfigScannerAgent extends AbstractAgent
     {
     }
 
-    public void initialise() throws InitialisationException    
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (configDirName == null)
         {
@@ -120,6 +123,7 @@ public class ConfigScannerAgent extends AbstractAgent
         {
             throw new InitialisationException(ioe, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     public String toString()

@@ -12,6 +12,8 @@ package org.mule.transformers.script;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.transformer.TransformerException;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -62,10 +64,14 @@ public class ScriptTransformer extends AbstractMessageAwareTransformer
      * 
      * @throws org.mule.api.lifecycle.InitialisationException
      */
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        super.initialise();
-        scriptable.initialise();
+        return LifecycleLogic.initialiseAll(this, super.initialise(), new LifecycleLogic.Closure()
+        {
+            public LifecycleTransitionResult doContinue() throws InitialisationException
+            {
+                return scriptable.initialise();
+            }});
     }
 
     public ScriptEngine getScriptEngine()

@@ -388,4 +388,9 @@ public class MuleConfiguration
         this.systemModelType = systemModelType;
     }
 
+    public void setClientMode(boolean clientMode)
+    {
+        this.clientMode = clientMode;
+    }
+
 }

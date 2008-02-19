@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.i18n.ManagementMessages;
 import org.mule.management.mbeans.YourKitProfilerService;
@@ -90,13 +91,13 @@ public class YourKitProfilerAgent implements Agent
      *
      * @see org.mule.api.lifecycle.Initialisable#initialise()
      */
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if(!isApiAvailable())
         {
             logger.warn("Cannot find YourKit API. Profiler JMX Agent will be unregistered.");
             unregisterMeQuietly();
-            return;
+            return LifecycleTransitionResult.OK;
         }
 
         final List servers = MBeanServerFactory.findMBeanServer(null);
@@ -120,6 +121,7 @@ public class YourKitProfilerAgent implements Agent
         {
             throw new InitialisationException(CoreMessages.failedToStart(this.getName()), e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /**
@@ -171,9 +173,9 @@ public class YourKitProfilerAgent implements Agent
      *
      * @see org.mule.api.lifecycle.Startable#start()
      */
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
-        // nothing to do
+        return LifecycleTransitionResult.OK;
     }
 
     /*
@@ -181,9 +183,9 @@ public class YourKitProfilerAgent implements Agent
      *
      * @see org.mule.api.lifecycle.Stoppable#stop()
      */
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
-        // nothing to do
+        return LifecycleTransitionResult.OK;
     }
 
     /*

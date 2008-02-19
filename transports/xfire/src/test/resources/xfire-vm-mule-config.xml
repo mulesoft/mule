@@ -26,8 +26,8 @@
                     <properties>
                         <spring:entry key="serviceInterfaces">
                             <spring:list>
-                                <spring:value>org.mule.api.component.simple.EchoService</spring:value>
                                 <spring:value>org.mule.tck.testmodels.services.DateService</spring:value>
+                                <spring:value>org.mule.api.component.simple.EchoService</spring:value>
                             </spring:list>
                         </spring:entry>
                     </properties>

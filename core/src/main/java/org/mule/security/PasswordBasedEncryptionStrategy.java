@@ -11,6 +11,7 @@
 package org.mule.security;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 
 import java.security.GeneralSecurityException;
@@ -44,7 +45,7 @@ public class PasswordBasedEncryptionStrategy extends AbstractJCEEncryptionStrate
         algorithm = DEFAULT_ALGORITHM;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (salt == null)
         {
@@ -57,7 +58,7 @@ public class PasswordBasedEncryptionStrategy extends AbstractJCEEncryptionStrate
         {
             throw new InitialisationException(CoreMessages.objectIsNull("Password"), this);
         }
-        super.initialise();
+        return super.initialise();
     }
 
     protected KeySpec createKeySpec()

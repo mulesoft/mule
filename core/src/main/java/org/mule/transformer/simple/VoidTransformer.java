@@ -12,6 +12,7 @@ package org.mule.transformer.simple;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 
@@ -94,7 +95,7 @@ public class VoidTransformer implements Transformer
         throw new IllegalStateException("Void transformer");
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         throw new IllegalStateException("Void transformer");
     }

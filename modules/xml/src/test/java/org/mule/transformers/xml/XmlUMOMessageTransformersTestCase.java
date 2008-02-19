@@ -17,6 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.util.SystemUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -149,7 +150,8 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
             {
                 XMLAssert.assertXpathEvaluatesTo("3", "count(//adapter/properties/scopedMap/entry/map/entry)", (String)result);
                 // depending on your VM and the phase of the moon this is either "number" or "object"
-                XMLAssert.assertXpathEvaluatesTo("number", "//adapter/properties/scopedMap/entry/map/entry/string/text()", (String)result);
+                String expectedValue = (SystemUtils.IS_JAVA_1_5 ? "object" : "number");
+                XMLAssert.assertXpathEvaluatesTo(expectedValue, "//adapter/properties/scopedMap/entry/map/entry/string/text()", (String)result);
                 XMLAssert.assertXpathEvaluatesTo("false", "//adapter/properties/scopedMap/entry/map/entry/org.mule.tck.testmodels.fruit.Apple/bitten", (String)result);
             }
             catch (Exception ex)

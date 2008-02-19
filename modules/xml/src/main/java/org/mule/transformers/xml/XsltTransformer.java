@@ -13,6 +13,7 @@ package org.mule.transformers.xml;
 import org.mule.RequestContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -75,7 +76,7 @@ public class XsltTransformer extends AbstractXmlTransformer
     /**
      *
      */
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         try
         {
@@ -85,6 +86,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         {
             throw new InitialisationException(te, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /**

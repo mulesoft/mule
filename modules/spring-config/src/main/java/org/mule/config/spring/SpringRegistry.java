@@ -45,7 +45,6 @@ import javax.transaction.TransactionManager;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ConfigurableApplicationContext;
 
-/** TODO */
 public class SpringRegistry extends AbstractRegistry
 {
     public static final String REGISTRY_ID = "org.mule.Registry.Spring";

@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleAdapterFactory;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
@@ -146,11 +147,12 @@ public abstract class AbstractModel implements Model
      *
      * @throws MuleException if a Service fails tcomponent
      */
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPING));
         started.set(false);
         fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPED));
+        return LifecycleTransitionResult.OK;
     }
 
     /**
@@ -158,7 +160,7 @@ public abstract class AbstractModel implements Model
      *
      * @throws MuleException if any of the components fail to start
      */
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
         if (!initialised.get())
         {
@@ -175,9 +177,10 @@ public abstract class AbstractModel implements Model
         {
             logger.debug("Model already started");
         }
+        return LifecycleTransitionResult.OK;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (!initialised.get())
         {
@@ -189,6 +192,7 @@ public abstract class AbstractModel implements Model
         {
             logger.debug("Model already initialised");
         }
+        return LifecycleTransitionResult.OK;
     }
 
     public ExceptionListener getExceptionListener()

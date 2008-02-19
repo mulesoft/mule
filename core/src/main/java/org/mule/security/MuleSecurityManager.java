@@ -12,6 +12,8 @@ package org.mule.security;
 
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityException;
@@ -25,6 +27,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
@@ -52,19 +56,12 @@ public class MuleSecurityManager implements SecurityManager
         // for debug
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        for (Iterator iterator = providers.values().iterator(); iterator.hasNext();)
-        {
-            SecurityProvider provider = (SecurityProvider) iterator.next();
-            provider.initialise();
-        }
-
-        for (Iterator iterator = cryptoStrategies.values().iterator(); iterator.hasNext();)
-        {
-            EncryptionStrategy strategy = (EncryptionStrategy) iterator.next();
-            strategy.initialise();
-        }
+        List all = new LinkedList(providers.values());
+        // ordering: appends
+        all.addAll(cryptoStrategies.values());
+        return LifecycleLogic.initialiseAll(all.iterator());
     }
 
     public Authentication authenticate(Authentication authentication)

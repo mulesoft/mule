@@ -20,6 +20,7 @@ import org.mule.config.i18n.Message;
  */
 public class RecoverableException extends InitialisationException
 {
+
     /** Serial version */
     private static final long serialVersionUID = -5799024626172482665L;
 
@@ -37,4 +38,5 @@ public class RecoverableException extends InitialisationException
     {
         super(message, cause, object);
     }
+
 }

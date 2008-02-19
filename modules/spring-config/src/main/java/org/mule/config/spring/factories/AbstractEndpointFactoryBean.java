@@ -14,6 +14,7 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 import org.apache.commons.logging.Log;
@@ -55,9 +56,9 @@ public abstract class AbstractEndpointFactoryBean extends EndpointURIEndpointBui
         return true;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        // No initialization
+        return LifecycleTransitionResult.OK;
     }
 
     protected abstract Object doGetObject() throws Exception;

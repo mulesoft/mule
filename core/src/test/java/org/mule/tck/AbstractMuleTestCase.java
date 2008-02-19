@@ -130,6 +130,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     public static final long LOCK_TIMEOUT = 30000;
 
     /**
+     * Default timeout for waiting for responses
+     */
+    public static final int RECEIVE_TIMEOUT = 5000;
+
+    /**
      * Use this as a semaphore to the unit test to indicate when a callback has successfully been called.
      */
     protected Latch callbackCalled;

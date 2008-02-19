@@ -11,6 +11,7 @@
 package org.mule.module.jca;
 
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;
@@ -79,9 +80,9 @@ public class DelegateWorkManager implements org.mule.api.context.WorkManager
         }
     }
 
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
-        // nothing to do
+        return LifecycleTransitionResult.OK;
     }
 
     public void stop() throws MuleException

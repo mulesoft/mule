@@ -38,6 +38,7 @@ import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformer.TransformerUtils;
 
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTestCase
 {
@@ -156,38 +157,42 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         // assertTrue(model.isComponentRegistered("orangeComponent"));
     }
 
-    // TODO Fix this somehow after MULE-1933
-//    public void testPropertiesConfig() throws Exception
-//    {
-//        Service service = muleContext.getRegistry().lookupComponent("orangeComponent");
-//
-//        Map props = descriptor.getProperties();
-//        assertNotNull(props);
-//        assertEquals("9", props.get("segments"));
-//        assertEquals("4.21", props.get("radius"));
-//        assertEquals("Juicy Baby!", props.get("brand"));
-//
-//        assertNotNull(props.get("listProperties"));
-//        List list = (List) props.get("listProperties");
-//        assertEquals(3, list.size());
-//        assertEquals("prop1", list.get(0));
-//        assertEquals("prop2", list.get(1));
-//        assertEquals("prop3", list.get(2));
-//
-//        assertNotNull(props.get("arrayProperties"));
-//        list = (List) props.get("arrayProperties");
-//        assertEquals(3, list.size());
-//        assertEquals("prop4", list.get(0));
-//        assertEquals("prop5", list.get(1));
-//        assertEquals("prop6", list.get(2));
-//
-//        assertNotNull(props.get("mapProperties"));
-//        props = (Map) props.get("mapProperties");
-//        assertEquals("prop1", props.get("prop1"));
-//        assertEquals("prop2", props.get("prop2"));
-//
-//        assertEquals(6, descriptor.getProperties().size());
-//    }
+    /*
+     * Since MULE-1933, Service no longer has properties and most properties are set on endpoint.
+     * So lets continue to test properties, but on endpoints instead.
+     */
+    public void testEndpointPropertiesConfig() throws Exception
+    {
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            "endpointWithProps");
+
+        Map props = endpoint.getProperties();
+        assertNotNull(props);
+        assertEquals("9", props.get("segments"));
+        assertEquals("4.21", props.get("radius"));
+        assertEquals("Juicy Baby!", props.get("brand"));
+
+        assertNotNull(props.get("listProperties"));
+        List list = (List) props.get("listProperties");
+        assertEquals(3, list.size());
+        assertEquals("prop1", list.get(0));
+        assertEquals("prop2", list.get(1));
+        assertEquals("prop3", list.get(2));
+
+        assertNotNull(props.get("arrayProperties"));
+        list = (List) props.get("arrayProperties");
+        assertEquals(3, list.size());
+        assertEquals("prop4", list.get(0));
+        assertEquals("prop5", list.get(1));
+        assertEquals("prop6", list.get(2));
+
+        assertNotNull(props.get("mapProperties"));
+        props = (Map) props.get("mapProperties");
+        assertEquals("prop1", props.get("prop1"));
+        assertEquals("prop2", props.get("prop2"));
+
+        assertEquals(6, endpoint.getProperties().size());
+    }
 
     public void testOutboundRouterConfig()
     {

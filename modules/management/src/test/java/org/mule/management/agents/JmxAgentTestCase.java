@@ -35,14 +35,10 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        
         serviceUrl = new JMXServiceURL(JmxAgent.DEFAULT_REMOTING_URI);
-        
         muleContext.getRegistry().registerAgent(new RmiRegistryAgent());
-
         jmxAgent = new JmxAgent();
         jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
-        
         muleContext.setId(DOMAIN);
     }
 
@@ -72,7 +68,8 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
             connector = JMXConnectorFactory.connect(serviceUrl, props);
             MBeanServerConnection connection = connector.getMBeanServerConnection();
             // is it the right server?
-            assertTrue(Arrays.asList(connection.getDomains()).contains("Mule." + DOMAIN));
+            assertTrue(Arrays.asList(connection.getDomains()).toString(),
+                    Arrays.asList(connection.getDomains()).contains("Mule." + DOMAIN));
         }
         finally
         {
@@ -150,4 +147,5 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
                   new FixedHostRmiClientSocketFactory("127.0.0.1"));
         jmxAgent.setConnectorServerProperties(props);
     }
+    
 }

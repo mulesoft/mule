@@ -14,17 +14,19 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.registry.Registry;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.List;
+import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,15 +38,18 @@ import org.apache.commons.logging.LogFactory;
  * Usually, Lifecycle phases have a fixed configuration in which case a specialisation of this class should be
  * created that initialises its configuration internally.
  *
+ * <p>Note that this class and {@link org.mule.api.lifecycle.LifecycleLogic} both make assumptions about
+ * the interfaces used - the return values and exceptions.  These are, currently, that the return value is either
+ * void or {@link org.mule.api.lifecycle.LifecycleTransitionResult} and either 0 or 1 exceptions can be
+ * thrown which are either {@link InstantiationException} or {@link org.mule.api.lifecycle.LifecycleException}.
+ *
  * @see org.mule.api.lifecycle.LifecyclePhase
  */
 public class DefaultLifecyclePhase implements LifecyclePhase
 {
-    /**
-     * logger used by this class
-     */
-    protected transient final Log logger = LogFactory.getLog(DefaultLifecyclePhase.class);
 
+    protected transient final Log logger = LogFactory.getLog(DefaultLifecyclePhase.class);
+    public static final int RETRY_MAX = 3;
     private Class lifecycleClass;
     private Method lifecycleMethod;
     private Set orderedLifecycleObjects = new LinkedHashSet(6);
@@ -82,45 +87,61 @@ public class DefaultLifecyclePhase implements LifecyclePhase
             throw new IllegalStateException("Lifecycle phase: " + name + " does not support current phase: "
                                             + currentPhase + ". Phases supported are: " + StringMessageUtils.toString(supportedPhases));
         }
-        boolean fireDefault = true;
-        Set called = new HashSet();
+
+        // overlapping interfaces can cause duplicates
+        Set duplicates = new HashSet();
+
         for (Iterator iterator = orderedLifecycleObjects.iterator(); iterator.hasNext();)
         {
             LifecycleObject lo = (LifecycleObject) iterator.next();
-            if (lo.getType().equals(getLifecycleClass()))
-            {
-                fireDefault = false;
-            }
-            Collection objects = RegistryContext.getRegistry().lookupObjects(lo.getType(), getRegistryScope());
-            if (objects != null && objects.size() > 0)
+            // list so that ordering is preserved on retry
+            List targets = new LinkedList(RegistryContext.getRegistry().lookupObjects(lo.getType(), getRegistryScope()));
+            if (targets.size() > 0)
             {
                 lo.firePreNotification(muleContext);
 
-                for (Iterator iterator1 = objects.iterator(); iterator1.hasNext();)
+                for (int retryCount = 0; retryCount < RETRY_MAX && targets.size() > 0; ++retryCount)
                 {
-                    Object o = iterator1.next();
-                    if (called.contains(new Integer(o.hashCode())))
+                    for (Iterator target = targets.iterator(); target.hasNext();)
                     {
-                        continue;
+                        Object o = target.next();
+                        if (duplicates.contains(o))
+                        {
+                            target.remove();
+                        }
+                        else
+                        {
+                            // delayed start for rmi registry (forces retry request from jmx)
+//                            if (o.getClass().getName().indexOf("RmiRegistryAgent") > -1 && 0 == retryCount) continue;
+                            // delayed start for jmx (forces correct ordering for jmx)
+//                            if (o.getClass().getName().indexOf("JmxAgent") > -1 && 0 == retryCount) continue;
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("lifecycle phase: " + getName() + " for object: " + o);
+                            }
+                            if (LifecycleTransitionResult.OK == applyLifecycle(o))
+                            {
+                                target.remove();
+                                duplicates.add(o);
+                            }
+                            else if (logger.isDebugEnabled())
+                            {
+                                logger.debug("retry requested for lifecycle phase: " + getName() + " for object: " + o);
+                            }
+                        }
                     }
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("lifecycle phase: " + getName() + " for object: " + o);
-                    }
+                }
 
-                    applyLifecycle(o);
-                    called.add(new Integer(o.hashCode()));
+                if (targets.size() > 0)
+                {
+                    Object component = targets.iterator().next();
+                    throw new LifecycleException(CoreMessages.exceededRetry(getName(), component), component);
                 }
 
                 lo.firePostNotification(muleContext);
             }
 
         }
-        if (fireDefault)
-        {
-            //TODO
-        }
-
     }
 
     public void addOrderedLifecycleObject(LifecycleObject lco)
@@ -163,12 +184,12 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         this.orderedLifecycleObjects = orderedLifecycleObjects;
     }
 
-    public Class[] getIgnorredObjectTypes()
+    public Class[] getIgnoredObjectTypes()
     {
         return ignorredObjectTypes;
     }
 
-    public void setIgnorredObjectTypes(Class[] ignorredObjectTypes)
+    public void setIgnoredObjectTypes(Class[] ignorredObjectTypes)
     {
         this.ignorredObjectTypes = ignorredObjectTypes;
     }
@@ -226,24 +247,31 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         }
     }
 
-    public void applyLifecycle(Object o) throws LifecycleException
+    public LifecycleTransitionResult applyLifecycle(Object o) throws LifecycleException
     {
         if (o == null)
         {
-            return;
+            return LifecycleTransitionResult.OK;
         }
-
         if (ignoreType(o.getClass()))
         {
-            return;
+            return LifecycleTransitionResult.OK;
         }
         if (!getLifecycleClass().isAssignableFrom(o.getClass()))
         {
-            return;
+            return LifecycleTransitionResult.OK;
         }
         try
         {
-            lifecycleMethod.invoke(o, ClassUtils.NO_ARGS);
+            Object result = lifecycleMethod.invoke(o, ClassUtils.NO_ARGS);
+            if (null == result)
+            {
+                return LifecycleTransitionResult.OK;
+            }
+            else
+            {
+                return (LifecycleTransitionResult) result;
+            }
         }
         catch (Exception e)
         {

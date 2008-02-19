@@ -50,7 +50,6 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** TODO */
 public class TransientRegistry extends AbstractRegistry
 {
     /** logger used by this class */
@@ -307,8 +306,10 @@ public class TransientRegistry extends AbstractRegistry
      */
     protected void doRegisterObject(String key, Object value, Object metadata) throws RegistrationException
     {
+        logger.debug("registering object");
         if (isInitialised() || isInitialising())
         {
+            logger.debug("applying processors");
             value = applyProcessors(value);
         }
 
@@ -326,8 +327,10 @@ public class TransientRegistry extends AbstractRegistry
             try
             {
                 MuleContext mc = MuleServer.getMuleContext();
+                logger.debug("context: " + mc);
                 if (mc != null)
                 {
+                    logger.debug("applying lifecycle");
                     mc.applyLifecycle(value);
                 }
                 else

@@ -21,6 +21,8 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.model.ModelException;
 import org.mule.api.model.MuleProxy;
 import org.mule.api.service.Service;
@@ -79,15 +81,20 @@ public class OptimisedMuleProxy implements MuleProxy
         this.pojoService = pojoService;
     }
 
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
         checkDisposed();
         if (!started && pojoService instanceof Startable)
         {
             try
             {
-                ((Startable) pojoService).start();
-                started = true;
+                return LifecycleLogic.startAll((Startable) pojoService, ((Startable) pojoService).start(), new LifecycleLogic.Closure()
+                {
+                    public LifecycleTransitionResult doContinue()
+                    {
+                        started = true;
+                        return LifecycleTransitionResult.OK;
+                    }});
             }
             catch (Exception e)
             {
@@ -95,7 +102,10 @@ public class OptimisedMuleProxy implements MuleProxy
                     CoreMessages.failedToStart("Service '" + service.getName() + "'"), e);
             }
         }
-
+        else
+        {
+            return LifecycleTransitionResult.OK;
+        }
     }
 
     public boolean isStarted()
@@ -103,7 +113,7 @@ public class OptimisedMuleProxy implements MuleProxy
         return started;
     }
 
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
         checkDisposed();
 
@@ -112,13 +122,17 @@ public class OptimisedMuleProxy implements MuleProxy
             started = false;
             try
             {
-                ((Stoppable) pojoService).stop();
+                return ((Stoppable) pojoService).stop();
             }
             catch (Exception e)
             {
                 throw new ModelException(
                     CoreMessages.failedToStop("Service '" + service.getName() + "'"), e);
             }
+        }
+        else
+        {
+            return LifecycleTransitionResult.OK;
         }
     }
 

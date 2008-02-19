@@ -35,6 +35,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
  */
 public abstract class MuleEndpoint extends ImmutableMuleEndpoint implements ImmutableEndpoint, MuleContextAware
 {
+
     private static final long serialVersionUID = 3883445445846168147L;
     
     public static final String ALWAYS_CREATE_STRING = "ALWAYS_CREATE";

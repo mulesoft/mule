@@ -67,7 +67,7 @@
         </xsd:choice>
     </xsd:group>
 
-    <xsd:element name="mule-unsafe" type="muleUnsafeType">
+    <!-- xsd:element name="mule-unsafe" type="muleUnsafeType">
         <xsd:annotation>
             <xsd:documentation>
                 An aternative root element that is more flexible, but which is less
@@ -84,7 +84,7 @@
             </xsd:choice>
         </xsd:sequence>
         <xsd:attribute name="name" type="substitutableName"/>
-    </xsd:complexType>
+    </xsd:complexType -->
 
     <xsd:element name="description" type="descriptionType"/>
     <xsd:complexType name="descriptionType">
@@ -948,13 +948,13 @@
     <!--   Shared elements                                             -->
     <!--==============================================================-->
 
-    <xsd:complexType name="container-contextType">
+    <!-- xsd:complexType name="container-contextType">
         <xsd:sequence>
             <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="class" type="substitutableClass" use="required"/>
         <xsd:attribute name="name" type="substitutableName"/>
-    </xsd:complexType>
+    </xsd:complexType -->
 
     <xsd:element name="queue-profile" type="queueProfileType" substitutionGroup="abstract-queue-profile"/>
     <xsd:complexType name="queueProfileType">
@@ -1708,12 +1708,13 @@
     </xsd:complexType>
 
     <xsd:complexType name="propertiesContainerContextType">
-        <xsd:sequence>
-            <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-        <xsd:attribute name="name" type="substitutableName" default="properties"/>
-        <xsd:attribute name="includeSystemProperties" type="substitutableBoolean"/>
-        <xsd:attribute name="enableTemplates" type="substitutableBoolean"/>
+        <xsd:complexContent>
+            <xsd:extension base="baseContainerContextType">
+                <xsd:attribute name="name" type="substitutableName" default="properties"/>
+                <xsd:attribute name="includeSystemProperties" type="substitutableBoolean"/>
+                <xsd:attribute name="enableTemplates" type="substitutableBoolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="iocContainerContextType">

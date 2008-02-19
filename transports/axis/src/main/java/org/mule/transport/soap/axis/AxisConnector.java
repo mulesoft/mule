@@ -356,12 +356,6 @@ public class AxisConnector extends AbstractConnector implements ManagerNotificat
             // then register again later
             muleContext.getRegistry().unregisterComponent(AXIS_SERVICE_PROPERTY + getName());
         }
-        // if the axis server hasn't been set, set it now. The Axis server
-        // may be set externally
-        if (axisComponent.getProperties().get(AXIS) == null)
-        {
-            axisComponent.getProperties().put(AXIS, axis);
-        }
 
         String serviceName = ((AxisMessageReceiver) receiver).getSoapService().getName();
         // No determine if the endpointUri requires a new connector to be

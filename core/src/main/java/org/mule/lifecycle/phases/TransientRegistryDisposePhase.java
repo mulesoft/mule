@@ -64,7 +64,7 @@ public class TransientRegistryDisposePhase extends DefaultLifecyclePhase
         disposeOrderedObjects.add(new NotificationLifecycleObject(Model.class));
         disposeOrderedObjects.add(new NotificationLifecycleObject(Disposable.class));
 
-        setIgnorredObjectTypes(ignorredObjects);
+        setIgnoredObjectTypes(ignorredObjects);
         setOrderedLifecycleObjects(disposeOrderedObjects);
         registerSupportedPhase(LifecyclePhase.ALL_PHASES);
     }

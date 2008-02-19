@@ -14,6 +14,7 @@ import org.mule.api.context.ContainerContext;
 import org.mule.api.context.ContainerException;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.Reader;
@@ -177,9 +178,9 @@ public class MultiContainerContext implements ContainerContext
         containers = null;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        // no op
+        return LifecycleTransitionResult.OK;
     }
 
 }

@@ -11,6 +11,7 @@
 package org.mule.security;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.Base64;
@@ -45,7 +46,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
 
     protected boolean base64Encoding = true;
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (algorithm == null)
         {
@@ -83,6 +84,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
             throw new InitialisationException(CoreMessages.failedToCreate("encryption ciphers"),
                 e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     protected abstract SecretKey getSecretKey() throws GeneralSecurityException;

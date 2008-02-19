@@ -13,6 +13,7 @@ package org.mule.management.agents;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.StringUtils;
 
@@ -68,7 +69,7 @@ public class RmiRegistryAgent extends AbstractAgent
         // nothing to do
     }
 
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
         if (serverUri == null)
         {
@@ -112,12 +113,14 @@ public class RmiRegistryAgent extends AbstractAgent
                 throw new InitialisationException(e, this);
             }
         }
+        return LifecycleTransitionResult.OK;
     }
 
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
         // TODO how do you unbind a registry??
         rmiRegistry = null;
+        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()
@@ -125,17 +128,15 @@ public class RmiRegistryAgent extends AbstractAgent
         // nothing to do
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        if (StringUtils.isNotBlank(serverUri))
+        if (StringUtils.isBlank(serverUri))
         {
-            return;
+            String theHost = StringUtils.defaultIfEmpty(host, DEFAULT_HOSTNAME);
+            String thePort = StringUtils.defaultIfEmpty(port, String.valueOf(DEFAULT_PORT));
+            serverUri = PROTOCOL_PREFIX + theHost + ":" + thePort;
         }
-
-        String theHost = StringUtils.defaultIfEmpty(host, DEFAULT_HOSTNAME);
-        String thePort = StringUtils.defaultIfEmpty(port, String.valueOf(DEFAULT_PORT));
-
-        serverUri = PROTOCOL_PREFIX + theHost + ":" + thePort;
+        return LifecycleTransitionResult.OK;
     }
 
     public Registry getRmiRegistry()

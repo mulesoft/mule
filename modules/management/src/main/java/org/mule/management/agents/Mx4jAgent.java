@@ -13,6 +13,7 @@ package org.mule.management.agents;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -163,7 +164,7 @@ public class Mx4jAgent extends AbstractAgent
     }
 
     /* @see org.mule.api.lifecycle.Initialisable#initialise() */
-    public void initialise() throws InitialisationException    
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         try
         {
@@ -192,10 +193,11 @@ public class Mx4jAgent extends AbstractAgent
         {
             throw new InitialisationException(CoreMessages.failedToStart("mx4j agent"), e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /* @see org.mule.api.lifecycle.Startable#start() */
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
         if (mBeanServer == null)
         {
@@ -220,14 +222,15 @@ public class Mx4jAgent extends AbstractAgent
         {
             // ignore
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /* @see org.mule.api.lifecycle.Stoppable#stop() */
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
         if (mBeanServer == null)
         {
-            return;
+            return LifecycleTransitionResult.OK;
         }
         try
         {
@@ -247,6 +250,7 @@ public class Mx4jAgent extends AbstractAgent
         {
             // ignore
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /**

@@ -15,6 +15,7 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.context.ContainerException;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.ReaderInputStream;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.util.CachedResource;
@@ -168,7 +169,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         }
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (configFile == null)
         {
@@ -177,7 +178,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
                 try
                 {
                     configure(configuration);
-                    return;
+                    return LifecycleTransitionResult.OK;
                 }
                 catch (ContainerException e)
                 {
@@ -186,7 +187,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
             }
             else
             {
-                return;
+                return LifecycleTransitionResult.OK;
             }
         }
 
@@ -208,6 +209,7 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         {
             throw new InitialisationException(new ConfigurationException(CoreMessages.failedToLoad("Application Context: " + configFile), e), this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

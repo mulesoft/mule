@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.api.security.EncryptionStrategyNotFoundException;
@@ -42,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractEndpointSecurityFilter implements EndpointSecurityFilter, MuleContextAware
 {
-    /** logger used by this class */
+
     protected transient Log logger = LogFactory.getLog(getClass());
 
     protected SecurityManager securityManager;
@@ -60,7 +61,7 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
         this.muleContext = context;
     }
 
-    public final void initialise() throws InitialisationException
+    public final LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (securityManager == null)
         {
@@ -95,6 +96,7 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
         }
 
         // further functionality moved to lazy initialisation
+        return LifecycleTransitionResult.OK;
     }
 
     protected final synchronized void lazyInit() throws InitialisationException

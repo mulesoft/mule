@@ -13,6 +13,7 @@ package org.mule.util.object;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.Hashtable;
@@ -65,7 +66,7 @@ public class JndiObjectFactory implements ObjectFactory, Initialisable, Disposab
         this.properties = properties;
     }
     
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (_context == null)
         {
@@ -100,6 +101,7 @@ public class JndiObjectFactory implements ObjectFactory, Initialisable, Disposab
                 throw new InitialisationException(e, this);
             }
         }
+        return LifecycleTransitionResult.OK;
     }
     
     public void dispose() 

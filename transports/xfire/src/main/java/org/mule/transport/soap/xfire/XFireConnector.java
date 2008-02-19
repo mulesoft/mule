@@ -380,18 +380,6 @@ public class XFireConnector extends AbstractConnector
         of.initialise();
         c.setServiceFactory(of);
         
-        // if the axis server hasn't been set, set it now. The Axis server
-        // may be set externally
-        if (c.getProperties().get(XFIRE_PROPERTY) == null)
-        {
-            c.getProperties().put(XFIRE_PROPERTY, xfire);
-        }
-        if (serviceTransport != null
-            && c.getProperties().get(XFIRE_TRANSPORT) == null)
-        {
-            c.getProperties().put(XFIRE_TRANSPORT, serviceTransport);
-        }
-        
         String serviceName = receiver.getService().getName();
 
         // No determine if the endpointUri requires a new connector to be

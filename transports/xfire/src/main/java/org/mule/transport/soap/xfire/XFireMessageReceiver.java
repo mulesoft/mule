@@ -16,6 +16,7 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.config.spring.editors.QNamePropertyEditor;
 import org.mule.transport.AbstractMessageReceiver;
+import org.mule.transport.soap.SoapConstants;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 import org.mule.util.StringUtils;
@@ -60,9 +61,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-//            Map props = new HashMap(service.getProperties());
-            Map props = new HashMap();
-            props.putAll(endpoint.getProperties());
+            Map props = new HashMap(endpoint.getProperties());
 
             // convert port Type to QName if specified
             if (props.containsKey(PORT_TYPE))
@@ -73,8 +72,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
             }
 
             // check if there is the namespace property on the service
-//            String namespace = (String) service.getProperties().get(SoapConstants.SOAP_NAMESPACE_PROPERTY);
-            String namespace = null;
+            String namespace = (String) endpoint.getProperties().get(SoapConstants.SOAP_NAMESPACE_PROPERTY);
 
             // check for namespace set as annotation
             if (connector.isEnableJSR181Annotations())
@@ -117,7 +115,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 rewriteProperty(props, "schemas");
             }
 
-//            serviceInterfaces = (List)service.getProperties().get(SoapConstants.SERVICE_INTERFACES);
+            serviceInterfaces = (List)endpoint.getProperties().get(SoapConstants.SERVICE_INTERFACES);
             Class exposedInterface;
 
             if (serviceInterfaces == null)
@@ -136,8 +134,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 }
             }
 
-//            String wsdlUrl = (String) service.getProperties().get(SoapConstants.WSDL_URL_PROPERTY);
-            String wsdlUrl = null;
+            String wsdlUrl = (String) endpoint.getProperties().get(SoapConstants.WSDL_URL_PROPERTY);
 
             if (StringUtils.isBlank(wsdlUrl))
             {

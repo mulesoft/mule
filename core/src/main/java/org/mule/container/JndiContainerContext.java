@@ -13,6 +13,8 @@ package org.mule.container;
 import org.mule.api.context.ContainerException;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ObjectUtils;
 
@@ -96,7 +98,7 @@ public class JndiContainerContext extends AbstractContainerContext
         throw new UnsupportedOperationException("configure(Reader)");
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         try
         {
@@ -109,5 +111,6 @@ public class JndiContainerContext extends AbstractContainerContext
         {
             throw new InitialisationException(CoreMessages.failedToCreate("Jndi context"), e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 }

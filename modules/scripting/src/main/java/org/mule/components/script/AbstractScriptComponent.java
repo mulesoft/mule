@@ -15,6 +15,7 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceAware;
 import org.mule.util.ClassUtils;
@@ -57,7 +58,7 @@ public abstract class AbstractScriptComponent
         this.service = service;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (getScript() == null && getScriptText() == null)
         {
@@ -92,9 +93,10 @@ public abstract class AbstractScriptComponent
             }
             else
             {
-                logger.warn("Cannot setup autoreload as the script fie is not on the local file system");
+                logger.warn("Cannot setup autoreload as the script file is not on the local file system");
             }
         }
+        return LifecycleTransitionResult.OK;
     }
 
     protected URL getScriptUrl(String scriptLocation)
@@ -138,20 +140,22 @@ public abstract class AbstractScriptComponent
         this.autoReload = autoReload;
     }
 
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
         if (monitor != null)
         {
             monitor.start();
         }
+        return LifecycleTransitionResult.OK;
     }
 
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
         if (monitor != null)
         {
             monitor.stop();
         }
+        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

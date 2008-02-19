@@ -15,8 +15,5 @@ org.mule.transport.tcp.integration.TcpFunctionalLegacyTestCase
 # MULE-2574
 org.mule.transport.tcp.integration.MuleMessageProtocolChunkingTestCase
 
-# MULE-2575 be careful when re-enabling this, it may hang the CI server
-#org.mule.transport.tcp.issues.KeepSendSocketOpenMule1491TestCase
-
 # MULE-2730
 org.mule.transport.tcp.issues.SynchStreamingMule1687TestCase

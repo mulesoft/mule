@@ -49,6 +49,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
     public void testInitialStateStopped() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("stoppedComponent");
+        assertEquals("stopped", c.getInitialState());
         // Service initially stopped
         assertFalse(c.isStarted());
 

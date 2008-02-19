@@ -17,12 +17,10 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleAdapter;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.routing.NestedRouter;
 import org.mule.api.service.Service;
@@ -59,9 +57,6 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
 
     private Object pojoService;
     private Service service;
-    private boolean isStoppable = false;
-    private boolean isStartable = false;
-    private boolean isDisposable = false;
 
     private boolean started = false;
     private boolean disposed = false;
@@ -94,11 +89,6 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         this.pojoService = pojoService;
         this.service = service;
         this.entryPointResolver = entryPointResolver;
-
-        isStartable = Startable.class.isInstance(service);
-        isStoppable = Stoppable.class.isInstance(service);
-        isDisposable = Disposable.class.isInstance(service);
-
         if (pojoService instanceof ServiceAware)
         {
             ((ServiceAware) pojoService).setService(service);
@@ -106,53 +96,54 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         configureNestedRouter();
     }
 
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
-        if (isStartable)
+        try
         {
-            try
+            return LifecycleLogic.startAll(service, service.start(), new LifecycleLogic.Closure()
             {
-                ((Startable) service).start();
-            }
-            catch (Exception e)
-            {
-                throw new DefaultMuleException(
-                    CoreMessages.failedToStart("UMO Service: " + service.getName()), e);
-            }
+                public LifecycleTransitionResult doContinue()
+                {
+                    started = true;
+                    return LifecycleTransitionResult.OK;
+                }});
         }
-        started = true;
+        catch (Exception e)
+        {
+            throw new DefaultMuleException(
+                    CoreMessages.failedToStart("UMO Service: " + service.getName()), e);
+        }
     }
 
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
-        if (isStoppable)
+        try
         {
-            try
+            return LifecycleLogic.stopAll(service, service.stop(), new LifecycleLogic.Closure()
             {
-                ((Stoppable) service).stop();
-            }
-            catch (Exception e)
-            {
-                throw new DefaultMuleException(
-                    CoreMessages.failedToStop("UMO Service: " + service.getName()), e);
-            }
+                public LifecycleTransitionResult doContinue()
+                {
+                    started = false;
+                    return LifecycleTransitionResult.OK;
+                }});
         }
-        started = false;
+        catch (Exception e)
+        {
+            throw new DefaultMuleException(
+                    CoreMessages.failedToStop("UMO Service: " + service.getName()), e);
+        }
     }
 
     public void dispose()
     {
-        if (isDisposable)
+        try
         {
-            try
-            {
-                ((Disposable) service).dispose();
-            }
-            catch (Exception e)
-            {
-                // TODO MULE-863: Handle or fail
-                logger.error("failed to dispose: " + service.getName(), e);
-            }
+            service.dispose();
+        }
+        catch (Exception e)
+        {
+            // TODO MULE-863: Handle or fail
+            logger.error("failed to dispose: " + service.getName(), e);
         }
         disposed = true;
     }
@@ -226,12 +217,9 @@ public class DefaultLifecycleAdapter implements LifecycleAdapter
         return resultMessage;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        if (Initialisable.class.isInstance(service))
-        {
-            ((Initialisable) service).initialise();
-        }
+        return service.initialise();
     }
 
     protected void configureNestedRouter() throws MuleException

@@ -42,7 +42,13 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 
     public void testGlobalNameGlobalTransformer() throws Exception
     {
-        doTestTransformed("global-name-global-transformer");
+        String response = request(send(), "global-name-global-transformer");
+        // Transformer is applied twice because it is on global endpoint and is
+        // therfore
+        // used for both the inbound and outbound endpoints because both use the
+        // global endpoint name and thus use the global endpoint as a template
+        assertEquals(MESSAGE + StringAppendTestTransformer.DEFAULT_TEXT
+                     + StringAppendTestTransformer.DEFAULT_TEXT, response);
     }
 
     public void testGlobalNameLocalTransformer() throws Exception
@@ -57,7 +63,7 @@ public class EndpointTransformerMule2131TestCase extends FunctionalTestCase
 
     public void testLocalNameLocalTransformer() throws Exception
     {
-        doTestTransformed("local-name-local-transformer");
+        doTestTransformed("vm://local-name-local-transformer?connector=queue");
     }
 
     protected void doTestTransformed(String endpoint) throws Exception

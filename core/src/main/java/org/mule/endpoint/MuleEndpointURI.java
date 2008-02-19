@@ -16,6 +16,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.EndpointURIBuilder;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
 import org.mule.config.i18n.CoreMessages;
@@ -150,7 +151,7 @@ public class MuleEndpointURI implements EndpointURI
     }
 
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         try
         {
@@ -169,6 +170,7 @@ public class MuleEndpointURI implements EndpointURI
         {
             throw new InitialisationException(e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     private String retrieveSchemeMetaInfo(String url)

@@ -14,6 +14,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.routing.Router;
 import org.mule.api.routing.RouterCatchAllStrategy;
 import org.mule.api.routing.RouterCollection;
@@ -54,13 +56,9 @@ public abstract class AbstractRouterCollection implements RouterCollection, Init
         statistics = new RouterStatistics(type);
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        for (Iterator iterator = routers.iterator(); iterator.hasNext();)
-        {
-            Router router = (Router) iterator.next();
-            router.initialise();
-        }
+        return LifecycleLogic.initialiseAll(routers.iterator());
     }
 
     public void dispose()

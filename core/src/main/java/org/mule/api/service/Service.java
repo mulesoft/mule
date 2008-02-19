@@ -10,8 +10,8 @@
 
 package org.mule.api.service;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
 import org.mule.api.context.MuleContextAware;
@@ -27,7 +27,6 @@ import org.mule.util.object.ObjectFactory;
 
 import java.beans.ExceptionListener;
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * <code>Service</code> is the interal repesentation of a Mule Managed
@@ -216,20 +215,6 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
      * Register a custom initialiser
      */
     void addInitialisationCallback(InitialisationCallback callback);
-
-    /**
-     * The properties for the Mule UMO.
-     * 
-     * @deprecated MULE-1933 Properties for the underlying service should be set on the ServiceFactory instead.
-     */
-    Map getProperties();
-
-    /**
-     * The properties for the Mule UMO.
-     * 
-     * @deprecated MULE-1933 Properties for the underlying service should be set on the ServiceFactory instead.
-     */
-    void setProperties(Map properties);
 
     /**
      * A descriptor can have a custom entrypoint resolver for its own object.

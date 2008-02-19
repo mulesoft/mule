@@ -16,11 +16,14 @@ import org.mule.management.agents.JmxServerNotificationAgent;
 import org.mule.management.agents.Log4jAgent;
 import org.mule.tck.FunctionalTestCase;
 
+import java.util.Collection;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     protected String getConfigResources()
     {
         return "management-default-namespace-config.xml";
@@ -39,7 +42,9 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
 
         MBeanServer mBeanServer = jmxAgent.getMBeanServer();
         String domainName = jmxAgent.getJmxSupportFactory().getJmxSupport().getDomainName(muleContext);
-        assertEquals(6, mBeanServer.queryMBeans(ObjectName.getInstance(domainName + ":*"), null).size());
+        Collection beans = mBeanServer.queryMBeans(ObjectName.getInstance(domainName + ":*"), null);
+        String message = domainName + ": " + beans.toString();
+        assertEquals(message, 6, beans.size());
 
         agent = muleContext.getRegistry().lookupAgent("Log4j JMX Agent");
         assertNotNull(agent);

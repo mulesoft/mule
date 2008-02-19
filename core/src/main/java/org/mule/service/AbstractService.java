@@ -21,6 +21,8 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.LifecycleLogic;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
@@ -56,10 +58,8 @@ import org.mule.util.object.SingletonObjectFactory;
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -153,13 +153,6 @@ public abstract class AbstractService implements Service
     private AtomicBoolean beyondInitialState = new AtomicBoolean(false);
 
     /**
-     * The properties for the Mule UMO.
-     *
-     * @deprecated MULE-1933 Properties for the underlying service should be set on the ServiceFactory instead.
-     */
-    protected Map properties = new HashMap();
-
-    /**
      * For Spring only
      */
     public AbstractService()
@@ -176,7 +169,7 @@ public abstract class AbstractService implements Service
      *          if the service fails
      *          to initialise
      */
-    public final synchronized void initialise() throws InitialisationException
+    public final synchronized LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (initialised.get())
         {
@@ -215,21 +208,25 @@ public abstract class AbstractService implements Service
             ((Initialisable) exceptionListener).initialise();
         }
 
-        serviceFactory.initialise();
+        return LifecycleLogic.initialiseAll(this, serviceFactory.initialise(), new LifecycleLogic.Closure()
+        {
+            public LifecycleTransitionResult doContinue() throws InitialisationException
+            {
+                doInitialise();
 
-        doInitialise();
+                // initialise statistics
+                stats = createStatistics();
 
-        // initialise statistics
-        stats = createStatistics();
+                stats.setEnabled(muleContext.getStatistics().isEnabled());
+                muleContext.getStatistics().add(stats);
+                stats.setOutboundRouterStat(outboundRouter.getStatistics());
+                stats.setInboundRouterStat(inboundRouter.getStatistics());
 
-        stats.setEnabled(muleContext.getStatistics().isEnabled());
-        muleContext.getStatistics().add(stats);
-        stats.setOutboundRouterStat(outboundRouter.getStatistics());
-        stats.setInboundRouterStat(inboundRouter.getStatistics());
+                initialised.set(true);
+                fireComponentNotification(ServiceNotification.SERVICE_INITIALISED);
 
-        initialised.set(true);
-        fireComponentNotification(ServiceNotification.SERVICE_INITIALISED);
-
+                return LifecycleTransitionResult.OK;
+            }});
     }
 
     protected ServiceStatistics createStatistics()
@@ -256,7 +253,7 @@ public abstract class AbstractService implements Service
         }
     }
 
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
         if (!stopped.get())
         {
@@ -273,32 +270,39 @@ public abstract class AbstractService implements Service
             fireComponentNotification(ServiceNotification.SERVICE_STOPPED);
             logger.info("Mule Service " + name + " has been stopped successfully");
         }
+        return LifecycleTransitionResult.OK;
     }
 
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
+        LifecycleTransitionResult status = LifecycleTransitionResult.OK;
         if (isStarted())
         {
             logger.info("Service is already started: " + name);
-            return;
-        }
-
-        if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
-        {
-            logger.info("Service " + name + " has not been started (initial state = 'stopped')");
-        }
-        else if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_PAUSED))
-        {
-            start(/*startPaused*/true);
-            logger.info("Service " + name + " has been started and paused (initial state = 'paused')");
         }
         else
         {
-            start(/*startPaused*/false);
-            logger.info("Service " + name + " has been started successfully");
+            if (initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
+            {
+                System.out.println("stopped");
+            }
+            if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_STOPPED))
+            {
+                logger.info("Service " + name + " has not been started (initial state = 'stopped')");
+            }
+            else if (!beyondInitialState.get() && initialState.equals(AbstractService.INITIAL_STATE_PAUSED))
+            {
+                status = start(/*startPaused*/true);
+                logger.info("Service " + name + " has been started and paused (initial state = 'paused')");
+            }
+            else
+            {
+                status = start(/*startPaused*/false);
+                logger.info("Service " + name + " has been started successfully");
+            }
+            beyondInitialState.set(true);
         }
-
-        beyondInitialState.set(true);
+        return status;
     }
 
     /**
@@ -307,7 +311,7 @@ public abstract class AbstractService implements Service
      * @param startPaused - Start service in a "paused" state (messages are
      *                    received but not processed).
      */
-    protected void start(boolean startPaused) throws MuleException
+    protected LifecycleTransitionResult start(boolean startPaused) throws MuleException
     {
         // Create the receivers for the service but do not start them yet.
         registerListeners();
@@ -337,7 +341,7 @@ public abstract class AbstractService implements Service
         // gets routed to the service before it is started,
         // org.mule.model.AbstractComponent.dispatchEvent() will throw a
         // ServiceException with message COMPONENT_X_IS_STOPPED (see MULE-526).
-        startListeners();
+        return startListeners();
     }
 
     /**
@@ -645,7 +649,7 @@ public abstract class AbstractService implements Service
         }
     }
 
-    protected void startListeners() throws MuleException
+    protected LifecycleTransitionResult startListeners() throws MuleException
     {
         ImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
@@ -658,12 +662,17 @@ public abstract class AbstractService implements Service
             if (receiver != null && endpoint.getConnector().isStarted()
                     && endpoint.getInitialState().equals(ImmutableEndpoint.INITIAL_STATE_STARTED))
             {
-                receiver.start();
+                if (LifecycleTransitionResult.OK != receiver.start())
+                {
+                    throw new InitialisationException(CoreMessages.nestedRetry(), receiver);
+                }
             }
         }
+        return LifecycleTransitionResult.OK;
     }
 
-    protected void stopListeners() throws MuleException
+    // This is not called by anything?!
+    protected LifecycleTransitionResult stopListeners() throws MuleException
     {
         ImmutableEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
@@ -675,9 +684,13 @@ public abstract class AbstractService implements Service
                     endpoint);
             if (receiver != null)
             {
-                receiver.stop();
+                if (LifecycleTransitionResult.OK != receiver.stop())
+                {
+                    throw new LifecycleException(CoreMessages.nestedRetry(), receiver);
+                }
             }
         }
+        return LifecycleTransitionResult.OK;
     }
 
     protected void connectListeners() throws MuleException
@@ -894,16 +907,6 @@ public abstract class AbstractService implements Service
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    public Map getProperties()
-    {
-        return properties;
-    }
-
-    public void setProperties(Map properties)
-    {
-        this.properties = properties;
     }
 
     /**

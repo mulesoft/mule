@@ -23,6 +23,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.Model;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
@@ -52,7 +53,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** TODO */
+
 public abstract class AbstractRegistry implements Registry
 {
     private static final ObjectToString objectToString = new ObjectToString();
@@ -153,7 +154,7 @@ public abstract class AbstractRegistry implements Registry
         return Initialisable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
     }
 
-    public final void initialise() throws InitialisationException
+    public final LifecycleTransitionResult initialise() throws InitialisationException
     {
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
 
@@ -187,7 +188,7 @@ public abstract class AbstractRegistry implements Registry
         {
             throw new InitialisationException(e, this);
         }
-
+        return LifecycleTransitionResult.OK;
     }
 
     protected void doInitialise() throws InitialisationException

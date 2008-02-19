@@ -15,6 +15,7 @@ import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.util.StringUtils;
 
 import java.rmi.server.RMIClientSocketFactory;
@@ -24,7 +25,7 @@ import java.util.Map;
 
 import javax.management.remote.rmi.RMIConnectorServer;
 
-/** TODO document. */
+
 public class DefaultJmxSupportAgent extends AbstractAgent
 {
 
@@ -36,7 +37,6 @@ public class DefaultJmxSupportAgent extends AbstractAgent
     private boolean loadProfilerAgent = false;
     private String port;
     private String host;
-
 
     public DefaultJmxSupportAgent()
     {
@@ -73,15 +73,15 @@ public class DefaultJmxSupportAgent extends AbstractAgent
     }
 
     /** {@inheritDoc} */
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
-        // nothing to do
+        return LifecycleTransitionResult.OK;
     }
 
     /** {@inheritDoc} */
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
-        // nothing to do
+        return LifecycleTransitionResult.OK;
     }
 
     /**
@@ -106,9 +106,8 @@ public class DefaultJmxSupportAgent extends AbstractAgent
      *          if a fatal error occurs
      *          causing the Mule instance to shutdown
      */
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-
         try
         {
             Agent agent = createRmiAgent();
@@ -166,6 +165,8 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         {
             throw new InitialisationException(e, this);
         }
+
+        return LifecycleTransitionResult.OK;
     }
 
     protected JmxAgent createJmxAgent()

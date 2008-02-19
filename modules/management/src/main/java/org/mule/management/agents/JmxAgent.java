@@ -16,6 +16,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.notification.ManagerNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -51,6 +52,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.io.IOException;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
@@ -75,6 +77,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JmxAgent extends AbstractAgent
 {
+
     public static final String DEFAULT_REMOTING_URI = "service:jmx:rmi:///jndi/rmi://localhost:1099/server";
     // populated with values below in a static initializer
     public static final Map DEFAULT_CONNECTOR_SERVER_PROPERTIES;
@@ -120,7 +123,6 @@ public class JmxAgent extends AbstractAgent
         DEFAULT_CONNECTOR_SERVER_PROPERTIES = Collections.unmodifiableMap(props);
     }
 
-
     public JmxAgent()
     {
         super("JMX Agent");
@@ -148,11 +150,11 @@ public class JmxAgent extends AbstractAgent
      * {@inheritDoc}
      *
      */
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (initialized.get())
         {
-            return;
+            return LifecycleTransitionResult.OK;
         }
         if (mBeanServer == null && !locateServer && !createServer)
         {
@@ -227,20 +229,21 @@ public class JmxAgent extends AbstractAgent
             }
         };
 
+        if (StringUtils.isBlank(muleContext.getId()))
+        {
+            // TODO i18n the message properly
+            throw new IllegalArgumentException(
+                    "Manager ID is mandatory when running with JmxAgent. Give your Mule configuration a valid ID.");
+        }
+
         try
         {
-
-            if (StringUtils.isBlank(muleContext.getId()))
-            {
-                // TODO i18n the message properly
-                throw new IllegalArgumentException(
-                        "Manager ID is mandatory when running with JmxAgent. Give your Mule configuration a valid ID.");
-            }
             muleContext.registerListener(l);
         } catch (NotificationException e) {
             throw new InitialisationException(e, this);
         }
         initialized.compareAndSet(false, true);
+        return LifecycleTransitionResult.OK;
     }
 
     /**
@@ -248,20 +251,31 @@ public class JmxAgent extends AbstractAgent
      *
      * @see org.mule.api.lifecycle.Startable#start()
      */
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
         if (connectorServer != null)
         {
             try
             {
+                // detect without starting - more complex (need to configure rmi address)
+                // and doesn't currently offer any advantage
+//                Socket socket = new Socket("localhost", 1099);
+//                socket.close();
                 logger.info("Starting JMX agent connector Server");
                 connectorServer.start();
+            }
+            catch (IOException e)
+            {
+                logger.debug("Trapping IOException", e);
+                // this probably means that the RMI server isn't started so we request a retry
+                return LifecycleTransitionResult.RETRY;
             }
             catch (Exception e)
             {
                 throw new JmxManagementException(CoreMessages.failedToStart("Jmx Connector"), e);
             }
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /**
@@ -269,7 +283,7 @@ public class JmxAgent extends AbstractAgent
      *
      * @see org.mule.api.lifecycle.Stoppable#stop()
      */
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
         if (connectorServer != null)
         {
@@ -282,6 +296,7 @@ public class JmxAgent extends AbstractAgent
                 throw new JmxManagementException(CoreMessages.failedToStop("Jmx Connector"), e);
             }
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /**

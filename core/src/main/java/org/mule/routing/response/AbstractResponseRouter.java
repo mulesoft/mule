@@ -104,7 +104,6 @@ public abstract class AbstractResponseRouter extends AbstractRouter implements R
         return propertyExtractor.getProperty(MuleProperties.MULE_MESSAGE_ID_PROPERTY, message);
     }
 
-
     public boolean isFailOnTimeout()
     {
         return failOnTimeout;

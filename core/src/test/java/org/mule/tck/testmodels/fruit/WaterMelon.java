@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 
 import java.util.HashMap;
 
@@ -123,14 +124,16 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
         return state;
     }
 
-    public void start()
+    public LifecycleTransitionResult start()
     {
         state = "started";
+        return LifecycleTransitionResult.OK;
     }
 
-    public void stop()
+    public LifecycleTransitionResult stop()
     {
         state = "stopped";
+        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

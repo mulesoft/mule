@@ -19,6 +19,7 @@ import org.mule.util.ObjectUtils;
 
 public class LifecycleException extends MuleException
 {
+
     /** Serial version */
     private static final long serialVersionUID = 2909614055858287394L;
 

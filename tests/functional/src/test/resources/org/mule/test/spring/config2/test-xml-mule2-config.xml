@@ -76,6 +76,34 @@
             </mule:properties>
         </mule:endpoint>
 
+    <mule:endpoint name="endpointWithProps" address="test://endpointWithProps">
+    	<mule:properties>
+    		<entry key="brand" value="Juicy Baby!"/>
+    		<entry key="segments" value="9"/>
+    		<entry key="radius" value="4.21"/>
+			<entry key="mapProperties">
+				<map>
+				    <entry key="prop1" value="prop1"/>
+			    	<entry key="prop2" value="prop2"/>
+				</map>
+			</entry>
+			<entry key="listProperties">
+				<list>
+					<value>prop1</value>
+					<value>prop2</value>
+					<value>prop3</value>
+				</list>
+			</entry>
+			<entry key="arrayProperties">
+				<list>
+					<value>prop4</value>
+					<value>prop5</value>
+					<value>prop6</value>
+				</list>
+			</entry>
+    	</mule:properties>
+    </mule:endpoint>
+
     </mule:mule>
 
     <bean name="orange" class="org.mule.tck.testmodels.fruit.Orange">

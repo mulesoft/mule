@@ -12,6 +12,8 @@ package org.mule.util.object;
 
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.UUID;
 
@@ -42,10 +44,15 @@ public class PrototypeObjectFactory extends AbstractObjectFactory
 
     public PrototypeObjectFactory(Class objectClass, Map properties) { super(objectClass, properties); }
     
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        super.initialise();
-        instances = new ConcurrentHashMap();        
+        return LifecycleLogic.initialiseAll(this, super.initialise(), new LifecycleLogic.Closure()
+        {
+            public LifecycleTransitionResult doContinue()
+            {
+                instances = new ConcurrentHashMap();
+                return LifecycleTransitionResult.OK;
+            }});
     }
     
     public void dispose()

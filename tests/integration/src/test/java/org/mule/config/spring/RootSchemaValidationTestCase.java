@@ -8,19 +8,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.persistence;
+package org.mule.config.spring;
 
-import org.mule.api.DefaultMuleException;
+import java.io.IOException;
 
-/**
- * <code>PersistenceException</code> is the exception thrown by
- * the PersistenceStore and/or Manager.
- */
-public class PersistenceException extends DefaultMuleException
+import org.xml.sax.SAXException;
+
+
+public class RootSchemaValidationTestCase extends AbstractSchemaValidationTestCase
 {
-    public PersistenceException()
-    {
-        super("");
-    }
-}
 
+    public void testRootSchema() throws IOException, SAXException
+    {
+        doTest("org/mule/config/spring/root-validation-test.xml");
+    }
+
+}

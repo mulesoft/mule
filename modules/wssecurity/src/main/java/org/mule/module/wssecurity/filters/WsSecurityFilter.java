@@ -26,8 +26,12 @@ import org.mule.module.wssecurity.handlers.MuleWSSInHandler;
 import org.mule.module.wssecurity.headers.WsSecurityHeadersSetter;
 import org.mule.security.AbstractEndpointSecurityFilter;
 import org.mule.transport.soap.axis.AxisConnector;
+import org.mule.transport.soap.axis.AxisServiceComponent;
 import org.mule.transport.soap.axis.extensions.MuleConfigProvider;
 import org.mule.transport.soap.xfire.XFireConnector;
+import org.mule.transport.soap.xfire.XFireServiceComponent;
+import org.mule.util.object.ObjectFactory;
+import org.mule.util.object.SingletonObjectFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +58,7 @@ import org.codehaus.xfire.util.dom.DOMOutHandler;
 
 public class WsSecurityFilter extends AbstractEndpointSecurityFilter
 {
-    
+
     private String wsDecryptionFile = null;
     private String wsSignatureFile = null;
     private Map addOutboundProperties = null;
@@ -88,10 +92,16 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
         throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
         EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
     {
-        Map properties = event.getSession().getService().getProperties();
-        if (properties.containsKey("xfire"))
+
+        // With inbound endpoints we need to get the Xfire/Axis server from the XFireServiceComponent/AxisServiceComponent
+        
+        ObjectFactory objFactory = event.getService().getServiceFactory();
+
+        if (objFactory instanceof SingletonObjectFactory
+            && ((SingletonObjectFactory) objFactory).getInstance() instanceof XFireServiceComponent)
         {
-            XFire server = (XFire)properties.get("xfire");
+            XFire server = ((XFireServiceComponent) ((SingletonObjectFactory) objFactory).getInstance()).getXfire();
+
             String pathInfo = event.getEndpoint().getEndpointURI().getPath();
 
             String serviceName;
@@ -132,7 +142,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
                 }
             }
 
-             if (connector != null)
+            if (connector != null)
             {
                 Object[] outhandlers = service.getOutHandlers().toArray();
                 for (i = 0; i < outhandlers.length; i++)
@@ -180,25 +190,25 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
                     props.putAll(getProperties(event));
                 }
 
-                // put the security properties found in the message, if any, in the
+                // put the security properties found in the message, if any, in
+                // the
                 // service
                 if (!props.isEmpty())
                 {
                     Object[] keys = props.keySet().toArray();
                     for (i = 0; i < keys.length; i++)
                     {
-                        service.setProperty((String)keys[i], props.getProperty((String)keys[i]));
+                        service.setProperty((String) keys[i], props.getProperty((String) keys[i]));
                     }
                 }
             }
         }
-        else if (properties.containsKey(AxisConnector.AXIS))
+        else if (objFactory instanceof SingletonObjectFactory
+                 && ((SingletonObjectFactory) objFactory).getInstance() instanceof AxisServiceComponent)
         {
-            AxisServer server = (AxisServer)event.getSession()
-                .getService()
-                .getProperties()
-                .get(AxisConnector.AXIS);
-            MuleConfigProvider provider = (MuleConfigProvider)server.getConfig();
+            AxisServer server = ((AxisServiceComponent) ((SingletonObjectFactory) objFactory).getInstance()).getAxis();
+
+            MuleConfigProvider provider = (MuleConfigProvider) server.getConfig();
 
             String prefix = event.getEndpoint().getProtocol() + ":";
             String serviceName = event.getEndpoint().getName().substring(prefix.length());
@@ -225,6 +235,7 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
                     new DefaultMuleMessage(e.getMessage()));
             }
         }
+
     }
 
     /**
@@ -234,18 +245,14 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
     protected void authenticateOutbound(MuleEvent event)
         throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
     {
+        
+        // With outbound endpoints we need to get the Xfire/Axis server from the endpoint's connector
+        
         if (event.getEndpoint().getConnector() instanceof XFireConnector)
         {
-            XFireConnector connector = (XFireConnector)event.getEndpoint().getConnector();
-            Map properties = event.getSession().getService().getProperties();
-            XFire server = (XFire)properties.get("xfire");
+            XFireConnector connector = (XFireConnector) event.getEndpoint().getConnector();
 
-            if (server == null)
-            {
-                server = connector.getXfire();
-            }
-
-            if (server != null)
+            if (connector.getXfire() != null)
             {
                 List clientHandlers = new ArrayList();
                 List existingOutHandlers = connector.getClientOutHandlers();
@@ -270,11 +277,12 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
                     props.putAll(getAddOutboundProperties());
                     event.getMessage().addProperties(props);
                 }
+
             }
         }
         else if (event.getEndpoint().getConnector() instanceof AxisConnector)
         {
-            AxisConnector connector = (AxisConnector)event.getEndpoint().getConnector();
+            AxisConnector connector = (AxisConnector) event.getEndpoint().getConnector();
 
             if (connector.getClientProvider() != null)
             {

@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
@@ -255,24 +256,29 @@ public abstract class ImmutableMuleEndpoint implements ImmutableEndpoint
 
         final ImmutableMuleEndpoint other = (ImmutableMuleEndpoint) obj;
         return equal(connectionStrategy, other.connectionStrategy) && equal(connector, other.connector)
-               && deleteUnacceptedMessages == other.deleteUnacceptedMessages
-               && equal(endpointEncoding, other.endpointEncoding) && equal(endpointUri, other.endpointUri)
-               && equal(filter, other.filter) && equal(initialState, other.initialState)
-               && equal(initialised, other.initialised) && equal(name, other.name)
-               && equal(properties, other.properties) && remoteSync == other.remoteSync
-               && equal(remoteSyncTimeout, other.remoteSyncTimeout)
-               && equal(responseTransformers, other.responseTransformers)
-               && equal(securityFilter, other.securityFilter) && synchronous == other.synchronous
-               && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
+                && deleteUnacceptedMessages == other.deleteUnacceptedMessages
+                && equal(endpointEncoding, other.endpointEncoding) && equal(endpointUri, other.endpointUri)
+                && equal(filter, other.filter) && equal(initialState, other.initialState)
+                // don't include lifecycle state as lifecycle code includes hashing
+//                && equal(initialised, other.initialised)
+                && equal(name, other.name)
+                && equal(properties, other.properties) && remoteSync == other.remoteSync
+                && equal(remoteSyncTimeout, other.remoteSyncTimeout)
+                && equal(responseTransformers, other.responseTransformers)
+                && equal(securityFilter, other.securityFilter) && synchronous == other.synchronous
+                && equal(transactionConfig, other.transactionConfig) && equal(transformers, other.transformers);
     }
 
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{connectionStrategy, connector,
-            deleteUnacceptedMessages ? Boolean.TRUE : Boolean.FALSE, endpointEncoding, endpointUri, filter,
-            initialState, initialised, name, properties, remoteSync ? Boolean.TRUE : Boolean.FALSE, remoteSyncTimeout,
-            responseTransformers, securityFilter, synchronous ? Boolean.TRUE : Boolean.FALSE, transactionConfig,
-            transformers});
+                deleteUnacceptedMessages ? Boolean.TRUE : Boolean.FALSE, endpointEncoding, endpointUri, filter,
+                initialState,
+                // don't include lifecycle state as lifeccle code includes hashing
+//                initialised,
+                name, properties, remoteSync ? Boolean.TRUE : Boolean.FALSE, remoteSyncTimeout,
+                responseTransformers, securityFilter, synchronous ? Boolean.TRUE : Boolean.FALSE, transactionConfig,
+                transformers});
     }
 
     public Filter getFilter()
@@ -434,9 +440,10 @@ public abstract class ImmutableMuleEndpoint implements ImmutableEndpoint
         return connectionStrategy;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         // Nothing to initialise currently
+        return LifecycleTransitionResult.OK;
     }
 
 }

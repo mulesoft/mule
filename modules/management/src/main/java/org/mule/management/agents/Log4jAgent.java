@@ -13,6 +13,7 @@ package org.mule.management.agents;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
@@ -55,7 +56,7 @@ public class Log4jAgent extends AbstractAgent
      * 
      * @see org.mule.api.lifecycle.Initialisable#initialise()
      */
-    public void initialise() throws InitialisationException    
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         try
         {
@@ -69,6 +70,7 @@ public class Log4jAgent extends AbstractAgent
         {
             throw new InitialisationException(CoreMessages.failedToStart("JMX Agent"), e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /**
@@ -95,9 +97,9 @@ public class Log4jAgent extends AbstractAgent
      * 
      * @see org.mule.api.lifecycle.Startable#start()
      */
-    public void start() throws MuleException
+    public LifecycleTransitionResult start() throws MuleException
     {
-        // nothing to do
+        return LifecycleTransitionResult.OK;
     }
 
     /*
@@ -105,9 +107,9 @@ public class Log4jAgent extends AbstractAgent
      * 
      * @see org.mule.api.lifecycle.Stoppable#stop()
      */
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
-        // nothing to do
+        return LifecycleTransitionResult.OK;
     }
 
     /*

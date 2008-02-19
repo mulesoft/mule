@@ -12,6 +12,7 @@ package org.mule.security;
 
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.CryptoFailureException;
 
 /**
@@ -30,9 +31,9 @@ public class MockEncryptionStrategy extends Named implements EncryptionStrategy
         return new byte[0];
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        // mock
+        return LifecycleTransitionResult.OK;
     }
 
 }

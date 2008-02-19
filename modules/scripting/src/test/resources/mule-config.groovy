@@ -159,8 +159,12 @@ dces = new DefaultServiceExceptionStrategy();
 dces.addEndpoint(createEndpoint("test://orange.exceptions", null, false));
 service.exceptionListener = dces
 
-//properties
-service.properties = [
+// properties
+// Since MULE-1933, Service no longer has properties and most properties are set on endpoint.
+// So lets continue to test properties, but on endpoints instead.
+endpointBuilderWithProps = new EndpointURIEndpointBuilder("test://endpointWithProps", muleContext)
+endpointBuilderWithProps.name = "endpointWithProps"
+endpointBuilderWithProps.properties = [
         brand: "Juicy Baby!",
         segments: "9",
         radius: "4.21",
@@ -168,6 +172,9 @@ service.properties = [
         listProperties: ["prop1", "prop2", "prop3"],
         arrayProperties: ["prop4", "prop5", "prop6"]
         ]
+muleContext.registry.registerEndpointBuilder("endpointWithProps",endpointBuilderWithProps)
+
+
 
 //register components
 muleContext.registry.registerService(service);

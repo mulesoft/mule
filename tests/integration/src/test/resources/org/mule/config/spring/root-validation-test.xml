@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans">
+
+    <spring:bean name="bean" class="java.lang.Object"/>
+
+    <spring:beans>
+        <spring:alias name="bean" alias="poot"/>
+    </spring:beans>
+
+    <environment-property name="property" value="value"/>
+    
+    <endpoint name="endpoint" address="test://${property}"/>
+
+    <model name="model">
+        <service name="service">
+            <inbound>
+                <inbound-endpoint ref="endpoint"/>
+            </inbound>
+            <component>
+                <spring-object bean="poot"/>
+            </component>
+        </service>
+    </model>
+
+</mule>

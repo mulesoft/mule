@@ -16,6 +16,7 @@ import org.mule.api.context.ContainerContext;
 import org.mule.api.context.ContainerException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.util.ChainedReader;
 import org.mule.util.SystemUtils;
 
@@ -55,9 +56,10 @@ public abstract class AbstractContainerContext implements ContainerContext, Mule
         this.name = name;
     }
 
-    public void initialise() throws InitialisationException
+    // default implementation does nothing
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-
+        return LifecycleTransitionResult.OK;
     }
 
     public final void doInitialise(MuleContext muleContext) throws InitialisationException

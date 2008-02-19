@@ -24,6 +24,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
@@ -107,7 +108,7 @@ public class DefaultMuleContext implements MuleContext
         startDate = System.currentTimeMillis();
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
 
@@ -150,6 +151,7 @@ public class DefaultMuleContext implements MuleContext
         {
             throw new InitialisationException(e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
 
@@ -181,7 +183,7 @@ public class DefaultMuleContext implements MuleContext
         systemName = domain + "." + clusterId + "." + id;
     }
 
-    public synchronized void start() throws MuleException
+    public synchronized LifecycleTransitionResult start() throws MuleException
     {
         lifecycleManager.checkPhase(Startable.PHASE_NAME);
         if (!isStarted())
@@ -207,6 +209,7 @@ public class DefaultMuleContext implements MuleContext
             }
             fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_STARTED));
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /**
@@ -216,14 +219,13 @@ public class DefaultMuleContext implements MuleContext
      * @throws MuleException if either any of the sessions or connectors fail to
      *                      stop
      */
-    public synchronized void stop() throws MuleException
+    public synchronized LifecycleTransitionResult stop() throws MuleException
     {
         lifecycleManager.checkPhase(Stoppable.PHASE_NAME);
-
         fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_STOPPING));
         lifecycleManager.firePhase(this, Stoppable.PHASE_NAME);
-
         fireNotification(new ManagerNotification(this, ManagerNotification.MANAGER_STOPPED));
+        return LifecycleTransitionResult.OK;
     }
 
     public void dispose()

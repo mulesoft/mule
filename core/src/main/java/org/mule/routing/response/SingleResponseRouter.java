@@ -22,6 +22,7 @@ import org.mule.routing.inbound.EventGroup;
  */
 public class SingleResponseRouter extends AbstractResponseAggregator
 {
+
     /**
      * The <code>SingleResponseRouter</code> will return true if the event group
      * size is 1. If the group size is greater than 1, a warning will be logged.

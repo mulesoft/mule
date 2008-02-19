@@ -11,6 +11,7 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.transaction.lookup.GenericTransactionManagerLookupFactory;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -30,9 +31,9 @@ public class TestTransactionManagerFactory extends GenericTransactionManagerLook
                                                            new InternalInvocationHandler());
     }
 
-    public void initialise()
+    public LifecycleTransitionResult initialise()
     {
-
+        return LifecycleTransitionResult.OK;
     }
 
     public class InternalInvocationHandler implements InvocationHandler

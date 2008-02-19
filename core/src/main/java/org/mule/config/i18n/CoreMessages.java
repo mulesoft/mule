@@ -1066,4 +1066,14 @@ public class CoreMessages extends MessageFactory
         return createMessage(BUNDLE_PATH, 260, StringMessageUtils.toString(configurationBuilder.getClass()));
     }
     
+    public static Message nestedRetry()
+    {
+        return createMessage(BUNDLE_PATH, 261);
+    }
+
+    public static Message exceededRetry(Object phase, Object component)
+    {
+        return createMessage(BUNDLE_PATH, 262, phase, component);
+    }
+
 }

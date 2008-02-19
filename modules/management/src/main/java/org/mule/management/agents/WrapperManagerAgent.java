@@ -13,6 +13,7 @@ package org.mule.management.agents;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.i18n.ManagementMessages;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
@@ -76,9 +77,8 @@ public class WrapperManagerAgent extends AbstractAgent
     }
 
     /* @see org.mule.api.lifecycle.Initialisable#initialise() */
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-
         try
         {
             final List servers = MBeanServerFactory.findMBeanServer(null);
@@ -107,7 +107,7 @@ public class WrapperManagerAgent extends AbstractAgent
                             "Duplicates will not be registered. Use the " + DEFAULT_WRAPPER_MBEAN_NAME + " MBean " +
                             "instead for control.");
                 unregisterMeQuietly();
-                return;
+                return LifecycleTransitionResult.OK;
             }
             else
             {
@@ -119,7 +119,7 @@ public class WrapperManagerAgent extends AbstractAgent
             {
                 logger.info("This JVM hasn't been launched by the wrapper, the agent will not run.");
                 unregisterMeQuietly();
-                return;
+                return LifecycleTransitionResult.OK;
             }
 
             wrapperName = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":" + WRAPPER_OBJECT_NAME);
@@ -134,20 +134,21 @@ public class WrapperManagerAgent extends AbstractAgent
         }
         catch (Exception e)
         {
-            throw new InitialisationException(
-                CoreMessages.failedToStart("wrapper agent"), e, this);
+            throw new InitialisationException(CoreMessages.failedToStart("wrapper agent"), e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     /* @see org.mule.api.lifecycle.Startable#start() */
-    public void start() throws MuleException {
-        // no-op
+    public LifecycleTransitionResult start() throws MuleException 
+    {
+        return LifecycleTransitionResult.OK;
     }
 
     /* @see org.mule.api.lifecycle.Stoppable#stop() */
-    public void stop() throws MuleException
+    public LifecycleTransitionResult stop() throws MuleException
     {
-        // no-op
+        return LifecycleTransitionResult.OK;
     }
 
     /* @see org.mule.api.lifecycle.Disposable#dispose() */

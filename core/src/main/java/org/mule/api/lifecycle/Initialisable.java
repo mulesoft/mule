@@ -13,10 +13,14 @@ package org.mule.api.lifecycle;
 /**
  * <code>Initialisable</code> is a lifecycle interface that gets called at the
  * initialise lifecycle stage of the implementing service.
+ *
+ * @see org.mule.api.lifecycle.LifecycleLogic
  */
 public interface Initialisable
 {
+
     static final String PHASE_NAME = "initialise";
+
     /**
      * Method used to perform any initialisation work. If a fatal error occurs during
      * initialisation an <code>InitialisationException</code> should be thrown,
@@ -25,9 +29,10 @@ public interface Initialisable
      * There is no guarantee that by throwing a Recoverable exception that the Mule
      * instance will not shut down.
      * 
-     * @throws InitialisationException if a fatal error occurs causing the Mule
-     *             instance to shutdown
+     * @throws InitialisationException if a fatal error occurs causing the Mule instance to shutdown
      * @throws RecoverableException if an error occurs that can be recovered from
+     * @return Status of transition
      */
-    void initialise() throws InitialisationException;
+    LifecycleTransitionResult initialise() throws InitialisationException;
+
 }

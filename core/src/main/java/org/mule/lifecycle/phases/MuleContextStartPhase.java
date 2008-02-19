@@ -62,7 +62,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase
         startOrderedObjects.add(new NotificationLifecycleObject(Startable.class));
 
 
-        setIgnorredObjectTypes(ignorredObjects);
+        setIgnoredObjectTypes(ignorredObjects);
         setOrderedLifecycleObjects(startOrderedObjects);
         registerSupportedPhase(Stoppable.PHASE_NAME);
         registerSupportedPhase(Initialisable.PHASE_NAME);

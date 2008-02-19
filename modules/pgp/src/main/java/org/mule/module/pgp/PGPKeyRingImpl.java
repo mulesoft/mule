@@ -12,6 +12,7 @@ package org.mule.module.pgp;
 
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.IOUtils;
 
@@ -111,7 +112,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         return (KeyBundle) principalsKeyBundleMap.get(principalId);
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         try
         {
@@ -128,6 +129,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
             logger.error("errore in inizializzazione:" + e.getMessage(), e);
             throw new InitialisationException(CoreMessages.failedToCreate("PGPKeyRingImpl"), e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     private void readPublicKeyRing() throws Exception

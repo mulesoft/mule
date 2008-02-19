@@ -135,9 +135,9 @@ public class AxisServiceProxy
         throws MuleException, ClassNotFoundException
     {
         Class[] interfaces;
-//        List ifaces = (List)component.getProperties().get(SERVICE_INTERFACES);
-        Map localProperties = (Map) properties.get();
         List ifaces = null;
+
+        Map localProperties = (Map) properties.get();
         if (null != localProperties)
         {
             ifaces = (List) localProperties.get(SoapConstants.SERVICE_INTERFACES);
@@ -156,7 +156,6 @@ public class AxisServiceProxy
             // get all implemented interfaces from superclasses as well
             final List intfList = ClassUtils.getAllInterfaces(implementationClass);
             interfaces = (Class[])intfList.toArray(new Class[intfList.size()]);
-
         }
         else
         {

@@ -11,6 +11,7 @@
 package org.mule.security;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.object.ObjectFactory;
@@ -45,7 +46,7 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
         algorithm = DEFAULT_ALGORITHM;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (key == null)
         {
@@ -65,7 +66,7 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
                 }
             }
         }
-        super.initialise();
+        return super.initialise();
     }
 
     protected KeySpec createKeySpec()

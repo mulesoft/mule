@@ -12,6 +12,7 @@ package org.mule.routing;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.Router;
 import org.mule.management.stats.RouterStatistics;
 
@@ -22,16 +23,16 @@ import org.mule.management.stats.RouterStatistics;
  */
 public abstract class AbstractRouter implements Router, MuleContextAware
 {
+
     private RouterStatistics routerStatistics;
 
     private MuleContext muleContext;
 
-
-    public void initialise() throws InitialisationException
+    // default impl does nothing
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        //template
+        return LifecycleTransitionResult.OK;
     }
-
 
     public void dispose()
     {

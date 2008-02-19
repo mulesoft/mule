@@ -11,6 +11,7 @@
 package org.mule.security;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityProvider;
@@ -37,9 +38,9 @@ public class MockSecurityProvider extends Named implements SecurityProvider
         return null;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        // mock
+        return LifecycleTransitionResult.OK;
     }
 
 }

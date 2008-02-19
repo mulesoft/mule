@@ -11,6 +11,7 @@
 package org.mule.module.acegi;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityContextFactory;
@@ -51,13 +52,14 @@ public class AcegiProviderAdapter implements SecurityProvider, AuthenticationPro
         this.name = name;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        // //all initialisation should be handled in the spring
+        // all initialisation should be handled in the spring
         // intitialisation hook afterPropertiesSet()
 
         // register context factory
         factory = new AcegiSecurityContextFactory();
+        return LifecycleTransitionResult.OK;
     }
 
     public void setName(String name)

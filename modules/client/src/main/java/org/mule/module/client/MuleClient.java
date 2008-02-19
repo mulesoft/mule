@@ -219,6 +219,7 @@ public class MuleClient implements Disposable
         {
             logger.info("No existing ManagementContext found, creating a new Mule instance");
             muleContext = muleContextFactory.createMuleContext();
+            muleContext.getConfiguration().setClientMode(true);
         }
         else
         {
@@ -979,7 +980,7 @@ public class MuleClient implements Disposable
         }
         // Dispose the muleContext only if the muleContext was created for this
         // client
-        if (RegistryContext.getConfiguration().isClientMode())
+        if (muleContext.getConfiguration().isClientMode())
         {
             logger.info("Stopping Mule...");
             muleContext.dispose();

@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.routing.filters.MessagePropertyFilter;
@@ -144,7 +145,7 @@ public class RestServiceWrapper implements Callable, Initialisable
         this.errorExpression = errorExpression;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         if (serviceUrl == null && !urlFromMessage)
         {
@@ -175,6 +176,7 @@ public class RestServiceWrapper implements Callable, Initialisable
                 errorFilter = new RegExFilter(errorExpression);
             }
         }
+        return LifecycleTransitionResult.OK;
     }
 
     public Object onCall(MuleEventContext eventContext) throws Exception

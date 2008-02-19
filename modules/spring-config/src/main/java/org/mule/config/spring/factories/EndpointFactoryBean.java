@@ -14,6 +14,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 import org.apache.commons.logging.Log;
@@ -72,9 +73,9 @@ public class EndpointFactoryBean extends EndpointURIEndpointBuilder
         return true;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        // No initialization
+        return LifecycleTransitionResult.OK;
     }
 
     public void setType(String type)

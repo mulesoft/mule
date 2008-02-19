@@ -21,7 +21,9 @@ import org.mule.api.MuleException;
  */
 public interface Startable
 {
+
     static final String PHASE_NAME = "start";
 
-    void start() throws MuleException;
+    LifecycleTransitionResult start() throws MuleException;
+
 }

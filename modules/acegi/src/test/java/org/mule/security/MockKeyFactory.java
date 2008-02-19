@@ -11,6 +11,7 @@
 package org.mule.security;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.util.object.ObjectFactory;
 
 
@@ -34,9 +35,9 @@ public class MockKeyFactory extends Named implements ObjectFactory
         // nothing to do
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        // nothing to do
+        return LifecycleTransitionResult.OK;
     }
     
     public void dispose()

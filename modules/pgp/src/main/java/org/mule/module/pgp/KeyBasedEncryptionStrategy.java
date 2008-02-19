@@ -11,6 +11,7 @@
 package org.mule.module.pgp;
 
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.AbstractNamedEncryptionStrategy;
@@ -102,7 +103,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         return data;
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
         try
         {
@@ -114,6 +115,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             throw new InitialisationException(
                 CoreMessages.failedToCreate("KeyBasedEncryptionStrategy"), e, this);
         }
+        return LifecycleTransitionResult.OK;
     }
 
     public PGPKeyRing getKeyManager()

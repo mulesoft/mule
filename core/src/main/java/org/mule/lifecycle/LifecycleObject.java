@@ -12,11 +12,9 @@ package org.mule.lifecycle;
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ServerNotification;
 
-/**
- * TODO
- */
 public class LifecycleObject
 {
+    
     private Class type;
     private ServerNotification preNotification;
     private ServerNotification postNotification;

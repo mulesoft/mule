@@ -12,6 +12,8 @@ package org.mule.container;
 
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.util.ClassUtils;
 
 import javax.naming.NamingException;
@@ -35,33 +37,38 @@ public class RmiContainerContext extends JndiContainerContext
         super("rmi");
     }
 
-    public void initialise() throws InitialisationException
+    public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        super.initialise();
-        if (securityPolicy != null)
+        return LifecycleLogic.initialiseAll(this, super.initialise(), new LifecycleLogic.Closure()
         {
-            if (ClassUtils.getResource(securityPolicy, getClass()) != null)
+            public LifecycleTransitionResult doContinue() throws InitialisationException
             {
-                System.setProperty("java.security.policy", securityPolicy);
-            }
-        }
-
-        // Set security manager
-        if (System.getSecurityManager() == null)
-        {
-            try
-            {
-                if (securityManager != null)
+                if (securityPolicy != null)
                 {
-                    Class clazz = ClassUtils.loadClass(securityManager, getClass());
-                    System.setSecurityManager((SecurityManager) clazz.newInstance());
+                    if (ClassUtils.getResource(securityPolicy, getClass()) != null)
+                    {
+                        System.setProperty("java.security.policy", securityPolicy);
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                throw new InitialisationException(e, this);
-            }
-        }
+
+                // Set security manager
+                if (System.getSecurityManager() == null)
+                {
+                    try
+                    {
+                        if (securityManager != null)
+                        {
+                            Class clazz = ClassUtils.loadClass(securityManager, getClass());
+                            System.setSecurityManager((SecurityManager) clazz.newInstance());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw new InitialisationException(e, RmiContainerContext.this);
+                    }
+                }
+                return LifecycleTransitionResult.OK;
+            }});
     }
 
     public Object getComponent(Object key) throws ObjectNotFoundException
