@@ -55,7 +55,25 @@
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-http</artifactId>
+                <version>${version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-ssl</artifactId>
+                <version>${version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-vm</artifactId>
+                <version>${version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-stdio</artifactId>
                 <version>${version}</version>
                 <scope>compile</scope>
             </dependency>
@@ -145,6 +163,7 @@
         <module>ear</module>
         <module>embedded</module>
         <module>jca</module>
+        <module>osgi</module>
         <module>profiler</module>
         <module>scripting</module>
         <module>server</module>
