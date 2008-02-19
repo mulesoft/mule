@@ -12,19 +12,48 @@ package org.mule.util.object;
 
 import org.mule.api.service.Service;
 import org.mule.config.PoolingProfile;
-import org.mule.model.seda.SedaService;
 import org.mule.model.seda.SedaModel;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.model.seda.SedaService;
 import org.mule.tck.services.UniqueComponent;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.UUID;
 
-public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
+public class PooledObjectFactoryTestCase extends AbstractObjectFactoryTestCase
 {
     public static final byte MAX_ACTIVE = 3;
     public static final long MAX_WAIT = 1500;
+
+    // @Override
+    public void testInitialise()
+    {
+        // TODO HH: auto-generated method stub
+    }
+
+    // @Override
+    public void testDispose()
+    {
+        // TODO HH: auto-generated method stub
+    }
+
+    // @Override
+    public void testGet()
+    {
+        // TODO HH: auto-generated method stub
+    }
+
+    // @Override
+    public void testGetObjectClass()
+    {
+        // TODO HH: auto-generated method stub
+    }
+
+    // @Override
+    public void testRelease()
+    {
+        // TODO HH: auto-generated method stub 
+    }
 
     protected PoolingProfile getDefaultPoolingProfile()
     {
@@ -282,37 +311,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         of.passivateObject(id, obj);
         of.destroyObject(id, obj);
     }
-    
-    public void testLookupObject() throws Exception
-    {
-        PooledObjectFactory of = new PooledObjectFactory(UniqueComponent.class, getDefaultPoolingProfile());
-        of.initialise();
 
-        assertEquals(0, of.getPoolSize());
-
-        Identifiable obj1 = (Identifiable)of.getOrCreate();
-        assertNotNull(obj1);
-        String id1 = obj1.getId();
-        assertNotNull(id1);
-
-        Identifiable obj2 = (Identifiable)of.getOrCreate();
-        assertNotNull(obj2);
-        String id2 = obj2.getId();
-        assertNotNull(id2);
-
-        assertFalse("Service IDs " + id1 + " and " + id2 + " should be different", id1.equals(id2));
-
-        Identifiable obj1A = (Identifiable)of.lookup(id1);
-        assertNotNull(obj1A);
-        assertEquals(id1, obj1A.getId());
-        assertEquals(obj1, obj1A);
-
-        Identifiable obj2A = (Identifiable)of.lookup(id2);
-        assertNotNull(obj2A);
-        assertEquals(id2, obj2A.getId());
-        assertEquals(obj2, obj2A);
-    }    
-    
     private class Borrower extends Thread
     {
         private PooledObjectFactory of;
@@ -360,4 +359,5 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         }
 
     }
+
 }

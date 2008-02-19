@@ -81,15 +81,6 @@ public class SpringBeanLookup implements ObjectFactory, ApplicationContextAware
         return applicationContext.getBean(bean);
     }
 
-    /**
-     * Unsupported: Calling applicationContext.getBean() will instantiate a bean if it is lazy-init or
-     * a non-singleton, which would not be a pure lookup.
-     */
-    public Object lookup(String id) throws Exception
-    {
-        throw new UnsupportedOperationException();
-    }
-
     public void release(Object object) throws Exception
     {
         // Not implemented for Spring Beans

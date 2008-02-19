@@ -49,6 +49,7 @@ public class DummyInitialContextFactory implements ObjectFactory
         // do nothing
     }
 
+    // TODO HH: remove
     public Object lookup(String arg0) throws Exception
     {
         throw new UnsupportedOperationException();

@@ -31,11 +31,6 @@ public interface ObjectFactory extends Initialisable, Disposable
      * instance.  This may not be logical or even possible depending on the implementation.
      */
     Class getObjectClass() throws Exception;
-    
-    /**
-     * Look up a previously created object instance by ID.
-     */
-    Object lookup(String id) throws Exception;
 
     /**
      * Inform the object factory/container that this object is no longer in use.  

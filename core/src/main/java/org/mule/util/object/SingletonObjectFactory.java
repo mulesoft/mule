@@ -86,28 +86,6 @@ public class SingletonObjectFactory extends AbstractObjectFactory
     }
 
     /** {@inheritDoc} */
-    public Object lookup(String id) throws Exception
-    {
-        // If IDs are specified, make sure they match.
-        if (instance != null && instance instanceof Identifiable && id != null)
-        {
-            if (id.equals(((Identifiable) instance).getId()))
-            {
-                return instance;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        // Otherwise just return the singleton instance if it exists.
-        else
-        {
-            return instance;
-        }
-    }
-
-    /** {@inheritDoc} */
     public void release(Object object) throws Exception
     {
         // nothing to do for a singleton

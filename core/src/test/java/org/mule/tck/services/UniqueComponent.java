@@ -13,13 +13,12 @@ package org.mule.tck.services;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.util.UUID;
-import org.mule.util.object.Identifiable;
 
 /**
  * Each instance of this service should contain a unique ID.  
  * Useful for testing object pools.
  */
-public class UniqueComponent implements Callable, Identifiable
+public class UniqueComponent implements Callable
 {
     String id = UUID.getUUID();
 

@@ -14,6 +14,22 @@
     <description>Tests which ensure that Mule sub projects work well together.</description>
     <packaging>jar</packaging>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!--
+                        Fork each test in its own VM to minimize side effects of
+                        failed AMQ shutdowns and other unrelated failures.
+                    -->
+                    <forkMode>pertest</forkMode>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>

@@ -2,8 +2,5 @@
 # Test cases listed in this file are not run.
 #
 
-# MULE-1729, 2203, 2205, 2228, 2297
-#org.mule.config.builders.GroovyScriptConfigurationBuilderTestCase
-
 # MULE-2877
 org.mule.components.script.refreshable.GroovyRefreshableBeanTestCase

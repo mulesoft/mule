@@ -5,6 +5,7 @@ import org.mule.tck.testmodels.mule.TestConnector
 import org.mule.tck.testmodels.mule.TestExceptionStrategy
 import org.mule.tck.testmodels.mule.TestCompressionTransformer
 import org.mule.routing.filters.xml.JXPathFilter
+import org.mule.api.endpoint.EndpointBuilder
 import org.mule.endpoint.EndpointURIEndpointBuilder
 import org.mule.model.seda.SedaModel
 import org.mule.tck.testmodels.fruit.FruitCleaner;
@@ -40,14 +41,13 @@ muleContext.registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY,
 
 muleContext.registry.registerObject("doCompression", "true")
 
+epFactory = muleContext.registry.lookupEndpointFactory()
+
 ImmutableEndpoint createEndpoint(String url, String name, Boolean inbound)
 {
-    ep = new EndpointURIEndpointBuilder(url, muleContext)
-    ep.name = name
-    ImmutableEndpoint toReturn = inbound ? ep.buildInboundEndpoint() : ep.buildOutboundEndpoint()
-    muleContext.registry.registerEndpoint(toReturn);
-
-    return toReturn
+    epBuilder= new EndpointURIEndpointBuilder(url, muleContext)
+    epBuilder.name = name
+    return inbound ? epFactory.getInboundEndpoint(epBuilder) : epFactory.getOutboundEndpoint(epBuilder)
 }
 
 //Set a dummy TX manager
@@ -72,30 +72,35 @@ filter = new JXPathFilter("name");
 filter.value = "bar"
 filter.namespaces = [foo: "http://foo.com"]
 
-ep = new EndpointURIEndpointBuilder("test://fruitBowlPublishQ", muleContext)
-ep.filter = filter
-muleContext.registry.registerEndpointBuilder("fruitBowlEndpoint", ep);
+// Global Endpoint
+epBuilder= new EndpointURIEndpointBuilder("test://fruitBowlPublishQ", muleContext)
+epBuilder.filter = filter
+muleContext.registry.registerEndpointBuilder("fruitBowlEndpoint", epBuilder);
 
-ep = new EndpointURIEndpointBuilder("test://test.queue", muleContext)
-muleContext.registry.registerEndpointBuilder("waterMelonEndpoint", ep);
+// Global Endpoint
+epBuilder= new EndpointURIEndpointBuilder("test://test.queue", muleContext)
+muleContext.registry.registerEndpointBuilder("waterMelonEndpoint", epBuilder);
 
-ep = new EndpointURIEndpointBuilder("test://AppleQueue", muleContext)
-ep.name = "appleInEndpoint"
-muleContext.registry.registerEndpointBuilder("appleInEndpoint", ep);
+// Global Endpoint
+epBuilder= new EndpointURIEndpointBuilder("test://AppleQueue", muleContext)
+epBuilder.name = "appleInEndpoint"
+muleContext.registry.registerEndpointBuilder("appleInEndpoint", epBuilder);
 
-ep = new EndpointURIEndpointBuilder("test://AppleResponseQueue", muleContext)
-ep.name = "appleResponseEndpoint"
-muleContext.registry.registerEndpoint(ep.buildInboundEndpoint());
+// Global Endpoint
+epBuilder= new EndpointURIEndpointBuilder("test://orangeQ", muleContext)
+epBuilder.name = "orangeEndpoint"
+epBuilder.setProperty("testGlobal", "value1")
+muleContext.registry.registerEndpointBuilder("orangeEndpoint", epBuilder);
 
-ep = new EndpointURIEndpointBuilder("test://orangeQ", muleContext)
-ep.name = "orangeEndpoint"
-ep.setProperty("testGlobal", "value1")
-muleContext.registry.registerEndpointBuilder("orangeEndpoint", ep);
+// Concrete Endpoints
+epBuilder= new EndpointURIEndpointBuilder("test://AppleResponseQueue", muleContext)
+epBuilder.name = "appleResponseEndpoint"
+appleResponseEndpoint = epFactory.getInboundEndpoint(epBuilder)
 
-ep = new EndpointURIEndpointBuilder("test://orange", muleContext)
-ep.name = "Orange"
-ep.responseTransformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
-muleContext.registry.registerEndpoint(ep.buildInboundEndpoint());
+epBuilder= new EndpointURIEndpointBuilder("test://orange", muleContext)
+epBuilder.name = "Orange"
+epBuilder.responseTransformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
+orangeEndpoint = epFactory.getInboundEndpoint(epBuilder)
 
 //register model
 Model model = new SedaModel();
@@ -111,14 +116,14 @@ Service service = new SedaService();
 service.model = model
 service.name = "orangeComponent"
 service.serviceFactory = new SingletonObjectFactory(Orange.class.name);
-ep = new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBuilder("orangeEndpoint"))
-ep.muleContext = muleContext
-ep.setProperty("testLocal", "value1")
-ep.filter = new PayloadTypeFilter(String.class)
-ep.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
+epBuilder= new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBuilder("orangeEndpoint"))
+epBuilder.muleContext = muleContext
+epBuilder.setProperty("testLocal", "value1")
+epBuilder.filter = new PayloadTypeFilter(String.class)
+epBuilder.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
 service.inboundRouter = new DefaultInboundRouterCollection()
-service.inboundRouter.addEndpoint(ep.buildInboundEndpoint())
-service.inboundRouter.addEndpoint(muleContext.registry.lookupEndpoint("Orange"))
+service.inboundRouter.addEndpoint(epFactory.getInboundEndpoint(epBuilder))
+service.inboundRouter.addEndpoint(orangeEndpoint)
 
 catchAllStrategy = new ForwardingCatchAllStrategy()
 catchAllStrategy.endpoint = createEndpoint("test://catch.all", null, true)
@@ -140,16 +145,16 @@ service.nestedRouter = nestedRouter
 
 //Outbound Router
 outboundRouter = new OutboundPassThroughRouter()
-ep = new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBuilder("appleInEndpoint"))
-ep.muleContext = muleContext
-ep.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
-outboundRouter.addEndpoint(ep.buildOutboundEndpoint())
+epBuilder = new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBuilder("appleInEndpoint"))
+epBuilder.muleContext = muleContext
+epBuilder.transformers = [ muleContext.registry.lookupTransformer("TestCompressionTransformer") ]
+outboundRouter.addEndpoint(epFactory.getOutboundEndpoint(epBuilder))
 service.outboundRouter.addRouter(outboundRouter)
 
 //Response Router
 responseRouter = new DefaultResponseRouterCollection();
 responseRouter.addEndpoint(createEndpoint("test://response1", null, true));
-responseRouter.addEndpoint(muleContext.registry.lookupEndpoint("appleResponseEndpoint"));
+responseRouter.addEndpoint(appleResponseEndpoint);
 responseRouter.addRouter(new TestResponseAggregator());
 responseRouter.timeout = 10001
 service.responseRouter = responseRouter
@@ -173,8 +178,6 @@ endpointBuilderWithProps.properties = [
         arrayProperties: ["prop4", "prop5", "prop6"]
         ]
 muleContext.registry.registerEndpointBuilder("endpointWithProps",endpointBuilderWithProps)
-
-
 
 //register components
 muleContext.registry.registerService(service);

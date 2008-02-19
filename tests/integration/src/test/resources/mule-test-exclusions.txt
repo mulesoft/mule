@@ -108,3 +108,6 @@ org.mule.test.integration.persistence.FilePersistenceTestCase
 
 # MULE-2996
 org.mule.config.spring.VmSchemaValidationTestCase
+
+# MULE-2999
+org.mule.config.spring.ComponentInterceptorTestCase

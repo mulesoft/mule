@@ -7,16 +7,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.util.object;
 
-/**
- * An object implementing this interface may be indexed/stored/retrieved by ID.
- */
-public interface Identifiable
+import org.mule.tck.AbstractMuleTestCase;
+
+public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
 {
-    public String getId();
-    
-    public void setId(String id);
+    public abstract void testInitialise();
+
+    public abstract void testDispose();
+
+    public abstract void testGetObjectClass();
+
+    public abstract void testGet();
+
+    public abstract void testRelease();
 }
-
-

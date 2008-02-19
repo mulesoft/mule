@@ -25,11 +25,6 @@ public class MockKeyFactory extends Named implements ObjectFactory
         return null;
     }
 
-    public Object lookup(String id) throws Exception
-    {
-        return null;
-    }
-
     public void release(Object object) throws Exception
     {
         // nothing to do

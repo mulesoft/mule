@@ -70,4 +70,5 @@ public abstract class AbstractClientRemotingTestCase extends FunctionalTestCase
         assertNotNull(message);
         assertEquals("Test Remote Message 2", message.getPayload());
     }
+    
 }

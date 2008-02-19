@@ -80,10 +80,7 @@ public class PrototypeObjectFactory extends AbstractObjectFactory
     {
         Object obj = super.getOrCreate();
         String id = UUID.getUUID();
-        if (obj instanceof Identifiable)
-        {
-            ((Identifiable) obj).setId(id);
-        }
+
         if (instances != null)
         {
             instances.put(id, obj);
@@ -92,20 +89,8 @@ public class PrototypeObjectFactory extends AbstractObjectFactory
         {
             throw new InitialisationException(MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
         }
-        return obj;
-    }
 
-    /** {@inheritDoc} */
-    public Object lookup(String id) throws Exception
-    {
-        if (instances != null)
-        {
-            return instances.get(id);
-        }
-        else 
-        {
-            return null;
-        }
+        return obj;
     }
 
     /** 
@@ -113,10 +98,6 @@ public class PrototypeObjectFactory extends AbstractObjectFactory
      */
     public void release(Object object) throws Exception
     {
-        if (object instanceof Identifiable)
-        {
-            instances.remove(((Identifiable) object).getId());
-        }
         if (object instanceof Disposable)
         {
             ((Disposable) object).dispose();
