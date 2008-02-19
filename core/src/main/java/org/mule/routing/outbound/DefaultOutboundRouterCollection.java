@@ -103,34 +103,6 @@ public class DefaultOutboundRouterCollection extends AbstractRouterCollection im
         return message;
     }
 
-    /**
-     * A helper method for finding out which endpoints a message would be routed to
-     * without actually routing the the message
-     *
-     * @param message the message to retrieve endpoints for
-     * @return an array of Endpoint objects or an empty array
-     * @throws RoutingException
-     */
-    public ImmutableEndpoint[] getEndpointsForMessage(MuleMessage message) throws MessagingException
-    {
-        List endpoints = new ArrayList();
-        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
-        {
-            OutboundRouter umoOutboundRouter = (OutboundRouter) iterator.next();
-            if (umoOutboundRouter.isMatch(message))
-            {
-                endpoints.addAll(umoOutboundRouter.getEndpoints());
-                if (!isMatchAll())
-                {
-                    break;
-                }
-            }
-        }
-
-        ImmutableEndpoint[] result = new ImmutableEndpoint[endpoints.size()];
-        return (ImmutableEndpoint[]) endpoints.toArray(result);
-    }
-
     protected MuleMessage catchAll(MuleMessage message, MuleSession session, boolean synchronous)
             throws RoutingException
     {

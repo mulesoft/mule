@@ -32,16 +32,6 @@ public interface OutboundRouterCollection extends RouterCollection
     MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous) throws MessagingException;
 
     /**
-     * A helper method for finding out which endpoints a message would be routed to
-     * without actually routing the the message.
-     * 
-     * @param message the message to retrieve endpoints for
-     * @return an array of Endpoint objects or an empty array
-     * @throws RoutingException if there is a filter exception
-     */
-    ImmutableEndpoint[] getEndpointsForMessage(MuleMessage message) throws MessagingException;
-
-    /**
      * Determines if any endpoints have been set on this router.
      * 
      * @return

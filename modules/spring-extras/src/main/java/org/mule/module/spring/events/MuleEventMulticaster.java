@@ -15,10 +15,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
 import org.mule.RegistryContext;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleContext;
-import org.mule.api.DefaultMuleException;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
@@ -26,8 +25,10 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.MalformedEndpointException;
+import org.mule.api.lifecycle.Callable;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.filter.ObjectFilter;
@@ -35,14 +36,15 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
+import org.mule.config.QueueProfile;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.module.spring.i18n.SpringMessages;
-import org.mule.model.seda.SedaService;
 import org.mule.model.seda.SedaModel;
+import org.mule.model.seda.SedaService;
+import org.mule.module.spring.i18n.SpringMessages;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
-import org.mule.util.object.PrototypeObjectFactory;
+import org.mule.util.object.SingletonObjectFactory;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
@@ -111,10 +113,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * @see MuleEventListener
  * @see MuleSubscriptionEventListener
  * @see ApplicationEventMulticaster
- * 
- * @deprecated Does this class still make any sense for Mule 2.x?
  */
-public class MuleEventMulticaster implements ApplicationEventMulticaster, ApplicationContextAware, MuleContextAware
+public class MuleEventMulticaster
+    implements ApplicationEventMulticaster, ApplicationContextAware, MuleContextAware, Callable
 {
     public static final String EVENT_MULTICASTER_DESCRIPTOR_NAME = "muleEventMulticasterDescriptor";
 
@@ -137,13 +138,6 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      * An ExecutorService for handling asynchronous events
      */
     protected ExecutorService asyncPool = null;
-
-    /**
-     * Any logical endpointUri mappings to register with mule. These allow for
-     * friendly names to be used in place of urls i.e. email-orders ->
-     * smtp://orders:password@restaurant.com
-     */
-    protected Map endpointMappings = null;
 
     /**
      * A list of endpoints the eventMulticaster will receive events on Note that if
@@ -175,7 +169,6 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     protected ExceptionListener exceptionListener = new LoggingExceptionListener();
 
     protected MuleContext muleContext;
-
 
     public void setMuleContext(MuleContext context)
     {
@@ -214,10 +207,10 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     {
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
         {
-            ApplicationListener applicationListener = (ApplicationListener)iterator.next();
+            ApplicationListener applicationListener = (ApplicationListener) iterator.next();
             if (applicationListener instanceof AsynchronousEventListener)
             {
-                if (((AsynchronousEventListener)applicationListener).getListener().equals(listener))
+                if (((AsynchronousEventListener) applicationListener).getListener().equals(listener))
                 {
                     listeners.remove(applicationListener);
                     return;
@@ -262,22 +255,13 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         // if the context gets refreshed we need to reinitialise
         if (e instanceof ContextRefreshedEvent)
         {
-            // If the manager is being initialised from another context
-            // don't try and initialise Mule
-            if (muleContext!=null && !muleContext.isInitialised())
+            try
             {
-                try
-                {
-                    registerMulticasterComponent();
-                }
-                catch (MuleException ex)
-                {
-                    throw new MuleRuntimeException(SpringMessages.failedToReinitMule(), ex);
-                }
+                registerMulticasterComponent();
             }
-            else
+            catch (MuleException ex)
             {
-                initMule();
+                throw new MuleRuntimeException(SpringMessages.failedToReinitMule(), ex);
             }
         }
         else if (e instanceof ContextClosedEvent)
@@ -287,7 +271,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
         else if (e instanceof MuleApplicationEvent)
         {
-            muleEvent = (MuleApplicationEvent)e;
+            muleEvent = (MuleApplicationEvent) e;
             // If there is no Mule event the event didn't originate from Mule
             // so its an outbound event
             if (muleEvent.getMuleEventContext() == null)
@@ -306,19 +290,19 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
 
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
         {
-            ApplicationListener listener = (ApplicationListener)iterator.next();
+            ApplicationListener listener = (ApplicationListener) iterator.next();
             if (muleEvent != null)
             {
-                // As the asynchronous listener wraps the real listener we need to
-                // check the
-                // type of the wrapped listener, but invoke the Async listener
+                // As the asynchronous listener wraps the real listener we need
+                // to check the type of the wrapped listener, but invoke the Async
+                // listener
                 if (listener instanceof AsynchronousEventListener)
                 {
-                    AsynchronousEventListener asyncListener = (AsynchronousEventListener)listener;
+                    AsynchronousEventListener asyncListener = (AsynchronousEventListener) listener;
                     if (asyncListener.getListener() instanceof MuleSubscriptionEventListener)
                     {
                         if (isSubscriptionMatch(muleEvent.getEndpoint(),
-                            ((MuleSubscriptionEventListener)asyncListener.getListener()).getSubscriptions()))
+                            ((MuleSubscriptionEventListener) asyncListener.getListener()).getSubscriptions()))
                         {
                             asyncListener.onApplicationEvent(muleEvent);
                         }
@@ -336,7 +320,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 else if (listener instanceof MuleSubscriptionEventListener)
                 {
                     if (isSubscriptionMatch(muleEvent.getEndpoint(),
-                        ((MuleSubscriptionEventListener)listener).getSubscriptions()))
+                        ((MuleSubscriptionEventListener) listener).getSubscriptions()))
                     {
                         listener.onApplicationEvent(muleEvent);
                     }
@@ -347,7 +331,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 }
             }
             else if (listener instanceof AsynchronousEventListener
-                     && !(((AsynchronousEventListener)listener).getListener() instanceof MuleEventListener))
+                     && !(((AsynchronousEventListener) listener).getListener() instanceof MuleEventListener))
             {
                 listener.onApplicationEvent(e);
             }
@@ -453,10 +437,11 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      * 
      * @param context the context received by Mule
      */
-    public void onMuleEvent(MuleEventContext context) throws TransformerException, MalformedEndpointException
+    public Object onCall(MuleEventContext context) throws TransformerException, MalformedEndpointException
     {
         multicastEvent(new MuleApplicationEvent(context.transformMessage(), context, applicationContext));
         context.setStopFurtherProcessing(true);
+        return null;
     }
 
     /**
@@ -500,12 +485,13 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 else
                 {
                     MuleSession session = new DefaultMuleSession(message,
-                        ((AbstractConnector)endpoint.getConnector()).getSessionHandler(), service);
+                        ((AbstractConnector) endpoint.getConnector()).getSessionHandler(), service);
                     RequestContext.setEvent(new DefaultMuleEvent(message, endpoint, session, false));
                     // transform if necessary
                     if (endpoint.getTransformers() != null)
                     {
-                        message = new DefaultMuleMessage(applicationEvent.getSource(), applicationEvent.getProperties());
+                        message = new DefaultMuleMessage(applicationEvent.getSource(),
+                            applicationEvent.getProperties());
                         message.applyTransformers(endpoint.getTransformers());
                     }
                     endpoint.dispatch(new DefaultMuleEvent(message, endpoint, session, false));
@@ -534,59 +520,6 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         this.applicationContext = applicationContext;
     }
 
-    protected void initMule()
-    {
-        try
-        {
-            // endpointsCache.clearErrors();
-            // See if there has been a discriptor explicitly configured
-            if (applicationContext.containsBean(EVENT_MULTICASTER_DESCRIPTOR_NAME))
-            {
-                service = (Service)applicationContext.getBean(EVENT_MULTICASTER_DESCRIPTOR_NAME);
-            }
-            // If the mule manager has been initialised in the contain
-            // there is not need to do anything here
-            if (applicationContext.containsBean("muleManager"))
-            {
-                // Register the multicaster descriptor
-                registerMulticasterComponent();
-                return;
-            }
-
-            if (!muleContext.isStarted())
-            {
-                RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(!asynchronous);
-                // register any endpointUri mappings
-                // TODO MULE-2494
-                //registerEndpointMappings();
-            }
-            // tell mule to load service definitions from spring
-            //SpringContainerContext containerContext = new SpringContainerContext();
-            //containerContext.setBeanFactory(applicationContext);
-
-            // see if there are any UMOConnectors to register
-            registerConnectors();
-
-            // Next see if there are any UMOTransformers to register
-            registerTransformers();
-
-            // TODO MULE-2494
-            //registerGlobalEndpoints();
-
-            // Register the multicaster descriptor
-            registerMulticasterComponent();
-
-            if (!muleContext.isStarted())
-            {
-               muleContext.start();
-            }
-        }
-        catch (MuleException e)
-        {
-            throw new MuleRuntimeException(SpringMessages.failedToReinitMule(), e);
-        }
-    }
-
     protected void registerMulticasterComponent() throws MuleException
     {
         // A discriptor hasn't been explicitly configured, so create a default
@@ -594,9 +527,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         {
             service = getDefaultService();
             setSubscriptionsOnService(service);
-            //service.setModelName(MuleProperties.OBJECT_SYSTEM_MODEL);
             muleContext.getRegistry().registerService(service);
-            service = muleContext.getRegistry().lookupService(service.getName());
         }
     }
 
@@ -606,14 +537,14 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         List endpoints = new ArrayList();
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
         {
-            ApplicationListener listener = (ApplicationListener)iterator.next();
+            ApplicationListener listener = (ApplicationListener) iterator.next();
             if (listener instanceof AsynchronousEventListener)
             {
-                listener = ((AsynchronousEventListener)listener).getListener();
+                listener = ((AsynchronousEventListener) listener).getListener();
             }
             if (listener instanceof MuleSubscriptionEventListener)
             {
-                subscriptions = ((MuleSubscriptionEventListener)listener).getSubscriptions();
+                subscriptions = ((MuleSubscriptionEventListener) listener).getSubscriptions();
                 for (int i = 0; i < subscriptions.length; i++)
                 {
                     if (subscriptions[i].indexOf("*") == -1 && MuleEndpointURI.isMuleUri(subscriptions[i]))
@@ -634,11 +565,12 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
             {
                 endpoint = (String) iterator.next();
-                
+
                 ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
                     endpoint);
 
-                // check whether the endpoint has already been set on the MuleEventMulticastor
+                // check whether the endpoint has already been set on the
+                // MuleEventMulticastor
                 if (service.getInboundRouter().getEndpoint(ep.getName()) == null)
                 {
                     service.getInboundRouter().addEndpoint(ep);
@@ -649,61 +581,48 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
 
     private boolean registerAsSoap(String endpoint, Object listener) throws MuleException
     {
-        throw new DefaultMuleException("Need to reimplement this method without using the QuickConfigurationBuilder.");
-//        if (endpoint.startsWith("glue") || endpoint.startsWith("soap") || endpoint.startsWith("axis") || endpoint.startsWith("xfire"))
-//        {
-//            EndpointURI ep = new MuleEndpointURI(endpoint);
-//            QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
-//
-//            // get the service name from the URI path
-//            String serviceName = null;
-//            if (ep.getPath() != null)
-//            {
-//                String path = ep.getPath();
-//                if (path.endsWith("/"))
-//                {
-//                    path = path.substring(0, path.length() - 1);
-//                }
-//                int i = path.lastIndexOf("/");
-//                if (i > -1)
-//                {
-//                    serviceName = path.substring(i + 1);
-//                }
-//            }
-//            else
-//            {
-//                serviceName = descriptor.getName();
-//            }
-//            // now strip off the service name
-//            String newEndpoint = endpoint;
-//            int i = newEndpoint.indexOf(serviceName);
-//            newEndpoint = newEndpoint.substring(0, i - 1);
-//            builder.registerComponentInstance(listener, serviceName, new MuleEndpointURI(newEndpoint));
-//            return true;
-//        }
-//        else
-//        {
-//            return false;
-//        }
-    }
+        if (endpoint.startsWith("glue") || endpoint.startsWith("soap") || endpoint.startsWith("axis")
+            || endpoint.startsWith("xfire"))
+        {
+            EndpointURI ep = new MuleEndpointURI(endpoint);
 
-// TODO MULE-2494
-//    protected void registerEndpointMappings() throws MuleException
-//    {
-//        // register any endpointUri mappings
-//        if (endpointMappings != null)
-//        {
-//            Map.Entry entry;
-//            for (Iterator iterator = endpointMappings.entrySet().iterator(); iterator.hasNext();)
-//            {
-//                entry = (Map.Entry) iterator.next();
-//                ImmutableEndpoint endpoint = muleContext.getRegistry()
-//                    .lookupEndpointFactory()
-//                    .getInboundEndpoint((String) entry.getKey());
-//                muleContext.getRegistry().registerEndpoint(endpoint);
-//            }
-//        }
-//    }
+            // get the service name from the URI path
+            String serviceName = null;
+            if (ep.getPath() != null)
+            {
+                String path = ep.getPath();
+                if (path.endsWith("/"))
+                {
+                    path = path.substring(0, path.length() - 1);
+                }
+                int i = path.lastIndexOf("/");
+                if (i > -1)
+                {
+                    serviceName = path.substring(i + 1);
+                }
+            }
+            else
+            {
+                serviceName = service.getName();
+            }
+            // now strip off the service name
+            String newEndpoint = endpoint;
+            int i = newEndpoint.indexOf(serviceName);
+            newEndpoint = newEndpoint.substring(0, i - 1);
+            SedaService s = new SedaService();
+            s.setName(serviceName);
+            s.setQueueProfile(new QueueProfile());
+            s.getInboundRouter().addEndpoint(
+                muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(newEndpoint));
+            s.setServiceFactory(new SingletonObjectFactory(listener));
+            muleContext.getRegistry().registerService(s);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     protected void registerConnectors() throws MuleException
     {
@@ -717,8 +636,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 Connector c;
                 for (Iterator iterator = connectors.entrySet().iterator(); iterator.hasNext();)
                 {
-                    entry = (Map.Entry)iterator.next();
-                    c = (Connector)entry.getValue();
+                    entry = (Map.Entry) iterator.next();
+                    c = (Connector) entry.getValue();
                     if (c.getName() == null)
                     {
                         c.setName(entry.getKey().toString());
@@ -728,31 +647,6 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             }
         }
     }
-
-// TODO MULE-2494
-//    protected void registerGlobalEndpoints() throws MuleException
-//    {
-//        if (!muleContext.isInitialised())
-//        {
-//            // Next see if there are any UMOConnectors to register
-//            Map endpoints = applicationContext.getBeansOfType(Endpoint.class, true, true);
-//            if (endpoints.size() > 0)
-//            {
-//                Map.Entry entry;
-//                Endpoint endpoint;
-//                for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();)
-//                {
-//                    entry = (Map.Entry)iterator.next();
-//                    endpoint = (Endpoint)entry.getValue();
-//                    if (endpoint.getName() == null)
-//                    {
-//                        endpoint.setName(entry.getKey().toString());
-//                    }
-//                    muleContext.getRegistry().registerEndpoint(endpoint);
-//                }
-//            }
-//        }
-//    }
 
     protected void registerTransformers() throws MuleException
     {
@@ -766,8 +660,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 Transformer t;
                 for (Iterator iterator = transformers.entrySet().iterator(); iterator.hasNext();)
                 {
-                    entry = (Map.Entry)iterator.next();
-                    t = (Transformer)entry.getValue();
+                    entry = (Map.Entry) iterator.next();
+                    t = (Transformer) entry.getValue();
                     if (t.getName() == null)
                     {
                         t.setName(entry.getKey().toString());
@@ -783,7 +677,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         // When the the beanFactory is refreshed all the beans get
         // reloaded so we need to unregister the service from Mule
         Model model = muleContext.getRegistry().lookupModel(MuleProperties.OBJECT_SYSTEM_MODEL);
-        if(model==null)
+        if (model == null)
         {
             model = new SedaModel();
             model.setName(MuleProperties.OBJECT_SYSTEM_MODEL);
@@ -796,6 +690,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         }
         service = new SedaService();
         service.setName(EVENT_MULTICASTER_DESCRIPTOR_NAME);
+        service.setModel(model);
         if (subscriptions == null)
         {
             logger.info("No receive endpoints have been set, using default '*'");
@@ -810,7 +705,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             for (int i = 0; i < subscriptions.length; i++)
             {
                 String subscription = subscriptions[i];
-                
+
                 EndpointFactory endpointFactory = muleContext.getRegistry().lookupEndpointFactory();
                 EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(subscription);
                 endpointBuilder.setSynchronous(!asynchronous);
@@ -819,9 +714,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 messageRouter.addEndpoint(endpoint);
             }
         }
-        // TODO RM: Need to put the actual instance here (not just the name reference), 
-        // please review whether the following is correct?
-        service.setServiceFactory(new PrototypeObjectFactory(MuleEventMulticaster.class));
+        service.setServiceFactory(new SingletonObjectFactory(this));
         return service;
     }
 
@@ -833,8 +726,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             {
                 setSubscriptionFilter(WildcardFilter.class);
             }
-            ObjectFilter filter = (ObjectFilter)ClassUtils.instanciateClass(getSubscriptionFilter(),
-                new Object[] {pattern});
+            ObjectFilter filter = (ObjectFilter) ClassUtils.instanciateClass(getSubscriptionFilter(),
+                new Object[]{pattern});
             return filter;
         }
         catch (Exception e)
@@ -863,30 +756,6 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     public void setSubscriptionFilter(Class subscriptionFilter)
     {
         this.subscriptionFilter = subscriptionFilter;
-    }
-
-    /**
-     * Any logical endpointUri mappings to register with mule. These allow for
-     * friendly names to be used in place of urls i.e. email-orders ->
-     * smtp://orders:password@restaurant.com
-     * 
-     * @return endpointMappings a map of logical names and endpoiut url strings
-     */
-    public Map getEndpointMappings()
-    {
-        return endpointMappings;
-    }
-
-    /**
-     * Any logical endpointUri mappings to register with mule. These allow for
-     * friendly names to be used in place of urls i.e. email-orders ->
-     * smtp://orders:password@restaurant.com
-     * 
-     * @param endpointMappings a map of logical names and endpoiut url strings
-     */
-    public void setEndpointMappings(Map endpointMappings)
-    {
-        this.endpointMappings = endpointMappings;
     }
 
     /**

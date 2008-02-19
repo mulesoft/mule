@@ -111,3 +111,10 @@ org.mule.config.spring.VmSchemaValidationTestCase
 
 # MULE-2999
 org.mule.config.spring.ComponentInterceptorTestCase
+
+# MULE-3000
+org.mule.test.integration.client.MuleClientRemotingTcpTestCase
+org.mule.test.integration.client.MuleClientRemotingJmsTestCase
+
+# MULE-3002
+org.mule.test.integration.management.ManagementSimpleStartupTestCase

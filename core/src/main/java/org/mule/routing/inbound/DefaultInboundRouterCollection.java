@@ -85,7 +85,7 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
         MuleEvent[] eventsToRoute = null;
         boolean noRoute = true;
         boolean match = false;
-        InboundRouter umoInboundRouter = null;
+        InboundRouter umoInboundRouter;
 
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
         {
@@ -159,29 +159,26 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
                 try
                 {
                     MuleMessage messageResult = null;
-                    if (eventsToRoute != null)
+                    for (int i = 0; i < eventsToRoute.length; i++)
                     {
-                        for (int i = 0; i < eventsToRoute.length; i++)
+                        // Set the originating endpoint so we'll know where this event came from further down the pipeline.
+                        if (event.getMessage().getProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY) == null)
                         {
-                            // Set the originating endpoint so we'll know where this event came from further down the pipeline.
-                            if (event.getMessage().getProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY) == null)
-                            {
-                                event.getMessage().setProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
-                            }
+                            event.getMessage().setProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
+                        }
 
-                            if (event.isSynchronous())
-                            {
-                                messageResult = send(eventsToRoute[i]);
-                            }
-                            else
-                            {
-                                dispatch(eventsToRoute[i]);
-                            }
-                            // Update stats
-                            if (getStatistics().isEnabled())
-                            {
-                                getStatistics().incrementRoutedMessage(eventsToRoute[i].getEndpoint());
-                            }
+                        if (event.isSynchronous())
+                        {
+                            messageResult = send(eventsToRoute[i]);
+                        }
+                        else
+                        {
+                            dispatch(eventsToRoute[i]);
+                        }
+                        // Update stats
+                        if (getStatistics().isEnabled())
+                        {
+                            getStatistics().incrementRoutedMessage(eventsToRoute[i].getEndpoint());
                         }
                     }
                     return messageResult;

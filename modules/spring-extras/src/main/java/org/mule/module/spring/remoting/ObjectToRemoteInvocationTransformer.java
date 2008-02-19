@@ -14,6 +14,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 
 import org.springframework.remoting.support.RemoteInvocation;
@@ -26,6 +27,7 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
         super();
         this.registerSourceType(RemoteInvocation.class);
         this.registerSourceType(byte[].class);
+        this.registerSourceType(InputStream.class);
         this.setReturnClass(RemoteInvocation.class);
     }
 
@@ -36,28 +38,46 @@ public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
             return src;
         }
 
-        try
+        Object o = null;
+
+        if (src instanceof InputStream)
         {
-            byte[] data = (byte[])src;
-            ByteArrayInputStream bais = new ByteArrayInputStream(data);
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            Object o = ois.readObject();
-            RemoteInvocation ri = (RemoteInvocation)o;
-            if (logger.isDebugEnabled())
+            try
             {
-                logger.debug("request to execute " + ri.getMethodName());
-                for (int i = 0; i < ri.getArguments().length; i++)
-                {
-                    Object a = ri.getArguments()[i];
-                    logger.debug("with argument (" + a.toString() + ")");
-                }
+                o = new ObjectInputStream((InputStream) src).readObject();
             }
-            return ri;
+            catch (Exception e)
+            {
+                throw new TransformerException(this, e);
+            }
         }
-        catch (Exception e)
+        else
         {
-            throw new TransformerException(this, e);
+            byte[] data = (byte[]) src;
+            ByteArrayInputStream bais = new ByteArrayInputStream(data);
+            try
+            {
+                ObjectInputStream ois = new ObjectInputStream(bais);
+                o = ois.readObject();
+            }
+            catch (Exception e)
+            {
+                throw new TransformerException(this, e);
+            }
         }
+
+        RemoteInvocation ri = (RemoteInvocation) o;
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("request to execute " + ri.getMethodName());
+            for (int i = 0; i < ri.getArguments().length; i++)
+            {
+                Object a = ri.getArguments()[i];
+                logger.debug("with argument (" + a.toString() + ")");
+            }
+        }
+        return ri;
+
     }
 
 }

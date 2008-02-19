@@ -40,13 +40,12 @@
 
     <bean name="_muleSimpleRegistryBootstrap" class="org.mule.config.bootstrap.SimpleRegistryBootstrap"/>
 
-    <!--  -->
     <bean name="_muleNotificationManager"
           class="org.mule.config.spring.ServerNotificationManagerConfigurator"/>
 
     <bean name="_muleConfiguration" class="org.mule.config.spring.MuleConfigurationConfigurator"/>
 
-    <mule:mule name="_muleSystemModel">
+    <mule:mule>
 
 
         <!-- Default configuration attributes are configured via default values in mule-core schema mule.xsd.

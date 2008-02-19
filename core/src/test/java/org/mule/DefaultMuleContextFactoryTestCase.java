@@ -299,6 +299,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 
     static class TestMuleConfiguration extends MuleConfiguration
     {
+        // just a skeleton
     }
 
 }

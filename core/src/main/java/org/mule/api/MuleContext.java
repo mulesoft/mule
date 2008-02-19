@@ -19,7 +19,6 @@ import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
-import org.mule.api.store.Store;
 import org.mule.config.MuleConfiguration;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
@@ -32,12 +31,6 @@ public interface MuleContext extends Lifecycle
 {
 
     String getSystemName();
-
-    Store getStore(String name) throws MuleException;
-
-    Store createStore(String name) throws MuleException;
-
-    void removeStore(Store store);
 
     Directories getDirectories();
 

@@ -10,9 +10,8 @@
 
 package org.mule.test.integration.management;
 
-import org.mule.management.agents.JmxAgent;
-import org.mule.management.agents.DefaultJmxSupportAgent;
 import org.mule.api.MuleException;
+import org.mule.management.agents.DefaultJmxSupportAgent;
 import org.mule.tck.FunctionalTestCase;
 
 public class ManagementSimpleStartupTestCase extends FunctionalTestCase

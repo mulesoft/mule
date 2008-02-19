@@ -28,7 +28,6 @@ import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
-import org.mule.api.store.Store;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleManifest;
@@ -397,24 +396,6 @@ public class DefaultMuleContext implements MuleContext
     public void setSystemName(String systemName)
     {
         this.systemName = systemName;
-    }
-
-    public Store getStore(String name) throws MuleException
-    {
-        //TODO LM: get store from registry
-        return null;
-    }
-
-    public Store createStore(String name) throws MuleException
-    {
-        //TODO LM: backed by registry
-        return null;
-    }
-
-    public void removeStore(Store store)
-    {
-        //TODO LM: get store from registry
-        store.dispose();
     }
 
     /**

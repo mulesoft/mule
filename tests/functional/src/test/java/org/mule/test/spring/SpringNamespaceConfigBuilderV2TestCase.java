@@ -18,6 +18,7 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.MuleContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.response.AbstractResponseRouter;

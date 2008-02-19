@@ -12,7 +12,7 @@
 
     <model name="test" >
         <service name="BridgeNoTransformer">
-            <inbound matchAll="true">
+            <inbound>
                 <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
                     <outbound-endpoint address="vm://catchall" connector-ref="vmQueue"/>
                 </custom-forwarding-catch-all-strategy>
@@ -32,7 +32,7 @@
         </service>
 
         <service name="BridgeTransformed">
-            <inbound matchAll="true">
+            <inbound>
                 <custom-forwarding-catch-all-strategy class="org.mule.test.usecases.routing.InboundTransformingForwardingCatchAllStrategy">
                     <outbound-endpoint address="vm://catchall" connector-ref="vmQueue">
                         <string-to-byte-array-transformer/>

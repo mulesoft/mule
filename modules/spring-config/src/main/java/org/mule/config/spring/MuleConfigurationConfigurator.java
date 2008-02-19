@@ -39,18 +39,9 @@ public class MuleConfigurationConfigurator extends MuleConfiguration implements 
         configuration.setDomainId(getDomainId());
         configuration.setId(getId());
         
-        //configuration.setD
         configuration.setDefaultConnectionStrategy(getDefaultConnectionStrategy());
         
         return configuration;
-//        
-//        
-//        <xsd:element name="default-threading-profile" type="threadingProfileType" minOccurs="0"/>
-//        <xsd:element name="default-dispatcher-threading-profile" type="threadingProfileType" minOccurs="0"/>
-//        <xsd:element name="default-receiver-threading-profile" type="threadingProfileType" minOccurs="0"/>
-//        <xsd:element name="default-service-threading-profile" type="threadingProfileType" minOccurs="0"/>
-//        <xsd:element ref="abstract-storage" minOccurs="0"/>
-
     }
 
     public Class getObjectType()
