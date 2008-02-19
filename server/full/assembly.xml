@@ -420,7 +420,7 @@ Disable temporarily to speed up build cycle during development
     <!-- 3rd-party libraries -->
     <!-- 
     When a new 3rd party library is added to the distro, it must be added in 3 places:
-       1. modules/all-bundles/pom.xml
+       1. distributions/osgi/all-bundles/pom.xml
        2. distributions/server/full/assembly.xml
        3. distributions/server/src/main/resources/conf/init.xargs
     -->
@@ -437,10 +437,7 @@ Disable temporarily to speed up build cycle during development
         <include>org.ops4j.pax.logging:pax-logging-api</include>
         <include>org.ops4j.pax.logging:pax-logging-service</include> 
         <!-- Concurrency lib -->
-        <include>org.springframework.osgi:backport-util-concurrent</include>
-        <!-- TOOD Upgrade to 3.1-SNAPSHOT
-        <include>org.springframework.osgi:backport-util-concurrent.osgi</include> 
-        -->
+        <include>backport-util-concurrent:backport-util-concurrent.osgi</include> 
       </includes>
       <!-- no XML -->
       <excludes>
