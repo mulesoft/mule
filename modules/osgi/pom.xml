@@ -6,50 +6,17 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
- <version>2.1.0-M1-SNAPSHOT</version>
+        <version>2.1.0-M1-SNAPSHOT</version>
     </parent>
   <artifactId>mule-module-osgi</artifactId>
-    <!--<packaging>bundle</packaging>-->
+  <packaging>bundle</packaging>
   <name>OSGi Support</name>
   <description>Classes used for Mule's OSGi support</description>
 
-    <build>
-         <plugins>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <!-- The org.mule.providers.service package doesn't get added to the
-                            auto-generated imports list for some reason. -->  
-                        <Import-Package>
-                            org.mule.providers.service,
-                            *
-                        </Import-Package>-->
-                        <Export-Package>
-                            org.mule.module.osgi,
-                            org.mule.module.osgi.util
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-         </plugins>
-    </build>
-    
   <dependencies>
         <dependency>
           <groupId>org.mule</groupId>
           <artifactId>mule-core</artifactId>
-        </dependency>
-          <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>osgi_R4_core</artifactId>
-                <version>1.0</version>
-        </dependency>
-          <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>osgi_R4_compendium</artifactId>
-                <version>1.0</version>
         </dependency>
   </dependencies>
 </project>

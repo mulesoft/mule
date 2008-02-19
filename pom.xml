@@ -90,7 +90,25 @@
             </dependency>
             <dependency>
                 <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-http</artifactId>
+                <version>${version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
                 <artifactId>mule-transport-ssl</artifactId>
+                <version>${version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-vm</artifactId>
+                <version>${version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.transports</groupId>
+                <artifactId>mule-transport-stdio</artifactId>
                 <version>${version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -545,6 +563,21 @@
                         <artifactId>junit</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl104-over-slf4j</artifactId>
+                <version>1.4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.4.3</version>
             </dependency>
             <!-- OSGi Specification -->
             <dependency>

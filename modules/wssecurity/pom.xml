@@ -58,6 +58,11 @@
             <version>${version}</version>
         </dependency>
         <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
             <groupId>wss4j</groupId>
             <artifactId>wss4j</artifactId>
             <version>1.5.0</version>
