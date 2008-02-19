@@ -198,7 +198,7 @@ Disable temporarily to speed up build cycle during development
         </dependency>
         <!-- Include all 3rd-party OSGi Bundles -->
         <dependency>
-            <groupId>org.mule.modules</groupId>
+            <groupId>org.mule.distributions</groupId>
             <artifactId>mule-bundles-all</artifactId>
             <version>${version}</version>
             <type>pom</type>
