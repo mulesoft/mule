@@ -16,7 +16,6 @@
 
     <modules>
         <module>acegi</module>
-        <module>all-bundles</module>
         <module>all-modules</module>
         <module>builders</module>
         <module>boot</module>
