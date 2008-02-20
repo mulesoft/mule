@@ -11,24 +11,26 @@
 package org.mule.osgi;
 
 import org.mule.api.MuleContext;
-import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 public class MuleContextActivator implements BundleActivator 
 {    
-    private MuleContext context;
+    private ServiceRegistration muleContextRef;
 
     public void start(BundleContext bc) throws Exception 
     {
-        context = new DefaultMuleContextFactory().createMuleContext(new DefaultsConfigurationBuilder());
-        context.start();
+        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
+        muleContext.start();
+        muleContextRef = bc.registerService(MuleContext.class.getName(), muleContext, null);
     }
 
     public void stop(BundleContext bc) throws Exception 
     {
+        MuleContext context = (MuleContext) bc.getService(muleContextRef.getReference());
         if (context != null)
         {
             context.stop();

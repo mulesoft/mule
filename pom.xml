@@ -892,6 +892,8 @@
                         <Bundle-DocURL>${pom.url}</Bundle-DocURL>
                         <!-- Each module can override these defaults in their osgi.properties file -->
                         <_include>-osgi.properties</_include>
+                        <!-- OSGi R4 -->
+                        <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
                         
                         <!-- Non-OSGi manifest entries -->
                         <More-Info>For more information go to ${productUrl}</More-Info>

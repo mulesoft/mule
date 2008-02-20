@@ -10,6 +10,10 @@
 
 package org.mule.module.osgi;
 
+import org.mule.api.MuleContext;
+import org.mule.api.config.ConfigurationException;
+import org.mule.config.spring.SpringXmlConfigurationBuilder;
+
 import java.util.Dictionary;
 
 import org.apache.commons.logging.Log;
@@ -19,6 +23,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.SynchronousBundleListener;
+import org.osgi.util.tracker.ServiceTracker;
 
 public class MuleBundleListener implements BundleActivator
 {
@@ -30,6 +35,9 @@ public class MuleBundleListener implements BundleActivator
     
     /** Bundle listener interested in Mule configs */
     private SynchronousBundleListener muleConfigListener;
+    
+    /** Reference to the MuleContext */
+    ServiceTracker muleContextRef;
     
     private static Log logger = LogFactory.getLog(MuleBundleListener.class);
     
@@ -50,7 +58,21 @@ public class MuleBundleListener implements BundleActivator
                 case BundleEvent.STARTED :
                 {
                     String configResources = getMuleConfigResources(bundle);
-                    logger.info("New Mule configuration detected: " + configResources);
+                    if (configResources != null)
+                    {
+                        logger.info("New Mule configuration detected: " + configResources);
+                        MuleContext muleContext = (MuleContext) muleContextRef.getService();
+                        
+                        // TODO This should be run in a separate non-blocking thread.
+                        try
+                        {
+                            new SpringXmlConfigurationBuilder(configResources).configure(muleContext);
+                        }
+                        catch (ConfigurationException e)
+                        {
+                            logger.error(e);
+                        }
+                    }
                     break;
                 }
                 case BundleEvent.STOPPING :
@@ -68,6 +90,9 @@ public class MuleBundleListener implements BundleActivator
     {
         this.bundleId = context.getBundle().getBundleId();
         
+        muleContextRef = new ServiceTracker(context, MuleContext.class.getName(), null);
+        muleContextRef.open();
+
         muleConfigListener = new MuleConfigListener();
         // listen to any changes in bundles
         context.addBundleListener(muleConfigListener);
