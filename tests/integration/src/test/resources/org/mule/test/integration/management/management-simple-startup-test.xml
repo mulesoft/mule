@@ -12,7 +12,7 @@
        http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
        http://www.mulesource.org/schema/mule/management/2.0 http://www.mulesource.org/schema/mule/management/2.0/mule-management.xsd">
 
-    <mgmt:jmx-default-config name="jmxAgent" host="0.0.0.0" port="1100"/>
+    <mgmt:jmx-default-config host="0.0.0.0" port="1100"/>
 
 </mule>
         

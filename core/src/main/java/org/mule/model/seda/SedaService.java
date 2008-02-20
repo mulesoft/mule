@@ -87,7 +87,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
      *             to initialise
      * @see org.mule.api.UMODescriptor
      */
-    public synchronized void doInitialise() throws InitialisationException
+    protected synchronized void doInitialise() throws InitialisationException
     {
         MuleConfiguration config = RegistryContext.getConfiguration();
         if (threadingProfile == null)
@@ -130,12 +130,12 @@ public class SedaService extends AbstractService implements Work, WorkListener
         }
     }
 
-    public void doForceStop() throws MuleException
+    protected void doForceStop() throws MuleException
     {
         doStop();
     }
 
-    public void doStop() throws MuleException
+    protected void doStop() throws MuleException
     {
         if (muleContext.getQueueManager().getQueueSession().getQueue(name).size() > 0)
         {
@@ -156,7 +156,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         }
     }
 
-    public void doStart() throws MuleException
+    protected void doStart() throws MuleException
     {
         try
         {
@@ -223,7 +223,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         }
     }
 
-    public MuleMessage doSend(MuleEvent event) throws MuleException
+    protected MuleMessage doSend(MuleEvent event) throws MuleException
     {
         MuleMessage result = null;
         Object pojoService = null;

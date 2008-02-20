@@ -33,7 +33,9 @@
             <inbound>
                 <vm:inbound-endpoint path="responder" synchronous="false" connector-ref="default"/>
             </inbound>
-            <component class="org.mule.tck.functional.FunctionalTestComponent"/>
+            <component>
+                <singleton-object class="org.mule.tck.functional.FunctionalTestComponent" />
+            </component>
         </service>
 
     </model>

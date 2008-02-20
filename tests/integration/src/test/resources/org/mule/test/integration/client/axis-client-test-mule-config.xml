@@ -8,7 +8,7 @@
        http://www.mulesource.org/schema/mule/client/2.0 http://www.mulesource.org/schema/mule/client/2.0/mule-client.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <client:remote-dispatcher-agent name="remoteDispatcher">
+    <client:remote-dispatcher-agent>
         <client:remote-endpoint ref="remoteEndpoint"/>
         <client:xml-wire-format/>
     </client:remote-dispatcher-agent>

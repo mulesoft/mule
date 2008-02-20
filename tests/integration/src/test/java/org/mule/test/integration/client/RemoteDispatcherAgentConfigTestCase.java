@@ -22,7 +22,7 @@ public class RemoteDispatcherAgentConfigTestCase extends FunctionalTestCase
 
     public void testNonEmptyProperties() throws Exception
     {
-        RemoteDispatcherAgent agent = (RemoteDispatcherAgent) muleContext.getRegistry().lookupAgent("remoteDispatcher");
+        RemoteDispatcherAgent agent = (RemoteDispatcherAgent) muleContext.getRegistry().lookupAgent("remote-dispatcher-agent");
         assertNotNull(agent.getEndpoint());
         assertEquals("test://12345",agent.getEndpoint().getEndpointURI().toString());
         assertNotNull(agent.getWireFormat());

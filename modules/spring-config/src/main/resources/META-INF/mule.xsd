@@ -102,23 +102,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <!--==============================================================-->
-    <!--   Abstract Types                                             -->
-    <!--==============================================================-->
-
-    <xsd:complexType name="abstractAgentType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Abstract base for agents.  Not used in core, but common to several modules.
-            </xsd:documentation>
-        </xsd:annotation>
-         <xsd:complexContent>
-            <xsd:extension base="abstractExtensionType">
-                <xsd:attribute name="name" type="substitutableName" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="abstract-extension" abstract="true" type="abstractExtensionType">
         <xsd:annotation>
             <xsd:documentation>
@@ -444,30 +427,41 @@
         <xsd:attribute name="defaultEncoding" type="xsd:string" default="UTF-8">
             <xsd:annotation>
                 <xsd:documentation>
+                    Currently unused - see JIRA issue MULE-3005.
+                    This is the encoding assumed when dealing with Strings
+                    if no more specific configuration is given.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="defaultTransactionTimeout" type="xsd:string" default="5000">
             <xsd:annotation>
                 <xsd:documentation>
+                    The default timeout for transactions,
+                    used if no more specific configuration is given.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="serverId" type="nonBlankString">
             <xsd:annotation>
                 <xsd:documentation>
+                    Currently unused - see JIRA issue MULE-3005.
+                    This is used to identify the Mule instance.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="clusterId" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
+                    Currently unused - see JIRA issue MULE-3005.
+                    This is used to identify the Mule cluser.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="domainId" type="xsd:string" default="org.mule">
             <xsd:annotation>
                 <xsd:documentation>
+                    Currently unused - see JIRA issue MULE-3005.
+                    This is used to identify the Mule domain.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -475,21 +469,59 @@
 
     <xsd:complexType name="notificationManagerType">
         <xsd:sequence>
-            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                <xsd:element ref="abstract-define-notification"/>
-            </xsd:sequence>
-            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                <xsd:element ref="abstract-disable-notification"/>
-            </xsd:sequence>
-            <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                <xsd:element name="notification-listener" type="notificationListenerType"/>
-            </xsd:sequence>
+            <xsd:element name="notification" type="defineNotificationType" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Associate an event with an interface.
+                        Listeners which implement the interface will receive instances of the event.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="disable-notification" type="disableNotificationType" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Block the association of an event with a particular interface.
+                        This filters events after the association with a particular interface
+                        (and so takes precedence).
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="notification-listener" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Register a bean as a listener with the notification system.
+                        Events are dispatched by reflection - the listener will receive all events
+                        associated with any interfaces it implements.
+                        The relationship between interfaces and events is configured by the
+                        notification and disable-notification elements.
+                    </xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                    <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The bean that will receive notifications.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="subscription" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                An optional string that is compared with the event's resource identifier.
+                                Only events with matching identifiers will be sent.
+                                If no value is given, all events are sent.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:complexType>
+            </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="dynamic" type="substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    If the notification manager is dynamic then updates to the manager will affect
-                    all messages.  Otherwise, some parts of the system may cache state for
+                    If the notification manager is dynamic then programatic updates to the manager
+                    (ie via Java code) will affect all messages.
+                    Otherwise, some parts of the system may cache state for
                     efficiency and so not generate newly enabled notifications.
                     The default value is false.
                 </xsd:documentation>
@@ -497,201 +529,557 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:element name="abstract-define-notification" abstract="true" type="abstractDefineNotificationType"/>
-    <xsd:complexType name="abstractDefineNotificationType"/>
-
-    <xsd:element name="abstract-disable-notification" abstract="true" type="abstractDisableNotificationType"/>
-    <xsd:complexType name="abstractDisableNotificationType"/>
-
-    <xsd:element name="notification" substitutionGroup="abstract-define-notification" type="defineNotificationType"/>
     <xsd:complexType name="defineNotificationType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractDefineNotificationType">
-                <xsd:attribute name="event-class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The class associated with a notification event that will be delivered to the interface.
-                            This can be used instead of the event attribute to specify a custom class.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="event">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The notification event to deliver.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="MANAGER"/>
-                            <xsd:enumeration value="MODEL"/>
-                            <xsd:enumeration value="SERVICE"/>
-                            <xsd:enumeration value="SECURITY"/>
-                            <xsd:enumeration value="MANAGEMENT"/>
-                            <xsd:enumeration value="CONNECTION"/>
-                            <xsd:enumeration value="REGISTRY"/>
-                            <xsd:enumeration value="CUSTOM"/>
-                            <xsd:enumeration value="MESSAGE"/>
-                            <xsd:enumeration value="EXCEPTION"/>
-                            <xsd:enumeration value="TRANSACTION"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="interface-class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The interface (class name) that will receive the notification event.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="interface">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The interface that will receive the notification event.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="MANAGER"/>
-                            <xsd:enumeration value="MODEL"/>
-                            <xsd:enumeration value="SERVICE"/>
-                            <xsd:enumeration value="SECURITY"/>
-                            <xsd:enumeration value="MANAGEMENT"/>
-                            <xsd:enumeration value="CONNECTION"/>
-                            <xsd:enumeration value="REGISTRY"/>
-                            <xsd:enumeration value="CUSTOM"/>
-                            <xsd:enumeration value="MESSAGE"/>
-                            <xsd:enumeration value="EXCEPTION"/>
-                            <xsd:enumeration value="TRANSACTION"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="disable-notification" substitutionGroup="abstract-disable-notification" type="disableNotificationType"/>
-    <xsd:complexType name="disableNotificationType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractDisableNotificationType">
-                <xsd:attribute name="event-class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The class associated with an event that will no longer be delivered to any interface.
-                            This can be used instead of the event attribute to specify a custom class.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="event">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The event to not deliver.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="MANAGER"/>
-                            <xsd:enumeration value="MODEL"/>
-                            <xsd:enumeration value="SERVICE"/>
-                            <xsd:enumeration value="SECURITY"/>
-                            <xsd:enumeration value="MANAGEMENT"/>
-                            <xsd:enumeration value="CONNECTION"/>
-                            <xsd:enumeration value="REGISTRY"/>
-                            <xsd:enumeration value="CUSTOM"/>
-                            <xsd:enumeration value="EXCEPTION"/>
-                            <xsd:enumeration value="TRANSACTION"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="interface-class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The interface (class name) that will no longer receive an event.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="interface">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The interface that will no longer receive an event.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="MANAGER"/>
-                            <xsd:enumeration value="MODEL"/>
-                            <xsd:enumeration value="SERVICE"/>
-                            <xsd:enumeration value="SECURITY"/>
-                            <xsd:enumeration value="MANAGEMENT"/>
-                            <xsd:enumeration value="CONNECTION"/>
-                            <xsd:enumeration value="REGISTRY"/>
-                            <xsd:enumeration value="CUSTOM"/>
-                            <xsd:enumeration value="EXCEPTION"/>
-                            <xsd:enumeration value="TRANSACTION"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="notificationListenerType">
-        <xsd:attribute name="ref" type="xsd:NMTOKEN" use="required"/>
-        <xsd:attribute name="subscription" type="xsd:string"/>
-    </xsd:complexType>
-
-    <xsd:element name="abstract-transaction" abstract="true" type="abstractTransactionType"/>
-    <xsd:complexType name="abstractTransactionType">
-        <xsd:attribute name="action">
+        <xsd:attribute name="event-class" type="substitutableClass">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The class associated with a notification event that will be delivered to the interface.
+                    This can be used instead of the event attribute to specify a custom class.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="event">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The notification event to deliver.
+                </xsd:documentation>
+            </xsd:annotation>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="NONE"/>
-                    <xsd:enumeration value="ALWAYS_BEGIN"/>
-                    <xsd:enumeration value="BEGIN_OR_JOIN"/>
-                    <xsd:enumeration value="ALWAYS_JOIN"/>
-                    <xsd:enumeration value="JOIN_IF_POSSIBLE"/>
+                    <xsd:enumeration value="MANAGER"/>
+                    <xsd:enumeration value="MODEL"/>
+                    <xsd:enumeration value="SERVICE"/>
+                    <xsd:enumeration value="SECURITY"/>
+                    <xsd:enumeration value="MANAGEMENT"/>
+                    <xsd:enumeration value="CONNECTION"/>
+                    <xsd:enumeration value="REGISTRY"/>
+                    <xsd:enumeration value="CUSTOM"/>
+                    <xsd:enumeration value="MESSAGE"/>
+                    <xsd:enumeration value="EXCEPTION"/>
+                    <xsd:enumeration value="TRANSACTION"/>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
-        <xsd:attribute name="timeout" type="xsd:NMTOKEN"/>
+        <xsd:attribute name="interface-class" type="substitutableClass">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The interface (class name) that will receive the notification event.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="interface">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The interface that will receive the notification event.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="MANAGER"/>
+                    <xsd:enumeration value="MODEL"/>
+                    <xsd:enumeration value="SERVICE"/>
+                    <xsd:enumeration value="SECURITY"/>
+                    <xsd:enumeration value="MANAGEMENT"/>
+                    <xsd:enumeration value="CONNECTION"/>
+                    <xsd:enumeration value="REGISTRY"/>
+                    <xsd:enumeration value="CUSTOM"/>
+                    <xsd:enumeration value="MESSAGE"/>
+                    <xsd:enumeration value="EXCEPTION"/>
+                    <xsd:enumeration value="TRANSACTION"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:element name="abstract-connection-strategy" abstract="true" type="abstractConnectionStrategyType"/>
-    <xsd:complexType name="abstractConnectionStrategyType"/>
+    <xsd:complexType name="disableNotificationType">
+        <xsd:attribute name="event-class" type="substitutableClass">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The class associated with an event that will no longer be delivered to any interface.
+                    This can be used instead of the event attribute to specify a custom class.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="event">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The event to not deliver.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="MANAGER"/>
+                    <xsd:enumeration value="MODEL"/>
+                    <xsd:enumeration value="SERVICE"/>
+                    <xsd:enumeration value="SECURITY"/>
+                    <xsd:enumeration value="MANAGEMENT"/>
+                    <xsd:enumeration value="CONNECTION"/>
+                    <xsd:enumeration value="REGISTRY"/>
+                    <xsd:enumeration value="CUSTOM"/>
+                    <xsd:enumeration value="EXCEPTION"/>
+                    <xsd:enumeration value="TRANSACTION"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="interface-class" type="substitutableClass">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The interface (class name) that will no longer receive an event.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="interface">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The interface that will no longer receive an event.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="MANAGER"/>
+                    <xsd:enumeration value="MODEL"/>
+                    <xsd:enumeration value="SERVICE"/>
+                    <xsd:enumeration value="SECURITY"/>
+                    <xsd:enumeration value="MANAGEMENT"/>
+                    <xsd:enumeration value="CONNECTION"/>
+                    <xsd:enumeration value="REGISTRY"/>
+                    <xsd:enumeration value="CUSTOM"/>
+                    <xsd:enumeration value="EXCEPTION"/>
+                    <xsd:enumeration value="TRANSACTION"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
 
-    <xsd:element name="abstract-property-extractor" abstract="true" type="abstractPropertyExtractorType"/>
-    <xsd:complexType name="abstractPropertyExtractorType"/>
 
-    <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType"/>
-    <xsd:complexType name="abstractSecurityFilterType"/>
+    <!--==============================================================-->
+    <!-- Models                                                       -->
+    <!--==============================================================-->
+
+    <xsd:element name="abstract-model" abstract="true" type="abstractModelType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract base for model elements.
+                Other modules may extend this if they need to add
+                model elements to the configuration.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractModelType">
+        <xsd:sequence>
+            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+            <xsd:group ref="entryPointResolvers"/>
+            <xsd:element ref="abstract-service" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="nonBlankString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The name used to identify this model.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:element name="seda-model" type="sedaModelType" substitutionGroup="abstract-model">
+        <xsd:annotation>
+            <xsd:documentation>
+                A SEDA (Staged Event Drivern Architecture) model has separate threads and
+                queues for each component.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="sedaModelType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractModelType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="inherit" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If true then this model element is an extension of a previous model
+                            element with the same name.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="model" type="defaultModelType" substitutionGroup="abstract-model">
+        <xsd:annotation>
+            <xsd:documentation>
+                The default model is a SEDA model.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="defaultModelType">
+        <xsd:complexContent>
+            <xsd:extension base="sedaModelType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- Model elements -->
+
+    <xsd:element name="abstract-queue-profile" abstract="true" type="abstractQueueProfileType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract base for queue profile elements.
+                Other modules may extend this if they need to add
+                queue profile elements to the configuration.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractQueueProfileType"/>
+
+    <!-- to give a cleaner config we allow either a set or an individual entry (but not both).-->
+    <xsd:group name="entryPointResolvers">
+        <xsd:choice>
+            <xsd:element ref="abstract-entry-point-resolver-set" minOccurs="0"/>
+            <!-- we could allow many of these, but it looks ugly -->
+            <xsd:element ref="abstract-entry-point-resolver" minOccurs="0"/>
+        </xsd:choice>
+    </xsd:group>
+
+    <xsd:element name="abstract-entry-point-resolver-set" abstract="true" type="abstractEntryPointResolverSetType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract base for entry point resolver set elements.
+                This allows various entry point resolver set implementations to be used.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractEntryPointResolverSetType"/>
+
+    <xsd:element name="legacy-entry-point-resolver-set" type="extensibleEntryPointResolverSet" substitutionGroup="abstract-entry-point-resolver-set">
+        <xsd:annotation>
+            <xsd:documentation>
+                An extensible set of entry point resolvers (which determine how a message is passed to a component in Java)
+                that already contains resolvers to implement the standard logic.
+                This is already provided by default and is only needed explicitly if
+                it will be extended with other entry point resolvers.
+                This element can be set on the model or component;
+                the model value provides a default which individual component values can override.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="entry-point-resolver-set" type="extensibleEntryPointResolverSet" substitutionGroup="abstract-entry-point-resolver-set">
+        <xsd:annotation>
+            <xsd:documentation>
+                An extensible set of entry point resolvers.
+                These determine how a message is passed to a component in Java.
+                Each entry point resolver is tried in turn until one succeeds in delivering the messge to the component.
+                This element can be set on the model or component;
+                the model value provides a default which individual component values can override.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="extensibleEntryPointResolverSet">
+        <xsd:complexContent>
+            <xsd:extension base="abstractEntryPointResolverSetType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-entry-point-resolver" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-entry-point-resolver-set" type="customEntryPointResolverSetType"
+                 substitutionGroup="abstract-entry-point-resolver-set">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom entry point resolver set.
+                This allows user-supplied code to determine how a message is passed to a component in Java.
+                This element can be set on the model or component;
+                the model value provides a default which individual component values can override.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customEntryPointResolverSetType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractEntryPointResolverSetType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An implementation of the EntryPointResolverSet interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-entry-point-resolver" abstract="true" type="abstractEntryPointResolverType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract base for an entry point resolver element.
+                This allows various entry point resolver implementations to be used.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="callable-entry-point-resolver" type="abstractEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver">
+        <xsd:annotation>
+            <xsd:documentation>
+                An entry point resolver for components that implement the Callable interface.
+                This passes a MuleEventContext to the component.
+                This element can be set on the model or component;
+                the model value provides a default which individual component values can override.
+                This element can also be used directly or as part of a set of resolvers;
+                the resolvers in a set are used in turn until one is successful.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractEntryPointResolverType"/>
+
+    <xsd:element name="custom-entry-point-resolver" type="customEntryPointResolverType"
+                 substitutionGroup="abstract-entry-point-resolver">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom entry point resolver.
+                This allows user-supplied code to determine how a message is passed to a component in Java.
+                This element can be set on the model or component;
+                the model value provides a default which individual component values can override.
+                This element can also be used directly or as part of a set of resolvers;
+                the resolvers in a set are used in turn until one is successful.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customEntryPointResolverType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractEntryPointResolverType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An implementation of the EntryPointResolver interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="baseEntryPointResolverType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractEntryPointResolverType">
+                <xsd:attribute name="transformFirst" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Should the message be transformer before being delivered to the component?
+                            By default, messages are transformed.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="acceptVoidMethods" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Should the resolver call void methods?
+                            By default, void methods are not considered as possible candidates for message delivery.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="property-entry-point-resolver" type="propertyEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver">
+        <xsd:annotation>
+            <xsd:documentation>
+                Use a message property to select the component method to be called.
+                This element can be set on the model or component;
+                the model value provides a default which individual component values can override.
+                This element can also be used directly or as part of a set of resolvers;
+                the resolvers in a set are used in turn until one is successful.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="propertyEntryPointResolverType">
+        <xsd:complexContent>
+            <xsd:extension base="baseEntryPointResolverType">
+                <xsd:attribute name="property" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the message property used to select a method on the component.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="method-entry-point-resolver" type="methodEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deliver the message to a named method.
+                This element can be set on the model or component;
+                the model value provides a default which individual component values can override.
+                This element can also be used directly or as part of a set of resolvers;
+                the resolvers in a set are used in turn until one is successful.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="methodEntryPointResolverType">
+        <xsd:complexContent>
+            <xsd:extension base="baseEntryPointResolverType">
+                <xsd:sequence>
+                    <xsd:element ref="include-entry-point" minOccurs="1" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="reflection-entry-point-resolver" type="reflectionEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver">
+        <xsd:annotation>
+            <xsd:documentation>
+                Generate a list of candidate methods from the component via reflections.
+                This element can be set on the model or component;
+                the model value provides a default which individual component values can override.
+                This element can also be used directly or as part of a set of resolvers;
+                the resolvers in a set are used in turn until one is successful.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="reflectionEntryPointResolverType">
+        <xsd:complexContent>
+            <xsd:extension base="baseEntryPointResolverType">
+                <xsd:sequence>
+                    <xsd:element name="exclude-object-methods" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                If specified, methods in the Java Object interface are not included in
+                                the list of possible methods that can receive the message.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="exclude-entry-point" type="methodType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                             <xsd:documentation>
+                                 Explicitly exclude a named method from receiving the message.
+                             </xsd:documentation>
+                         </xsd:annotation>
+                     </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="array-entry-point-resolver" type="complexEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver">
+        <xsd:annotation>
+             <xsd:documentation>
+                 Deliver the message to a method which takes a single array as argument.
+                 This element can be set on the model or component;
+                 the model value provides a default which individual component values can override.
+                 This element can also be used directly or as part of a set of resolvers;
+                 the resolvers in a set are used in turn until one is successful.
+             </xsd:documentation>
+         </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="no-arguments-entry-point-resolver" type="complexEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver">
+        <xsd:annotation>
+             <xsd:documentation>
+                 Call a method without arguments (the message is not passed to the component).
+             </xsd:documentation>
+         </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="complexEntryPointResolverType">
+        <xsd:complexContent>
+            <xsd:extension base="reflectionEntryPointResolverType">
+                <xsd:sequence>
+                    <xsd:element ref="include-entry-point" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="enableDiscovery" type="substitutableBoolean"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="include-entry-point" type="methodType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A possible method for delivery.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="methodType">
+        <xsd:attribute name="method" type="nonBlankString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The name of the method.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
 
 
     <!--==============================================================-->
     <!--  Services                                                    -->
     <!--==============================================================-->
 
-    <xsd:element name="abstract-service" abstract="true" type="abstractServiceType"/>
+    <xsd:element name="abstract-service" abstract="true" type="abstractServiceType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract base for a service element.
+                This allows various service implementations to be used.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="abstractServiceType">
-        <xsd:attribute name="name" type="nonBlankString" use="required"/>
+        <xsd:attribute name="name" type="nonBlankString">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The name used to identify this service.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="baseServiceType">
         <xsd:annotation>
-            <xsd:documentation>Base support for a model-based wrapper around the POJO service (SEDA, Streaming, etc.)
+            <xsd:documentation>
+                Base support for a model-based wrapper around the POJO service (SEDA, Streaming, etc.)
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="abstractServiceType">
                 <xsd:sequence>
-                    <xsd:element name="inbound" type="inboundCollectionType" minOccurs="0"/>
+                    <xsd:element name="inbound" type="inboundCollectionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The elements within "inbound" describe how messages enter the service.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <!-- minOccurs="0" to allow for <forwarding-router/> and/or default component -->
                     <xsd:element ref="abstract-component" minOccurs="0"/>
-                    <xsd:element name="outbound" type="outboundCollectionType" minOccurs="0"/>
-                    <xsd:element name="async-reply" type="asyncReplyCollectionType" minOccurs="0"/>
+                    <xsd:element name="outbound" type="outboundCollectionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The elements within "outbound" describe how messages leave the service.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="async-reply" type="asyncReplyCollectionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The elements within "async-reply" describe how asynchronous replies are handled.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass"/>
                 <xsd:attribute name="initialState" default="started">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The initial state of the service.
+                            Usually a service is started automatically, but this attribute can block any
+                            initial startup ("stopped") or stop the service immediately after initial
+                            startup ("paused").
+                        </xsd:documentation>
+                    </xsd:annotation>
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:NMTOKEN">
                             <xsd:enumeration value="started"/>
@@ -704,7 +1092,14 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-exception-strategy" abstract="true" type="abstractExceptionStrategyType"/>
+    <xsd:element name="abstract-exception-strategy" abstract="true" type="abstractExceptionStrategyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract base for an exception strategy element.
+                This allows various exception strategy implementations to be used.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="abstractExceptionStrategyType"/>
 
     <xsd:complexType name="asyncReplyCollectionType">
@@ -713,20 +1108,34 @@
             <xsd:element ref="abstract-async-reply-router" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS"/>
-        <xsd:attribute name="timeout" type="xsd:string"/>
+        <xsd:attribute name="timeout" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The timeout (ms) to wait for a reply.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:element name="abstract-async-reply-router" abstract="true" type="abstractAsyncReplyRouterType"/>
+    <xsd:element name="abstract-async-reply-router" abstract="true" type="abstractAsyncReplyRouterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract base for an async reply router element.
+                This allows various async reply router implementations to be used.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="abstractAsyncReplyRouterType"/>
 
-    <xsd:complexType name="defaultServiceType">
-        <xsd:complexContent>
-            <xsd:extension base="sedaServiceType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="service" type="sedaServiceType" substitutionGroup="abstract-service"/>
+    <xsd:element name="service" type="sedaServiceType" substitutionGroup="abstract-service">
+        <xsd:annotation>
+            <xsd:documentation>
+                The standard SEDA service.
+                A service describes how to receive messages, deliver them to 
+                a component, and handle the results (if any).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="sedaServiceType">
         <xsd:complexContent>
             <xsd:extension base="baseServiceType">
@@ -734,56 +1143,123 @@
                     <xsd:element ref="abstract-component-threading-profile" minOccurs="0"/>
                     <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attribute name="queueTimeout" type="xsd:integer"/>
+                <xsd:attribute name="queueTimeout" type="xsd:integer">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The timeout used when taking messages from the SEDA queue.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-component-threading-profile" abstract="true" type="abstractComponentThreadingProfileType"/>
+    <xsd:element name="custom-service" type="customServiceType" substitutionGroup="abstract-service">
+        <xsd:annotation>
+            <xsd:documentation>
+                A user-implemeted service
+                (typically used only in testing).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customServiceType">
+        <xsd:complexContent>
+            <xsd:extension base="baseServiceType">
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The class to use for the service.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-component-threading-profile" abstract="true" type="abstractComponentThreadingProfileType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract base for component threading profile element.
+                This allows various component threading profile implementations to be used.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="abstractComponentThreadingProfileType"/>
 
     <!--==============================================================-->
     <!-- Components                                              -->
     <!--==============================================================-->
 
-    <xsd:element name="abstract-component" abstract="true" type="abstractComponentType"/>
-    <xsd:complexType name="abstractComponentType">
+    <xsd:element name="abstract-component" abstract="true" type="abstractComponentType">
         <xsd:annotation>
             <xsd:documentation>
-                A component that will be invoked by mule.
+                Abstract base for component element.
+                This allows various component implementations to be used.
             </xsd:documentation>
         </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractComponentType">
         <xsd:sequence>
             <xsd:group ref="entryPointResolvers"/>
-            <!--<xsd:element ref="abstract-binding" minOccurs="0" maxOccurs="unbounded"/>-->
         </xsd:sequence>
     </xsd:complexType>
     
-    <xsd:element name="component" type="pojoComponentType" substitutionGroup="abstract-component"/>
-    <xsd:complexType name="pojoComponentType">
+    <xsd:element name="component" type="pojoComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
-            <xsd:documentation>Pojo component that will be invoked by mule.</xsd:documentation>
+            <xsd:documentation>
+                A simple POJO (Plain Old Java Object) component
+                that will be invoked by Mule when a message is received.
+                The instance can be specified via a factory, or via a class.
+            </xsd:documentation>
         </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="pojoComponentType">
         <xsd:complexContent>
             <xsd:extension base="abstractComponentType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-object-factory" minOccurs="0"/>
-                    <xsd:element name="binding" type="pojoBindingType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="binding" type="pojoBindingType" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A binding associates a Mule endpoint with an injected Java interface
+                                (this is like using Spring to inject a bean, but instead of calling a
+                                method on the bean a message is sent to an endpoint).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass"/>
+                <xsd:attribute name="class" type="substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Specify a component class.
+                            This is a shortcut that is equivalent to providing a singleton-object element.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
     
     <xsd:complexType name="pojoBindingType">
-        <xsd:annotation>
-            <xsd:documentation>Binding between the pojo component and endpoints.</xsd:documentation>
-        </xsd:annotation>
         <xsd:sequence>
             <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        <xsd:attribute name="interface" use="required"/>
-        <xsd:attribute name="method" use="optional"/>
+        <xsd:attribute name="interface" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The interface to be injected.
+                    A proxy will be created that implements this interface by calling out to the endpoint.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="method" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The method on the interface that should be used.
+                    This can be omitted if the interface has a single method.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="defaultComponentType">
@@ -795,7 +1271,9 @@
     <xsd:element name="bridge-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                Built-in BridgeComponent that enables a bridge between an inbound and outbound endpoints.
+                This transfers a message from inbound to outbound endpoints.
+                This name is provided for backwards compatability - it is equivalent to a
+                pass-through-component, which is the default and does not need to be explicitly specified.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -803,9 +1281,9 @@
     <xsd:element name="pass-through-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                Built-in PassThroughComponent that enables a bridge between an inbound and outbound endpoints.
-                This is less efficient than the BridgeComponent, but respects inbound routers that "consume"
-                messages.
+                The default, "do nothing" component.
+                The message is simply transferred from inbound to outbound endpoints.
+                This is the default and need not be specified.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -813,7 +1291,7 @@
     <xsd:element name="echo-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                Built-in EchoComponent that logs the message and returns the payload back as the result.
+                This logs the message and returns the payload back as the result.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -821,8 +1299,7 @@
     <xsd:element name="log-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                Built-in LogComponent that simply logs the message content (or content length if it is a
-                large message).
+                 This logs the message content (or content length if it is a large message).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -830,7 +1307,7 @@
     <xsd:element name="null-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                Built-in NullComponent that will throw an exception if it receives a message.
+                This will throw an exception if it receives a message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -843,7 +1320,14 @@
     <xsd:complexType name="transactionManagerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransactionManagerType">
-                <xsd:attribute name="name" type="substitutableName" default="transactionManagerFactory" use="optional"/>
+                <xsd:attribute name="name" type="substitutableName" default="transactionManager" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An optional name for the transaction manager.
+                            The default value is "transactionManager".
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -854,7 +1338,9 @@
                 <xsd:sequence>
                     <xsd:element name="environment" type="mapType" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
-                            <xsd:documentation>Properties to be set on the created object</xsd:documentation>
+                            <xsd:documentation>
+                                Properties to be set on the created object.
+                            </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
@@ -868,26 +1354,68 @@
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The class to instantiate to create a transaction manager.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
 
     <xsd:element name="custom-transaction-manager" type="customTransactionManagerType"
-                 substitutionGroup="abstract-transaction-manager"/>
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                A user-implemented transaction manager.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:element name="jndi-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager"/>
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:element name="weblogic-transaction-manager" type="jndiTransactionManagerType"
-                 substitutionGroup="abstract-transaction-manager"/>
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:element name="websphere-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager"/>
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:element name="jrun-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager"/>
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:element name="jboss-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager"/>
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:element name="resin-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager"/>
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
 
     <!--==============================================================-->
@@ -937,6 +1465,28 @@
             </xsd:sequence>
         </xsd:sequence>
     </xsd:group>
+
+    <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType"/>
+    <xsd:complexType name="abstractSecurityFilterType"/>
+
+    <xsd:element name="abstract-connection-strategy" abstract="true" type="abstractConnectionStrategyType"/>
+    <xsd:complexType name="abstractConnectionStrategyType"/>
+
+    <xsd:element name="abstract-transaction" abstract="true" type="abstractTransactionType"/>
+    <xsd:complexType name="abstractTransactionType">
+        <xsd:attribute name="action">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="NONE"/>
+                    <xsd:enumeration value="ALWAYS_BEGIN"/>
+                    <xsd:enumeration value="BEGIN_OR_JOIN"/>
+                    <xsd:enumeration value="ALWAYS_JOIN"/>
+                    <xsd:enumeration value="JOIN_IF_POSSIBLE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="timeout" type="xsd:NMTOKEN"/>
+    </xsd:complexType>
 
     <xsd:attributeGroup name="defaultEndpointAttributes">
         <xsd:attributeGroup ref="restrictedEndpointAttributes"/>
@@ -1461,159 +2011,6 @@
 
 
     <!--==============================================================-->
-    <!-- Models                                                       -->
-    <!--==============================================================-->
-
-    <xsd:element name="model" type="defaultModelType" substitutionGroup="abstract-model"/>
-
-    <xsd:element name="abstract-model" abstract="true" type="abstractModelType"/>
-    <xsd:complexType name="abstractModelType">
-        <xsd:sequence>
-            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-            <xsd:group ref="entryPointResolvers"/>
-            <xsd:element ref="abstract-service" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-        <xsd:attribute name="name" type="nonBlankString" use="required"/>
-        <xsd:attribute name="class" type="substitutableClass"/>
-    </xsd:complexType>
-
-    <xsd:complexType name="defaultModelType">
-        <xsd:complexContent>
-            <xsd:extension base="sedaModelType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="seda-model" type="sedaModelType" substitutionGroup="abstract-model"/>
-    <xsd:complexType name="sedaModelType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractModelType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-queue-profile" minOccurs="0"/>
-                </xsd:sequence>
-                <xsd:attribute name="inherit" type="xsd:boolean"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!-- Model elements -->
-
-    <xsd:element name="abstract-queue-profile" abstract="true" type="abstractQueueProfileType"/>
-    <xsd:complexType name="abstractQueueProfileType"/>
-
-    <!-- to give a cleaner config we allow either a set or an individual entry (but not both).-->
-    <xsd:group name="entryPointResolvers">
-        <xsd:choice>
-            <xsd:element ref="abstract-entry-point-resolver-set" minOccurs="0"/>
-            <!-- we could allow many of these, but it looks ugly -->
-            <xsd:element ref="abstract-entry-point-resolver" minOccurs="0"/>
-        </xsd:choice>
-    </xsd:group>
-
-    <xsd:element name="abstract-entry-point-resolver-set" abstract="true" type="abstractEntryPointResolverSetType"/>
-    <xsd:complexType name="abstractEntryPointResolverSetType"/>
-
-    <xsd:element name="legacy-entry-point-resolver-set" type="extensibleEntryPointResolverSet" substitutionGroup="abstract-entry-point-resolver-set"/>
-    <xsd:element name="entry-point-resolver-set" type="extensibleEntryPointResolverSet" substitutionGroup="abstract-entry-point-resolver-set"/>
-    <xsd:complexType name="extensibleEntryPointResolverSet">
-        <xsd:complexContent>
-            <xsd:extension base="abstractEntryPointResolverSetType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-entry-point-resolver" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="custom-entry-point-resolver-set" type="customEntryPointResolverSetType"
-                 substitutionGroup="abstract-entry-point-resolver-set"/>
-    <xsd:complexType name="customEntryPointResolverSetType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractEntryPointResolverSetType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="abstract-entry-point-resolver" abstract="true" type="abstractEntryPointResolverType"/>
-    <xsd:element name="callable-entry-point-resolver" type="abstractEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
-    <xsd:complexType name="abstractEntryPointResolverType"/>
-
-    <xsd:element name="custom-entry-point-resolver" type="customEntryPointResolverType"
-                 substitutionGroup="abstract-entry-point-resolver"/>
-    <xsd:complexType name="customEntryPointResolverType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractEntryPointResolverType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="baseEntryPointResolverType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractEntryPointResolverType">
-                <xsd:attribute name="transformFirst" type="substitutableBoolean"/>
-                <xsd:attribute name="acceptVoidMethods" type="substitutableBoolean"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="property-entry-point-resolver" type="propertyEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
-    <xsd:complexType name="propertyEntryPointResolverType">
-        <xsd:complexContent>
-            <xsd:extension base="baseEntryPointResolverType">
-                <xsd:attribute name="property" type="substitutableName"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="method-entry-point-resolver" type="methodEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
-    <xsd:complexType name="methodEntryPointResolverType">
-        <xsd:complexContent>
-            <xsd:extension base="baseEntryPointResolverType">
-                <xsd:sequence>
-                    <xsd:element ref="include-entry-point" minOccurs="1" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="reflection-entry-point-resolver" type="reflectionEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
-    <xsd:complexType name="reflectionEntryPointResolverType">
-        <xsd:complexContent>
-            <xsd:extension base="baseEntryPointResolverType">
-                <xsd:sequence>
-                    <xsd:element name="exclude-object-methods" minOccurs="0"/>
-                    <xsd:element name="exclude-entry-point" type="methodType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="array-entry-point-resolver" type="complexEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
-    <xsd:element name="no-arguments-entry-point-resolver" type="complexEntryPointResolverType" substitutionGroup="abstract-entry-point-resolver"/>
-    <xsd:complexType name="complexEntryPointResolverType">
-        <xsd:complexContent>
-            <xsd:extension base="reflectionEntryPointResolverType">
-                <xsd:sequence>
-                    <xsd:element ref="include-entry-point" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="enableDiscovery" type="substitutableBoolean"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="include-entry-point" type="methodType"/>
-    <xsd:complexType name="methodType">
-        <xsd:attribute name="method" type="nonBlankString"/>
-    </xsd:complexType>
-
-    <!--==============================================================-->
     <!--  Routers                                                     -->
     <!--==============================================================-->
 
@@ -1647,6 +2044,9 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="abstract-property-extractor" abstract="true" type="abstractPropertyExtractorType"/>
+    <xsd:complexType name="abstractPropertyExtractorType"/>
 
     <xsd:element name="idempotent-receiver-router" type="filteredInboundRouterType"
                  substitutionGroup="abstract-inbound-router"/>
@@ -2099,6 +2499,17 @@
     <!--==============================================================-->
     <!--  Utils / Standard Types                                      -->
     <!--==============================================================-->
+
+    <xsd:complexType name="abstractAgentType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract base for agents.  Not used in core, but common to several modules.
+            </xsd:documentation>
+        </xsd:annotation>
+         <xsd:complexContent>
+            <xsd:extension base="abstractExtensionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <!-- corresponds to TlsIndirectKeyStore, named as tls-client in transport namespace -->
     <xsd:complexType name="tlsClientKeyStoreType">

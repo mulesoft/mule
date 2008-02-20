@@ -20,7 +20,7 @@
 
     <model name="main">
 
-        <service name="service" class="org.mule.tck.testmodels.mule.TestSedaService">
+        <custom-service name="service" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <ssl:inbound-endpoint ref="in"/>
             </inbound>
@@ -31,7 +31,7 @@
                     </properties>
                 </pooled-object>
             </component>
-        </service>
+        </custom-service>
 
     </model>
 

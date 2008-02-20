@@ -103,22 +103,8 @@ public class TransformerUtils
 
     public static boolean isUndefined(List transformers)
     {
-        discourageNullTransformers(transformers);
         // pointer equality
         return null == transformers || UNDEFINED == transformers;
-    }
-
-    public static void discourageNullTransformers(List transformers)
-    {
-        // please don't use null for undefined transformers
-        if (null == transformers)
-        {
-            if (logger.isWarnEnabled())
-            {
-                logger.warn("Null transformer detected - please use UNDEFINED or empty list, as appropriate");
-            }
-//            throw new NullPointerException("Null transformer detected - please use UNDEFINED or empty list, as appropriate");
-        }
     }
 
     public static boolean isDefined(List transformers)

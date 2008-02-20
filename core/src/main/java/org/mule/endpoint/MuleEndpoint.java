@@ -101,7 +101,6 @@ public abstract class MuleEndpoint extends ImmutableMuleEndpoint implements Immu
 
     protected void setTransformers(AtomicReference reference, List transformers)
     {
-        TransformerUtils.discourageNullTransformers(transformers);
         reference.set(transformers);
         updateTransformerEndpoints(reference);
     }

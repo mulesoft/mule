@@ -42,7 +42,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testSimpleJmxAgentConfig() throws Exception
     {
-        Agent agent = muleContext.getRegistry().lookupAgent("simpleJmxServer");
+        Agent agent = muleContext.getRegistry().lookupAgent("jmx-server");
         assertNotNull(agent);
         assertEquals(JmxAgent.class, agent.getClass());
         JmxAgent jmxAgent = (JmxAgent) agent;
@@ -54,32 +54,37 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(agent);
         assertEquals(Log4jAgent.class, agent.getClass());
 
-        agent = muleContext.getRegistry().lookupAgent("jmx-mx4j");
+        agent = muleContext.getRegistry().lookupAgent("jmx-mx4j-adaptor");
         assertNotNull(agent);
         assertEquals(Mx4jAgent.class, agent.getClass());
         Mx4jAgent mx4jAgent = (Mx4jAgent) agent;
         assertEquals(mx4jAgent.getJmxAdaptorUrl(), "http://127.0.0.1:8000");
 
-        agent = muleContext.getRegistry().lookupAgent("jmxNotificationAgent");
+        agent = muleContext.getRegistry().lookupAgent("jmx-notifications");
         assertNotNull(agent);
         assertEquals(JmxServerNotificationAgent.class, agent.getClass());
 
-        agent = muleContext.getRegistry().lookupAgent("log4JNotificationAgent");
+        agent = muleContext.getRegistry().lookupAgent("log4j-notifications");
         assertNotNull(agent);
         assertEquals(Log4jNotificationLoggerAgent.class, agent.getClass());
 
-        agent = muleContext.getRegistry().lookupAgent("chainsawNotificationAgent");
+        agent = muleContext.getRegistry().lookupAgent("chainsaw-notifications");
         assertNotNull(agent);
         assertEquals(Log4jNotificationLoggerAgent.class, agent.getClass());
         Log4jNotificationLoggerAgent lnlAgent = (Log4jNotificationLoggerAgent) agent;
         assertEquals(lnlAgent.getChainsawPort(), CHAINSAW_PORT);
         assertEquals(lnlAgent.getChainsawHost(), "127.0.0.1");
 
-        agent = muleContext.getRegistry().lookupAgent("publishNotificationAgent");
+        agent = muleContext.getRegistry().lookupAgent("publish-notifications");
         assertNotNull(agent);
         assertEquals(EndpointNotificationLoggerAgent.class, agent.getClass());
         EndpointNotificationLoggerAgent enlAgent = (EndpointNotificationLoggerAgent) agent;
         assertEquals(enlAgent.getEndpointAddress(), "test://test");
+
+        agent = muleContext.getRegistry().lookupAgent("test-custom-agent");
+        assertNotNull(agent);
+        assertEquals(TestAgent.class, agent.getClass());
+        assertEquals("woggle", ((TestAgent) agent).getFrobbit());
     }
 
     public void testAgentsOrder() throws Exception
@@ -96,9 +101,9 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(iter.next() instanceof TestAgent);
         assertTrue(iter.next() instanceof JmxServerNotificationAgent);
         Log4jNotificationLoggerAgent log4jAgent = (Log4jNotificationLoggerAgent) iter.next();
-        assertEquals(log4jAgent.getName(), "log4JNotificationAgent");
+        assertEquals(log4jAgent.getName(), "log4j-notifications");
         log4jAgent = (Log4jNotificationLoggerAgent) iter.next();
-        assertEquals(log4jAgent.getName(), "chainsawNotificationAgent");
+        assertEquals(log4jAgent.getName(), "chainsaw-notifications");
         assertTrue(iter.next() instanceof EndpointNotificationLoggerAgent);
     }
 

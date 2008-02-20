@@ -23,7 +23,7 @@
 
     <model name="main">
 
-        <service name="testComponent1" class="org.mule.tck.testmodels.mule.TestSedaService">
+        <custom-service name="testComponent1" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <tls:inbound-endpoint ref="sendEndpoint"/>
             </inbound>
@@ -36,9 +36,9 @@
                     </properties>
                 </pooled-object>
             </component>
-        </service>
+        </custom-service>
 
-        <service name="testComponent2" class="org.mule.tck.testmodels.mule.TestSedaService">
+        <custom-service name="testComponent2" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <tls:inbound-endpoint ref="sendManyEndpoint"/>
             </inbound>
@@ -51,9 +51,9 @@
                     </properties>
                 </pooled-object>
             </component>
-        </service>
+        </custom-service>
 
-        <service name="testComponent3" class="org.mule.tck.testmodels.mule.TestSedaService">
+        <custom-service name="testComponent3" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <inbound-endpoint ref="asyncEndpoint"/>
             </inbound>
@@ -66,7 +66,7 @@
                     </properties>
                 </pooled-object>
             </component>
-        </service>
+        </custom-service>
 
     </model>
 

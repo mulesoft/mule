@@ -51,8 +51,10 @@ import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransformerRefDefinitionParser;
+import org.mule.config.spring.parsers.specific.ModelDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.GenericEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
+import org.mule.config.spring.parsers.processors.ProvideDefaultName;
 import org.mule.container.JndiContainerContext;
 import org.mule.container.PropertiesContainerContext;
 import org.mule.container.RmiContainerContext;
@@ -234,7 +236,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("properties-container", new MuleOrphanDefinitionParser(PropertiesContainerContext.class, true));
 
         // Models
-        registerBeanDefinitionParser("model", new InheritDefinitionParser(new OrphanDefinitionParser(SedaModel.class, true), new NamedDefinitionParser()));
+        registerBeanDefinitionParser("model", new ModelDefinitionParser());
         registerBeanDefinitionParser("seda-model", new InheritDefinitionParser(new OrphanDefinitionParser(SedaModel.class, true), new NamedDefinitionParser()));
 //        registerBeanDefinitionParser("model-seda-optimised", new OrphanDefinitionParser(OptimisedSedaModel.class, true));
 //        registerBeanDefinitionParser("model-pipeline", new OrphanDefinitionParser(PipelineModel.class, true));
@@ -257,6 +259,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         // Services
         registerBeanDefinitionParser("seda-service", new ServiceDefinitionParser(SedaService.class));
         registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaService.class));
+        registerBeanDefinitionParser("custom-service", new ServiceDefinitionParser());
 
         // Pojo Components
         registerBeanDefinitionParser("component", new ComponentDefinitionParser());

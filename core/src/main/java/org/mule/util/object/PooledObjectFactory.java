@@ -14,51 +14,61 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.PoolingProfile;
-import org.mule.util.UUID;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.pool.KeyedPoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.pool.impl.GenericObjectPool;
 
 /**
- * Creates a new instance of the object on each call.  If the object implements the Identifiable 
- * interface, individual instances can be looked up by ID.
+ * Creates a new instance of the object on each call. If the object implements the
+ * Identifiable interface, individual instances can be looked up by ID.
  */
-public class PooledObjectFactory extends AbstractObjectFactory implements KeyedPoolableObjectFactory
+public class PooledObjectFactory extends AbstractObjectFactory implements PoolableObjectFactory
 {
-    /** 
-     * Active instances of the object which have been created.  
+    /**
+     * Active instances of the object which have been created.
      */
-    protected GenericKeyedObjectPool pool = null;
-    
-    protected PoolingProfile poolingProfile = null;
-    
-    /** For Spring only */
-    public PooledObjectFactory() { super(); }
-    
-    public PooledObjectFactory(Class objectClass) { super(objectClass); }
+    protected GenericObjectPool pool = null;
 
-    public PooledObjectFactory(Class objectClass, Map properties) { super(objectClass, properties); }
-    
-    public PooledObjectFactory(Class objectClass, PoolingProfile poolingProfile) 
-    { 
+    protected PoolingProfile poolingProfile = null;
+
+    /** For Spring only */
+    public PooledObjectFactory()
+    {
+        super();
+    }
+
+    public PooledObjectFactory(Class objectClass)
+    {
+        super(objectClass);
+    }
+
+    public PooledObjectFactory(Class objectClass, Map properties)
+    {
+        super(objectClass, properties);
+    }
+
+    public PooledObjectFactory(Class objectClass, PoolingProfile poolingProfile)
+    {
         super(objectClass);
         this.poolingProfile = poolingProfile;
     }
 
-    public PooledObjectFactory(Class objectClass, Map properties, PoolingProfile poolingProfile) 
-    { 
-        super(objectClass, properties); 
+    public PooledObjectFactory(Class objectClass, Map properties, PoolingProfile poolingProfile)
+    {
+        super(objectClass, properties);
         this.poolingProfile = poolingProfile;
     }
-    
+
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
         super.initialise();
-        GenericKeyedObjectPool.Config config = new GenericKeyedObjectPool.Config();
+
+        GenericObjectPool.Config config = new GenericObjectPool.Config();
+
         if (poolingProfile != null)
         {
             config.maxIdle = poolingProfile.getMaxIdle();
@@ -66,7 +76,8 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
             config.maxWait = poolingProfile.getMaxWait();
             config.whenExhaustedAction = (byte) poolingProfile.getExhaustedAction();
         }
-        pool = new GenericKeyedObjectPool(this, config);
+
+        pool = new GenericObjectPool(this, config);
 
         try
         {
@@ -76,6 +87,7 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
         {
             throw new InitialisationException(e, this);
         }
+
         return LifecycleTransitionResult.OK;
     }
 
@@ -85,6 +97,7 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
         {
             int numToBorrow = 0;
             int initPolicy = poolingProfile.getInitialisationPolicy();
+
             if (initPolicy == PoolingProfile.INITIALISE_ALL)
             {
                 numToBorrow = poolingProfile.getMaxActive();
@@ -93,8 +106,8 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
             {
                 numToBorrow = 1;
             }
-                
-            List holderList = new ArrayList(numToBorrow);    
+
+            List holderList = new ArrayList(numToBorrow);
             try
             {
                 for (int t = 0; t < numToBorrow; t++)
@@ -120,9 +133,8 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
     {
         if (pool != null)
         {
-            try 
+            try
             {
-                // TODO Ideally we should call Disposable.dispose() on each object in the pool before destroying it.
                 pool.close();
             }
             catch (Exception e)
@@ -141,37 +153,29 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
      */
     public Object getOrCreate() throws Exception
     {
-        return pool.borrowObject(UUID.getUUID());
+        // TODO HH: fallout from MULE-2676 prevents this from working properly..this is SO WRONG!
+        return super.getOrCreate();
+        // return pool.borrowObject();
     }
 
-    /** 
+    /**
      * Returns the object instance to the pool.
      */
     public void release(Object object) throws Exception
     {
-// TODO HH: fixme
-//        if (object instanceof Identifiable)
-//        {
-//            pool.returnObject(((Identifiable) object).getId(), object);
-//        }
+        pool.returnObject(object);
     }
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // KeyedPoolableObjectFactory Interface
-    ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public Object makeObject(Object key) throws Exception
+    // //////////////////////////////////////////////////////////////////////////////////////////////
+    // PoolableObjectFactory Interface
+    // //////////////////////////////////////////////////////////////////////////////////////////////
+
+    public Object makeObject() throws Exception
     {
-        Object obj = super.getOrCreate();
-// TODO HH: fixme
-//        if (obj instanceof Identifiable)
-//        {
-//            ((Identifiable) obj).setId((String) key);
-//        }
-        return obj;
+        return super.getOrCreate();
     }
 
-    public void destroyObject(Object key, Object obj) throws Exception
+    public void destroyObject(Object obj) throws Exception
     {
         if (obj instanceof Disposable)
         {
@@ -179,24 +183,24 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
         }
     }
 
-    public void activateObject(Object key, Object obj) throws Exception
+    public void activateObject(Object obj) throws Exception
     {
         // nothing to do
     }
 
-    public void passivateObject(Object key, Object obj) throws Exception
+    public void passivateObject(Object obj) throws Exception
     {
         // nothing to do
     }
 
-    public boolean validateObject(Object key, Object obj)
+    public boolean validateObject(Object obj)
     {
         return true;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////
     // Getters and Setters
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////////////////////////////////////
 
     public int getPoolSize()
     {
@@ -209,8 +213,8 @@ public class PooledObjectFactory extends AbstractObjectFactory implements KeyedP
             return 0;
         }
     }
-    
-   public PoolingProfile getPoolingProfile()
+
+    public PoolingProfile getPoolingProfile()
     {
         return poolingProfile;
     }

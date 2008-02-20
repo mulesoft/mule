@@ -20,6 +20,9 @@ import org.mule.api.lifecycle.LifecycleTransitionResult;
  */
 public class TestAgent implements Agent
 {
+
+    private String frobbit;
+
     public String getName()
     {
         return "Test Agent";
@@ -63,5 +66,15 @@ public class TestAgent implements Agent
     public void unregistered()
     {
         // nothing to do
+    }
+
+    public String getFrobbit()
+    {
+        return frobbit;
+    }
+
+    public void setFrobbit(String frobbit)
+    {
+        this.frobbit = frobbit;
     }
 }

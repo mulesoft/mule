@@ -7,19 +7,19 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
     <model name="main">
-        <service name="unique1" class="org.mule.tck.testmodels.mule.TestSedaService">
+        <custom-service name="unique1" class="org.mule.tck.testmodels.mule.TestSedaService">
             <component class="org.mule.tck.services.UniqueComponent" />
-        </service>
-        <service name="unique2" class="org.mule.tck.testmodels.mule.TestSedaService">
+        </custom-service>
+        <custom-service name="unique2" class="org.mule.tck.testmodels.mule.TestSedaService">
             <component>
                 <singleton-object class="org.mule.tck.services.UniqueComponent" />
             </component>
-        </service>
-        <service name="unique3" class="org.mule.tck.testmodels.mule.TestSedaService">
+        </custom-service>
+        <custom-service name="unique3" class="org.mule.tck.testmodels.mule.TestSedaService">
             <component>
                 <spring-object bean="myUniqueBean"  />
             </component>
-        </service>
+        </custom-service>
         <!-- SEDA-specific attributes 
         <service name="unique4" serviceFactory-ref="genericFactory" enablePooling="false"/>
         -->

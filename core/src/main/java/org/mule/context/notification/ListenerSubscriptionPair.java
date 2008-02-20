@@ -70,26 +70,4 @@ public class ListenerSubscriptionPair
         return nullSubscription;
     }
 
-//    public int hashCode()
-//    {
-//        return (null == listener ? 1 : listener.hashCode())
-//                ^ (null == subscription ? 2 : subscription.hashCode())
-//                ^ Boolean.valueOf(isNullSubscription()).hashCode();
-//    }
-//
-//    public boolean equals(Object obj)
-//    {
-//        if (obj instanceof ListenerSubscriptionPair)
-//        {
-//            ListenerSubscriptionPair other = (ListenerSubscriptionPair) obj;
-//            return other.listener.equals(listener)
-//                    && other.subscription.equals(subscription)
-//                    && other.nullSubscription == nullSubscription;
-//        }
-//        else
-//        {
-//            return false;
-//        }
-//    }
-
 }

@@ -22,10 +22,6 @@ import org.w3c.dom.Element;
 public class MuleOrphanDefinitionParser extends OrphanDefinitionParser
 {
     
-    public static final String ROOT_ELEMENTS =
-            AbstractMuleBeanDefinitionParser.ROOT_ELEMENT + " "
-                    + AbstractMuleBeanDefinitionParser.ROOT_UNSAFE_ELEMENT;
-
     /**
      * This constructor assumes that the class name will be explicitly specified as an attribute on the element.
      */
@@ -50,8 +46,7 @@ public class MuleOrphanDefinitionParser extends OrphanDefinitionParser
         if (!isTopLevel(element))
         {
             throw new IllegalStateException("This element should be embedded inside the Mule <"
-                    + ROOT_ELEMENT + "> or <" + ROOT_UNSAFE_ELEMENT + "> elements: "
-                    + SpringXMLUtils.elementToString(element));
+                    + ROOT_ELEMENT + "> element: " + SpringXMLUtils.elementToString(element));
         }
     }
 

@@ -98,14 +98,6 @@ public class DefaultResponseRouterCollection extends AbstractRouterCollection im
             }
         }
 
-        // if (result != null && transformer != null) {
-        // try {
-        // result = new DefaultMuleMessage(transformer.transform(result.getPayload()),
-        // result.getProperties());
-        // } catch (TransformerException e) {
-        // throw new RoutingException(result, null);
-        // }
-        // }
         return result;
 
     }

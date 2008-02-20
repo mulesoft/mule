@@ -46,7 +46,6 @@ public class HttpTransformTestCase extends FunctionalTestCase
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         assertNotNull(message.getPayload());
-        assertTrue(message.getPayload() instanceof byte[]);
         Object result = bas.transform(message.getPayload());
         assertEquals(payload, result);
     }
@@ -59,7 +58,6 @@ public class HttpTransformTestCase extends FunctionalTestCase
         assertNotNull(message);
         ByteArrayToSerializable bas = new ByteArrayToSerializable();
         assertNotNull(message.getPayload());
-        assertTrue(message.getPayload() instanceof byte[]);
         Object result = bas.transform(message.getPayload());
         assertEquals(payload, result);
     }

@@ -40,7 +40,7 @@ public class CookieHelper
     /**
      * Do not instantiate.
      */
-    private CookieHelper ()
+    private CookieHelper()
     {
         // no op
     }
@@ -100,7 +100,7 @@ public class CookieHelper
             }
         }
 
-        return (Cookie[])cookies.toArray(new Cookie[cookies.size()]);
+        return (Cookie[]) cookies.toArray(new Cookie[cookies.size()]);
     }
 
 }

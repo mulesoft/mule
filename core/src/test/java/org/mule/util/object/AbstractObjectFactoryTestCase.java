@@ -10,17 +10,65 @@
 
 package org.mule.util.object;
 
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.AbstractMuleTestCase;
 
 public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
 {
-    public abstract void testInitialise();
+    protected ObjectFactory factory;
 
-    public abstract void testDispose();
+    // @Override
+    public void doSetUp()
+    {
+        factory = getObjectFactory();
+    }
 
-    public abstract void testGetObjectClass();
+    public final void testInitialise() throws Exception
+    {
+        try
+        {
+            factory.getOrCreate();
+            fail("expected InitialisationException");
+        }
+        catch (InitialisationException iex)
+        {
+            // OK
+        }
 
-    public abstract void testGet();
+        try
+        {
+            factory.initialise();
+        }
+        catch (InitialisationException iex)
+        {
+            fail(iex.getDetailedMessage());
+        }
 
-    public abstract void testRelease();
+        assertNotNull(factory.getOrCreate());
+    }
+
+    // @Override
+    public final void testDispose() throws Exception
+    {
+        factory.initialise();
+        factory.dispose();
+
+        try
+        {
+            factory.getOrCreate();
+            fail("expected InitialisationException");
+        }
+        catch (InitialisationException iex)
+        {
+            // OK
+        }
+
+    }
+
+    public abstract ObjectFactory getObjectFactory();
+
+    public abstract void testGetObjectClass() throws Exception;
+
+    public abstract void testGet() throws Exception;
+
 }

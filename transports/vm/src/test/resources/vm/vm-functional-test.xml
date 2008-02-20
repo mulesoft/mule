@@ -10,7 +10,7 @@
 
     <vm:connector name="asynchVm" queueEvents="true"/>
 
-    <model name="asynchTestModel">
+    <model>
 
         <service name="myAsynchService">
             <inbound>

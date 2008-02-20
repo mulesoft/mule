@@ -10,6 +10,7 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.processors.ProvideDefaultNameFromElement;
 import org.mule.management.agents.JmxAgent;
 import org.mule.util.StringUtils;
 
@@ -29,6 +30,7 @@ public class JmxAgentDefinitionParser extends AbstractMuleBeanDefinitionParser
     {
         singleton = true;
         addAlias("server", "mBeanServer");
+        registerPreProcessor(new ProvideDefaultNameFromElement());
     }
 
     protected Class getBeanClass(Element element)

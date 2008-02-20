@@ -12,33 +12,27 @@ package org.mule.util.object;
 
 public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCase
 {
+
     // @Override
-    public void testInitialise()
+    public ObjectFactory getObjectFactory()
     {
-        // TODO HH: auto-generated method stub
+        SingletonObjectFactory factory = new SingletonObjectFactory();
+        factory.setObjectClass(Object.class);
+        return factory;
     }
 
     // @Override
-    public void testDispose()
+    public void testGetObjectClass() throws Exception
     {
-        // TODO HH: auto-generated method stub
+        factory.initialise();
+        assertEquals(Object.class, factory.getObjectClass());
     }
 
     // @Override
-    public void testGet()
+    public void testGet() throws Exception
     {
-        // TODO HH: auto-generated method stub
+        factory.initialise();
+        assertSame(factory.getOrCreate(), factory.getOrCreate());
     }
 
-    // @Override
-    public void testGetObjectClass()
-    {
-        // TODO HH: auto-generated method stub
-    }
-
-    // @Override
-    public void testRelease()
-    {
-        // TODO HH: auto-generated method stub
-    }
 }

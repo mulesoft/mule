@@ -11,6 +11,7 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.processors.ProvideDefaultName;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -19,9 +20,17 @@ import org.w3c.dom.Element;
 public class ServiceDefinitionParser extends OrphanDefinitionParser
 {
 
+    // for custom services
+    public ServiceDefinitionParser()
+    {
+        super(true);
+        registerPreProcessor(new ProvideDefaultName("service"));
+    }
+
     public ServiceDefinitionParser(Class clazz)
     {
         super(clazz, true);
+        registerPreProcessor(new ProvideDefaultName("service"));
     }
 
     //@java.lang.Override

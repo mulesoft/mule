@@ -13,9 +13,6 @@ import org.mule.module.client.remoting.RemoteDispatcherAgent;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
 
-/**
- * TODO
- */
 public class RemoteDispatcherTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
@@ -25,7 +22,7 @@ public class RemoteDispatcherTestCase extends FunctionalTestCase
 
     public void testNonEmptyProperties() throws Exception
     {
-        RemoteDispatcherAgent agent = (RemoteDispatcherAgent) muleContext.getRegistry().lookupAgent("foo");
+        RemoteDispatcherAgent agent = (RemoteDispatcherAgent) muleContext.getRegistry().lookupAgent("remote-dispatcher-agent");
         assertNotNull(agent.getEndpoint());
         assertEquals("test://localhost:50608",agent.getEndpoint().getEndpointURI().getUri().toString());
         assertNotNull(agent.getWireFormat());

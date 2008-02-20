@@ -26,4 +26,11 @@ public class XFireLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsync
     {
         return 10;
     }
+
+    // @Override
+    protected int getWarmUpMessages()
+    {
+        return 10;
+    }
+
 }

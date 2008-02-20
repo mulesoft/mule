@@ -133,7 +133,6 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
             this.latch = latch;
             this.numberOfRequests = numberOfRequests;
             this.exListener = exListener;
-
         }
 
         public void run()
@@ -141,10 +140,9 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
             int i = 0;
             try
             {
-                Thread.sleep(2000);
                 MuleClient client = new MuleClient();
                 MuleMessage result = null;
-                for ( i = 0; i < numberOfRequests; i++)
+                for (i = 0; i < numberOfRequests; i++)
                 {
                     try
                     {

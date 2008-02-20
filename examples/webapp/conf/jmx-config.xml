@@ -8,8 +8,8 @@
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd
        http://www.mulesource.org/schema/mule/management/2.0 http://www.mulesource.org/schema/mule/management/2.0/mule-management.xsd">
 
-    <management:jmx-server name="simpleJmxServer"/>
+    <management:jmx-server/>
 
-    <management:jmx-mx4j-adaptor name="jmx-mx4j" jmxAdaptorUrl="http://localhost:9999"/>
+    <management:jmx-mx4j-adaptor jmxAdaptorUrl="http://localhost:9999"/>
 
  </mule>

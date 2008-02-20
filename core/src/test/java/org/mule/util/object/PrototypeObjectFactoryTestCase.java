@@ -12,14 +12,17 @@ package org.mule.util.object;
 
 public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCase
 {
+
     // @Override
-    public void testInitialise()
+    public ObjectFactory getObjectFactory()
     {
-        // TODO HH: auto-generated method stub
+        PrototypeObjectFactory factory = new PrototypeObjectFactory();
+        factory.setObjectClass(Object.class);
+        return factory;
     }
 
     // @Override
-    public void testDispose()
+    public void testGetObjectClass()
     {
         // TODO HH: auto-generated method stub
     }
@@ -30,15 +33,4 @@ public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCas
         // TODO HH: auto-generated method stub
     }
 
-    // @Override
-    public void testGetObjectClass()
-    {
-        // TODO HH: auto-generated method stub
-    }
-
-    // @Override
-    public void testRelease()
-    {
-        // TODO HH: auto-generated method stub
-    }
 }

@@ -25,6 +25,7 @@ import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.Iterator;
@@ -45,6 +46,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a MuleMessage into a
@@ -293,8 +295,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             }
             else if (src instanceof byte[])
             {
-                // TODO Danger here! We don't know if the content is
-                // really text or not
                 if (mimeType == null)
                 {
                     mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
@@ -309,12 +309,13 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageAwareTransfo
             }
             else
             {
-//                // TODO Danger here! We don't know if the content is
-//                // really text or not
-//                if (mimeType == null) mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-//                byte[] buffer = (byte[])serializableToByteArray.doTransform(src, encoding);
-//                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, mimeType));
-                throw new IllegalArgumentException("this should never happen");
+                if (mimeType == null)
+                {
+                    mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                }
+                
+                byte[] buffer = SerializationUtils.serialize((Serializable) src);
+                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, mimeType));
             }
         }
 

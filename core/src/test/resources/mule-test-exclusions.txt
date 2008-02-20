@@ -14,8 +14,6 @@ org.mule.util.object.PooledObjectFactoryTestCase
 # MULE-2536
 org.mule.util.queue.FilePersistenceTestCase
 
-org.mule.routing.inbound.IdempotentInMemoryMessageIdStoreTestCase
-
 # Duplicate registration doesn't currently produce an exception, should it?
 # See comment in TransientRegistry.doRegisterObject()
 # Blocked by MULE-2162 since the MuleConfiguration is being registered more than once.

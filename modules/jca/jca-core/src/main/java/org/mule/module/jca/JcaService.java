@@ -86,7 +86,7 @@ public class JcaService extends AbstractService implements WorkListener
         throw new ServiceException(JcaMessages.cannotPauseResumeJcaComponent(), null, this);
     }
 
-    public synchronized void doInitialise() throws InitialisationException
+    protected synchronized void doInitialise() throws InitialisationException
     {
         if (null == entryPointResolverSet)
         {

@@ -27,7 +27,7 @@ public class TransformerDefinitionParser extends ParentContextDefinitionParser
 
     public TransformerDefinitionParser(Class transformer)
     {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENTS, new MuleOrphanDefinitionParser(transformer, false));
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(transformer, false));
         and(RESPONSE_TRANSFORMERS, new ChildDefinitionParser(RESPONSE_TRANSFORMER, transformer));
         otherwise(new ChildDefinitionParser(TRANSFORMER, transformer));
     }
@@ -37,7 +37,7 @@ public class TransformerDefinitionParser extends ParentContextDefinitionParser
      */
     public TransformerDefinitionParser()
     {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENTS, new MuleOrphanDefinitionParser(false));
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(false));
         and(RESPONSE_TRANSFORMERS, new ChildDefinitionParser(RESPONSE_TRANSFORMER));
         otherwise(new ChildDefinitionParser(TRANSFORMER));
     }

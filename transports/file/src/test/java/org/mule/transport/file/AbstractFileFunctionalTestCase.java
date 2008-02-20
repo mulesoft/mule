@@ -12,7 +12,7 @@ package org.mule.transport.file;
 
 import org.mule.api.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.file.FileConnector;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -20,8 +20,8 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 
 /**
- * We are careful here to access the file system in a generic way.  This means setting directories
- * dynamically.
+ * We are careful here to access the file system in a generic way. This means setting
+ * directories dynamically.
  */
 public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
 {
@@ -29,9 +29,11 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
     public static final String TEST_MESSAGE = "Test file contents";
     public static final String TARGET_FILE = "TARGET_FILE";
 
+    private File tmpDir;
+
     public AbstractFileFunctionalTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeManagerPerSuite(false);
     }
 
     protected String getConfigResources()
@@ -47,7 +49,7 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
     // annoying but necessary wait apparently due to OS caching?
     protected void waitForFileSystem() throws Exception
     {
-        synchronized(this)
+        synchronized (this)
         {
             wait(1000);
         }
@@ -55,7 +57,7 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
 
     protected File initForRequest() throws Exception
     {
-        File tmpDir = File.createTempFile("mule-file-test-", "-dir");
+        tmpDir = File.createTempFile("mule-file-test-", "-dir");
         tmpDir.delete();
         tmpDir.mkdir();
         tmpDir.deleteOnExit();
@@ -66,8 +68,8 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
         target.deleteOnExit();
 
         // define the readFromDirectory on the connector
-        FileConnector connector =
-                (FileConnector) muleContext.getRegistry().lookupConnector("receiveConnector");
+        FileConnector connector = (FileConnector) muleContext.getRegistry().lookupConnector(
+            "receiveConnector");
         connector.setReadFromDirectory(tmpDir.getAbsolutePath());
         logger.debug("Directory is " + connector.getReadFromDirectory());
 
@@ -82,6 +84,12 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
         assertTrue(message.getPayload() instanceof byte[]);
         String result = new String((byte[]) message.getPayload());
         assertEquals(TEST_MESSAGE, result);
+    }
+
+    protected void doTearDown() throws Exception
+    {
+        super.doTearDown();
+        FileUtils.deleteTree(tmpDir);
     }
 
 }
