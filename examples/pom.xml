@@ -64,18 +64,14 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${version}</version>
-            <type>test-jar</type>
-        </dependency>
+
+        <!-- Unit tests -->        
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
         </dependency>
-        <!-- Better testing of XML -->        
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>

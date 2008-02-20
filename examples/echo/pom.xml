@@ -28,5 +28,10 @@
             <artifactId>mule-transport-xfire</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${version}</version>
+        </dependency>
     </dependencies>
 </project>
