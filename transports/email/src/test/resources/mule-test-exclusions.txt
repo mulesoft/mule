@@ -2,5 +2,3 @@
 # Test cases listed in this file are not run.
 #
 
-# Something strange making this test fail
-org.mule.transport.email.connectors.Pop3ConnectorTestCase
