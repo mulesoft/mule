@@ -29,6 +29,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     protected String defaultConfigResourceName = "default-mule-config.xml";
 
     protected ApplicationContext parentContext;
+    
+    /** Prepend "default-mule-config.xml" to the list of config resources. */
+    private boolean useDefaultConfigResource = true;
 
     public SpringXmlConfigurationBuilder(String configResources, ApplicationContext parentContext) throws ConfigurationException
     {
@@ -65,10 +68,18 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
-        ConfigResource[] all = new ConfigResource[configResources.length + 1];
-        all[0] = new ConfigResource(defaultConfigResourceName);
-        System.arraycopy(configResources, 0, all, 1, configResources.length);
-        createSpringParentRegistry(muleContext, muleContext.getRegistry(), all);
+        ConfigResource[] allResources;
+        if (useDefaultConfigResource)
+        {
+            allResources = new ConfigResource[configResources.length + 1];
+            allResources[0] = new ConfigResource(defaultConfigResourceName);
+            System.arraycopy(configResources, 0, allResources, 1, configResources.length);
+        }
+        else
+        {
+            allResources = configResources;
+        }
+        createSpringParentRegistry(muleContext, muleContext.getRegistry(), allResources);
     }
 
     /**
@@ -112,6 +123,16 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     public void setParentContext(ApplicationContext parentContext)
     {
         this.parentContext = parentContext;
+    }
+
+    public boolean isUseDefaultConfigResource()
+    {
+        return useDefaultConfigResource;
+    }
+
+    public void setUseDefaultConfigResource(boolean useDefaultConfigResource)
+    {
+        this.useDefaultConfigResource = useDefaultConfigResource;
     }
 
 }
