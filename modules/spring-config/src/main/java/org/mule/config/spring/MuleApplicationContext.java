@@ -174,7 +174,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
                 }
                 catch (IOException e)
                 {
-                    //ignore, should never happen
+                    logger.error(e);
                 }
             }
         }
