@@ -12,7 +12,6 @@ package org.mule.config.builders;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.registry.Registry;
 import org.mule.config.ConfigResource;
 import org.mule.config.spring.MuleApplicationContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -28,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextException;
 import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ClassPathResource;
@@ -75,39 +73,18 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
         context = servletContext;
     }
 
-    protected void createSpringParentRegistry(MuleContext muleContext, Registry registry, ConfigResource[] all)
+    protected ApplicationContext createApplicationContext(MuleContext muleContext, ConfigResource[] configResources)
     {
-        Resource[] servletContextResources = new Resource[all.length];
-        for (int i = 0; i < all.length; i++)
+        Resource[] servletContextResources = new Resource[configResources.length];
+        for (int i = 0; i < configResources.length; i++)
         {
-            servletContextResources[i] = new ServletContextOrClassPathResource(context, all[i].getResourceName());
+            servletContextResources[i] = new ServletContextOrClassPathResource(context, configResources[i].getResourceName());
         }
 
-        parentContext = loadParentContext(context);
+        // TODO Do we still need support for a parent context?
+        //parentContext = loadParentContext(context);
 
-        try
-        {
-            if (parentContext != null)
-            {
-                new MuleApplicationContext(muleContext, registry, servletContextResources, parentContext);
-            }
-            else
-            {
-                new MuleApplicationContext(muleContext, registry, servletContextResources);
-            }
-        }
-        catch (BeansException e)
-        {
-            // If creation of MuleApplicationContext fails, remove
-            // TransientRegistry->SpringRegistry parent relationship
-            registry.setParent(null);
-            throw e;
-        }
-        catch (IOException e)
-        {
-            registry.setParent(null);
-            throw new ApplicationContextException("Failed to load config resource", e);
-        }
+        return new MuleApplicationContext(muleContext, servletContextResources);
     }
 
     /**
