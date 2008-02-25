@@ -12,20 +12,35 @@ package org.mule.config;
 
 import org.mule.RegistryContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.agent.Agent;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.DefaultWorkListener;
-import org.mule.api.registry.Registry;
+import org.mule.api.lifecycle.FatalException;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.transport.ConnectionStrategy;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.SingleAttemptConnectionStrategy;
 import org.mule.util.FileUtils;
+import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.jar.Manifest;
 
 import javax.resource.spi.work.WorkListener;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
@@ -36,9 +51,8 @@ import org.apache.commons.logging.LogFactory;
  * <code>MuleManager</code>. Once the <code>MuleManager</code> has been
  * initialised this class is immutable.
  */
-public class MuleConfiguration
+public class MuleConfiguration implements Initialisable
 {
-
     private static final String DEFAULT_LOG_DIRECTORY = "logs";
 
     /** logger used by this class */
@@ -116,14 +130,19 @@ public class MuleConfiguration
      */
     private boolean clientMode = false;
 
-    /** The unique Id for this MuleContext */
-    private String id;
+    /** the unique id for this Mule instance */
+    private String id = null;
 
-    /** The cluster Id for this MuleContext */
-    private String clusterId;
+    /** If this node is part of a cluster then this is the shared cluster Id */
+    private String clusterId = null;
 
-    /** The Domain Id for this MuleContext */
-    private String domainId;
+    /** The domain name that this instance belongs to. */
+    private String domainId = null;
+
+    protected String systemName;
+    
+    /** the date in milliseconds from when the server was started */
+    private long startDate = 0;
 
     /**
      * The default connection Strategy used for a connector when one hasn't been
@@ -139,6 +158,192 @@ public class MuleConfiguration
         setWorkingDirectory(DEFAULT_WORKING_DIRECTORY);
         setId(UUID.getUUID());
         setDomainId("org.mule");
+        startDate = System.currentTimeMillis();
+    }
+
+    public LifecycleTransitionResult initialise() throws InitialisationException
+    {
+        setupIds();
+        try
+        {
+            validateEncoding();
+            validateOSEncoding();
+            validateXML();
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
+        }        
+        return LifecycleTransitionResult.OK;
+    }
+
+    protected void setupIds() throws InitialisationException
+    {
+        if (id == null)
+        {
+            throw new InitialisationException(CoreMessages.objectIsNull("Instance ID"), this);
+        }
+        if (clusterId == null)
+        {
+            clusterId = CoreMessages.notClustered().getMessage();
+        }
+        if (domainId == null)
+        {
+            try
+            {
+                domainId = InetAddress.getLocalHost().getHostName();
+            }
+            catch (UnknownHostException e)
+            {
+                throw new InitialisationException(e, this);
+            }
+        }
+        systemName = domainId + "." + clusterId + "." + id;
+    }
+
+    protected void validateEncoding() throws FatalException
+    {
+        String encoding = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+        if (encoding == null)
+        {
+            encoding = getDefaultEncoding();
+            System.setProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, encoding);
+        }
+        else
+        {
+            setDefaultEncoding(encoding);
+        }
+        //Check we have a valid and supported encoding
+        if (!Charset.isSupported(getDefaultEncoding()))
+        {
+            throw new FatalException(CoreMessages.propertyHasInvalidValue("encoding", getDefaultEncoding()), this);
+        }
+    }
+
+    protected void validateOSEncoding() throws FatalException
+    {
+        String encoding = System.getProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY);
+        if (encoding == null)
+        {
+            encoding = getDefaultOSEncoding();
+            System.setProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY, encoding);
+        }
+        else
+        {
+            setDefaultOSEncoding(encoding);
+        }
+        // Check we have a valid and supported encoding
+        if (!Charset.isSupported(getDefaultOSEncoding()))
+        {
+            throw new FatalException(CoreMessages.propertyHasInvalidValue("osEncoding",
+                    getDefaultOSEncoding()), this);
+        }
+    }
+
+    /**
+     * Mule needs a proper JAXP implementation and will complain when run with a plain JDK
+     * 1.4. Use the supplied launcher or specify a proper JAXP implementation via
+     * <code>-Djava.endorsed.dirs</code>. See the following URLs for more information:
+     * <ul>
+     * <li> {@link http://xerces.apache.org/xerces2-j/faq-general.html#faq-4}
+     * <li> {@link http://xml.apache.org/xalan-j/faq.html#faq-N100D6}
+     * <li> {@link http://java.sun.com/j2se/1.4.2/docs/guide/standards/}
+     * </ul>
+     */
+    protected void validateXML() throws FatalException
+    {
+        SAXParserFactory f = SAXParserFactory.newInstance();
+        if (f == null || f.getClass().getName().indexOf("crimson") != -1)
+        {
+            throw new FatalException(CoreMessages.valueIsInvalidFor(f.getClass().getName(),
+                "javax.xml.parsers.SAXParserFactory"), this);
+        }
+    }
+
+    /**
+     * Returns a formatted string that is a summary of the configuration of the
+     * server. This is the brock of information that gets displayed when the server
+     * starts
+     *
+     * @return a string summary of the server information
+     */
+    public String getStartSplash()
+    {
+        String notset = CoreMessages.notSet().getMessage();
+
+        // Mule Version, Timestamp, and Server ID
+        List message = new ArrayList();
+        Manifest mf = MuleManifest.getManifest();
+        Map att = mf.getMainAttributes();
+        if (att.values().size() > 0)
+        {
+            message.add(StringUtils.defaultString(MuleManifest.getProductDescription(), notset));
+            message.add(CoreMessages.version().getMessage() + " Build: "
+                    + StringUtils.defaultString(MuleManifest.getBuildNumber(), notset));
+
+            message.add(StringUtils.defaultString(MuleManifest.getVendorName(), notset));
+            message.add(StringUtils.defaultString(MuleManifest.getProductMoreInfo(), notset));
+        }
+        else
+        {
+            message.add(CoreMessages.versionNotSet().getMessage());
+        }
+        message.add(" ");
+        message.add(CoreMessages.serverStartedAt(getStartDate()).getMessage());
+        message.add("Server ID: " + id);
+
+        // JDK, OS, and Host
+        message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info")
+                + ")");
+        String patch = System.getProperty("sun.os.patch.level", null);
+        message.add("OS: " + System.getProperty("os.name")
+                + (patch != null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : "") + " ("
+                + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
+        try
+        {
+            InetAddress host = InetAddress.getLocalHost();
+            message.add("Host: " + host.getHostName() + " (" + host.getHostAddress() + ")");
+        }
+        catch (UnknownHostException e)
+        {
+            // ignore
+        }
+
+        // Mule Agents
+        message.add(" ");
+        //List agents
+        Collection agents = RegistryContext.getRegistry().lookupObjects(Agent.class);
+        if (agents.size() == 0)
+        {
+            message.add(CoreMessages.agentsRunning().getMessage() + " "
+                    + CoreMessages.none().getMessage());
+        }
+        else
+        {
+            message.add(CoreMessages.agentsRunning().getMessage());
+            Agent umoAgent;
+            for (Iterator iterator = agents.iterator(); iterator.hasNext();)
+            {
+                umoAgent = (Agent) iterator.next();
+                message.add("  " + umoAgent.getDescription());
+            }
+        }
+        return StringMessageUtils.getBoilerPlate(message, '*', 70);
+    }
+
+    public String getEndSplash()
+    {
+        List message = new ArrayList(2);
+        long currentTime = System.currentTimeMillis();
+        message.add(CoreMessages.shutdownNormally(new Date()).getMessage());
+        long duration = 10;
+        if (startDate > 0)
+        {
+            duration = currentTime - startDate;
+        }
+        message.add(CoreMessages.serverWasUpForDuration(duration).getMessage());
+
+        return StringMessageUtils.getBoilerPlate(message, '*', 78);
     }
 
     /** @return true if the model is running synchronously or false otherwise */
@@ -150,52 +355,6 @@ public class MuleConfiguration
     public void setDefaultSynchronousEndpoints(boolean synchronous)
     {
         this.synchronous = synchronous;
-    }
-
-    public ThreadingProfile getDefaultMessageDispatcherThreadingProfile()
-    {
-        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_MESSAGE_DISPATCHER_THREADING_PROFILE);
-    }
-
-    public ThreadingProfile getDefaultMessageRequesterThreadingProfile()
-    {
-        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_MESSAGE_REQUESTER_THREADING_PROFILE);
-    }
-
-    public ThreadingProfile getDefaultMessageReceiverThreadingProfile()
-    {
-        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE);
-    }
-
-    public ThreadingProfile getDefaultComponentThreadingProfile()
-    {
-        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_COMPONENT_THREADING_PROFILE);
-    }
-
-    public ThreadingProfile getDefaultThreadingProfile()
-    {
-        return getThreadingProfile(MuleProperties.OBJECT_DEFAULT_THREADING_PROFILE);
-    }
-
-    private ThreadingProfile getThreadingProfile(String name)
-    {
-        ThreadingProfile tp = null;
-
-        Registry registry = RegistryContext.getRegistry();
-        if (registry != null)
-        {
-            tp = (ThreadingProfile) RegistryContext.getRegistry().lookupObject(name);
-        }
-
-        if (null != tp)
-        {
-            return tp;
-        }
-        else
-        {
-            // only used in tests, where no registry is present
-            return ThreadingProfile.DEFAULT_THREADING_PROFILE;
-        }
     }
 
     public int getDefaultSynchronousEventTimeout()
@@ -393,4 +552,23 @@ public class MuleConfiguration
         this.clientMode = clientMode;
     }
 
+    public String getSystemName()
+    {
+        return systemName;
+    }
+
+    public void setSystemName(String systemName)
+    {
+        this.systemName = systemName;
+    }
+
+    /**
+     * Returns the long date when the server was started
+     *
+     * @return the long date when the server was started
+     */
+    public long getStartDate()
+    {
+        return startDate;
+    }
 }
