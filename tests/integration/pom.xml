@@ -48,6 +48,7 @@
             <artifactId>mule-modules-all</artifactId>
             <version>${version}</version>
             <type>pom</type>
+            <scope>test</scope>
         </dependency>
         <!-- Include all Mule Transports -->
         <dependency>
@@ -55,6 +56,14 @@
             <artifactId>mule-transports-all</artifactId>
             <version>${version}</version>
             <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <!-- Used by MuleStartupTestCase -->
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-hello</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Used by ServerTools.java -->
