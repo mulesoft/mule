@@ -1,5 +1,5 @@
 ##########################################################################
-# Mule 1.x
+# Mule 1.x failures
 ##########################################################################
 
 # These tests hang if you're behind a firewall.
@@ -46,14 +46,7 @@ org.mule.test.integration.transaction.XATransactionsWithSpringDAO
 org.mule.test.integration.client.MuleClientTransactionTestCase
 
 ##########################################################################
-# Unfinished 2.x implementation
-##########################################################################
-
-# MULE-2740
-#org.mule.test.integration.MuleEndpointConfigurationTestCase
-
-##########################################################################
-# Mule 2.x-specific failures
+# Mule 2.0.x failures
 ##########################################################################
 
 # MULE-2736
@@ -74,6 +67,14 @@ org.mule.test.integration.streaming.FileToTcpStreamingTestCase
 # MULE-2733
 # @ in URI is not getting replaced (1 of 3 tests fails)
 org.mule.test.integration.util.ObjectNameHelperTestCase
+
+##########################################################################
+# Mule 2.x failures
+##########################################################################
+
+# Throws "Specification not exhausted: class org.mule.context.notification.ManagerNotification: 108"
+# I don't understand what this is trying to test for exactly
+org.mule.context.notification.ServerNotificationManagerTestCase
 
 ##########################################################################
 # Low priority

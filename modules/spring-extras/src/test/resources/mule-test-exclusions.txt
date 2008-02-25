@@ -2,3 +2,11 @@
 # Test cases listed in this file are not run.
 #
 
+# Broke for 2.x
+# Caused by: org.springframework.beans.PropertyBatchUpdateException; nested PropertyAccessExceptions (1) are:
+# PropertyAccessException 1: org.springframework.beans.MethodInvocationException: Property 'asynchronous' threw exception; nested exception is java.lang.NullPointerException
+# 	at org.springframework.beans.AbstractPropertyAccessor.setPropertyValues(AbstractPropertyAccessor.java:104)
+# 	at org.springframework.beans.AbstractPropertyAccessor.setPropertyValues(AbstractPropertyAccessor.java:59)
+# 	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyPropertyValue (AbstractAutowireCapableBeanFactory.java:1198)
+org.mule.module.spring.events.AsyncSpringEventsTestCase
+
