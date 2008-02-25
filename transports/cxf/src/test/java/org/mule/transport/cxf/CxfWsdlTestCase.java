@@ -16,7 +16,6 @@ import org.mule.DefaultMuleSession;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.registry.Registry;
 import org.mule.endpoint.MuleEndpoint;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
@@ -53,15 +52,12 @@ public class CxfWsdlTestCase extends AbstractMuleTestCase
      */
     public void testCxfWsdlServiceWithEndpointParam() throws Exception
     {
-
-        Registry registry = muleContext.getRegistry();
-
-        MuleEndpoint endpoint = (MuleEndpoint) registry.lookupEndpointFactory().getOutboundEndpoint(TEST_URL_NOWSDL);
+        MuleEndpoint endpoint = (MuleEndpoint) muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(TEST_URL_NOWSDL);
         endpoint.setProperty("wsdlUrl", TEST_URL_WSDL);
 
         MuleMessage message = new DefaultMuleMessage("test1");
         MuleSession session = new DefaultMuleSession(message,
-            ((AbstractConnector) endpoint.getConnector()).getSessionHandler());
+            ((AbstractConnector) endpoint.getConnector()).getSessionHandler(), muleContext);
         MuleEvent event = new DefaultMuleEvent(message, endpoint, session, true);
         MuleMessage reply = session.sendEvent(event);
 

@@ -10,7 +10,7 @@
 
 package org.mule.util;
 
-import org.mule.RegistryContext;
+import org.mule.MuleServer;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
 
@@ -449,7 +449,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils
         else
         {
             extractFileResources(normalizeFilePath(url,
-                                                   RegistryContext.getConfiguration().getDefaultEncoding()),
+                                                   MuleServer.getMuleContext().getConfiguration().getDefaultEncoding()),
                                                    outputDir, resourceName, keepParentDirectory);
         }
     }

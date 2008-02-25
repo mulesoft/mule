@@ -10,8 +10,9 @@
 
 package org.mule;
 
-import org.mule.api.MuleException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
@@ -69,17 +70,20 @@ public final class DefaultMuleSession implements MuleSession
 
     private Map properties = null;
 
-    public DefaultMuleSession(Service service)
+    private MuleContext muleContext;
+    
+    public DefaultMuleSession(Service service, MuleContext muleContext)
     {
+        this.muleContext = muleContext;
         properties = new HashMap();
         id = UUID.getUUID();
         this.service = service;
     }
 
-    public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, Service service)
+    public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, Service service, MuleContext muleContext)
         throws MuleException
     {
-        this(message, requestSessionHandler);
+        this(message, requestSessionHandler, muleContext);
         if (service == null)
         {
             throw new IllegalArgumentException(
@@ -88,9 +92,10 @@ public final class DefaultMuleSession implements MuleSession
         this.service = service;
     }
 
-    public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler) throws MuleException
+    public DefaultMuleSession(MuleMessage message, SessionHandler requestSessionHandler, MuleContext muleContext) throws MuleException
     {
-
+        this.muleContext = muleContext;
+        
         if (requestSessionHandler == null)
         {
             throw new IllegalArgumentException(
@@ -139,7 +144,7 @@ public final class DefaultMuleSession implements MuleSession
 
     public void dispatchEvent(MuleMessage message, String endpointName) throws MuleException
     {
-        dispatchEvent(message, RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName));
+        dispatchEvent(message,  muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName));
     }
  
     public void dispatchEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException
@@ -164,7 +169,7 @@ public final class DefaultMuleSession implements MuleSession
 
     public MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException
     {
-        return sendEvent(message, RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName));
+        return sendEvent(message, muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName));
     }
 
     public MuleMessage sendEvent(MuleMessage message) throws MuleException
@@ -391,7 +396,7 @@ public final class DefaultMuleSession implements MuleSession
      */
     public MuleMessage requestEvent(String endpointName, long timeout) throws MuleException
     {
-        ImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
         return requestEvent(endpoint, timeout);
     }
 

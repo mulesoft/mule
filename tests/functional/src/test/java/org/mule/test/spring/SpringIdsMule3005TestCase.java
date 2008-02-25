@@ -10,10 +10,10 @@
 
 package org.mule.test.spring;
 
-import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.tck.AbstractConfigBuilderTestCase;
 
 
 /**
@@ -42,9 +42,9 @@ public class SpringIdsMule3005TestCase extends AbstractConfigBuilderTestCase
 
     public void testIds()
     {
-        assertEquals("serverId", muleContext.getId());
-        assertEquals("clusterId", muleContext.getClusterId());
-        assertEquals("domainId", muleContext.getDomain());
+        assertEquals("serverId", muleContext.getConfiguration().getId());
+        assertEquals("clusterId", muleContext.getConfiguration().getClusterId());
+        assertEquals("domainId", muleContext.getConfiguration().getDomainId());
     }
 
 }

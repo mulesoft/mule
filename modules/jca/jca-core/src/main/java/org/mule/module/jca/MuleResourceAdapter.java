@@ -10,7 +10,6 @@
 
 package org.mule.module.jca;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
@@ -64,11 +63,6 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     protected final Map endpoints = new HashMap();
     protected String defaultJcaModelName;
 
-    public MuleResourceAdapter()
-    {
-        RegistryContext.getOrCreateRegistry().getConfiguration().setSystemModelType(JcaModel.JCA_MODEL_TYPE);
-    }
-
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException
     {
         ois.defaultReadObject();
@@ -81,6 +75,9 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     public void start(BootstrapContext bootstrapContext) throws ResourceAdapterInternalException
     {
         this.bootstrapContext = bootstrapContext;
+
+        muleContext.getConfiguration().setSystemModelType(JcaModel.JCA_MODEL_TYPE);
+        
         if (info.getConfigurations() != null)
         {
             ConfigurationBuilder builder = null;

@@ -70,7 +70,7 @@ public class ThreadSafeAccessTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage(new Object(), (Map) null);
         return new DefaultMuleEvent(message,
                 MuleTestUtils.getTestInboundEndpoint("test", muleContext),
-                new DefaultMuleSession(new DirectService()), false);
+                new DefaultMuleSession(new DirectService(), muleContext), false);
     }
 
     protected void resetAccessControl(ThreadSafeAccess target) throws InterruptedException

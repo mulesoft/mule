@@ -13,8 +13,8 @@ package org.mule.model.seda;
 import org.mule.DefaultMuleEvent;
 import org.mule.FailedToQueueEventException;
 import org.mule.RegistryContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
@@ -89,11 +89,11 @@ public class SedaService extends AbstractService implements Work, WorkListener
      */
     protected synchronized void doInitialise() throws InitialisationException
     {
-        MuleConfiguration config = RegistryContext.getConfiguration();
+        MuleConfiguration config = muleContext.getConfiguration();
         if (threadingProfile == null)
         {
             // TODO MULE-2102 This should be configured in the default template.
-            threadingProfile = config.getDefaultComponentThreadingProfile();
+            threadingProfile = muleContext.getDefaultComponentThreadingProfile();
         }
         // Create thread pool
         workManager = threadingProfile.createWorkManager(getName());

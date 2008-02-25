@@ -195,7 +195,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
         else
         {
-            return RegistryContext.getConfiguration().isDefaultSynchronousEndpoints();
+            return muleContext.getConfiguration().isDefaultSynchronousEndpoints();
         }
     }
     
@@ -299,7 +299,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         if (muleContext != null)
         {
-            return muleContext.getRegistry().getConfiguration().getDefaultEncoding();
+            return muleContext.getConfiguration().getDefaultEncoding();
         }
         else
         {
@@ -337,7 +337,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected int getDefaultRemoteSyncTimeout(Connector connector)
     {
-        return muleContext.getRegistry().getConfiguration().getDefaultSynchronousEventTimeout();
+        return muleContext.getConfiguration().getDefaultSynchronousEventTimeout();
     }
 
     protected List getInboundTransformers(Connector connector, EndpointURI endpointURI)

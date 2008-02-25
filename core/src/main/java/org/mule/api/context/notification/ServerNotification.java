@@ -10,7 +10,7 @@
 
 package org.mule.api.context.notification;
 
-import org.mule.RegistryContext;
+import org.mule.MuleServer;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.ClassUtils;
 
@@ -80,7 +80,7 @@ public abstract class ServerNotification extends EventObject
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
-        if (RegistryContext.getRegistry() != null && null != message)
+        if (MuleServer.getMuleContext().getRegistry() != null && null != message)
         {
             serverId = message.toString();
         }

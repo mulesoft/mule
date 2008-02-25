@@ -31,7 +31,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         super.doSetUp();
 
         // The working directory is deleted on tearDown
-        File tempDir = FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory(), "tmp");
+        File tempDir = FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory(), "tmp");
         if (!tempDir.exists())
         {
             tempDir.mkdirs();
@@ -65,7 +65,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
     public String getTestEndpointURI()
     {
-        return "file://" + RegistryContext.getConfiguration().getWorkingDirectory();
+        return "file://" + muleContext.getConfiguration().getWorkingDirectory();
     }
 
     public Object getValidMessage() throws Exception

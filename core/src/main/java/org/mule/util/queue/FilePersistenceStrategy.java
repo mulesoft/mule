@@ -10,7 +10,6 @@
 
 package org.mule.util.queue;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.config.MuleConfiguration;
@@ -183,7 +182,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
      */
     public void open() throws IOException
     {
-        String path = RegistryContext.getConfiguration().getWorkingDirectory() + File.separator
+        String path = muleContext.getConfiguration().getWorkingDirectory() + File.separator
                       + MuleConfiguration.DEFAULT_QUEUE_STORE;
         store = FileUtils.newFile(path).getCanonicalFile();
         store.mkdirs();

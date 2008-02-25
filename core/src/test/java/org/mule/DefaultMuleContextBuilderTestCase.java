@@ -55,15 +55,14 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
     {
         // Build
         DefaultMuleContextBuilder builder = new DefaultMuleContextBuilder();
-        builder.setMuleConfiguration(new MyMuleConfiguration())
-            .setLifecycleManager(new MyLifeCycleManager())
-            .setNotificationManager(new MyServerNotificationManager())
-            .setWorkManager(new MyWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "test"));
+        builder.setLifecycleManager(new MyLifeCycleManager())
+               .setNotificationManager(new MyServerNotificationManager())
+               .setWorkManager(new MyWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "test"));
         MuleContext muleContext = builder.buildMuleContext();
 
         // Assert
         assertNotNull(muleContext);
-        assertEquals(MyMuleConfiguration.class, muleContext.getConfiguration().getClass());
+        //assertEquals(MyMuleConfiguration.class, muleContext.getConfiguration().getClass());
         assertEquals(MyLifeCycleManager.class, muleContext.getLifecycleManager().getClass());
         assertEquals(MyServerNotificationManager.class, muleContext.getNotificationManager().getClass());
         assertEquals(MyWorkManager.class, muleContext.getWorkManager().getClass());

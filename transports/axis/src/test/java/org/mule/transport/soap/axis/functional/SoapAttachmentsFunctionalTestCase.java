@@ -53,7 +53,7 @@ public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
             File tempFile = File.createTempFile("test", ".att");
             tempFile.deleteOnExit();
             msg.addAttachment("testAttachment", new DataHandler(new FileDataSource(tempFile)));
-            DefaultMuleSession session = new DefaultMuleSession(msg, ((AbstractConnector) ep.getConnector()).getSessionHandler());
+            DefaultMuleSession session = new DefaultMuleSession(msg, ((AbstractConnector) ep.getConnector()).getSessionHandler(), muleContext);
             DefaultMuleEvent event = new DefaultMuleEvent(msg, ep, session, true);
             MuleMessage result = client.send(event);
             assertNotNull(result);

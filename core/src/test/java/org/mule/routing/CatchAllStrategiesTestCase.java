@@ -169,7 +169,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         };
         messageRouter.setCatchAllStrategy(strategy);
 
-        MuleSession session = getTestSession(getTestService());
+        MuleSession session = getTestSession(getTestService(), muleContext);
 
         messageRouter.route(new DefaultMuleMessage("hello"), session, true);
         assertEquals(1, catchAllCount[0]);

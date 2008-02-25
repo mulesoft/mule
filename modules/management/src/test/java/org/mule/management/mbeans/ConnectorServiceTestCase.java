@@ -25,7 +25,7 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
     public void testUndeploy() throws Exception
     {
         final String configId = "ConnectorServiceTest";
-        muleContext.setId(configId);
+        muleContext.getConfiguration().setId(configId);
         final Connector connector = new TestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();

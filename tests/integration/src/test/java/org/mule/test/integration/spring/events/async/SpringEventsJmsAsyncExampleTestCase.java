@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.spring.events.async;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -60,7 +59,7 @@ public class SpringEventsJmsAsyncExampleTestCase extends AbstractMuleTestCase
         };
         subscriptionBean.setEventCallback(callback);
 
-        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
+        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
         MuleClient client = new MuleClient();
         Order order = new Order("Sausage and Mash");
         client.send("jms://orders.queue", order, null);

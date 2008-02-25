@@ -372,7 +372,7 @@ public class MuleServer implements Runnable
         msgs.add(CoreMessages.fatalErrorInShutdown());
         if (muleContext != null)
         {
-            msgs.add(CoreMessages.serverStartedAt(muleContext.getStartDate()));
+            msgs.add(CoreMessages.serverStartedAt(muleContext.getConfiguration().getStartDate()));
         }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
 

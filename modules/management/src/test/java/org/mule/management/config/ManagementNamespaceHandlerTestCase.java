@@ -10,12 +10,10 @@
 
 package org.mule.management.config;
 
-import org.mule.RegistryContext;
 import org.mule.agent.EndpointNotificationLoggerAgent;
 import org.mule.agent.Log4jNotificationLoggerAgent;
 import org.mule.api.agent.Agent;
 import org.mule.api.registry.Registry;
-import org.mule.config.spring.SpringRegistry;
 import org.mule.management.agents.JmxAgent;
 import org.mule.management.agents.JmxServerNotificationAgent;
 import org.mule.management.agents.Log4jAgent;
@@ -89,10 +87,9 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testAgentsOrder() throws Exception
     {
-        Registry registry = RegistryContext.getRegistry();
-        SpringRegistry springRegistry = (SpringRegistry) registry.getParent();
-        assertNotNull(springRegistry);
-        Collection agents = springRegistry.lookupObjects(Agent.class);
+        Registry registry = muleContext.getRegistry();
+        assertNotNull(registry);
+        Collection agents = registry.lookupObjects(Agent.class);
         assertEquals(agents.size(), 8);
         Iterator iter = agents.iterator();
         assertTrue(iter.next() instanceof JmxAgent);

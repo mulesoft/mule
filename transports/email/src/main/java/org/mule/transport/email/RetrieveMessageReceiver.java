@@ -11,7 +11,7 @@
 package org.mule.transport.email;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.RegistryContext;
+import org.mule.MuleServer;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -87,7 +87,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
         if (StringUtils.isEmpty(backupFolder))
         {
             this.backupFolder =
-                    RegistryContext.getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
+                    MuleServer.getMuleContext().getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
         }
 
         if (backupFolder != null && !this.backupFolder.endsWith(File.separator))

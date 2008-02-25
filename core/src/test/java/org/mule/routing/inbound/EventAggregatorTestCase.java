@@ -33,7 +33,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
     public void testMessageAggregator() throws Exception
     {
         Service testService = getTestService("test", Apple.class);
-        MuleSession session = getTestSession(testService);
+        MuleSession session = getTestSession(testService, muleContext);
 
         InboundRouterCollection messageRouter = new DefaultInboundRouterCollection();
         SimpleEventAggregator router = new SimpleEventAggregator(3);

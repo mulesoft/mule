@@ -65,7 +65,7 @@ public class SedaModel extends AbstractModel
 
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
-        queueTimeout = RegistryContext.getConfiguration().getDefaultSynchronousEventTimeout();
+        queueTimeout = muleContext.getConfiguration().getDefaultSynchronousEventTimeout();
         if (queueProfile==null)
         {
             queueProfile = new QueueProfile();

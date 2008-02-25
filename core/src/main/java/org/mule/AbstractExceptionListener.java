@@ -10,11 +10,11 @@
 
 package org.mule;
 
-import org.mule.api.MuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointURI;
@@ -253,7 +253,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                     exceptionMessage = new DefaultMuleMessage(msg, ctx.getMessage());
                 }
                 MuleEvent exceptionEvent = new DefaultMuleEvent(exceptionMessage, endpoint, new DefaultMuleSession(
-                    exceptionMessage, new MuleSessionHandler()), true);
+                    exceptionMessage, new MuleSessionHandler(), muleContext), true);
                 exceptionEvent = RequestContext.setEvent(exceptionEvent);
                 endpoint.send(exceptionEvent);
 

@@ -32,7 +32,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
 
     public void testAgentsRegistrationOrder() throws Exception
     {
-        muleContext.getRegistry().getConfiguration().setId("MuleAgentsTestCase.agentsRegistrationOrder");
+        muleContext.getConfiguration().setId("MuleAgentsTestCase.agentsRegistrationOrder");
         JmxAgent agentFirst = new JmxAgent();
         // If you specified "JmxAgent", it was the first one in the map,
         // but for "jmxAgent" the order was not preserved.
@@ -56,7 +56,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
      */
     public void testJmxAgentInjectedMBeanServer() throws Exception
     {
-        muleContext.getRegistry().getConfiguration().setId("MuleAgentsTestCase.jmxAgentInjectedMBeanServer");
+        muleContext.getConfiguration().setId("MuleAgentsTestCase.jmxAgentInjectedMBeanServer");
         JmxAgent jmxAgent = new JmxAgent();
         List servers = MBeanServerFactory.findMBeanServer(null);
         MBeanServer server;

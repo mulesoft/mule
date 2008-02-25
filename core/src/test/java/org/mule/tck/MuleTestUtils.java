@@ -284,7 +284,7 @@ public final class MuleTestUtils
 
     public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint, MuleContext context) throws Exception
     {
-        MuleSession session = getTestSession(service);
+        MuleSession session = getTestSession(service, context);
         return new DefaultMuleEvent(new DefaultMuleMessage(data, new HashMap()), endpoint, session, true);
     }
 
@@ -309,14 +309,14 @@ public final class MuleTestUtils
         return t;
     }
 
-    public static MuleSession getTestSession(Service service)
+    public static MuleSession getTestSession(Service service, MuleContext context)
     {
-        return new DefaultMuleSession(service);
+        return new DefaultMuleSession(service, context);
     }
 
-    public static MuleSession getTestSession()
+    public static MuleSession getTestSession(MuleContext context)
     {
-        return getTestSession(null);
+        return getTestSession(null, context);
     }
 
     public static TestConnector getTestConnector(MuleContext context) throws Exception

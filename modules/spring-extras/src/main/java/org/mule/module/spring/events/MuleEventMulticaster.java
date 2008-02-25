@@ -13,7 +13,6 @@ package org.mule.module.spring.events;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
-import org.mule.RegistryContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
@@ -417,8 +416,7 @@ public class MuleEventMulticaster
         {
             if (asyncPool == null)
             {
-                asyncPool = RegistryContext.getConfiguration().getDefaultThreadingProfile().createPool(
-                    "spring-events");
+                asyncPool = muleContext.getDefaultThreadingProfile().createPool("spring-events");
             }
         }
         else
@@ -485,7 +483,7 @@ public class MuleEventMulticaster
                 else
                 {
                     MuleSession session = new DefaultMuleSession(message,
-                        ((AbstractConnector) endpoint.getConnector()).getSessionHandler(), service);
+                        ((AbstractConnector) endpoint.getConnector()).getSessionHandler(), service, muleContext);
                     RequestContext.setEvent(new DefaultMuleEvent(message, endpoint, session, false));
                     // transform if necessary
                     if (endpoint.getTransformers() != null)

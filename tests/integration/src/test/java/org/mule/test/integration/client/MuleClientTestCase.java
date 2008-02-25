@@ -11,7 +11,6 @@
 package org.mule.test.integration.client;
 
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -27,7 +26,7 @@ public class MuleClientTestCase extends FunctionalTestCase
     public void testClientSendDirect() throws Exception
     {
         MuleClient client = new MuleClient();
-        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
+        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         MuleMessage message = client.sendDirect("TestReceiverUMO", null, "Test Client Send message", null);
         assertNotNull(message);
@@ -37,7 +36,7 @@ public class MuleClientTestCase extends FunctionalTestCase
     public void testClientDispatchDirect() throws Exception
     {
         MuleClient client = new MuleClient();
-        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
+        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
 
         client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message", null);
     }
@@ -45,8 +44,8 @@ public class MuleClientTestCase extends FunctionalTestCase
     public void testClientSendGlobalEndpoint() throws Exception
     {
         MuleClient client = new MuleClient();
-        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
-        RegistryContext.getConfiguration().setDefaultRemoteSync(true);
+        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
+        muleContext.getConfiguration().setDefaultRemoteSync(true);
 
         MuleMessage message = client.send("vmEndpoint", "Test Client Send message", null);
         assertNotNull(message);
@@ -56,8 +55,8 @@ public class MuleClientTestCase extends FunctionalTestCase
     public void testClientSend() throws Exception
     {
         MuleClient client = new MuleClient();
-        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
-        RegistryContext.getConfiguration().setDefaultRemoteSync(true);
+        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
+        muleContext.getConfiguration().setDefaultRemoteSync(true);
 
         MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
         assertNotNull(message);
@@ -67,8 +66,8 @@ public class MuleClientTestCase extends FunctionalTestCase
     public void testClientMultiSend() throws Exception
     {
         MuleClient client = new MuleClient();
-        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
-        RegistryContext.getConfiguration().setDefaultRemoteSync(true);
+        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
+        muleContext.getConfiguration().setDefaultRemoteSync(true);
 
         for (int i = 0; i < 100; i++)
         {
@@ -81,7 +80,7 @@ public class MuleClientTestCase extends FunctionalTestCase
     public void testClientMultidispatch() throws Exception
     {
         MuleClient client = new MuleClient();
-        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(false);
+        muleContext.getConfiguration().setDefaultSynchronousEndpoints(false);
 
         int i = 0;
         // to init

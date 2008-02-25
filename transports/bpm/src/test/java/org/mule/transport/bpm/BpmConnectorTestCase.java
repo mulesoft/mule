@@ -12,8 +12,6 @@ package org.mule.transport.bpm;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.bpm.BPMS;
-import org.mule.transport.bpm.ProcessConnector;
 import org.mule.transport.bpm.test.TestBpms;
 
 import com.mockobjects.dynamic.Mock;
@@ -45,6 +43,7 @@ public class BpmConnectorTestCase extends AbstractConnectorTestCase
         Mock bpms = new Mock(BPMS.class);
         bpms.expect("setMessageService", c);
         c.setBpms((BPMS) bpms.proxy());
+        c.setMuleContext(muleContext);
         c.initialise();
         bpms.verify();
     }

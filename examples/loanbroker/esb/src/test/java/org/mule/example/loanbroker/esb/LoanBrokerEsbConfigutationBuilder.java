@@ -14,7 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.model.Model;
-import org.mule.api.registry.Registry;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
@@ -60,7 +60,7 @@ public class LoanBrokerEsbConfigutationBuilder extends AbstractConfigurationBuil
         // Set defaults
         new DefaultsConfigurationBuilder().configure(muleContext);
 
-        Registry registry = muleContext.getRegistry();
+        MuleRegistry registry = muleContext.getRegistry();
 
         // Connectors
         EjbConnector ejbConnector = new EjbConnector();

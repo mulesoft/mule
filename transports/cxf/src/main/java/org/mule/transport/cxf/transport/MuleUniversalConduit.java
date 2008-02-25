@@ -282,7 +282,7 @@ public class MuleUniversalConduit extends AbstractConduit
         MuleMessage message = new DefaultMuleMessage(sa);
         if (session == null)
         {
-            session = new DefaultMuleSession(message, connector.getSessionHandler());
+            session = new DefaultMuleSession(message, connector.getSessionHandler(), connector.getMuleContext());
         }
 
         MuleEvent event = new DefaultMuleEvent(message, ep, session, true);

@@ -10,7 +10,6 @@
 
 package org.mule.container;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.context.ContainerContext;
 import org.mule.api.context.ContainerException;
@@ -115,7 +114,7 @@ public abstract class AbstractContainerContext implements ContainerContext, Mule
 
     protected String getDefaultEncoding()
     {
-        return RegistryContext.getConfiguration().getDefaultEncoding();
+        return muleContext.getConfiguration().getDefaultEncoding();
     }
 
 

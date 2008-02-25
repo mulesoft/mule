@@ -26,7 +26,7 @@ public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
     public void testCorrelationGroupSizePropertySet() throws Exception
     {
         Service testService = getTestService("test", Apple.class);
-        MuleSession session = getTestSession(testService);
+        MuleSession session = getTestSession(testService, muleContext);
 
         ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
 

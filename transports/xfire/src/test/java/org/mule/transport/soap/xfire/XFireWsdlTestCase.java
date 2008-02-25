@@ -63,7 +63,7 @@ public class XFireWsdlTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage("test1");
         MuleSession session = new DefaultMuleSession(message, ((AbstractConnector) endpoint.getConnector())
-            .getSessionHandler());
+            .getSessionHandler(), muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, true);
         MuleMessage reply = session.sendEvent(event);
 

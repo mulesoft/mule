@@ -33,7 +33,7 @@ public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         super.doSetUp();
 
         // The working directory is deleted on tearDown
-        File dir = FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory(), "tmp");
+        File dir = FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory(), "tmp");
         if (!dir.exists())
         {
             dir.mkdirs();

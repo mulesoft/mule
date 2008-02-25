@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.transport.jdbc;
 
-import org.mule.RegistryContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.model.Model;
 import org.mule.api.transport.Connector;
@@ -74,7 +73,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     protected void doSetUp() throws Exception
     {
         // Make sure we are running synchronously
-        RegistryContext.getConfiguration().setDefaultSynchronousEndpoints(true);
+        muleContext.getConfiguration().setDefaultSynchronousEndpoints(true);
         SedaModel model = new SedaModel();
         model.setName("main");
         model.getPoolingProfile().setInitialisationPolicy(

@@ -39,7 +39,7 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerAgent(new RmiRegistryAgent());
         jmxAgent = new JmxAgent();
         jmxAgent.setConnectorServerUrl(JmxAgent.DEFAULT_REMOTING_URI);
-        muleContext.setId(DOMAIN);
+        muleContext.getConfiguration().setId(DOMAIN);
     }
 
     protected void doTearDown()

@@ -10,13 +10,11 @@
 
 package org.mule.transport.file;
 
-import org.mule.RegistryContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.Connector;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.file.FileConnector;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -67,7 +65,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
     {
         super.doSetUp();
         // The working directory is deleted on tearDown
-        tempDir = FileUtils.newFile(RegistryContext.getConfiguration().getWorkingDirectory(), tempDirName);
+        tempDir = FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory(), tempDirName);
         if (!tempDir.exists())
         {
             tempDir.mkdirs();
@@ -95,6 +93,6 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
 
     public String getTestEndpointURI()
     {
-        return "file://" + muleContext.getRegistry().getConfiguration().getWorkingDirectory();
+        return "file://" + muleContext.getConfiguration().getWorkingDirectory();
     }
 }

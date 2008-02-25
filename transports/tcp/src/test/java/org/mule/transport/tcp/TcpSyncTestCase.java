@@ -36,7 +36,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
         MuleMessage message = new DefaultMuleMessage(payload);
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointUri);
-        DefaultMuleSession session = new DefaultMuleSession(message, new NullSessionHandler());
+        DefaultMuleSession session = new DefaultMuleSession(message, new NullSessionHandler(), muleContext);
         DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session, true);
         event.setTimeout(60000);
         return event.getSession().sendEvent(event);

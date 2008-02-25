@@ -11,28 +11,19 @@
 package org.mule.transport.ssl;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.MuleEndpoint;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractConnectorTestCase;
 
-import java.io.IOException;
-
 public class SslConnectorTestCase extends AbstractConnectorTestCase
 {
-
     // @Override
     public Connector createConnector() throws Exception
     {
-        return createConnector(true);
-    }
-
-    public static SslConnector createConnector(boolean initialised)
-        throws InitialisationException, IOException
-    {
         SslConnector cnn = new SslConnector();
+        cnn.setMuleContext(muleContext);
         cnn.setName("SslConnector");
         cnn.setKeyStore("serverKeystore");
         cnn.setClientKeyStore("clientKeystore");
@@ -42,18 +33,13 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         cnn.setTrustStore("trustStore");
         cnn.setTrustStorePassword("mulepassword");
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
-        //TODO FIX URGENT
-        // can this go?!  who added it?  when was it urgent?
-//        if (initialised)
-//        {
-//            cnn.initialise(muleContext);
-//        }
         return cnn;
     }
 
     public void testClientConnector() throws Exception
     {
         SslConnector cnn = new SslConnector();
+        cnn.setMuleContext(muleContext);
         cnn.setClientKeyStore("clientKeystore");
         cnn.setClientKeyStorePassword("mulepassword");
         cnn.getDispatcherThreadingProfile().setDoThreading(false);

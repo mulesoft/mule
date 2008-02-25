@@ -16,8 +16,8 @@ import org.mule.NullSessionHandler;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.ResponseOutputStream;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
@@ -341,7 +341,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
                 //Maybe the filter should be checked in the MessageListener...
                 message = handleUnacceptedFilter(message);
                 RequestContext.setEvent(new DefaultMuleEvent(message, endpoint,
-                        new DefaultMuleSession(message, new NullSessionHandler()), synchronous));
+                        new DefaultMuleSession(message, new NullSessionHandler(), connector.getMuleContext()), synchronous));
                 return message;
             }
         }
@@ -565,7 +565,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
                     ros = new ResponseOutputStream(outputStream);
                 }
             }
-            MuleSession session = new DefaultMuleSession(message, connector.getSessionHandler(), service);
+            MuleSession session = new DefaultMuleSession(message, connector.getSessionHandler(), service, connector.getMuleContext());
             MuleEvent muleEvent = new DefaultMuleEvent(message, endpoint, session, synchronous, ros);
             muleEvent = OptimizedRequestContext.unsafeSetEvent(muleEvent);
             message = muleEvent.getMessage();

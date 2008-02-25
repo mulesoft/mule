@@ -9,8 +9,8 @@
  */
 package org.mule;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
@@ -78,13 +78,10 @@ public class MuleShutdownHook extends Thread
         msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
         msgs.add(" ");
         msgs.add(CoreMessages.fatalErrorInShutdown());
-        if(RegistryContext.getRegistry()!=null)
+        MuleContext context = MuleServer.getMuleContext();
+        if(context!=null)
         {
-            MuleContext context = MuleServer.getMuleContext();
-            if(context!=null)
-            {
-                msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
-            }
+            msgs.add(CoreMessages.serverStartedAt(context.getConfiguration().getStartDate()));
         }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
 
@@ -110,7 +107,7 @@ public class MuleShutdownHook extends Thread
 
         if(context!=null)
         {
-            msgs.add(CoreMessages.serverStartedAt(context.getStartDate()));
+            msgs.add(CoreMessages.serverStartedAt(context.getConfiguration().getStartDate()));
         }
         msgs.add(CoreMessages.serverShutdownAt(new Date()));
         String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 86);

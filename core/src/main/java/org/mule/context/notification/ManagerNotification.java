@@ -71,13 +71,13 @@ public class ManagerNotification extends ServerNotification implements BlockingS
     {
         super(getId(context), action);
         resourceIdentifier = getId(context);
-        this.clusterId = context.getClusterId();
-        this.domain = context.getDomain();
+        this.clusterId = context.getConfiguration().getClusterId();
+        this.domain = context.getConfiguration().getDomainId();
     }
 
     private static String getId(MuleContext context)
     {
-        return context.getDomain() + "." + context.getClusterId() + "." + context.getId();
+        return context.getConfiguration().getDomainId() + "." + context.getConfiguration().getClusterId() + "." + context.getConfiguration().getId();
     }
 
     public String getClusterId()
@@ -92,7 +92,7 @@ public class ManagerNotification extends ServerNotification implements BlockingS
 
     protected String getPayloadToString()
     {
-        return ((MuleContext) source).getId();
+        return ((MuleContext) source).getConfiguration().getId();
     }
 
     public String toString()

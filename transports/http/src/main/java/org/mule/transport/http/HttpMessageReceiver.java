@@ -10,12 +10,12 @@
 
 package org.mule.transport.http;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
+import org.mule.MuleServer;
 import org.mule.NullSessionHandler;
 import org.mule.OptimizedRequestContext;
-import org.mule.RegistryContext;
 import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -128,7 +128,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             String encoding = endpoint.getEncoding();
             if (encoding == null)
             {
-                encoding = RegistryContext.getConfiguration().getDefaultEncoding();
+                encoding = MuleServer.getMuleContext().getConfiguration().getDefaultEncoding();
             }
 
             conn = new HttpServerConnection(socket, encoding);
@@ -204,7 +204,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         protected HttpResponse doHead(RequestLine requestLine) throws MuleException
         {
             MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
-            MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(message, new NullSessionHandler()), true);
+            MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(message, new NullSessionHandler(), connector.getMuleContext()), true);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_OK);
@@ -268,7 +268,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         protected HttpResponse doOtherValid(RequestLine requestLine, String method) throws MuleException
         {
             MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
-            MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(message, new NullSessionHandler()), true);
+            MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(message, new NullSessionHandler(), connector.getMuleContext()), true);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_METHOD_NOT_ALLOWED);
@@ -279,7 +279,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         protected HttpResponse doBad(RequestLine requestLine) throws MuleException
         {
             MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance());
-            MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(message, new NullSessionHandler()), true);
+            MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(message, new NullSessionHandler(), connector.getMuleContext()), true);
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
@@ -321,7 +321,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     HttpResponse expected = new HttpResponse();
                     expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
                     final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected), endpoint,
-                            new DefaultMuleSession(service), true);
+                            new DefaultMuleSession(service, connector.getMuleContext()), true);
                     RequestContext.setEvent(event);
                     conn.writeResponse(transformResponse(expected));
                 }
@@ -343,7 +343,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
             response.setBodyString(HttpMessages.cannotBindToAddress(failedPath).toString());
             RequestContext.setEvent(new DefaultMuleEvent(new DefaultMuleMessage(response), endpoint,
-                    new DefaultMuleSession(service), true));
+                    new DefaultMuleSession(service, connector.getMuleContext()), true));
             // The DefaultResponseTransformer will set the necessary headers
             return transformResponse(response);
         }

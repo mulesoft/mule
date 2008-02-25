@@ -143,8 +143,8 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
         if (destComponent != null)
         {
-            MuleSession session = new DefaultMuleSession(MuleServer.getMuleContext().getRegistry().lookupService(
-                destComponent));
+            MuleSession session = 
+                new DefaultMuleSession(context.getMuleContext().getRegistry().lookupService(destComponent), context.getMuleContext());
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type

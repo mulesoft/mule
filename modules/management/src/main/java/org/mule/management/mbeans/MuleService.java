@@ -89,7 +89,7 @@ public class MuleService implements MuleServiceMBean
     {
         if (!isStopped())
         {
-            return new Date(muleContext.getStartDate());
+            return new Date(muleContext.getConfiguration().getStartDate());
         }
         else
         {
@@ -155,7 +155,7 @@ public class MuleService implements MuleServiceMBean
 
     public String getServerId()
     {
-        return muleContext.getId();
+        return muleContext.getConfiguration().getId();
     }
 
     public String getHostname()
@@ -219,7 +219,7 @@ public class MuleService implements MuleServiceMBean
 
     public String getInstanceId()
     {
-        return muleContext.getId();
+        return muleContext.getConfiguration().getId();
     }
 
     public String getConfigBuilderClassName()

@@ -75,9 +75,9 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
     public void testDefaultCommonEndpointAttributes(ImmutableEndpoint ep)
     {
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
-        assertEquals(muleContext.getRegistry().getConfiguration().getDefaultSynchronousEventTimeout(),
+        assertEquals(muleContext.getConfiguration().getDefaultSynchronousEventTimeout(),
             ep.getRemoteSyncTimeout());
-        assertEquals(muleContext.getRegistry().getConfiguration().isDefaultSynchronousEndpoints(),
+        assertEquals(muleContext.getConfiguration().isDefaultSynchronousEndpoints(),
             ep.isSynchronous());
         assertEquals(false, ep.isRemoteSync());
         assertTrue(ep.getConnectionStrategy() instanceof SingleAttemptConnectionStrategy);
@@ -87,7 +87,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertTrue(ep.getConnector() instanceof TestConnector);
         assertEquals(ObjectNameHelper.getEndpointName(ep), ep.getName());
         assertFalse(ep.isDeleteUnacceptedMessages());
-        assertEquals(muleContext.getRegistry().getConfiguration().getDefaultEncoding(), ep.getEncoding());
+        assertEquals(muleContext.getConfiguration().getDefaultEncoding(), ep.getEncoding());
         assertEquals(null, ep.getFilter());
         assertEquals(ImmutableEndpoint.INITIAL_STATE_STARTED, ep.getInitialState());
     }

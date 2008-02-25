@@ -6,7 +6,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.model.Model;
-import org.mule.api.registry.Registry;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.endpoint.DefaultEndpointFactory;
@@ -42,8 +42,9 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         configureDefaults(muleContext.getRegistry());
     }
 
-    protected void configureDefaults(Registry registry) throws MuleException
+    protected void configureDefaults(MuleRegistry registry) throws MuleException
     {
+        //registry.registerObject(MuleProperties.OBJECT_MULE_CONFIGURATION, new MuleConfiguration());
         registry.registerObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP,
             new SimpleRegistryBootstrap());
         QueueManager queueManager = new TransactionalQueueManager();

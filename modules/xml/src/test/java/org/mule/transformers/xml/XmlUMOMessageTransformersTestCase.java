@@ -10,14 +10,13 @@
 
 package org.mule.transformers.xml;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.util.SystemUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +31,7 @@ public class XmlUMOMessageTransformersTestCase extends AbstractXmlTransformerTes
     protected void doSetUp() throws Exception
     {
         RequestContext.setEvent(new DefaultMuleEvent(testObject, getTestOutboundEndpoint("test"), MuleTestUtils
-            .getTestSession(), true));
+            .getTestSession(muleContext), true));
     }
 
     // @Override

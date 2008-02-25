@@ -10,7 +10,6 @@
 package org.mule.management.agents;
 
 import org.mule.AbstractAgent;
-import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.notification.ManagerNotificationListener;
@@ -25,8 +24,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ManagerNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.management.i18n.ManagementMessages;
-import org.mule.management.mbeans.ServiceService;
-import org.mule.management.mbeans.ServiceServiceMBean;
 import org.mule.management.mbeans.ConnectorService;
 import org.mule.management.mbeans.ConnectorServiceMBean;
 import org.mule.management.mbeans.EndpointService;
@@ -37,6 +34,8 @@ import org.mule.management.mbeans.MuleConfigurationService;
 import org.mule.management.mbeans.MuleConfigurationServiceMBean;
 import org.mule.management.mbeans.MuleService;
 import org.mule.management.mbeans.MuleServiceMBean;
+import org.mule.management.mbeans.ServiceService;
+import org.mule.management.mbeans.ServiceServiceMBean;
 import org.mule.management.mbeans.StatisticsService;
 import org.mule.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.management.support.JmxSupport;
@@ -46,13 +45,13 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.io.IOException;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
@@ -229,7 +228,7 @@ public class JmxAgent extends AbstractAgent
             }
         };
 
-        if (StringUtils.isBlank(muleContext.getId()))
+        if (StringUtils.isBlank(muleContext.getConfiguration().getId()))
         {
             // TODO i18n the message properly
             throw new IllegalArgumentException(
@@ -407,7 +406,7 @@ public class JmxAgent extends AbstractAgent
                                                          InstanceAlreadyExistsException, MalformedObjectNameException
     {
         ObjectName on = jmxSupport.getObjectName(jmxSupport.getDomainName(muleContext) + ":type=org.mule.Configuration,name=GlobalConfiguration");
-        MuleConfigurationServiceMBean serviceMBean = new MuleConfigurationService(RegistryContext.getConfiguration());
+        MuleConfigurationServiceMBean serviceMBean = new MuleConfigurationService(muleContext.getConfiguration());
         logger.debug("Registering configuration with name: " + on);
         mBeanServer.registerMBean(serviceMBean, on);
         registeredMBeans.add(on);

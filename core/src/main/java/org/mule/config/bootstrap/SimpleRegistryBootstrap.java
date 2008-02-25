@@ -9,12 +9,13 @@
  */
 package org.mule.config.bootstrap;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.Registry;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
@@ -120,7 +121,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
 
     }
 
-    private void registerTransformers(Properties props, Registry registry) throws MuleException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
+    private void registerTransformers(Properties props, MuleRegistry registry) throws MuleException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException
     {
         int i = 1;
         String transString = props.getProperty(TRANSFORMER_PREFIX + i);

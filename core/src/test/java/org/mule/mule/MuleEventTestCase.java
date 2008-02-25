@@ -85,7 +85,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         String data = "Test Data";
         ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test", CollectionUtils.singletonList(new TestEventTransformer()));
         DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(data), endpoint,
-            getTestSession(getTestService("apple", Apple.class)), true,
+            getTestSession(getTestService("apple", Apple.class), muleContext), true,
             new ResponseOutputStream(System.out));
 
         assertNotNull(event.getId());

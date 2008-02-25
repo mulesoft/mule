@@ -10,11 +10,11 @@
 
 package org.mule;
 
-import org.mule.api.MuleException;
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
@@ -48,11 +48,13 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     private final MuleEvent event;
     private final MuleSession session;
+    private MuleContext muleContext;
 
     public DefaultMuleEventContext(MuleEvent event)
     {
         this.event = event;
         this.session = event.getSession();
+        this.muleContext = event.getMuleContext();
     }
 
     /**
@@ -420,7 +422,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException
     {
-        ImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
         setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }

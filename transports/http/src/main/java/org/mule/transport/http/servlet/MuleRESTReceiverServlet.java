@@ -11,6 +11,7 @@
 package org.mule.transport.http.servlet;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.MuleServer;
 import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -119,7 +120,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
             MuleMessage message = new DefaultMuleMessage(receiver.getConnector()
                 .getMessageAdapter(httpServletRequest));
-            receiver.routeMessage(message, RegistryContext.getConfiguration().isDefaultSynchronousEndpoints());
+            receiver.routeMessage(message, MuleServer.getMuleContext().getConfiguration().isDefaultSynchronousEndpoints());
 
             httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);
             if (feedback)

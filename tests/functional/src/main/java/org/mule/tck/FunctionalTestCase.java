@@ -48,7 +48,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
     protected MuleContext createMuleContext() throws Exception
     {
         MuleContext mc = super.createMuleContext();
-        RegistryContext.getConfiguration().setDefaultWorkListener(new TestingWorkListener());
+        mc.getConfiguration().setDefaultWorkListener(new TestingWorkListener());
         return mc;
     }
 

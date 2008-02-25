@@ -10,7 +10,7 @@
 
 package org.mule.context.notification;
 
-import org.mule.RegistryContext;
+import org.mule.MuleServer;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
@@ -22,8 +22,8 @@ import org.mule.config.MuleConfiguration;
 import org.mule.util.ClassUtils;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -228,7 +228,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
     {
         if (null == workListener)
         {
-            MuleConfiguration config = RegistryContext.getConfiguration();
+            MuleConfiguration config = MuleServer.getMuleContext().getConfiguration();
             if (null != config)
             {
                 workListener = config.getDefaultWorkListener();

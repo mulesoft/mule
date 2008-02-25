@@ -228,22 +228,20 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
     
     public void testCreateEndpointByCustomizingEndpointBuilder() throws MuleException
     {
-        Registry r = muleContext.getRegistry();
-        
         // Create and register two connectors
         TestConnector testConnector1 = new TestConnector();
         testConnector1.setName("testConnector1");
         TestConnector testConnector2 = new TestConnector();
         testConnector2.setName("testConnector2");
-        r.registerConnector(testConnector1);
-        r.registerConnector(testConnector2);
+        muleContext.getRegistry().registerConnector(testConnector1);
+        muleContext.getRegistry().registerConnector(testConnector2);
         
         String globalEndpointName = "concreteEndpoint";
         
         // Create and register a endpoint builder (global endpoint) with connector1
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test://address", muleContext);
         endpointBuilder.setConnector(testConnector1);
-        r.registerObject(globalEndpointName, endpointBuilder);
+        muleContext.getRegistry().registerObject(globalEndpointName, endpointBuilder);
         EndpointFactory endpointFactory = new DefaultEndpointFactory();
         endpointFactory.setMuleContext(muleContext);
         try

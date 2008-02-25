@@ -11,7 +11,6 @@
 package org.mule.module.client.remoting;
 
 import org.mule.AbstractAgent;
-import org.mule.RegistryContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -112,7 +111,7 @@ public class RemoteDispatcherAgent extends AbstractAgent
             {
 
                 Service component = RemoteDispatcherComponent.getSerivce(endpoint, wireFormat,
-                    RegistryContext.getConfiguration().getDefaultEncoding(), RegistryContext.getConfiguration()
+                    muleContext.getConfiguration().getDefaultEncoding(), muleContext.getConfiguration()
                         .getDefaultSynchronousEventTimeout(), muleContext);
                 muleContext.getRegistry().registerService(component);
             }

@@ -46,7 +46,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
     public void testEventMetaDataPropagation() throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService("component1");
-        MuleSession session = new DefaultMuleSession(service);
+        MuleSession session = new DefaultMuleSession(service, muleContext);
         MuleEvent event =
                 new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent"),
                         (ImmutableEndpoint)service.getInboundRouter().getEndpoints().get(0), session, true);

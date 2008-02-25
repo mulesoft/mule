@@ -159,7 +159,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess
 
         //The transformer to execute on this message
         Transformer transformer = null;
-        transformer = RegistryContext.getRegistry().lookupTransformer(inputCls, outputType);
+        transformer = MuleServer.getMuleContext().getRegistry().lookupTransformer(inputCls, outputType);
 
         //no transformers found
         if (transformer == null)
