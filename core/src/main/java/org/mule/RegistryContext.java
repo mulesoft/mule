@@ -9,9 +9,7 @@
  */
 package org.mule;
 
-import org.mule.api.registry.Registry;
-import org.mule.config.MuleConfiguration;
-import org.mule.registry.TransientRegistry;
+import org.mule.api.registry.MuleRegistry;
 
 /** 
  * A handle to the Mule Registry.  We should make no assumptions about the location of the actual Registry
@@ -20,30 +18,8 @@ import org.mule.registry.TransientRegistry;
  */
 public class RegistryContext
 {
-    protected static Registry registry;
-    
-    public static Registry getRegistry()
+    public static MuleRegistry getRegistry()
     {
-        return registry;
-    }
-
-    public static synchronized void setRegistry(Registry registry)
-    {
-        RegistryContext.registry = registry;
-    }
-
-    public static MuleConfiguration getConfiguration()
-    {
-        // TODO Migrate uses to obtain configuration from MuleContext
-        return MuleServer.getMuleContext().getConfiguration();
-    }
-
-    public static Registry getOrCreateRegistry()
-    {
-        if(registry==null || registry.isDisposed())
-        {
-            registry = new TransientRegistry();
-        }
-        return registry;
+        return MuleServer.getMuleContext().getRegistry();
     }
 }
