@@ -19,6 +19,7 @@ import org.mule.api.model.Model;
 import org.mule.api.transport.Connector;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.builders.AbstractConfigurationBuilder;
+import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.model.seda.SedaModel;
@@ -71,8 +72,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         configBuilders.add(new TestConfigurationBuilder2());
 
         TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
-        muleContextBuilder.setMuleConfiguration(new TestMuleConfiguration());
-
         MuleContext muleContext = muleContextFactory.createMuleContext(configBuilders, muleContextBuilder);
 
         // Assert MuleContext config
@@ -89,9 +88,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     public void testCreateMuleContextMuleContextBuilder() throws InitialisationException, ConfigurationException
     {
         TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
-        muleContextBuilder.setMuleConfiguration(new TestMuleConfiguration());
-
-        MuleContext muleContext = muleContextFactory.createMuleContext(muleContextBuilder);
+        MuleContext muleContext = muleContextFactory.createMuleContext(new SimpleConfigurationBuilder(null), muleContextBuilder);
 
         // Assert MuleContext config
         testCustomMuleContext(muleContext);
@@ -104,8 +101,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     {
 
         TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
-        muleContextBuilder.setMuleConfiguration(new TestMuleConfiguration());
-
         MuleContext muleContext = muleContextFactory.createMuleContext(new TestConfigurationBuilder2(),
             muleContextBuilder);
 
@@ -218,7 +213,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertEquals(TestMuleContext.class, muleContext.getClass());
         assertTrue(muleContext.isInitialised());
         assertNotNull(muleContext.getConfiguration());
-        assertEquals(TestMuleConfiguration.class, muleContext.getConfiguration().getClass());
+        //assertEquals(TestMuleConfiguration.class, muleContext.getConfiguration().getClass());
         assertNotNull(muleContext.getLifecycleManager().getClass());
         assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[0]);
         assertNotNull(muleContext.getLifecycleManager().getLifecycles().toArray()[1]);
@@ -282,7 +277,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         public MuleContext buildMuleContext()
         {
             MuleContext muleContext = new TestMuleContext(getLifecycleManager());
-            muleContext.setConfiguration(getMuleConfiguration());
             muleContext.setWorkManager(getWorkManager());
             muleContext.setNotificationManager(getNotificationManager());
             return muleContext;

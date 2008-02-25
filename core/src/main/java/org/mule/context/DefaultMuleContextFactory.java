@@ -11,7 +11,6 @@
 package org.mule.context;
 
 import org.mule.MuleServer;
-import org.mule.RegistryContext;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
@@ -34,36 +33,35 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultMuleContextFactory implements MuleContextFactory
 {
-
     protected static final Log logger = LogFactory.getLog(DefaultMuleContextBuilder.class);
 
     /**
-     * {@inheritDoc
+     * Use default ConfigurationBuilder, default MuleContextBuilder
      */
     public MuleContext createMuleContext() throws InitialisationException, ConfigurationException
     {
-        // Create MuleContext using default MuleContextBuilder
-        MuleContext muleContext = doCreateMuleContext(null);
-
         // Configure with defaults needed for a feasible/startable MuleContext
-        new DefaultsConfigurationBuilder().configure(muleContext);
-
-        return muleContext;
+        return createMuleContext(new DefaultsConfigurationBuilder(), new DefaultMuleContextBuilder());
     }
 
     /**
-     * {@inheritDoc
+     * Use default MuleContextBuilder
      */
     public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder)
         throws InitialisationException, ConfigurationException
     {
         // Create MuleContext using default MuleContextBuilder
-        MuleContext muleContext = doCreateMuleContext(null);
+        return createMuleContext(configurationBuilder, new DefaultMuleContextBuilder());
+    }
 
-        // Configure
-        configurationBuilder.configure(muleContext);
-
-        return muleContext;
+    /**
+     * Use default ConfigurationBuilder
+     */
+    public MuleContext createMuleContext(MuleContextBuilder muleContextBuilder)
+        throws InitialisationException, ConfigurationException
+    {
+        // Configure with defaults needed for a feasible/startable MuleContext
+        return createMuleContext(new DefaultsConfigurationBuilder(), muleContextBuilder);
     }
 
     /**
@@ -82,15 +80,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         }
 
         return muleContext;
-    }
-
-    /**
-     * {@inheritDoc
-     */
-    public MuleContext createMuleContext(MuleContextBuilder muleContextBuilder)
-        throws InitialisationException, ConfigurationException
-    {
-        return doCreateMuleContext(muleContextBuilder);
     }
 
     /**
@@ -146,7 +135,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         throws InitialisationException, ConfigurationException
     {
         // Create MuleContext
-        MuleContext muleContext = doCreateMuleContext(null);
+        MuleContext muleContext = doCreateMuleContext(new DefaultMuleContextBuilder());
 
         // Configure with startup properties
         if (properties != null && !properties.isEmpty())
@@ -176,7 +165,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         throws InitialisationException, ConfigurationException
     {
         // Create MuleContext
-        MuleContext muleContext = doCreateMuleContext(null);
+        MuleContext muleContext = doCreateMuleContext(new DefaultMuleContextBuilder());
 
         // Configure with startup properties
         if (properties != null && !properties.isEmpty())
@@ -193,9 +182,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     protected MuleContext doCreateMuleContext(MuleContextBuilder muleContextBuilder)
         throws InitialisationException
     {
-        // Create transent registry
-        RegistryContext.getOrCreateRegistry();
-
         // Create muleContext instance and set it in MuleServer
         MuleContext muleContext = buildMuleContext(muleContextBuilder);
         MuleServer.setMuleContext(muleContext);
@@ -208,11 +194,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory
 
     protected MuleContext buildMuleContext(MuleContextBuilder muleContextBuilder)
     {
-        // If no MuleContextBuilder is specfied use DefaultMuleContextBuilder
-        if (muleContextBuilder == null)
-        {
-            muleContextBuilder = new DefaultMuleContextBuilder();
-        }
         return muleContextBuilder.buildMuleContext();
     }
 
