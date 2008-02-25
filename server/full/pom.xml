@@ -67,30 +67,29 @@
                 </executions>
             </plugin>
 
+            <!-- Disable for now since this will completely change for OSGi.
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>mule-assembly-verifier</artifactId>
-                <!-- version is managed in the pluginManagement of the toplevel pom -->
+                <!- version is managed in the pluginManagement of the toplevel pom ->
                 <executions>
-                    <!-- Disable for now since this will completely change for OSGi.
                     <execution>
                         <phase>verify</phase>
                         <goals>
                             <goal>verify</goal>
                         </goals>
                     </execution>
-                    -->
                 </executions>
                 <configuration>
                     <projectOutputFile>mule-${version}.zip</projectOutputFile>
-                    <!-- Default is under src/main/resources, pull it to the root for this project -->
+                    <!- Default is under src/main/resources, pull it to the root for this project ->
                     <whitelist>assembly-whitelist.txt</whitelist>
-                    <!--
+                    <!-
                         Blacklisted entries are supposed to be part of the distribution,
                         but not verified. They are defined by their full path relative to the
                         distribution *archive*; therefore we need to specify the name of the
                         toplevel subdirectory in the archive too.
-                    -->
+                    ->
                     <blacklist>
                         <entry>mule-${version}/lib/endorsed/xml-apis-1.3.04.jar</entry>
                         <entry>mule-${version}/lib/endorsed/xercesImpl-2.9.1.jar</entry>
@@ -99,6 +98,7 @@
                     </blacklist>
                 </configuration>
             </plugin>
+            -->
 
             <plugin>
                 <groupId>org.codehaus.mojo.groovy</groupId>

@@ -88,6 +88,12 @@
 -istart opt/spring-core.jar
 -istart opt/spring-context.jar
 -istart opt/spring-beans.jar
+# Spring OSGi
+-istart opt/spring-osgi-core.jar
+-istart opt/spring-osgi-io.jar
+-istart opt/spring-osgi-extender.jar
+-istart opt/spring-aop.jar
+-istart opt/aopalliance.osgi.jar
 
 # Re-packaged by Mule for OSGi
 -istart opt/backport-util-concurrent.osgi.jar
@@ -98,9 +104,10 @@
 -initlevel 9
 # Core
 -istart mule/mule-core.jar
+# Registers Mule bundle listener
+-istart mule/mule-module-osgi.jar
 # Modules
 -istart mule/mule-module-spring-config.jar
--istart mule/mule-module-osgi.jar
 # Transports
 -istart mule/mule-transport-vm.jar
 -istart mule/mule-transport-file.jar

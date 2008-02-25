@@ -433,6 +433,12 @@ Disable temporarily to speed up build cycle during development
         <include>org.springframework:spring-core</include>
         <include>org.springframework:spring-beans</include>
         <include>org.springframework:spring-context</include>
+        <!-- Spring OSGi -->
+        <include>org.springframework.osgi:spring-osgi-core</include>
+        <include>org.springframework.osgi:spring-osgi-io</include>
+        <include>org.springframework.osgi:spring-osgi-extender</include>
+        <include>org.springframework:spring-aop</include>
+        <include>aopalliance:aopalliance.osgi</include>
         <!-- PAX Logging -->
         <include>org.ops4j.pax.logging:pax-logging-api</include>
         <include>org.ops4j.pax.logging:pax-logging-service</include> 
