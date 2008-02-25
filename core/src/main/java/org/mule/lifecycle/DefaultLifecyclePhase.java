@@ -9,13 +9,11 @@
  */
 package org.mule.lifecycle;
 
-import org.mule.RegistryContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.api.registry.Registry;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringMessageUtils;
@@ -24,9 +22,9 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,7 +55,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase
     private String name;
     private String oppositeLifecyclePhase;
     private Set supportedPhases;
-    private int registryScope = Registry.SCOPE_REMOTE;
 
     public DefaultLifecyclePhase(String name, Class lifecycleClass, String oppositeLifecyclePhase)
     {
@@ -95,7 +92,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         {
             LifecycleObject lo = (LifecycleObject) iterator.next();
             // list so that ordering is preserved on retry
-            List targets = new LinkedList(RegistryContext.getRegistry().lookupObjects(lo.getType(), getRegistryScope()));
+            List targets = new LinkedList(muleContext.getRegistry().lookupObjects(lo.getType()));
             if (targets.size() > 0)
             {
                 lo.firePreNotification(muleContext);
@@ -277,16 +274,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase
         {
             throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(lifecycleMethod.getName(), o), e, this);
         }
-    }
-
-    public int getRegistryScope()
-    {
-        return registryScope;
-    }
-
-    public void setRegistryScope(int registryScope)
-    {
-        this.registryScope = registryScope;
     }
 
     public String getOppositeLifecyclePhase()

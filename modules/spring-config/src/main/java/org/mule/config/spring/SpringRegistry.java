@@ -10,26 +10,21 @@
 
 package org.mule.config.spring;
 
-import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
-import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
 import org.mule.api.registry.ServiceException;
-import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.config.MuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.container.MultiContainerContext;
 import org.mule.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.GenericLifecycleManager;
 import org.mule.registry.AbstractRegistry;
@@ -43,20 +38,14 @@ import java.util.Properties;
 import javax.transaction.TransactionManager;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 public class SpringRegistry extends AbstractRegistry
 {
     public static final String REGISTRY_ID = "org.mule.Registry.Spring";
 
-    protected ConfigurableApplicationContext applicationContext;
-
-    /**
-     * TODO MULE-1908
-     *
-     * @deprecated Should MultiContainerContext still be used in 2.x? MULE-1908
-     */
-    protected MultiContainerContext containerContext;
+    protected ApplicationContext applicationContext;
 
     public SpringRegistry()
     {
@@ -68,18 +57,35 @@ public class SpringRegistry extends AbstractRegistry
         super(id);
     }
 
-    public SpringRegistry(ConfigurableApplicationContext applicationContext)
+    public SpringRegistry(ApplicationContext applicationContext)
     {
         super(REGISTRY_ID);
         this.applicationContext = applicationContext;
     }
 
-    public SpringRegistry(String id, ConfigurableApplicationContext applicationContext)
+    public SpringRegistry(String id, ApplicationContext applicationContext)
     {
         super(id);
         this.applicationContext = applicationContext;
     }
 
+    //@Override
+    protected void doInitialise() throws InitialisationException
+    {
+        if (applicationContext instanceof ConfigurableApplicationContext)
+        {
+            ((ConfigurableApplicationContext) applicationContext).refresh();
+        }
+    }
+
+    protected void doDispose()
+    {
+        if (applicationContext instanceof ConfigurableApplicationContext)
+        {
+            ((ConfigurableApplicationContext) applicationContext).close();
+        }
+    }
+    
     protected LifecycleManager createLifecycleManager()
     {
         GenericLifecycleManager lcm = new GenericLifecycleManager();
@@ -90,7 +96,7 @@ public class SpringRegistry extends AbstractRegistry
         return lcm;
     }
 
-    protected Object doLookupObject(String key)
+    public Object lookupObject(String key)
     {
         if (StringUtils.isBlank(key))
         {
@@ -111,7 +117,7 @@ public class SpringRegistry extends AbstractRegistry
         }
     }
 
-    protected Collection doLookupObjects(Class type)
+    public Collection lookupObjects(Class type)
     {
         Map map = applicationContext.getBeansOfType(type);
         // MULE-2762
@@ -131,15 +137,6 @@ public class SpringRegistry extends AbstractRegistry
             throw new ServiceException(CoreMessages.failedToLoad(type + " " + name));
         }
         return ServiceDescriptorFactory.create(type, name, props, overrides, this);
-    }
-
-    /**
-     * @return the MuleConfiguration for this MuleManager. This object is immutable
-     *         once the manager has initialised.
-     */
-    protected synchronized MuleConfiguration getLocalConfiguration()
-    {
-        return (MuleConfiguration) applicationContext.getBean(MuleProperties.OBJECT_MULE_CONFIGURATION);
     }
 
     /** {@inheritDoc} */
@@ -183,6 +180,39 @@ public class SpringRegistry extends AbstractRegistry
         return applicationContext.getBeansOfType(Transformer.class).values();
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////
+    // Registry is read-only
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    public void registerObject(String key, Object value) throws RegistrationException
+    {
+        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+    }
+
+    public void registerObject(String key, Object value, Object metadata) throws RegistrationException
+    {
+        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+    }
+
+    public void registerObjects(Map objects) throws RegistrationException
+    {
+        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+    }
+
+    public void unregisterObject(String key)
+    {
+        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+    }
+
+    public void unregisterObject(String key, Object metadata) throws RegistrationException
+    {
+        throw new UnsupportedOperationException("Registry is read-only so objects cannot be registered or unregistered.");
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////////
+    // Registry meta-data
+    ////////////////////////////////////////////////////////////////////////////////////
+    
     public boolean isReadOnly()
     {
         return true;
@@ -191,103 +221,5 @@ public class SpringRegistry extends AbstractRegistry
     public boolean isRemote()
     {
         return false;
-    }
-
-    public void registerConnector(Connector connector)
-            throws MuleException
-    {
-        unsupportedOperation("registerConnector", connector);
-    }
-
-    public void unregisterConnector(String connectorName) throws MuleException
-    {
-        unsupportedOperation("unregisterConnector", connectorName);
-    }
-
-    public void registerEndpoint(ImmutableEndpoint endpoint)
-            throws MuleException
-    {
-        unsupportedOperation("registerEndpoint", endpoint);
-    }
-
-    public void unregisterEndpoint(String endpointName)
-    {
-        unsupportedOperation("unregisterEndpoint", endpointName);
-    }
-
-    protected void doRegisterTransformer(Transformer transformer) throws MuleException
-    {
-        unsupportedOperation("registerTransformer", transformer);
-    }
-
-    public void unregisterTransformer(String transformerName)
-    {
-        unsupportedOperation("unregistertransformer", transformerName);
-    }
-
-    /** {@inheritDoc} */
-    public void registerService(Service service)
-            throws MuleException
-    {
-        unsupportedOperation("registerComponent", service);
-    }
-
-    public void unregisterComponent(String componentName)
-    {
-        unsupportedOperation("unregisterComponent", componentName);
-    }
-
-    public void registerModel(Model model) throws MuleException
-    {
-        unsupportedOperation("registerModel", model);
-    }
-
-    public void unregisterModel(String modelName)
-    {
-        unsupportedOperation("unregisterModel", modelName);
-    }
-
-    public void registerAgent(Agent agent) throws MuleException
-    {
-        unsupportedOperation("registerAgent", agent);
-    }
-
-    public void unregisterAgent(String agentName) throws MuleException
-    {
-        unsupportedOperation("unregisterAgent", agentName);
-    }
-
-    protected void doRegisterObject(String key,
-                                    Object value,
-                                    Object metadata) throws RegistrationException
-    {
-        unsupportedOperation("doRegisterObject", key);
-    }
-
-    public void unregisterObject(String key)
-    {
-        unsupportedOperation("unregisterObject", key);
-    }
-
-    public void registerObjects(Map objects) throws RegistrationException
-    {
-        unsupportedOperation("registryObjects", objects);
-    }
-
-    public void setConfiguration(MuleConfiguration config)
-    {
-        unsupportedOperation("setConfiguration", config);
-    }
-
-    public void registerEndpointBuilder(String name,
-                                        EndpointBuilder builder) throws MuleException
-    {
-        unsupportedOperation("registerEndpointBuilder", builder);
-    }
-    
-    protected void doDispose()
-    {
-        super.doDispose();
-        applicationContext.close();
     }
 }

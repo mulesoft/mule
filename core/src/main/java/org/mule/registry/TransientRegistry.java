@@ -10,42 +10,30 @@
 package org.mule.registry;
 
 import org.mule.MuleServer;
-import org.mule.RegistryContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
-import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecyclePhase;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
-import org.mule.api.registry.AbstractServiceDescriptor;
 import org.mule.api.registry.ObjectProcessor;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.Registry;
-import org.mule.api.registry.ServiceDescriptor;
-import org.mule.api.registry.ServiceDescriptorFactory;
-import org.mule.api.registry.ServiceException;
 import org.mule.api.service.Service;
-import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.config.MuleConfiguration;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.GenericLifecycleManager;
 import org.mule.lifecycle.phases.TransientRegistryDisposePhase;
 import org.mule.lifecycle.phases.TransientRegistryInitialisePhase;
-import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
-import org.mule.util.SpiUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,50 +45,23 @@ public class TransientRegistry extends AbstractRegistry
     public static final String REGISTRY_ID = "org.mule.Registry.Transient";
 
     /** Map of Maps registry */
-    private Map registry;
-
-    //TODO MULE-2162 how do we handle Muleconfig across Registries
-    private MuleConfiguration config; // = new MuleConfiguration();
+    private Map registry = new HashMap(8);
 
     public TransientRegistry()
     {
         super(REGISTRY_ID);
-        init();
-    }
-
-    public TransientRegistry(Registry parent)
-    {
-        super(REGISTRY_ID, parent);
-        init();
-    }
-
-    private void init()
-    {
-        registry = new HashMap(8);
-
         getObjectTypeMap(ObjectProcessor.class).put("_mulePropertyExtractorProcessor",
                 new PropertyExtractorProcessor());
-
-        RegistryContext.setRegistry(this);
-        try
-        {
-            initialise();
-        }
-        catch (InitialisationException e)
-        {
-            logger.error(e);
-        }
-
     }
 
     protected LifecycleManager createLifecycleManager()
     {
         GenericLifecycleManager lcm = new GenericLifecycleManager();
         LifecyclePhase initPhase = new TransientRegistryInitialisePhase();
-        initPhase.setRegistryScope(Registry.SCOPE_IMMEDIATE);
+        //initPhase.setRegistryScope(Registry.SCOPE_IMMEDIATE);
         lcm.registerLifecycle(initPhase);
         LifecyclePhase disposePhase = new TransientRegistryDisposePhase();
-        disposePhase.setRegistryScope(Registry.SCOPE_IMMEDIATE);
+        //disposePhase.setRegistryScope(Registry.SCOPE_IMMEDIATE);
         lcm.registerLifecycle(disposePhase);
         return lcm;
     }
@@ -108,23 +69,29 @@ public class TransientRegistry extends AbstractRegistry
     //@java.lang.Override
     protected void doInitialise() throws InitialisationException
     {
-        int oldScope = getDefaultScope();
-        setDefaultScope(Registry.SCOPE_IMMEDIATE);
+        //int oldScope = getDefaultScope();
+        //setDefaultScope(Registry.SCOPE_IMMEDIATE);
         try
         {
-            applyProcessors(getConnectors());
-            applyProcessors(getTransformers());
-            applyProcessors(getEndpoints());
-            applyProcessors(getAgents());
-            applyProcessors(getModels());
-            applyProcessors(lookupComponents());
+            applyProcessors(lookupObjects(Connector.class));
+            applyProcessors(lookupObjects(Transformer.class));
+            applyProcessors(lookupObjects(ImmutableEndpoint.class));
+            applyProcessors(lookupObjects(Agent.class));
+            applyProcessors(lookupObjects(Model.class));
+            applyProcessors(lookupObjects(Service.class));
             applyProcessors(lookupObjects(Object.class));
         }
         finally
         {
-            setDefaultScope(oldScope);
+            //setDefaultScope(oldScope);
         }
 
+    }
+
+    //@Override
+    protected void doDispose()
+    {
+        // empty
     }
 
     protected void applyProcessors(Map objects)
@@ -160,7 +127,7 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
-    protected Object doLookupObject(String key)
+    public Object lookupObject(String key)
     {
         Object o = null;
         if (key != null)
@@ -179,17 +146,7 @@ public class TransientRegistry extends AbstractRegistry
         return o;
     }
 
-    protected MuleConfiguration getLocalConfiguration()
-    {
-        return config;
-    }
-
-    public void setConfiguration(MuleConfiguration config)
-    {
-        this.config = config;
-    }
-
-    public Collection doLookupObjects(Class returntype)
+    public Collection lookupObjects(Class returntype)
     {
         Map map = (Map) registry.get(returntype);
         if (map != null)
@@ -198,47 +155,10 @@ public class TransientRegistry extends AbstractRegistry
         }
         else
         {
-            return null;
+            return new ArrayList(0);
         }
     }
 
-
-    /** Looks up the service descriptor from a singleton cache and creates a new one if not found. */
-    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
-    {
-        String key = new AbstractServiceDescriptor.Key(name, overrides).getKey();
-        //TODO If we want these descriptors loaded form Spring we need to checnge the key mechanism
-        //and the scope, and then deal with circular reference issues.
-        ServiceDescriptor sd = (ServiceDescriptor) lookupObject(key);
-
-        synchronized (this)
-        {
-            if (sd == null)
-            {
-                sd = createServiceDescriptor(type, name, overrides);
-                try
-                {
-                    registerObject(key, sd, ServiceDescriptor.class);
-                }
-                catch (RegistrationException e)
-                {
-                    throw new ServiceException(e.getI18nMessage(), e);
-                }
-            }
-        }
-        return sd;
-    }
-
-    /** @deprecated ServiceDescriptors will be created upon bundle startup for OSGi. */
-    protected ServiceDescriptor createServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
-    {
-        Properties props = SpiUtils.findServiceDescriptor(type, name);
-        if (props == null)
-        {
-            throw new ServiceException(CoreMessages.failedToLoad(type + " " + name));
-        }
-        return ServiceDescriptorFactory.create(type, name, props, overrides, this);
-    }
 
     protected Map getObjectTypeMap(Object o)
     {
@@ -276,9 +196,7 @@ public class TransientRegistry extends AbstractRegistry
         // it is initialised, we end up triggering object creation.  that causes circular dependencies because
         // this may have originally been called while creating objects in spring...  so we prevent that by
         // only doing the full lookup once everything is stable.  ac.
-        Collection processors = 
-                lookupObjects(ObjectProcessor.class,
-                        (null != getParent() && getParent().isInitialised()) ? getDefaultScope() : SCOPE_IMMEDIATE);
+        Collection processors = lookupObjects(ObjectProcessor.class);
         for (Iterator iterator = processors.iterator(); iterator.hasNext();)
         {
             ObjectProcessor o = (ObjectProcessor) iterator.next();
@@ -293,9 +211,9 @@ public class TransientRegistry extends AbstractRegistry
      * @param key
      * @param value
      */
-    protected void doRegisterObject(String key, Object value) throws RegistrationException
+    public void registerObject(String key, Object value) throws RegistrationException
     {
-        doRegisterObject(key, value, Object.class);
+        registerObject(key, value, Object.class);
     }
 
     /**
@@ -304,7 +222,7 @@ public class TransientRegistry extends AbstractRegistry
      * @param key
      * @param value
      */
-    protected void doRegisterObject(String key, Object value, Object metadata) throws RegistrationException
+    public void registerObject(String key, Object value, Object metadata) throws RegistrationException
     {
         logger.debug("registering object");
         if (isInitialised() || isInitialising())
@@ -351,136 +269,30 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
-    //@java.lang.Override
-    public void registerAgent(Agent agent) throws MuleException
-    {
-        registerObject(agent.getName(), agent, Agent.class);
-    }
-
-    //@java.lang.Override
-    public void registerConnector(Connector connector) throws MuleException
-    {
-        registerObject(connector.getName(), connector, Connector.class);
-    }
-
-    //@java.lang.Override
-    public void registerEndpoint(ImmutableEndpoint endpoint) throws MuleException
-    {
-        registerObject(endpoint.getName(), endpoint, ImmutableEndpoint.class);
-    }
-
-    public void registerEndpointBuilder(String name, EndpointBuilder builder) throws MuleException
-    {
-        registerObject(name, builder, EndpointBuilder.class);
-    }
-
-    //@java.lang.Override
-    public void registerModel(Model model) throws MuleException
-    {
-        registerObject(model.getName(), model, Model.class);
-    }
-
-    //@java.lang.Override
-    protected void doRegisterTransformer(Transformer transformer) throws MuleException
-    {
-        //TODO should we always throw an exception if an object already exists
-        if (lookupTransformer(transformer.getName()) != null)
-        {
-            throw new RegistrationException(CoreMessages.objectAlreadyRegistered("transformer: " +
-                    transformer.getName(), lookupTransformer(transformer.getName()), transformer).getMessage());
-        }
-        registerObject(transformer.getName(), transformer, Transformer.class);
-    }
-
-    //@java.lang.Override
-    public void registerService(Service service) throws MuleException
-    {
-        registerObject(service.getName(), service, Service.class);
-    }
-
-    protected void unregisterObject(String key, Object metadata) throws MuleException
+    public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
         Object obj = getObjectTypeMap(metadata).remove(key);
         if (obj instanceof Stoppable)
         {
-            ((Stoppable) obj).stop();
+            try
+            {
+                ((Stoppable) obj).stop();
+            }
+            catch (MuleException e)
+            {
+                throw new RegistrationException(e);
+            }
         }
     }
 
-    public void unregisterObject(String key) throws MuleException
+    public void unregisterObject(String key) throws RegistrationException
     {
         unregisterObject(key, Object.class);
     }
 
-    //@java.lang.Override
-    public void unregisterComponent(String componentName) throws MuleException
-    {
-        unregisterObject(componentName, Service.class);
-    }
-
-
-    //@java.lang.Override
-    public void unregisterAgent(String agentName) throws MuleException
-    {
-        unregisterObject(agentName, Agent.class);
-    }
-
-    //@java.lang.Override
-    public void unregisterConnector(String connectorName) throws MuleException
-    {
-        unregisterObject(connectorName, Connector.class);
-    }
-
-    //@java.lang.Override
-    public void unregisterEndpoint(String endpointName) throws MuleException
-    {
-        unregisterObject(endpointName, ImmutableEndpoint.class);
-    }
-
-    //@java.lang.Override
-    public void unregisterModel(String modelName) throws MuleException
-    {
-        unregisterObject(modelName, Model.class);
-    }
-
-    //@java.lang.Override
-    public void unregisterTransformer(String transformerName) throws MuleException
-    {
-        Transformer transformer = lookupTransformer(transformerName);
-        if (transformer instanceof DiscoverableTransformer)
-        {
-            exactTransformerCache.clear();
-            transformerListCache.clear();
-        }
-        unregisterObject(transformerName, Transformer.class);
-    }
-
-    //@java.lang.Override
-    public Transformer lookupTransformer(String name)
-    {
-        Transformer transformer = super.lookupTransformer(name);
-        if (transformer != null)
-        {
-            try
-            {
-                if (transformer.getEndpoint() != null)
-                {
-                    throw new IllegalStateException("Endpoint cannot be set");
-                }
-//                Map props = BeanUtils.describe(transformer);
-//                props.remove("endpoint");
-//                props.remove("strategy");
-//                transformer = (Transformer)ClassUtils.instanciateClass(transformer.getClass(), ClassUtils.NO_ARGS);
-                //TODO: friggin' cloning
-                transformer = (Transformer) BeanUtils.cloneBean(transformer);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return transformer;
-    }
+    // /////////////////////////////////////////////////////////////////////////
+    // Registry Metadata
+    // /////////////////////////////////////////////////////////////////////////
 
     public boolean isReadOnly()
     {
