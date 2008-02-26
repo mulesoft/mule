@@ -33,7 +33,7 @@ public class OsgiRegistryBroker extends AbstractRegistryBroker
 
     public void addRegistry(Registry registry)
     {
-        bundleContext.registerService(new String[]{registry.getClass().getName(), Registry.class.getName()}, registry, null);
+        bundleContext.registerService(Registry.class.getName(), registry, null);
     }
 
     public void removeRegistry(Registry registry)

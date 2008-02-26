@@ -11,7 +11,6 @@
 package org.mule.registry;
 
 import org.mule.MuleServer;
-import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -71,9 +70,8 @@ public abstract class AbstractRegistry implements Registry
             lifecycleManager.firePhase(MuleServer.getMuleContext(), Disposable.PHASE_NAME);
             PropertyExtractorManager.clear();
         }
-        catch (MuleException e)
+        catch (Exception e)
         {
-            // TODO
             logger.error("Failed to cleanly dispose: " + e.getMessage(), e);
         }
     }

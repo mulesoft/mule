@@ -12,38 +12,45 @@ package org.mule.osgi;
 
 import org.mule.api.MuleContext;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.context.OsgiMuleContextBuilder;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+/**
+ * Starts up a vanilla Mule instance and makes the MuleContext available via the OSGi ServiceRegistry.
+ */
 public class MuleContextActivator implements BundleActivator 
 {    
+    private MuleContext muleContext;
     private ServiceRegistration muleContextRef;
 
     public void start(BundleContext bc) throws Exception 
     {
-        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
-        muleContext.start();
+        muleContext = new DefaultMuleContextFactory().createMuleContext(new OsgiMuleContextBuilder(bc));
+        // TODO Get MuleStartupTestCase.testProgrammaticDefaultsThenStartThenSpringXml() working before we can enable this.
+        //muleContext.start();
+
         muleContextRef = bc.registerService(MuleContext.class.getName(), muleContext, null);
     }
 
     public void stop(BundleContext bc) throws Exception 
     {
-        MuleContext context = (MuleContext) bc.getService(muleContextRef.getReference());
-        if (context != null)
+        if (muleContext != null)
         {
-            context.stop();
             try
             {
-                if (!(context.isDisposed() || context.isDisposing()))
+                if (!(muleContext.isDisposed() || muleContext.isDisposing()))
                 {
-                    context.dispose();
+                    // Will stop the context implicitly before disposing.
+                    muleContext.dispose();
                 }
             }
             finally
             {
-                context = null; 
+                muleContext = null; 
+                muleContextRef.unregister();
             }
         }
     }

@@ -4,6 +4,7 @@ package org.mule;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.service.Service;
+import org.mule.config.spring.SpringOsgiXmlConfigurationBuilder;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.OsgiMuleContextBuilder;
@@ -217,21 +218,6 @@ public class MuleStartupTestCase extends TestCase
 //        assertTrue("Service not started", verifyStarted());
 //    }
 
-    public void testSpringOsgiXml() throws Exception
-    {
-        // Start up OSGi Framework
-        setUpOsgiFramework();
-        
-        muleContext = new DefaultMuleContextFactory().createMuleContext(
-            new SpringXmlConfigurationBuilder(USER_CONFIG),
-            new OsgiMuleContextBuilder(bundleContext));
-        muleContext.start();
-
-        assertTrue("Default configuration not found in registry", verifyDefaultConfig());
-        assertTrue("User configuration not found in registry", verifyUserConfig());
-        assertTrue("Service not started", verifyStarted());
-    }
-
     public void testProgrammaticDefaultsThenSpringOsgiXml() throws Exception
     {
         // Start up OSGi Framework
@@ -240,11 +226,13 @@ public class MuleStartupTestCase extends TestCase
         // Start up Mule core with defaults
         muleContext = new DefaultMuleContextFactory().createMuleContext(
             new OsgiMuleContextBuilder(bundleContext));
+
+        // Make the MuleContext available via the OSGi ServiceRegistry 
+        // (done by the MuleContextActivator normally)
+        bundleContext.registerService(new String[]{OsgiMuleContext.class.getName(), MuleContext.class.getName()}, muleContext, null);
         
         // Start up user config
-        SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(USER_CONFIG);
-        builder.setUseDefaultConfigResource(false);
-        builder.configure(muleContext);
+        new SpringOsgiXmlConfigurationBuilder(new String[]{"classpath:" + USER_CONFIG}, bundleContext).configure(muleContext);
         muleContext.start();
 
         assertTrue("Default configuration not found in registry", verifyDefaultConfig());

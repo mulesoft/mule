@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractConfigurationBuilder implements ConfigurationBuilder
 {
-    protected static final Log logger = LogFactory.getLog(AbstractConfigurationBuilder.class);
+    protected transient final Log logger = LogFactory.getLog(getClass());
 
     private boolean configured = false;
 
