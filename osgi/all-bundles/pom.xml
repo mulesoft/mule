@@ -50,10 +50,12 @@
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-io</artifactId>
         </dependency>
+        <!-- We package this one ourselves 
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-extender</artifactId>
         </dependency>
+        -->
 
        <!-- 3rd party libs repackaged for OSGi -->
        <dependency>
