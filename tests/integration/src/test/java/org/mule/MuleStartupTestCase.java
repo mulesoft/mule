@@ -218,26 +218,26 @@ public class MuleStartupTestCase extends TestCase
 //        assertTrue("Service not started", verifyStarted());
 //    }
 
-    public void testProgrammaticDefaultsThenSpringOsgiXml() throws Exception
-    {
-        // Start up OSGi Framework
-        setUpOsgiFramework();
-        
-        // Start up Mule core with defaults
-        muleContext = new DefaultMuleContextFactory().createMuleContext(
-            new OsgiMuleContextBuilder(bundleContext));
-
-        // Make the MuleContext available via the OSGi ServiceRegistry 
-        // (done by the MuleContextActivator normally)
-        bundleContext.registerService(new String[]{OsgiMuleContext.class.getName(), MuleContext.class.getName()}, muleContext, null);
-        
-        // Start up user config
-        new SpringOsgiXmlConfigurationBuilder(new String[]{"classpath:" + USER_CONFIG}, bundleContext).configure(muleContext);
-        muleContext.start();
-
-        assertTrue("Default configuration not found in registry", verifyDefaultConfig());
-        assertTrue("User configuration not found in registry", verifyUserConfig());
-        assertTrue("Service not started", verifyStarted());
-    }
+//    public void testProgrammaticDefaultsThenSpringOsgiXml() throws Exception
+//    {
+//        // Start up OSGi Framework
+//        setUpOsgiFramework();
+//        
+//        // Start up Mule core with defaults
+//        muleContext = new DefaultMuleContextFactory().createMuleContext(
+//            new OsgiMuleContextBuilder(bundleContext));
+//
+//        // Make the MuleContext available via the OSGi ServiceRegistry 
+//        // (done by the MuleContextActivator normally)
+//        bundleContext.registerService(new String[]{OsgiMuleContext.class.getName(), MuleContext.class.getName()}, muleContext, null);
+//        
+//        // Start up user config
+//        new SpringOsgiXmlConfigurationBuilder(new String[]{"classpath:" + USER_CONFIG}, bundleContext).configure(muleContext);
+//        muleContext.start();
+//
+//        assertTrue("Default configuration not found in registry", verifyDefaultConfig());
+//        assertTrue("User configuration not found in registry", verifyUserConfig());
+//        assertTrue("Service not started", verifyStarted());
+//    }
 
 }
