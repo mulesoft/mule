@@ -607,12 +607,14 @@
                 <version>${springOsgiVersion}</version>
                 <scope>provided</scope>
             </dependency>
+            <!-- We package this one ourselves 
             <dependency>
                 <groupId>org.springframework.osgi</groupId>
                 <artifactId>spring-osgi-extender</artifactId>
                 <version>${springOsgiVersion}</version>
                 <scope>provided</scope>
             </dependency>
+            -->
         </dependencies>
     </dependencyManagement>
     

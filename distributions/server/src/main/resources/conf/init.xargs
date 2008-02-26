@@ -91,7 +91,6 @@
 # Spring OSGi
 -istart opt/spring-osgi-core.jar
 -istart opt/spring-osgi-io.jar
--istart opt/spring-osgi-extender.jar
 -istart opt/spring-aop.jar
 -istart opt/aopalliance.osgi.jar
 

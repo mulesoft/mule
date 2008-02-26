@@ -30,6 +30,7 @@
         <dependency>
             <groupId>org.springframework.osgi</groupId>
             <artifactId>spring-osgi-extender</artifactId>
+            <version>${springOsgiVersion}</version>
         </dependency>
   </dependencies>
 </project>
