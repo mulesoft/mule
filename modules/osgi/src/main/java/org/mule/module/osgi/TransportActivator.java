@@ -27,11 +27,14 @@ import java.util.Properties;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
 
 
 public class TransportActivator implements BundleActivator {
     
     public static final String OSGI_HEADER_TRANSPORTS = "Mule-Transports";
+    
+    private ServiceRegistration descriptorRef;
     
     public void start(BundleContext bc) throws Exception {
         Dictionary headers = bc.getBundle().getHeaders();
@@ -41,12 +44,12 @@ public class TransportActivator implements BundleActivator {
         String transportHeader = (String) headers.get(OSGI_HEADER_TRANSPORTS);
         if (transportHeader == null)
         {
-            throw new ConfigurationException(MessageFactory.createStaticMessage("Transport must declare its protocol as an OSGi header."));
+            throw new ConfigurationException(MessageFactory.createStaticMessage("Transport must declare its protocol(s) as an OSGi header."));
         }
         String[] transports = StringUtils.splitAndTrim(transportHeader, ",");
 
         String transport;
-        for (int i=0; i<transports.length; ++i)
+        for (int i = 0; i < transports.length; ++i)
         {
             transport = transports[i];
             // Look up the service descriptor file (e.g., "tcp.properties")
@@ -66,10 +69,15 @@ public class TransportActivator implements BundleActivator {
             osgiProps.put(Constants.SERVICE_PID, headers.get(Constants.BUNDLE_SYMBOLICNAME) + "." + transport);
             osgiProps.put(Constants.SERVICE_DESCRIPTION, headers.get(Constants.BUNDLE_DESCRIPTION));
             osgiProps.put(Constants.SERVICE_VENDOR, headers.get(Constants.BUNDLE_VENDOR));
-            bc.registerService(TransportServiceDescriptor.class.getName(), descriptor, osgiProps);    
+            descriptorRef = bc.registerService(TransportServiceDescriptor.class.getName(), descriptor, osgiProps);    
         }
     }
 
-    public void stop(BundleContext bc) throws Exception {
+    public void stop(BundleContext bc) throws Exception 
+    {
+        if (descriptorRef != null)
+        {
+            descriptorRef.unregister();
+        }
     }
 }
