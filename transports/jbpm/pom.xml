@@ -96,10 +96,6 @@
                     <groupId>net.sf.ehcache</groupId>
                     <artifactId>ehcache</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>dom4j</groupId>
-                    <artifactId>dom4j</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <!-- Use the combined cglib-nodep instead of separate cglib and asm dependencies -->
