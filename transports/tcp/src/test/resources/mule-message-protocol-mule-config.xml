@@ -21,7 +21,6 @@
             <inbound>
                 <vm:inbound-endpoint path="in"/>
             </inbound>
-            <pass-through-component/>
             <outbound>
                 <message-chunking-router messageSize="90">
                     <tcp:outbound-endpoint host="localhost" port="63994"/>
@@ -34,7 +33,6 @@
                 <tcp:inbound-endpoint host="localhost" port="63994"/>
                 <message-chunking-aggregator-router/>
             </inbound>
-            <pass-through-component/>
             <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="out"/>

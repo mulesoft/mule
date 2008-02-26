@@ -31,10 +31,11 @@
                 <xsd:element name="serialization-wire-format"/>
                 <xsd:element name="custom-wire-format">
                     <xsd:complexType>
-                        <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+                        <xsd:attribute name="class" type="mule:substitutableClass" use="required"/>
                     </xsd:complexType>
                 </xsd:element>
             </xsd:choice>
         </xsd:sequence>
     </xsd:group>
+
 </xsd:schema>

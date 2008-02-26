@@ -44,9 +44,9 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         {
             this.setFileMessage((File) message);
         }
-        else if(message instanceof FileMessageReceiver.ReceiverFileInputStream)
+        else if (message instanceof ReceiverFileInputStream)
         {
-            this.setStreamMessage((FileMessageReceiver.ReceiverFileInputStream)message);
+            this.setStreamMessage((ReceiverFileInputStream) message);
         }
         else
         {
@@ -63,7 +63,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
 
     public Object getPayload()
     {
-        return file;
+        return payload;
     }
 
     protected void setFileMessage(File message) throws MessagingException
@@ -81,14 +81,13 @@ public class FileMessageAdapter extends AbstractMessageAdapter
         setProperty(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
     }
 
-    protected void setStreamMessage(FileMessageReceiver.ReceiverFileInputStream message) throws MessagingException
+    protected void setStreamMessage(ReceiverFileInputStream message) throws MessagingException
     {
         this.file = message.getCurrentFile();
         this.payload = message;
         setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
         setProperty(FileConnector.PROPERTY_DIRECTORY, this.file.getParent());
     }
-
 
     public String getUniqueId()
     {

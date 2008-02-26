@@ -49,17 +49,20 @@
             maxIdleTransformers="10"
             transformerFactoryClass="org.mule.module.xml.config.CustomXsltTransformerFactory"
             xsl-file="file">
-        <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-            <!-- test for this string in test -->
-            <!-- Whenever you match any node or any attribute -->
-            <xsl:template match="node()|@*">
-                <!-- Copy the current node -->
-                <xsl:copy>
-                    <!-- Including any attributes it has and any child nodes -->
-                    <xsl:apply-templates select="@*|node()"/>
-                </xsl:copy>
-            </xsl:template>
-        </xsl:stylesheet>
+        <mxml:xslt-text>
+            <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                <!-- test for this string in test -->
+                <!-- Whenever you match any node or any attribute -->
+                <xsl:template match="node()|@*">
+                    <!-- Copy the current node -->
+                    <xsl:copy>
+                        <!-- Including any attributes it has and any child nodes -->
+                        <xsl:apply-templates select="@*|node()"/>
+                    </xsl:copy>
+                </xsl:template>
+            </xsl:stylesheet>
+        </mxml:xslt-text>
+        <mxml:context-property key="bar" value="${header:foo}"/>
     </mxml:xslt-transformer>
 
 </mule>

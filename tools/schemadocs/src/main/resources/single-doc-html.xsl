@@ -27,9 +27,6 @@
 
     <!-- this is the element we will generate documentation for -->
     <xsl:param name="elementName"/>
-    <!-- set this to get the old table format back -->
-    <!-- remove once layout ok -->
-    <xsl:param name="doubleLineTable"/>
 
     <!-- the table of pages for linking -->
     <xsl:key name="item-to-page" match="link" use="item"/>
@@ -49,68 +46,37 @@
         <a>
             <!-- define a tag we can link to -->
             <xsl:attribute name="id">#<xsl:value-of select="@name"/></xsl:attribute>
-            <h2>&lt;<xsl:value-of select="@name"/> ...&gt; in 2.x</h2>
+            <h2>&lt;<xsl:value-of select="@name"/> ...&gt;</h2>
         </a>
-        <p>
+        <!-- p>
             <em>This documentation is automatically generated from the XML schema.
             We are still extending the documentation and improving the presentation;
             please bear with us.
             To add similar documentation to other pages, examine the source of this
             page and copy the {cache ....} section that contains {xslt ...}.
             Change the "elementName" parameter to select the element you want displayed.</em>
-        </p>
+        </p -->
         <xsl:apply-templates select="." mode="documentation"/>
         <!--
         <xsl:if test="@type">
             <p>Type: <xsl:value-of select="@type"/></p>
         </xsl:if>
         -->
-        <h3>Properties</h3>
+        <h3>Attributes</h3>
         <table class="confluenceTable">
-            <xsl:choose>
-                <xsl:when test="$doubleLineTable">
-                    <tr>
-                        <th class="confluenceTh" rowspan="2" style="width:25%">Name</th>
-                        <th class="confluenceTh" style="width:25%">Type</th>
-                        <th class="confluenceTh" style="width:25%">Required</th>
-                        <th class="confluenceTh" style="width:25%">Default</th>
-                    </tr>
-                    <tr>
-                        <th class="confluenceTh" colspan="3">Description</th>
-                    </tr>
-                </xsl:when>
-                <xsl:otherwise>
-                    <tr>
-                        <th class="confluenceTh" style="width:20%">Name</th>
-                        <th class="confluenceTh" style="width:10%">Type</th>
-                        <th class="confluenceTh" style="width:10%">Required</th>
-                        <th class="confluenceTh" style="width:10%">Default</th>
-                        <th class="confluenceTh">Description</th>
-                    </tr>
-                </xsl:otherwise>
-            </xsl:choose>
+            <th class="confluenceTh" style="width:20%">Name</th>
+            <th class="confluenceTh" style="width:10%">Type</th>
+            <th class="confluenceTh" style="width:10%">Required</th>
+            <th class="confluenceTh" style="width:10%">Default</th>
+            <th class="confluenceTh">Description</th>
             <xsl:apply-templates select="." mode="attributes"/>
         </table>
         <h3>Child Elements</h3>
         <table class="confluenceTable">
-            <xsl:choose>
-                <xsl:when test="$doubleLineTable">
-                    <tr>
-                        <th class="confluenceTh" rowspan="2" style="width:25%">Name</th>
-                        <th class="confluenceTh">Type</th>
-                    </tr>
-                    <tr>
-                        <th class="confluenceTh">Description</th>
-                    </tr>
-                </xsl:when>
-                <xsl:otherwise>
-                    <tr>
-                        <th class="confluenceTh" style="width:20%">Name</th>
-                        <th class="confluenceTh" style="width:10%">Type</th>
-                        <th class="confluenceTh">Description</th>
-                    </tr>
-                </xsl:otherwise>
-            </xsl:choose>
+            <tr>
+                <th class="confluenceTh" style="width:20%">Name</th>
+                <th class="confluenceTh">Description</th>
+            </tr>
             <xsl:call-template name="element-children"/>
             <xsl:if test="@type">
                 <xsl:variable name="type" select="@type"/>
@@ -195,58 +161,28 @@
     <!-- attributes -->
 
     <xsl:template match="xsd:attribute[@name]" mode="attributes">
-        <xsl:choose>
-            <xsl:when test="$doubleLineTable">
-                <tr><xsl:call-template name="attribute-line-1"/></tr>
-                <tr><td colspan="3"><xsl:call-template name="attribute-line-2"/></td></tr>
-            </xsl:when>
-            <xsl:otherwise>
-                <tr>
-                    <xsl:call-template name="attribute-line-1"/>
-                    <td><xsl:call-template name="attribute-line-2"/></td>
-                </tr>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template name="attribute-line-1">
-        <td>
-            <xsl:attribute name="rowspan">
+        <tr>
+            <td rowspan="1">
+                <xsl:value-of select="@name"/>
+            </td>
+            <td style="text-align: center"><xsl:call-template name="rewrite-type"><xsl:with-param name="type" select="@type"/></xsl:call-template></td>
+            <td style="text-align: center">
                 <xsl:choose>
-                    <xsl:when test="$doubleLineTable">2</xsl:when>
-                    <xsl:otherwise>1</xsl:otherwise>
+                    <xsl:when test="@required">yes</xsl:when>
+                    <xsl:otherwise>no</xsl:otherwise>
                 </xsl:choose>
-            </xsl:attribute>
-            <xsl:value-of select="@name"/>
-        </td>
-        <td style="text-align: center"><xsl:call-template name="rewrite-type"><xsl:with-param name="type" select="@type"/></xsl:call-template></td>
-        <td style="text-align: center">
-            <xsl:choose>
-                <xsl:when test="$doubleLineTable">
-                    <xsl:choose>
-                        <xsl:when test="@required">required</xsl:when>
-                        <xsl:otherwise>not required</xsl:otherwise>
-                    </xsl:choose>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:choose>
-                        <xsl:when test="@required">yes</xsl:when>
-                        <xsl:otherwise>no</xsl:otherwise>
-                    </xsl:choose>
-                </xsl:otherwise>
-            </xsl:choose>
-        </td>
-        <td style="text-align: center">
-            <xsl:if test="@default"><xsl:value-of select="@default"/></xsl:if>
-        </td>
-    </xsl:template>
-
-    <xsl:template name="attribute-line-2">
-        <xsl:if test="xsd:annotation/xsd:documentation/text()">
-            <p>
-                <xsl:value-of select="xsd:annotation/xsd:documentation/text()"/>
-            </p>
-        </xsl:if>
+            </td>
+            <td style="text-align: center">
+                <xsl:if test="@default"><xsl:value-of select="@default"/></xsl:if>
+            </td>
+            <td>
+                <xsl:if test="xsd:annotation/xsd:documentation/text()">
+                    <p>
+                        <xsl:value-of select="xsd:annotation/xsd:documentation/text()"/>
+                    </p>
+                </xsl:if>
+            </td>
+        </tr>
     </xsl:template>
 
     <xsl:template match="xsd:element" mode="attributes">
@@ -310,66 +246,24 @@
     <!-- documentation here more restricted than "documentation" mode -->
 
     <xsl:template match="xsd:element[@ref]" mode="elements">
-        <xsl:choose>
-            <xsl:when test="$doubleLineTable">
-                <tr><xsl:call-template name="element-line-1"/></tr>
-                <tr><xsl:call-template name="element-line-2"/></tr>
-            </xsl:when>
-            <xsl:otherwise>
-                <tr>
-                    <xsl:call-template name="element-line-1"/>
-                    <xsl:call-template name="element-line-2"/>
-                </tr>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template name="element-line-1">
-        <xsl:variable name="ref" select="@ref"/>
-        <td>
-            <xsl:attribute name="rowspan">
-                <xsl:choose>
-                    <xsl:when test="$doubleLineTable">2</xsl:when>
-                    <xsl:otherwise>1</xsl:otherwise>
-                </xsl:choose>
-            </xsl:attribute>
-            <xsl:call-template name="link">
-                <xsl:with-param name="item">
-                    <xsl:value-of select="@ref"/>
-                </xsl:with-param>
-            </xsl:call-template>
-        </td>
-        <xsl:apply-templates
-                select="/xsd:schema/xsd:element[@name=$ref]" mode="elements-type"/>
-    </xsl:template>
-
-    <xsl:template name="element-line-2">
-        <xsl:variable name="ref" select="@ref"/>
-        <td>
-            <!-- include both ref and element doc -->
-            <xsl:apply-templates select="." mode="elements-doc"/>
-            <xsl:apply-templates
-                    select="/xsd:schema/xsd:element[@name=$ref]" mode="elements-doc"/>
-            <xsl:apply-templates
-                    select="/xsd:schema/xsd:element[@name=$ref]" mode="elements-abstract"/>
-        </td>
-    </xsl:template>
-
-    <xsl:template match="xsd:element[@name]" mode="elements">
         <tr>
-            <td rowspan="2">
+            <xsl:variable name="ref" select="@ref"/>
+            <td rowspan="1">
                 <xsl:call-template name="link">
                     <xsl:with-param name="item">
-                        <xsl:value-of select="@name"/>
+                        <xsl:value-of select="@ref"/>
                     </xsl:with-param>
                 </xsl:call-template>
             </td>
-            <xsl:apply-templates select="." mode="elements-type"/>
+            <td>
+                <!-- include both ref and element doc -->
+                <xsl:apply-templates select="." mode="elements-doc"/>
+                <xsl:apply-templates
+                        select="/xsd:schema/xsd:element[@name=$ref]" mode="elements-doc"/>
+                <xsl:apply-templates
+                        select="/xsd:schema/xsd:element[@name=$ref]" mode="elements-abstract"/>
+            </td>
         </tr>
-        <tr><td>
-            <xsl:apply-templates select="." mode="elements-doc"/>
-            <xsl:apply-templates select="." mode="elements-abstract"/>
-        </td></tr>
     </xsl:template>
 
     <xsl:template match="xsd:element[contains(@name, ':abstract-')]"
@@ -396,10 +290,6 @@
         </p>
     </xsl:template>
 
-    <xsl:template match="xsd:element[@name]" mode="elements-type">
-        <td><xsl:value-of select="@type"/></td>
-    </xsl:template>
-
     <xsl:template match="xsd:element[@name]" mode="elements-list">
         <li>&lt;<xsl:value-of select="@name"/> ...&gt;</li>
     </xsl:template>
@@ -420,6 +310,22 @@
         <xsl:apply-templates select="xsd:complexType" mode="elements"/>
         <xsl:apply-templates select="xsd:complexContent" mode="elements"/>
         <xsl:apply-templates select="xsd:extension" mode="elements"/>
+    </xsl:template>
+
+    <xsl:template match="xsd:element[@name]" mode="elements">
+        <tr>
+            <xsl:variable name="name" select="@name"/>
+            <td rowspan="1">
+                <xsl:call-template name="link">
+                    <xsl:with-param name="item">
+                        <xsl:value-of select="@name"/>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </td>
+            <td>
+                <xsl:apply-templates select="." mode="elements-doc"/>
+            </td>
+        </tr>
     </xsl:template>
 
     <xsl:template match="xsd:group" mode="elements">

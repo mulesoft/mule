@@ -19,7 +19,6 @@
                     <append-string-transformer message="3"/>
                 </vm:inbound-endpoint>
             </inbound>
-            <pass-through-component/>
             <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="test1-out"/>
@@ -36,13 +35,11 @@
         <service name="service2">
             <inbound>
                 <vm:inbound-endpoint path="test2-in">
-                    <!-- TODO Travis had better syntax -->
                     <transformer ref="1"/>
                     <transformer ref="2"/>
                     <transformer ref="3"/>
                 </vm:inbound-endpoint>
             </inbound>
-            <pass-through-component/>
             <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="test2-out"/>
@@ -60,7 +57,6 @@
                     <append-string-transformer message="3"/>
                 </vm:inbound-endpoint>
             </inbound>
-            <pass-through-component/>
             <outbound>
                 <outbound-pass-through-router>
                     <vm:outbound-endpoint path="test3-out">

@@ -66,7 +66,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
             testObjectXmlOut();
             
             // Pull result from "xml-object-out" endpoint as queuing is enabled and otherwise we get
-            // OutOfMemoryExceptions during stress tests when these reslts build up in queue.
+            // OutOfMemoryExceptions during stress tests when these results build up in queue.
             request(new MuleClient(), "xml-object-out", Parent.class);
             
             if (i % tenth == 0)

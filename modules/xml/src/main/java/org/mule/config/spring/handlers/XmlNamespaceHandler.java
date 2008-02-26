@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.handlers;
 
+import org.mule.config.spring.parsers.XsltTextDefinitionParser;
 import org.mule.config.spring.parsers.XsltTransformerDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
@@ -38,8 +39,8 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerBeanDefinitionParser("jxpath-filter", new ChildDefinitionParser("filter", JXPathFilter.class));
         registerBeanDefinitionParser("is-xml-filter", new ChildDefinitionParser("filter", IsXmlFilter.class));
-        registerBeanDefinitionParser("message-splitter", new RouterDefinitionParser("router", FilteringXmlMessageSplitter.class));
-        registerMuleBeanDefinitionParser("round-robin-splitter", new RouterDefinitionParser("router", RoundRobinXmlSplitter.class)).addAlias("endpointFiltering", "enableEndpointFiltering");
+        registerBeanDefinitionParser("message-splitter", new RouterDefinitionParser(FilteringXmlMessageSplitter.class));
+        registerMuleBeanDefinitionParser("round-robin-splitter", new RouterDefinitionParser(RoundRobinXmlSplitter.class)).addAlias("endpointFiltering", "enableEndpointFiltering");
         registerBeanDefinitionParser("dom-to-xml-transformer", new MuleOrphanDefinitionParser(DomDocumentToXml.class, false));
         registerBeanDefinitionParser("dom-to-output-handler", new MuleOrphanDefinitionParser(DocumentToOutputHandler.class, false));
         registerBeanDefinitionParser("jxpath-extractor-transformer", new MuleOrphanDefinitionParser(JXPathExtractor.class, false));
@@ -53,6 +54,7 @@ public class XmlNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("bean-property-extractor", new ChildDefinitionParser("propertyExtractor", BeanPayloadPropertyExtractor.class));
         registerBeanDefinitionParser("namespace", new ChildMapEntryDefinitionParser("namespaces", "prefix", "uri"));
         registerBeanDefinitionParser("context-property", new ChildMapEntryDefinitionParser("contextProperties", "key", "value"));
+        registerBeanDefinitionParser("xslt-text", new XsltTextDefinitionParser("xslt", String.class));
     }
 
 }

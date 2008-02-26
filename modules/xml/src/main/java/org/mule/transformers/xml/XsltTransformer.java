@@ -20,6 +20,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.properties.PropertyExtractorManager;
 import org.mule.xml.util.XMLUtils;
 
 import java.io.IOException;
@@ -37,13 +38,58 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
 /**
  * <code>XsltTransformer</code> performs an XSLT transform on a DOM (or other XML-ish)
  * object.
+ *
+ * This transformer maintains a pool of {@link javax.xml.Transformer} objects to speed up processing of concurrent requests.
+ * The pool can be configured using {@link #setMaxIdleTransformers()} and {@link #setMaxIdleTransformers()}.
+ *
+ * Parameter can also be set as part of the transformation context and these can be mapped to conent in the current message using
+ * property extractors or can be fixed values.
+ *
+ *
+ * For example, the current event's message has a property named "myproperty", also you want to generate a uuid as a
+ * parameter. To do this you can define context properties that can provide an expression to be evaluated on the current
+ * message.
+ * </p>
+ * <p>
+ * Example Configuration:
+ * </p>
+ *
+ * <pre>
+ *  &lt;mxml:xslt-transformer name=&quot;MyXsltTransformer&quot; xslFile=&quot;myXslFile.xsl&quot;&amp;gt
+ *      &lt;context-property name=&quot;myParameter&quot; value=&quot;${head:myproperty}&quot;/&amp;gt
+ *      &lt;context-property name=&quot;myParameter2&quot; value=&quot;${function:uuid}&quot;/&amp;gt
+ *  &lt;/mxml:xslt-transformer&amp;gt
+ * </pre>
+ *
+ * <p>
+ * The 'header' expression pulls a header from the current message and 'function' can execute a set of arbitrary functions.
+ * You can also pass in static values by ommitting the expression prefix '${'.
+ * </p>
+ *
+ * In addition to being able to pass in an XSLT file you can also define templates inline. For example -
+ *
+ * <pre>
+ *  &lt;mxml:xslt-transformer name=&quot;MyXsltTransformer&quot;&amp;gt
+ *      &lt;mxml:xslt-text&amp;gt
+ *          <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://test.com" version="2.0">
+
+ *                <xsl:param name="echo"/>
+ *
+ *               <xsl:template match="/">
+ *                   <echo-value>
+ *                       <xsl:value-of select="$echo"/>
+ *                   </echo-value>
+ *               </xsl:template>
+ *           </xsl:stylesheet>
+ *  &lt;/mxml:xslt-text&amp;gt
+ * </pre>
+ *
  */
 
 public class XsltTransformer extends AbstractXmlTransformer
@@ -55,14 +101,14 @@ public class XsltTransformer extends AbstractXmlTransformer
     // MAX_IDLE is also the total limit
     private static final int MAX_ACTIVE_TRANSFORMERS = MAX_IDLE_TRANSFORMERS;
     // Prefix to use in a parameter to specify it is an expression that must be evaluated
-    private static final String PARAM_EVAL_TOKEN = "#";
+    private static final String PARAM_EXTRACTOR_TOKEN = "${";
 
     protected final GenericObjectPool transformerPool;
 
     private volatile String xslTransformerFactoryClassName;
     private volatile String xslFile;
     private volatile String xslt;
-    private volatile Map transformParameters;
+    private volatile Map contextProperties;
 
     public XsltTransformer()
     {
@@ -123,9 +169,9 @@ public class XsltTransformer extends AbstractXmlTransformer
                 transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
 
                 // set transformation parameters
-                if (transformParameters != null)
+                if (contextProperties != null)
                 {
-                    for (Iterator i = transformParameters.entrySet().iterator(); i.hasNext();)
+                    for (Iterator i = contextProperties.entrySet().iterator(); i.hasNext();)
                     {
                         Map.Entry parameter = (Entry) i.next();
                         String key = (String) parameter.getKey();
@@ -380,9 +426,9 @@ public class XsltTransformer extends AbstractXmlTransformer
      *      java.lang.Object)
      * @return a map of the parameter names and associated values
      */
-    public Map getTransformParameters()
+    public Map getContextProperties()
     {
-        return transformParameters;
+        return contextProperties;
     }
 
     /**
@@ -390,52 +436,22 @@ public class XsltTransformer extends AbstractXmlTransformer
      * 
      * @see javax.xml.transform.Transformer#setParameter(java.lang.String,
      *      java.lang.Object)
-     * @param transformParameters a map of the parameter names and associated values
+     * @param contextProperties a map of the parameter names and associated values
      */
-    public void setTransformParameters(Map transformParameters)
+    public void setContextProperties(Map contextProperties)
     {
-        this.transformParameters = transformParameters;
+        this.contextProperties = contextProperties;
     }
 
     /**
-     * <p>
      * Returns the value to be set for the parameter. This method is called for each
      * parameter before it is set on the transformer. The purpose of this method is to
      * allow dynamic parameters related to the event (usually message properties) to be
-     * used. Any attribute of the current MuleEventContext can be accessed using JXPath.
-     * </p>
-     * <p>
-     * For example: If the current event's message has a property named "myproperty", to
-     * pass this in you would set the transform parameter's value to be
-     * "#getProperty(message,'myproperty')".
-     * </p>
-     * <p>
-     * Example Configuration:
-     * </p>
-     * 
-     * <pre>
-     *  &lt;transformer name=&quot;MyXsltTransformer&quot; className=&quot;org.mule.transformer.xml.XsltTransformer&quot;&amp;gt
-     *      &lt;properties&gt;
-     *          &lt;property name=&quot;xslFile&quot; value=&quot;myXslFile.xsl&quot;/&amp;gt
-     *          &lt;map name=&quot;transformParameters&quot;&amp;gt
-     *              &lt;property name=&quot;myParameter&quot; value=&quot;#getProperty(message,'myproperty')&quot;/&amp;gt
-     *          &lt;/map&amp;gt
-     *      &lt;/properties&amp;gt
-     *  &lt;/transformer&amp;gt
-     * </pre>
-     * 
-     * <p>
-     * Only parameter values that begin with # are evalued in this maner. Values that do
-     * not start with # are returned as is. Values that start with ## are returned as is
-     * starting from the second character. For example "##myparameter" would be passed
-     * into the transformer as "#myparameter"
-     * </p>
-     * <p>
-     * This method may be overloaded by a sub class to provide a different dynamic
-     * parameter implementation.
-     * </p>
-     * 
-     * @param name the name of the parameter
+     * used. Any attribute of the current MuleEvent can be accessed using Property Extractors
+     * such as JXpath, bean path or header retrieval.
+     *
+     * @param name the name of the parameter. The name isn't used for this implementation but is exposed as a
+     * param for classes that may need it.
      * @param value the value of the paramter
      * @return the object to be set as the parameter value
      * @throws TransformerException
@@ -446,28 +462,19 @@ public class XsltTransformer extends AbstractXmlTransformer
         {
             String stringValue = (String) value;
 
-            if (!stringValue.startsWith(PARAM_EVAL_TOKEN))
+            if (!stringValue.startsWith(PARAM_EXTRACTOR_TOKEN))
             {
                 return stringValue;
-
-            }
-            else if (stringValue.startsWith(PARAM_EVAL_TOKEN + PARAM_EVAL_TOKEN))
-            {
-                return stringValue.substring(1);
-
             }
             else
             {
-
                 MuleEventContext context = RequestContext.getEventContext();
 
                 if (context == null)
                 {
                     throw new TransformerException(CoreMessages.noCurrentEventForTransformer(), this);
                 }
-
-                JXPathContext jxpathContext = JXPathContext.newContext(context);
-                return jxpathContext.getValue(stringValue.substring(1));
+                return PropertyExtractorManager.processExpression(value.toString(), context.getMessage());
             }
         }
 

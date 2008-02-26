@@ -27,6 +27,7 @@
     <mxml:xml-to-object-transformer name="xmlToObject"/>
 
     <mxml:xslt-transformer name="xslt" returnClass="org.dom4j.Document">
+        <mxml:xslt-text>
         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
             <!-- test for this string in test -->
             <!-- Whenever you match any node or any attribute -->
@@ -37,9 +38,11 @@
                 </xsl:copy>
             </xsl:template>
         </xsl:stylesheet>
+        </mxml:xslt-text>
     </mxml:xslt-transformer>
 
     <mxml:xslt-transformer name="xslt-string" returnClass="java.lang.String">
+        <mxml:xslt-text>
         <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
             <!-- test for this string in test -->
             <!-- Whenever you match any node or any attribute -->
@@ -50,6 +53,7 @@
                 </xsl:copy>
             </xsl:template>
         </xsl:stylesheet>
+        </mxml:xslt-text>
     </mxml:xslt-transformer>
 
     <endpoint name="xml-in" address="vm://xml-in" connector-ref="default"/>

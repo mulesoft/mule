@@ -48,7 +48,7 @@ public class SecurityNamespaceHandlerTestCase extends FunctionalTestCase
             EncryptionStrategy strategy = (EncryptionStrategy) strategies.next();
             logger.debug(strategy.getName() + " / " + strategy.toString() + " / " + strategy.getClass());
         }
-        assertNotNull(securityManager.getEncryptionStrategy(name));
+        assertNotNull(name, securityManager.getEncryptionStrategy(name));
         assertTrue(securityManager.getEncryptionStrategy(name).getClass().equals(clazz));
     }
 

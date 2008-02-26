@@ -18,15 +18,14 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.MuleContext;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.routing.response.AbstractResponseRouter;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.util.properties.PropertyExtractor;
-import org.mule.xml.util.properties.JXPathPropertyExtractor;
+import org.mule.util.properties.FunctionPropertyExtractor;
 
 import java.util.List;
 
@@ -71,10 +70,8 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertNotNull(routers);
         assertEquals(1, routers.size());
         AbstractOutboundRouter theRouter = (AbstractOutboundRouter)routers.get(0);
-        PropertyExtractor pe = theRouter.getPropertyExtractor();
-        assertNotNull(pe);
         // the one we put in the config
-        assertTrue(pe instanceof JXPathPropertyExtractor);
+        assertTrue(theRouter.getPropertyExtractor() instanceof CorrelationPropertiesExtractor);
     }
 
     public void testPropertyExtractorResponseRouterConfig() throws Exception
@@ -87,10 +84,8 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertNotNull(routers);
         assertEquals(1, routers.size());
         AbstractResponseRouter theRouter = (AbstractResponseRouter)routers.get(0);
-        PropertyExtractor pe = theRouter.getPropertyExtractor();
-        assertNotNull(pe);
         // the one we put in the config
-        assertTrue(pe instanceof JXPathPropertyExtractor);
+        assertTrue(theRouter.getPropertyExtractor() instanceof FunctionPropertyExtractor);
     }
 
     public void testPropertyTypesConfig() throws Exception

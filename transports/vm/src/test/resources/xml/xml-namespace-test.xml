@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.0"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.mulesource.org/schema/mule/xml/2.0 http://www.mulesource.org/schema/mule/xml/2.0/mule-xml.xsd
+       http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
+
+    <mxml:xslt-transformer maxActiveTransformers="4" maxIdleTransformers="4" returnClass="java.lang.String"
+                           name="test1">
+        <mxml:xslt-text>
+            <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://test.com" version="2.0">
+
+                <xsl:param name="echo"/>
+
+                <xsl:template match="/">
+                    <echo-value>
+                        <xsl:value-of select="$echo"/>
+                    </echo-value>
+                </xsl:template>
+            </xsl:stylesheet>
+        </mxml:xslt-text>
+        <mxml:context-property key="echo" value="${header:Welcome}"/>
+    </mxml:xslt-transformer>
+</mule>

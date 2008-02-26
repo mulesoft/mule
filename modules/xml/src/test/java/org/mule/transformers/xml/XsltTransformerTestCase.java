@@ -125,7 +125,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         // set parameter
         Map params = new HashMap();
         params.put("param1", param);
-        transformer.setTransformParameters(params);
+        transformer.setContextProperties(params);
 
         // init transformer
         transformer.initialise();
@@ -179,8 +179,8 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
         // set parameter
         Map params = new HashMap();
-        params.put("param1", "#getProperty(message,'myproperty')");
-        transformer.setTransformParameters(params);
+        params.put("param1", "${header:myproperty}");
+        transformer.setContextProperties(params);
 
         // init transformer
         transformer.initialise();

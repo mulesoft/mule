@@ -68,6 +68,8 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(xslt.getXslt());
         String transform = xslt.getXslt();
         assertTrue(transform.indexOf("test for this string in test") > -1);
+
+        assertEquals("${header:foo}", xslt.getContextProperties().get("bar"));
     }
 
     protected AbstractTransformer getAndTestTransformer(String name, Class clazz)

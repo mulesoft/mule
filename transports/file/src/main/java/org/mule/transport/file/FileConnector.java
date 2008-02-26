@@ -10,6 +10,7 @@
 
 package org.mule.transport.file;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -17,6 +18,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
+import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToSerializable;
@@ -164,12 +166,12 @@ public class FileConnector extends AbstractConnector
         if (props != null)
         {
             // Override properties on the endpoint for the specific endpoint
-            String read = (String)props.get(PROPERTY_READ_FROM_DIRECTORY);
+            String read = (String) props.get(PROPERTY_READ_FROM_DIRECTORY);
             if (read != null)
             {
                 readDir = read;
             }
-            String move = (String)props.get(PROPERTY_MOVE_TO_DIRECTORY);
+            String move = (String) props.get(PROPERTY_MOVE_TO_DIRECTORY);
             if (move != null)
             {
                 moveTo = move;
@@ -212,19 +214,19 @@ public class FileConnector extends AbstractConnector
                 }
             }
 
-            // this is surreal!  what on earth was it useful for?
-//            Map srvOverride = (Map) props.get(PROPERTY_SERVICE_OVERRIDE);
-//            if (srvOverride != null)
-//            {
-//                if (serviceOverrides == null)
-//                {
-//                    serviceOverrides = new Properties();
-//                }
-//                serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
-//                    NoActionTransformer.class.getName());
-//                serviceOverrides.setProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER,
-//                    NoActionTransformer.class.getName());
-//            }
+            // this is surreal! what on earth was it useful for?
+            // Map srvOverride = (Map) props.get(PROPERTY_SERVICE_OVERRIDE);
+            // if (srvOverride != null)
+            // {
+            // if (serviceOverrides == null)
+            // {
+            // serviceOverrides = new Properties();
+            // }
+            // serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER,
+            // NoActionTransformer.class.getName());
+            // serviceOverrides.setProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER,
+            // NoActionTransformer.class.getName());
+            // }
 
         }
 
@@ -488,18 +490,6 @@ public class FileConnector extends AbstractConnector
     public void setAutoDelete(boolean autoDelete)
     {
         this.autoDelete = autoDelete;
-        if (!autoDelete)
-        {
-            if (serviceOverrides == null)
-            {
-                serviceOverrides = new Properties();
-            }
-            if (serviceOverrides.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER) == null)
-            {
-                serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER,
-                    FileMessageAdapter.class.getName());
-            }
-        }
     }
 
     public String getMoveToPattern()
@@ -537,7 +527,7 @@ public class FileConnector extends AbstractConnector
         }
 
         String filename;
-        String outPattern = (String)endpoint.getProperty(FileConnector.PROPERTY_OUTPUT_PATTERN);
+        String outPattern = (String) endpoint.getProperty(FileConnector.PROPERTY_OUTPUT_PATTERN);
         if (outPattern == null)
         {
             outPattern = message.getStringProperty(FileConnector.PROPERTY_OUTPUT_PATTERN, null);
@@ -598,6 +588,20 @@ public class FileConnector extends AbstractConnector
     public void setStreaming(boolean streaming)
     {
         this.streaming = streaming;
+    }
+
+    public MessageAdapter getMessageAdapter(Object message) throws MessagingException
+    {
+        if (isStreaming())
+        {
+            // TODO Shouldn't we have a way to specify MessageAdaptor for streaming
+            // in service descriptor
+            return new FileMessageAdapter(message);
+        }
+        else
+        {
+            return super.getMessageAdapter(message);
+        }
     }
 
 }

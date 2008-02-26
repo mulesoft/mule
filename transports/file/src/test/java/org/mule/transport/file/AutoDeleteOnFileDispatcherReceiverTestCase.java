@@ -18,6 +18,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.io.InputStream;
 
 public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTestCase
 {
@@ -56,9 +57,16 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
 
         MuleMessage message = RequestContext.getEventContext().requestEvent(getTestEndpointURI()+"/"+tempDirName, 50000);
         assertNotNull(message.getPayload());
+        assertTrue(message.getPayload() instanceof InputStream);
 
-        File[] files = tempDir.listFiles();
-        assertTrue(files.length == 0);
+        // Auto-delete happens after FileInputStream.close() when streaming.  Streaming is default.
+        assertTrue(tempDir.listFiles().length > 0);
+        ((InputStream) message.getPayload()).close();
+        // Give file-system some time (annoying but necessary wait apparently due to OS caching?)
+        Thread.sleep(1000);
+        assertTrue(tempDir.listFiles().length == 0);
+        
+        
     }
 
     protected void doSetUp() throws Exception
@@ -66,6 +74,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
         super.doSetUp();
         // The working directory is deleted on tearDown
         tempDir = FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory(), tempDirName);
+        tempDir.deleteOnExit();
         if (!tempDir.exists())
         {
             tempDir.mkdirs();

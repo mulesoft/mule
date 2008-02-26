@@ -92,15 +92,9 @@
     <xsd:element name="weblogic-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
     <xsd:element name="websphere-connector" type="vendorJmsConnectorType" substitutionGroup="mule:abstract-connector"/>
  
-    <xsd:element name="transaction" type="jmsTransactionType" substitutionGroup="mule:abstract-transaction"/>
-    <xsd:complexType name="jmsTransactionType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractTransactionType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="client-ack-transaction" type="jmsTransactionType" substitutionGroup="mule:abstract-transaction"/>
-    <xsd:element name="xa-transaction" type="jmsTransactionType" substitutionGroup="mule:abstract-transaction"/>
+    <xsd:element name="transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
+    <xsd:element name="client-ack-transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
+    <xsd:element name="xa-transaction" type="mule:baseTransactionType" substitutionGroup="mule:abstract-transaction"/>
 
     <xsd:element name="jmsmessage-to-object-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>
     <xsd:element name="object-to-jmsmessage-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer"/>

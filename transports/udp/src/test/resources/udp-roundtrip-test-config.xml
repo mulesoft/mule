@@ -18,7 +18,6 @@
             <inbound>
                 <udp:inbound-endpoint host="${hostname}" port="61000"/>
             </inbound>
-            <pass-through-component/>
             <outbound>
                 <outbound-pass-through-router>
                     <udp:outbound-endpoint host="${hostname}" port="61001"/>

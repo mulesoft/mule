@@ -27,10 +27,10 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.endpoint.MuleEndpoint;
 import org.mule.model.seda.SedaService;
+import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.logic.AndFilter;
-import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.outbound.FilteringOutboundRouter;
@@ -78,24 +78,13 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testGlobalEndpointConfig() throws MuleException
     {
         super.testGlobalEndpointConfig();
-        ImmutableEndpoint endpoint = null;
-        try
-        {
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("fruitBowlEndpoint");
-        }
-        catch (MuleException e)
-        {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("fruitBowlEndpoint");
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
-        assertNotNull(endpoint.getFilter());
-        JXPathFilter filter = (JXPathFilter) endpoint.getFilter();
-        assertEquals("name", filter.getPattern());
-        assertEquals("bar", filter.getExpectedValue());
-        assertNotNull(filter.getNamespaces());
-        assertEquals("http://foo.com", filter.getNamespaces().get("foo"));
+
+        MessagePropertyFilter filter = (MessagePropertyFilter)endpoint.getFilter();
+        assertNotNull(filter);
+        assertEquals("foo=bar", filter.getExpression());
     }
 
     // @Override

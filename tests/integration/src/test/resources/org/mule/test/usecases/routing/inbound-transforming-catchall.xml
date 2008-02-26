@@ -23,7 +23,6 @@
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </selective-consumer-router>
             </inbound>
-            <pass-through-component/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>
@@ -47,7 +46,6 @@
                     <payload-type-filter expectedType="java.lang.Integer"/>
                 </selective-consumer-router>
             </inbound>
-            <pass-through-component/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="vm://out" connector-ref="vmQueue"/>

@@ -94,8 +94,6 @@
 </link><link>
 <item>mule:component</item><page>SchemaBasics</page>
 </link><link>
-<item>mule:pass-through-component</item><page>SchemaBasics</page>
-</link><link>
 <item>mule:echo-component</item><page>SchemaBasics</page>
 </link><link>
 <item>mule:log-component</item><page>SchemaBasics</page>

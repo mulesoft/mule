@@ -16,12 +16,15 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageRequester;
+import org.mule.transport.DefaultMessageAdapter;
 import org.mule.transport.file.filters.FilenameWildcardFilter;
 import org.mule.transport.file.i18n.FileMessages;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.net.URLDecoder;
 
@@ -40,7 +43,7 @@ public class FileMessageRequester extends AbstractMessageRequester
 
     /**
      * There is no associated session for a file connector
-     *
+     * 
      * @throws org.mule.api.MuleException
      */
     public Object getDelegateSession() throws MuleException
@@ -52,6 +55,7 @@ public class FileMessageRequester extends AbstractMessageRequester
      * Will attempt to do a receive from a directory, if the endpointUri resolves to
      * a file name the file will be returned, otherwise the first file in the
      * directory according to the filename filter configured on the connector.
+     * 
      * @param timeout this is ignored when doing a receive on this dispatcher
      * @return a message containing file contents or null if there was notthing to
      *         receive
@@ -90,58 +94,112 @@ public class FileMessageRequester extends AbstractMessageRequester
                     long thisFileAge = now - lastMod;
                     if (thisFileAge < fileAge)
                     {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("The file has not aged enough yet, will return nothing for: " +
-                                         result.getCanonicalPath());
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("The file has not aged enough yet, will return nothing for: "
+                                         + result.getCanonicalPath());
                         }
                         return null;
                     }
                 }
 
-                DefaultMuleMessage message;
+                // Don't we need to try to obtain a file lock as we do with receiver
+
+                FileConnector fc = ((FileConnector) connector);
+
+                String sourceFileOriginalName = result.getName();
+
+                // This isn't nice but is needed as MessageAdaptor is required to
+                // resolve
+                // destination file name, and StreamingReceiverFileInputStream is
+                // required to create MessageAdaptor
+                DefaultMessageAdapter fileParserMsgAdaptor = new DefaultMessageAdapter(null);
+                fileParserMsgAdaptor.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+
+                // set up destination file
                 File destinationFile = null;
-                if (connector.getMoveToDirectory() != null)
+                String movDir = fc.getMoveToDirectory();
+                if (movDir != null)
                 {
-                    destinationFile = FileUtils.newFile(connector.getMoveToDirectory(), result
-                        .getName());
-                    if (!result.renameTo(destinationFile))
+                    String destinationFileName = sourceFileOriginalName;
+                    String moveToPattern = fc.getMoveToPattern();
+                    if (moveToPattern != null)
                     {
-                        logger.error("Failed to move file: " + result.getAbsolutePath()
-                                     + " to " + destinationFile.getAbsolutePath());
-                        message = new DefaultMuleMessage(connector.getMessageAdapter(result));
+                        destinationFileName = ((FileConnector) connector).getFilenameParser().getFilename(
+                            fileParserMsgAdaptor, moveToPattern);
+                    }
+                    // don't use new File() directly, see MULE-1112
+                    destinationFile = FileUtils.newFile(movDir, destinationFileName);
+                }
+
+                MessageAdapter msgAdapter = null;
+                try
+                {
+                    if (fc.isStreaming())
+                    {
+                        msgAdapter = connector.getMessageAdapter(new ReceiverFileInputStream(result, fc.isAutoDelete(),
+                            destinationFile));
                     }
                     else
                     {
-                        message = new DefaultMuleMessage(connector.getMessageAdapter(destinationFile));
+                        msgAdapter = connector.getMessageAdapter(result);
                     }
+                }
+                catch (FileNotFoundException e)
+                {
+                    // we can ignore since we did manage to acquire a lock, but just
+                    // in case
+                    logger.error("File being read disappeared!", e);
+                    return null;
+                }
+                msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
+                if (!fc.isStreaming())
+                {
+                    moveOrDelete(result, destinationFile);
+                    return new DefaultMuleMessage(msgAdapter);
                 }
                 else
                 {
-                    message = new DefaultMuleMessage(connector.getMessageAdapter(result));
+                    // If we are streaming no need to move/delete now, that will be
+                    // done when stream is closed
+                    return new DefaultMuleMessage(msgAdapter);
                 }
-
-                if (connector.isAutoDelete())
-                {
-                    // no moveTo directory
-                    if (destinationFile == null)
-                    {
-                        // delete source
-                        if (!result.delete())
-                        {
-                            throw new DefaultMuleException(
-                                FileMessages.failedToDeleteFile(result.getAbsolutePath()));
-                        }
-                    }
-
-                    // nothing to do here since moveFile() should have deleted
-                    // the source file for us
-                }
-
-                return message;
             }
         }
         return null;
+    }
+
+    private void moveOrDelete(final File sourceFile, File destinationFile) throws DefaultMuleException
+    {
+
+        if (destinationFile != null)
+        {
+            // move sourceFile to new destination
+            if (!FileUtils.moveFile(sourceFile, destinationFile))
+            {
+                throw new DefaultMuleException(FileMessages.failedToMoveFile(sourceFile.getAbsolutePath(),
+                    destinationFile.getAbsolutePath()));
+            }
+        }
+        if (((FileConnector) connector).isAutoDelete())
+        {
+            // no moveTo directory
+            if (destinationFile == null)
+            {
+                // delete source
+                if (!sourceFile.delete())
+                {
+                    throw new DefaultMuleException(FileMessages.failedToDeleteFile(sourceFile.getAbsolutePath()));
+                }
+            }
+            else
+            {
+                // nothing to do here since moveFile() should have deleted
+                // the source file for us
+            }
+        }
+
     }
 
     protected void doDispose()

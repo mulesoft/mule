@@ -29,6 +29,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.nio.channels.FileChannel;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -730,4 +731,42 @@ public class FileUtils extends org.apache.commons.io.FileUtils
     
         return isRenamed;
     }
+    
+    /** Try to move a file by renaming with backup attempt by copying/deleting via NIO */
+    public static boolean moveFile(File sourceFile, File destinationFile)
+    {
+        // try fast file-system-level move/rename first
+        boolean success = sourceFile.renameTo(destinationFile);
+
+        if (!success)
+        {
+            // try again using NIO copy
+            FileInputStream fis = null;
+            FileOutputStream fos = null;
+            try
+            {
+                fis = new FileInputStream(sourceFile);
+                fos = new FileOutputStream(destinationFile);
+                FileChannel srcChannel = fis.getChannel();
+                FileChannel dstChannel = fos.getChannel();
+                dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
+                srcChannel.close();
+                dstChannel.close();
+                success = sourceFile.delete();
+            }
+            catch (IOException ioex)
+            {
+                // grr!
+                success = false;
+            }
+            finally
+            {
+                IOUtils.closeQuietly(fis);
+                IOUtils.closeQuietly(fos);
+            }
+        }
+
+        return success;
+    }
+
 }

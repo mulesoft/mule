@@ -13,9 +13,12 @@ package org.mule.transport.file;
 import org.mule.api.MuleMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.FileUtils;
+import org.mule.util.IOUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.Writer;
 import java.net.MalformedURLException;
 
@@ -81,8 +84,13 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
     {
         assertNotNull(message);
         assertNotNull(message.getPayload());
-        assertTrue(message.getPayload() instanceof byte[]);
-        String result = new String((byte[]) message.getPayload());
+        assertTrue(message.getPayload() instanceof InputStream);
+
+        InputStream fis = (InputStream) message.getPayload();
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        IOUtils.copy(fis, byteOut);
+        fis.close();
+        String result = new String(byteOut.toByteArray());
         assertEquals(TEST_MESSAGE, result);
     }
 

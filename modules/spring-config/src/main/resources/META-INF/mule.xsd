@@ -105,7 +105,7 @@
     <xsd:element name="abstract-extension" abstract="true" type="abstractExtensionType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for arbitrary extensions as children of the mule element.
+                A placeholder for arbitrary extensions as children of the mule element.
                 Other transports and modules may extend this if they need to add global
                 elements to the configuration (but consider the more specific elements
                 like abstract-connector first).
@@ -117,7 +117,7 @@
     <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for connector elements.
+                A placeholder for connector elements.
                 Other transports and modules may extend this if they need to add global
                 connector elements to the configuration.
             </xsd:documentation>
@@ -136,7 +136,7 @@
     <xsd:element name="abstract-global-endpoint" abstract="true" type="abstractGlobalEndpointType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for endpoint elements.
+                A placeholder for endpoint elements.
                 Other transports and modules may extend this if they need to add global
                 endpoint elements to the configuration.
             </xsd:documentation>
@@ -156,7 +156,7 @@
     <xsd:element name="abstract-inbound-endpoint" abstract="true" type="abstractInboundEndpointType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for inbound endpoint elements.
+                A placeholder for inbound endpoint elements.
                 Other transports and modules may extend this if they need to add
                 inbound endpoint elements to the configuration.
             </xsd:documentation>
@@ -166,7 +166,7 @@
         <xsd:attribute name="name" type="substitutableName">
             <xsd:annotation>
                 <xsd:documentation>
-                    Identifies the inbound endpoint, but is of relatively little use
+                    Identifies the inbound endpoint in the registry, but is of relatively little use
                     - it cannot be referred to from MuleClient, for example.
                     For more useful aliases, use global endpoints.
                 </xsd:documentation>
@@ -177,7 +177,7 @@
     <xsd:element name="abstract-outbound-endpoint" abstract="true" type="abstractOutboundEndpointType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for outbound endpoint elements.
+                A placeholder for outbound endpoint elements.
                 Other transports and modules may extend this if they need to add
                 outbound endpoint elements to the configuration.
             </xsd:documentation>
@@ -187,7 +187,7 @@
         <xsd:attribute name="name" type="substitutableName">
             <xsd:annotation>
                 <xsd:documentation>
-                    Identifies the outbound endpoint, but is of relatively little use
+                    Identifies the outbound endpoint in the registry, but is of relatively little use
                     - it cannot be referred to from MuleClient, for example.
                     For more useful aliases, use global endpoints.
                 </xsd:documentation>
@@ -198,7 +198,7 @@
     <xsd:element name="abstract-transformer" abstract="true" type="abstractTransformerType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for transformer elements.
+                A placeholder for transformer elements.
                 Other transports and modules may extend this if they need to add
                 transformer elements to the configuration.
             </xsd:documentation>
@@ -268,7 +268,7 @@
     <xsd:element name="abstract-catch-all-strategy" abstract="true" type="abstractCatchAllStrategyType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for catch-all strategy elements.
+                A placeholder for catch-all strategy elements.
                 Other transports and modules may extend this if they need to add
                 catch-all strategy elements to the configuration.
             </xsd:documentation>
@@ -279,7 +279,7 @@
     <xsd:element name="abstract-inbound-router" abstract="true" type="abstractInboundRouterType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for inbound router elements.
+                A placeholder for inbound router elements.
                 Other transports and modules may extend this if they need to add
                 inbound router elements to the configuration.
             </xsd:documentation>
@@ -290,7 +290,7 @@
     <xsd:element name="abstract-filter" abstract="true" type="abstractFilterType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for filter elements.
+                A placeholder for filter elements.
                 Other transports and modules may extend this if they need to add
                 filter elements to the configuration.
             </xsd:documentation>
@@ -332,7 +332,7 @@
     <xsd:element name="abstract-outbound-router" abstract="true" type="abstractOutboundRouterType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for outbound router elements.
+                A placeholder for outbound router elements.
                 Other transports and modules may extend this if they need to add
                 outbound router elements to the configuration.
             </xsd:documentation>
@@ -343,7 +343,7 @@
     <xsd:element name="abstract-transaction-manager" abstract="true" type="abstractTransactionManagerType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for transaction manager elements.
+                A placeholder for transaction manager elements.
                 Other transports and modules may extend this if they need to add
                 transaction manager elements to the configuration.
             </xsd:documentation>
@@ -659,7 +659,7 @@
     <xsd:element name="abstract-model" abstract="true" type="abstractModelType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for model elements.
+                A placeholder for model elements.
                 Other modules may extend this if they need to add
                 model elements to the configuration.
             </xsd:documentation>
@@ -724,7 +724,7 @@
     <xsd:element name="abstract-queue-profile" abstract="true" type="abstractQueueProfileType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for queue profile elements.
+                A placeholder for queue profile elements.
                 Other modules may extend this if they need to add
                 queue profile elements to the configuration.
             </xsd:documentation>
@@ -744,7 +744,7 @@
     <xsd:element name="abstract-entry-point-resolver-set" abstract="true" type="abstractEntryPointResolverSetType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for entry point resolver set elements.
+                A placeholder for entry point resolver set elements.
                 This allows various entry point resolver set implementations to be used.
             </xsd:documentation>
         </xsd:annotation>
@@ -815,7 +815,7 @@
     <xsd:element name="abstract-entry-point-resolver" abstract="true" type="abstractEntryPointResolverType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for an entry point resolver element.
+                A placeholder for an entry point resolver element.
                 This allows various entry point resolver implementations to be used.
             </xsd:documentation>
         </xsd:annotation>
@@ -1022,7 +1022,7 @@
     <xsd:element name="abstract-service" abstract="true" type="abstractServiceType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for a service element.
+                A placeholder for a service element.
                 This allows various service implementations to be used.
             </xsd:documentation>
         </xsd:annotation>
@@ -1095,7 +1095,7 @@
     <xsd:element name="abstract-exception-strategy" abstract="true" type="abstractExceptionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for an exception strategy element.
+                A placeholder for an exception strategy element.
                 This allows various exception strategy implementations to be used.
             </xsd:documentation>
         </xsd:annotation>
@@ -1120,7 +1120,7 @@
     <xsd:element name="abstract-async-reply-router" abstract="true" type="abstractAsyncReplyRouterType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for an async reply router element.
+                A placeholder for an async reply router element.
                 This allows various async reply router implementations to be used.
             </xsd:documentation>
         </xsd:annotation>
@@ -1179,7 +1179,7 @@
     <xsd:element name="abstract-component-threading-profile" abstract="true" type="abstractComponentThreadingProfileType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for component threading profile element.
+                A placeholder for component threading profile element.
                 This allows various component threading profile implementations to be used.
             </xsd:documentation>
         </xsd:annotation>
@@ -1193,7 +1193,7 @@
     <xsd:element name="abstract-component" abstract="true" type="abstractComponentType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for component element.
+                A placeholder for component element.
                 This allows various component implementations to be used.
             </xsd:documentation>
         </xsd:annotation>
@@ -1272,13 +1272,13 @@
         <xsd:annotation>
             <xsd:documentation>
                 This transfers a message from inbound to outbound endpoints.
-                This name is provided for backwards compatability - it is equivalent to a
-                pass-through-component, which is the default and does not need to be explicitly specified.
+                This name is provided for backwards compatability - it is equivalent to not specifying any component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="pass-through-component" type="defaultComponentType" substitutionGroup="abstract-component">
+    <!-- don't expose this, it's not needed -->
+    <!-- xsd:element name="pass-through-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 The default, "do nothing" component.
@@ -1286,7 +1286,7 @@
                 This is the default and need not be specified.
             </xsd:documentation>
         </xsd:annotation>
-    </xsd:element>
+    </xsd:element -->
 
     <xsd:element name="echo-component" type="defaultComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
@@ -1317,6 +1317,85 @@
     <!--   Transactions                                               -->
     <!--==============================================================-->
 
+    <xsd:element name="abstract-transaction" abstract="true" type="abstractTransactionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for transaction elements.
+                Other transports and modules may extend this if they need to add
+                transaction elements to the configuration.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractTransactionType">
+        <xsd:attribute name="action">
+            <xsd:annotation>
+                <xsd:documentation>
+                    NONE - Never participate in a transaction;
+                    ALWAYS_BEGIN - Always start a new transaction when receiving an event. An exception will be thrown if a transaction already exists;
+                    BEGIN_OR_JOIN - If a transaction is already in progress when an event is received, join the transaction, otherwise start a new transaction;
+                    ALWAYS_JOIN - Always expects a transaction to be in progress when an event is received, if there is no transaction an exception is thrown;
+                    JOIN_IF_POSSIBLE - Will join the current transaction if one is available otherwise no transaction is created.
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="NONE"/>
+                    <xsd:enumeration value="ALWAYS_BEGIN"/>
+                    <xsd:enumeration value="BEGIN_OR_JOIN"/>
+                    <xsd:enumeration value="ALWAYS_JOIN"/>
+                    <xsd:enumeration value="JOIN_IF_POSSIBLE"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="timeout" type="xsd:NMTOKEN">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Timeout for transaction (ms).
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="baseTransactionType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransactionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-transaction" type="customTransactionType" substitutionGroup="abstract-transaction">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allow access to user-defined or otherwise unsupported third party transactions.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customTransactionType">
+        <xsd:complexContent>
+            <xsd:extension base="baseTransactionType">
+                <xsd:attribute name="factory-class" type="substitutableClass">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A class that implements the TransactionFactory interface.
+                            This will be instantiated and used to generate a transaction.
+                            The attribute and the "factory-ref" attribute are mutually exclusive;
+                            one of the two is required.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A bean that implements the TransactionFactory interface.
+                            This will be used to generate a transaction.
+                            The attribute and the "factory-class" attribute are mutually exclusive;
+                            one of the two is required.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:complexType name="transactionManagerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransactionManagerType">
@@ -1332,6 +1411,22 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="websphere-transaction-manager" type="transactionManagerType" substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                The Websphere transaction manager.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="jboss-transaction-manager" type="transactionManagerType"
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                The JBoss transaction manager.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:complexType name="jndiTransactionManagerType">
         <xsd:complexContent>
             <xsd:extension base="abstractTransactionManagerType">
@@ -1339,7 +1434,7 @@
                     <xsd:element name="environment" type="mapType" minOccurs="0" maxOccurs="1">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Properties to be set on the created object.
+                                The JNDI environment.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -1348,6 +1443,60 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="weblogic-transaction-manager" type="jndiTransactionManagerType"
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                The Weblogic transaction manager.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="jrun-transaction-manager" type="transactionManagerType"
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                The JRun transaction manager.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="resin-transaction-manager" type="transactionManagerType"
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                The Resin transaction manager.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="jndi-transaction-manager" substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                Retrieve a named transaction manager factory from JNDI.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="jndiTransactionManagerType">
+                    <xsd:attribute name="jndiName" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The name of the manager factory to retrieve (eg java:/TransactionManager).
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="custom-transaction-manager" type="customTransactionManagerType"
+                 substitutionGroup="abstract-transaction-manager">
+        <xsd:annotation>
+            <xsd:documentation>
+                A user-implemented transaction manager.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="customTransactionManagerType">
         <xsd:complexContent>
             <xsd:extension base="jndiTransactionManagerType">
@@ -1364,64 +1513,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-
-    <xsd:element name="custom-transaction-manager" type="customTransactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                A user-implemented transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="jndi-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The JNDI transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="weblogic-transaction-manager" type="jndiTransactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The Weblogic transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="websphere-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The Websphere transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="jrun-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The JRun transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="jboss-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The JBoss transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="resin-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The Resin transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
 
 
     <!--==============================================================-->
@@ -1503,7 +1594,7 @@
     <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for security filter elements.
+                A placeholder for security filter elements.
                 Other transports and modules may extend this if they need to add
                 security filter elements to the configuration.
             </xsd:documentation>
@@ -1514,52 +1605,13 @@
     <xsd:element name="abstract-connection-strategy" abstract="true" type="abstractConnectionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for connection strategy elements.
+                A placeholder for connection strategy elements.
                 Other transports and modules may extend this if they need to add
                 connection strategy elements to the configuration.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractConnectionStrategyType"/>
-
-    <xsd:element name="abstract-transaction" abstract="true" type="abstractTransactionType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Abstract base for transaction elements.
-                Other transports and modules may extend this if they need to add
-                transaction elements to the configuration.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractTransactionType">
-        <xsd:attribute name="action">
-            <xsd:annotation>
-                <xsd:documentation>
-                    NONE - Never participate in a transaction;
-                    ALWAYS_BEGIN - Always start a new transaction when receiving an event. An exception will be thrown if a transaction already exists;
-                    BEGIN_OR_JOIN - If a transaction is already in progress when an event is received, join the transaction, otherwise start a new transaction;
-                    ALWAYS_JOIN - Always expects a transaction to be in progress when an event is received, if there is no transaction an exception is thrown;
-                    JOIN_IF_POSSIBLE - Will join the current transaction if one is available otherwise no transaction is created.               
-                </xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="NONE"/>
-                    <xsd:enumeration value="ALWAYS_BEGIN"/>
-                    <xsd:enumeration value="BEGIN_OR_JOIN"/>
-                    <xsd:enumeration value="ALWAYS_JOIN"/>
-                    <xsd:enumeration value="JOIN_IF_POSSIBLE"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:attribute>
-        <xsd:attribute name="timeout" type="xsd:NMTOKEN">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Timeout for transaction (ms).
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
 
     <xsd:attributeGroup name="defaultEndpointAttributes">
         <xsd:attributeGroup ref="restrictedEndpointAttributes"/>
@@ -1648,40 +1700,6 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
-
-    <xsd:element name="custom-transaction" type="customTransactionType" substitutionGroup="abstract-transaction">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allow access to user-defined or otherwise unsupported third party transactions.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="customTransactionType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransactionType">
-                <xsd:attribute name="factory-class" type="substitutableClass">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A class that implements the TransactionFactory interface.
-                            This will be instantiated and used to generate a transaction.
-                            The attribute and the "factory-ref" attribute are mutually exclusive;
-                            one of the two is required.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="factory-ref" type="xsd:NMTOKEN">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A bean that implements the TransactionFactory interface.
-                            This will be used to generate a transaction.
-                            The attribute and the "factory-class" attribute are mutually exclusive;
-                            one of the two is required.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:complexType name="replyToType">
         <xsd:attribute name="address" type="xsd:string" use="required">
@@ -2231,26 +2249,34 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <!-- TODO RM* Wire formats -->
-
     <!--==============================================================-->
     <!--   Shared elements                                             -->
     <!--==============================================================-->
 
-    <!-- xsd:complexType name="container-contextType">
-        <xsd:sequence>
-            <xsd:any namespace="##other" processContents="strict" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-        <xsd:attribute name="class" type="substitutableClass" use="required"/>
-        <xsd:attribute name="name" type="substitutableName"/>
-    </xsd:complexType -->
-
-    <xsd:element name="queue-profile" type="queueProfileType" substitutionGroup="abstract-queue-profile"/>
+    <xsd:element name="queue-profile" type="queueProfileType" substitutionGroup="abstract-queue-profile">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configure the queue used on a component.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="queueProfileType">
         <xsd:complexContent>
             <xsd:extension base="abstractQueueProfileType">
-                <xsd:attribute name="maxOutstandingMessages" type="xsd:string"/>
-                <xsd:attribute name="persistent" type="substitutableBoolean" default="false"/>
+                <xsd:attribute name="maxOutstandingMessages" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum size of the queue.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="persistent" type="substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the queue is persistent.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2300,12 +2326,38 @@
         <xsd:complexContent>
             <xsd:extension base="abstractSecurityManagerType">
                 <xsd:sequence>
-                    <xsd:element name="custom-security-provider" type="customSecurityProviderType" minOccurs="0"/>
-                    <xsd:element name="custom-encryption-strategy" type="customEncryptionStrategyType" minOccurs="0"/>
+                    <xsd:element name="custom-security-provider" type="customSecurityProviderType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Allow any implementation of UMOSecurityProvider to be used.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="custom-encryption-strategy" type="customEncryptionStrategyType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Allow any implementation of UMOEncryptionStrategy to be used.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element name="secret-key-encryption-strategy" type="secretKeyEncryptionStrategyType"
-                                 minOccurs="0"/>
+                                 minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Provides secret key-based encryption using JCE.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element name="password-encryption-strategy" type="passwordEncryptionStrategyType"
-                                 minOccurs="0"/>
+                                 minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Provides password-based encryption using JCE. Users must specify a password and
+                                optionally a salt and iteration count as well. The default algorithm is
+                                PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -2330,79 +2382,132 @@
     </xsd:complexType>
 
     <xsd:complexType name="customSecurityProviderType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allow any implementation of UMOSecurityProvider to be used.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
+       <xsd:complexContent>
             <xsd:extension base="securityProviderType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="provider-ref" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="provider-ref" type="xsd:NMTOKEN" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the security provider to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="customEncryptionStrategyType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Allow any implementation of UMOEncryptionStrategy to be used.
-            </xsd:documentation>
-        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="encryptionStrategyType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="strategy-ref" type="xsd:NMTOKEN" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the encryption strategy (which may be a Spring bean that
+                            implements the EncryptionStrategy interface).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="passwordEncryptionStrategyType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Provides password-based encryption using JCE. Users must specify a password and
-                optionally a salt and iteration count as well. The default algorithm is
-                PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.
-            </xsd:documentation>
-        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="encryptionStrategyType">
-                <xsd:attribute name="password" type="xsd:string" use="required"/>
-                <xsd:attribute name="salt" type="xsd:string"/>
-                <xsd:attribute name="iterationCount" type="substitutableInt"/>
+                <xsd:attribute name="password" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="salt" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The salt to use (this helps prevent dictionary attacks).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="iterationCount" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The number of itreations to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="secretKeyEncryptionStrategyType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Provides secret key-based encryption using JCE.
-            </xsd:documentation>
-        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="encryptionStrategyType">
-                <xsd:attribute name="key" type="xsd:string"/>
-                <xsd:attribute name="keyFactory-ref" type="xsd:NMTOKEN"/>
+                <xsd:attribute name="key" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The key to use.
+                            This and the keyFactory-ref attribute are mutually exclusive.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="keyFactory-ref" type="xsd:NMTOKEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the key factory to use.
+                            This should implement the ObjectFactory interface and return a byte array.
+                            This and the key attribute are mutually exclusive.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="component-threading-profile" type="threadingProfileType" substitutionGroup="abstract-component-threading-profile"/>
+    <xsd:element name="component-threading-profile" type="threadingProfileType" substitutionGroup="abstract-component-threading-profile">
+        <xsd:annotation>
+            <xsd:documentation>
+                The threading profile to use on the component.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <!-- this is a general threading type used by various elements here -->
     <xsd:complexType name="threadingProfileType">
         <xsd:complexContent>
             <!-- this is a hack that allows us to use this general threading profile as a component threading profile
                  without retyping everything -->
             <xsd:extension base="abstractComponentThreadingProfileType">
-                <xsd:attribute name="maxThreadsActive" type="xsd:string"/>
-                <xsd:attribute name="maxThreadsIdle" type="xsd:string"/>
-                <xsd:attribute name="threadTTL" type="xsd:string"/>
+                <xsd:attribute name="maxThreadsActive" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum number of threads that will be used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxThreadsIdle" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum number of idle threads stored in the pool.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="threadTTL" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The time excess threads in the pool live before being discarded.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="poolExhaustedAction">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            How tasks should be handled when no more threads are available.
+                        </xsd:documentation>
+                    </xsd:annotation>
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:NMTOKEN">
                             <xsd:enumeration value="WAIT"/>
@@ -2413,10 +2518,27 @@
                         </xsd:restriction>
                     </xsd:simpleType>
                 </xsd:attribute>
-                <xsd:attribute name="threadWaitTimeout" type="xsd:string"/>
-                <xsd:attribute name="doThreading" type="substitutableBoolean" default="true"/>
-                <xsd:attribute name="maxBufferSize" type="xsd:string"/>
-                <xsd:attribute name="name" type="substitutableName"/>
+                <xsd:attribute name="threadWaitTimeout" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            How long to wait (when the pool exhausted action is WAIT).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether threading should be used at all (default is true).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxBufferSize" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The size of the queue used (when the pool exhausted action is WAIT).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2425,11 +2547,21 @@
     <!--   Exception strategies                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="default-service-exception-strategy" type="exceptionStrategyType"
-                 substitutionGroup="abstract-exception-strategy"/>
-    <xsd:element name="default-connector-exception-strategy" type="exceptionStrategyType"
-                 substitutionGroup="abstract-exception-strategy"/>
-    <xsd:complexType name="exceptionStrategyType">
+    <xsd:element name="default-service-exception-strategy" type="endpointExceptionStrategyType" substitutionGroup="abstract-exception-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                Provide default exception handling via an endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="default-connector-exception-strategy" type="endpointExceptionStrategyType" substitutionGroup="abstract-exception-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                Provide default exception handling via an endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="endpointExceptionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="abstractExceptionStrategyType">
                 <xsd:sequence>
@@ -2439,15 +2571,28 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-exception-strategy" type="customExceptionStrategyType"
-                 substitutionGroup="abstract-exception-strategy"/>
+    <xsd:element name="custom-exception-strategy" type="customExceptionStrategyType" substitutionGroup="abstract-exception-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                A user-defined exception stratgey.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="customExceptionStrategyType">
         <xsd:complexContent>
-            <xsd:extension base="exceptionStrategyType">
+            <xsd:extension base="endpointExceptionStrategyType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A class that implements the ExceptionListener interface.
+                            In addition, if an outbound-endpoint element is specified,
+                            it is set as an "endpoint" bean property.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2457,33 +2602,58 @@
 
     <xsd:complexType name="connectionStrategyType">
         <xsd:complexContent>
-            <xsd:extension base="abstractConnectionStrategyType">
-                <!-- don't see what this is for - MULE-1771 -->
-                <!-- xsd:attribute name="inbound" type="xsd:boolean" use="required"/ -->
-            </xsd:extension>
+            <xsd:extension base="abstractConnectionStrategyType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="retry-connection-strategy" type="retryConnectionStrategyType"
-                 substitutionGroup="abstract-connection-strategy"/>
+    <xsd:element name="retry-connection-strategy" type="retryConnectionStrategyType" substitutionGroup="abstract-connection-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                Retry making a connection on failure.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="retryConnectionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="connectionStrategyType">
-                <xsd:attribute name="retryFrequency" type="substitutableLong"/>
-                <xsd:attribute name="retryCount" type="substitutableInt"/>
+                <xsd:attribute name="retryFrequency" type="substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            How often to retry (pause time in ms).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="retryCount" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Maximum number of retries.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-connection-strategy" type="customConnectionStrategyType"
-                 substitutionGroup="abstract-connection-strategy"/>
+    <xsd:element name="custom-connection-strategy" type="customConnectionStrategyType" substitutionGroup="abstract-connection-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                A user-defined connection strategy.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="customConnectionStrategyType">
         <xsd:complexContent>
             <xsd:extension base="connectionStrategyType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A class that implements the ConnectionStrategy interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2491,11 +2661,23 @@
 
     <!-- Custom connector element -->
 
-    <xsd:element name="custom-connector" type="customConnectorType" substitutionGroup="abstract-connector"/>
+    <xsd:element name="custom-connector" type="customConnectorType" substitutionGroup="abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                A user-defined connector.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="customConnectorType">
         <xsd:complexContent>
             <xsd:extension base="connectorType">
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A class that implements the Connector interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2506,17 +2688,6 @@
     <!--==============================================================-->
 
     <!-- Inbound Router implementations -->
-
-    <xsd:element name="forwarding-router" type="forwardingRouterType" substitutionGroup="abstract-inbound-router"/>
-    <xsd:complexType name="forwardingRouterType">
-        <xsd:complexContent>
-            <xsd:extension base="filteredInboundRouterType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="idempotent-secure-hash-receiver-router" type="filteredInboundRouterType"
                  substitutionGroup="abstract-inbound-router"/>
@@ -2553,10 +2724,9 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="selective-consumer-router" type="selectiveConsumerRouterType"
-                 substitutionGroup="abstract-inbound-router"/>
-    <xsd:element name="correlation-resequencer-router" type="selectiveConsumerRouterType"
-                 substitutionGroup="abstract-inbound-router"/>
+    <xsd:element name="forwarding-router" type="selectiveConsumerRouterType" substitutionGroup="abstract-inbound-router"/>
+    <xsd:element name="selective-consumer-router" type="selectiveConsumerRouterType" substitutionGroup="abstract-inbound-router"/>
+    <xsd:element name="correlation-resequencer-router" type="selectiveConsumerRouterType" substitutionGroup="abstract-inbound-router"/>
     <xsd:complexType name="selectiveConsumerRouterType">
         <xsd:complexContent>
             <xsd:extension base="filteredInboundRouterType">
@@ -2994,7 +3164,7 @@
     <xsd:complexType name="abstractAgentType">
         <xsd:annotation>
             <xsd:documentation>
-                Abstract base for agents.  Not used in core, but common to several modules.
+                A placeholder for agents.  Not used in core, but common to several modules.
             </xsd:documentation>
         </xsd:annotation>
          <xsd:complexContent>

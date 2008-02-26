@@ -18,16 +18,18 @@ import org.mule.routing.inbound.CorrelationAggregator;
 public class RouterDefinitionParser extends ChildDefinitionParser
 {
 
-    public RouterDefinitionParser(String setterMethod, Class clazz)
+    public static final String ROUTER = "router";
+
+    public RouterDefinitionParser(Class clazz)
     {
-        super(setterMethod, clazz);
+        super(ROUTER, clazz);
         standardOptions();
     }
 
     // specifically for subclasses of CorrelationAggregator (requires a "class=..." in the config)
-    public RouterDefinitionParser(String setterMethod)
+    public RouterDefinitionParser()
     {
-        super(setterMethod, null, CorrelationAggregator.class, true);
+        super(ROUTER, null, CorrelationAggregator.class, true);
         standardOptions();
     }
 

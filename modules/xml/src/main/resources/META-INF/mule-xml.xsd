@@ -117,15 +117,21 @@
         <xsd:complexContent>
             <xsd:extension base="xmlTransformerType">
                 <xsd:sequence>
-                    <xsd:any namespace="http://www.w3.org/1999/XSL/Transform" minOccurs="0" maxOccurs="1" processContents="lax"/>
+                    <xsd:element name="xslt-text" maxOccurs="1" minOccurs="0" type="xsltTextType"/>
+                    <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="maxIdleTransformers" type="mule:substitutableInt"/>
                 <xsd:attribute name="maxActiveTransformers" type="mule:substitutableInt"/>
-                <xsd:attribute name="xslt" type="xsd:string"/>
                 <xsd:attribute name="xsl-file" type="xsd:string"/>
                 <xsd:attribute name="transformerFactoryClass" type="xsd:NMTOKEN"/>
             </xsd:extension>
         </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="xsltTextType">
+        <xsd:sequence maxOccurs="1" minOccurs="1">
+            <xsd:any namespace="http://www.w3.org/1999/XSL/Transform" minOccurs="0" maxOccurs="1" processContents="lax"/>
+        </xsd:sequence>
     </xsd:complexType>
 
     <xsd:element name="xml-prettyprinter-transformer" type="xmlPrettyPrinterType" substitutionGroup="mule:abstract-transformer"/>

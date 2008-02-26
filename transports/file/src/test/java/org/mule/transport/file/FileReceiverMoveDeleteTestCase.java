@@ -11,20 +11,24 @@
 package org.mule.transport.file;
 
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.service.Service;
+import org.mule.api.transformer.TransformerException;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.endpoint.URIBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.transformer.AbstractMessageAwareTransformer;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.object.SingletonObjectFactory;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class FileInboundEndpointMoveDeleteTestCase extends AbstractFileFunctionalTestCase
+public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
 
     public void testMoveAndDeleteStreaming() throws Exception
@@ -33,7 +37,7 @@ public class FileInboundEndpointMoveDeleteTestCase extends AbstractFileFunctiona
 
         File moveToDir = configureConnector(inFile, true, true, true);
 
-        assertRecevied(configureService(inFile));
+        assertRecevied(configureService(inFile, true));
 
         assertFiles(inFile, moveToDir, true, true);
     }
@@ -44,7 +48,7 @@ public class FileInboundEndpointMoveDeleteTestCase extends AbstractFileFunctiona
 
         File moveToDir = configureConnector(inFile, true, true, false);
 
-        assertRecevied(configureService(inFile));
+        assertRecevied(configureService(inFile, true));
 
         assertFiles(inFile, moveToDir, true, false);
     }
@@ -55,7 +59,7 @@ public class FileInboundEndpointMoveDeleteTestCase extends AbstractFileFunctiona
 
         File moveToDir = configureConnector(inFile, true, false, true);
 
-        assertRecevied(configureService(inFile));
+        assertRecevied(configureService(inFile, true));
 
         assertFiles(inFile, moveToDir, false, true);
     }
@@ -66,7 +70,7 @@ public class FileInboundEndpointMoveDeleteTestCase extends AbstractFileFunctiona
 
         File moveToDir = configureConnector(inFile, true, false, false);
 
-        assertRecevied(configureService(inFile));
+        assertRecevied(configureService(inFile, true));
 
         assertFiles(inFile, moveToDir, false, false);
     }
@@ -76,7 +80,7 @@ public class FileInboundEndpointMoveDeleteTestCase extends AbstractFileFunctiona
         File inFile = initForRequest();
 
         File moveToDir = configureConnector(inFile, false, true, true);
-        assertRecevied(configureService(inFile));
+        assertRecevied(configureService(inFile, false));
 
         assertFiles(inFile, moveToDir, true, true);
     }
@@ -87,7 +91,7 @@ public class FileInboundEndpointMoveDeleteTestCase extends AbstractFileFunctiona
 
         File moveToDir = configureConnector(inFile, false, true, false);
 
-        assertRecevied(configureService(inFile));
+        assertRecevied(configureService(inFile, false));
 
         assertFiles(inFile, moveToDir, true, false);
     }
@@ -98,7 +102,7 @@ public class FileInboundEndpointMoveDeleteTestCase extends AbstractFileFunctiona
 
         File moveToDir = configureConnector(inFile, false, false, true);
 
-        assertRecevied(configureService(inFile));
+        assertRecevied(configureService(inFile, false));
 
         assertFiles(inFile, moveToDir, false, true);
     }
@@ -109,47 +113,40 @@ public class FileInboundEndpointMoveDeleteTestCase extends AbstractFileFunctiona
 
         File moveToDir = configureConnector(inFile, false, false, false);
 
-        assertRecevied(configureService(inFile));
+        assertRecevied(configureService(inFile, false));
 
         assertFiles(inFile, moveToDir, false, false);
     }
 
-    protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete)
-        throws Exception
-    {
-        FileConnector fc = new FileConnector();
-        fc.setName("moveDeleteConnector");
-        File moveToDir = new File(inFile.getParent() + "/moveto/");
-        moveToDir.mkdir();
-        muleContext.getRegistry().registerConnector(fc);
-        if (move)
-        {
-            fc.setMoveToDirectory(moveToDir.getPath());
-        }
-        fc.setAutoDelete(delete);
-        fc.setStreaming(stream);
-        return moveToDir;
-    }
-
-    protected Latch configureService(File inFile) throws Exception
+    protected Latch configureService(File inFile, boolean streaming) throws Exception
     {
 
         Service s = new SedaService();
         s.setName("moveDeleteBridgeService");
         String url = fileToUrl(inFile.getParentFile()) + "?connector=moveDeleteConnector";
+        org.mule.api.transformer.Transformer transformer;
+        if (streaming)
+        {
+            transformer = new FileMessageAdaptorAssertingTransformer(FileMessageAdapter.class);
+        }
+        else
+        {
+            transformer = new FileMessageAdaptorAssertingTransformer(FileContentsMessageAdapter.class);
+
+        }
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(url), muleContext);
+        endpointBuilder.addTransformer(transformer);
+        endpointBuilder.setSynchronous(true);
         s.getInboundRouter().addEndpoint(
-            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url));
+            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder));
         final Latch latch = new Latch();
         FunctionalTestComponent component = new FunctionalTestComponent();
         component.setEventCallback(new EventCallback()
         {
             public void eventReceived(final MuleEventContext context, final Object message) throws Exception
             {
-                System.out.println("COUTNTING DOWN LATCH: " + latch);
-                System.out.println(latch.getCount() + "-> ");
                 assertEquals(1, latch.getCount());
                 latch.countDown();
-                System.out.println(latch.getCount());
                 assertEquals(TEST_MESSAGE, context.transformMessageToString());
             }
         });
@@ -167,22 +164,25 @@ public class FileInboundEndpointMoveDeleteTestCase extends AbstractFileFunctiona
         assertTrue(latch != null && latch.await(2000, TimeUnit.MILLISECONDS));
     }
 
-    protected void assertFiles(File inFile, File moveToDir, boolean move, boolean delete) throws Exception
+    private class FileMessageAdaptorAssertingTransformer extends AbstractMessageAwareTransformer
     {
-        waitForFileSystem();
-        assertTrue(inFile.exists() == !delete);
+        private Class expectedMessageAdaptor;
 
-        if (!delete)
+        public FileMessageAdaptorAssertingTransformer(Class expectedMessageAdaptor)
         {
-            assertEquals(TEST_MESSAGE, new BufferedReader(new FileReader(inFile)).readLine());
+            this.expectedMessageAdaptor = expectedMessageAdaptor;
         }
 
-        File movedFile = new File(moveToDir.getPath() + inFile.getName());
-        assertTrue(movedFile.exists() == move);
-
-        if (move)
+        public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
         {
-            assertEquals(TEST_MESSAGE, new BufferedReader(new FileReader(movedFile)).readLine());
+            assertEquals(expectedMessageAdaptor, message.getAdapter().getClass());
+
+            // If we are streaming, copy/delete shouldn't have happened yet
+            if (expectedMessageAdaptor.equals(FileMessageAdapter.class))
+            {
+                assertFilesUntouched(((FileMessageAdapter) message.getAdapter()).file);
+            }
+            return message;
         }
     }
 

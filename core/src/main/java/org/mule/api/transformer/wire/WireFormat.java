@@ -15,9 +15,6 @@ import org.mule.api.MuleException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/**
- * TODO
- */
 
 public interface WireFormat
 {

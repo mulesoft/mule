@@ -40,7 +40,7 @@ public class ForwardingRouterDefinitionParser extends AbstractSerialDelegatingDe
     public ForwardingRouterDefinitionParser()
     {
         super();
-        addDelegate(new RouterDefinitionParser("router", ForwardingConsumer.class));
+        addDelegate(new RouterDefinitionParser(ForwardingConsumer.class));
         addDelegate(new NullComponentPlaceholder());
     }
     

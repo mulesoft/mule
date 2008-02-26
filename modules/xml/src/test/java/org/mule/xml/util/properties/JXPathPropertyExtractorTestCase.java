@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.config;
+package org.mule.xml.util.properties;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.tck.AbstractMuleTestCase;

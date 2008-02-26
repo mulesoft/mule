@@ -15,7 +15,6 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-import org.mule.transport.file.FileMessageReceiver;
 import org.mule.util.FileUtils;
 
 import com.mockobjects.dynamic.Mock;

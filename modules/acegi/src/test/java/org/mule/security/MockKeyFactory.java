@@ -20,9 +20,10 @@ import org.mule.util.object.ObjectFactory;
  */
 public class MockKeyFactory extends Named implements ObjectFactory
 {
+
     public Object getOrCreate() throws Exception
     {
-        return null;
+        return "key".getBytes();
     }
 
     public void release(Object object) throws Exception
@@ -44,4 +45,5 @@ public class MockKeyFactory extends Named implements ObjectFactory
     {
         return null;
     }
+    
 }

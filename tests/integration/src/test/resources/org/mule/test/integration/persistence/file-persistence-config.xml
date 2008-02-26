@@ -22,7 +22,6 @@
             <inbound>
                 <inbound-endpoint address="vm://test.queue" connector-ref="vmQueue"/>
             </inbound>
-            <pass-through-component/>
             <outbound>
                 <outbound-pass-through-router>
                     <outbound-endpoint address="stdio://System.out"/>

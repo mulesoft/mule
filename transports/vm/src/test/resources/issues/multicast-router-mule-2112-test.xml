@@ -17,7 +17,6 @@
             <inbound>
                 <vm:inbound-endpoint ref="inbound" synchronous="true"/>
             </inbound>
-            <pass-through-component/>
             <outbound>
                 <multicasting-router>
                     <vm:outbound-endpoint ref="endpointHop1"/>
