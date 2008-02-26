@@ -8,11 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.util.object;
+package org.mule.config.spring.util;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.util.object.ObjectFactory;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
