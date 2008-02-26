@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.model.Model;
+import org.mule.api.registry.Registry;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.component.simple.EchoComponent;
@@ -27,7 +28,7 @@ import org.mule.routing.inbound.DefaultInboundRouterCollection;
 import org.mule.transport.soap.transformers.HttpRequestToSoapRequest;
 import org.mule.util.object.PooledObjectFactory;
 
-public class XFireEchoConfigutationBuilder extends AbstractConfigurationBuilder implements ConfigurationBuilder
+public class XFireEchoConfigurationBuilder extends AbstractConfigurationBuilder implements ConfigurationBuilder
 {
 
     // @Override
@@ -36,10 +37,12 @@ public class XFireEchoConfigutationBuilder extends AbstractConfigurationBuilder 
         // Set defaults
         new DefaultsConfigurationBuilder().configure(muleContext);
 
+        Registry registry = muleContext.getRegistry();
+
         // Model
         Model model = new SedaModel();
         model.setName("model");
-        muleContext.getRegistry().registerModel(model);
+        registry.registerModel(model);
 
         // Service
         Service service = new SedaService();
@@ -59,6 +62,7 @@ public class XFireEchoConfigutationBuilder extends AbstractConfigurationBuilder 
         // - component
         service.setServiceFactory(new PooledObjectFactory(EchoComponent.class));
 
-        muleContext.getRegistry().registerService(service);
+        registry.registerService(service);
+
     }
 }

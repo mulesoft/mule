@@ -246,7 +246,7 @@ public class CxfMessageReceiver extends AbstractMessageReceiver
     {
         try
         {
-            return service.getServiceFactory().getOrCreate().getClass();
+            return service.getServiceFactory().getObjectClass();
         }
         catch (Exception e)
         {

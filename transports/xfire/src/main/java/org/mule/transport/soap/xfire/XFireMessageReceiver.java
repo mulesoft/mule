@@ -120,7 +120,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
             if (serviceInterfaces == null)
             {
-                exposedInterface = service.getServiceFactory().getOrCreate().getClass();
+                exposedInterface = service.getServiceFactory().getObjectClass();
             }
             else
             {

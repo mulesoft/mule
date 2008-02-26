@@ -13,7 +13,7 @@ package org.mule.example.loanbroker.esn;
 import org.mule.example.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
 
 
-public class XFireLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCase
+public class XFireLoanBrokerAsynchronousMule3016TestCase extends AbstractAsynchronousLoanBrokerTestCase
 {
     // @Override
     protected String getConfigResources()
@@ -24,15 +24,13 @@ public class XFireLoanBrokerAsynchronousFunctionalTestCase extends AbstractAsync
     // @Override
     protected int getNumberOfRequests()
     {
-        // MULE-3016
-        return 1;
+        return 10;
     }
 
     // @Override
     protected int getWarmUpMessages()
     {
-        // MULE-3016
-        return 0;
+        return 10;
     }
 
 }
