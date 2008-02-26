@@ -15,18 +15,30 @@ import org.mule.api.config.PropertyFactory;
 import java.net.InetAddress;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Extracts the local hostname from the local system
  */
 public class HostNameFactory implements PropertyFactory
 {
+    protected static final Log logger = LogFactory.getLog(HostNameFactory.class);
 
     public Object create(Map props) throws Exception
     {
         // we could use getCanonicalHostName here.  however, on machines behind
         // NAT firewalls it seems that is often the NAT address, which corresponds
         // to an interface on the firewall, not on the local machine.
-        return InetAddress.getLocalHost().getHostName();
+        try
+        {
+            return InetAddress.getLocalHost().getHostName();
+        }
+        catch (Exception e)
+        {
+            logger.warn("Unable to resolve hostname, defaulting to 'localhost': " + e.getMessage(), e);
+            return "localhost";
+        }
     }
 
 }
