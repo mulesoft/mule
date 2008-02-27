@@ -1720,14 +1720,14 @@
                             Note that a list of transformers can also be specified directly
                             (without the "transformers" element), but then it is not possible
                             to also specify response transformers
-                            (using the "responseTransformers" element).
+                            (using the "response-transformers" element).
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:complexType>
                         <xsd:group ref="transformersList"/>
                     </xsd:complexType>
                 </xsd:element>
-                <xsd:element name="responseTransformers" minOccurs="0">
+                <xsd:element name="response-transformers" minOccurs="0">
                     <xsd:annotation>
                         <xsd:documentation>
                             A list of transformer elements that will be applied to the response message

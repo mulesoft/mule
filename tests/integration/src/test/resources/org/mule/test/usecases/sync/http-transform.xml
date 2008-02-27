@@ -31,11 +31,11 @@
                     <transformers>
                         <transformer ref="ByteArrayToString"/>
                     </transformers>
-                    <responseTransformers>
+                    <response-transformers>
                         <transformer ref="ObjectToXml"/>
                         <transformer ref="Compress"/>
                         <transformer ref="ToHttpResponse"/>
-                    </responseTransformers>
+                    </response-transformers>
                 </inbound-endpoint>
             </inbound>
             <echo-component/>

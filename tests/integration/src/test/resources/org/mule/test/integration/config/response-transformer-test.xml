@@ -17,10 +17,10 @@
                         <transformer ref="normal1"/>
                         <string-to-byte-array-transformer name="normal2"/>
                     </transformers>
-                    <responseTransformers>
+                    <response-transformers>
                         <transformer ref="response1"/>
                         <string-to-byte-array-transformer name="response2"/>
-                    </responseTransformers>
+                    </response-transformers>
                 </inbound-endpoint>
             </inbound>
         </service>

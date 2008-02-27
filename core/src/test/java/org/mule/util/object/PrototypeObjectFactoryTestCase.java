@@ -16,21 +16,25 @@ public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCas
     // @Override
     public ObjectFactory getObjectFactory()
     {
-        PrototypeObjectFactory factory = new PrototypeObjectFactory();
+        return new PrototypeObjectFactory();
+    }
+
+    // @Override
+    public void testGetObjectClass() throws Exception
+    {
+        PrototypeObjectFactory factory = (PrototypeObjectFactory) getObjectFactory();
         factory.setObjectClass(Object.class);
-        return factory;
+        factory.initialise();
+        assertEquals(Object.class, factory.getObjectClass());
     }
 
     // @Override
-    public void testGetObjectClass()
+    public void testGet() throws Exception
     {
-        // TODO HH: auto-generated method stub
-    }
-
-    // @Override
-    public void testGet()
-    {
-        // TODO HH: auto-generated method stub
+        PrototypeObjectFactory factory = (PrototypeObjectFactory) getObjectFactory();
+        factory.setObjectClass(Object.class);
+        factory.initialise();
+        assertNotSame(factory.getInstance(), factory.getInstance());
     }
 
 }

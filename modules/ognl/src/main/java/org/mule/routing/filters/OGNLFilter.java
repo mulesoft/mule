@@ -33,7 +33,7 @@ public class OGNLFilter implements Filter
 
     /**
      * Sets the expression for this filter. The argument must be a valid expression
-     * as described ini the OGNL documentation.
+     * as described in the OGNL documentation.
      *
      * @param expression the expression to use for message evaluation
      * @throws ConfigurationException if the expression cannot be parsed

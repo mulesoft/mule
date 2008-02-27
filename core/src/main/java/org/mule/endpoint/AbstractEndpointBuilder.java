@@ -274,7 +274,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected boolean getDefaultRemoteSync(Connector connector)
     {
-        return false;
+        return muleContext.getConfiguration().isDefaultRemoteSync();
     }
 
     protected boolean getDeleteUnacceptedMessages(Connector connector)

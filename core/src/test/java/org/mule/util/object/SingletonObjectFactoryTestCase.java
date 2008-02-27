@@ -16,14 +16,14 @@ public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCas
     // @Override
     public ObjectFactory getObjectFactory()
     {
-        SingletonObjectFactory factory = new SingletonObjectFactory();
-        factory.setObjectClass(Object.class);
-        return factory;
+        return new SingletonObjectFactory();
     }
 
     // @Override
     public void testGetObjectClass() throws Exception
     {
+        SingletonObjectFactory factory = (SingletonObjectFactory) getObjectFactory();
+        factory.setObjectClass(Object.class);
         factory.initialise();
         assertEquals(Object.class, factory.getObjectClass());
     }
@@ -31,6 +31,8 @@ public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCas
     // @Override
     public void testGet() throws Exception
     {
+        SingletonObjectFactory factory = (SingletonObjectFactory) getObjectFactory();
+        factory.setObjectClass(Object.class);
         factory.initialise();
         assertSame(factory.getInstance(), factory.getInstance());
     }

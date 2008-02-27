@@ -10,9 +10,9 @@
     <xsd:import namespace="http://www.mulesource.org/schema/mule/core/2.0"
                 schemaLocation="http://www.mulesource.org/schema/mule/core/2.0/mule.xsd"/>
 
-    <xsd:element name="filter" type="OGNMComplexType" substitutionGroup="mule:abstract-filter"/>
+    <xsd:element name="filter" type="OGNLComplexType" substitutionGroup="mule:abstract-filter"/>
 
-    <xsd:complexType name="OGNMComplexType">
+    <xsd:complexType name="OGNLComplexType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractFilterType">
                 <xsd:sequence>

@@ -10,11 +10,6 @@
 
 package org.mule.util.object;
 
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleLogic;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
-
 import java.util.Map;
 
 /**
@@ -49,39 +44,4 @@ public class PrototypeObjectFactory extends AbstractObjectFactory
         super(objectClass, properties);
     }
 
-    public LifecycleTransitionResult initialise() throws InitialisationException
-    {
-        return LifecycleLogic.initialiseAll(this, super.initialise(), new LifecycleLogic.Closure()
-        {
-            public LifecycleTransitionResult doContinue()
-            {
-                return LifecycleTransitionResult.OK;
-            }
-        });
-    }
-
-    public void dispose()
-    {
-        // nothing to do
-    }
-
-    /**
-     * Creates a new instance of the object on each call.
-     */
-    // @Override
-    public Object getInstance() throws Exception
-    {
-        return super.getInstance();
-    }
-
-    /**
-     * Disposes of the object if it is {@link Disposable}.
-     */
-    public void release(Object object) throws Exception
-    {
-        if (object instanceof Disposable)
-        {
-            ((Disposable) object).dispose();
-        }
-    }
 }

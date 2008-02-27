@@ -41,7 +41,7 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
         return "style/axis-mule-message-config.xml";
     }
 
-    protected static String getServiceEndpoint()
+    protected String getServiceEndpoint()
     {
         return "http://localhost:63080/ServiceEntryPoint";
     }

@@ -8,7 +8,7 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
        http://www.mulesource.org/schema/mule/core/2.0 http://www.mulesource.org/schema/mule/core/2.0/mule.xsd">
 
-    <configuration serverId="serverId" defaultSynchronousEndpoints="false" domainId="domainIn" clusterId="cluserId">
+    <configuration serverId="serverId" defaultSynchronousEndpoints="true" defaultRemoteSync="true"  domainId="domainIn" clusterId="cluserId" defaultEncoding="US-ASCII">
         <default-threading-profile maxBufferSize="42" maxThreadsActive="16"
                                    maxThreadsIdle="3" poolExhaustedAction="WAIT" threadTTL="60001"/>
     </configuration>

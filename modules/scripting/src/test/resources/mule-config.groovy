@@ -124,7 +124,7 @@ muleContext.registry.registerModel(model)
 Service service = new SedaService();
 service.model = model
 service.name = "orangeComponent"
-service.serviceFactory = new SingletonObjectFactory(Orange.class.name);
+service.componentFactory = new SingletonObjectFactory(Orange.class.name);
 epBuilder= new EndpointURIEndpointBuilder(muleContext.registry.lookupEndpointBuilder("orangeEndpoint"))
 epBuilder.muleContext = muleContext
 epBuilder.setProperty("testLocal", "value1")

@@ -63,6 +63,12 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     protected final Map endpoints = new HashMap();
     protected String defaultJcaModelName;
 
+    public MuleResourceAdapter()
+    {
+        // TODO Make this work for OSGi
+        //RegistryContext.getOrCreateRegistry();
+    }
+
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException
     {
         ois.defaultReadObject();

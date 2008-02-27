@@ -22,7 +22,9 @@ fi
 
 cat schemadoc-prefix.txt > "$NORMALIZED"
 
-for file in `find ../../.. \( -name "normalized.xsd" -prune \) -o \( -name "buildtools" -prune \) -o \( -name "*classes" -prune \) -o \( -name "test" -prune \) -o -name "*.xsd" -print `
+# note that we exclude ws security explicitly here since it is still include in the package, but not supported
+
+for file in `find ../../.. \( -name "normalized.xsd" -prune \) -o \( -name "buildtools" -prune \) -o \( -name "mule-wssecurity.xsd" -prune \) -o \( -name "*classes" -prune \) -o \( -name "test" -prune \) -o -name "*.xsd" -print `
 do
   tag=`echo "$file" | sed -e "s/.*mule-\?\(.*\)\.xsd/\1/"`
   if [ -z "$tag" ]

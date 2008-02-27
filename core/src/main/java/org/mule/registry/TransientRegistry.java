@@ -159,7 +159,6 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
-
     protected Map getObjectTypeMap(Object o)
     {
         if (o == null)

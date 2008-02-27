@@ -11,9 +11,3 @@ org.mule.transport.soap.axis.AxisServletBindingTestCase
 
 # MULE-2164
 org.mule.transport.soap.axis.AxisEndpointMule2164TestCase
-
-# MULE-2573
-org.mule.transport.soap.axis.functional.SoapAttachmentsFunctionalTestCase
-
-# MULE-2638
-org.mule.transport.soap.axis.style.AxisMessageStyleServiceWithoutNamespaceTestCase

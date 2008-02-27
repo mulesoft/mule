@@ -141,11 +141,19 @@
     <link><item>file:file-to-string-transformer</item><page>Additional+Configuration</page></link>
     <link><item>jms:jmsmessage-to-object-transformer</item><page>Additional+Configuration</page></link>
     <link><item>jms:object-to-jmsmessage-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:encryption-security-filter</item><page>Additional+Configuration</page></link>
+    <link><item>jaas:jaas-security-filter</item><page>Additional+Configuration</page></link>
+    <link><item>acegi:http-security-filter</item><page>Additional+Configuration</page></link>
+    <link><item>pgp:security-filter</item><page>Additional+Configuration</page></link>
     
     <link><item>mule:inbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:outbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:endpoint</item><page>Configuring+Endpoints</page></link>
-
+    <link><item>mule:retry-connection-strategy</item><page>Configuring+Endpoints</page></link>
+    <link><item>mule:custom-connection-strategy</item><page>Configuring+Endpoints</page></link>
+    <link><item>mule:transformers</item><page>Configuring+Endpoints</page></link>
+    <link><item>mule:response-transformers</item><page>Configuring+Endpoints</page></link>
+    
     <link><item>axis:component</item><page>Axis+Transport</page></link>
     <link><item>axis:inbound-endpoint</item><page>Axis+Transport</page></link>
     <link><item>axis:outbound-endpoint</item><page>Axis+Transport</page></link>
