@@ -34,7 +34,6 @@ import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
-import org.mule.util.object.ObjectFactory;
 
 import java.util.List;
 import java.util.Properties;
@@ -43,7 +42,6 @@ import java.util.Properties;
 public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor implements TransportServiceDescriptor
 {
     private String connector;
-    private String connectorFactory;
     private String dispatcherFactory;
     private String requesterFactory;
     private String transactionFactory;
@@ -69,7 +67,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         super(service);
 
         connector = removeProperty(MuleProperties.CONNECTOR_CLASS, props);
-        connectorFactory = removeProperty(MuleProperties.CONNECTOR_FACTORY, props);
         dispatcherFactory = removeProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, props);
         requesterFactory = removeProperty(MuleProperties.CONNECTOR_REQUESTER_FACTORY, props);
         transactionFactory = removeProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, props);
@@ -102,7 +99,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
 
         connector = props.getProperty(MuleProperties.CONNECTOR_CLASS, connector);
-        connectorFactory = props.getProperty(MuleProperties.CONNECTOR_FACTORY, connectorFactory);
         dispatcherFactory = props.getProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, dispatcherFactory);
         requesterFactory = props.getProperty(MuleProperties.CONNECTOR_REQUESTER_FACTORY, requesterFactory);
         messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, messageReceiver);
@@ -352,23 +348,14 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         // if there is a factory, use it
         try
         {
-            if (connectorFactory != null)
+            if (connector != null)
             {
-                ObjectFactory factory = (ObjectFactory) ClassUtils.loadClass(connectorFactory,
-                        TransportFactory.class).newInstance();
-                newConnector = (Connector) factory.getOrCreate();
+                newConnector = (Connector) ClassUtils.loadClass(connector, TransportFactory.class)
+                        .newInstance();
             }
             else
             {
-                if (connector != null)
-                {
-                    newConnector = (Connector) ClassUtils.loadClass(connector, TransportFactory.class)
-                            .newInstance();
-                }
-                else
-                {
-                    throw new TransportServiceException(CoreMessages.objectNotSetInService("Connector", getService()));
-                }
+                throw new TransportServiceException(CoreMessages.objectNotSetInService("Connector", getService()));
             }
         }
         catch (TransportServiceException e)
@@ -378,7 +365,6 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         catch (Exception e)
         {
             throw new TransportServiceException(CoreMessages.failedToCreateObjectWith("Connector", connector), e);
-
         }
 
         if (newConnector.getName() == null)

@@ -14,7 +14,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringMessageUtils;
-import org.mule.util.object.ObjectFactory;
 
 import java.security.GeneralSecurityException;
 import java.security.spec.AlgorithmParameterSpec;
@@ -27,11 +26,11 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * SecretKey based encryption using JCE. Users must specify a key as an array of
  * bytes. This can be set directly on the strategy or a keyFactory can be specified.
- * A keyFactory is an implementation of org.mule.util.ObjectFactory and must return a
+ * A keyFactory is an implementation of {@link SecretKeyFactory} and must return a
  * byte array. The default algorthm used by this strategy is Blowfish, but users can
  * specify any valid algorithm supported by JCE.
  * 
- * @see ObjectFactory
+ * @see SecretKeyFactory
  */
 public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
 {
@@ -39,7 +38,7 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
     public static final String DEFAULT_ALGORITHM = "Blowfish";
 
     private byte[] key;
-    private ObjectFactory keyFactory;
+    private SecretKeyFactory keyFactory;
 
     public SecretKeyEncryptionStrategy()
     {
@@ -58,7 +57,7 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
             {
                 try
                 {
-                    key = (byte[]) keyFactory.getOrCreate();
+                    key = keyFactory.getKey();
                 }
                 catch (Exception e)
                 {
@@ -89,12 +88,12 @@ public class SecretKeyEncryptionStrategy extends AbstractJCEEncryptionStrategy
         this.key = StringMessageUtils.getBytes(rawKey);
     }
 
-    public ObjectFactory getKeyFactory()
+    public SecretKeyFactory getKeyFactory()
     {
         return keyFactory;
     }
 
-    public void setKeyFactory(ObjectFactory keyFactory)
+    public void setKeyFactory(SecretKeyFactory keyFactory)
     {
         this.keyFactory = keyFactory;
     }

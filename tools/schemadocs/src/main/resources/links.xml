@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?><links xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <link><item>mule:model</item><page>Models</page></link>
-    <link><item>mule:service</item><page>Models</page></link>
-    <link><item>mule:inbound</item><page>Models</page></link>
-    <link><item>mule:outbound</item><page>Models</page></link>
-    <link><item>mule:component</item><page>Models</page></link>
+    <link><item>mule:model</item><page>Configuring+Models</page></link>
+    <link><item>mule:service</item><page>Configuring+Models</page></link>
+    <link><item>mule:inbound</item><page>Configuring+Models</page></link>
+    <link><item>mule:outbound</item><page>Configuring+Models</page></link>
+    <link><item>mule:component</item><page>Configuring+Models</page></link>
     <link><item>mule:inbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:outbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:endpoint</item><page>Configuring+Endpoints</page></link>
+
+    <link><item>axis:component</item><page>Axis+Transport</page></link>
+    <link><item>axis:inbound-endpoint</item><page>Axis+Transport</page></link>
+    <link><item>axis:outbound-endpoint</item><page>Axis+Transport</page></link>
+    <link><item>axis:endpoint</item><page>Axis+Transport</page></link>
+    <link><item>axis:options</item><page>Axis+Transport</page></link>
+    <link><item>axis:bean-type</item><page>Axis+Transport</page></link>
+    <link><item>axis:soap-service</item><page>Axis+Transport</page></link>
+    <link><item>axis:soap-method</item><page>Axis+Transport</page></link>
+    <link><item>axis:soap-parameter</item><page>Axis+Transport</page></link>
+    <link><item>axis:soap-return</item><page>Axis+Transport</page></link>
 </links>

@@ -1017,7 +1017,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for a service element.
-                Services combine message rounting with a Java (typically) component.
+                Services combine message routing with a Java (typically) component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

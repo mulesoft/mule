@@ -11,6 +11,7 @@
 package org.mule.mule.security;
 
 import org.mule.security.SecretKeyEncryptionStrategy;
+import org.mule.security.SecretKeyFactory;
 import org.mule.tck.AbstractMuleTestCase;
 
 public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
@@ -21,6 +22,26 @@ public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
         SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
         ske.setAlgorithm("Blowfish");
         ske.setKey("shhhhh");
+        ske.initialise();
+
+        byte[] b = ske.encrypt("hello".getBytes(), null);
+
+        assertNotSame(new String(b), "hello");
+        String s = new String(ske.decrypt(b, null), "UTF-8");
+        assertEquals("hello", s);
+    }
+
+    public void testRoundTripEncryptionBlowfishWithKeyFactory() throws Exception
+    {
+        SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
+        ske.setAlgorithm("Blowfish");
+        ske.setKeyFactory(new SecretKeyFactory()
+        {
+            public byte[] getKey()
+            {
+                return "shhhh".getBytes();
+            }
+        });
         ske.initialise();
 
         byte[] b = ske.encrypt("hello".getBytes(), null);
@@ -44,4 +65,5 @@ public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
         String s = new String(ske.decrypt(b, null), "UTF-8");
         assertEquals("hello", s);
     }
+
 }

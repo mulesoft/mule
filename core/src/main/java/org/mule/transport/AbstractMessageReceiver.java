@@ -359,7 +359,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
                     + ". Message is being ignored");
         }
 
-        return null;
+        return message;
     }
 
     /*

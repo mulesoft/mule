@@ -105,7 +105,6 @@ public interface MuleProperties
     String CONNECTOR_MESSAGE_RECEIVER_CLASS = "message.receiver";
     String CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS = "transacted.message.receiver";
     String CONNECTOR_XA_TRANSACTED_MESSAGE_RECEIVER_CLASS = "xa.transacted.message.receiver";
-    String CONNECTOR_FACTORY = "connector.factory";
     String CONNECTOR_DISPATCHER_FACTORY = "dispatcher.factory";
     String CONNECTOR_REQUESTER_FACTORY = "requester.factory";
     String CONNECTOR_TRANSACTION_FACTORY = "transaction.factory";

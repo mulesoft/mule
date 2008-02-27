@@ -11,14 +11,12 @@
 package org.mule.security;
 
 /**
- * Empty mock for tests
+ * A factory class for providing secret keys to an instance of
+ * {@link SecretKeyEncryptionStrategy}.
+ * 
+ * @see SecretKeyEncryptionStrategy
  */
-public class MockKeyFactory extends Named implements SecretKeyFactory
+public interface SecretKeyFactory
 {
-
-    public byte[] getKey()
-    {
-        return "key".getBytes();
-    }
-
+    byte[] getKey();
 }

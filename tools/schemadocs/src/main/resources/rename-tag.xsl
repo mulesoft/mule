@@ -28,6 +28,10 @@
         </xsl:copy>
     </xsl:template>
 
+    <xsl:template match="xsd:simpleType">
+        <xsl:call-template name="copyWithRename"/>
+    </xsl:template>
+
     <xsl:template match="xsd:complexType">
         <xsl:call-template name="copyWithRename"/>
     </xsl:template>
@@ -37,6 +41,14 @@
     </xsl:template>
 
     <xsl:template match="xsd:extension">
+        <xsl:call-template name="copyWithRename"/>
+    </xsl:template>
+
+    <xsl:template match="xsd:restriction">
+        <xsl:call-template name="copyWithRename"/>
+    </xsl:template>
+
+    <xsl:template match="xsd:enumeration">
         <xsl:call-template name="copyWithRename"/>
     </xsl:template>
 
@@ -111,6 +123,10 @@
                         <xsl:attribute name="substitutionGroup"><xsl:value-of select="concat($tag, ':', @substitutionGroup)"/></xsl:attribute>
                     </xsl:otherwise>
                 </xsl:choose>
+            </xsl:if>
+            <!-- is there a better way of doing this? -->
+            <xsl:if test="@value">
+                <xsl:attribute name="value"><xsl:value-of select="@value"/></xsl:attribute>
             </xsl:if>
             <xsl:apply-templates select="./*"/>
         </xsl:copy>

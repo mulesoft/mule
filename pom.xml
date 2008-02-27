@@ -893,6 +893,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.2</version>
                 <!--
                     Fix surefire-report:report goal, which failed to
                     complete if there were test errors (no report was
