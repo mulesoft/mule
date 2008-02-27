@@ -101,7 +101,7 @@
                          a svn checkout the file connector would try to process subversion's meta
                          dirs which is not what we want.
                     -->
-                    <file:filter-filename-wildcard pattern="*.xml"/>
+                    <file:filename-wildcard-filter pattern="*.xml"/>
                 </inbound-endpoint>
             </inbound>
             

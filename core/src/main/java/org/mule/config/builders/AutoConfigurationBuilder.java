@@ -95,9 +95,10 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 
                 String className = (String) props.get(extension);
 
-                if (!ClassUtils.isClassOnPath(className, this.getClass()))
+                if (className == null || !ClassUtils.isClassOnPath(className, this.getClass()))
                 {
-                    throw new ConfigurationException(CoreMessages.configurationBuilderNoMatching(createConfigResourcesString()));
+                    throw new ConfigurationException(
+                        CoreMessages.configurationBuilderNoMatching(createConfigResourcesString()));
                 }
 
                 ConfigResource[] constructorArg = new ConfigResource[configs.size()];
@@ -105,6 +106,10 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
                 ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils.instanciateClass(className, new Object[]{constructorArg});
                 cb.configure(muleContext);
             }
+        }
+        catch (ConfigurationException e)
+        {
+            throw e;
         }
         catch (Exception e)
         {

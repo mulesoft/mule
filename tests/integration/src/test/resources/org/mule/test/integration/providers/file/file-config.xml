@@ -14,7 +14,7 @@
         <service name="mycomponent">
             <inbound>
                 <inbound-endpoint address="file://./test" connector-ref="file">
-                    <file:filter-filename-wildcard pattern="*.data"/>
+                    <file:filename-wildcard-filter pattern="*.data"/>
                 </inbound-endpoint>
             </inbound>
             <component class="org.mule.test.integration.transport.file.FileFunctionalTestCase$FileTestComponent"/>

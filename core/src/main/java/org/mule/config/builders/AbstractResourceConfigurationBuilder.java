@@ -17,7 +17,6 @@ import org.mule.config.ConfigResource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.commons.logging.Log;
@@ -93,10 +92,6 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
                 configResources[i] = new ConfigResource(configs[i]);
             }
             return configResources;
-        }
-        catch (FileNotFoundException e)
-        {
-            throw new ConfigurationException(CoreMessages.configurationBuilderNoMatching(e.getMessage()), e);
         }
         catch (IOException e)
         {

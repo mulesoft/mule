@@ -77,7 +77,7 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
             {
                 try
                 {
-                    configResources[i] = new ByteArrayResource(IOUtils.toByteArray(resource.getInputStream()));
+                    configResources[i] = new ByteArrayResource(IOUtils.toByteArray(resource.getInputStream()), resource.getResourceName());
                 }
                 catch (IOException e)
                 {

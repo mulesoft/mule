@@ -117,14 +117,15 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         MuleContext muleContext = null;
         try
         {
-            muleContext = muleContextFactory.createMuleContext("my-resource.xml");
+            muleContext = muleContextFactory.createMuleContext("log4j.properties");
 
         }
         catch (ConfigurationException e)
         {
-             assertEquals(
-                "No suitable configuration builder for resource \"my-resource.xml\" found.  Check you have configuration module on your classpath and are using correct file extension.",
-                e.getMessage());
+            assertEquals(
+                "No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j.properties'}]\" found.  "
+                                + "Check you have configuration module on your classpath and are using correct file extension. "
+                                + "(org.mule.api.config.ConfigurationException)", e.getMessage());
         }
         assertNull(muleContext);
 
@@ -139,14 +140,15 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         MuleContext muleContext = null;
         try
         {
-            muleContext = muleContextFactory.createMuleContext("my-resource.xml", properties);
+            muleContext = muleContextFactory.createMuleContext("log4j.properties", properties);
 
         }
         catch (ConfigurationException e)
         {
             assertEquals(
-                "No suitable configuration builder for resource \"my-resource.xml\" found.  Check you have configuration module on your classpath and are using correct file extension.",
-                e.getMessage());
+                "No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j.properties'}]\" found.  "
+                                + "Check you have configuration module on your classpath and are using correct file extension. "
+                                + "(org.mule.api.config.ConfigurationException)", e.getMessage());
         }
 
         assertNull(muleContext);
