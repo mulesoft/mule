@@ -610,6 +610,7 @@ public class MuleEventMulticaster
             newEndpoint = newEndpoint.substring(0, i - 1);
             SedaService s = new SedaService();
             s.setName(serviceName);
+            s.setModel(muleContext.getRegistry().lookupSystemModel());
             s.setQueueProfile(new QueueProfile());
             s.getInboundRouter().addEndpoint(
                 muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(newEndpoint));

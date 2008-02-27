@@ -184,7 +184,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         //Transformer elements
         registerBeanDefinitionParser("transformers", new ParentDefinitionParser());
-        registerMuleBeanDefinitionParser("responseTransformers", new ParentDefinitionParser()).addAlias("transformer", "responseTransformer");
+        registerMuleBeanDefinitionParser("response-transformers", new ParentDefinitionParser());
 
         registerBeanDefinitionParser("transformer", new TransformerRefDefinitionParser());
 

@@ -17,8 +17,6 @@ org.mule.test.integration.routing.replyto.ReplytoChainIntegration4TestCase
 org.mule.test.usecases.axis.AxisClientWithComplexTypesTestCase
 org.mule.test.integration.VisualizerServiceTestCase
 
-org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
-
 org.mule.test.integration.transaction.OutboundTransactionsTestCase
 
 # These tests work when run from the IDE (IntelliJ)
@@ -96,10 +94,6 @@ org.mule.test.integration.models.SedaPipelineTestCase
 
 # MULE-1789
 org.mule.test.integration.config.MultiContainerTestCase
-
-# MULE-2739
-# Does this still need to work for 2.x?
-org.mule.test.integration.spring.events.SpringEventsJmsExampleTestCase
 
 # MULE-2745
 # How to configure <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/> ?

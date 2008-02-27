@@ -18,8 +18,6 @@ import org.mule.tck.functional.EventCallback;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 /**
  * <code>SpringEventsJmsExampleTestCase</code> is a testcase used to test the
  * example config in the documentation. This test is not run when building this
@@ -28,8 +26,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
 {
     private final AtomicInteger eventCount = new AtomicInteger(0);
-
-    private ClassPathXmlApplicationContext context;
 
     protected String getConfigResources()
     {
@@ -40,7 +36,7 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
     {
         setStartContext(false);
     }
-    
+
     protected void doSetUp() throws Exception
     {
         eventCount.set(0);
@@ -48,7 +44,8 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
 
     public void testReceivingASubscriptionEvent() throws Exception
     {
-        OrderManagerBean subscriptionBean = (OrderManagerBean)context.getBean("orderManager");
+        OrderManagerBean subscriptionBean = (OrderManagerBean) muleContext.getRegistry().lookupObject(
+            "orderManagerBean");
         assertNotNull(subscriptionBean);
         // when an event is received by 'testEventBean1' this callback will be
         // invoked
@@ -76,7 +73,7 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
     public void testReceiveAsWebService() throws Exception
     {
         MuleClient client = new MuleClient();
-        OrderManagerBean orderManager = (OrderManagerBean)context.getBean("orderManager");
+        OrderManagerBean orderManager = (OrderManagerBean) muleContext.getRegistry().lookupObject("orderManagerBean");
         assertNotNull(orderManager);
         EventCallback callback = new EventCallback()
         {
@@ -88,8 +85,8 @@ public class SpringEventsJmsExampleTestCase extends FunctionalTestCase
         orderManager.setEventCallback(callback);
 
         Order order = new Order("Sausage and Mash");
-        MuleMessage result = client.send("axis:http://localhost:44444/mule/orderManager?method=processOrder",
-            order, null);
+        MuleMessage result = client.send("axis:http://localhost:44444/mule/orderManager?method=processOrder", order,
+            null);
 
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", (result.getPayload()));

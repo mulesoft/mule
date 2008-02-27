@@ -23,7 +23,7 @@ public class TransformerDefinitionParser extends ParentContextDefinitionParser
 
     public static final String TRANSFORMER = "transformer";
     public static final String RESPONSE_TRANSFORMER = "responseTransformer";
-    public static final String RESPONSE_TRANSFORMERS = RESPONSE_TRANSFORMER + "s";
+    public static final String RESPONSE_TRANSFORMERS = "response-transformers";
 
     public TransformerDefinitionParser(Class transformer)
     {

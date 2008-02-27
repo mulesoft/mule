@@ -31,7 +31,7 @@ import java.util.Random;
 public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
 {
 
-    @Override
+    //@Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();

@@ -53,6 +53,7 @@ public class SchemaDocsMain
     public static final String TAG = "tag";
     public static final String XSL_FILE = "rename-tag.xsl";
     public static final List TARGET_PATH = Arrays.asList(new String[]{"tools", "schemadocs", "target"});
+    public static final String[] BLOCKED = new String[]{"wssecurity"};
 
     protected final Log logger = LogFactory.getLog(getClass());
 
@@ -203,7 +204,21 @@ public class SchemaDocsMain
                 new FilenameFilter() {
                     public boolean accept(File dir, String name)
                     {
-                        return name.startsWith(MULE) && name.endsWith(XSD);
+                        if (name.startsWith(MULE) && name.endsWith(XSD))
+                        {
+                            for (int i = 0; i < BLOCKED.length; ++i)
+                            {
+                                if (name.indexOf(BLOCKED[i]) > -1)
+                                {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 };
         while (resources.hasMoreElements())

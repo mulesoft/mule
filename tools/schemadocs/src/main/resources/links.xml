@@ -153,16 +153,32 @@
     <link><item>mule:custom-connection-strategy</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:transformers</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:response-transformers</item><page>Configuring+Endpoints</page></link>
+
+    <link><item>mule:receiver-threading-profile</item><page>General+Transport+Configuration</page></link>
+    <link><item>mule:dispatcher-threading-profile</item><page>General+Transport+Configuration</page></link>
+    <link><item>mule:service-overrides</item><page>General+Transport+Configuration</page></link>
     
-    <link><item>axis:component</item><page>Axis+Transport</page></link>
+    <link><item>axis:connector</item><page>Axis+Transport</page></link>
     <link><item>axis:inbound-endpoint</item><page>Axis+Transport</page></link>
     <link><item>axis:outbound-endpoint</item><page>Axis+Transport</page></link>
     <link><item>axis:endpoint</item><page>Axis+Transport</page></link>
     <link><item>axis:options</item><page>Axis+Transport</page></link>
+    <link><item>axis:option</item><page>Axis+Transport</page></link>
     <link><item>axis:bean-type</item><page>Axis+Transport</page></link>
     <link><item>axis:soap-service</item><page>Axis+Transport</page></link>
     <link><item>axis:soap-method</item><page>Axis+Transport</page></link>
     <link><item>axis:soap-parameter</item><page>Axis+Transport</page></link>
     <link><item>axis:soap-return</item><page>Axis+Transport</page></link>
+    <link><item>axis:supported-scheme</item><page>Axis+Transport</page></link>
+
+    <link><item>bpm:connector</item><page>Bpm+Transport</page></link>
+    <link><item>bpm:inbound-endpoint</item><page>Bpm+Transport</page></link>
+    <link><item>bpm:outbound-endpoint</item><page>Bpm+Transport</page></link>
+    <link><item>bpm:endpoint</item><page>Bpm+Transport</page></link>
+
+    <link><item>cxf:connector</item><page>Cxf+Transport</page></link>
+    <link><item>cxf:inbound-endpoint</item><page>Cxf+Transport</page></link>
+    <link><item>cxf:outbound-endpoint</item><page>Cxf+Transport</page></link>
+    <link><item>cxf:endpoint</item><page>Cxf+Transport</page></link>
 
 </links>
