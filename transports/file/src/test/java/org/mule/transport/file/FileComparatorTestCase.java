@@ -46,7 +46,7 @@ public class FileComparatorTestCase extends FunctionalTestCase
             }
         };
 
-        ((FunctionalTestComponent) muleContext.getRegistry().lookupService(COMPONENT_NAME).getServiceFactory().getOrCreate()).
+        ((FunctionalTestComponent) muleContext.getRegistry().lookupService(COMPONENT_NAME).getComponentFactory().getInstance()).
                 setEventCallback(callback);
 
         muleContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).stop();

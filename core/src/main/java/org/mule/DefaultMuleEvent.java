@@ -599,7 +599,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         logger = LogFactory.getLog(getClass());
         in.defaultReadObject();
         int hashCode = in.readInt();
-        endpoint = MuleServer.getMuleContext().getRegistry().lookupEndpoint(
+        endpoint = (ImmutableEndpoint) MuleServer.getMuleContext().getRegistry().lookupObject(
             DefaultEndpointFactory.ENDPOINT_REGISTRY_PREFIX + hashCode);
     }
 

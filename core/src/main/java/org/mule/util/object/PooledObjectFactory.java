@@ -112,7 +112,7 @@ public class PooledObjectFactory extends AbstractObjectFactory implements Poolab
             {
                 for (int t = 0; t < numToBorrow; t++)
                 {
-                    holderList.add(this.getOrCreate());
+                    holderList.add(this.getInstance());
                 }
             }
             finally
@@ -151,10 +151,10 @@ public class PooledObjectFactory extends AbstractObjectFactory implements Poolab
     /**
      * Creates a new instance of the object on each call.
      */
-    public Object getOrCreate() throws Exception
+    public Object getInstance() throws Exception
     {
         // TODO HH: fallout from MULE-2676 prevents this from working properly..this is SO WRONG!
-        return super.getOrCreate();
+        return super.getInstance();
         // return pool.borrowObject();
     }
 
@@ -172,7 +172,7 @@ public class PooledObjectFactory extends AbstractObjectFactory implements Poolab
 
     public Object makeObject() throws Exception
     {
-        return super.getOrCreate();
+        return super.getInstance();
     }
 
     public void destroyObject(Object obj) throws Exception

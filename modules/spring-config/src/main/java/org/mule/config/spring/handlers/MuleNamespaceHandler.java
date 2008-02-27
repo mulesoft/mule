@@ -320,7 +320,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-property-extractor", new ChildDefinitionParser("propertyExtractor"));
         registerBeanDefinitionParser("map-property-extractor", new ChildDefinitionParser("propertyExtractor", MapPayloadPropertyExtractor.class));
         registerBeanDefinitionParser("message-property-extractor", new ChildDefinitionParser("propertyExtractor", MessageHeaderPropertyExtractor.class));
-        //registerBeanDefinitionParser("payload-property-extractor", new ChildDefinitionParser("propertyExtractor", PayloadPropertyExtractor.class));
 
         //Catch all Strategies
         registerBeanDefinitionParser("logging-catch-all-strategy", new ChildDefinitionParser("catchAllStrategy", LoggingCatchAllStrategy.class));

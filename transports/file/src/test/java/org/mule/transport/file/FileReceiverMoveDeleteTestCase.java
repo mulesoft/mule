@@ -152,7 +152,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         });
 
         component.initialise();
-        s.setServiceFactory(new SingletonObjectFactory(component));
+        s.setComponentFactory(new SingletonObjectFactory(component));
         s.setModel(muleContext.getRegistry().lookupSystemModel());
         muleContext.getRegistry().registerService(s);
         s.start();

@@ -23,7 +23,7 @@ import java.util.Date;
  * to be called and returns a result. The functions it supports are -
  * <ul>
  * <li>now - returns an {@link java.sql.Timestamp} with the current time.</li>
- * <li>now - returns a {@link java.util.Date} with the current time.</li>
+ * <li>date - returns a {@link java.util.Date} with the current time.</li>
  * <li>uuid - returns a globally unique identifier</li>
  * <li>hostname - returns the hostname of the machine Mule is running on</li>
  * <li>ip - returns the ip address of the machine Mule is running on</li>

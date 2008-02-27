@@ -50,7 +50,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
         {
             try
             {
-                instance = super.getOrCreate();
+                instance = super.getInstance();
             }
             catch (Exception e)
             {
@@ -73,7 +73,7 @@ public class SingletonObjectFactory extends AbstractObjectFactory
     /**
      * Always returns the same instance of the object.
      */
-    public Object getOrCreate() throws Exception
+    public Object getInstance() throws Exception
     {
         if (instance != null)
         {
@@ -101,20 +101,6 @@ public class SingletonObjectFactory extends AbstractObjectFactory
         {
             return super.getObjectClass();
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // Getters and Setters
-    ///////////////////////////////////////////////////////////////////////////////////////
-    
-    public Object getInstance()
-    {
-        return instance;
-    }
-
-    public void setInstance(Object instance)
-    {
-        this.instance = instance;
     }
 
 }

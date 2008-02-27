@@ -272,7 +272,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             props.put("wireFormat", wireFormat);
             props.put("encoding", encoding);
             props.put("synchronousEventTimeout", new Integer(eventTimeout));
-            service.setServiceFactory(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props));
+            service.setComponentFactory(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props));
 
             service.setMuleContext(managementContext);
             service.getInboundRouter().addEndpoint(endpoint);

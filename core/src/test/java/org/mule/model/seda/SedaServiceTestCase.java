@@ -43,7 +43,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
     {
         SedaService component = new SedaService();
         component.setName("test");
-        component.setServiceFactory(new PrototypeObjectFactory(Object.class));
+        component.setComponentFactory(new PrototypeObjectFactory(Object.class));
         component.setModel(new SedaModel());
         component.setMuleContext(muleContext);
         component.getModel().setMuleContext(muleContext);
@@ -63,7 +63,7 @@ public class SedaServiceTestCase extends AbstractMuleTestCase // AbstractService
             // here we are safe-guarding for any future changes
             SedaService component = new SedaService();
             component.setName("test");
-            component.setServiceFactory(new PrototypeObjectFactory(Object.class));
+            component.setComponentFactory(new PrototypeObjectFactory(Object.class));
             component.setModel(new SedaModel());
 
             component.handleWorkException(getTestWorkEvent(), "workRejected");

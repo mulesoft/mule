@@ -355,7 +355,7 @@ public final class MuleTestUtils
         c.setName(name);
         ObjectFactory of = new SingletonObjectFactory(clazz, props);
         of.initialise();
-        c.setServiceFactory(of);
+        c.setComponentFactory(of);
         c.setModel(model);
         if (initialize)
         {

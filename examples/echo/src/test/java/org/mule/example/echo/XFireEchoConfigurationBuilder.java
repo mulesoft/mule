@@ -57,7 +57,7 @@ public class XFireEchoConfigurationBuilder extends AbstractConfigurationBuilder 
         service.setInboundRouter(inbound);
 
         // - component
-        service.setServiceFactory(new PooledObjectFactory(EchoComponent.class));
+        service.setComponentFactory(new PooledObjectFactory(EchoComponent.class));
         muleContext.getRegistry().registerService(service);
 
     }

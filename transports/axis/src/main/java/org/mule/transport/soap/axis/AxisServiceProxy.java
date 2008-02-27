@@ -147,7 +147,7 @@ public class AxisServiceProxy
             final Class implementationClass;
             try
             {
-                implementationClass = component.getServiceFactory().getObjectClass();
+                implementationClass = component.getComponentFactory().getObjectClass();
             }
             catch (Exception e)
             {

@@ -150,9 +150,9 @@ public class SedaService extends AbstractService implements Work, WorkListener
             }
         }
         workManager.dispose();
-        if (serviceFactory instanceof Stoppable)
+        if (componentFactory instanceof Stoppable)
         {
-            ((Stoppable) serviceFactory).stop();
+            ((Stoppable) componentFactory).stop();
         }
     }
 
@@ -161,9 +161,9 @@ public class SedaService extends AbstractService implements Work, WorkListener
         try
         {
             //serviceFactory.initialise();
-            if (serviceFactory instanceof Startable)
+            if (componentFactory instanceof Startable)
             {
-                ((Startable) serviceFactory).start();
+                ((Startable) componentFactory).start();
             }
             workManager.start();
             workManager.scheduleWork(this, WorkManager.INDEFINITE, null, this);
@@ -183,7 +183,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
             workManager.dispose();
         }
 
-        serviceFactory.dispose();
+        componentFactory.dispose();
     }
 
     protected void doDispatch(MuleEvent event) throws MuleException
@@ -252,7 +252,7 @@ public class SedaService extends AbstractService implements Work, WorkListener
         {
             try
             {
-                serviceFactory.release(pojoService);
+                componentFactory.release(pojoService);
             }
             catch (Exception e)
             {
@@ -333,9 +333,9 @@ public class SedaService extends AbstractService implements Work, WorkListener
                 }
                 try
                 {
-                    if (serviceFactory != null)
+                    if (componentFactory != null)
                     {
-                        serviceFactory.release(pojoService);
+                        componentFactory.release(pojoService);
                     }
                 }
                 catch (Exception e2)

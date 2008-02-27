@@ -34,7 +34,7 @@ public class PollingReceiversRestartTestCase extends FunctionalTestCase
 
         muleContext.start();
 
-        Object ftc = getPojoServiceForComponent("Test");
+        Object ftc = getComponent("Test");
         assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
 
         AtomicInteger pollCounter = new AtomicInteger(0);

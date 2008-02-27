@@ -40,7 +40,7 @@ public class JcaServiceTestCase extends AbstractMuleTestCase // AbstractServiceT
         service = new JcaService(new DelegateWorkManager(workManager));
         service.setName(name);
         service.setModel(jcaModel);
-        service.setServiceFactory(new SingletonObjectFactory(new EchoComponent()));
+        service.setComponentFactory(new SingletonObjectFactory(new EchoComponent()));
         muleContext.getRegistry().registerService(service);
 
         assertNotNull(service);

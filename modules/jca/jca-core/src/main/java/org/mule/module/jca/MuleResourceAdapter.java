@@ -211,7 +211,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
             try
             {
-                muleContext.getRegistry().unregisterComponent(service.getName());
+                muleContext.getRegistry().unregisterService(service.getName());
             }
             catch (MuleException e)
             {
@@ -273,7 +273,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         // Set endpointFactory rather than endpoint here, so we can obtain a
         // new endpoint instance from factory for each incoming message in
         // JcaComponet as reccomended by JCA specification
-        service.setServiceFactory(new SingletonObjectFactory(endpointFactory));
+        service.setComponentFactory(new SingletonObjectFactory(endpointFactory));
         service.setModel(model);
         muleContext.getRegistry().registerService(service);
         return service;

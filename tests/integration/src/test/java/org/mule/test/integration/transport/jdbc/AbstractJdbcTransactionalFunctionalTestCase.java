@@ -105,7 +105,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         Service service = new SedaService();
         service.setExceptionListener(new DefaultExceptionStrategy());
         service.setName("testComponent");
-        service.setServiceFactory(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class));
+        service.setComponentFactory(new PrototypeObjectFactory(JdbcFunctionalTestComponent.class));
 
         TransactionFactory tf = getTransactionFactory();
         TransactionConfig txConfig = new MuleTransactionConfig();

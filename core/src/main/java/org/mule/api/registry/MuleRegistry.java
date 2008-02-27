@@ -38,18 +38,6 @@ public interface MuleRegistry extends Registry
     Connector lookupConnector(String name);
 
     /**
-     * Looks up an returns endpoints registered in the registry by their idendifier (currently endpoint name)<br/><br/
-     * <b>NOTE: This method does not create new endpoint instances, but rather returns existing endpoint
-     * instances that have been registered. This lookup method should be avoided and the intelligent, role
-     * specific endpoint lookup methods should be used instead.<br/><br/>
-     *
-     * @param name the idendtifer/name used to register endpoint in registry
-     * @see #lookupInboundEndpoint(String, org.mule.api.MuleContext)
-     * @see #lookupResponseEndpoint(String, org.mule.api.MuleContext)
-     */
-    ImmutableEndpoint lookupEndpoint(String name);
-
-    /**
      * Looks-up endpoint builders which can be used to repeatably create endpoints with the same configuration.
      * These endpoint builder are either global endpoints or they are builders used to create named
      * endpoints configured on routers and exception strategies.
@@ -82,9 +70,9 @@ public interface MuleRegistry extends Registry
      */
     Transformer lookupTransformer(Class input, Class output) throws TransformerException;
 
-    Collection/*<Service>*/ lookupComponents(String model);
+    Collection/*<Service>*/ lookupServices(String model);
 
-    Collection/*<Service>*/ lookupComponents();
+    Collection/*<Service>*/ lookupServices();
 
     Model lookupModel(String name);
 
@@ -129,7 +117,7 @@ public interface MuleRegistry extends Registry
 
     void registerService(Service service) throws MuleException;
 
-    void unregisterComponent(String componentName) throws MuleException;
+    void unregisterService(String serviceName) throws MuleException;
 
     void registerModel(Model model) throws MuleException;
 

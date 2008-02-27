@@ -30,7 +30,7 @@ public class RestServiceComponentTestCase extends FunctionalTestCase
     {
 
         Service service = muleContext.getRegistry().lookupService(SERVICE_NAME);
-        Object object = service.getServiceFactory().getOrCreate();
+        Object object = service.getComponentFactory().getInstance();
         assertEquals(object.getClass().getName(), RestServiceWrapper.class.getName());
         RestServiceWrapper restServiceWrapper = (RestServiceWrapper) object;
         assertEquals(restServiceWrapper.getServiceUrl(), SERVICE_URL);

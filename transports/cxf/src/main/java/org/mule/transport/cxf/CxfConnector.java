@@ -185,7 +185,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         SingletonObjectFactory of = new SingletonObjectFactory(svcComponent);
         of.setService(c);
         of.initialise();
-        c.setServiceFactory(of);
+        c.setComponentFactory(of);
         
         // No determine if the endpointUri requires a new connector to be
         // registed in the case of http we only need to register the new

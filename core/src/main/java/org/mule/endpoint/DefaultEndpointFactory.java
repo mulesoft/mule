@@ -95,7 +95,7 @@ public class DefaultEndpointFactory implements EndpointFactory
      */
     protected ImmutableEndpoint registerEndpoint(ImmutableEndpoint endpoint) throws RegistrationException
     {
-        ImmutableEndpoint registryEndpoint = muleContext.getRegistry().lookupEndpoint(
+        ImmutableEndpoint registryEndpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject(
             ENDPOINT_REGISTRY_PREFIX + endpoint.hashCode());
         if (registryEndpoint == null)
         {

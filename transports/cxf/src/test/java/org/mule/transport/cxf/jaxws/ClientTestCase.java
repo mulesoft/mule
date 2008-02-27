@@ -32,7 +32,7 @@ public class ClientTestCase extends FunctionalTestCase
 
     private GreeterImpl getGreeter() throws Exception
     {
-        Object instance = getPojoServiceForComponent("greeterService");
+        Object instance = getComponent("greeterService");
         
         return (GreeterImpl) instance;
     }

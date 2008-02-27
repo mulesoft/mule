@@ -215,7 +215,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
             // expected
         }
         connector.unregisterListener(service, endpoint);
-        muleContext.getRegistry().unregisterComponent(service.getName());
+        muleContext.getRegistry().unregisterService(service.getName());
     }
 
     public void testConnectorBeanProps() throws Exception

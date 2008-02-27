@@ -64,7 +64,7 @@ public class MultiStreamMule1696TestCase extends AbstractFtpServerTestCase
     {
         MuleClient client = new MuleClient();
 
-        Object ftc = getPojoServiceForComponent("testComponent");
+        Object ftc = getComponent("testComponent");
         assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
 
         assertNotNull(ftc);

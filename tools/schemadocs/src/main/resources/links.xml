@@ -13,6 +13,9 @@
     <link><item>mule:log-component</item><page>Configuring+Models</page></link>
     <link><item>mule:null-component</item><page>Configuring+Models</page></link>
     <link><item>http:rest-service-component</item><page>Configuring+Models</page></link>
+    <link><item>http:payloadParameterName</item><page>Configuring+Models</page></link>
+    <link><item>http:requiredParameter</item><page>Configuring+Models</page></link>
+    <link><item>http:optionalParameter</item><page>Configuring+Models</page></link>
     <link><item>mule:default-service-exception-strategy</item><page>Configuring+Models</page></link>
     <link><item>mule:default-connector-exception-strategy</item><page>Configuring+Models</page></link>
     <link><item>mule:custom-exception-strategy</item><page>Configuring+Models</page></link>
@@ -44,30 +47,101 @@
     <link><item>mule:message-chunking-aggregator-router</item><page>Configuring+Models</page></link>
     <link><item>mule:custom-correlation-aggregator-router</item><page>Configuring+Models</page></link>
     <link><item>mule:custom-inbound-router</item><page>Configuring+Models</page></link>
-    <link><item>mule:filter</item><page>Configuring+Models</page></link>
-    <link><item>mule:not-filter</item><page>Configuring+Models</page></link>
-    <link><item>mule:and-filter</item><page>Configuring+Models</page></link>
-    <link><item>mule:or-filter</item><page>Configuring+Models</page></link>
-    <link><item>mule:wildcard-filter</item><page>Configuring+Models</page></link>
-    <link><item>mule:regex-filter</item><page>Configuring+Models</page></link>
-    <link><item>mule:message-property-filter</item><page>Configuring+Models</page></link>
-    <link><item>mule:exception-type-filter</item><page>Configuring+Models</page></link>
-    <link><item>mule:payload-type-filter</item><page>Configuring+Models</page></link>
-    <link><item>mule:custom-filter</item><page>Configuring+Models</page></link>
-    <link><item>xml:is-xml-filter</item><page>Configuring+Models</page></link>
-    <link><item>xml:jxpath-filter</item><page>Configuring+Models</page></link>
-    <link><item>file:filename-wildcard-filter</item><page>Configuring+Models</page></link>
-    <link><item>jms:property-filter</item><page>Configuring+Models</page></link>
-    <link><item>ognl:filter</item><page>Configuring+Models</page></link>
-    <link><item>mule:bean-property-extractor</item><page>Configuring+Models</page></link>
-    <link><item>mule:correlation-property-extractor</item><page>Configuring+Models</page></link>
-    <link><item>mule:map-property-extractor</item><page>Configuring+Models</page></link>
-    <link><item>mule:message-property-extractor</item><page>Configuring+Models</page></link>
-    <link><item>mule:payload-property-extractor</item><page>Configuring+Models</page></link>
-    <link><item>xml:jxpath-property-extractor</item><page>Configuring+Models</page></link>
-    <link><item>xml:dom4j-property-extractor</item><page>Configuring+Models</page></link>
-    <link><item>xml:jdom-property-extractor</item><page>Configuring+Models</page></link>
+    <link><item>mule:spring-object</item><page>Configuring+Models</page></link>
+    <link><item>mule:singleton-object</item><page>Configuring+Models</page></link>
+    <link><item>mule:prototype-object</item><page>Configuring+Models</page></link>
+    <link><item>mule:pooled-object</item><page>Configuring+Models</page></link>
+    <link><item>mule:binding</item><page>Configuring+Models</page></link>
+    <link><item>mule:pooling-profile</item><page>Configuring+Models</page></link>
+    <link><item>mule:outbound-pass-through-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:filtering-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:chaining-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:exception-based-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:multicasting-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:template-endpoint-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:endpoint-selector-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:list-message-splitter-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:message-chunking-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:static-recipient-list-router</item><page>Configuring+Models</page></link>
+    <link><item>mule:custom-outbound-router</item><page>Configuring+Models</page></link>
+    <link><item>xml:message-splitter</item><page>Configuring+Models</page></link>
+    <link><item>xml:round-robin-splitter</item><page>Configuring+Models</page></link>
 
+    <link><item>mule:property</item><page>Additional+Configuration</page></link>
+    <link><item>mule:properties</item><page>Additional+Configuration</page></link>
+    <link><item>mule:custom-transaction</item><page>Additional+Configuration</page></link>
+    <link><item>jms:transaction</item><page>Additional+Configuration</page></link>
+    <link><item>jms:client-ack-transaction</item><page>Additional+Configuration</page></link>
+    <link><item>jms:xa-transaction</item><page>Additional+Configuration</page></link>
+    <link><item>jdbc:transaction</item><page>Additional+Configuration</page></link>
+    <link><item>mule:filter</item><page>Additional+Configuration</page></link>
+    <link><item>mule:not-filter</item><page>Additional+Configuration</page></link>
+    <link><item>mule:and-filter</item><page>Additional+Configuration</page></link>
+    <link><item>mule:or-filter</item><page>Additional+Configuration</page></link>
+    <link><item>mule:wildcard-filter</item><page>Additional+Configuration</page></link>
+    <link><item>mule:regex-filter</item><page>Additional+Configuration</page></link>
+    <link><item>mule:message-property-filter</item><page>Additional+Configuration</page></link>
+    <link><item>mule:exception-type-filter</item><page>Additional+Configuration</page></link>
+    <link><item>mule:payload-type-filter</item><page>Additional+Configuration</page></link>
+    <link><item>mule:custom-filter</item><page>Additional+Configuration</page></link>
+    <link><item>xml:is-xml-filter</item><page>Additional+Configuration</page></link>
+    <link><item>xml:jxpath-filter</item><page>Additional+Configuration</page></link>
+    <link><item>file:filename-wildcard-filter</item><page>Additional+Configuration</page></link>
+    <link><item>jms:property-filter</item><page>Additional+Configuration</page></link>
+    <link><item>ognl:filter</item><page>Additional+Configuration</page></link>
+    <link><item>mule:custom-property-extractor</item><page>Additional+Configuration</page></link>
+    <link><item>mule:map-property-extractor</item><page>Additional+Configuration</page></link>
+    <link><item>mule:message-property-extractor</item><page>Additional+Configuration</page></link>
+    <link><item>mule:correlation-property-extractor</item><page>Additional+Configuration</page></link>
+    <link><item>mule:function-property-extractor</item><page>Additional+Configuration</page></link>
+    <link><item>xml:jxpath-property-extractor</item><page>Additional+Configuration</page></link>
+    <link><item>xml:xpath-property-extractor</item><page>Additional+Configuration</page></link>
+    <link><item>xml:bean-property-extractor</item><page>Additional+Configuration</page></link>
+    <link><item>mule:transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:custom-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:message-properties-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:no-action-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:base64-encoder-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:base64-decoder-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:xml-entity-encoder-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:xml-entity-decoder-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:gzip-compress-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:gzip-uncompress-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:byte-array-to-hex-string-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:hex-string-to-byte-array-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:byte-array-to-object-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:object-to-byte-array-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:object-to-string-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:byte-array-to-serializable-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:serializable-to-byte-array-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:byte-array-to-string-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:string-to-byte-array-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:append-string-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:encrypt-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>mule:decrypt-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>xml:dom-to-xml-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>xml:dom-to-output-handler-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>xml:jxpath-extractor-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>xml:object-to-xml-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>xml:xml-to-dom-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>xml:xml-to-object-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>xml:xslt-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>xml:xml-prettyprinter-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>email:email-to-string-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>email:string-to-email-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>email:object-to-mime-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>email:mime-to-bytes-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>email:bytes-to-mime-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>soap:http-to-soap-request-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>http:http-client-response-to-object-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>http:http-response-to-string-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>http:object-to-http-client-request-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>http:message-to-http-response-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>file:file-to-byte-array-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>file:file-to-string-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>jms:jmsmessage-to-object-transformer</item><page>Additional+Configuration</page></link>
+    <link><item>jms:object-to-jmsmessage-transformer</item><page>Additional+Configuration</page></link>
+    
     <link><item>mule:inbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:outbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:endpoint</item><page>Configuring+Endpoints</page></link>

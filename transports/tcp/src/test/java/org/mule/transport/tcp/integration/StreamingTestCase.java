@@ -76,7 +76,7 @@ public class StreamingTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         // this works only if singleton set in descriptor
-        Object ftc = getPojoServiceForComponent("testComponent");
+        Object ftc = getComponent("testComponent");
         assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
         assertNotNull(ftc);
 

@@ -27,15 +27,16 @@ public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
 
     public void testLookupEndpoint() throws MuleException
     {
-        ImmutableEndpoint endpoint1 = muleContext.getRegistry().lookupEndpoint("Endpoint");
-        // Null expected because lookupEndpoint does not create endpoints from global endpoint name.        
-        assertNull(endpoint1);
+        Object endpoint1 = muleContext.getRegistry().lookupObject("Endpoint");
+        // This returns the builder rather than the endpoint
+        assertTrue(endpoint1 instanceof EndpointBuilder);
+        assertFalse(endpoint1 instanceof ImmutableEndpoint);
 
-        EndpointBuilder endpointBuiler = muleContext.getRegistry().lookupEndpointBuilder("Endpoint");      
+        EndpointBuilder endpointBuiler = muleContext.getRegistry().lookupEndpointBuilder("Endpoint");
         // There should however be an endpoint builder with this id/name
         assertNotNull(endpointBuiler);
-        
-        ImmutableEndpoint endpoint2 = muleContext.getRegistry().lookupEndpoint(
+
+        ImmutableEndpoint endpoint2 = (ImmutableEndpoint) muleContext.getRegistry().lookupObject(
             "axis:http://localhost:18081/mule/Service?method=toString");
         // Null expected because lookupEndpoint does not create endpoints from uri's.
         assertNull(endpoint2);

@@ -35,7 +35,7 @@ public class SimplePojoServiceDefinitionParser extends ObjectFactoryDefinitionPa
 
     public SimplePojoServiceDefinitionParser(Class clazz)
     {
-        super(SingletonObjectFactory.class, "serviceFactory");
+        super(SingletonObjectFactory.class, "componentFactory");
         this.clazz = clazz;
     }
 

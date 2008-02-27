@@ -126,7 +126,7 @@ public abstract class AbstractService implements Service
      * Factory which creates an instance of the actual service object.
      * By default a singleton object factory with the {@link PassThroughComponent} is used
      */
-    protected ObjectFactory serviceFactory = new SingletonObjectFactory(PassThroughComponent.class);
+    protected ObjectFactory componentFactory = new SingletonObjectFactory(PassThroughComponent.class);
 
     /**
      * The service's name
@@ -210,7 +210,7 @@ public abstract class AbstractService implements Service
             ((Initialisable) exceptionListener).initialise();
         }
 
-        return LifecycleLogic.initialiseAll(this, serviceFactory.initialise(), new LifecycleLogic.Closure()
+        return LifecycleLogic.initialiseAll(this, componentFactory.initialise(), new LifecycleLogic.Closure()
         {
             public LifecycleTransitionResult doContinue() throws InitialisationException
             {
@@ -782,7 +782,7 @@ public abstract class AbstractService implements Service
 
     protected Object getOrCreateService() throws MuleException
     {
-        if (serviceFactory == null)
+        if (componentFactory == null)
         {
             throw new InitialisationException(MessageFactory.createStaticMessage("Service " + name + " has not been initialized properly, no serviceFactory."), this);
         }
@@ -790,7 +790,7 @@ public abstract class AbstractService implements Service
         Object component;
         try
         {
-            component = serviceFactory.getOrCreate();
+            component = componentFactory.getInstance();
             if (component instanceof ServiceAware)
             {
                 ((ServiceAware) component).setService(this);
@@ -836,14 +836,14 @@ public abstract class AbstractService implements Service
         this.model = model;
     }
 
-    public ObjectFactory getServiceFactory()
+    public ObjectFactory getComponentFactory()
     {
-        return serviceFactory;
+        return componentFactory;
     }
 
-    public void setServiceFactory(ObjectFactory serviceFactory)
+    public void setComponentFactory(ObjectFactory componentFactory)
     {
-        this.serviceFactory = serviceFactory;
+        this.componentFactory = componentFactory;
     }
 
     public ExceptionListener getExceptionListener()

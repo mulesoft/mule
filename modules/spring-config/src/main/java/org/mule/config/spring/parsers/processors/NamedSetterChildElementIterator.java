@@ -21,9 +21,12 @@ import org.w3c.dom.Element;
  * This iterates over the child elements, generates beans, and sets them on the current bean via the
  * setter given.  So presumably there's either a single child or the destination is a collection.
  *
- * <p>Since this handles the iteratino over children explicitly you need to set the flag
+ * <p>Since this handles the iteration over children explicitly you need to set the flag
  * {@link org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate#MULE_NO_RECURSE}
  * on the parser.
+ *
+ * @see org.mule.config.spring.parsers.processors.AbstractChildElementIterator - please read the
+ * documentation for that processor
  */
 public class NamedSetterChildElementIterator extends AbstractChildElementIterator
 {

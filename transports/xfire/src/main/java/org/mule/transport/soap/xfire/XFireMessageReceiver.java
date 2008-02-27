@@ -83,7 +83,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
                 // we have to retrieve the implementation classname and create a
                 // class for it
                 WebServiceAnnotation webServiceAnnotation = 
-                    wa.getWebServiceAnnotation(service.getServiceFactory().getObjectClass());
+                    wa.getWebServiceAnnotation(service.getComponentFactory().getObjectClass());
                 namespace = webServiceAnnotation.getTargetNamespace();
             }
 
@@ -120,7 +120,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
             if (serviceInterfaces == null)
             {
-                exposedInterface = service.getServiceFactory().getObjectClass();
+                exposedInterface = service.getComponentFactory().getObjectClass();
             }
             else
             {

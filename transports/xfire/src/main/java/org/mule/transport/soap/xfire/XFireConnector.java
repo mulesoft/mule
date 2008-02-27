@@ -379,7 +379,7 @@ public class XFireConnector extends AbstractConnector
         // threading profile.
         of.setService(c);
         of.initialise();
-        c.setServiceFactory(of);
+        c.setComponentFactory(of);
         
         String serviceName = receiver.getService().getName();
 

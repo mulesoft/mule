@@ -23,7 +23,7 @@ public class ResponseTransformerTestCase extends FunctionalTestCase
 
     public void testTransformers()
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpoint("endpoint");
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject("endpoint");
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertEquals(2, endpoint.getTransformers().size());
         checkNames("normal", endpoint.getTransformers());

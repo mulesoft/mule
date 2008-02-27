@@ -26,7 +26,7 @@ public class PollingEtagTestCase extends FunctionalTestCase
 
     public void testPollingReceiversRestart() throws Exception
     {
-        Object ftc = getPojoServiceForComponent("Test");
+        Object ftc = getComponent("Test");
         assertTrue("FunctionalTestComponent expected", ftc instanceof FunctionalTestComponent);
 
         AtomicInteger pollCounter = new AtomicInteger(0);

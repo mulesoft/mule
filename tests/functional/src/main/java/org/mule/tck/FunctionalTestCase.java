@@ -60,12 +60,12 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
 
     protected abstract String getConfigResources();
     
-    protected Object getPojoServiceForComponent(String componentName) throws Exception
+    protected Object getComponent(String componentName) throws Exception
     {
         Service c = muleContext.getRegistry().lookupService(componentName);
         if (c != null)
         {
-            return c.getServiceFactory().getOrCreate();
+            return c.getComponentFactory().getInstance();
         }
         else
         {

@@ -152,7 +152,7 @@ public class LoanBrokerEsbConfigutationBuilder extends AbstractConfigurationBuil
         Service loanBrokerService = new SedaService();
         loanBrokerService.setName("LoanBroker");
         loanBrokerService.setModel(model);
-        loanBrokerService.setServiceFactory(new PooledObjectFactory(AsynchronousLoanBroker.class));
+        loanBrokerService.setComponentFactory(new PooledObjectFactory(AsynchronousLoanBroker.class));
         // in
         InboundRouterCollection loanBrokerServiceInbound = new DefaultInboundRouterCollection();
         loanBrokerServiceInbound.addEndpoint(CustomerRequestsREST.buildInboundEndpoint());
@@ -178,7 +178,7 @@ public class LoanBrokerEsbConfigutationBuilder extends AbstractConfigurationBuil
         Service creditAgencyGatewayService = new SedaService();
         creditAgencyGatewayService.setName("CreditAgencyGatewayService");
         creditAgencyGatewayService.setModel(model);
-        creditAgencyGatewayService.setServiceFactory(new PooledObjectFactory(ReflectionMessageBuilder.class));
+        creditAgencyGatewayService.setComponentFactory(new PooledObjectFactory(ReflectionMessageBuilder.class));
         // in
         InboundRouterCollection creditAgencyGatewayServiceInbound = new DefaultInboundRouterCollection();
         creditAgencyGatewayServiceInbound.addEndpoint(CreditAgencyGateway.buildInboundEndpoint());
@@ -226,7 +226,7 @@ public class LoanBrokerEsbConfigutationBuilder extends AbstractConfigurationBuil
         Service lenderServiceService = new SedaService();
         lenderServiceService.setName("LenderServiceService");
         lenderServiceService.setModel(model);
-        lenderGatewayService.setServiceFactory(new PooledObjectFactory(DefaultLender.class));
+        lenderGatewayService.setComponentFactory(new PooledObjectFactory(DefaultLender.class));
         // in
         InboundRouterCollection lenderServiceServiceInbound = new DefaultInboundRouterCollection();
         lenderServiceServiceInbound.addEndpoint(LenderService.buildInboundEndpoint());
@@ -254,7 +254,7 @@ public class LoanBrokerEsbConfigutationBuilder extends AbstractConfigurationBuil
         Service bank1Service = new SedaService();
         bank1Service.setName("TheBank1");
         bank1Service.setModel(model);
-        bank1Service.setServiceFactory(new PooledObjectFactory(Bank.class));
+        bank1Service.setComponentFactory(new PooledObjectFactory(Bank.class));
         InboundRouterCollection bank1ServiceInbound = new DefaultInboundRouterCollection();
         bank1ServiceInbound.addEndpoint(bank1In.buildInboundEndpoint());
         bank1Service.setInboundRouter(bank1ServiceInbound);
@@ -264,7 +264,7 @@ public class LoanBrokerEsbConfigutationBuilder extends AbstractConfigurationBuil
         Service bank2Service = new SedaService();
         bank2Service.setName("TheBank2");
         bank2Service.setModel(model);
-        bank2Service.setServiceFactory(new PooledObjectFactory(Bank.class));
+        bank2Service.setComponentFactory(new PooledObjectFactory(Bank.class));
         InboundRouterCollection bank2ServiceInbound = new DefaultInboundRouterCollection();
         bank2ServiceInbound.addEndpoint(bank2In.buildInboundEndpoint());
         bank2Service.setInboundRouter(bank2ServiceInbound);
@@ -274,7 +274,7 @@ public class LoanBrokerEsbConfigutationBuilder extends AbstractConfigurationBuil
         Service bank3Service = new SedaService();
         bank3Service.setName("TheBank3");
         bank3Service.setModel(model);
-        bank3Service.setServiceFactory(new PooledObjectFactory(Bank.class));
+        bank3Service.setComponentFactory(new PooledObjectFactory(Bank.class));
         InboundRouterCollection bank3ServiceInbound = new DefaultInboundRouterCollection();
         bank3ServiceInbound.addEndpoint(bank3In.buildInboundEndpoint());
         bank3Service.setInboundRouter(bank3ServiceInbound);
@@ -284,7 +284,7 @@ public class LoanBrokerEsbConfigutationBuilder extends AbstractConfigurationBuil
         Service bank4Service = new SedaService();
         bank4Service.setName("TheBank4");
         bank4Service.setModel(model);
-        bank4Service.setServiceFactory(new PooledObjectFactory(Bank.class));
+        bank4Service.setComponentFactory(new PooledObjectFactory(Bank.class));
         InboundRouterCollection bank4ServiceInbound = new DefaultInboundRouterCollection();
         bank4ServiceInbound.addEndpoint(bank4In.buildInboundEndpoint());
         bank4Service.setInboundRouter(bank4ServiceInbound);

@@ -12,89 +12,70 @@ package org.mule.util.object;
 
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.lifecycle.LifecycleLogic;
-import org.mule.config.i18n.MessageFactory;
-import org.mule.util.UUID;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 
-import java.util.Iterator;
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
 /**
- * Creates a new instance of the object on each call.  If the object implements the Identifiable 
- * interface, individual instances can be looked up by ID.
+ * Creates a new instance of the object on each call.
  */
 public class PrototypeObjectFactory extends AbstractObjectFactory
 {
-    /** 
-     * Active instances of the object which have been created.  
-     */
-    protected Map instances = null;
-    
+
     /** For Spring only */
-    public PrototypeObjectFactory() { super(); }
-    
-    public PrototypeObjectFactory(String objectClassName) { super(objectClassName); }
+    public PrototypeObjectFactory()
+    {
+        super();
+    }
 
-    public PrototypeObjectFactory(String objectClassName, Map properties) { super(objectClassName, properties); }
+    public PrototypeObjectFactory(String objectClassName)
+    {
+        super(objectClassName);
+    }
 
-    public PrototypeObjectFactory(Class objectClass) { super(objectClass); }
+    public PrototypeObjectFactory(String objectClassName, Map properties)
+    {
+        super(objectClassName, properties);
+    }
 
-    public PrototypeObjectFactory(Class objectClass, Map properties) { super(objectClass, properties); }
-    
+    public PrototypeObjectFactory(Class objectClass)
+    {
+        super(objectClass);
+    }
+
+    public PrototypeObjectFactory(Class objectClass, Map properties)
+    {
+        super(objectClass, properties);
+    }
+
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
         return LifecycleLogic.initialiseAll(this, super.initialise(), new LifecycleLogic.Closure()
         {
             public LifecycleTransitionResult doContinue()
             {
-                instances = new ConcurrentHashMap();
                 return LifecycleTransitionResult.OK;
-            }});
+            }
+        });
     }
-    
+
     public void dispose()
     {
-        if (instances != null)
-        {
-            Iterator it = instances.values().iterator();
-            while (it.hasNext())
-            {
-                Object obj = it.next();
-                if (obj instanceof Disposable)
-                {
-                    ((Disposable) obj).dispose();
-                }
-            }
-            instances.clear();
-            instances = null;
-        }
+        // nothing to do
     }
 
     /**
      * Creates a new instance of the object on each call.
      */
-    public Object getOrCreate() throws Exception
+    // @Override
+    public Object getInstance() throws Exception
     {
-        Object obj = super.getOrCreate();
-        String id = UUID.getUUID();
-
-        if (instances != null)
-        {
-            instances.put(id, obj);
-        }
-        else 
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
-        }
-
-        return obj;
+        return super.getInstance();
     }
 
-    /** 
-     * Removes the object instance from the list of active instances.
+    /**
+     * Disposes of the object if it is {@link Disposable}.
      */
     public void release(Object object) throws Exception
     {

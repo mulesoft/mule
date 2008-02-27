@@ -77,7 +77,7 @@ public final class ObjectNameHelper
         // We can't check local edpoints right now but the chances of conflict are
         // very small and will be
         // reported during JMX object registration
-        while (RegistryContext.getRegistry().lookupEndpoint(tempName) != null)
+        while (RegistryContext.getRegistry().lookupObject(tempName) != null)
         {
             i++;
             tempName = name + SEPARATOR + i;

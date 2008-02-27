@@ -32,7 +32,7 @@ public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCas
     public void testGet() throws Exception
     {
         factory.initialise();
-        assertSame(factory.getOrCreate(), factory.getOrCreate());
+        assertSame(factory.getInstance(), factory.getInstance());
     }
 
 }

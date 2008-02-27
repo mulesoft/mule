@@ -2689,10 +2689,7 @@
             <xsd:extension base="abstractInboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-filter" minOccurs="0"/>
-                    <xsd:choice minOccurs="0">
-                        <xsd:element ref="abstract-property-extractor"/>
-                        <xsd:element ref="custom-property-extractor"/>
-                    </xsd:choice>
+                    <xsd:element ref="abstract-property-extractor" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -2772,10 +2769,7 @@
             <xsd:extension base="abstractAsyncReplyRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:choice minOccurs="0">
-                        <xsd:element ref="abstract-property-extractor"/>
-                        <xsd:element ref="custom-property-extractor"/>
-                    </xsd:choice>
+                    <xsd:element ref="abstract-property-extractor" minOccurs="0"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -2806,10 +2800,7 @@
                     <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="reply-to" type="replyToType" minOccurs="0"/>
                     <xsd:element ref="abstract-transaction" minOccurs="0"/>
-                    <xsd:choice minOccurs="0">
-                        <xsd:element ref="abstract-property-extractor"/>
-                        <xsd:element ref="custom-property-extractor"/>
-                    </xsd:choice>
+                    <xsd:element ref="abstract-property-extractor" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="enableCorrelation" default="IF_NOT_SET">
                     <xsd:simpleType>
@@ -2957,16 +2948,70 @@
 
     <!-- property extractors -->
 
-    <xsd:element name="bean-property-extractor" type="abstractPropertyExtractorType"
-                 substitutionGroup="abstract-property-extractor"/>
-    <xsd:element name="correlation-property-extractor" type="abstractPropertyExtractorType"
-                 substitutionGroup="abstract-property-extractor"/>
     <xsd:element name="map-property-extractor" type="abstractPropertyExtractorType"
-                 substitutionGroup="abstract-property-extractor"/>
+                 substitutionGroup="abstract-property-extractor">
+        <xsd:annotation>
+            <xsd:documentation>
+                If the message payload is a map then the property is extracted from the
+                map using the property name as key.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="message-property-extractor" type="abstractPropertyExtractorType"
-                 substitutionGroup="abstract-property-extractor"/>
-    <xsd:element name="payload-property-extractor" type="abstractPropertyExtractorType"
-                 substitutionGroup="abstract-property-extractor"/>
+                 substitutionGroup="abstract-property-extractor">
+        <xsd:annotation>
+            <xsd:documentation>
+                The property is extracted from the message headers using the header property
+                name as key.  The special value "payload" retrieves the message payload.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="correlation-property-extractor" type="abstractPropertyExtractorType"
+                 substitutionGroup="abstract-property-extractor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A special extractor, this returns the correlation ID for various standard cases.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="function-property-extractor" type="abstractPropertyExtractorType"
+                 substitutionGroup="abstract-property-extractor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Rather than extract a value from the message, this supports the following
+                functions: "now", "date", "uuid", "hostname" and "ip".
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="custom-property-extractor" type="customPropertyExtractorType"
+                 substitutionGroup="abstract-property-extractor">
+        <xsd:annotation>
+            <xsd:documentation>
+                This allows an arbitrary class to be used as a property extractor.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customPropertyExtractorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractPropertyExtractorType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An implementation of the PropertyExtractor interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 
 
     <!--==============================================================-->
@@ -3437,14 +3482,6 @@
             </xsd:simpleType>
         </xsd:union>
     </xsd:simpleType>
-
-    <xsd:element name="custom-property-extractor" type="customPropertyExtractorType"/>
-    <xsd:complexType name="customPropertyExtractorType">
-        <xsd:sequence>
-            <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-        <xsd:attribute name="class" type="substitutableClass" use="required"/>
-    </xsd:complexType>
 
     <!-- i found this a bit confusing, so here's some background...
          this type is typically called from something like

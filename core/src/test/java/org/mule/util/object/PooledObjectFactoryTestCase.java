@@ -75,16 +75,16 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
 
         assertEquals(0, of.getPoolSize());
 
-        Object borrowed = of.getOrCreate();
+        Object borrowed = of.getInstance();
         assertNotNull(borrowed);
         assertEquals(1, of.getPoolSize());
         of.release(borrowed);
         assertEquals(0, of.getPoolSize());
 
-        borrowed = of.getOrCreate();
+        borrowed = of.getInstance();
         assertNotNull(borrowed);
         assertEquals(1, of.getPoolSize());
-        Object borrowed2 = of.getOrCreate();
+        Object borrowed2 = of.getInstance();
         assertNotNull(borrowed2);
         assertEquals(2, of.getPoolSize());
     }
@@ -100,14 +100,14 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
 
         for (int i = 0; i < MAX_ACTIVE; i++)
         {
-            borrowed = of.getOrCreate();
+            borrowed = of.getInstance();
             assertNotNull(borrowed);
             assertEquals(of.getPoolSize(), i + 1);
         }
 
         try
         {
-            borrowed = of.getOrCreate();
+            borrowed = of.getInstance();
             fail("Should throw an Exception");
         }
         catch (Exception e)
@@ -126,11 +126,11 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         Object borrowed = null;
 
         assertEquals(0, of.getPoolSize());
-        borrowed = of.getOrCreate();
+        borrowed = of.getInstance();
         assertNotNull(borrowed);
-        borrowed = of.getOrCreate();
+        borrowed = of.getInstance();
         assertNotNull(borrowed);
-        borrowed = of.getOrCreate();
+        borrowed = of.getInstance();
         assertNotNull(borrowed);
         assertEquals(3, of.getPoolSize());
 
@@ -138,7 +138,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         // long starttime = System.currentTimeMillis();
         try
         {
-            borrowed = of.getOrCreate();
+            borrowed = of.getInstance();
             fail("Should throw an Exception");
         }
         catch (Exception e)
@@ -163,8 +163,8 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
 
         assertEquals(0, of.getPoolSize());
 
-        borrowed = of.getOrCreate();
-        borrowed = of.getOrCreate();
+        borrowed = of.getInstance();
+        borrowed = of.getInstance();
         assertEquals(2, of.getPoolSize());
 
         // TODO
@@ -182,7 +182,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
             // ignore
         }
 
-        borrowed = of.getOrCreate();
+        borrowed = of.getInstance();
         // TODO
         // long totalTime = System.currentTimeMillis() - starttime;
         // Need to allow for alittle variance in system time
@@ -200,14 +200,14 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         PooledObjectFactory of = new PooledObjectFactory(Orange.class, pp);
         of.initialise();
 
-        Object borrowed = of.getOrCreate();
-        borrowed = of.getOrCreate();
-        borrowed = of.getOrCreate();
+        Object borrowed = of.getInstance();
+        borrowed = of.getInstance();
+        borrowed = of.getInstance();
         assertEquals(3, of.getPoolSize());
         // assertEquals(3, pool.getMaxSize());
 
         // Should now grow
-        borrowed = of.getOrCreate();
+        borrowed = of.getInstance();
         assertNotNull(borrowed);
 
         assertEquals(4, of.getPoolSize());
@@ -220,7 +220,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         PooledObjectFactory of = new PooledObjectFactory(Orange.class, pp);
         of.initialise();
 
-        Object borrowed = of.getOrCreate();
+        Object borrowed = of.getInstance();
         assertEquals(1, of.getPoolSize());
         of.release(borrowed);
 
@@ -228,7 +228,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         assertEquals(0, of.getPoolSize());
 
         of.initialise();
-        borrowed = of.getOrCreate();
+        borrowed = of.getInstance();
         assertEquals(1, of.getPoolSize());
     }
 
@@ -243,19 +243,19 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
 
         Object obj;
 
-        obj = of.getOrCreate();
+        obj = of.getInstance();
         assertNotNull(obj);
         assertTrue("Object should be of type UniqueComponent", obj instanceof UniqueComponent);
         String id1 = ((UniqueComponent) obj).getId();
         assertNotNull(id1);
 
-        obj = of.getOrCreate();
+        obj = of.getInstance();
         assertNotNull(obj);
         assertTrue("Object should be of type UniqueComponent", obj instanceof UniqueComponent);
         String id2 = ((UniqueComponent) obj).getId();
         assertNotNull(id2);
 
-        obj = of.getOrCreate();
+        obj = of.getInstance();
         assertNotNull(obj);
         assertTrue("Object should be of type UniqueComponent", obj instanceof UniqueComponent);
         String id3 = ((UniqueComponent) obj).getId();
@@ -271,7 +271,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         PooledObjectFactory of = new PooledObjectFactory(WaterMelon.class, getDefaultPoolingProfile());
         of.initialise();
 
-        WaterMelon wm = (WaterMelon) of.getOrCreate();
+        WaterMelon wm = (WaterMelon) of.getInstance();
         of.release(wm);
         assertEquals("disposed", wm.getState());
     }
@@ -286,18 +286,18 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         c.setName("test");
         PooledObjectFactory of = new PooledObjectFactory(Orange.class, getDefaultPoolingProfile());
         of.initialise();
-        c.setServiceFactory(of);
+        c.setComponentFactory(of);
         c.setModel(model);
 
         c.setMuleContext(muleContext);
         muleContext.applyLifecycle(c);
 
-        assertTrue(c.getServiceFactory() instanceof PooledObjectFactory);
-        assertEquals(0, ((PooledObjectFactory) c.getServiceFactory()).getPoolSize());
-        assertTrue(c.getServiceFactory().getOrCreate() instanceof Orange);
-        assertEquals(1, ((PooledObjectFactory) c.getServiceFactory()).getPoolSize());
+        assertTrue(c.getComponentFactory() instanceof PooledObjectFactory);
+        assertEquals(0, ((PooledObjectFactory) c.getComponentFactory()).getPoolSize());
+        assertTrue(c.getComponentFactory().getInstance() instanceof Orange);
+        assertEquals(1, ((PooledObjectFactory) c.getComponentFactory()).getPoolSize());
         c.dispose();
-        assertEquals(0, ((PooledObjectFactory) c.getServiceFactory()).getPoolSize());
+        assertEquals(0, ((PooledObjectFactory) c.getComponentFactory()).getPoolSize());
     }
 
     public void testLifeCycleMethods() throws Exception
@@ -342,7 +342,7 @@ public class PooledObjectFactoryTestCase extends AbstractMuleTestCase
         {
             try
             {
-                Object object = of.getOrCreate();
+                Object object = of.getInstance();
                 try
                 {
                     sleep(time);

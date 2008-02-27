@@ -90,7 +90,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, ServiceAwa
     /**
      * Creates an initialized object instance based on the class and sets any properties.
      */
-    public Object getOrCreate() throws Exception
+    public Object getInstance() throws Exception
     {
         Object object = ClassUtils.instanciateClass(objectClass, ClassUtils.NO_ARGS);
 

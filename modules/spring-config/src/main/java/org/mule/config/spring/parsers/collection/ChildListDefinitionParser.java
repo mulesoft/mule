@@ -20,7 +20,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class ChildListDefinitionParser extends ChildDefinitionParser {
+public class ChildListDefinitionParser extends ChildDefinitionParser
+{
 
     public ChildListDefinitionParser(String setterMethod)
     {

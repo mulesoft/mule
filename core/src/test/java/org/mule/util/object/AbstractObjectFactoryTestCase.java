@@ -27,7 +27,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
     {
         try
         {
-            factory.getOrCreate();
+            factory.getInstance();
             fail("expected InitialisationException");
         }
         catch (InitialisationException iex)
@@ -44,7 +44,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
             fail(iex.getDetailedMessage());
         }
 
-        assertNotNull(factory.getOrCreate());
+        assertNotNull(factory.getInstance());
     }
 
     // @Override
@@ -55,7 +55,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
 
         try
         {
-            factory.getOrCreate();
+            factory.getInstance();
             fail("expected InitialisationException");
         }
         catch (InitialisationException iex)

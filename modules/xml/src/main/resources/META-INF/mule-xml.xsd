@@ -157,9 +157,34 @@
 
     <!-- xml property extractors -->
 
-    <xsd:element name="jxpath-property-extractor" type="mule:abstractPropertyExtractorType" substitutionGroup="mule:abstract-property-extractor"/>
-    <xsd:element name="dom4j-property-extractor" type="mule:abstractPropertyExtractorType" substitutionGroup="mule:abstract-property-extractor"/>
-    <xsd:element name="jdom-property-extractor" type="mule:abstractPropertyExtractorType" substitutionGroup="mule:abstract-property-extractor"/>
+    <xsd:element name="jxpath-property-extractor" type="mule:abstractPropertyExtractorType" substitutionGroup="mule:abstract-property-extractor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Extract a property whose "name" is an XPATH expression.
+                If the payload is a string it is assumed to be an XML formatted document,
+                otherwise it is passed to JXPathContext.newContext which allows XPATH access to the bean hierarchy.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="xpath-property-extractor" type="mule:abstractPropertyExtractorType" substitutionGroup="mule:abstract-property-extractor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Extract a property whose "name" is an XPATH expression.
+                The payload should be a Document instance (either dom4j or w3c).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="bean-property-extractor" type="mule:abstractPropertyExtractorType" substitutionGroup="mule:abstract-property-extractor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Extract a property whose "name" is an XPATH expression.
+                JavaBeanXPath is used, after replacing "/" with "." in the XPATH expression,
+                to extract a Java object from the payload.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <!-- xml support -->
 

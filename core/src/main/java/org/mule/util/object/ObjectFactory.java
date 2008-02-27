@@ -24,7 +24,7 @@ public interface ObjectFactory extends Initialisable, Disposable
      * an existing instance depending on the implementation.  If a new instance
      * is created it will also be initialized by this method (Initilisable.initialise()).
      */
-    Object getOrCreate() throws Exception;
+    Object getInstance() throws Exception;
     
     /**
      * Returns the class of the object to be instantiated without actually creating an

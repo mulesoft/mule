@@ -54,7 +54,7 @@ public class PoolingProfileTestCase  extends FunctionalTestCase
     {
         Service c = muleContext.getRegistry().lookupService(service);
         assertNotNull(service, c);
-        PooledObjectFactory of = (PooledObjectFactory)c.getServiceFactory();
+        PooledObjectFactory of = (PooledObjectFactory)c.getComponentFactory();
         PoolingProfile profile = of.getPoolingProfile();
         assertNotNull(profile);
         assertEquals("exhausted:", exhausted, profile.getExhaustedAction());

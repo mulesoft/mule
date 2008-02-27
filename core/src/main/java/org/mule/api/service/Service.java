@@ -90,14 +90,14 @@ public interface Service extends Serializable, Lifecycle, MuleContextAware, Name
     ExceptionListener getExceptionListener();
 
     /**
-     * @return Factory which creates an instance of the actual service object.
+     * @return Factory which creates or returns an instance of the actual service component.
      */
-    ObjectFactory getServiceFactory();
+    ObjectFactory getComponentFactory();
 
     /**
      * Factory which creates an instance of the actual service object.
      */
-    void setServiceFactory(ObjectFactory factory);
+    void setComponentFactory(ObjectFactory factory);
 
     /**
      * Inbound Routers control how events are received by a service. If no router

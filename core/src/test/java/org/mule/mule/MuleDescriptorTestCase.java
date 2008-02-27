@@ -38,10 +38,10 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
         // assertEquals(2, descriptor.getInitialisationPolicy());
 
         //assertNull("Factory should be null but is " + service.getServiceFactory(), service.getServiceFactory());
-        assertNotNull(service.getServiceFactory());
-        assertEquals(SingletonObjectFactory.class, service.getServiceFactory().getClass());
-        service.getServiceFactory().initialise();
-        assertTrue(service.getServiceFactory().getOrCreate() instanceof PassThroughComponent);
+        assertNotNull(service.getComponentFactory());
+        assertEquals(SingletonObjectFactory.class, service.getComponentFactory().getClass());
+        service.getComponentFactory().initialise();
+        assertTrue(service.getComponentFactory().getInstance() instanceof PassThroughComponent);
         assertNull(service.getName());
         //assertEquals(0, service.getProperties().size());
     }

@@ -29,9 +29,9 @@ public class MulticastRouterMule2112TestCase  extends FunctionalTestCase
 
     public void testMulticastRoutingOverTwoEndpoints() throws Exception
     {
-        Object hop1 = getPojoServiceForComponent("hop1");
+        Object hop1 = getComponent("hop1");
         assertTrue("FunctionalTestComponent expected", hop1 instanceof FunctionalTestComponent);
-        Object hop2 = getPojoServiceForComponent("hop2");
+        Object hop2 = getComponent("hop2");
         assertTrue("FunctionalTestComponent expected", hop2 instanceof FunctionalTestComponent);
         assertNotNull(hop1);
         assertNotNull(hop2);

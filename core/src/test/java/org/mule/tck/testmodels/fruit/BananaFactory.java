@@ -29,7 +29,7 @@ public class BananaFactory implements ObjectFactory
         // nothing to do
     }
 
-    public Object getOrCreate() throws Exception
+    public Object getInstance() throws Exception
     {
         return new Banana();
     }

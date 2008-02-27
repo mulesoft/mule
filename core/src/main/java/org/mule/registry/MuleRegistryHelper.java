@@ -90,6 +90,20 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return (Connector) registry.lookupObject(name);
     }
 
+    /**
+     * Removed this method from {@link Registry} API as it should only be used
+     * internally and may confuse users. The {@link EndpointFactory} should be used
+     * for creating endpoints.<br/><br/> Looks up an returns endpoints registered in the
+     * registry by their idendifier (currently endpoint name)<br/><br/ <b>NOTE:
+     * This method does not create new endpoint instances, but rather returns
+     * existing endpoint instances that have been registered. This lookup method
+     * should be avoided and the intelligent, role specific endpoint lookup methods
+     * should be used instead.<br/><br/>
+     * 
+     * @param name the idendtifer/name used to register endpoint in registry
+     * @see #lookupInboundEndpoint(String, org.mule.api.MuleContext)
+     * @see #lookupResponseEndpoint(String, org.mule.api.MuleContext)
+     */
     public ImmutableEndpoint lookupEndpoint(String name)
     {
         Object obj = registry.lookupObject(name);
@@ -306,16 +320,16 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         return (Service) registry.lookupObject(name);
     }
 
-    public Collection/*<Service>*/ lookupComponents()
+    public Collection/*<Service>*/ lookupServices()
     {
-        return registry.lookupObjects(Service.class);
+        return lookupObjects(Service.class);
     }
 
-    public Collection/*<Service>*/ lookupComponents(String model)
+    public Collection/*<Service>*/ lookupServices(String model)
     {
-        Collection/*<Service>*/ components = lookupComponents();
-        List modelComponents = new ArrayList();
-        Iterator it = components.iterator();
+        Collection/*<Service>*/ services = lookupServices();
+        List modelServices = new ArrayList();
+        Iterator it = services.iterator();
         Service service;
         while (it.hasNext())
         {
@@ -323,10 +337,10 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
             // TODO Make this comparison more robust.
             if (model.equals(service.getModel().getName()))
             {
-                modelComponents.add(service);
+                modelServices.add(service);
             }
         }
-        return modelComponents;
+        return modelServices;
     }
 
     public final void registerTransformer(Transformer transformer) throws MuleException
@@ -494,9 +508,9 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
     }
 
     //@java.lang.Override
-    public void unregisterComponent(String componentName) throws MuleException
+    public void unregisterService(String serviceName) throws MuleException
     {
-        registry.unregisterObject(componentName, Service.class);
+        registry.unregisterObject(serviceName, Service.class);
     }
 
 

@@ -13,6 +13,7 @@ package org.mule.module.wssecurity.filters;
 import org.mule.DefaultMuleMessage;
 import org.mule.RegistryContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.api.security.EncryptionStrategyNotFoundException;
@@ -21,6 +22,7 @@ import org.mule.api.security.SecurityProviderNotFoundException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.api.security.UnsupportedAuthenticationSchemeException;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.wssecurity.handlers.MuleWSSInHandler;
 import org.mule.module.wssecurity.headers.WsSecurityHeadersSetter;
@@ -95,12 +97,22 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
 
         // With inbound endpoints we need to get the Xfire/Axis server from the XFireServiceComponent/AxisServiceComponent
         
-        ObjectFactory objFactory = event.getService().getServiceFactory();
+        ObjectFactory objFactory = event.getService().getComponentFactory();
+        Object component;
 
-        if (objFactory instanceof SingletonObjectFactory
-            && ((SingletonObjectFactory) objFactory).getInstance() instanceof XFireServiceComponent)
+        // this is only necessary because ObjectFactory.getInstance declares that it throws "Exception" for whatever reason
+        try
         {
-            XFire server = ((XFireServiceComponent) ((SingletonObjectFactory) objFactory).getInstance()).getXfire();
+            component = objFactory.getInstance();
+        }
+        catch (Exception ex)
+        {
+            throw new MuleRuntimeException(CoreMessages.authDeniedOnEndpoint(event.getEndpoint().getEndpointURI()), ex);
+        }
+        
+        if (objFactory instanceof SingletonObjectFactory && component instanceof XFireServiceComponent)
+        {
+            XFire server = ((XFireServiceComponent) component).getXfire();
 
             String pathInfo = event.getEndpoint().getEndpointURI().getPath();
 
@@ -203,10 +215,9 @@ public class WsSecurityFilter extends AbstractEndpointSecurityFilter
                 }
             }
         }
-        else if (objFactory instanceof SingletonObjectFactory
-                 && ((SingletonObjectFactory) objFactory).getInstance() instanceof AxisServiceComponent)
+        else if (objFactory instanceof SingletonObjectFactory && component instanceof AxisServiceComponent)
         {
-            AxisServer server = ((AxisServiceComponent) ((SingletonObjectFactory) objFactory).getInstance()).getAxis();
+            AxisServer server = ((AxisServiceComponent) component).getAxis();
 
             MuleConfigProvider provider = (MuleConfigProvider) server.getConfig();
 

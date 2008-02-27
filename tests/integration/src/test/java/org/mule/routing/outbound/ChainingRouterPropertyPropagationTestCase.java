@@ -30,8 +30,8 @@ public class ChainingRouterPropertyPropagationTestCase extends FunctionalTestCas
 
     public void testPropertiesPropagation() throws Exception
     {
-        FunctionalTestComponent hop1 = (FunctionalTestComponent) muleContext.getRegistry().lookupService("hop1Service").getServiceFactory().getOrCreate();
-        FunctionalTestComponent hop2 = (FunctionalTestComponent) muleContext.getRegistry().lookupService("hop2Service").getServiceFactory().getOrCreate();
+        FunctionalTestComponent hop1 = (FunctionalTestComponent) muleContext.getRegistry().lookupService("hop1Service").getComponentFactory().getInstance();
+        FunctionalTestComponent hop2 = (FunctionalTestComponent) muleContext.getRegistry().lookupService("hop2Service").getComponentFactory().getInstance();
         assertNotNull(hop1);
 
         final AtomicBoolean hop1made = new AtomicBoolean(false);

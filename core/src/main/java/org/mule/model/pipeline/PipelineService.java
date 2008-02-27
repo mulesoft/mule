@@ -120,7 +120,7 @@ public class PipelineService extends DirectService
     {
         try
         {
-            serviceFactory.release(callable);
+            componentFactory.release(callable);
         }
         catch (Exception e)
         {

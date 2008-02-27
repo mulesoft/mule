@@ -20,13 +20,13 @@ public class DuplicateRegistrationTestCase extends AbstractMuleTestCase
 {
     public void testComponentAlreadyDefinedThrowsException() throws Exception
     {
-        Collection components = muleContext.getRegistry().lookupComponents();
+        Collection components = muleContext.getRegistry().lookupServices();
         assertEquals(0, components.size());
         
         final String componentName = "TEST_COMPONENT_1";
         getTestService(componentName, Object.class);
 
-        components = muleContext.getRegistry().lookupComponents();
+        components = muleContext.getRegistry().lookupServices();
         assertEquals(1, components.size());
         
         // register it again with the same name
@@ -42,7 +42,7 @@ public class DuplicateRegistrationTestCase extends AbstractMuleTestCase
                        StringUtils.contains(e.getMessage(), componentName));
         }
 
-        components = muleContext.getRegistry().lookupComponents();
+        components = muleContext.getRegistry().lookupServices();
         assertEquals(1, components.size());
     }
 }

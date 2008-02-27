@@ -48,7 +48,7 @@ public class ForwardingRouterDefinitionParser extends AbstractSerialDelegatingDe
     {
         public NullComponentPlaceholder()
         {
-            super("serviceFactory", SingletonObjectFactory.class);
+            super("componentFactory", SingletonObjectFactory.class);
         }
         
         protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)

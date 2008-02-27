@@ -57,7 +57,7 @@ public class DirectService extends AbstractService
     {
         try
         {
-            serviceFactory.release(pojoService);
+            componentFactory.release(pojoService);
         }
         catch (Exception e)
         {

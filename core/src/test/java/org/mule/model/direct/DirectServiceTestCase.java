@@ -21,7 +21,7 @@ public class DirectServiceTestCase extends AbstractServiceTestCase
     {
         service = new DirectService();
         service.setName("direct");
-        service.setServiceFactory(new SingletonObjectFactory(Object.class));
+        service.setComponentFactory(new SingletonObjectFactory(Object.class));
         service.setModel(new DirectModel());
         service.setMuleContext(muleContext);
     }

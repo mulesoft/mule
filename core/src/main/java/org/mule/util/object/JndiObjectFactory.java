@@ -123,7 +123,7 @@ public class JndiObjectFactory implements ObjectFactory, Initialisable, Disposab
         }
     }
     
-    public Object getOrCreate() throws Exception
+    public Object getInstance() throws Exception
     {
         if (_object == null || lookupOnEachCall == true)
         {

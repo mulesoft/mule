@@ -27,7 +27,7 @@ import org.mule.util.object.ObjectFactory;
  */
 public class DummyInitialContextFactory implements ObjectFactory
 {
-    public Object getOrCreate() throws Exception
+    public Object getInstance() throws Exception
     {
         SimpleContext c = new SimpleContext();
         c.bind("vmConnector", new VMConnector());
