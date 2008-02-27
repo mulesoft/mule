@@ -15,11 +15,11 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.RegistryContext;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.DefaultMessageAdapter;
@@ -336,7 +336,7 @@ public class MuleUniversalChannel extends AbstractChannel
 
     protected MuleMessage send(String uri, MessageAdapter adapter) throws MuleException
     {
-        ImmutableEndpoint ep = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+        OutboundEndpoint ep = RegistryContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
         MuleMessage message = new DefaultMuleMessage(adapter);
         MuleEvent event = new DefaultMuleEvent(message, ep, RequestContext.getEventContext().getSession(), true);
         return ep.send(event);

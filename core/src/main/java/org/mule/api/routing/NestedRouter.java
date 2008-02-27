@@ -13,7 +13,7 @@ package org.mule.api.routing;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 
 public interface NestedRouter extends Router
 {
@@ -40,9 +40,9 @@ public interface NestedRouter extends Router
      */
     MuleMessage route(MuleMessage message, MuleSession session, boolean synchronous) throws MessagingException;
 
-    void setEndpoint(ImmutableEndpoint endpoint);
+    void setEndpoint(OutboundEndpoint endpoint);
     
-    ImmutableEndpoint getEndpoint();
+    OutboundEndpoint getEndpoint();
 
     Class getInterface();
 

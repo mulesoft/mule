@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.service.Service;
@@ -48,7 +48,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     private URI uri;
     protected List responseTransformers = null;
 
-    public UdpMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
+    public UdpMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
     {
 

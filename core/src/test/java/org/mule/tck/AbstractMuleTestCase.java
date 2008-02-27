@@ -19,6 +19,8 @@ import org.mule.api.MuleSession;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
@@ -462,42 +464,42 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         // template method
     }
 
-    public static ImmutableEndpoint getTestInboundEndpoint(String name) throws Exception
+    public static InboundEndpoint getTestInboundEndpoint(String name) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext);
     }
 
-    public static ImmutableEndpoint getTestOutboundEndpoint(String name) throws Exception
+    public static OutboundEndpoint getTestOutboundEndpoint(String name) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext);
     }
     
-    public static ImmutableEndpoint getTestInboundEndpoint(String name, String uri) throws Exception
+    public static InboundEndpoint getTestInboundEndpoint(String name, String uri) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, null, null, null);
     }
 
-    public static ImmutableEndpoint getTestOutboundEndpoint(String name, String uri) throws Exception
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, null, null, null);
     }
     
-    public static ImmutableEndpoint getTestInboundEndpoint(String name, List transformers) throws Exception
+    public static InboundEndpoint getTestInboundEndpoint(String name, List transformers) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, null, transformers, null, null);
     }
 
-    public static ImmutableEndpoint getTestOutboundEndpoint(String name, List transformers) throws Exception
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, List transformers) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, null, transformers, null, null);
     }
     
-    public static ImmutableEndpoint getTestInboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties) throws Exception
+    public static InboundEndpoint getTestInboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, transformers, filter, properties);
     }
 
-    public static ImmutableEndpoint getTestOutboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties) throws Exception
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties);
     }

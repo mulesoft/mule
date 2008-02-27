@@ -10,7 +10,8 @@
 
 package org.mule.api;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.service.Service;
 
@@ -70,7 +71,7 @@ public interface MuleSession extends Serializable
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
-    MuleMessage sendEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException;
+    MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException;
 
     /**
      * Depending on the session state this methods either Passes an event
@@ -119,7 +120,7 @@ public interface MuleSession extends Serializable
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
-    void dispatchEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException;
+    void dispatchEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException;
 
     /**
      * Depending on the session state this methods either Passes an event
@@ -144,7 +145,7 @@ public interface MuleSession extends Serializable
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
      */
-    MuleMessage requestEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException;
+    MuleMessage requestEvent(InboundEndpoint endpoint, long timeout) throws MuleException;
 
     /**
      * Requests a synchronous receive of an event on the service
@@ -182,7 +183,7 @@ public interface MuleSession extends Serializable
      * @return the event to send/dispatch
      * @throws MuleException if the evnet cannot be created
      */
-    MuleEvent createOutboundEvent(MuleMessage message, ImmutableEndpoint endpoint, MuleEvent previousEvent)
+    MuleEvent createOutboundEvent(MuleMessage message, OutboundEndpoint endpoint, MuleEvent previousEvent)
         throws MuleException;
 
     /**

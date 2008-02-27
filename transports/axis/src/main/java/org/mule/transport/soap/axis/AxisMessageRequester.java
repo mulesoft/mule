@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.transport.AbstractMessageRequester;
 
@@ -40,7 +41,7 @@ public class AxisMessageRequester extends AbstractMessageRequester
     protected AxisConnector connector;
     protected Service service;
 
-    public AxisMessageRequester(ImmutableEndpoint endpoint)
+    public AxisMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (AxisConnector)endpoint.getConnector();

@@ -16,7 +16,8 @@ import org.mule.ResponseOutputStream;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -69,7 +70,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         //muleContext.getRegistry().registerComponent(service);
         EndpointBuilder builder = new EndpointURIEndpointBuilder(getTestEndpointURI(), muleContext);
         builder.setName("test");
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             builder);
         try
         {
@@ -85,7 +86,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     public void testSend() throws Exception
     {
         //muleContext.getRegistry().registerConnector(createConnector(false));
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             getTestEndpointURI());
         
         Service service = getTestService(uniqueName("testComponent"), FunctionalTestComponent.class);

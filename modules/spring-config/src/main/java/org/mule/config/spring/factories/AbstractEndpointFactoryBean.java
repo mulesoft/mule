@@ -11,7 +11,6 @@
 package org.mule.config.spring.factories;
 
 import org.mule.api.endpoint.EndpointException;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
@@ -38,12 +37,6 @@ public abstract class AbstractEndpointFactoryBean extends EndpointURIEndpointBui
     public AbstractEndpointFactoryBean()
     {
         super();
-    }
-
-    public Class getObjectType()
-    {
-        // TODO MULE-2292 Use role-specific interface
-        return ImmutableEndpoint.class;
     }
 
     public Object getObject() throws Exception

@@ -15,7 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 
@@ -50,7 +50,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                 MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
             initialise(message);
 
-            ImmutableEndpoint endpoint;
+            OutboundEndpoint endpoint;
             MuleMessage result = null;
             Document part;
             List parts = (List)nodesContext.get();
@@ -75,7 +75,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
                 }
                 else
                 {
-                    endpoint = (ImmutableEndpoint)getEndpoints().get(epCounter.next());
+                    endpoint = (OutboundEndpoint) getEndpoints().get(epCounter.next());
                 }
 
                 if (endpoint == null)
@@ -131,11 +131,11 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
      * @param message the current message being processed
      * @return the message part to dispatch
      */
-    protected ImmutableEndpoint getEndpointForMessage(MuleMessage message)
+    protected OutboundEndpoint getEndpointForMessage(MuleMessage message)
     {
         for (int i = 0; i < endpoints.size(); i++)
         {
-            ImmutableEndpoint endpoint = (ImmutableEndpoint)endpoints.get(i);
+            OutboundEndpoint endpoint = (OutboundEndpoint)endpoints.get(i);
 
             try
             {
@@ -166,7 +166,7 @@ public class RoundRobinXmlSplitter extends FilteringXmlMessageSplitter
         return null;
     }
 
-    public void addEndpoint(ImmutableEndpoint endpoint)
+    public void addEndpoint(OutboundEndpoint endpoint)
     {
         if (endpoint.getFilter() != null && !enableEndpointFiltering)
         {

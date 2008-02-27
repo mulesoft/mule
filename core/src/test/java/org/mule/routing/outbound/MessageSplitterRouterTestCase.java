@@ -13,7 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.StringUtils;
@@ -32,9 +32,9 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
     {
         Mock session = MuleTestUtils.getMockSession();
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://endpointUri.1");
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://endpointUri.2");
-        ImmutableEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://endpointUri.3");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://endpointUri.1");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("Test2Provider", "test://endpointUri.2");
+        OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://endpointUri.3");
 
         // Dummy message splitter
         AbstractMessageSplitter router = new AbstractMessageSplitter()
@@ -47,7 +47,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
                 parts = Arrays.asList(StringUtils.splitAndTrim(message.getPayload().toString(), ","));
             }
 
-            protected MuleMessage getMessagePart(MuleMessage message, ImmutableEndpoint endpoint)
+            protected MuleMessage getMessagePart(MuleMessage message, OutboundEndpoint endpoint)
             {
                 if (endpoint.getEndpointURI().getAddress().equals("endpointUri.1"))
                 {

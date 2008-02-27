@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.AbstractMessageDispatcher;
@@ -32,7 +32,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
 {
     private ProcessConnector connector;
 
-    public ProcessMessageDispatcher(ImmutableEndpoint endpoint)
+    public ProcessMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (ProcessConnector)endpoint.getConnector();

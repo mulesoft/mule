@@ -25,7 +25,7 @@ public interface MuleConnection
 {
     void dispatch(String url, Object payload, Map messageProperties) throws MuleException;
 
-    MuleMessage receive(String url, long timeout) throws MuleException;
+    MuleMessage request(String url, long timeout) throws MuleException;
 
     MuleManagedConnection getManagedConnection();
 

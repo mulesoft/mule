@@ -42,6 +42,11 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- Include all Mule Modules -->
         <dependency>
             <groupId>org.mule.modules</groupId>

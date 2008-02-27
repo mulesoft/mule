@@ -10,14 +10,16 @@
 
 package org.mule.api.transport;
 
-import org.mule.api.MuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.service.Service;
 
@@ -42,7 +44,7 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      * @throws Exception if the MessageReceiver cannot be created or the Receiver
      *             cannot be registered
      */
-    MessageReceiver registerListener(Service service, ImmutableEndpoint endpoint) throws Exception;
+    MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception;
 
     /**
      * @param service the listening service
@@ -51,7 +53,7 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      *             associated with the given endpoint this will not throw an
      *             exception
      */
-    void unregisterListener(Service service, ImmutableEndpoint endpoint) throws Exception;
+    void unregisterListener(Service service, InboundEndpoint endpoint) throws Exception;
 
     /**
      * @return true if the endpoint is started
@@ -160,7 +162,7 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      * @param event The event to dispatch
      * @throws DispatchException if the event fails to be dispatched
      */
-    void dispatch(ImmutableEndpoint endpoint, MuleEvent event) throws DispatchException;
+    void dispatch(OutboundEndpoint endpoint, MuleEvent event) throws DispatchException;
 
     /**
      * Make a specific request to the underlying transport
@@ -189,7 +191,7 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      *         returned if no data was avaialable
      * @throws Exception if the call to the underlying protocal cuases an exception
      */
-    MuleMessage request(ImmutableEndpoint endpoint, long timeout) throws Exception;
+    MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception;
 
     /**
      * Sends an event from the endpoint to the external system
@@ -198,7 +200,7 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      * @return event the response form the external system wrapped in a MuleEvent
      * @throws DispatchException if the event fails to be dispatched
      */
-    MuleMessage send(ImmutableEndpoint endpoint, MuleEvent event) throws DispatchException;
+    MuleMessage send(OutboundEndpoint endpoint, MuleEvent event) throws DispatchException;
 
 
     /**
@@ -213,7 +215,7 @@ public interface Connector extends Lifecycle, MuleContextAware, NamedObject
      * @return the output stream to use for this request
      * @throws MuleException
      */
-    OutputStream getOutputStream(ImmutableEndpoint endpoint, MuleMessage message) throws MuleException;
+    OutputStream getOutputStream(OutboundEndpoint endpoint, MuleMessage message) throws MuleException;
 
     MuleContext getMuleContext();
 }

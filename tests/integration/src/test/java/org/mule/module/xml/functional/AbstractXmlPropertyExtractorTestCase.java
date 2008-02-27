@@ -32,7 +32,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
 
     protected String getConfigResources()
     {
-        return "xml/property-extractor-test.xml";
+        return "org/mule/module/xml/property-extractor-test.xml";
     }
 
     public void testMatch() throws Exception

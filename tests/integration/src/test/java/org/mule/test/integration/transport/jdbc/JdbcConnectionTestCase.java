@@ -12,7 +12,7 @@ package org.mule.test.integration.transport.jdbc;
 
 
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -56,7 +56,7 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("jdbc://test?sql=SELECT * FROM TABLE", muleContext);
         endpointBuilder.setName("test");
         endpointBuilder.setConnector(connector);
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             endpointBuilder);
         muleContext.start();
         connector.registerListener(service, endpoint);

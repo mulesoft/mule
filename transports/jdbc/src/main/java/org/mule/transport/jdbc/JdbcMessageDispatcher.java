@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transaction.TransactionCoordination;
@@ -41,7 +42,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
     private static final String STORED_PROCEDURE_PREFIX = "{ ";
     private static final String STORED_PROCEDURE_SUFFIX = " }";
 
-    public JdbcMessageDispatcher(ImmutableEndpoint endpoint)
+    public JdbcMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (JdbcConnector) endpoint.getConnector();

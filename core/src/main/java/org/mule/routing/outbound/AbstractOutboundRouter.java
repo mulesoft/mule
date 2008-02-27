@@ -16,6 +16,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
@@ -59,7 +60,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
 
     protected TransactionConfig transactionConfig;
 
-    public void dispatch(MuleSession session, MuleMessage message, ImmutableEndpoint endpoint) throws MuleException
+    public void dispatch(MuleSession session, MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
         setMessageProperties(session, message, endpoint);
 
@@ -89,7 +90,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         }
     }
 
-    public MuleMessage send(MuleSession session, MuleMessage message, ImmutableEndpoint endpoint) throws MuleException
+    public MuleMessage send(MuleSession session, MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
         if (replyTo != null)
         {
@@ -149,7 +150,7 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         return result;
     }
 
-    protected void setMessageProperties(MuleSession session, MuleMessage message, ImmutableEndpoint endpoint)
+    protected void setMessageProperties(MuleSession session, MuleMessage message, OutboundEndpoint endpoint)
     {
         if (replyTo != null)
         {
@@ -227,26 +228,23 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
             ImmutableEndpoint umoEndpoint = (ImmutableEndpoint) iterator.next();
-            if (!umoEndpoint.isOutbound())
+            if (!(umoEndpoint instanceof OutboundEndpoint))
             {
                 throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
                     this, umoEndpoint));
             }
-            addEndpoint(umoEndpoint);
+            else{
+                addEndpoint((OutboundEndpoint) umoEndpoint);
+            }
         }
     }
 
-    public void addEndpoint(ImmutableEndpoint endpoint)
+    public void addEndpoint(OutboundEndpoint endpoint)
     {
-        if (!endpoint.isOutbound())
-        {
-            throw new InvalidEndpointTypeException(CoreMessages.outboundRouterMustUseOutboudEndpoints(
-                this, endpoint));
-        }
         endpoints.add(endpoint);
     }
 
-    public boolean removeEndpoint(ImmutableEndpoint endpoint)
+    public boolean removeEndpoint(OutboundEndpoint endpoint)
     {
         return endpoints.remove(endpoint);
     }
@@ -339,12 +337,12 @@ public abstract class AbstractOutboundRouter extends AbstractRouter implements O
      * @return the Endpoint or null if the endpointUri is not registered
      * @see org.mule.api.routing.InboundRouterCollection
      */
-    public ImmutableEndpoint getEndpoint(String name)
+    public OutboundEndpoint getEndpoint(String name)
     {
-        ImmutableEndpoint endpointDescriptor;
+        OutboundEndpoint endpointDescriptor;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            endpointDescriptor = (ImmutableEndpoint)iterator.next();
+            endpointDescriptor = (OutboundEndpoint)iterator.next();
             if (endpointDescriptor.getName().equals(name))
             {
                 return endpointDescriptor;

@@ -11,13 +11,11 @@
 package org.mule.transport.udp;
 
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-import org.mule.transport.udp.UdpConnector;
-import org.mule.transport.udp.UdpMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -35,7 +33,7 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         return new UdpMessageReceiver(endpoint.getConnector(), (Service) mockComponent.proxy(), endpoint);
     }
 
-    public ImmutableEndpoint getEndpoint() throws Exception
+    public InboundEndpoint getEndpoint() throws Exception
     {
         EndpointBuilder builder = new EndpointURIEndpointBuilder("udp://localhost:10100", muleContext);
         builder.setConnector(new UdpConnector());

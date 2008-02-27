@@ -12,7 +12,7 @@ package org.mule.transport.stdio;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.stdio.i18n.StdioMessages;
@@ -32,7 +32,7 @@ public class StdioMessageDispatcher extends AbstractMessageDispatcher
 {
     private final StdioConnector connector;
 
-    public StdioMessageDispatcher(ImmutableEndpoint endpoint)
+    public StdioMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (StdioConnector)endpoint.getConnector();

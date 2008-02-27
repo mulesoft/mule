@@ -10,21 +10,8 @@
 
 package org.mule.config.spring.parsers;
 
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.transformers.xml.XsltTransformer;
-import org.mule.xml.util.XMLUtils;
-
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class XsltTransformerDefinitionParser extends MuleOrphanDefinitionParser
 {

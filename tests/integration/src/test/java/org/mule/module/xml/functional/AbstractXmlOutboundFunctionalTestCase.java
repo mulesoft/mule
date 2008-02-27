@@ -34,7 +34,7 @@ public abstract class AbstractXmlOutboundFunctionalTestCase extends AbstractXmlF
 
     protected String getConfigResources()
     {
-        return "xml/xml-outbound-functional-test.xml";
+        return "org/mule/module/xml/xml-outbound-functional-test.xml";
     }
 
     protected void doSend(String endpoint) throws IOException, MuleException

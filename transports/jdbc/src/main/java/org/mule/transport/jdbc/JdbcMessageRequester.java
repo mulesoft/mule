@@ -12,7 +12,7 @@ package org.mule.transport.jdbc;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 
 
@@ -21,7 +21,7 @@ public class JdbcMessageRequester extends AbstractMessageRequester
 
     private JdbcConnector connector;
 
-    public JdbcMessageRequester(ImmutableEndpoint endpoint)
+    public JdbcMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (JdbcConnector) endpoint.getConnector();

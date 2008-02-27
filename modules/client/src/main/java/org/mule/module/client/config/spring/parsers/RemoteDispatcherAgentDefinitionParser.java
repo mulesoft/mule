@@ -9,14 +9,8 @@
  */
 package org.mule.module.client.config.spring.parsers;
 
-import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.AgentDefinitionParser;
 import org.mule.module.client.remoting.RemoteDispatcherAgent;
-
-import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
 
 public class RemoteDispatcherAgentDefinitionParser extends AgentDefinitionParser
 {

@@ -10,12 +10,11 @@
 
 package org.mule.transport.tcp;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-import org.mule.transport.tcp.TcpMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -31,7 +30,7 @@ public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             (Service)mockComponent.proxy(), endpoint);
     }
 
-    public ImmutableEndpoint getEndpoint() throws Exception
+    public InboundEndpoint getEndpoint() throws Exception
     {
         return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("tcp://localhost:1234");
     }

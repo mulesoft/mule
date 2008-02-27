@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
@@ -63,7 +64,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected Service service;
     private Map callParameters;
 
-    public AxisMessageDispatcher(ImmutableEndpoint endpoint)
+    public AxisMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (AxisConnector)endpoint.getConnector();

@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageAdapter;
@@ -53,7 +53,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     private JmsConnector connector;
     private Session cachedSession;
 
-    public JmsMessageDispatcher(ImmutableEndpoint endpoint)
+    public JmsMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (JmsConnector)endpoint.getConnector();

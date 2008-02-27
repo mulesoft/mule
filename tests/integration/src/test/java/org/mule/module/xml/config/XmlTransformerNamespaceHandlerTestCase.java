@@ -26,7 +26,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "xml/xml-transformer-namespace-test.xml";
+        return "org/mule/module/xml/xml-transformer-namespace-test.xml";
     }
 
     public void testDomToXml()

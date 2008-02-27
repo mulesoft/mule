@@ -11,7 +11,7 @@
 package org.mule.transport;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.ReceiveException;
@@ -23,7 +23,7 @@ import org.mule.context.notification.MessageNotification;
 public abstract class AbstractMessageRequester extends AbstractConnectable implements MessageRequester
 {
     
-    public AbstractMessageRequester(ImmutableEndpoint endpoint)
+    public AbstractMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
     }

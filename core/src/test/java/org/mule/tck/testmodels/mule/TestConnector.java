@@ -10,10 +10,11 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleException;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageAdapter;
@@ -37,7 +38,7 @@ public class TestConnector extends AbstractConnector
         super();
         setDispatcherFactory(new AbstractMessageDispatcherFactory()
         {
-            public MessageDispatcher create(ImmutableEndpoint endpoint) throws MuleException
+            public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
             {
                 return new TestMessageDispatcher(endpoint);
             }
@@ -94,7 +95,7 @@ public class TestConnector extends AbstractConnector
         this.someProperty = someProperty;
     }
 
-    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         MessageReceiver receiver = new AbstractMessageReceiver(this, service, endpoint)
         {
@@ -132,7 +133,7 @@ public class TestConnector extends AbstractConnector
         return receiver;
     }
 
-    public void destroyReceiver(MessageReceiver receiver, ImmutableEndpoint endpoint) throws Exception
+    public void destroyReceiver(MessageReceiver receiver, InboundEndpoint endpoint) throws Exception
     {
         // nothing to do
     }

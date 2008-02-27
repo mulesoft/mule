@@ -11,7 +11,7 @@
 package org.mule.transport;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.config.i18n.CoreMessages;
@@ -45,27 +45,27 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
 
     public void activateObject(Object key, Object obj) throws Exception
     {
-        factory.activate((ImmutableEndpoint) key, (MessageDispatcher) obj);
+        factory.activate((OutboundEndpoint) key, (MessageDispatcher) obj);
     }
 
     public void destroyObject(Object key, Object obj) throws Exception
     {
-        factory.destroy((ImmutableEndpoint) key, (MessageDispatcher) obj);
+        factory.destroy((OutboundEndpoint) key, (MessageDispatcher) obj);
     }
 
     public Object makeObject(Object key) throws Exception
     {
-        return factory.create((ImmutableEndpoint) key);
+        return factory.create((OutboundEndpoint) key);
     }
 
     public void passivateObject(Object key, Object obj) throws Exception
     {
-        factory.passivate((ImmutableEndpoint) key, (MessageDispatcher) obj);
+        factory.passivate((OutboundEndpoint) key, (MessageDispatcher) obj);
     }
 
     public boolean validateObject(Object key, Object obj)
     {
-        return factory.validate((ImmutableEndpoint) key, (MessageDispatcher) obj);
+        return factory.validate((OutboundEndpoint) key, (MessageDispatcher) obj);
     }
 
     public boolean isCreateDispatcherPerRequest()
@@ -73,27 +73,27 @@ public class KeyedPoolMessageDispatcherFactoryAdapter
         return factory.isCreateDispatcherPerRequest();
     }
 
-    public MessageDispatcher create(ImmutableEndpoint endpoint) throws MuleException
+    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         return factory.create(endpoint);
     }
 
-    public void activate(ImmutableEndpoint endpoint, MessageDispatcher dispatcher) throws MuleException
+    public void activate(OutboundEndpoint endpoint, MessageDispatcher dispatcher) throws MuleException
     {
         factory.activate(endpoint, dispatcher);
     }
 
-    public void destroy(ImmutableEndpoint endpoint, MessageDispatcher dispatcher)
+    public void destroy(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         factory.destroy(endpoint, dispatcher);
     }
 
-    public void passivate(ImmutableEndpoint endpoint, MessageDispatcher dispatcher)
+    public void passivate(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         factory.passivate(endpoint, dispatcher);
     }
 
-    public boolean validate(ImmutableEndpoint endpoint, MessageDispatcher dispatcher)
+    public boolean validate(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         return factory.validate(endpoint, dispatcher);
     }

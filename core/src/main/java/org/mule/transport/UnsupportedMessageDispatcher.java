@@ -12,12 +12,12 @@ package org.mule.transport;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 
 public final class UnsupportedMessageDispatcher extends AbstractMessageDispatcher
 {
 
-    public UnsupportedMessageDispatcher(ImmutableEndpoint endpoint)
+    public UnsupportedMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
     }

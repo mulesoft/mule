@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
@@ -90,7 +90,7 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
                 throw new CouldNotRouteOutboundMessageException(
                         CoreMessages.objectIsNull("Endpoint Name: " + getSelectorProperty()), message, null);
             }
-            ImmutableEndpoint ep = null;
+            OutboundEndpoint ep = null;
             try
             {
                 ep = lookupEndpoint(endpointName);
@@ -117,13 +117,13 @@ public class EndpointSelector extends FilteringOutboundRouter implements MuleCon
         return result;
     }
 
-    protected ImmutableEndpoint lookupEndpoint(String endpointName) throws MuleException
+    protected OutboundEndpoint lookupEndpoint(String endpointName) throws MuleException
     {
-        ImmutableEndpoint ep;
+        OutboundEndpoint ep;
         Iterator iterator = endpoints.iterator();
         while (iterator.hasNext())
         {
-            ep = (ImmutableEndpoint) iterator.next();
+            ep = (OutboundEndpoint) iterator.next();
             // Endpoint identifier (deprecated)
             if (endpointName.equals(ep.getEndpointURI().getEndpointName()))
             {

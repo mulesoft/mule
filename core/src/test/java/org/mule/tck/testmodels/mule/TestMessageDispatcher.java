@@ -12,14 +12,14 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.transport.AbstractMessageDispatcher;
 
 public class TestMessageDispatcher extends AbstractMessageDispatcher
 {
 
-    public TestMessageDispatcher(final ImmutableEndpoint endpoint)
+    public TestMessageDispatcher(final OutboundEndpoint endpoint)
     {
         super(endpoint);
     }

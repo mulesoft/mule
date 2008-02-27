@@ -17,8 +17,6 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.ConnectionStrategy;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.MessageDispatching;
-import org.mule.api.transport.MessageRequesting;
 
 import java.io.Serializable;
 import java.util.List;
@@ -29,7 +27,7 @@ import java.util.Map;
  * sent or received. An Enpoint is an Resource address (EndpointUri), with associated
  * transformation, transaction and filtering rules.
  */
-public interface ImmutableEndpoint extends Serializable, Initialisable, MessageDispatching, MessageRequesting
+public interface ImmutableEndpoint extends Serializable, Initialisable
 {
 
     public static final String INITIAL_STATE_STARTED = "started";
@@ -126,20 +124,6 @@ public interface ImmutableEndpoint extends Serializable, Initialisable, MessageD
      *         behaviour is avoided.
      */
     boolean isReadOnly();
-
-    /**
-     * Determines whether this endpoint can be used to send events
-     *
-     * @return true if it has been configured to send events, false otherwise
-     */
-    boolean isOutbound();
-
-    /**
-     * Determines whether this endpoint can be used to receive events
-     *
-     * @return true if it has been configured to receive events, false otherwise
-     */
-    boolean isInbound();
 
     /**
      * Returns the transaction configuration for this endpoint

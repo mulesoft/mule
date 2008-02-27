@@ -19,7 +19,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -77,27 +79,37 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
 
     public void setEndpoints(List endpoints)
     {
-        this.endpoints.clear();
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
+        if (endpoints != null)
         {
-            addEndpoint((ImmutableEndpoint) iterator.next());
+            this.endpoints.clear();
+            // Ensure all endpoints are response endpoints
+            // This will go when we start dropping suport for 1.4 and start using 1.5
+            for (Iterator it = this.endpoints.iterator(); it.hasNext();)
+            {
+                ImmutableEndpoint endpoint = (ImmutableEndpoint) it.next();
+                if (!(endpoint instanceof InboundEndpoint))
+                {
+                    throw new InvalidEndpointTypeException(CoreMessages.exceptionListenerMustUseOutboundEndpoint(this,
+                        endpoint));
+                }
+            }
+            this.endpoints.addAll(endpoints);
+        }
+        else
+        {
+            throw new IllegalArgumentException("List of endpoints = null");
         }
     }
 
-    public void addEndpoint(ImmutableEndpoint endpoint)
+    public void addEndpoint(OutboundEndpoint endpoint)
     {
         if (endpoint != null)
         {
-            if (!endpoint.isOutbound())
-            {
-                throw new InvalidEndpointTypeException(CoreMessages.exceptionListenerMustUseOutboundEndpoint(
-                    this, endpoint));
-            }
             endpoints.add(endpoint);
         }
     }
 
-    public boolean removeEndpoint(ImmutableEndpoint endpoint)
+    public boolean removeEndpoint(OutboundEndpoint endpoint)
     {
         return endpoints.remove(endpoint);
     }
@@ -219,7 +231,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      */
     protected void routeException(MuleMessage message, ImmutableEndpoint failedEndpoint, Throwable t)
     {
-        ImmutableEndpoint endpoint = getEndpoint(t);
+        OutboundEndpoint endpoint = getEndpoint(t);
         if (endpoint != null)
         {
             try
@@ -298,11 +310,11 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
      * @return The endpoint used to dispatch an exception message on or null if there
      *         are no endpoints registered
      */
-    protected ImmutableEndpoint getEndpoint(Throwable t)
+    protected OutboundEndpoint getEndpoint(Throwable t)
     {
         if (endpoints.size() > 0)
         {
-            return (ImmutableEndpoint) endpoints.get(0);
+            return (OutboundEndpoint) endpoints.get(0);
         }
         else
         {

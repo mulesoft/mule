@@ -11,9 +11,8 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.soap.axis.AxisMessageDispatcher;
 
 import javax.xml.namespace.QName;
 
@@ -24,7 +23,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 {
     public void testHostInfoReplace() throws Exception
     {
-        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "axis:http://mycompany.com:8080/services/myService?method=foo");
         
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
@@ -36,7 +35,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 
     public void testHostReplace() throws Exception
     {
-        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "axis:http://mycompany.com:8080/services/myService?method=foo");
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         MuleEvent event = getTestEvent("test,", ep);

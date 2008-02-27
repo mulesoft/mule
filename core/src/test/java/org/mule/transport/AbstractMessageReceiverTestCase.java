@@ -10,7 +10,7 @@
 
 package org.mule.transport;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.AbstractMuleTestCase;
@@ -19,7 +19,7 @@ import org.mule.tck.testmodels.fruit.Orange;
 public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCase
 {
     protected Service service;
-    protected ImmutableEndpoint endpoint;
+    protected InboundEndpoint endpoint;
 
     protected void doSetUp() throws Exception
     {
@@ -30,7 +30,7 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
     public void testCreate() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test");
+        InboundEndpoint endpoint = getTestInboundEndpoint("Test");
         MessageReceiver receiver = getMessageReceiver();
 
         assertNotNull(receiver.getEndpoint());
@@ -73,5 +73,5 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
      * @return
      * @throws Exception
      */
-    public abstract ImmutableEndpoint getEndpoint() throws Exception;
+    public abstract InboundEndpoint getEndpoint() throws Exception;
 }

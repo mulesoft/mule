@@ -10,7 +10,7 @@
 
 package org.mule.transport.file;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.MuleTestUtils;
@@ -51,7 +51,7 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             endpoint, read.getAbsolutePath(), move.getAbsolutePath(), null, 1000);
     }
 
-    public ImmutableEndpoint getEndpoint() throws Exception
+    public InboundEndpoint getEndpoint() throws Exception
     {
         return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("file://./simple");
     }

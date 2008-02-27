@@ -16,7 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
@@ -67,7 +67,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
 
         MuleMessage result = null;
-        ImmutableEndpoint endpoint;
+        OutboundEndpoint endpoint;
         MuleMessage request;
 
         for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
@@ -122,9 +122,9 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
     }
 
-    protected ImmutableEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException
+    protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException
     {
-        ImmutableEndpoint endpoint = null;
+        OutboundEndpoint endpoint = null;
         try
         {
             if (recipient instanceof EndpointURI)
@@ -140,7 +140,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
                 throw new RegistrationException("Failed to create endpoint for: " + recipient);
             }
 
-            ImmutableEndpoint existingEndpoint = (ImmutableEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
+            OutboundEndpoint existingEndpoint = (OutboundEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
             if (existingEndpoint != null)
             {
                 endpoint = existingEndpoint;
@@ -153,10 +153,10 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         return endpoint;
     }
 
-    protected ImmutableEndpoint getRecipientEndpointFromUri(EndpointURI uri)
+    protected OutboundEndpoint getRecipientEndpointFromUri(EndpointURI uri)
             throws MuleException
     {
-        ImmutableEndpoint endpoint = null;
+        OutboundEndpoint endpoint = null;
         if (null != getMuleContext() && null != getMuleContext().getRegistry())
         {
             endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri.getAddress());
@@ -168,10 +168,10 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         return endpoint;
     }
 
-    protected ImmutableEndpoint getRecipientEndpointFromString(MuleMessage message, String recipient)
+    protected OutboundEndpoint getRecipientEndpointFromString(MuleMessage message, String recipient)
             throws MuleException
     {
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) recipientCache.get(recipient);
+        OutboundEndpoint endpoint = (OutboundEndpoint) recipientCache.get(recipient);
         if (null == endpoint && null != getMuleContext() && null != getMuleContext().getRegistry())
         {
             endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(recipient);

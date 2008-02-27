@@ -11,6 +11,8 @@
 package org.mule.management.mbeans;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ObjectNameHelper;
@@ -59,7 +61,7 @@ public class EndpointService implements EndpointServiceMBean
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("Endpoint").getMessage());
         }
-        if (receiver == null && endpoint.isInbound())
+        if (receiver == null && endpoint instanceof InboundEndpoint)
         {
             throw new IllegalArgumentException(
                 "Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");
@@ -109,12 +111,12 @@ public class EndpointService implements EndpointServiceMBean
 
     public boolean isInbound()
     {
-        return endpoint.isInbound();
+        return endpoint instanceof InboundEndpoint;
     }
 
     public boolean isOutbound()
     {
-        return endpoint.isOutbound();
+        return endpoint instanceof OutboundEndpoint;
     }
 
     public boolean isSynchronous()

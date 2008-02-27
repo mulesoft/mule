@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transport.AbstractMessageDispatcher;
 
@@ -46,7 +46,7 @@ public class CxfMessageDispatcher extends AbstractMessageDispatcher
     protected final CxfConnector connector;
     protected ClientWrapper wrapper;
     
-    public CxfMessageDispatcher(ImmutableEndpoint endpoint)
+    public CxfMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (CxfConnector) endpoint.getConnector();

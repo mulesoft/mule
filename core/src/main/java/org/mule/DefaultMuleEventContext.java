@@ -19,7 +19,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -214,7 +215,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * @throws org.mule.api.MuleException if the event fails to be processed by the
      *             service or the transport for the endpoint
      */
-    public MuleMessage sendEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException
+    public MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
         // If synchronous receive has not been explicitly set, default it to true
         setRemoteSync(message, endpoint);
@@ -235,7 +236,7 @@ public class DefaultMuleEventContext implements MuleEventContext
     {
         // If synchronous receive has not been explicitly set, default it to
         // true
-        setRemoteSync(message, event.getEndpoint());
+        setRemoteSync(message, (OutboundEndpoint) event.getEndpoint());
         return session.sendEvent(message);
     }
 
@@ -252,7 +253,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(MuleMessage message, EndpointURI endpointUri) throws MuleException
     {
-        ImmutableEndpoint endpoint =
+        OutboundEndpoint endpoint =
                 getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointUri);
 
         // If synchronous receive has not been explicitly set, default it to
@@ -422,7 +423,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(MuleMessage message, String endpointName) throws MuleException
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
+        OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
         setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }
@@ -466,7 +467,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public void dispatchEvent(MuleMessage message, EndpointURI endpointUri) throws MuleException
     {
-        ImmutableEndpoint endpoint =
+        OutboundEndpoint endpoint =
                 getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointUri);
         session.dispatchEvent(message, endpoint);
     }
@@ -498,7 +499,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * @throws org.mule.api.MuleException if the event fails to be processed by the
      *             service or the transport for the endpoint
      */
-    public void dispatchEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException
+    public void dispatchEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
         session.dispatchEvent(message, endpoint);
     }
@@ -512,7 +513,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * @return The requested event or null if the request times out
      * @throws org.mule.api.MuleException if the request operation fails
      */
-    public MuleMessage requestEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException
+    public MuleMessage requestEvent(InboundEndpoint endpoint, long timeout) throws MuleException
     {
         return session.requestEvent(endpoint, timeout);
     }
@@ -541,7 +542,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage requestEvent(EndpointURI endpointUri, long timeout) throws MuleException
     {
-        ImmutableEndpoint endpoint =
+        InboundEndpoint endpoint =
                 getMuleContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointUri);
         return session.requestEvent(endpoint, timeout);
     }
@@ -639,7 +640,7 @@ public class DefaultMuleEventContext implements MuleEventContext
         return event.getTimeout();
     }
 
-    private void setRemoteSync(MuleMessage message, ImmutableEndpoint endpoint)
+    private void setRemoteSync(MuleMessage message, OutboundEndpoint endpoint)
     {
         if (endpoint.isRemoteSync())
         {
@@ -682,4 +683,5 @@ public class DefaultMuleEventContext implements MuleEventContext
     {
         return event.getMuleContext();
     }
+
 }

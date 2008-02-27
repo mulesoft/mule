@@ -15,7 +15,7 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.file.i18n.FileMessages;
@@ -34,7 +34,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
 {
     private final FileConnector connector;
 
-    public FileMessageDispatcher(ImmutableEndpoint endpoint)
+    public FileMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (FileConnector) endpoint.getConnector();

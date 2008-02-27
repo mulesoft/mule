@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MuleServer;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -58,7 +58,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver
 
     public RetrieveMessageReceiver(Connector connector,
                                         Service service,
-                                        ImmutableEndpoint endpoint,
+                                        InboundEndpoint endpoint,
                                         long checkFrequency,
                                         boolean backupEnabled,
                                         String backupFolder)

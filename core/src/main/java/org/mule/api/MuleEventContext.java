@@ -11,7 +11,8 @@
 package org.mule.api;
 
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -188,7 +189,7 @@ public interface MuleEventContext
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
-    MuleMessage sendEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException;
+    MuleMessage sendEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException;
 
     /**
      * sends an event request via the configured outbound router for this service.
@@ -325,7 +326,7 @@ public interface MuleEventContext
      * @throws MuleException if the event fails to be processed by the service or
      *             the transport for the endpoint
      */
-    void dispatchEvent(MuleMessage message, ImmutableEndpoint endpoint) throws MuleException;
+    void dispatchEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException;
 
     /**
      * Requests a synchronous receive of an event on the service.
@@ -336,7 +337,7 @@ public interface MuleEventContext
      * @return The requested event or null if the request times out
      * @throws MuleException if the request operation fails
      */
-    MuleMessage requestEvent(ImmutableEndpoint endpoint, long timeout) throws MuleException;
+    MuleMessage requestEvent(InboundEndpoint endpoint, long timeout) throws MuleException;
 
     /**
      * Requests a synchronous receive of an event on the service.

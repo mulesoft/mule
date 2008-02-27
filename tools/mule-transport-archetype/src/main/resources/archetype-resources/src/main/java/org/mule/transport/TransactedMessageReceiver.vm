@@ -34,7 +34,7 @@ public class ${TransportName}TransactedMessageReceiver extends TransactedPolling
 
     public ${TransportName}TransactedMessageReceiver(Connector connector,
                                           Service service,
-                                          final Endpoint endpoint,
+                                          final InboundEndpoint endpoint,
                                           long pollingFrequency) throws CreateException
     {
         super(connector, service, endpoint, pollingFrequency);

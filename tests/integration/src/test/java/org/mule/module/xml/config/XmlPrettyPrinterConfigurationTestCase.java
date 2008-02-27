@@ -18,7 +18,7 @@ public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "xml/xml-prettyprinter-config.xml";
+        return "org/mule/module/xml/xml-prettyprinter-config.xml";
     }
 
     public void testPrettyPrinter()

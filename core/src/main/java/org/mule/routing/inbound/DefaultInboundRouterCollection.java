@@ -10,16 +10,17 @@
 
 package org.mule.routing.inbound;
 
-import org.mule.api.MuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.InvalidEndpointTypeException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.lifecycle.LifecycleLogic;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.RoutingException;
@@ -221,24 +222,12 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
         }
     }
 
-    public void addEndpoint(ImmutableEndpoint endpoint)
+    public void addEndpoint(InboundEndpoint endpoint)
     {
-        if (endpoint != null)
-        {
-            if (!endpoint.isInbound())
-            {
-                throw new InvalidEndpointTypeException(CoreMessages.inboundRouterMustUseInboundEndpoints(
-                    this, endpoint));
-            }
-            endpoints.add(endpoint);
-        }
-        else
-        {
-            throw new IllegalArgumentException("endpoint = null");
-        }
+        endpoints.add(endpoint);
     }
 
-    public boolean removeEndpoint(ImmutableEndpoint endpoint)
+    public boolean removeEndpoint(InboundEndpoint endpoint)
     {
         return endpoints.remove(endpoint);
     }
@@ -252,18 +241,18 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
     {
         if (endpoints != null)
         {
-            // Ensure all endpoints are receiver endpoints
+            this.endpoints.clear();
+            // Ensure all endpoints are response endpoints
+            // This will go when we start dropping suport for 1.4 and start using 1.5
             for (Iterator it = endpoints.iterator(); it.hasNext();)
             {
-                ImmutableEndpoint endpoint=(ImmutableEndpoint) it.next();
-                if (!endpoint.isInbound())
+                ImmutableEndpoint endpoint = (ImmutableEndpoint) it.next();
+                if (!(endpoint instanceof InboundEndpoint))
                 {
-                    throw new InvalidEndpointTypeException(CoreMessages.inboundRouterMustUseInboundEndpoints(
-                        this, endpoint));
+                    throw new InvalidEndpointTypeException(CoreMessages.inboundRouterMustUseInboundEndpoints(this,
+                        endpoint));
                 }
             }
-
-            this.endpoints.clear();
             this.endpoints.addAll(endpoints);
         }
         else
@@ -277,12 +266,12 @@ public class DefaultInboundRouterCollection extends AbstractRouterCollection imp
      * @return the Endpoint or null if the endpointUri is not registered
      * @see org.mule.api.routing.InboundRouterCollection
      */
-    public ImmutableEndpoint getEndpoint(String name)
+    public InboundEndpoint getEndpoint(String name)
     {
-        ImmutableEndpoint endpointDescriptor;
+        InboundEndpoint endpointDescriptor;
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {
-            endpointDescriptor = (ImmutableEndpoint) iterator.next();
+            endpointDescriptor = (InboundEndpoint) iterator.next();
             if (endpointDescriptor.getName().equals(name))
             {
                 return endpointDescriptor;

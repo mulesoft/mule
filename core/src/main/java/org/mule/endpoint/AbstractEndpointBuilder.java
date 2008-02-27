@@ -82,17 +82,17 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected String registryId = null;
     protected MuleContext muleContext;
 
-    public ImmutableEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
+    public org.mule.api.endpoint.InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
     {
         return doBuildInboundEndpoint();
     }
 
-    public ImmutableEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException
+    public org.mule.api.endpoint.OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException
     {
         return doBuildOutboundEndpoint();
     }
 
-    protected void configureEndpoint(MuleEndpoint ep) throws InitialisationException, EndpointException
+    protected void configureEndpoint(AbstractEndpoint ep) throws InitialisationException, EndpointException
     {
         // use an explicit value here to avoid caching
         Map properties = getProperties();
@@ -164,18 +164,18 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    protected ImmutableEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException
+    protected org.mule.api.endpoint.InboundEndpoint doBuildInboundEndpoint() throws InitialisationException, EndpointException
     {
-        InboundEndpoint ep = new InboundEndpoint();
+        DefaultInboundEndpoint ep = new DefaultInboundEndpoint();
         configureEndpoint(ep);
         ep.setTransformers(getInboundTransformers(ep.getConnector(), ep.getEndpointURI()));
         ep.setResponseTransformers(getInboundEndpointResponseTransformers(ep.getConnector(), ep.getEndpointURI()));
         return ep;
     }
 
-    protected ImmutableEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
+    protected org.mule.api.endpoint.OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
     {
-        OutboundEndpoint ep = new OutboundEndpoint();
+        DefaultOutboundEndpoint ep = new DefaultOutboundEndpoint();
         configureEndpoint(ep);
         ep.setTransformers(getOutboundTransformers(ep.getConnector(), ep.getEndpointURI()));
         ep.setResponseTransformers(getOutboundEndpointResponseTransformers(ep.getConnector(), ep.getEndpointURI()));

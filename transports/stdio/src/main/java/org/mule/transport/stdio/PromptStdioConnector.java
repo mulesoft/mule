@@ -13,6 +13,7 @@ package org.mule.transport.stdio;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -192,7 +193,7 @@ public class PromptStdioConnector extends StdioConnector
         return this;
     }
 
-    public MessageReceiver registerListener(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception
     {
         if (receivers.size() > 0)
         {

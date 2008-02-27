@@ -22,7 +22,7 @@ public class XsltWithParamsTransformerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "xml/xml-namespace-test.xml";
+        return "org/mule/module/xml/xml-namespace-test.xml";
     }
 
     protected void doSetUp() throws Exception

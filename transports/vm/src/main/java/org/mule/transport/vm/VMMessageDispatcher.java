@@ -13,7 +13,7 @@ package org.mule.transport.vm;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.config.i18n.CoreMessages;
@@ -30,7 +30,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 {
     private final VMConnector connector;
 
-    public VMMessageDispatcher(ImmutableEndpoint endpoint)
+    public VMMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (VMConnector) endpoint.getConnector();

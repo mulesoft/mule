@@ -16,7 +16,8 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
@@ -115,13 +116,13 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         endpointBuilder.setName("testIn");
         endpointBuilder.setConnector(connector);
         endpointBuilder.setTransactionConfig(txConfig);
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             endpointBuilder);
 
         EndpointBuilder endpointBuilder2 = new EndpointURIEndpointBuilder(getOutDest(), muleContext);
         endpointBuilder2.setName("testOut");
         endpointBuilder2.setConnector(connector);
-        ImmutableEndpoint outProvider = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint outProvider = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointBuilder2);
         
         service.setOutboundRouter(new DefaultOutboundRouterCollection());

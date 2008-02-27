@@ -11,7 +11,7 @@
 package org.mule.transport.ssl;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -28,8 +28,8 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocket;
 import javax.resource.spi.work.Work;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 
 public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeCompletedListener
@@ -44,7 +44,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
     private Certificate[] peerCertificateChain;
     private Certificate[] localCertificateChain;
 
-    public SslMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
+    public SslMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
     {
         super(connector, service, endpoint);

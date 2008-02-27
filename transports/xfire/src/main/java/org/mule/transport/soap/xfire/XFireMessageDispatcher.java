@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.transport.AbstractMessageDispatcher;
@@ -52,7 +53,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher
     protected final XFireConnector connector;
     private final TemplateParser soapActionTemplateParser = TemplateParser.createAntStyleParser();
 
-    public XFireMessageDispatcher(ImmutableEndpoint endpoint)
+    public XFireMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (XFireConnector) endpoint.getConnector();

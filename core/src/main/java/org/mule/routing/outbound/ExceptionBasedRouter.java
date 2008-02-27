@@ -10,11 +10,11 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.api.MuleException;
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
@@ -58,7 +58,7 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
 
         MuleMessage result = null;
         // need that ref for an error message
-        ImmutableEndpoint endpoint = null;
+        OutboundEndpoint endpoint = null;
         boolean success = false;
 
         synchronized (endpoints)

@@ -13,13 +13,17 @@ package org.mule.transport.http;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.DefaultMuleSession;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.DefaultMessageAdapter;
 import org.mule.util.MapUtils;
@@ -35,7 +39,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
     
     public PollingHttpMessageReceiver(Connector connector,
                                       Service service,
-                                      final ImmutableEndpoint endpoint) throws CreateException
+                                      final InboundEndpoint endpoint) throws CreateException
     {
 
         super(connector, service, endpoint);
@@ -74,15 +78,22 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             req.setProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, customHeaders);
         }
         req.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-        
+
         MuleSession session = new DefaultMuleSession(service, connector.getMuleContext());
         MuleEvent event = new DefaultMuleEvent(req, endpoint, session, true);
+
+        // We need to create an outbound endpoint to do the polled request using
+        // send() as thats the only way we can customize headers and use eTags
+        MuleContext muleContext = endpoint.getMuleContext();
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(endpoint, muleContext);
+        OutboundEndpoint outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            endpointBuilder);
         
-        MuleMessage message = connector.send(endpoint, event);
-        
-        int status = message.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);        
+        MuleMessage message = connector.send(outboundEndpoint, event);
+
+        int status = message.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         etag = message.getStringProperty(HttpConstants.HEADER_ETAG, null);
-        
+
         if (status != 304 || !checkEtag)
         {
             routeMessage(message, endpoint.isSynchronous());

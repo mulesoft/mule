@@ -25,8 +25,9 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.MalformedEndpointException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
@@ -451,7 +452,7 @@ public class MuleEventMulticaster
      */
     protected void dispatchEvent(MuleApplicationEvent applicationEvent) throws ApplicationEventException
     {
-        ImmutableEndpoint endpoint;
+        OutboundEndpoint endpoint;
         try
         {
             endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
@@ -564,7 +565,7 @@ public class MuleEventMulticaster
             {
                 endpoint = (String) iterator.next();
 
-                ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+                InboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
                     endpoint);
 
                 // check whether the endpoint has already been set on the
@@ -707,7 +708,7 @@ public class MuleEventMulticaster
                 EndpointFactory endpointFactory = muleContext.getRegistry().lookupEndpointFactory();
                 EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(subscription);
                 endpointBuilder.setSynchronous(!asynchronous);
-                ImmutableEndpoint endpoint = endpointFactory.getInboundEndpoint(endpointBuilder);
+                InboundEndpoint endpoint = endpointFactory.getInboundEndpoint(endpointBuilder);
 
                 messageRouter.addEndpoint(endpoint);
             }

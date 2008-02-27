@@ -13,7 +13,7 @@ package org.mule.transport.vm;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -37,7 +37,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     private VMConnector connector;
     private final Object lock = new Object();
 
-    public VMMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
+    public VMMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
         throws CreateException
     {
         super(connector, service, endpoint);

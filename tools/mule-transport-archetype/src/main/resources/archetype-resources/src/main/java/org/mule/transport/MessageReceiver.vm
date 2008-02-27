@@ -17,7 +17,7 @@ import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.AbstractMessageReceiver;
 #end
 import org.mule.api.service.Service;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 
@@ -31,7 +31,7 @@ public class ${TransportName}MessageReceiver extends #if( $isPollingReceiver == 
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
     public ${TransportName}MessageReceiver(Connector connector, Service service,
-                              ImmutableEndpoint endpoint)
+                              InboundEndpoint endpoint)
             throws CreateException
     {
         super(connector, service, endpoint);

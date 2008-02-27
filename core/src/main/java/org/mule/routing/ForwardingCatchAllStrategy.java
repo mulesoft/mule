@@ -14,9 +14,9 @@ import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.routing.ServiceRoutingException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.routing.ServiceRoutingException;
 import org.mule.config.i18n.CoreMessages;
 
 /**
@@ -40,7 +40,7 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
         }
         try
         {
-            ImmutableEndpoint endpoint = getEndpoint();
+            OutboundEndpoint endpoint = getEndpoint();
             if (sendTransformed && endpoint.getTransformers() != null)
             {
                 message.applyTransformers(endpoint.getTransformers());

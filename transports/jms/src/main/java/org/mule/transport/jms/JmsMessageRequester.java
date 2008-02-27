@@ -12,7 +12,7 @@ package org.mule.transport.jms;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 
 import javax.jms.Destination;
@@ -31,7 +31,7 @@ public class JmsMessageRequester extends AbstractMessageRequester
 
     private JmsConnector connector;
 
-    public JmsMessageRequester(ImmutableEndpoint endpoint)
+    public JmsMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (JmsConnector)endpoint.getConnector();

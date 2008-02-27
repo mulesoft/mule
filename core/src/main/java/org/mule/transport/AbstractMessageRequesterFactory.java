@@ -11,7 +11,7 @@
 package org.mule.transport;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.util.ClassUtils;
@@ -43,24 +43,24 @@ public abstract class AbstractMessageRequesterFactory implements MessageRequeste
         return false;
     }
 
-    public abstract MessageRequester create(ImmutableEndpoint endpoint) throws MuleException;
+    public abstract MessageRequester create(InboundEndpoint endpoint) throws MuleException;
 
-    public void activate(ImmutableEndpoint endpoint, MessageRequester requester) throws MuleException
+    public void activate(InboundEndpoint endpoint, MessageRequester requester) throws MuleException
     {
         requester.activate();
     }
 
-    public void destroy(ImmutableEndpoint endpoint, MessageRequester requester)
+    public void destroy(InboundEndpoint endpoint, MessageRequester requester)
     {
         requester.dispose();
     }
 
-    public void passivate(ImmutableEndpoint endpoint, MessageRequester requester)
+    public void passivate(InboundEndpoint endpoint, MessageRequester requester)
     {
         requester.passivate();
     }
 
-    public boolean validate(ImmutableEndpoint endpoint, MessageRequester requester)
+    public boolean validate(InboundEndpoint endpoint, MessageRequester requester)
     {
         // Unless requesters are to be disposed of after every request, we check if
         // the requester is still valid or has e.g. disposed itself after an

@@ -23,7 +23,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
@@ -65,7 +65,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
     protected Service service = null;
 
     /** The endpoint descriptor which is associated with this receiver */
-    protected ImmutableEndpoint endpoint = null;
+    protected InboundEndpoint endpoint = null;
 
     private InternalMessageListener listener;
 
@@ -114,9 +114,9 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
      *                  the receiver implementation i.e. an email address, a directory, a
      *                  jms destination or port address.
      * @see Service
-     * @see ImmutableEndpoint
+     * @see InboundEndpoint
      */
-    public AbstractMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
+    public AbstractMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
     {
         setConnector(connector);
@@ -166,7 +166,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
     *
     * @see org.mule.api.transport.MessageReceiver#getEndpointName()
     */
-    public ImmutableEndpoint getEndpoint()
+    public InboundEndpoint getEndpoint()
     {
         return endpoint;
     }
@@ -367,7 +367,7 @@ public abstract class AbstractMessageReceiver implements MessageReceiver
      * 
      * @see org.mule.api.transport.MessageReceiver#setEndpoint(org.mule.api.endpoint.Endpoint)
      */
-    public void setEndpoint(ImmutableEndpoint endpoint)
+    public void setEndpoint(InboundEndpoint endpoint)
     {
         if (endpoint == null)
         {

@@ -10,11 +10,10 @@
 
 package org.mule.transport.ssl;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-import org.mule.transport.ssl.SslMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -28,7 +27,7 @@ public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         return new SslMessageReceiver(endpoint.getConnector(), (Service) mockComponent.proxy(), endpoint);
     }
 
-    public ImmutableEndpoint getEndpoint() throws Exception
+    public InboundEndpoint getEndpoint() throws Exception
     {
         return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ssl://localhost:1234");
     }

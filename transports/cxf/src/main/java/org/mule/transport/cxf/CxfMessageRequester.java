@@ -13,7 +13,7 @@ package org.mule.transport.cxf;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 
 import java.util.Iterator;
@@ -31,7 +31,7 @@ public class CxfMessageRequester extends AbstractMessageRequester
     protected CxfConnector connector;
     private ClientWrapper wrapper;
     
-    public CxfMessageRequester(ImmutableEndpoint endpoint)
+    public CxfMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (CxfConnector)endpoint.getConnector();

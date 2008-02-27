@@ -24,7 +24,7 @@ public class ${TransportName}ConnectorFactoryTestCase extends AbstractMuleTestCa
 
     public void testCreateFromFactory() throws Exception
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry()
+        InboundEndpoint endpoint = muleContext.getRegistry()
                 .lookupEndpointFactory().getInboundEndpoint(getEndpointURI());
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());

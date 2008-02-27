@@ -16,6 +16,7 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
@@ -229,11 +230,11 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
         // Remove the Axis Receiver Security filter now
         receiverEndpointBuilder.setSecurityFilter(null);
 
-        ImmutableEndpoint serviceEndpoint = muleContext.getRegistry()
+        InboundEndpoint serviceEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(serviceEndpointbuilder);
 
-        ImmutableEndpoint receiverEndpoint = muleContext.getRegistry()
+        InboundEndpoint receiverEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(receiverEndpointBuilder);
 
@@ -254,7 +255,7 @@ public class CxfConnector extends AbstractConnector implements ManagerNotificati
      *         is the service name, which is equivilent to the Axis service name.
      */
     @Override
-    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         if (endpoint.getEndpointURI().getPort() == -1)
         {

@@ -10,7 +10,7 @@
 
 package org.mule.transport.email;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 
@@ -85,7 +85,7 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
      * @see org.mule.transport.UMOConnector#registerListener(javax.jms.MessageListener,
      *      java.lang.String)
      */
-    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         Object[] args = {new Long(checkFrequency), Boolean.valueOf(isBackupEnabled()), backupFolder};
         return serviceDescriptor.createMessageReceiver(this, service, endpoint, args);

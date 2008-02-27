@@ -28,7 +28,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 
     protected String getConfigResources()
     {
-        return "xml/xml-transformer-functional-test.xml";
+        return "org/mule/module/xml/xml-transformer-functional-test.xml";
     }
 
     protected MuleClient sendXml() throws MuleException

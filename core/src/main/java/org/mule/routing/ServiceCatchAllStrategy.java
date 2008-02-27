@@ -12,13 +12,13 @@ package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.routing.ServiceRoutingException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.routing.ServiceRoutingException;
 
 /**
  * <code>ServiceCatchAllStrategy</code> is used to catch any events and forward the
@@ -26,12 +26,12 @@ import org.mule.api.routing.RoutingException;
  */
 public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
 {
-    public void setEndpoint(ImmutableEndpoint endpoint)
+    public void setEndpoint(OutboundEndpoint endpoint)
     {
         throw new UnsupportedOperationException("The endpoint cannot be set on this catch all");
     }
 
-    public ImmutableEndpoint getEndpoint()
+    public OutboundEndpoint getEndpoint()
     {
         return null;
     }

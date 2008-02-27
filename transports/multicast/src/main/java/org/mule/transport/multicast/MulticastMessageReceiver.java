@@ -10,7 +10,7 @@
 
 package org.mule.transport.multicast;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.transport.AbstractConnector;
@@ -28,7 +28,7 @@ import javax.resource.spi.work.Work;
 public class MulticastMessageReceiver extends UdpMessageReceiver
 {
 
-    public MulticastMessageReceiver(AbstractConnector connector, Service service, ImmutableEndpoint endpoint)
+    public MulticastMessageReceiver(AbstractConnector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
     {
         super(connector, service, endpoint);

@@ -11,6 +11,7 @@
 package org.mule.config.spring.factories;
 
 import org.mule.api.endpoint.EndpointException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 /**
@@ -27,6 +28,11 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
     public OutboundEndpointFactoryBean()
     {
         super();
+    }
+    
+    public Class getObjectType()
+    {
+        return OutboundEndpoint.class;
     }
 
     public Object doGetObject() throws Exception

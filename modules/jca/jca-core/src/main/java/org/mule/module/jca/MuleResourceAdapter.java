@@ -14,7 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
 import org.mule.context.DefaultMuleContextFactory;
@@ -159,7 +159,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 JcaModel model = getJcaModel(modelName);
 
                 // Create Endpoint
-                ImmutableEndpoint endpoint = createMessageInflowEndpoint(muleActivationSpec);
+                InboundEndpoint endpoint = createMessageInflowEndpoint(muleActivationSpec);
 
                 // Create Service
                 Service service = createJcaService(endpointFactory, model, endpoint);
@@ -263,7 +263,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
     protected Service createJcaService(MessageEndpointFactory endpointFactory,
                                               JcaModel model,
-                                              ImmutableEndpoint endpoint) throws MuleException
+                                              InboundEndpoint endpoint) throws MuleException
     {
         String name = "JcaService#" + endpointFactory.hashCode();
         Service service = new JcaService(new DelegateWorkManager(bootstrapContext.getWorkManager()));
@@ -279,7 +279,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         return service;
     }
 
-    protected ImmutableEndpoint createMessageInflowEndpoint(MuleActivationSpec muleActivationSpec)
+    protected InboundEndpoint createMessageInflowEndpoint(MuleActivationSpec muleActivationSpec)
         throws MuleException
     {
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(new URIBuilder(

@@ -11,7 +11,7 @@
 package org.mule.transport.jdbc;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.transport.AbstractMessageDispatcherFactory;
 
@@ -26,7 +26,7 @@ public class JdbcMessageDispatcherFactory extends AbstractMessageDispatcherFacto
      * 
      * @see org.mule.api.transport.MessageDispatcherFactory#create(org.mule.api.transport.Connector)
      */
-    public MessageDispatcher create(ImmutableEndpoint endpoint) throws MuleException
+    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         return new JdbcMessageDispatcher(endpoint);
     }

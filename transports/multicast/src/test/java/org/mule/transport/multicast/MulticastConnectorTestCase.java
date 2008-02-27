@@ -10,10 +10,10 @@
 
 package org.mule.transport.multicast;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
-import org.mule.endpoint.MuleEndpoint;
+import org.mule.endpoint.AbstractEndpoint;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractConnectorTestCase;
 
@@ -43,13 +43,13 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
-        ImmutableEndpoint endpoint = getTestInboundEndpoint("Test");
+        InboundEndpoint endpoint = getTestInboundEndpoint("Test");
         Connector connector = getConnector();
 
         try
         {
-            ((MuleEndpoint) endpoint).setEndpointURI(null);
-            ((MuleEndpoint) endpoint).setConnector(connector);
+            ((AbstractEndpoint) endpoint).setEndpointURI(null);
+            ((AbstractEndpoint) endpoint).setConnector(connector);
             connector.registerListener(service, endpoint);
             fail("cannot register with null endpointUri");
         }
@@ -60,7 +60,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 
         try
         {
-            ((MuleEndpoint) endpoint).setEndpointURI(null);
+            ((AbstractEndpoint) endpoint).setEndpointURI(null);
             connector.registerListener(service, endpoint);
             fail("cannot register with empty endpointUri");
         }
@@ -69,9 +69,9 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
             // expected
         }
 
-        ImmutableEndpoint endpoint2 = muleContext.getRegistry()
+        InboundEndpoint endpoint2 = muleContext.getRegistry()
             .lookupEndpointFactory()
-            .getOutboundEndpoint("multicast://228.2.3.4:10100");
+            .getInboundEndpoint("multicast://228.2.3.4:10100");
 
         connector.registerListener(service, endpoint2);
         try

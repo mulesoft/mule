@@ -12,17 +12,19 @@ package org.mule.model.seda.optimised;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.LifecycleLogic;
+import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.lifecycle.LifecycleTransitionResult;
-import org.mule.api.lifecycle.LifecycleLogic;
 import org.mule.api.model.ModelException;
 import org.mule.api.model.MuleProxy;
 import org.mule.api.service.Service;
@@ -191,7 +193,7 @@ public class OptimisedMuleProxy implements MuleProxy
         MuleMessage returnMessage = null;
         try
         {
-            if (event.getEndpoint().isInbound())
+            if (event.getEndpoint() instanceof InboundEndpoint)
             {
                 // RequestContext.setEvent(event);
                 // Object replyTo = event.getMessage().getReplyTo();
@@ -385,7 +387,7 @@ public class OptimisedMuleProxy implements MuleProxy
 
         try
         {
-            if (event.getEndpoint().isInbound())
+            if (event.getEndpoint() instanceof InboundEndpoint)
             {
                 // dispatch the next receiver
                 event = RequestContext.setEvent(event);
@@ -429,7 +431,8 @@ public class OptimisedMuleProxy implements MuleProxy
             }
             else
             {
-                event.getEndpoint().dispatch(event);
+                OutboundEndpoint endpoint = (OutboundEndpoint) event.getEndpoint();
+                endpoint.dispatch(event);
             }
 
             if (stat.isEnabled())

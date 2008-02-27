@@ -13,8 +13,8 @@ package org.mule.transformers.xml;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
 

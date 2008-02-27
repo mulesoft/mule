@@ -13,6 +13,7 @@ package org.mule.transport.udp;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class UdpMessageRequester extends AbstractMessageRequester
     
     protected final UdpConnector connector;
 
-    public UdpMessageRequester(ImmutableEndpoint endpoint)
+    public UdpMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (UdpConnector)endpoint.getConnector();

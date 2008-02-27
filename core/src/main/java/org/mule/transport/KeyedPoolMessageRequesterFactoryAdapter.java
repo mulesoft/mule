@@ -11,7 +11,7 @@
 package org.mule.transport;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.config.i18n.CoreMessages;
@@ -45,27 +45,27 @@ public class KeyedPoolMessageRequesterFactoryAdapter
 
     public void activateObject(Object key, Object obj) throws Exception
     {
-        factory.activate((ImmutableEndpoint) key, (MessageRequester) obj);
+        factory.activate((InboundEndpoint) key, (MessageRequester) obj);
     }
 
     public void destroyObject(Object key, Object obj) throws Exception
     {
-        factory.destroy((ImmutableEndpoint) key, (MessageRequester) obj);
+        factory.destroy((InboundEndpoint) key, (MessageRequester) obj);
     }
 
     public Object makeObject(Object key) throws Exception
     {
-        return factory.create((ImmutableEndpoint) key);
+        return factory.create((InboundEndpoint) key);
     }
 
     public void passivateObject(Object key, Object obj) throws Exception
     {
-        factory.passivate((ImmutableEndpoint) key, (MessageRequester) obj);
+        factory.passivate((InboundEndpoint) key, (MessageRequester) obj);
     }
 
     public boolean validateObject(Object key, Object obj)
     {
-        return factory.validate((ImmutableEndpoint) key, (MessageRequester) obj);
+        return factory.validate((InboundEndpoint) key, (MessageRequester) obj);
     }
 
     public boolean isCreateRequesterPerRequest()
@@ -73,27 +73,27 @@ public class KeyedPoolMessageRequesterFactoryAdapter
         return factory.isCreateRequesterPerRequest();
     }
 
-    public MessageRequester create(ImmutableEndpoint endpoint) throws MuleException
+    public MessageRequester create(InboundEndpoint endpoint) throws MuleException
     {
         return factory.create(endpoint);
     }
 
-    public void activate(ImmutableEndpoint endpoint, MessageRequester requester) throws MuleException
+    public void activate(InboundEndpoint endpoint, MessageRequester requester) throws MuleException
     {
         factory.activate(endpoint, requester);
     }
 
-    public void destroy(ImmutableEndpoint endpoint, MessageRequester requester)
+    public void destroy(InboundEndpoint endpoint, MessageRequester requester)
     {
         factory.destroy(endpoint, requester);
     }
 
-    public void passivate(ImmutableEndpoint endpoint, MessageRequester requester)
+    public void passivate(InboundEndpoint endpoint, MessageRequester requester)
     {
         factory.passivate(endpoint, requester);
     }
 
-    public boolean validate(ImmutableEndpoint endpoint, MessageRequester requester)
+    public boolean validate(InboundEndpoint endpoint, MessageRequester requester)
     {
         return factory.validate(endpoint, requester);
     }

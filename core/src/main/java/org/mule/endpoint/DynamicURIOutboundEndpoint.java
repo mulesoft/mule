@@ -14,7 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.routing.filter.Filter;
@@ -30,20 +30,20 @@ import java.util.Map;
 /**
  * Allow's EndpointURI to be set and changed dynamically by wrapping up an immutable endpoint instance.
  */
-public class DynamicEndpointURIEndpoint implements ImmutableEndpoint
+public class DynamicURIOutboundEndpoint implements OutboundEndpoint
 {
 
     private static final long serialVersionUID = -2814979100270307813L;
 
-    private ImmutableEndpoint endpoint;
+    private OutboundEndpoint endpoint;
     private EndpointURI dynamicEndpointURI;
 
-    public DynamicEndpointURIEndpoint(ImmutableEndpoint endpoint)
+    public DynamicURIOutboundEndpoint(OutboundEndpoint endpoint)
     {
         this.endpoint = endpoint;
     }
 
-    public DynamicEndpointURIEndpoint(ImmutableEndpoint endpoint, EndpointURI dynamicEndpointURI)
+    public DynamicURIOutboundEndpoint(OutboundEndpoint endpoint, EndpointURI dynamicEndpointURI)
     {
         this.endpoint = endpoint;
         setEndpointURI(dynamicEndpointURI);
@@ -64,16 +64,6 @@ public class DynamicEndpointURIEndpoint implements ImmutableEndpoint
     public void setEndpointURI(EndpointURI dynamicEndpointURI)
     {
         this.dynamicEndpointURI = dynamicEndpointURI;
-    }
-
-    public boolean isInbound()
-    {
-        return endpoint.isInbound();
-    }
-
-    public boolean isOutbound()
-    {
-        return endpoint.isOutbound();
     }
 
     public void dispatch(MuleEvent event) throws DispatchException
@@ -181,11 +171,6 @@ public class DynamicEndpointURIEndpoint implements ImmutableEndpoint
         return endpoint.isSynchronous();
     }
 
-    public MuleMessage request(long timeout) throws Exception
-    {
-        return endpoint.request(timeout);
-    }
-
     public MuleMessage send(MuleEvent event) throws DispatchException
     {
         return endpoint.send(event);
@@ -205,7 +190,7 @@ public class DynamicEndpointURIEndpoint implements ImmutableEndpoint
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        final DynamicEndpointURIEndpoint other = (DynamicEndpointURIEndpoint) obj;
+        final DynamicURIOutboundEndpoint other = (DynamicURIOutboundEndpoint) obj;
         if (dynamicEndpointURI == null)
         {
             if (other.dynamicEndpointURI != null) return false;

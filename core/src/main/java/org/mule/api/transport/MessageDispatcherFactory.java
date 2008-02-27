@@ -12,6 +12,7 @@ package org.mule.api.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 
 /**
  * <code>MessageDispatcherFactory</code> is a factory interface for managing the
@@ -27,7 +28,7 @@ public interface MessageDispatcherFactory
      * an exception occurs in the dispatcher, it is automatically disposed of and a
      * new one is created for the next request. This allows dispatchers to recover
      * from loss of connection and other faults. When invoked by
-     * {@link #validate(ImmutableEndpoint, MessageDispatcher)} it takes
+     * {@link #validate(OutboundEndpoint, MessageDispatcher)} it takes
      * precedence over the dispatcher's own return value of
      * {@link MessageDispatcher#validate()}.
      *
@@ -44,29 +45,29 @@ public interface MessageDispatcherFactory
      *         transport
      * @throws MuleException if the dispatcher cannot be created
      */
-    MessageDispatcher create(ImmutableEndpoint endpoint) throws MuleException;
+    MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException;
 
     /**
      * Invoked <strong>before</strong> the given dispatcher is handed out to a
-     * client, but <strong>not</strong> after {@link #create(ImmutableEndpoint)}.
+     * client, but <strong>not</strong> after {@link #create(OutboundEndpoint)}.
      * 
      * @param endpoint the endpoint of the dispatcher
      * @param dispatcher the dispatcher to be activated
      * @throws MuleException if the dispatcher cannot be activated
      */
-    void activate(ImmutableEndpoint endpoint, MessageDispatcher dispatcher) throws MuleException;
+    void activate(OutboundEndpoint endpoint, MessageDispatcher dispatcher) throws MuleException;
 
     /**
      * Invoked <strong>after</strong> the dispatcher is returned from a client but
      * <strong>before</strong> it is prepared for return to its pool via
-     * {@link #passivate(ImmutableEndpoint, MessageDispatcher)}.
+     * {@link #passivate(OutboundEndpoint, MessageDispatcher)}.
      * 
      * @param endpoint the endpoint of the dispatcher
      * @param dispatcher the dispatcher to be validated
      * @return <code>true</code> if the dispatcher is valid for reuse,
      *         <code>false</code> otherwise.
      */
-    boolean validate(ImmutableEndpoint endpoint, MessageDispatcher dispatcher);
+    boolean validate(OutboundEndpoint endpoint, MessageDispatcher dispatcher);
 
     /**
      * Invoked immediately <strong>before</strong> the given dispatcher is returned
@@ -75,15 +76,15 @@ public interface MessageDispatcherFactory
      * @param endpoint the endpoint of the dispatcher
      * @param dispatcher the dispatcher to be passivated
      */
-    void passivate(ImmutableEndpoint endpoint, MessageDispatcher dispatcher);
+    void passivate(OutboundEndpoint endpoint, MessageDispatcher dispatcher);
 
     /**
      * Invoked when a dispatcher returned <code>false</code> for
-     * {@link #validate(ImmutableEndpoint, MessageDispatcher)}.
+     * {@link #validate(OutboundEndpoint, MessageDispatcher)}.
      * 
      * @param endpoint the endpoint of the dispatcher
      * @param dispatcher the dispatcher to be validated
      */
-    void destroy(ImmutableEndpoint endpoint, MessageDispatcher dispatcher);
+    void destroy(OutboundEndpoint endpoint, MessageDispatcher dispatcher);
 
 }

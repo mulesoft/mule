@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
@@ -129,7 +130,7 @@ public class FileConnector extends AbstractConnector
     }
     
     // @Override
-    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         if (endpoint.getFilter() != null)
         {
@@ -149,7 +150,7 @@ public class FileConnector extends AbstractConnector
      * <li>pollingFrequency</li>
      * </ul>
      */
-    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         String readDir = endpoint.getEndpointURI().getAddress();
         if (null != getReadFromDirectory())

@@ -11,7 +11,7 @@
 package org.mule.transport.jdbc;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageRequester;
 import org.mule.transport.AbstractMessageRequesterFactory;
 
@@ -26,7 +26,7 @@ public class JdbcMessageRequesterFactory extends AbstractMessageRequesterFactory
      *
      * @see org.mule.api.transport.MessageDispatcherFactory#create(org.mule.api.transport.Connector)
      */
-    public MessageRequester create(ImmutableEndpoint endpoint) throws MuleException
+    public MessageRequester create(InboundEndpoint endpoint) throws MuleException
     {
         return new JdbcMessageRequester(endpoint);
     }

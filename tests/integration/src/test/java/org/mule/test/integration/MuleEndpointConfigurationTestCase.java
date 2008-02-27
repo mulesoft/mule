@@ -14,6 +14,8 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
@@ -58,7 +60,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // (axis seems to use undefined transformers in some strange way)
 //        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         // assertTrue(provider.getTransformer() instanceof ObjectToFileMessage);
-        assertTrue(endpoint.isOutbound());
+        assertTrue(endpoint instanceof OutboundEndpoint);
 
         // second Router
         OutboundRouter router2 = (OutboundRouter)outboundRouter.getRouters().get(1);
@@ -69,13 +71,13 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // cannot get this to work and get axis tests to work
         // (axis seems to use undefined transformers in some strange way)
 //        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
-        assertTrue(endpoint.isOutbound());
+        assertTrue(endpoint instanceof OutboundEndpoint);
 
         endpoint = (ImmutableEndpoint)router2.getEndpoints().get(1);
         assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("test.queue2", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
-        assertTrue(endpoint.isOutbound());
+        assertTrue(endpoint instanceof OutboundEndpoint);
 
     }
 
@@ -92,7 +94,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals("queue4", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
-        assertTrue(endpoint.isInbound());
+        assertTrue(endpoint instanceof InboundEndpoint);
     }
 
     public void testComponent4RouterEndpoints() throws Exception
@@ -112,14 +114,14 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // cannot get this to work and get axis tests to work
         // (axis seems to use undefined transformers in some strange way)
 //        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
-        assertTrue(endpoint.isOutbound());
+        assertTrue(endpoint instanceof OutboundEndpoint);
 
         endpoint = (ImmutableEndpoint)router.getEndpoints().get(1);
         assertEquals(VMConnector.VM, endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("yet.another.queue", endpoint.getEndpointURI().getAddress());
         assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint.getTransformers().get(0) instanceof ObjectToXml);
-        assertTrue(endpoint.isOutbound());
+        assertTrue(endpoint instanceof OutboundEndpoint);
     }
 
     public void testComponent5RouterEndpoints() throws Exception
@@ -139,7 +141,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // cannot get this to work and get axis tests to work
         // (axis seems to use undefined transformers in some strange way)
 //        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
-        assertTrue(endpoint.isOutbound());
+        assertTrue(endpoint instanceof OutboundEndpoint);
 
         endpoint = (ImmutableEndpoint)router.getEndpoints().get(1);
         assertEquals(TcpConnector.TCP, endpoint.getConnector().getProtocol().toLowerCase());
@@ -147,7 +149,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // cannot get this to work and get axis tests to work
         // (axis seems to use undefined transformers in some strange way)
 //        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
-        assertTrue(endpoint.isOutbound());
+        assertTrue(endpoint instanceof OutboundEndpoint);
     }
 
     public void testEndpointFromURI() throws Exception
@@ -156,7 +158,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
             "test://hello?remoteSync=true&remoteSyncTimeout=2002&connector=testConnector1");
         assertTrue(ep.isRemoteSync());
         assertEquals(2002, ep.getRemoteSyncTimeout());
-        assertTrue(ep.isInbound());
+        assertTrue(ep instanceof InboundEndpoint);
 
         // Test MuleEvent timeout proporgation
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("hello"), ep, MuleTestUtils.getTestSession(muleContext), false);

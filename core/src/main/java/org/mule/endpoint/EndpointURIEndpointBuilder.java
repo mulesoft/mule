@@ -73,9 +73,6 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder implemen
         this(new URIBuilder(endpointURI), muleContext);
     }
 
-    /**
-     * @deprecated
-     */
     public EndpointURIEndpointBuilder(ImmutableEndpoint source, MuleContext muleContext)
     {
         this(source.getEndpointURI(), muleContext);

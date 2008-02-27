@@ -10,7 +10,7 @@
 
 package org.mule.transport.cxf.wsdl;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.cxf.ClientWrapper;
 import org.mule.transport.cxf.CxfMessageDispatcher;
 import org.mule.util.StringUtils;
@@ -28,7 +28,7 @@ public class CxfWsdlMessageDispatcher extends CxfMessageDispatcher
 {
     public static final String DEFAULT_WSDL_TRANSPORT = "org.codehaus.xfire.transport.http.SoapHttpTransport";
 
-    public CxfWsdlMessageDispatcher(ImmutableEndpoint endpoint)
+    public CxfWsdlMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
     }

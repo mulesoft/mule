@@ -12,10 +12,8 @@ package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.soap.axis.AxisConnector;
-import org.mule.transport.soap.axis.AxisMessageDispatcher;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +25,7 @@ public class AxisMessageDispatcherTestCase extends AbstractMuleTestCase
 {
     public void testNullParametersInCallAllowed() throws Exception
     {
-        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             "axis:http://www.muleumo.org/services/myService?method=myTestMethod");
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         dispatcher.service = new Service();

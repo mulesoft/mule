@@ -12,7 +12,7 @@ package org.mule.transport.service;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointURIBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionFactory;
@@ -42,11 +42,11 @@ public interface TransportServiceDescriptor extends ServiceDescriptor
 
     public MessageReceiver createMessageReceiver(Connector connector,
                                                              Service service,
-                                                             ImmutableEndpoint endpoint) throws MuleException;
+                                                             InboundEndpoint endpoint) throws MuleException;
 
     public MessageReceiver createMessageReceiver(Connector connector,
                                                              Service service,
-                                                             ImmutableEndpoint endpoint,
+                                                             InboundEndpoint endpoint,
                                                              Object[] args) throws MuleException;
 
     public MessageDispatcherFactory createDispatcherFactory() throws TransportServiceException;

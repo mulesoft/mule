@@ -13,7 +13,7 @@ package org.mule.transport.file;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
@@ -59,7 +59,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
     public FileMessageReceiver(Connector connector,
                                Service service,
-                               ImmutableEndpoint endpoint,
+                               InboundEndpoint endpoint,
                                String readDir,
                                String moveDir,
                                String moveToPattern,

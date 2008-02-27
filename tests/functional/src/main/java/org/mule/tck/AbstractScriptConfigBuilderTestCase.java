@@ -14,6 +14,7 @@ import org.mule.AbstractExceptionListener;
 import org.mule.api.MuleException;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.routing.NestedRouter;
@@ -308,10 +309,10 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(2, messageRouter.getEndpoints().size());
         ImmutableEndpoint ep = (ImmutableEndpoint) messageRouter.getEndpoints().get(0);
         assertEquals("response1", ep.getEndpointURI().getAddress());
-        assertTrue(ep.isInbound());
+        assertTrue(ep instanceof InboundEndpoint);
         ep = (ImmutableEndpoint) messageRouter.getEndpoints().get(1);
         assertEquals("AppleResponseQueue", ep.getEndpointURI().getAddress());
-        assertTrue(ep.isInbound());
+        assertTrue(ep instanceof InboundEndpoint);
     }
 
     /* moved to ManagementStartupTestCase in integration

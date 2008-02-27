@@ -16,7 +16,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
@@ -45,7 +45,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
 
     private Server httpServer;
 
-    public JettyHttpMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
+    public JettyHttpMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
     {
 
@@ -81,7 +81,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
                 EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("servlet://" + path.substring(1),
                     connector.getMuleContext());
                 endpointBuilder.setTransformers(endpoint.getTransformers());
-                ImmutableEndpoint ep = connector.getMuleContext()
+                InboundEndpoint ep = connector.getMuleContext()
                     .getRegistry()
                     .lookupEndpointFactory()
                     .getInboundEndpoint(endpointBuilder);

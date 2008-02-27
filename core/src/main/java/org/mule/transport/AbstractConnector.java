@@ -25,6 +25,8 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.DisposeException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
@@ -794,7 +796,7 @@ public abstract class AbstractConnector
         this.dispatchers.setMaxIdle(maxActive);
     }
 
-    private MessageDispatcher getDispatcher(ImmutableEndpoint endpoint) throws MuleException
+    private MessageDispatcher getDispatcher(OutboundEndpoint endpoint) throws MuleException
     {
         this.checkDisposed();
 
@@ -848,7 +850,7 @@ public abstract class AbstractConnector
         }
     }
 
-    private void returnDispatcher(ImmutableEndpoint endpoint, MessageDispatcher dispatcher)
+    private void returnDispatcher(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         if (endpoint != null && dispatcher != null)
         {
@@ -908,7 +910,7 @@ public abstract class AbstractConnector
         this.requesters.setMaxIdle(maxActive);
     }
 
-    private MessageRequester getRequester(ImmutableEndpoint endpoint) throws MuleException
+    private MessageRequester getRequester(InboundEndpoint endpoint) throws MuleException
     {
         this.checkDisposed();
 
@@ -962,7 +964,7 @@ public abstract class AbstractConnector
         }
     }
 
-    private void returnRequester(ImmutableEndpoint endpoint, MessageRequester requester)
+    private void returnRequester(InboundEndpoint endpoint, MessageRequester requester)
     {
         if (endpoint != null && requester != null)
         {
@@ -1006,7 +1008,7 @@ public abstract class AbstractConnector
         }
     }
 
-    public MessageReceiver registerListener(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception
     {
         if (endpoint == null)
         {
@@ -1050,13 +1052,13 @@ public abstract class AbstractConnector
      * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against
      */
-    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         return StringUtils.defaultIfEmpty(endpoint.getEndpointURI().getFilterAddress(), endpoint
             .getEndpointURI().getAddress());
     }
 
-    public final void unregisterListener(Service service, ImmutableEndpoint endpoint) throws Exception
+    public final void unregisterListener(Service service, InboundEndpoint endpoint) throws Exception
     {
         if (service == null)
         {
@@ -1168,7 +1170,7 @@ public abstract class AbstractConnector
         this.receiverThreadingProfile = receiverThreadingProfile;
     }
 
-    public void destroyReceiver(MessageReceiver receiver, ImmutableEndpoint endpoint) throws Exception
+    public void destroyReceiver(MessageReceiver receiver, InboundEndpoint endpoint) throws Exception
     {
         receiver.dispose();
     }
@@ -1288,7 +1290,7 @@ public abstract class AbstractConnector
         return false;
     }
 
-    public MessageReceiver getReceiver(Service service, ImmutableEndpoint endpoint)
+    public MessageReceiver getReceiver(Service service, InboundEndpoint endpoint)
     {
         if (receivers != null)
         {
@@ -1777,7 +1779,7 @@ public abstract class AbstractConnector
     // TODO the following methods should probably be lifecycle-enabled;
     // for now they are only stubs to get the refactoring going.
 
-    public void dispatch(ImmutableEndpoint endpoint, MuleEvent event) throws DispatchException
+    public void dispatch(OutboundEndpoint endpoint, MuleEvent event) throws DispatchException
     {
         MessageDispatcher dispatcher = null;
 
@@ -1809,7 +1811,7 @@ public abstract class AbstractConnector
      * @param dispatcher
      * @param result
      */
-    protected void setupDispatchReturn(final ImmutableEndpoint endpoint,
+    protected void setupDispatchReturn(final OutboundEndpoint endpoint,
                                        final MessageDispatcher dispatcher,
                                        MuleMessage result)
     {
@@ -1844,7 +1846,7 @@ public abstract class AbstractConnector
                 timeout);
     }
 
-    public MuleMessage request(ImmutableEndpoint endpoint, long timeout) throws Exception
+    public MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception
     {
         MessageRequester requester = null;
         MuleMessage result = null;
@@ -1869,7 +1871,7 @@ public abstract class AbstractConnector
      * @param requester
      * @param result
      */
-    protected void setupRequestReturn(final ImmutableEndpoint endpoint,
+    protected void setupRequestReturn(final InboundEndpoint endpoint,
                                       final MessageRequester requester,
                                       MuleMessage result)
     {
@@ -1898,7 +1900,7 @@ public abstract class AbstractConnector
         }
     }
 
-    public MuleMessage send(ImmutableEndpoint endpoint, MuleEvent event) throws DispatchException
+    public MuleMessage send(OutboundEndpoint endpoint, MuleEvent event) throws DispatchException
     {
         MessageDispatcher dispatcher = null;
 
@@ -2074,7 +2076,7 @@ public abstract class AbstractConnector
      *             really depends on the underlying transport, thus any exception
      *             could be thrown
      */
-    protected MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint)
+    protected MessageReceiver createReceiver(Service service, InboundEndpoint endpoint)
         throws Exception
     {
         return getServiceDescriptor().createMessageReceiver(this, service, endpoint);
@@ -2138,7 +2140,7 @@ public abstract class AbstractConnector
      * @return the output stream to use for this request
      * @throws MuleException in case of any error
      */
-    public OutputStream getOutputStream(ImmutableEndpoint endpoint, MuleMessage message)
+    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleMessage message)
         throws MuleException
     {
         throw new UnsupportedOperationException(

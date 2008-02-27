@@ -13,6 +13,7 @@ package org.mule.transport.http;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -137,7 +138,7 @@ public class HttpConnector extends TcpConnector
     /**
      * @see Connector#registerListener(Service, Endpoint)
      */
-    public MessageReceiver registerListener(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver registerListener(Service service, InboundEndpoint endpoint) throws Exception
     {
         if (endpoint != null)
         {
@@ -174,7 +175,7 @@ public class HttpConnector extends TcpConnector
      * @param endpoint the endpoint being registered for the service
      * @return the key to store the newly created receiver against
      */
-    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         String key = endpoint.getEndpointURI().toString();
         int i = key.indexOf('?');

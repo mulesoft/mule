@@ -4,7 +4,7 @@ import org.mule.tck.testmodels.mule.TestTransactionManagerFactory
 import org.mule.tck.testmodels.mule.TestConnector
 import org.mule.tck.testmodels.mule.TestExceptionStrategy
 import org.mule.tck.testmodels.mule.TestCompressionTransformer
-import org.mule.routing.filters.xml.JXPathFilter
+import org.mule.routing.filters.MessagePropertyFilter
 import org.mule.api.endpoint.EndpointBuilder
 import org.mule.endpoint.EndpointURIEndpointBuilder
 import org.mule.model.seda.SedaModel
@@ -18,6 +18,8 @@ import org.mule.routing.ForwardingCatchAllStrategy
 import org.mule.tck.testmodels.mule.TestResponseAggregator
 import org.mule.routing.outbound.OutboundPassThroughRouter
 import org.mule.api.endpoint.ImmutableEndpoint
+import org.mule.api.endpoint.InboundEndpoint
+import org.mule.api.endpoint.OutboundEndpoint
 import org.mule.api.model.Model
 import org.mule.api.service.Service
 import org.mule.model.seda.SedaService
@@ -43,12 +45,20 @@ muleContext.registry.registerObject("doCompression", "true")
 
 epFactory = muleContext.registry.lookupEndpointFactory()
 
-ImmutableEndpoint createEndpoint(String url, String name, Boolean inbound)
+InboundEndpoint createInboundEndpoint(String url, String name)
 {
     epBuilder= new EndpointURIEndpointBuilder(url, muleContext)
     epBuilder.name = name
-    return inbound ? epFactory.getInboundEndpoint(epBuilder) : epFactory.getOutboundEndpoint(epBuilder)
+    return epFactory.getInboundEndpoint(epBuilder)
 }
+
+OutboundEndpoint createOutboundEndpoint(String url, String name)
+{
+    epBuilder= new EndpointURIEndpointBuilder(url, muleContext)
+    epBuilder.name = name
+    return epFactory.getOutboundEndpoint(epBuilder)
+}
+
 
 //Set a dummy TX manager
 muleContext.transactionManager = new TestTransactionManagerFactory().create()
@@ -67,10 +77,9 @@ testCompressionTransformer.beanProperty2 = 12
 testCompressionTransformer.containerProperty = "myString"
 muleContext.registry.registerTransformer(testCompressionTransformer);
 
-//Register endpoints
-filter = new JXPathFilter("name");
-filter.value = "bar"
-filter.namespaces = [foo: "http://foo.com"]
+//Register Filter
+filter = new MessagePropertyFilter();
+filter.expression = "foo=bar"
 
 // Global Endpoint
 epBuilder= new EndpointURIEndpointBuilder("test://fruitBowlPublishQ", muleContext)
@@ -105,7 +114,7 @@ orangeEndpoint = epFactory.getInboundEndpoint(epBuilder)
 //register model
 Model model = new SedaModel();
 exceptionStrategy = new TestExceptionStrategy();
-exceptionStrategy.addEndpoint(createEndpoint("test://component.exceptions", null, false));
+exceptionStrategy.addEndpoint(createOutboundEndpoint("test://component.exceptions", null));
 model.exceptionListener = exceptionStrategy
 model.lifecycleAdapterFactory = new TestDefaultLifecycleAdapterFactory()
 model.entryPointResolverSet = new TestEntryPointResolverSet()
@@ -126,18 +135,18 @@ service.inboundRouter.addEndpoint(epFactory.getInboundEndpoint(epBuilder))
 service.inboundRouter.addEndpoint(orangeEndpoint)
 
 catchAllStrategy = new ForwardingCatchAllStrategy()
-catchAllStrategy.endpoint = createEndpoint("test://catch.all", null, true)
+catchAllStrategy.endpoint = createOutboundEndpoint("test://catch.all", null)
 service.inboundRouter.catchAllStrategy = catchAllStrategy
 
 //Nested Router
 nestedRouter = new DefaultNestedRouterCollection();
 nr = new DefaultNestedRouter();
-nr.endpoint = createEndpoint("test://do.wash", null, false)
+nr.endpoint = createOutboundEndpoint("test://do.wash", null)
 nr.setInterface(FruitCleaner.class);
 nr.method = "wash"
 nestedRouter.addRouter(nr);
 nr = new DefaultNestedRouter();
-nr.endpoint = createEndpoint("test://do.polish", null, false)
+nr.endpoint = createOutboundEndpoint("test://do.polish", null)
 nr.setInterface(FruitCleaner.class);
 nr.method = "polish"
 nestedRouter.addRouter(nr);
@@ -153,7 +162,7 @@ service.outboundRouter.addRouter(outboundRouter)
 
 //Response Router
 responseRouter = new DefaultResponseRouterCollection();
-responseRouter.addEndpoint(createEndpoint("test://response1", null, true));
+responseRouter.addEndpoint(createInboundEndpoint("test://response1", null));
 responseRouter.addEndpoint(appleResponseEndpoint);
 responseRouter.addRouter(new TestResponseAggregator());
 responseRouter.timeout = 10001
@@ -161,7 +170,7 @@ service.responseRouter = responseRouter
 
 //Exception Strategy
 dces = new DefaultServiceExceptionStrategy();
-dces.addEndpoint(createEndpoint("test://orange.exceptions", null, false));
+dces.addEndpoint(createOutboundEndpoint("test://orange.exceptions", null));
 service.exceptionListener = dces
 
 // properties

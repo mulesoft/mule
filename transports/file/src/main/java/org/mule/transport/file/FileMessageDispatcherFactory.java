@@ -11,7 +11,7 @@
 package org.mule.transport.file;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.transport.AbstractMessageDispatcherFactory;
 
@@ -22,7 +22,7 @@ import org.mule.transport.AbstractMessageDispatcherFactory;
 public class FileMessageDispatcherFactory extends AbstractMessageDispatcherFactory
 {
     /** {@inheritDoc} */
-    public MessageDispatcher create(ImmutableEndpoint endpoint) throws MuleException
+    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         return new FileMessageDispatcher(endpoint);
     }

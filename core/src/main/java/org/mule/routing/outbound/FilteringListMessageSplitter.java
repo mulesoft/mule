@@ -12,7 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -86,7 +86,7 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
     /**
      * @inheritDocs
      */
-    protected MuleMessage getMessagePart(MuleMessage message, ImmutableEndpoint endpoint)
+    protected MuleMessage getMessagePart(MuleMessage message, OutboundEndpoint endpoint)
     {
         List payloads = (List) payloadContext.get();
 

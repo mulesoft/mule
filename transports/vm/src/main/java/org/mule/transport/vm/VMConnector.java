@@ -15,7 +15,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -24,7 +24,7 @@ import org.mule.api.transport.MessageAdapter;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.endpoint.DynamicEndpointURIEndpoint;
+import org.mule.endpoint.DynamicURIInboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transaction.TransactionCoordination;
@@ -98,7 +98,7 @@ public class VMConnector extends AbstractConnector
         // template method
     }
 
-    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         if (queueEvents)
         {
@@ -224,9 +224,9 @@ public class VMConnector extends AbstractConnector
             WildcardFilter filter = new WildcardFilter(filterAddress);
             if (filter.accept(endpointUri.getAddress()))
             {
-                ImmutableEndpoint endpoint = receiver.getEndpoint();
+                InboundEndpoint endpoint = receiver.getEndpoint();
                 EndpointURI newEndpointURI = new MuleEndpointURI(endpointUri, filterAddress);
-                receiver.setEndpoint(new DynamicEndpointURIEndpoint(endpoint, newEndpointURI));
+                receiver.setEndpoint(new DynamicURIInboundEndpoint(endpoint, newEndpointURI));
 
                 if (logger.isDebugEnabled())
                 {

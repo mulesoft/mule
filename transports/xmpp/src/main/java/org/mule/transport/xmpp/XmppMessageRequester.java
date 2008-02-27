@@ -13,9 +13,9 @@ package org.mule.transport.xmpp;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.transport.AbstractMessageRequester;
 
 import org.jivesoftware.smack.Chat;
@@ -32,7 +32,7 @@ public class XmppMessageRequester extends AbstractMessageRequester
     private final XmppConnector connector;
     private volatile XMPPConnection xmppConnection = null;
 
-    public XmppMessageRequester(ImmutableEndpoint endpoint)
+    public XmppMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (XmppConnector)endpoint.getConnector();

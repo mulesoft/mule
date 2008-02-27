@@ -10,7 +10,7 @@
 
 package org.mule.transport.ejb;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -28,7 +28,7 @@ public class EjbMessageReceiver extends RmiMessageReceiver
 
     public EjbMessageReceiver(Connector connector,
                               Service service,
-                              ImmutableEndpoint endpoint,
+                              InboundEndpoint endpoint,
                               long frequency) throws CreateException
     {
         super(connector, service, endpoint, frequency);

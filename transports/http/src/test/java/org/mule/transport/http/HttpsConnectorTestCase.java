@@ -11,7 +11,7 @@
 package org.mule.transport.http;
 
 import org.mule.api.MuleContext;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -66,7 +66,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
             getTestEndpointURI());
 
         getConnector().registerListener(service, endpoint);

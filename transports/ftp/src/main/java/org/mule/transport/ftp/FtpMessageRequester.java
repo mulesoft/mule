@@ -13,7 +13,7 @@ package org.mule.transport.ftp;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.file.FileConnector;
 
@@ -31,7 +31,7 @@ public class FtpMessageRequester extends AbstractMessageRequester
 {
     protected final FtpConnector connector;
 
-    public FtpMessageRequester(ImmutableEndpoint endpoint)
+    public FtpMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (FtpConnector) endpoint.getConnector();

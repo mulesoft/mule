@@ -12,13 +12,13 @@ package org.mule.routing.inbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.MuleServer;
-import org.mule.api.MuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.AggregationException;
 
@@ -94,7 +94,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
                     if (this.shouldAggregateEvents(group))
                     {
                         MuleMessage returnMessage = this.aggregateEvents(group);
-                        ImmutableEndpoint endpoint;
+                        InboundEndpoint endpoint;
 
                         try
                         {

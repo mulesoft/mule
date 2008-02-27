@@ -13,7 +13,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionException;
@@ -34,7 +34,7 @@ import javax.resource.spi.work.Work;
 public abstract class AbstractReceiverWorker implements Work
 {
     protected List messages;
-    protected ImmutableEndpoint endpoint;
+    protected InboundEndpoint endpoint;
     protected AbstractMessageReceiver receiver;
     protected OutputStream out;
 

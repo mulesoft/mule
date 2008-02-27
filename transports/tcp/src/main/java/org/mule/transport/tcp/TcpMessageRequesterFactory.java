@@ -11,14 +11,14 @@
 package org.mule.transport.tcp;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageRequester;
 import org.mule.transport.AbstractMessageRequesterFactory;
 
 public class TcpMessageRequesterFactory extends AbstractMessageRequesterFactory
 {
 
-    public MessageRequester create(ImmutableEndpoint endpoint) throws MuleException
+    public MessageRequester create(InboundEndpoint endpoint) throws MuleException
     {
         return new TcpMessageRequester(endpoint);
     }

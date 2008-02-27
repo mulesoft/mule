@@ -13,6 +13,7 @@ package org.mule.module.jca;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
@@ -135,7 +136,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         JcaModel jcaModel = resourceAdapter.getJcaModel("jca");
         MuleActivationSpec activationSpec = new MuleActivationSpec();
         activationSpec.setEndpoint("test://testEndpoint");
-        ImmutableEndpoint endpoint = resourceAdapter.createMessageInflowEndpoint(activationSpec);
+        InboundEndpoint endpoint = resourceAdapter.createMessageInflowEndpoint(activationSpec);
 
         Service service = resourceAdapter.createJcaService(endpointFactory, jcaModel, endpoint);
 

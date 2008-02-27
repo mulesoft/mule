@@ -17,7 +17,7 @@ import org.mule.api.MuleMessage;
  * Define generic methods for dispatching events.
  * The exact behaviour of the action is defined by the implementing class.
  * 
- * @see org.mule.api.endpoint.ImmutableEndpoint
+ * @see org.mule.api.endpoint.OutboundEndpoint
  * @see org.mule.api.transport.MessageDispatcher
  */
 public interface MessageDispatching

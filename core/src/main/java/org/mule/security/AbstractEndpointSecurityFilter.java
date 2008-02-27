@@ -15,6 +15,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.security.CredentialsAccessor;
@@ -115,11 +117,11 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
             throw new InitialisationException(CoreMessages.objectIsNull("Endpoint"), this);
         }
 
-        if (endpoint.isInbound())
+        if (endpoint instanceof InboundEndpoint)
         {
             inbound = true;
         }
-        else if (endpoint.isOutbound())
+        else if (endpoint instanceof OutboundEndpoint)
         {
             inbound = false;
         }

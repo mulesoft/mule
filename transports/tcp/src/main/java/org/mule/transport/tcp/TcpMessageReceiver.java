@@ -13,7 +13,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.DisposeException;
@@ -53,7 +53,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 {
     private ServerSocket serverSocket = null;
 
-    public TcpMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
+    public TcpMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
     {
         super(connector, service, endpoint);

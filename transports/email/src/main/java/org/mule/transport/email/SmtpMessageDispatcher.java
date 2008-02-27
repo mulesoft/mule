@@ -14,7 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageDispatcher;
@@ -35,7 +35,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 {
     private volatile Transport transport;
 
-    public SmtpMessageDispatcher(ImmutableEndpoint endpoint)
+    public SmtpMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
     }

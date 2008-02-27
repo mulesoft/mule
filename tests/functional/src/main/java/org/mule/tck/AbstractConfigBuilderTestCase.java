@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.ObjectNotFoundException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.routing.InboundRouter;
 import org.mule.api.routing.InboundRouterCollection;
@@ -25,7 +26,6 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
-import org.mule.endpoint.MuleEndpoint;
 import org.mule.model.seda.SedaService;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -315,7 +315,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         // test transaction config
         Service service = muleContext.getRegistry().lookupService("appleComponent2");
-        MuleEndpoint inEndpoint = (MuleEndpoint) service.getInboundRouter().getEndpoint(
+        InboundEndpoint inEndpoint = service.getInboundRouter().getEndpoint(
                 "transactedInboundEndpoint");
         assertNotNull(inEndpoint);
         assertNotNull(inEndpoint.getProperties());

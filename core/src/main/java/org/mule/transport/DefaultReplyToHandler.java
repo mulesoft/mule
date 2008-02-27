@@ -12,13 +12,13 @@ package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.RegistryContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
@@ -61,7 +61,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         String replyToEndpoint = replyTo.toString();
 
         // get the endpoint for this url
-        ImmutableEndpoint endpoint = getEndpoint(event, replyToEndpoint);
+        OutboundEndpoint endpoint = getEndpoint(event, replyToEndpoint);
 
         // make sure remove the replyTo property as not cause a a forever
         // replyto loop
@@ -89,9 +89,9 @@ public class DefaultReplyToHandler implements ReplyToHandler
 
     }
 
-    protected synchronized ImmutableEndpoint getEndpoint(MuleEvent event, String endpointUri) throws MuleException
+    protected synchronized OutboundEndpoint getEndpoint(MuleEvent event, String endpointUri) throws MuleException
     {
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) endpointCache.get(endpointUri);
+        OutboundEndpoint endpoint = (OutboundEndpoint) endpointCache.get(endpointUri);
         if (endpoint == null)
         {
             EndpointFactory endpointFactory = RegistryContext.getRegistry().lookupEndpointFactory();

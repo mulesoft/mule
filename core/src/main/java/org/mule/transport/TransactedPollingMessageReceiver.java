@@ -12,7 +12,7 @@ package org.mule.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionCallback;
@@ -42,7 +42,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     public TransactedPollingMessageReceiver(Connector connector,
                                             Service service,
-                                            final ImmutableEndpoint endpoint) throws CreateException
+                                            final InboundEndpoint endpoint) throws CreateException
     {
         super(connector, service, endpoint);
         this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().getFactory() != null);
@@ -50,12 +50,12 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
 
     /**
      * @deprecated please use
-     *             {@link #TransactedPollingMessageReceiver(Connector,Service,ImmutableEndpoint,long,TimeUnit)}
+     *             {@link #TransactedPollingMessageReceiver(Connector,Service,InboundEndpoint,long,TimeUnit)}
      *             instead
      */
     public TransactedPollingMessageReceiver(Connector connector,
                                             Service service,
-                                            final ImmutableEndpoint endpoint,
+                                            final InboundEndpoint endpoint,
                                             long frequency) throws CreateException
     {
         this(connector, service, endpoint);

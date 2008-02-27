@@ -12,7 +12,7 @@ package org.mule.transport.quartz;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
@@ -43,7 +43,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
 
     private final QuartzConnector connector;
 
-    public QuartzMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
+    public QuartzMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
     {
         super(connector, service, endpoint);

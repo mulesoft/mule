@@ -13,7 +13,7 @@ package org.mule.transport.bpm;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
@@ -30,7 +30,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
 
     private ProcessConnector connector = null;
 
-    public ProcessMessageReceiver(Connector connector, Service service, ImmutableEndpoint endpoint)
+    public ProcessMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
             throws CreateException
     {
         super(connector, service, endpoint);

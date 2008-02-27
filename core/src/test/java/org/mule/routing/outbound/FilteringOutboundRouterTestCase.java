@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -91,7 +92,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://foo?[barValue]");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://foo?[barValue]");
         assertNotNull(endpoint1);
 
         FilteringOutboundRouter router = new FilteringOutboundRouter();
@@ -109,7 +110,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage("test event", m);
 
         assertTrue(router.isMatch(message));
-        ImmutableEndpoint ep = router.getEndpoint(0, message);
+        OutboundEndpoint ep = router.getEndpoint(0, message);
         // MULE-2690: assert that templated endpoints are not mutated
         assertNotSame(endpoint1, ep);
         // assert that the returned endpoint has a resolved URI

@@ -12,21 +12,21 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RouterCatchAllStrategy;
 import org.mule.api.routing.RoutingException;
 import org.mule.util.StringMessageUtils;
 
 public class TestCatchAllStrategy implements RouterCatchAllStrategy
 {
-    private ImmutableEndpoint endpoint;
+    private OutboundEndpoint endpoint;
 
-    public void setEndpoint(ImmutableEndpoint endpoint)
+    public void setEndpoint(OutboundEndpoint endpoint)
     {
         this.endpoint = endpoint;
     }
 
-    public ImmutableEndpoint getEndpoint()
+    public OutboundEndpoint getEndpoint()
     {
         return endpoint;
     }

@@ -24,7 +24,7 @@ public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "xml/xml-outbound-namespace-test.xml";
+        return "org/mule/module/xml/xml-outbound-namespace-test.xml";
     }
 
     public void testMessageSplitter()

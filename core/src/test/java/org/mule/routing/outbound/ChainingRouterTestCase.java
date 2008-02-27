@@ -14,7 +14,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.endpoint.DynamicEndpointURIEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -77,7 +78,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
     public void testChainingOutboundRouterSynchronousWithTemplate() throws Exception
     {
-        ImmutableEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://foo?[barValue]");
+        OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", "test://foo?[barValue]");
         assertNotNull(endpoint3);
         router.addEndpoint(endpoint3);
 
@@ -89,12 +90,12 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         ImmutableEndpoint ep = router.getEndpoint(2, message);
         assertEquals("test://foo?bar", ep.getEndpointURI().toString());
 
-        session.expectAndReturn("sendEvent", C.eq(message, new DynamicEndpointURIEndpoint(
-            (ImmutableEndpoint) router.getEndpoints().get(0), new MuleEndpointURI("test://test"))), message);
-        session.expectAndReturn("sendEvent", C.eq(message, new DynamicEndpointURIEndpoint(
-            (ImmutableEndpoint) router.getEndpoints().get(1), new MuleEndpointURI("test://test"))), message);
-        session.expectAndReturn("sendEvent", C.eq(message, new DynamicEndpointURIEndpoint(
-            (ImmutableEndpoint) router.getEndpoints().get(2), new MuleEndpointURI("test://foo?bar"))), message);
+        session.expectAndReturn("sendEvent", C.eq(message, new DynamicURIOutboundEndpoint(
+            (OutboundEndpoint) router.getEndpoints().get(0), new MuleEndpointURI("test://test"))), message);
+        session.expectAndReturn("sendEvent", C.eq(message, new DynamicURIOutboundEndpoint(
+            (OutboundEndpoint) router.getEndpoints().get(1), new MuleEndpointURI("test://test"))), message);
+        session.expectAndReturn("sendEvent", C.eq(message, new DynamicURIOutboundEndpoint(
+            (OutboundEndpoint) router.getEndpoints().get(2), new MuleEndpointURI("test://foo?bar"))), message);
         final MuleMessage result = router.route(message, (MuleSession)session.proxy(), true);
         assertNotNull("This is a sync call, we need a result returned.", result);
         assertEquals(message, result);

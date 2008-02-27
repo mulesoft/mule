@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -36,7 +37,7 @@ public interface MessageReceiver extends Lifecycle, Connectable
     /**
      * @return the receivers endpoint
      */
-    ImmutableEndpoint getEndpoint();
+    InboundEndpoint getEndpoint();
 
     /**
      * @param message
@@ -52,7 +53,7 @@ public interface MessageReceiver extends Lifecycle, Connectable
      * @param endpoint the endpoint to listen on
      * @see ImmutableEndpoint
      */
-    void setEndpoint(ImmutableEndpoint endpoint);
+    void setEndpoint(InboundEndpoint endpoint);
 
     /**
      * @param service the service to associate with the receiver. When data is

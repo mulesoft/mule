@@ -11,7 +11,7 @@
 package org.mule.transport;
 
 import org.mule.api.DefaultMuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageAdapter;
@@ -20,7 +20,6 @@ import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transport.AbstractConnector;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
@@ -149,8 +148,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         Service service = getTestService("anApple", Apple.class);
 
-        ImmutableEndpoint endpoint = 
-            muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(getTestEndpointURI());
+        InboundEndpoint endpoint = 
+            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(getTestEndpointURI());
 
         try
         {

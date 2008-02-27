@@ -16,7 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.component.builder.MessageBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.service.Service;
@@ -69,7 +69,7 @@ public abstract class AbstractMessageBuilder implements ServiceAware, Callable, 
 
             for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
             {
-                ImmutableEndpoint endpoint = (ImmutableEndpoint) iterator.next();
+                OutboundEndpoint endpoint = (OutboundEndpoint) iterator.next();
                 Object request = requestMessage.getPayload();
 
                 boolean rsync = eventContext.getMessage().getBooleanProperty(

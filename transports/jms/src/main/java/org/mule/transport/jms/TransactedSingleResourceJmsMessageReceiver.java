@@ -12,7 +12,7 @@ package org.mule.transport.jms;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.StartException;
@@ -61,7 +61,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
      */
     public TransactedSingleResourceJmsMessageReceiver(Connector connector,
                                                       Service service,
-                                                      ImmutableEndpoint endpoint) throws CreateException
+                                                      InboundEndpoint endpoint) throws CreateException
     {
 
         super(connector, service, endpoint);

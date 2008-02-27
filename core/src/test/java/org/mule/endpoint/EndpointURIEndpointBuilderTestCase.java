@@ -14,6 +14,8 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestInboundTransformer;
@@ -34,9 +36,8 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         try
         {
             ImmutableEndpoint ep = endpointBuilder.buildInboundEndpoint();
-            assertTrue(ep.isInbound());
-            assertFalse(ep.isOutbound());
-            assertTrue(ep.isInbound());
+            assertTrue(ep instanceof InboundEndpoint);
+            assertFalse(ep instanceof OutboundEndpoint);
             assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
             assertTrue(ep.getTransformers().get(0) instanceof TestInboundTransformer);
             assertTrue(TransformerUtils.isDefined(ep.getResponseTransformers()));
@@ -56,9 +57,8 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         try
         {
             ImmutableEndpoint ep = endpointBuilder.buildOutboundEndpoint();
-            assertTrue(ep.isOutbound());
-            assertTrue(ep.isOutbound());
-            assertFalse(ep.isInbound());
+            assertFalse(ep instanceof InboundEndpoint);
+            assertTrue(ep instanceof OutboundEndpoint);
             assertTrue(TransformerUtils.isDefined(ep.getTransformers()));
             assertTrue(ep.getTransformers().get(0) instanceof TestOutboundTransformer);
             assertTrue(TransformerUtils.isUndefined(ep.getResponseTransformers()));

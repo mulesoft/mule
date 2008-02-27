@@ -13,7 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.IOUtils;
@@ -30,9 +30,9 @@ import org.dom4j.DocumentHelper;
 
 public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 {
-    private ImmutableEndpoint endpoint1;
-    private ImmutableEndpoint endpoint2;
-    private ImmutableEndpoint endpoint3;
+    private OutboundEndpoint endpoint1;
+    private OutboundEndpoint endpoint2;
+    private OutboundEndpoint endpoint3;
     private FilteringXmlMessageSplitter xmlSplitter;
 
     // @Override

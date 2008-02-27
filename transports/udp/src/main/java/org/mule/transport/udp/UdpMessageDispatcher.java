@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.AbstractMessageDispatcher;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
 {
     protected final UdpConnector connector;
 
-    public UdpMessageDispatcher(ImmutableEndpoint endpoint)
+    public UdpMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (UdpConnector)endpoint.getConnector();

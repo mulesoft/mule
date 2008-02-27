@@ -30,14 +30,13 @@
 
     <!-- the table of pages for linking -->
     <xsl:key name="item-to-page" match="link" use="item"/>
-    <xsl:variable name="items-to-pages" select="document('http://svn.codehaus.org/mule/branches/mule-2.x/tools/schemadocs/src/main/resources/links.xml')/links"/>
+    <xsl:variable name="items-to-pages" select="document('http://svn.codehaus.org/mule/branches/mule-2.0.x/tools/schemadocs/src/main/resources/links.xml')/links"/>
     <!-- xsl:variable name="items-to-pages" select="document('links.xml')/links"/ -->
 
     <xsl:template match="/">
         <html>
             <body>
-                <xsl:apply-templates
-                        select="//xsd:element[@name=$elementName]" mode="start"/>
+                <xsl:apply-templates select="//xsd:element[@name=$elementName]" mode="start"/>
             </body>
         </html>
     </xsl:template>
@@ -45,7 +44,13 @@
     <xsl:template match="xsd:element" mode="start">
         <a>
             <!-- define a tag we can link to -->
-            <xsl:attribute name="id">#<xsl:value-of select="@name"/></xsl:attribute>
+            <xsl:attribute name="id">
+                <xsl:call-template name="anchor">
+                    <xsl:with-param name="item">
+                        <xsl:value-of select="@name"/>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </xsl:attribute>
             <h2>&lt;<xsl:value-of select="@name"/> ...&gt;</h2>
         </a>
         <!-- p>
@@ -57,14 +62,9 @@
             Change the "elementName" parameter to select the element you want displayed.</em>
         </p -->
         <xsl:apply-templates select="." mode="documentation"/>
-        <!--
-        <xsl:if test="@type">
-            <p>Type: <xsl:value-of select="@type"/></p>
-        </xsl:if>
-        -->
         <h3>Attributes</h3>
         <table class="confluenceTable">
-            <th class="confluenceTh" style="width:20%">Name</th>
+            <th class="confluenceTh" style="width:10%">Name</th>
             <th class="confluenceTh" style="width:10%">Type</th>
             <th class="confluenceTh" style="width:10%">Required</th>
             <th class="confluenceTh" style="width:10%">Default</th>
@@ -80,18 +80,9 @@
             <xsl:call-template name="element-children"/>
             <xsl:if test="@type">
                 <xsl:variable name="type" select="@type"/>
-                <xsl:apply-templates
-                        select="/xsd:schema/xsd:complexType[@name=$type]" mode="elements"/>
+                <xsl:apply-templates select="/xsd:schema/xsd:complexType[@name=$type]" mode="elements"/>
             </xsl:if>
         </table>
-        <!--
-        <h3>Substitution</h3>
-        <xsl:apply-templates select="." mode="substitution"/>
-        <h3>Type Hierarchy</h3>
-        <ul>
-            <xsl:apply-templates select="." mode="types"/>
-        </ul>
-        -->
     </xsl:template>
 
 
@@ -236,8 +227,7 @@
 
     <xsl:template match="xsd:extension" mode="attributes">
         <xsl:variable name="base" select="@base"/>
-        <xsl:apply-templates
-                select="/xsd:schema/xsd:complexType[@name=$base]" mode="attributes"/>
+        <xsl:apply-templates select="/xsd:schema/xsd:complexType[@name=$base]" mode="attributes"/>
         <xsl:call-template name="attribute-children"/>
     </xsl:template>
 
@@ -273,8 +263,7 @@
             <xsl:choose>
                 <!-- this should always be true when using the normalized schema -->
                 <xsl:when test="/xsd:schema/xsd:element[@substitutionGroup=$name]">
-                    This is an abstract element; another element with a compatible
-                    type must be used in its place:
+                    The following elements can be used here:
                     <ul>
                         <xsl:apply-templates
                                 select="/xsd:schema/xsd:element[@substitutionGroup=$name]"
@@ -291,7 +280,14 @@
     </xsl:template>
 
     <xsl:template match="xsd:element[@name]" mode="elements-list">
-        <li>&lt;<xsl:value-of select="@name"/> ...&gt;</li>
+        <li>
+            <xsl:call-template name="link">
+                <xsl:with-param name="item">
+                    <xsl:value-of select="@name"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </li>
+        <!-- li>&lt;<xsl:value-of select="@name"/> ...&gt;</li -->
     </xsl:template>
 
     <xsl:template match="xsd:element" mode="elements-doc">
@@ -374,62 +370,26 @@
     </xsl:template>
 
 
-    <!-- types -->
-
-    <xsl:template match="xsd:element[@type]" mode="types">
-        <xsl:variable name="type" select="@type"/>
-        <xsl:choose>
-            <xsl:when test="/xsd:schema/xsd:complexType[@name=$type]">
-                <xsl:apply-templates
-                        select="/xsd:schema/xsd:complexType[@name=$type]" mode="types"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <li><xsl:value-of select="@type"/>
-                    (This type is not defined in this schema.  This means that
-                    other attributes and elements may exist which are not documented
-                    here)</li>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-      
-    <xsl:template match="xsd:element[./xsd:complexType]" mode="types">
-        <xsl:apply-templates select="xsd:complexType"/>
-    </xsl:template>
-      
-    <xsl:template name="type-children">
-        <xsl:apply-templates select="xsd:complexType" mode="types"/>
-        <xsl:apply-templates select="xsd:complexContent" mode="types"/>
-        <xsl:apply-templates select="xsd:extension" mode="types"/>
-    </xsl:template>
-
-    <xsl:template match="xsd:complexType" mode="types">
-        <li><xsl:value-of select="@name"/></li>
-        <xsl:call-template name="type-children"/>
-    </xsl:template>
-
-    <xsl:template match="xsd:complexContent" mode="types">
-        <xsl:call-template name="type-children"/>
-    </xsl:template>
-
-    <xsl:template match="xsd:extension" mode="types">
-        <xsl:variable name="base" select="@base"/>
-        <xsl:apply-templates
-                select="/xsd:schema/xsd:complexType[@name=$base]" mode="types"/>
-    </xsl:template>
-
-
     <!-- convert common types to nicer text -->
 
     <xsl:template name="rewrite-type">
         <xsl:param name="type"/>
+        <xsl:variable name="simpleType">
+            <xsl:choose>
+                <xsl:when test="starts-with($type, 'mule:')"><xsl:value-of select="substring($type, 6)"/></xsl:when>
+                <xsl:when test="starts-with($type, 'xsd:')"><xsl:value-of select="substring($type, 5)"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="$type"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
         <xsl:choose>
-            <xsl:when test="$type='mule:substitutableInt'">integer</xsl:when>
-            <xsl:when test="$type='mule:substitutableBoolean'">boolean</xsl:when>
-            <xsl:when test="$type='mule:substitutableLong'">long</xsl:when>
-            <xsl:when test="$type='mule:substitutablePortNumber'">port number</xsl:when>
-            <xsl:when test="$type='mule:substitutableClass'">class name</xsl:when>
-            <xsl:when test="starts-with($type, 'xsd:')"><xsl:value-of select="substring($type, 5)"/></xsl:when>
-            <xsl:otherwise><xsl:value-of select="$type"/></xsl:otherwise>
+            <xsl:when test="$simpleType='substitutableInt'">integer</xsl:when>
+            <xsl:when test="$simpleType='substitutableBoolean'">boolean</xsl:when>
+            <xsl:when test="$simpleType='substitutableLong'">long</xsl:when>
+            <xsl:when test="$simpleType='substitutablePortNumber'">port number</xsl:when>
+            <xsl:when test="$simpleType='substitutableClass'">class name</xsl:when>
+            <xsl:when test="$simpleType='substitutableName' or $simpleType='NMTOKEN'">name (no spaces)</xsl:when>
+            <xsl:when test="$simpleType='NMTOKENS'">list of names</xsl:when>
+            <xsl:otherwise><xsl:value-of select="$simpleType"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
@@ -443,6 +403,7 @@
 
 
     <!-- links via a separate index - see links.xml -->
+    <!-- this includes a confluence specific hack - the link itself has the name in -->
 
     <xsl:template name="link">
         <xsl:param name="item"/>
@@ -453,12 +414,33 @@
         </xsl:variable>
         <xsl:choose>
             <xsl:when test="string-length($page) > 0">
+                <xsl:variable name="pageClean" select="translate($page, '\+-:', '')"/>
+                <xsl:variable name="itemClean" select="translate($item, '\+-:', '')"/>
                 <a>
                     <xsl:attribute name="href">
-                        <xsl:value-of select="$page"/>#<xsl:value-of select="$item"/>
+                        <xsl:value-of select="$page"/>#<xsl:value-of select="$pageClean"/>-<xsl:value-of select="$itemClean"/>
                     </xsl:attribute>
                     <xsl:value-of select="$item"/>
                 </a>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$item"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="anchor">
+        <xsl:param name="item"/>
+        <xsl:variable name="page">
+            <xsl:apply-templates select="$items-to-pages">
+                <xsl:with-param name="item" select="$item"/>
+            </xsl:apply-templates>
+        </xsl:variable>
+        <xsl:choose>
+            <xsl:when test="string-length($page) > 0">
+                <xsl:variable name="pageClean" select="translate($page, '\+-:', '')"/>
+                <xsl:variable name="itemClean" select="translate($item, '\+-:', '')"/>
+                <xsl:value-of select="$pageClean"/>-<xsl:value-of select="$itemClean"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$item"/>

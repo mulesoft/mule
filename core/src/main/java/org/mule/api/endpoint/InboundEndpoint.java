@@ -8,26 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.endpoint;
+package org.mule.api.endpoint;
 
-public class InboundEndpoint extends MuleEndpoint
+import org.mule.api.transport.MessageRequesting;
+
+public interface InboundEndpoint extends ImmutableEndpoint, MessageRequesting
 {
 
-    private static final long serialVersionUID = -4752772777414636142L;
-
-    public InboundEndpoint()
-    {
-        super();
-    }
-
-    public boolean isOutbound()
-    {
-        return false;
-    }
-
-    public boolean isInbound()
-    {
-        return true;
-    }
-    
 }
+
+

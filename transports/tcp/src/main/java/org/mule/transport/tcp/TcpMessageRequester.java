@@ -12,7 +12,7 @@ package org.mule.transport.tcp;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 
 import java.net.Socket;
@@ -26,7 +26,7 @@ public class TcpMessageRequester extends AbstractMessageRequester
 
     private final TcpConnector connector;
 
-    public TcpMessageRequester(ImmutableEndpoint endpoint)
+    public TcpMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (TcpConnector) endpoint.getConnector();

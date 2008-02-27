@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transport.AbstractMessageDispatcher;
 
@@ -32,7 +33,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     private final TcpConnector connector;
 
-    public TcpMessageDispatcher(ImmutableEndpoint endpoint)
+    public TcpMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (TcpConnector) endpoint.getConnector();

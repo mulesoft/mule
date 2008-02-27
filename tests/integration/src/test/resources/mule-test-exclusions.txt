@@ -68,6 +68,10 @@ org.mule.test.integration.streaming.FileToTcpStreamingTestCase
 # @ in URI is not getting replaced (1 of 3 tests fails)
 org.mule.test.integration.util.ObjectNameHelperTestCase
 
+# MULE-2620
+org.mule.module.xml.functional.BeanPropertyExtractorMultipleEndpointsTestCase
+org.mule.module.xml.functional.BeanPropertyExtractorTestCase
+
 ##########################################################################
 # Mule 2.x failures
 ##########################################################################

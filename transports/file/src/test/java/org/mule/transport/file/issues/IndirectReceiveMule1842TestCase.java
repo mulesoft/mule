@@ -11,7 +11,7 @@
 package org.mule.transport.file.issues;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.file.AbstractFileFunctionalTestCase;
@@ -34,7 +34,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         String url = fileToUrl(target) + "?connector=receiveConnector";
         logger.debug(url);
         
-        ImmutableEndpoint endpoint = 
+        InboundEndpoint endpoint = 
             muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url);
         relay.getInboundRouter().addEndpoint(endpoint);
         relay.stop();

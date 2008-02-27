@@ -11,12 +11,12 @@
 package org.mule.transport;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 
 public final class UnsupportedMessageRequester extends AbstractMessageRequester
 {
 
-    public UnsupportedMessageRequester(ImmutableEndpoint endpoint)
+    public UnsupportedMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
     }

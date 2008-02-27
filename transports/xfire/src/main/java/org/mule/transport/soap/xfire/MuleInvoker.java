@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.NullPayload;
 
@@ -80,7 +80,7 @@ public class MuleInvoker implements Invoker
         }
     }
 
-    public ImmutableEndpoint getEndpoint()
+    public InboundEndpoint getEndpoint()
     {
         return receiver.getEndpoint();
     }

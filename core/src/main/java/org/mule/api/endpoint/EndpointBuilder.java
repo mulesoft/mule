@@ -39,7 +39,7 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
      * @throws EndpointException
      * @throws InitialisationException
      */
-    ImmutableEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException;
+    InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException;
 
     /**
      * Constructs outbound endpoints
@@ -48,7 +48,7 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable
      * @throws EndpointException
      * @throws InitialisationException
      */
-    ImmutableEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException;
+    OutboundEndpoint buildOutboundEndpoint() throws EndpointException, InitialisationException;
 
     void setConnector(Connector connector);
 

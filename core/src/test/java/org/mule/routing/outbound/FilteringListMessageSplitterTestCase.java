@@ -13,7 +13,7 @@ package org.mule.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -28,7 +28,7 @@ public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
         Service testService = getTestService("test", Apple.class);
         MuleSession session = getTestSession(testService, muleContext);
 
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
+        OutboundEndpoint endpoint = getTestOutboundEndpoint("Test1Provider");
 
         FilteringListMessageSplitter router = new FilteringListMessageSplitter();
         router.setFilter(null);

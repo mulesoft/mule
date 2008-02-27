@@ -25,7 +25,7 @@ public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
 
     protected String getConfigResources()
     {
-        return "xml/xml-filter-functional-test.xml";
+        return "org/mule/module/xml/xml-filter-functional-test.xml";
     }
 
     /**

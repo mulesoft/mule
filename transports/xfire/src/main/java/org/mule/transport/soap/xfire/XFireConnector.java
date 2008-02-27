@@ -18,6 +18,7 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
@@ -427,11 +428,11 @@ public class XFireConnector extends AbstractConnector
         // Remove the Axis Receiver Security filter now
         receiverEndpointBuilder.setSecurityFilter(null);
 
-        ImmutableEndpoint serviceEndpoint = muleContext.getRegistry()
+        InboundEndpoint serviceEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(serviceEndpointbuilder);
 
-        ImmutableEndpoint receiverEndpoint = muleContext.getRegistry()
+        InboundEndpoint receiverEndpoint = muleContext.getRegistry()
             .lookupEndpointFactory()
             .getInboundEndpoint(receiverEndpointBuilder);
 
@@ -461,7 +462,7 @@ public class XFireConnector extends AbstractConnector
      * @return the key to store the newly created receiver against. In this case it
      *         is the service name, which is equivilent to the Axis service name.
      */
-    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         if (endpoint.getEndpointURI().getPort() == -1)
         {

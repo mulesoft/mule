@@ -12,6 +12,7 @@ package org.mule.transport.jdbc;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -77,7 +78,7 @@ public class JdbcConnector extends AbstractConnector
         }
     }
 
-    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         Map props = endpoint.getProperties();
         if (props != null)

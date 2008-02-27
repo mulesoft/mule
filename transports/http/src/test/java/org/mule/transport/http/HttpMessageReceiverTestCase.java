@@ -11,7 +11,7 @@
 package org.mule.transport.http;
 
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -32,7 +32,7 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         return new HttpMessageReceiver(endpoint.getConnector(), (Service) mockComponent.proxy(), endpoint);
     }
 
-    public ImmutableEndpoint getEndpoint() throws Exception
+    public InboundEndpoint getEndpoint() throws Exception
     {
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("http://localhost:6789", muleContext);
         endpointBuilder.setResponseTransformers(CollectionUtils.singletonList(new MuleMessageToHttpResponse()));

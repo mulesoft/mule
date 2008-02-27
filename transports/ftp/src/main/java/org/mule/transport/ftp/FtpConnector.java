@@ -10,11 +10,12 @@
 
 package org.mule.transport.ftp;
 
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.ConnectorException;
@@ -88,7 +89,7 @@ public class FtpConnector extends AbstractConnector
         return FTP;
     }
 
-    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         long polling = pollingFrequency;
         Map props = endpoint.getProperties();

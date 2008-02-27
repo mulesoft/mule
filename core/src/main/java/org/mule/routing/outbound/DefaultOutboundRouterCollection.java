@@ -13,7 +13,6 @@ package org.mule.routing.outbound;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RoutingException;
@@ -23,9 +22,7 @@ import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.transaction.TransactionTemplate;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * <code>DefaultOutboundRouterCollection</code> is a container of routers. An

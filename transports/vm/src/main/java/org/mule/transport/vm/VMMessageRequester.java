@@ -11,7 +11,7 @@
 package org.mule.transport.vm;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
@@ -25,7 +25,7 @@ public class VMMessageRequester extends AbstractMessageRequester
 
     private final VMConnector connector;
 
-    public VMMessageRequester(ImmutableEndpoint endpoint)
+    public VMMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (VMConnector) endpoint.getConnector();

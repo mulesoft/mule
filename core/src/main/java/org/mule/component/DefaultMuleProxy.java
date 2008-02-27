@@ -14,14 +14,15 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.LifecycleAdapter;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.model.EntryPointResolverSet;
@@ -174,11 +175,12 @@ public class DefaultMuleProxy implements MuleProxy
         MuleMessage returnMessage = null;
         try
         {
-            if (event.getEndpoint().isInbound())
+            if (event.getEndpoint() instanceof InboundEndpoint)
             {
+                InboundEndpoint endpoint = (InboundEndpoint) event.getEndpoint();
                 event = OptimizedRequestContext.unsafeSetEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
-                ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
+                ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), endpoint);
 
                 // stats
                 long startTime = 0;
@@ -332,7 +334,7 @@ public class DefaultMuleProxy implements MuleProxy
         suspended = false;
     }
 
-    protected ReplyToHandler getReplyToHandler(MuleMessage message, ImmutableEndpoint endpoint)
+    protected ReplyToHandler getReplyToHandler(MuleMessage message, InboundEndpoint endpoint)
     {
         Object replyTo = message.getReplyTo();
         ReplyToHandler replyToHandler = null;
@@ -358,7 +360,7 @@ public class DefaultMuleProxy implements MuleProxy
             }
 
             // get the endpointUri for this uri
-            ImmutableEndpoint endpoint = muleContext.getRegistry()
+            OutboundEndpoint endpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
                 .getOutboundEndpoint(returnMessage.getReplyTo().toString());
             // make sure remove the replyTo property as not cause a a forever
@@ -392,12 +394,13 @@ public class DefaultMuleProxy implements MuleProxy
 
         try
         {
-            if (event.getEndpoint().isInbound())
+            if (event.getEndpoint() instanceof InboundEndpoint)
             {
+                InboundEndpoint endpoint = (InboundEndpoint) event.getEndpoint();
                 // dispatch the next receiver
                 event = OptimizedRequestContext.criticalSetEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
-                ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), event.getEndpoint());
+                ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(), endpoint);
 
                 // do stats
                 long startTime = 0;
@@ -447,7 +450,8 @@ public class DefaultMuleProxy implements MuleProxy
             }
             else
             {
-                event.getEndpoint().dispatch(event);
+                OutboundEndpoint endpoint = (OutboundEndpoint) event.getEndpoint();
+                endpoint.dispatch(event);
             }
 
             if (stat.isEnabled())

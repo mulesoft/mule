@@ -11,7 +11,7 @@
 package org.mule.transport.soap.xfire;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.config.spring.editors.QNamePropertyEditor;
@@ -48,7 +48,7 @@ public class XFireMessageReceiver extends AbstractMessageReceiver
 
     protected List serviceInterfaces;
 
-    public XFireMessageReceiver(Connector umoConnector, org.mule.api.service.Service service, ImmutableEndpoint umoEndpoint)
+    public XFireMessageReceiver(Connector umoConnector, org.mule.api.service.Service service, InboundEndpoint umoEndpoint)
         throws CreateException
     {
         super(umoConnector, service, umoEndpoint);

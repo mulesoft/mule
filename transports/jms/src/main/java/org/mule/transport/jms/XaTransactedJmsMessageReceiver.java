@@ -11,7 +11,7 @@
 package org.mule.transport.jms;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
@@ -73,7 +73,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         }
     }
 
-    public XaTransactedJmsMessageReceiver(Connector umoConnector, Service service, ImmutableEndpoint endpoint)
+    public XaTransactedJmsMessageReceiver(Connector umoConnector, Service service, InboundEndpoint endpoint)
         throws CreateException
     {
         super(umoConnector, service, endpoint);

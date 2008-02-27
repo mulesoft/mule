@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.AbstractMessageDispatcher;
 
 import org.jivesoftware.smack.Chat;
@@ -33,7 +33,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     private volatile Chat chat;
     private volatile GroupChat groupChat;
 
-    public XmppMessageDispatcher(ImmutableEndpoint endpoint)
+    public XmppMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (XmppConnector)endpoint.getConnector();

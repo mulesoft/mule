@@ -18,7 +18,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 
 /**
@@ -29,7 +29,7 @@ import org.mule.api.transport.DispatchException;
  */
 public class WireTap extends SelectiveConsumer
 {
-    private volatile ImmutableEndpoint tap;
+    private volatile OutboundEndpoint tap;
 
     public boolean isMatch(MuleEvent event) throws MessagingException
     {
@@ -65,12 +65,12 @@ public class WireTap extends SelectiveConsumer
         return super.process(event);
     }
 
-    public ImmutableEndpoint getEndpoint()
+    public OutboundEndpoint getEndpoint()
     {
         return tap;
     }
 
-    public void setEndpoint(ImmutableEndpoint endpoint) throws MuleException
+    public void setEndpoint(OutboundEndpoint endpoint) throws MuleException
     {
         this.tap = endpoint;
     }

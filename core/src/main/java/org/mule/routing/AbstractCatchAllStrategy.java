@@ -10,7 +10,7 @@
 
 package org.mule.routing;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RouterCatchAllStrategy;
 import org.mule.management.stats.RouterStatistics;
 
@@ -31,16 +31,16 @@ public abstract class AbstractCatchAllStrategy implements RouterCatchAllStrategy
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected ImmutableEndpoint endpoint;
+    protected OutboundEndpoint endpoint;
 
     protected RouterStatistics statistics;
 
-    public void setEndpoint(ImmutableEndpoint endpoint)
+    public void setEndpoint(OutboundEndpoint endpoint)
     {
         this.endpoint = endpoint;
     }
 
-    public ImmutableEndpoint getEndpoint()
+    public OutboundEndpoint getEndpoint()
     {
         return endpoint;
     }

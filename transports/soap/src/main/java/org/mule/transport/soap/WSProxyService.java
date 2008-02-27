@@ -16,6 +16,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -135,9 +136,9 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
                 return wsdlFileContents;
             }
             MuleContext muleContext = MuleServer.getMuleContext();
-            ImmutableEndpoint webServiceEndpoint = muleContext.getRegistry()
+            InboundEndpoint webServiceEndpoint = muleContext.getRegistry()
                 .lookupEndpointFactory()
-                .getOutboundEndpoint(this.wsdlEndpoint);
+                .getInboundEndpoint(this.wsdlEndpoint);
 
             MuleMessage replyWSDL = eventContext.requestEvent(webServiceEndpoint, eventContext.getTimeout());
 

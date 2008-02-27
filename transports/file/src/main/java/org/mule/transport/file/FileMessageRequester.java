@@ -15,7 +15,7 @@ import org.mule.MuleServer;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageAdapter;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.DefaultMessageAdapter;
@@ -35,7 +35,7 @@ public class FileMessageRequester extends AbstractMessageRequester
 {
     private final FileConnector connector;
 
-    public FileMessageRequester(ImmutableEndpoint endpoint)
+    public FileMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (FileConnector) endpoint.getConnector();

@@ -11,7 +11,7 @@
 package org.mule.transport.ftp;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.transport.AbstractMessageDispatcherFactory;
 
@@ -19,7 +19,7 @@ public class FtpMessageDispatcherFactory extends AbstractMessageDispatcherFactor
 {
 
     /** {@inheritDoc} */
-    public MessageDispatcher create(ImmutableEndpoint endpoint) throws MuleException
+    public MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException
     {
         return new FtpMessageDispatcher(endpoint);
     }

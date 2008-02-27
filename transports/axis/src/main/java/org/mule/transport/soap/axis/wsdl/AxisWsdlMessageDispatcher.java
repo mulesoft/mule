@@ -11,7 +11,7 @@
 package org.mule.transport.soap.axis.wsdl;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.soap.SoapConstants;
 import org.mule.transport.soap.axis.AxisMessageDispatcher;
 
@@ -35,7 +35,7 @@ import org.apache.axis.wsdl.symbolTable.SymTabEntry;
 public class AxisWsdlMessageDispatcher extends AxisMessageDispatcher
 {
 
-    public AxisWsdlMessageDispatcher(ImmutableEndpoint endpoint)
+    public AxisWsdlMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
     }

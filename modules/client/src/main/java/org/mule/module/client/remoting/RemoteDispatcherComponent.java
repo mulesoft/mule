@@ -26,6 +26,8 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -179,7 +181,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
     protected Object sendAction(RemoteDispatcherNotification action, MuleEventContext context) throws MuleException
     {
         MuleMessage result = null;
-        ImmutableEndpoint endpoint = null;
+        OutboundEndpoint endpoint = null;
         MuleContext managementContext = context.getMuleContext();
         try
         {
@@ -254,7 +256,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
     }
 
 
-    public static final Service getSerivce(ImmutableEndpoint endpoint,
+    public static final Service getSerivce(InboundEndpoint endpoint,
                                                     WireFormat wireFormat,
                                                     String encoding,
                                                     int eventTimeout,

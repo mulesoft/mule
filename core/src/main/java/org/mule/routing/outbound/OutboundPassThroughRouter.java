@@ -12,7 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 
@@ -32,7 +32,7 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
     }
 
 
-    public void addEndpoint(ImmutableEndpoint endpoint)
+    public void addEndpoint(OutboundEndpoint endpoint)
     {
         if (endpoint == null)
         {

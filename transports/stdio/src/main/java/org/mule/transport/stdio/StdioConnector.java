@@ -10,7 +10,7 @@
 
 package org.mule.transport.stdio;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.AbstractConnector;
@@ -42,7 +42,7 @@ public abstract class StdioConnector extends AbstractConnector
      * @see org.mule.api.transport.Connector#registerListener(org.mule.api.MuleSession,
      *      org.mule.api.endpoint.Endpoint)
      */
-    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         return serviceDescriptor.createMessageReceiver(this, service, endpoint,
             new Object[]{new Long(AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY)});

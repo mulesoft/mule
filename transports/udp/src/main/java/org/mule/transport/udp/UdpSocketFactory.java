@@ -10,6 +10,7 @@
 package org.mule.transport.udp;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.util.MapUtils;
 
@@ -38,7 +39,7 @@ public class UdpSocketFactory implements KeyedPoolableObjectFactory
         ImmutableEndpoint ep = (ImmutableEndpoint)key;
         DatagramSocket socket;
 
-        if(ep.isInbound())
+        if(ep instanceof InboundEndpoint)
         {
             int port = ep.getEndpointURI().getPort();
             String host = ep.getEndpointURI().getHost();

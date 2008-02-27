@@ -17,7 +17,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointNotFoundException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
 
@@ -58,7 +58,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         {
             if (httpServletRequest.getParameter("endpoint") != null)
             {
-                ImmutableEndpoint endpoint = getEndpointForURI(httpServletRequest);
+                InboundEndpoint endpoint = getEndpointForURI(httpServletRequest);
                 String timeoutString = httpServletRequest.getParameter("timeout");
                 long to = timeout;
 
@@ -140,7 +140,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
     {
         try
         {
-            ImmutableEndpoint endpoint = getEndpointForURI(httpServletRequest);
+            InboundEndpoint endpoint = getEndpointForURI(httpServletRequest);
             String timeoutString = httpServletRequest.getParameter("timeout");
             long to = timeout;
 
@@ -171,7 +171,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
         }
     }
 
-    protected ImmutableEndpoint getEndpointForURI(HttpServletRequest httpServletRequest)
+    protected InboundEndpoint getEndpointForURI(HttpServletRequest httpServletRequest)
         throws MuleException
     {
         String endpointName = httpServletRequest.getParameter("endpoint");
@@ -180,7 +180,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             throw new EndpointException(HttpMessages.httpParameterNotSet("endpoint"));
         }
 
-        ImmutableEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
+        InboundEndpoint endpoint = RegistryContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
         if (endpoint == null)
         {
             // if we dont find an endpoint for the given name, lets check the

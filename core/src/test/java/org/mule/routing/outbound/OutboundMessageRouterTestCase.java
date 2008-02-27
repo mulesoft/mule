@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -167,7 +168,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         FilteringOutboundRouter filterRouter = new FilteringOutboundRouter();
         MuleSession session = getTestSession(getTestService(), muleContext);
         MuleMessage message = new DefaultMuleMessage(new DefaultMessageAdapter(new StringBuffer()));
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint("test");
+        OutboundEndpoint endpoint = getTestOutboundEndpoint("test");
         filterRouter.setMessageProperties(session, message, endpoint);
         assertNotNull(message.getCorrelationId());
     }

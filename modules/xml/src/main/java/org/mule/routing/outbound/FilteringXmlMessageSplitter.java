@@ -12,8 +12,7 @@ package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.routing.outbound.AbstractMessageSplitter;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
@@ -242,7 +241,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
      *            part
      * @return the message part to dispatch
      */
-    protected MuleMessage getMessagePart(MuleMessage message, ImmutableEndpoint endpoint)
+    protected MuleMessage getMessagePart(MuleMessage message, OutboundEndpoint endpoint)
     {
         List nodes = (List)nodesContext.get();
 

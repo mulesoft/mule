@@ -10,12 +10,11 @@
 
 package org.mule.transport.multicast;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-import org.mule.transport.multicast.MulticastMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -31,7 +30,7 @@ public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTes
             (Service)mockComponent.proxy(), endpoint);
     }
 
-    public ImmutableEndpoint getEndpoint() throws Exception
+    public InboundEndpoint getEndpoint() throws Exception
     {
         return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("multicast://228.2.3.4:10100");
     }

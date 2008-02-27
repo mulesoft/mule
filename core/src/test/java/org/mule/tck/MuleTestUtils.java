@@ -23,6 +23,8 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
@@ -93,9 +95,9 @@ public final class MuleTestUtils
 //        }
 //    }
 
-    public static ImmutableEndpoint getTestInboundEndpoint(String name, final MuleContext context) throws Exception
+    public static InboundEndpoint getTestInboundEndpoint(String name, final MuleContext context) throws Exception
     {
-        return getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
+        return (InboundEndpoint) getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
         {
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
@@ -104,9 +106,9 @@ public final class MuleTestUtils
         });
     }
 
-    public static ImmutableEndpoint getTestOutboundEndpoint(String name, final MuleContext context) throws Exception
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, final MuleContext context) throws Exception
     {
-        return getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
+        return (OutboundEndpoint) getTestEndpoint(name, null, null, null, null, context, new EndpointSource()
         {
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
@@ -115,30 +117,30 @@ public final class MuleTestUtils
         });
     }
     
-    public static ImmutableEndpoint getTestInboundEndpoint(String name,
+    public static InboundEndpoint getTestInboundEndpoint(String name,
                                                             final MuleContext context,
                                                             String uri,
                                                             List transformers,
                                                             Filter filter,
                                                             Map properties) throws Exception
     {
-        return getTestEndpoint(name, uri, transformers, filter, properties, context, new EndpointSource()
+        return (InboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context, new EndpointSource()
         {
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
-                return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             }
         });
     }
     
-    public static ImmutableEndpoint getTestOutboundEndpoint(String name,
+    public static OutboundEndpoint getTestOutboundEndpoint(String name,
                                                             final MuleContext context,
                                                             String uri,
                                                             List transformers,
                                                             Filter filter,
                                                             Map properties) throws Exception
     {
-        return getTestEndpoint(name, uri, transformers, filter, properties, context, new EndpointSource()
+        return (OutboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context, new EndpointSource()
         {
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
@@ -403,9 +405,14 @@ public final class MuleTestUtils
         return new Mock(DefaultMuleContext.class, "muleMuleContext");
     }
 
-    public static Mock getMockEndpoint()
+    public static Mock getMockInboundEndpoint()
     {
-        return new Mock(ImmutableEndpoint.class, "umoEndpoint");
+        return new Mock(InboundEndpoint.class, "umoEndpoint");
+    }
+    
+    public static Mock getMockOutboundEndpoint()
+    {
+        return new Mock(OutboundEndpoint.class, "umoEndpoint");
     }
 
     public static Mock getMockEndpointURI()

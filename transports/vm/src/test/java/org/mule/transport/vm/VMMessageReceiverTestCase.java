@@ -10,10 +10,9 @@
 
 package org.mule.transport.vm;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-import org.mule.transport.vm.VMMessageReceiver;
 
 public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
@@ -36,7 +35,7 @@ public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         return receiver;
     }
 
-    public ImmutableEndpoint getEndpoint() throws Exception
+    public InboundEndpoint getEndpoint() throws Exception
     {
         return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vm://test");
     }

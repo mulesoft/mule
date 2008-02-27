@@ -118,8 +118,10 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for connector elements.
-                Other transports and modules may extend this if they need to add global
-                connector elements to the configuration.
+                Connector elements allow properties to be configured across all endpoints that
+                use the same transport.
+                If multiple connectors are defined for the same transport then each endpoint
+                must name which connector is being used.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -136,9 +138,10 @@
     <xsd:element name="abstract-global-endpoint" abstract="true" type="abstractGlobalEndpointType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for endpoint elements.
-                Other transports and modules may extend this if they need to add global
-                endpoint elements to the configuration.
+                A placeholder for global endpoint elements.
+                Global endpoints are named templates that allow us to define an endpoint once
+                and refer to it in several places.
+                Currently the same template is used for both inbound and outbound endpoints.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -157,8 +160,8 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for inbound endpoint elements.
-                Other transports and modules may extend this if they need to add
-                inbound endpoint elements to the configuration.
+                Inbound endpoints receive messages from the underlying transport.
+                The message payload is then delivered to the component for processing.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -178,8 +181,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for outbound endpoint elements.
-                Other transports and modules may extend this if they need to add
-                outbound endpoint elements to the configuration.
+                Outbound endpoints dispatch messages to the underlying transport.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -199,8 +201,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for transformer elements.
-                Other transports and modules may extend this if they need to add
-                transformer elements to the configuration.
+                Transformers convert message payloads.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -269,8 +270,6 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for catch-all strategy elements.
-                Other transports and modules may extend this if they need to add
-                catch-all strategy elements to the configuration.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -280,8 +279,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for inbound router elements.
-                Other transports and modules may extend this if they need to add
-                inbound router elements to the configuration.
+                Inbound routers control how incoming messages are handled.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -291,8 +289,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for filter elements.
-                Other transports and modules may extend this if they need to add
-                filter elements to the configuration.
+                Filters are used to make decisions within the Mule framework.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -333,8 +330,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for outbound router elements.
-                Other transports and modules may extend this if they need to add
-                outbound router elements to the configuration.
+                Outbound routers control how outgoing messages are delivered to the outbound endpoints.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -344,8 +340,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for transaction manager elements.
-                Other transports and modules may extend this if they need to add
-                transaction manager elements to the configuration.
+                Transaction managers are used to co-ordinate transactions.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -660,8 +655,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for model elements.
-                Other modules may extend this if they need to add
-                model elements to the configuration.
+                A model provides basic settings and processing for all the services it contains.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -725,8 +719,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for queue profile elements.
-                Other modules may extend this if they need to add
-                queue profile elements to the configuration.
+                A queue profile controls how messages are queued before being processed.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -745,7 +738,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for entry point resolver set elements.
-                This allows various entry point resolver set implementations to be used.
+                These combine a group of entry point resolvers, trying them in turn until one succeeds.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -816,7 +809,8 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for an entry point resolver element.
-                This allows various entry point resolver implementations to be used.
+                Entry point resolvers define how payloads are delivered to Java code
+                (ie they choose the method to call).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1023,7 +1017,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for a service element.
-                This allows various service implementations to be used.
+                Services combine message rounting with a Java (typically) component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1096,7 +1090,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for an exception strategy element.
-                This allows various exception strategy implementations to be used.
+                Exception strategies define how Mule should react to errors.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1121,7 +1115,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for an async reply router element.
-                This allows various async reply router implementations to be used.
+                Asynchronous replies are handled via this router.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1180,7 +1174,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for component threading profile element.
-                This allows various component threading profile implementations to be used.
+                Threading profils define how thread pools interact with the component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1194,7 +1188,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for component element.
-                This allows various component implementations to be used.
+                A component processes data.  Typically it is a Java object.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1321,8 +1315,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for transaction elements.
-                Other transports and modules may extend this if they need to add
-                transaction elements to the configuration.
+                Transactions allow a series of operations to be grouped together.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1595,8 +1588,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for security filter elements.
-                Other transports and modules may extend this if they need to add
-                security filter elements to the configuration.
+                Security filters can control access to the system, etc.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1606,8 +1598,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for connection strategy elements.
-                Other transports and modules may extend this if they need to add
-                connection strategy elements to the configuration.
+                Connection strategies control how the underlying transport handles connection errors.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3469,7 +3460,13 @@
     <xsd:element name="properties" type="mapType">
         <xsd:annotation>
             <xsd:documentation>
-                Set properties via Spring's entry attribute.
+                Set Mule properties.
+                These are name/value pairs that can be set on components, services, etc,
+                and which provide a generic way of configuring the system.
+                In Mule v2 you typically shouldn't need to use generic properties like
+                this, since almost all functionality is exposed via dedicated elements.
+                However, they can be useful in configuring obscure or overlooked options
+                and in configuring transports from the generic endpoint elements.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3481,7 +3478,19 @@
 
     <xsd:group name="propertiesGroup">
         <xsd:sequence>
-            <xsd:element name="property" type="keyValueType" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="property" type="keyValueType" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Set a Mule property.
+                        This is a name/value pair that can be set on components, services, etc,
+                        and which provide a generic way of configuring the system.
+                        In Mule v2 you typically shouldn't need to use a generic property like
+                        this, since almost all functionality is exposed via dedicated elements.
+                        However, it can be useful in configuring obscure or overlooked options
+                        and in configuring transports from the generic endpoint elements.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
             <xsd:element ref="properties" minOccurs="0"/>
         </xsd:sequence>
     </xsd:group>

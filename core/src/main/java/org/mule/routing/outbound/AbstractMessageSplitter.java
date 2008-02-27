@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 
@@ -45,13 +45,13 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
         this.initialise(message);
 
-        ImmutableEndpoint endpoint;
+        OutboundEndpoint endpoint;
         MuleMessage result = null;
         List list = getEndpoints();
         int correlationSequence = 1;
         for (Iterator iterator = list.iterator(); iterator.hasNext();)
         {
-            endpoint = (ImmutableEndpoint) iterator.next();
+            endpoint = (OutboundEndpoint) iterator.next();
             message = getMessagePart(message, endpoint);
             // TODO MULE-1378
             if (message == null)
@@ -139,7 +139,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
     /**
      * This method can be implemented to split the message up before
-     * {@link #getMessagePart(MuleMessage, ImmutableEndpoint)} method is called.
+     * {@link #getMessagePart(MuleMessage, OutboundEndpoint)} method is called.
      * 
      * @param message the message being routed
      */
@@ -154,11 +154,11 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
      * @param endpoint the endpoint that will be used to route the resulting message part
      * @return the message part to dispatch
      */
-    protected abstract MuleMessage getMessagePart(MuleMessage message, ImmutableEndpoint endpoint);
+    protected abstract MuleMessage getMessagePart(MuleMessage message, OutboundEndpoint endpoint);
 
     /**
      * This method is called after all parts of the original message have been processed;
-     * typically this is the case after {@link #getMessagePart(MuleMessage, ImmutableEndpoint)}
+     * typically this is the case after {@link #getMessagePart(MuleMessage, OutboundEndpoint)}
      * returned <code>null</code>.
      */
     protected abstract void cleanup();

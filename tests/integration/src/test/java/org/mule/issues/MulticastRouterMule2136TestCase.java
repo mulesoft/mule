@@ -30,7 +30,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
 
     protected String getConfigResources()
     {
-        return "issues/multicast-router-mule-2136-test.xml";
+        return "org/mule/issues/multicast-router-mule-2136-test.xml";
     }
 
     protected MuleClient sendObject() throws MuleException

@@ -18,7 +18,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.NullPayload;
@@ -33,7 +33,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
 {
 
     private String endpointAddress;
-    private ImmutableEndpoint logEndpoint = null;
+    private OutboundEndpoint logEndpoint = null;
     private MuleSession session;
 
 

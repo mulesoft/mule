@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
@@ -202,7 +203,7 @@ public class RmiConnector extends AbstractJndiConnector
         this.securityManager = securityManager;
     }
 
-    public MessageReceiver createReceiver(Service service, ImmutableEndpoint endpoint) throws Exception
+    public MessageReceiver createReceiver(Service service, InboundEndpoint endpoint) throws Exception
     {
         final Object[] args = new Object[]{new Long(pollingFrequency)};
         return getServiceDescriptor().createMessageReceiver(this, service, endpoint, args);

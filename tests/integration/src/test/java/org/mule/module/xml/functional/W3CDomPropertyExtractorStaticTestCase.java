@@ -27,7 +27,7 @@ public class W3CDomPropertyExtractorStaticTestCase extends AbstractXmlPropertyEx
 
     protected String getConfigResources()
     {
-        return "xml/property-extractor-static-test.xml";
+        return "org/mule/module/xml/property-extractor-static-test.xml";
     }
 
     protected Object getMatchMessage() throws ParserConfigurationException

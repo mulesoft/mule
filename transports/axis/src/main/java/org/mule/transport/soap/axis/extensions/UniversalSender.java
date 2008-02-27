@@ -24,6 +24,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
@@ -89,7 +90,7 @@ public class UniversalSender extends BasicHandler
         ImmutableEndpoint requestEndpoint = (ImmutableEndpoint)call
             .getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
         
-        ImmutableEndpoint endpoint;
+        OutboundEndpoint endpoint;
 
         // put username and password in URI if they are set on the current event
         if (msgContext.getUsername() != null)
@@ -216,7 +217,7 @@ public class UniversalSender extends BasicHandler
                 MuleContext muleContext = MuleServer.getMuleContext();
                 EndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint, muleContext);
                 builder.setRemoteSync(true);
-                ImmutableEndpoint syncEndpoint = muleContext.getRegistry()
+                OutboundEndpoint syncEndpoint = muleContext.getRegistry()
                     .lookupEndpointFactory()
                     .getOutboundEndpoint(builder);
                 MuleEvent dispatchEvent = new DefaultMuleEvent(message, syncEndpoint, session, sync);
@@ -257,22 +258,22 @@ public class UniversalSender extends BasicHandler
 
     }
 
-    protected ImmutableEndpoint lookupEndpoint(String uri) throws MuleException
+    protected OutboundEndpoint lookupEndpoint(String uri) throws MuleException
     {
         Service axis = RegistryContext.getRegistry().lookupService(AxisConnector.AXIS_SERVICE_COMPONENT_NAME);
         EndpointURI endpoint = new MuleEndpointURI(uri);
         MuleContext muleContext = MuleServer.getMuleContext(); 
-        ImmutableEndpoint ep;
+        OutboundEndpoint ep;
 
         if (axis != null)
         {
             synchronized (endpointsCache)
             {
-                ep = (ImmutableEndpoint)endpointsCache.get(endpoint.getAddress());
+                ep = (OutboundEndpoint) endpointsCache.get(endpoint.getAddress());
                 if (ep == null)
                 {
                     updateEndpointCache(axis.getOutboundRouter());
-                    ep = (ImmutableEndpoint)endpointsCache.get(endpoint.getAddress());
+                    ep = (OutboundEndpoint) endpointsCache.get(endpoint.getAddress());
                     if (ep == null)
                     {
                         logger.debug("Dispatch Endpoint uri: " + uri

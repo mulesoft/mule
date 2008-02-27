@@ -13,7 +13,7 @@ package org.mule.transport.ejb;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.Message;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -94,7 +94,7 @@ public class EjbFunctionalTestCase extends FunctionalTestCase
         props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
         builder.setProperties(props);
 
-        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             builder);
         try
         {
@@ -116,7 +116,7 @@ public class EjbFunctionalTestCase extends FunctionalTestCase
         props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
         builder.setProperties(props);
         
-        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             builder);
         
         try

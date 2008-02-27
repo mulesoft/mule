@@ -16,13 +16,14 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.endpoint.DynamicEndpointURIEndpoint;
+import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.TemplateParser;
 
@@ -58,7 +59,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), message, null);
         }
 
-        ImmutableEndpoint ep = getEndpoint(0, message);
+        OutboundEndpoint ep = getEndpoint(0, message);
 
         try
         {
@@ -117,7 +118,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         this.transformers = transformers;
     }
 
-    public void addEndpoint(ImmutableEndpoint endpoint)
+    public void addEndpoint(OutboundEndpoint endpoint)
     {
         if (!useTemplates && parser.isContainsTemplate(endpoint.getEndpointURI().toString()))
         {
@@ -137,16 +138,16 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
      * @throws CouldNotRouteOutboundMessageException if the template causs the
      *             endpoint to become illegal or malformed
      */
-    public ImmutableEndpoint getEndpoint(int index, MuleMessage message)
+    public OutboundEndpoint getEndpoint(int index, MuleMessage message)
         throws CouldNotRouteOutboundMessageException
     {
         if (!useTemplates)
         {
-            return (ImmutableEndpoint) endpoints.get(index);
+            return (OutboundEndpoint) endpoints.get(index);
         }
         else
         {
-            ImmutableEndpoint ep = (ImmutableEndpoint) endpoints.get(index);
+            OutboundEndpoint ep = (OutboundEndpoint) endpoints.get(index);
             String uri = ep.getEndpointURI().toString();
 
             if (logger.isDebugEnabled())
@@ -179,7 +180,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
                         ep.getEndpointURI().getScheme(), newUri.getScheme()), message, ep);
                 }
 
-                return new DynamicEndpointURIEndpoint(ep, newUri);
+                return new DynamicURIOutboundEndpoint(ep, newUri);
             }
             catch (EndpointException e)
             {

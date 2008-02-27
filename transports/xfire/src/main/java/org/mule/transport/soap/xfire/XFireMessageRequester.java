@@ -13,7 +13,7 @@ package org.mule.transport.soap.xfire;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 import org.mule.transport.soap.xfire.transport.MuleUniversalTransport;
 
@@ -36,7 +36,7 @@ public class XFireMessageRequester extends AbstractMessageRequester
     protected Client client = null;
     protected final XFireConnector connector;
 
-    public XFireMessageRequester(ImmutableEndpoint endpoint)
+    public XFireMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (XFireConnector) endpoint.getConnector();

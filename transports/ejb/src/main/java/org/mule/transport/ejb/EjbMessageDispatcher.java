@@ -10,7 +10,7 @@
 
 package org.mule.transport.ejb;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.transport.rmi.RmiMessageDispatcher;
 
 /**
@@ -20,7 +20,7 @@ import org.mule.transport.rmi.RmiMessageDispatcher;
 public class EjbMessageDispatcher extends RmiMessageDispatcher
 {
 
-    public EjbMessageDispatcher(ImmutableEndpoint endpoint)
+    public EjbMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
     }

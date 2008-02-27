@@ -12,11 +12,12 @@ package org.mule.transport;
 
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
-import org.mule.api.MuleException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.ResponseRouterCollection;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -35,7 +36,7 @@ import javax.resource.spi.work.WorkManager;
 public abstract class AbstractMessageDispatcher extends AbstractConnectable implements MessageDispatcher
 {
 
-    public AbstractMessageDispatcher(ImmutableEndpoint endpoint)
+    public AbstractMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
     }

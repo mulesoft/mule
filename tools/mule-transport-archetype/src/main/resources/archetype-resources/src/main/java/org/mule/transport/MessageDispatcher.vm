@@ -13,7 +13,7 @@ package org.mule.transport.${TransportNameLower};
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +27,7 @@ public class ${TransportName}MessageDispatcher extends AbstractMessageDispatcher
     /* For general guidelines on writing transports see
        http://mule.mulesource.org/display/MULE/Writing+Transports */
 
-    public ${TransportName}MessageDispatcher(ImmutableEndpoint endpoint)
+    public ${TransportName}MessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
 

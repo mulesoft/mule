@@ -18,6 +18,8 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.CoreMessages;
 
@@ -33,7 +35,7 @@ public class DefaultEndpointFactory implements EndpointFactory
 
     protected MuleContext muleContext;
     
-    public ImmutableEndpoint getInboundEndpoint(String uri)
+    public InboundEndpoint getInboundEndpoint(String uri)
         throws MuleException
     {
         logger.debug("DefaultEndpointFactory request for inbound endpoint for uri: " + uri);
@@ -46,7 +48,7 @@ public class DefaultEndpointFactory implements EndpointFactory
         return getInboundEndpoint(endpointBuilder);
     }
 
-    public ImmutableEndpoint getOutboundEndpoint(String uri)
+    public OutboundEndpoint getOutboundEndpoint(String uri)
         throws MuleException
     {
         logger.debug("DefaultEndpointFactory request for outbound endpoint for uri: " + uri);
@@ -73,16 +75,16 @@ public class DefaultEndpointFactory implements EndpointFactory
         return endpointBuilder;
     }
 
-    public ImmutableEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException
+    public InboundEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException
     {
         ImmutableEndpoint endpoint = builder.buildInboundEndpoint();
-        return registerEndpoint(endpoint);
+        return (InboundEndpoint) registerEndpoint(endpoint);
     }
 
-    public ImmutableEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException
+    public OutboundEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException
     {
         ImmutableEndpoint endpoint = builder.buildOutboundEndpoint();
-        return registerEndpoint(endpoint);
+        return (OutboundEndpoint) registerEndpoint(endpoint);
     }
 
     /**
@@ -132,9 +134,9 @@ public class DefaultEndpointFactory implements EndpointFactory
         this.muleContext = context;
     }
 
-    public ImmutableEndpoint getInboundEndpoint(EndpointURI uri) throws MuleException
+    public org.mule.api.endpoint.InboundEndpoint getInboundEndpoint(EndpointURI uri) throws MuleException
     {
-        return getEndpoint(uri, new EndpointSource()
+        return (InboundEndpoint) getEndpoint(uri, new EndpointSource()
         {
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
@@ -143,9 +145,9 @@ public class DefaultEndpointFactory implements EndpointFactory
         });
     }
 
-    public ImmutableEndpoint getOutboundEndpoint(EndpointURI uri) throws MuleException
+    public OutboundEndpoint getOutboundEndpoint(EndpointURI uri) throws MuleException
     {
-        return getEndpoint(uri, new EndpointSource()
+        return (OutboundEndpoint) getEndpoint(uri, new EndpointSource()
         {
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {

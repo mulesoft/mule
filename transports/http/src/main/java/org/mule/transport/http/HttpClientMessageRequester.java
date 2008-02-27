@@ -11,7 +11,7 @@
 package org.mule.transport.http;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.ReceiveException;
 import org.mule.transport.AbstractMessageRequester;
@@ -34,7 +34,7 @@ public class HttpClientMessageRequester extends AbstractMessageRequester
     private volatile HttpClient client = null;
     private final Transformer receiveTransformer;
 
-    public HttpClientMessageRequester(ImmutableEndpoint endpoint)
+    public HttpClientMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (HttpConnector) endpoint.getConnector();

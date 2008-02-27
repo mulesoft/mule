@@ -12,7 +12,7 @@ package org.mule.transport.email.connectors;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.InboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.routing.inbound.DefaultInboundRouterCollection;
@@ -21,11 +21,11 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.email.transformers.EmailMessageToString;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * Given an endpoint ({@link #getTestEndpointURI()}) this waits for up to 10 seconds,
@@ -68,7 +68,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         });
 
         Service service = MuleTestUtils.getTestService(uniqueName("testComponent"), FunctionalTestComponent.class, props, muleContext, /*initialize*/false);
-        ImmutableEndpoint ep = 
+        InboundEndpoint ep = 
             muleContext.getRegistry().lookupEndpointFactory()
                 .getInboundEndpoint(getTestEndpointURI());
         InboundRouterCollection inboundRouter = new DefaultInboundRouterCollection();

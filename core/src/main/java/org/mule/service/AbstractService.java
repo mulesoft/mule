@@ -17,6 +17,8 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
@@ -449,11 +451,11 @@ public abstract class AbstractService implements Service
         // in the DefaultMuleSession#dispatchEvent
         ImmutableEndpoint endpoint = event.getEndpoint();
 
-        if (!endpoint.isInbound())
+        if (endpoint instanceof OutboundEndpoint)
         {
             try
             {
-                endpoint.dispatch(event);
+                ((OutboundEndpoint) endpoint).dispatch(event);
             }
             catch (Exception e)
             {
@@ -603,12 +605,12 @@ public abstract class AbstractService implements Service
 
     protected void registerListeners() throws MuleException
     {
-        ImmutableEndpoint endpoint;
+        InboundEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (ImmutableEndpoint) it.next();
+            endpoint = (InboundEndpoint) it.next();
             try
             {
                 endpoint.getConnector().registerListener(this, endpoint);
@@ -627,12 +629,12 @@ public abstract class AbstractService implements Service
 
     protected void unregisterListeners() throws MuleException
     {
-        ImmutableEndpoint endpoint;
+        InboundEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (ImmutableEndpoint) it.next();
+            endpoint = (InboundEndpoint) it.next();
             try
             {
                 endpoint.getConnector().unregisterListener(this, endpoint);
@@ -651,12 +653,12 @@ public abstract class AbstractService implements Service
 
     protected LifecycleTransitionResult startListeners() throws MuleException
     {
-        ImmutableEndpoint endpoint;
+        InboundEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (ImmutableEndpoint) it.next();
+            endpoint = (InboundEndpoint) it.next();
             MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                     endpoint);
             if (receiver != null && endpoint.getConnector().isStarted()
@@ -674,12 +676,12 @@ public abstract class AbstractService implements Service
     // This is not called by anything?!
     protected LifecycleTransitionResult stopListeners() throws MuleException
     {
-        ImmutableEndpoint endpoint;
+        InboundEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (ImmutableEndpoint) it.next();
+            endpoint = (InboundEndpoint) it.next();
             MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                     endpoint);
             if (receiver != null)
@@ -695,12 +697,12 @@ public abstract class AbstractService implements Service
 
     protected void connectListeners() throws MuleException
     {
-        ImmutableEndpoint endpoint;
+        InboundEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (ImmutableEndpoint) it.next();
+            endpoint = (InboundEndpoint) it.next();
             MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                     endpoint);
             if (receiver != null)
@@ -722,12 +724,12 @@ public abstract class AbstractService implements Service
 
     protected void disconnectListeners() throws MuleException
     {
-        ImmutableEndpoint endpoint;
+        InboundEndpoint endpoint;
         List endpoints = getIncomingEndpoints();
 
         for (Iterator it = endpoints.iterator(); it.hasNext();)
         {
-            endpoint = (ImmutableEndpoint) it.next();
+            endpoint = (InboundEndpoint) it.next();
             MessageReceiver receiver = ((AbstractConnector) endpoint.getConnector()).getReceiver(this,
                     endpoint);
             if (receiver != null)

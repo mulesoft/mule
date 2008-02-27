@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.message.DefaultExceptionPayload;
@@ -147,8 +148,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
+        OutboundEndpoint endpoint1 = (OutboundEndpoint) getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
+        OutboundEndpoint endpoint2 = (OutboundEndpoint) getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.addEndpoint(endpoint1);
@@ -181,8 +182,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.addEndpoint(endpoint1);
@@ -214,8 +215,8 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     {
         Mock mockSession = MuleTestUtils.getMockSession();
 
-        ImmutableEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
-        ImmutableEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("TestFailEndpoint", "test://Failure");
+        OutboundEndpoint endpoint2 = getTestOutboundEndpoint("TestSuccessEndpoint", "test://Success");
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         router.addEndpoint(endpoint1);

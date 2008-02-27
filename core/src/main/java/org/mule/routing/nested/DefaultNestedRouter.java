@@ -13,7 +13,7 @@ package org.mule.routing.nested;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.NestedRouter;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.management.stats.RouterStatistics;
@@ -90,7 +90,7 @@ public class DefaultNestedRouter extends AbstractRouter implements NestedRouter
         }
     }
 
-    public void setEndpoint(ImmutableEndpoint e)
+    public void setEndpoint(OutboundEndpoint e)
     {
         outboundRouter = new OutboundPassThroughRouter();
         outboundRouter.addEndpoint(e);
@@ -112,11 +112,11 @@ public class DefaultNestedRouter extends AbstractRouter implements NestedRouter
         return sb.toString();
     }
 
-    public ImmutableEndpoint getEndpoint()
+    public OutboundEndpoint getEndpoint()
     {
         if (outboundRouter != null)
         {
-            return (ImmutableEndpoint) outboundRouter.getEndpoints().get(0);
+            return (OutboundEndpoint) outboundRouter.getEndpoints().get(0);
         }
         else
         {

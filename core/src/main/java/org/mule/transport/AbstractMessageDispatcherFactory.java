@@ -11,7 +11,7 @@
 package org.mule.transport;
 
 import org.mule.api.MuleException;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.util.ClassUtils;
@@ -44,24 +44,24 @@ public abstract class AbstractMessageDispatcherFactory implements MessageDispatc
         return false;
     }
 
-    public abstract MessageDispatcher create(ImmutableEndpoint endpoint) throws MuleException;
+    public abstract MessageDispatcher create(OutboundEndpoint endpoint) throws MuleException;
 
-    public void activate(ImmutableEndpoint endpoint, MessageDispatcher dispatcher) throws MuleException
+    public void activate(OutboundEndpoint endpoint, MessageDispatcher dispatcher) throws MuleException
     {
         dispatcher.activate();
     }
 
-    public void destroy(ImmutableEndpoint endpoint, MessageDispatcher dispatcher)
+    public void destroy(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         dispatcher.dispose();
     }
 
-    public void passivate(ImmutableEndpoint endpoint, MessageDispatcher dispatcher)
+    public void passivate(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         dispatcher.passivate();
     }
 
-    public boolean validate(ImmutableEndpoint endpoint, MessageDispatcher dispatcher)
+    public boolean validate(OutboundEndpoint endpoint, MessageDispatcher dispatcher)
     {
         // Unless dispatchers are to be disposed of after every request, we check if
         // the dispatcher is still valid or has e.g. disposed itself after an

@@ -13,7 +13,7 @@ package org.mule.transport.rmi;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transport.AbstractMessageDispatcher;
 
@@ -32,7 +32,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
     protected volatile Remote remoteObject;
     protected volatile Method invokedMethod;
 
-    public RmiMessageDispatcher(ImmutableEndpoint endpoint)
+    public RmiMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
         this.connector = (RmiConnector)endpoint.getConnector();

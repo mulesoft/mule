@@ -15,11 +15,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.endpoint.DynamicEndpointURIEndpoint;
+import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.util.TemplateParser;
 
@@ -52,7 +53,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
 
         try
         {
-            ImmutableEndpoint ep = (ImmutableEndpoint) endpoints.get(0);
+            OutboundEndpoint ep = (OutboundEndpoint) endpoints.get(0);
             String uri = ep.getEndpointURI().toString();
 
             if (logger.isDebugEnabled())
@@ -86,7 +87,7 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter
                     ep.getEndpointURI().getScheme(), newUri.getScheme()), message, ep);
             }
 
-            ep = new DynamicEndpointURIEndpoint(ep, new MuleEndpointURI(uri));
+            ep = new DynamicURIOutboundEndpoint(ep, new MuleEndpointURI(uri));
 
             if (synchronous)
             {

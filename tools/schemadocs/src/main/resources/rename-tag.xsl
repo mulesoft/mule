@@ -44,6 +44,10 @@
         <xsl:call-template name="copyWithRename"/>
     </xsl:template>
 
+    <xsl:template match="xsd:attributeGroup">
+        <xsl:call-template name="copyWithRename"/>
+    </xsl:template>
+
     <xsl:template match="xsd:sequence">
         <xsl:call-template name="copyWithRename"/>
     </xsl:template>

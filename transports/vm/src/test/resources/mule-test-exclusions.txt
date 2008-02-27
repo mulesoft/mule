@@ -2,10 +2,6 @@
 # Test cases listed in this file are not run.
 #
 
-# MULE-2620
-org.mule.module.xml.functional.BeanPropertyExtractorMultipleEndpointsTestCase
-org.mule.module.xml.functional.BeanPropertyExtractorTestCase
-
 # MULE-2905
 org.mule.transport.vm.functional.VmTransactionTestCase
 

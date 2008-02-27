@@ -13,7 +13,7 @@ package org.mule.api.routing;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 
 import java.util.List;
 
@@ -29,9 +29,9 @@ public interface InboundRouterCollection extends RouterCollection
 
     InboundRouter removeRouter(InboundRouter router);
 
-    void addEndpoint(ImmutableEndpoint endpoint);
+    void addEndpoint(InboundEndpoint endpoint);
 
-    boolean removeEndpoint(ImmutableEndpoint endpoint);
+    boolean removeEndpoint(InboundEndpoint endpoint);
 
     List getEndpoints();
 
@@ -40,7 +40,7 @@ public interface InboundRouterCollection extends RouterCollection
      * @return the Endpoint or null if the endpointUri is not registered
      * @see InboundRouterCollection
      */
-    ImmutableEndpoint getEndpoint(String name);
+    InboundEndpoint getEndpoint(String name);
 
     void setEndpoints(List endpoints);
 }

@@ -13,7 +13,7 @@ package org.mule.api.routing;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transaction.TransactionConfig;
 
 import java.util.List;
@@ -48,7 +48,7 @@ public interface OutboundRouter extends Router
      * 
      * @param endpoint the endpoint to add to the router
      */
-    void addEndpoint(ImmutableEndpoint endpoint);
+    void addEndpoint(OutboundEndpoint endpoint);
 
     /**
      * Removes a specific endpoint from the router
@@ -56,7 +56,7 @@ public interface OutboundRouter extends Router
      * @param endpoint the endpoint to remove
      * @return true if the endpoint was removed
      */
-    boolean removeEndpoint(ImmutableEndpoint endpoint);
+    boolean removeEndpoint(OutboundEndpoint endpoint);
 
     /**
      * This method is responsible for routing the Message via the MuleSession. The logic
@@ -131,6 +131,6 @@ public interface OutboundRouter extends Router
      * @param name the Endpoint identifier
      * @return the Endpoint or null if the endpointUri is not registered
      */
-    public ImmutableEndpoint getEndpoint(String name);
+    public OutboundEndpoint getEndpoint(String name);
 
 }

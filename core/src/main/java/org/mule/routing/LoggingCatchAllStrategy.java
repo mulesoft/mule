@@ -13,7 +13,7 @@ package org.mule.routing;
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 
 import org.apache.commons.logging.Log;
@@ -29,7 +29,7 @@ public class LoggingCatchAllStrategy extends AbstractCatchAllStrategy
 {
     private static final Log logger = LogFactory.getLog(DefaultMuleEvent.class);
 
-    public void setEndpoint(ImmutableEndpoint endpoint)
+    public void setEndpoint(OutboundEndpoint endpoint)
     {
         throw new UnsupportedOperationException("An endpoint cannot be set on this Catch All strategy");
     }
@@ -39,7 +39,7 @@ public class LoggingCatchAllStrategy extends AbstractCatchAllStrategy
         throw new UnsupportedOperationException("An endpoint cannot be set on this Catch All strategy");
     }
 
-    public ImmutableEndpoint getEndpoint()
+    public OutboundEndpoint getEndpoint()
     {
         return null;
     }

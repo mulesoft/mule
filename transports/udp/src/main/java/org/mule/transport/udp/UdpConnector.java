@@ -12,6 +12,7 @@ package org.mule.transport.udp;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.transport.AbstractConnector;
@@ -181,7 +182,7 @@ public class UdpConnector extends AbstractConnector
     }
 
 
-    protected Object getReceiverKey(Service service, ImmutableEndpoint endpoint)
+    protected Object getReceiverKey(Service service, InboundEndpoint endpoint)
     {
         return endpoint.getEndpointURI().getAddress() + "/" + service.getName();
     }

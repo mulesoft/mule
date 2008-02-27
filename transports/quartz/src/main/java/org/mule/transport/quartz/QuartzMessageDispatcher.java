@@ -13,7 +13,7 @@ package org.mule.transport.quartz;
 import org.mule.RegistryContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.quartz.i18n.QuartzMessages;
@@ -39,7 +39,7 @@ import org.quartz.Trigger;
 public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 {
 
-    public QuartzMessageDispatcher(ImmutableEndpoint endpoint)
+    public QuartzMessageDispatcher(OutboundEndpoint endpoint)
     {
         super(endpoint);
     }

@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.AbstractMessageRequester;
 
 import javax.mail.Flags;
@@ -34,7 +34,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
 {
     private Folder folder;
 
-    public RetrieveMessageRequester(ImmutableEndpoint endpoint)
+    public RetrieveMessageRequester(InboundEndpoint endpoint)
     {
         super(endpoint);
     }
