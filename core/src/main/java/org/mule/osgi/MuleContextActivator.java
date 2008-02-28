@@ -14,8 +14,12 @@ import org.mule.api.MuleContext;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.OsgiMuleContextBuilder;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
 /**
@@ -32,7 +36,12 @@ public class MuleContextActivator implements BundleActivator
         // TODO Get MuleStartupTestCase.testProgrammaticDefaultsThenStartThenSpringXml() working before we can enable this.
         //muleContext.start();
 
-        muleContextRef = bc.registerService(MuleContext.class.getName(), muleContext, null);
+        Dictionary headers = bc.getBundle().getHeaders();
+        Hashtable osgiProps = new Hashtable();
+        osgiProps.put(Constants.SERVICE_PID, headers.get(Constants.BUNDLE_SYMBOLICNAME) + "." + muleContext.getConfiguration().getId());
+        osgiProps.put(Constants.SERVICE_DESCRIPTION, headers.get(Constants.BUNDLE_DESCRIPTION));
+        osgiProps.put(Constants.SERVICE_VENDOR, headers.get(Constants.BUNDLE_VENDOR));
+        muleContextRef = bc.registerService(MuleContext.class.getName(), muleContext, osgiProps);
     }
 
     public void stop(BundleContext bc) throws Exception 
