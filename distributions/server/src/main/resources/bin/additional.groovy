@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: additional.groovy 298 2008-01-31 00:42:47Z andrew $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -77,7 +77,9 @@ if (debugEnabled || profileEnabled || adHocOptionsAvailable) {
 */
 def void writeAdHocProps(Writer w) {
     args.findAll { it.startsWith('-M') }.each { arg ->
-        w << "wrapper.java.additional.${paramIndex++}=${arg.replaceFirst("^-M", "")}\n"
+        w << "wrapper.java.additional.${paramIndex}=\"${arg.replaceFirst("^-M", "")}\"\n"
+        w << "wrapper.java.additional.${paramIndex}.stripquotes=TRUE\n"
+        paramIndex++
     }
 }
 
