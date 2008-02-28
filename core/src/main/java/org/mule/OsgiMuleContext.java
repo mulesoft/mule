@@ -10,7 +10,10 @@
 package org.mule;
 
 import org.mule.api.lifecycle.LifecycleManager;
+import org.mule.api.registry.MuleRegistry;
+import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
+import org.mule.registry.MuleOsgiRegistryHelper;
 import org.mule.registry.OsgiRegistryBroker;
 
 import org.osgi.framework.BundleContext;
@@ -35,5 +38,10 @@ public class OsgiMuleContext extends DefaultMuleContext
     protected RegistryBroker createRegistryBroker()
     {
         return new OsgiRegistryBroker(bundleContext);
+    }
+    
+    protected MuleRegistry createRegistryHelper(Registry registry)
+    {
+        return new MuleOsgiRegistryHelper(registry, bundleContext);
     }
 }

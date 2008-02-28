@@ -36,6 +36,8 @@ import java.util.Properties;
  */
 public interface TransportServiceDescriptor extends ServiceDescriptor
 {
+    public static final String OSGI_HEADER_TRANSPORT = "Mule-Transport";
+        
     public MessageAdapter createMessageAdapter(Object message) throws TransportServiceException;
 
     public SessionHandler createSessionHandler() throws TransportServiceException;

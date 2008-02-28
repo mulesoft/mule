@@ -24,6 +24,7 @@ import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.lifecycle.LifecycleTransitionResult;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
@@ -56,7 +57,7 @@ public class DefaultMuleContext implements MuleContext
     private RegistryBroker registryBroker;
 
     /** Simplified Mule configuration interface */
-    private MuleRegistryHelper muleRegistry;
+    private MuleRegistry muleRegistryHelper;
     
     /** stats used for management */
     private AllStatistics stats = new AllStatistics();
@@ -89,6 +90,11 @@ public class DefaultMuleContext implements MuleContext
         return new DefaultRegistryBroker();
     }
     
+    protected MuleRegistry createRegistryHelper(Registry registry)
+    {
+        return new MuleRegistryHelper(registry);
+    }
+    
     public LifecycleTransitionResult initialise() throws InitialisationException
     {
         lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
@@ -106,7 +112,7 @@ public class DefaultMuleContext implements MuleContext
         try
         {
             registryBroker = createRegistryBroker();
-            muleRegistry = new MuleRegistryHelper(registryBroker);
+            muleRegistryHelper = createRegistryHelper(registryBroker);
             
             // Initialize internal registries
             registryBroker.initialise();
@@ -554,9 +560,9 @@ public class DefaultMuleContext implements MuleContext
         this.lifecycleManager = lifecycleManager;
     }
 
-    public MuleRegistryHelper getRegistry()
+    public MuleRegistry getRegistry()
     {
-        return muleRegistry;
+        return muleRegistryHelper;
     }
 
     /**

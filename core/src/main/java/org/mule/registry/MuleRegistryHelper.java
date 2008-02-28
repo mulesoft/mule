@@ -55,6 +55,9 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Adds lookup/register/unregister methods for Mule-specific entities to the standard
  * Registry interface.
+ * 
+ * TODO MULE-2228 "Java-based configuration mechanism for Mule 2.0" will extend/build 
+ * upon this interface.
  */
 public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposable
 {

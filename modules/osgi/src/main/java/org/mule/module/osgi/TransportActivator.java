@@ -24,24 +24,26 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Properties;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
+import org.springframework.osgi.util.BundleDelegatingClassLoader;
 
 
 public class TransportActivator implements BundleActivator {
     
-    public static final String OSGI_HEADER_TRANSPORTS = "Mule-Transports";
-    
     private ServiceRegistration descriptorRef;
     
     public void start(BundleContext bc) throws Exception {
-        Dictionary headers = bc.getBundle().getHeaders();
+        Bundle bundle = bc.getBundle();
+        ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
+        Dictionary headers = bundle.getHeaders();
         
         // The transport(s) should have been declared as a manifest header, e.g.:
         //   Mule-Transports: http, https, servlet
-        String transportHeader = (String) headers.get(OSGI_HEADER_TRANSPORTS);
+        String transportHeader = (String) headers.get(TransportServiceDescriptor.OSGI_HEADER_TRANSPORT);
         if (transportHeader == null)
         {
             throw new ConfigurationException(MessageFactory.createStaticMessage("Transport must declare its protocol(s) as an OSGi header."));
@@ -54,21 +56,23 @@ public class TransportActivator implements BundleActivator {
             transport = transports[i];
             // Look up the service descriptor file (e.g., "tcp.properties")
             String descriptorPath = "/" + SpiUtils.SERVICE_ROOT + SpiUtils.PROVIDER_SERVICE_PATH + transport + ".properties";
-            URL descriptorUrl = bc.getBundle().getEntry(descriptorPath);
+            URL descriptorUrl = bundle.getEntry(descriptorPath);
             if (descriptorUrl == null)
             {
                 throw new ConfigurationException(MessageFactory.createStaticMessage("Unable to locate service descriptor file: " + descriptorPath));
             }
             Properties props = new Properties();
             props.load(descriptorUrl.openStream());
+            // TODO Pass in the bundleClassLoader as a parameter to the ServiceDescriptor/ServiceDescriptorFactory
             ServiceDescriptor descriptor = 
-                ServiceDescriptorFactory.create(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, transport, props, null, MuleServer.getMuleContext().getRegistry());
+                ServiceDescriptorFactory.create(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, transport, props, null, MuleServer.getMuleContext().getRegistry());            
     
             // Register the ServiceDescriptor as an OSGi Service.
             Hashtable osgiProps = new Hashtable();
             osgiProps.put(Constants.SERVICE_PID, headers.get(Constants.BUNDLE_SYMBOLICNAME) + "." + transport);
             osgiProps.put(Constants.SERVICE_DESCRIPTION, headers.get(Constants.BUNDLE_DESCRIPTION));
             osgiProps.put(Constants.SERVICE_VENDOR, headers.get(Constants.BUNDLE_VENDOR));
+            osgiProps.put(TransportServiceDescriptor.OSGI_HEADER_TRANSPORT, transport);
             descriptorRef = bc.registerService(TransportServiceDescriptor.class.getName(), descriptor, osgiProps);    
         }
     }
