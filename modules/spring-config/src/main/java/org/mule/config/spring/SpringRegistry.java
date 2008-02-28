@@ -10,32 +10,19 @@
 
 package org.mule.config.spring;
 
-import org.mule.api.agent.Agent;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.api.model.Model;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.registry.ServiceDescriptor;
-import org.mule.api.registry.ServiceDescriptorFactory;
-import org.mule.api.registry.ServiceException;
-import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.Connector;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.GenericLifecycleManager;
 import org.mule.registry.AbstractRegistry;
-import org.mule.util.SpiUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Properties;
-
-import javax.transaction.TransactionManager;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -126,58 +113,6 @@ public class SpringRegistry extends AbstractRegistry
         //    MapUtils.debugPrint(System.out, "Beans of type " + type, map);
         //}
         return map.values();
-    }
-
-    public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides)
-            throws ServiceException
-    {
-        Properties props = SpiUtils.findServiceDescriptor(type, name);
-        if (props == null)
-        {
-            throw new ServiceException(CoreMessages.failedToLoad(type + " " + name));
-        }
-        return ServiceDescriptorFactory.create(type, name, props, overrides, this);
-    }
-
-    /** {@inheritDoc} */
-    public TransactionManager getTransactionManager()
-    {
-        try
-        {
-            return (TransactionManager) lookupObject(TransactionManager.class);
-        }
-        catch (RegistrationException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Collection getModels()
-    {
-        return applicationContext.getBeansOfType(Model.class).values();
-    }
-
-    /** {@inheritDoc} */
-    public Collection getConnectors()
-    {
-        return applicationContext.getBeansOfType(Connector.class).values();
-    }
-
-    public Collection getAgents()
-    {
-        return applicationContext.getBeansOfType(Agent.class).values();
-    }
-
-    /** {@inheritDoc} */
-    public Collection getEndpoints()
-    {
-        return applicationContext.getBeansOfType(ImmutableEndpoint.class).values();
-    }
-
-    /** {@inheritDoc} */
-    public Collection getTransformers()
-    {
-        return applicationContext.getBeansOfType(Transformer.class).values();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
