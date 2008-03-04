@@ -12,6 +12,7 @@ package org.mule.module.osgi;
 
 import org.mule.api.MuleContext;
 import org.mule.config.spring.MuleOsgiApplicationContext;
+import org.mule.config.spring.SpringRegistry;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -30,7 +31,11 @@ public class MuleContextLoaderListener extends ContextLoaderListener
         
         DelegatedExecutionOsgiBundleApplicationContext sdoac = new MuleOsgiApplicationContext(locations, muleContext, bundleContext);
         postProcessContext(sdoac);
+        
+        // Note: The SpringRegistry must be created before applicationContext.refresh() gets called because
+        // some beans may try to look up other beans via the Registry during preInstantiateSingletons().
+        muleContext.addRegistry(new SpringRegistry(sdoac));
+
         return sdoac;
     }
-
 }

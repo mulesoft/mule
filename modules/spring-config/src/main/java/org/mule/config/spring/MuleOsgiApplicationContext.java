@@ -11,6 +11,7 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.transport.Connector;
 import org.mule.config.factories.HostNameFactory;
 import org.mule.config.spring.editors.ConnectorPropertyEditor;
@@ -85,5 +86,24 @@ public class MuleOsgiApplicationContext extends OsgiBundleXmlApplicationContext
         beanDefinitionReader.setDocumentReaderClass(MuleBeanDefinitionDocumentReader.class);
         // Add error reporting
         beanDefinitionReader.setProblemReporter(new MissingParserProblemReporter());
+    }
+
+    //@Override
+    protected void finishRefresh()
+    {
+        super.finishRefresh();
+        
+        // TODO The MuleContext should have already been started by the Mule Core bundle.
+        if (!muleContext.isStarted())
+        {
+            try
+            {
+                muleContext.start();
+            }
+            catch (MuleException e)
+            {
+                throw new RuntimeException("Unable to start MuleContext", e);
+            }
+        }
     }
 }
