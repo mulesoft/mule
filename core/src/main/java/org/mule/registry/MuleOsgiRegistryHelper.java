@@ -33,16 +33,33 @@ public class MuleOsgiRegistryHelper extends MuleRegistryHelper
         this.bundleContext = bundleContext;
     }
     
-    /** Looks up the service descriptor from a singleton cache and creates a new one if not found. */
     public ServiceDescriptor lookupServiceDescriptor(String type, String name, Properties overrides) throws ServiceException
     {
         if (ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE.equals(type))
         {
-            ServiceReference[] transportRefs;
+            ServiceReference[] transportRefs = null;
             String filter = "(" + TransportServiceDescriptor.OSGI_HEADER_TRANSPORT + "=" + name + ")";
             try
             {
-                transportRefs = bundleContext.getServiceReferences(TransportServiceDescriptor.class.getName(), filter);
+                //transportRefs = bundleContext.getServiceReferences(TransportServiceDescriptor.class.getName(), filter);
+
+                // TODO The following block of code should all be replaced by the line above if the filter had
+                // the correct syntax.
+                ServiceReference[] refs = bundleContext.getServiceReferences(TransportServiceDescriptor.class.getName(), null);
+                int nRefs = refs.length;
+                logger.debug("Searching for transport = " + name + ", " + nRefs + " TransportServiceDescriptor(s) found");
+                String transport;
+                for (int i=0; i < nRefs; ++i)
+                {
+                    transport = (String) refs[i].getProperty(TransportServiceDescriptor.OSGI_HEADER_TRANSPORT);
+                    logger.debug("transport = " + transport);
+                    if (name.equals(transport))
+                    {
+                        transportRefs = new ServiceReference[1];
+                        transportRefs[0] = refs[i];
+                        break;
+                    }
+                }
             }
             catch (InvalidSyntaxException e)
             {
