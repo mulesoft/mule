@@ -136,6 +136,7 @@
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
                 <version>${geronimoSpecsVersion}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -156,6 +157,7 @@
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
                 <version>${geronimoSpecsVersion}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
