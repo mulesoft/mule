@@ -274,6 +274,15 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         return clazz;
     }
 
+    /**
+     * Load a class with a given name from the given classloader.
+     */
+    public static Class loadClass(final String className, final ClassLoader classLoader)
+    throws ClassNotFoundException
+    {
+        return classLoader.loadClass(className);
+    }
+
     /** Prints the current classloader hierarchy - useful for debugging. */
     public static void printClassLoader()
     {
@@ -367,9 +376,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
             InstantiationException, IllegalAccessException, InvocationTargetException
     {
-        Class clazz = loadClass(name, ClassUtils.class);
-        return instanciateClass(clazz, constructorArgs);
-
+        return instanciateClass(name, constructorArgs, (ClassLoader) null);
     }
 
     public static Object instanciateClass(String name, Object[] constructorArgs, Class callingClass)
@@ -377,6 +384,26 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
             InstantiationException, IllegalAccessException, InvocationTargetException
     {
         Class clazz = loadClass(name, callingClass);
+        return instanciateClass(clazz, constructorArgs);
+    }
+
+    public static Object instanciateClass(String name, Object[] constructorArgs, ClassLoader classLoader)
+        throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException,
+        InstantiationException, IllegalAccessException, InvocationTargetException
+    {
+        Class clazz;
+        if (classLoader != null)
+        {
+            clazz = loadClass(name, classLoader);
+        }
+        else
+        {
+            clazz = loadClass(name, ClassUtils.class);
+        }
+        if (clazz == null)
+        {
+            throw new ClassNotFoundException(name);
+        }
         return instanciateClass(clazz, constructorArgs);
     }
 

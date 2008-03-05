@@ -11,6 +11,7 @@
 package org.mule.module.osgi;
 
 import org.mule.MuleServer;
+import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceDescriptorFactory;
@@ -38,8 +39,12 @@ public class TransportActivator implements BundleActivator {
     
     public void start(BundleContext bc) throws Exception {
         Bundle bundle = bc.getBundle();
-        ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle);
         Dictionary headers = bundle.getHeaders();
+
+        // We use the transport's bundle classloader first, and mule-core's bundle classloader as a backup.  
+        // TODO This works in most cases, but if the transport service descriptor refers to a class which is neither
+        // in the transport itself nor mule-core, we'll get a ClassNotFound exception.
+        ClassLoader bundleClassLoader = BundleDelegatingClassLoader.createBundleClassLoaderFor(bundle, MuleContext.class.getClassLoader());
         
         // The transport(s) should have been declared as a manifest header, e.g.:
         //   Mule-Transports: http, https, servlet
@@ -63,9 +68,8 @@ public class TransportActivator implements BundleActivator {
             }
             Properties props = new Properties();
             props.load(descriptorUrl.openStream());
-            // TODO Pass in the bundleClassLoader as a parameter to the ServiceDescriptor/ServiceDescriptorFactory
             ServiceDescriptor descriptor = 
-                ServiceDescriptorFactory.create(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, transport, props, null, MuleServer.getMuleContext().getRegistry());            
+                ServiceDescriptorFactory.create(ServiceDescriptorFactory.PROVIDER_SERVICE_TYPE, transport, props, null, MuleServer.getMuleContext().getRegistry(), bundleClassLoader);            
     
             // Register the ServiceDescriptor as an OSGi Service.
             Hashtable osgiProps = new Hashtable();

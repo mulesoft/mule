@@ -472,7 +472,7 @@ public class MuleRegistryHelper implements MuleRegistry, Initialisable, Disposab
         {
             throw new ServiceException(CoreMessages.failedToLoad(type + " " + name));
         }
-        return ServiceDescriptorFactory.create(type, name, props, overrides, registry);
+        return ServiceDescriptorFactory.create(type, name, props, overrides, registry, null);
     }
 
     //@java.lang.Override

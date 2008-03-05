@@ -62,7 +62,9 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
     private Properties exceptionMappings = new Properties();
 
-    public DefaultTransportServiceDescriptor(String service, Properties props, Registry registry)
+    private ClassLoader classLoader;
+    
+    public DefaultTransportServiceDescriptor(String service, Properties props, Registry registry, ClassLoader classLoader)
     {
         super(service);
 
@@ -88,6 +90,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 //        {
 //            e.printStackTrace();
 //        }
+        this.classLoader = classLoader;
     }
 
 
@@ -155,7 +158,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         {
             try
             {
-                return (MessageAdapter) ClassUtils.instanciateClass(clazz, new Object[]{message});
+                return (MessageAdapter) ClassUtils.instanciateClass(clazz, new Object[]{message}, classLoader);
             }
             catch (Exception e)
             {
@@ -184,8 +187,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         try
         {
-            return (SessionHandler) ClassUtils.instanciateClass(sessionHandler, ClassUtils.NO_ARGS,
-                    getClass());
+            return (SessionHandler) ClassUtils.instanciateClass(sessionHandler, ClassUtils.NO_ARGS, classLoader);
         }
         catch (Throwable e)
         {
@@ -253,7 +255,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
             try
             {
-                return (MessageReceiver) ClassUtils.instanciateClass(receiverClass, newArgs);
+                return (MessageReceiver) ClassUtils.instanciateClass(receiverClass, newArgs, classLoader);
             }
             catch (Exception e)
             {
@@ -277,7 +279,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             try
             {
                 return (MessageDispatcherFactory) ClassUtils.instanciateClass(dispatcherFactory,
-                        ClassUtils.NO_ARGS);
+                        ClassUtils.NO_ARGS, classLoader);
             }
             catch (Exception e)
             {
@@ -301,7 +303,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             try
             {
                 return (MessageRequesterFactory) ClassUtils.instanciateClass(requesterFactory,
-                        ClassUtils.NO_ARGS);
+                        ClassUtils.NO_ARGS, classLoader);
             }
             catch (Exception e)
             {
@@ -326,7 +328,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             try
             {
                 return (TransactionFactory) ClassUtils.instanciateClass(transactionFactory,
-                        ClassUtils.NO_ARGS);
+                        ClassUtils.NO_ARGS, classLoader);
             }
             catch (Exception e)
             {
@@ -350,7 +352,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         {
             if (connector != null)
             {
-                newConnector = (Connector) ClassUtils.loadClass(connector, TransportFactory.class)
+                newConnector = (Connector) ClassUtils.loadClass(connector, classLoader)
                         .newInstance();
             }
             else
@@ -389,7 +391,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             try
             {
                 inboundTransformer = (Transformer) ClassUtils.instanciateClass(
-                        defaultInboundTransformer, ClassUtils.NO_ARGS);
+                        defaultInboundTransformer, ClassUtils.NO_ARGS, classLoader);
                 return CollectionUtils.singletonList(inboundTransformer);
             }
             catch (Exception e)
@@ -415,7 +417,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             try
             {
                 outboundTransformer = (Transformer) ClassUtils.instanciateClass(
-                        defaultOutboundTransformer, ClassUtils.NO_ARGS);
+                        defaultOutboundTransformer, ClassUtils.NO_ARGS, classLoader);
                 return CollectionUtils.singletonList(outboundTransformer);
             }
             catch (Exception e)
@@ -441,7 +443,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             try
             {
                 responseTransformer = (Transformer) ClassUtils.instanciateClass(
-                        defaultResponseTransformer, ClassUtils.NO_ARGS);
+                        defaultResponseTransformer, ClassUtils.NO_ARGS, classLoader);
                 return CollectionUtils.singletonList(responseTransformer);
             }
             catch (Exception e)
@@ -468,7 +470,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             logger.debug("Loading endpointUri resolver: " + endpointBuilder);
             try
             {
-                return (EndpointURIBuilder) ClassUtils.instanciateClass(endpointBuilder, ClassUtils.NO_ARGS);
+                return (EndpointURIBuilder) ClassUtils.instanciateClass(endpointBuilder, ClassUtils.NO_ARGS, classLoader);
             }
             catch (Exception e)
             {

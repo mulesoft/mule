@@ -37,9 +37,8 @@ public class ServiceDescriptorFactory
     /**
      * Factory method to create a new service descriptor.
      */
-    public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides, Registry registry) throws ServiceException
+    public static ServiceDescriptor create(String type, String name, Properties props, Properties overrides, Registry registry, ClassLoader classLoader) throws ServiceException
     {       
-
         if (overrides != null)
         {
             props.putAll(overrides);
@@ -52,7 +51,7 @@ public class ServiceDescriptorFactory
         {
             try
             {
-                sd = new DefaultTransportServiceDescriptor(name, props, registry);
+                sd = new DefaultTransportServiceDescriptor(name, props, registry, classLoader);
             }
             catch (Exception e)
             {
