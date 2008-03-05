@@ -442,8 +442,10 @@ Disable temporarily to speed up build cycle during development
         <!-- PAX Logging -->
         <include>org.ops4j.pax.logging:pax-logging-api</include>
         <include>org.ops4j.pax.logging:pax-logging-service</include> 
-        <!-- Concurrency lib -->
+        <!-- Re-packaged by Mule for OSGi -->
         <include>backport-util-concurrent:backport-util-concurrent.osgi</include> 
+        <include>org.apache.geronimo.specs:geronimo-j2ee-connector.osgi</include> 
+        <include>org.apache.geronimo.specs:geronimo-jta.osgi</include> 
       </includes>
       <!-- no XML -->
       <excludes>
