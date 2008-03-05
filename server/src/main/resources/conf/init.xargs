@@ -96,6 +96,8 @@
 
 # Re-packaged by Mule for OSGi
 -istart opt/backport-util-concurrent.osgi.jar
+-istart opt/geronimo-j2ee-connector.osgi.jar
+-istart opt/geronimo-jta.osgi.jar
 
 #############################################################
 # Mule
